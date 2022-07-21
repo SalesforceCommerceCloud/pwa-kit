@@ -54,16 +54,66 @@ export type ShopperSearchInstance = ShopperSearch<
 >
 
 export interface ApiClients {
-    shopperBaskets: ShopperBasketsInstance
-    shopperContexts: ShopperContextsInstance
-    shopperCustomers: ShopperCustomersInstance
-    shopperDiscoverySearch: ShopperDiscoverySearchInstance
-    shopperGiftCertificates: ShopperGiftCertificatesInstance
-    shopperLogin: ShopperLoginInstance
-    shopperOrders: ShopperOrdersInstance
-    shopperProducts: ShopperProductsInstance
-    shopperPromotions: ShopperPromotionsInstance
-    shopperSearch: ShopperSearchInstance
+    shopperBaskets: ShopperBaskets<{
+        clientId: string
+        organizationId: string
+        shortCode: string
+        siteId: string
+    }>
+    shopperContexts: ShopperContexts<{
+        clientId: string
+        organizationId: string
+        shortCode: string
+        siteId: string
+    }>
+    shopperCustomers: ShopperCustomers<{
+        clientId: string
+        organizationId: string
+        shortCode: string
+        siteId: string
+    }>
+    shopperDiscoverySearch: ShopperDiscoverySearch<{
+        clientId: string
+        organizationId: string
+        shortCode: string
+        siteId: string
+    }>
+    shopperGiftCertificates: ShopperGiftCertificates<{
+        clientId: string
+        organizationId: string
+        shortCode: string
+        siteId: string
+    }>
+    shopperLogin: ShopperLogin<{
+        clientId: string
+        organizationId: string
+        shortCode: string
+        siteId: string
+    }>
+    shopperOrders: ShopperOrders<{
+        clientId: string
+        organizationId: string
+        shortCode: string
+        siteId: string
+    }>
+    shopperProducts: ShopperProducts<{
+        clientId: string
+        organizationId: string
+        shortCode: string
+        siteId: string
+    }>
+    shopperPromotions: ShopperPromotions<{
+        clientId: string
+        organizationId: string
+        shortCode: string
+        siteId: string
+    }>
+    shopperSearch: ShopperSearch<{
+        clientId: string
+        organizationId: string
+        shortCode: string
+        siteId: string
+    }>
 }
 
 export interface CommonHookResponse {
