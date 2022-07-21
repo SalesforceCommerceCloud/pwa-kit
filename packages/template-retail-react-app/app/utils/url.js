@@ -8,7 +8,7 @@
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getLocaleByReference, getParamsFromPath} from './utils'
 import {getDefaultSite, getSites} from './site-utils'
-import {HOME_HREF} from '../constants'
+import {HOME_HREF, urlPartPositions} from '../constants'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
@@ -163,7 +163,6 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     return newUrl
 }
 
-//TODO: Clean up and merge cases
 //TODO: Add option disallowParams: ['refine']
 export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
@@ -178,84 +177,41 @@ export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
     const isDefaultSite = defaultSite === siteUrl
     const isDefaultLocale = defaultLocale === localeUrl
 
-    //TODO: Clean unused variables
-    /* eslint-disable no-unused-vars */
-    /* eslint-disable no-unreachable */
+    const querySite =
+        (siteConfig === urlPartPositions.QUERY_PARAM && showDefaultsConfig) ||
+        (siteConfig === urlPartPositions.QUERY_PARAM && !showDefaultsConfig && !isDefaultSite)
+    const queryLocale =
+        (localeConfig === urlPartPositions.QUERY_PARAM && showDefaultsConfig) ||
+        (localeConfig === urlPartPositions.QUERY_PARAM && !showDefaultsConfig && !isDefaultLocale)
 
-    switch (true) {
-        // showDefaultsConfig
-        case siteConfig === 'path' && localeConfig === 'path' && showDefaultsConfig:
-            return (href, site, locale) =>
-                `${site ? `/${site}` : ''}${locale ? `/${locale}` : ''}${href}`
-            break
-        case siteConfig === 'path' && localeConfig === 'query_param' && showDefaultsConfig:
-            return (href, site, locale) => `/${site}${href}?locale=${locale}`
-            break
-        case siteConfig === 'path' && localeConfig === 'none' && showDefaultsConfig:
-            return (href, site, locale) => `/${site}${href}`
-            break
-        case siteConfig === 'query_param' && localeConfig === 'path' && showDefaultsConfig:
-            return (href, site, locale) => `/${locale}${href}?site=${site}`
-            break
-        case siteConfig === 'query_param' && localeConfig === 'query_param' && showDefaultsConfig:
-            return (href, site, locale) => `/${href}?site=${site}&locale=${locale}`
-            break
-        case siteConfig === 'query_param' && localeConfig === 'none' && showDefaultsConfig:
-            return (href, site, locale) => `/${href}?site=${site}`
-            break
-        case siteConfig === 'none' && localeConfig === 'path' && showDefaultsConfig:
-            return (href, site, locale) => `/${locale}${href}`
-            break
-        case siteConfig === 'none' && localeConfig === 'query_param' && showDefaultsConfig:
-            return (href, site, locale) => `/${href}?locale=${locale}`
-            break
-        // !showDefaultsConfig
-        case siteConfig === 'path' && localeConfig === 'path' && !showDefaultsConfig:
-            if (!isDefaultLocale && !isDefaultSite)
-                return (href, site, locale) => `/${site}/${locale}${href}`
-            if (!isDefaultLocale && isDefaultSite)
-                return (href, site, locale) => `/${locale}${href}`
-            if (isDefaultLocale && !isDefaultSite) return (href, site, locale) => `/${site}${href}`
-            break
-        case siteConfig === 'path' && localeConfig === 'query_param' && !showDefaultsConfig:
-            if (!isDefaultLocale && !isDefaultSite)
-                return (href, site, locale) => `/${site}${href}?locale=${locale}`
-            if (!isDefaultLocale && isDefaultSite)
-                return (href, site, locale) => `/${href}?locale=${locale}`
-            if (isDefaultLocale && !isDefaultSite) return (href, site, locale) => `/${site}${href}`
-            break
-        case siteConfig === 'path' && localeConfig === 'none' && !showDefaultsConfig:
-            if (!isDefaultSite) return (href, site, locale) => `/${site}${href}`
-            break
-        case siteConfig === 'query_param' && localeConfig === 'path' && !showDefaultsConfig:
-            if (!defaultLocale && !defaultSite)
-                return (href, site, locale) => `/${locale}${href}?site=${site}`
-            if (!defaultLocale && defaultSite) return (href, site, locale) => `/${locale}${href}`
-            if (defaultLocale && !defaultSite)
-                return (href, site, locale) => `/${href}?site=${site}`
-            break
-        case siteConfig === 'query_param' && localeConfig === 'query_param' && !showDefaultsConfig:
-            if (!defaultLocale && !defaultSite)
-                return (href, site, locale) => `/${href}?site=${site}&locale=${locale}`
-            if (!defaultLocale && defaultSite)
-                return (href, site, locale) => `/${href}?locale=${locale}`
-            if (defaultLocale && !defaultSite)
-                return (href, site, locale) => `/${href}?site=${site}`
-            break
-        case siteConfig === 'query_param' && localeConfig === 'none' && !showDefaultsConfig:
-            if (!defaultSite) return (href, site, locale) => `/${href}?site=${site}`
-            break
-        case siteConfig === 'none' && localeConfig === 'path' && !showDefaultsConfig:
-            if ((!defaultLocale && !defaultSite) || (!defaultLocale && defaultSite))
-                return (href, site, locale) => `/${locale}${href}`
-            break
-        case siteConfig === 'none' && localeConfig === 'query_param' && !showDefaultsConfig:
-            if ((!defaultLocale && !defaultSite) || (!defaultLocale && defaultSite))
-                return (href, site, locale) => `/${href}?locale=${locale}`
-            break
-        default:
-            return (href) => `${href ? `/${href}` : ''}`
+    const isQuery = querySite || queryLocale
+    const isQuerySiteAndLocale = querySite && queryLocale
+
+    const pathSite =
+        (siteConfig === urlPartPositions.PATH && showDefaultsConfig) ||
+        (siteConfig === urlPartPositions.PATH && !showDefaultsConfig && !isDefaultSite)
+    const pathLocale =
+        (localeConfig === urlPartPositions.PATH && showDefaultsConfig) ||
+        (localeConfig === urlPartPositions.PATH && !showDefaultsConfig && !isDefaultLocale)
+
+    const isPathSiteAndLocale = pathSite && pathLocale
+
+    const templateConfig = {
+        pathSite: pathSite,
+        pathLocale: pathLocale,
+        isPathSiteAndLocale: isPathSiteAndLocale,
+        isQuery: isQuery,
+        isQuerySiteAndLocale: isQuerySiteAndLocale,
+        querySite: querySite,
+        queryLocale: queryLocale
     }
+
+    return (href, site, locale, c = templateConfig) =>
+        `${c.pathSite && site ? `/${site}` : ''}${c.pathLocale && locale ? `/${locale}` : ''}` +
+        `${href}` +
+        `${c.isQuery && (site || locale) ? '?' : ''}${c.querySite && site ? `site=${site}` : ''}${
+            c.isQuerySiteAndLocale && locale ? '&' : ''
+        }${c.queryLocale && locale ? `locale=${locale}` : ''}`
 }
 
 /**
