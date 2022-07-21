@@ -7,7 +7,7 @@ You can use the template as a starting point to:
 
 -   Build simple Express apps.
 -   Develop APIs.
--   Add support for running different frameworks (other than React) on Managed Runtime.
+-   Run different frameworks (other than React) on Managed Runtime.
 
 ## Setup and run
 
