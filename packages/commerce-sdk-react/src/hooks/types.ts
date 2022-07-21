@@ -53,69 +53,6 @@ export type ShopperSearchInstance = ShopperSearch<
     ShopperSearchTypes.ShopperSearchParameters & Record<string, unknown>
 >
 
-export interface ApiClients {
-    shopperBaskets: ShopperBaskets<{
-        clientId: string
-        organizationId: string
-        shortCode: string
-        siteId: string
-    }>
-    shopperContexts: ShopperContexts<{
-        clientId: string
-        organizationId: string
-        shortCode: string
-        siteId: string
-    }>
-    shopperCustomers: ShopperCustomers<{
-        clientId: string
-        organizationId: string
-        shortCode: string
-        siteId: string
-    }>
-    shopperDiscoverySearch: ShopperDiscoverySearch<{
-        clientId: string
-        organizationId: string
-        shortCode: string
-        siteId: string
-    }>
-    shopperGiftCertificates: ShopperGiftCertificates<{
-        clientId: string
-        organizationId: string
-        shortCode: string
-        siteId: string
-    }>
-    shopperLogin: ShopperLogin<{
-        clientId: string
-        organizationId: string
-        shortCode: string
-        siteId: string
-    }>
-    shopperOrders: ShopperOrders<{
-        clientId: string
-        organizationId: string
-        shortCode: string
-        siteId: string
-    }>
-    shopperProducts: ShopperProducts<{
-        clientId: string
-        organizationId: string
-        shortCode: string
-        siteId: string
-    }>
-    shopperPromotions: ShopperPromotions<{
-        clientId: string
-        organizationId: string
-        shortCode: string
-        siteId: string
-    }>
-    shopperSearch: ShopperSearch<{
-        clientId: string
-        organizationId: string
-        shortCode: string
-        siteId: string
-    }>
-}
-
 export interface CommonHookResponse {
     error: Error | undefined
     isLoading: boolean

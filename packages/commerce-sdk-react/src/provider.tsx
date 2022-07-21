@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {ReactElement} from 'react'
-
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -19,17 +18,29 @@ import {
     ShopperSearch
 } from 'commerce-sdk-isomorphic'
 
-import {ApiClients} from './hooks/types'
-
-export interface CommerceApiProviderProps {
-    children: React.ReactNode
+type ApiClientConfigParams = {
     clientId: string
     organizationId: string
     siteId: string
     shortCode: string
+}
+export interface CommerceApiProviderProps extends ApiClientConfigParams {
+    children: React.ReactNode
     proxy: string
     locale: string
     currency: string
+}
+export interface ApiClients {
+    shopperBaskets: ShopperBaskets<ApiClientConfigParams>
+    shopperContexts: ShopperContexts<ApiClientConfigParams>
+    shopperCustomers: ShopperCustomers<ApiClientConfigParams>
+    shopperDiscoverySearch: ShopperDiscoverySearch<ApiClientConfigParams>
+    shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
+    shopperLogin: ShopperLogin<ApiClientConfigParams>
+    shopperOrders: ShopperOrders<ApiClientConfigParams>
+    shopperProducts: ShopperProducts<ApiClientConfigParams>
+    shopperPromotions: ShopperPromotions<ApiClientConfigParams>
+    shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
 /**
@@ -40,7 +51,7 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
 /**
  * Initialize a set of Commerce API clients and make it available to all of descendant components
  *
- * @param props - Config values to initialize the Commerce API clients
+ * @param props
  * @returns Provider to wrap your app with
  */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
