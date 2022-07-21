@@ -257,15 +257,12 @@ jobs:
           command: |
               if [[ $DEVELOP || $RELEASE ]]; then
                 target=staging
-                target_commerce_sdk_react=commerce-sdk-react
+                target_commerce_sdk_react="commerce-sdk-react"
               elif [[ $RELEASE ]]; then
                 target=production
-                target_commerce_sdk_react="commerce-sdk-react"
               else
                 target=""
               fi
-
-              target_commerce_sdk_react="commerce-sdk-react"
 
               project="scaffold-pwa"
 
