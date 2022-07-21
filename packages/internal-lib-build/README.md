@@ -1,6 +1,6 @@
 # PWA Kit Internal Tools
 
-A package that contains internal tools used by other libraries in the `pwa-kit` monorepo. It can't run outside the context of this monorepo.
+A package that contains internal tools used by other packages in the `pwa-kit` monorepo. It can't run outside the context of this monorepo.
 
 To see all the available commands:
 

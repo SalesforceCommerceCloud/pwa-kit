@@ -1,7 +1,7 @@
 # Typescript Minimal
 
 A zero-configuration project template for TypeScript applications
-built with the PWA Kit SDKs.
+built with PWA Kit SDKs.
 
 ## Setup
 

@@ -1,6 +1,6 @@
 # Commerce SDK React
 
-A package that contains a library of React hooks for fetching data from Salesforce B2C Commerce.
+A library of React hooks for fetching data from Salesforce B2C Commerce.
 
 ## Documentation
 

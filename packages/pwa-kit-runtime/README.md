@@ -1,6 +1,6 @@
 # The PWA Kit Runtime
 
-A library that contains runtime environments that enable Node.js applications to run on Managed Runtime.
+A library of runtime environments that enable Node.js applications to run on Managed Runtime.
 
 ## Documentation
 

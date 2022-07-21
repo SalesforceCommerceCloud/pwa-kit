@@ -1,6 +1,6 @@
 # PWA Kit Create App
 
-A tool for generating PWA Kit projects based on the [Retail React App](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html) template.
+A tool for generating PWA Kit projects based on project templates, such as the [Retail React App](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html).
 
 ## Requirements
 
