@@ -37,7 +37,6 @@ const main = () => {
     // check if current version is larger or equal than the latest one in npm,
     // if it is true, build and publish the docs to the gh-pages branch
     const isLatest = semver.gte(currentVersion, latestVersion)
-    // we only want to publish the docs for latest release branch
     if (isLatest) {
         console.log(`Publish docs for version ${currentVersion} to gh-pages branch`)
         // build the docs
