@@ -10,7 +10,7 @@ import {CommerceApiContext} from '../provider'
 import {ApiClients} from './types'
 
 /**
- * Access a set of Commerce API clients
+ * Access a set of initialized Commerce API clients, which are initialized using the configurations passed to the CommerceApiProvider.
  *
  * @returns Commerce API clients
  */
