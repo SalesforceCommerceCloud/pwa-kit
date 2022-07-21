@@ -13,12 +13,12 @@ const routes = [
     {
         path: '/',
         exact: true,
-        component: Home,
+        component: Home
     },
     {
         path: '/useShopperProducts',
-        component: UseProducts,
-    },
+        component: UseProducts
+    }
 ]
 
 export default routes

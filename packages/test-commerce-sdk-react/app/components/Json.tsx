@@ -12,4 +12,6 @@ const Json = React.memo(({data}: {data: any}) => (
     </div>
 ))
 
+Json.displayName = 'Json'
+
 export default Json
