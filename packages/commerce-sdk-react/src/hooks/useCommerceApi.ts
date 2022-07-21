@@ -6,7 +6,8 @@
  */
 
 import React from 'react'
-import {CommerceApiContext, ApiClients} from '../provider'
+import {CommerceApiContext} from '../provider'
+import {ApiClients} from './types'
 
 /**
  * Access a set of initialized Commerce API clients, which are initialized using the configurations passed to the CommerceApiProvider.

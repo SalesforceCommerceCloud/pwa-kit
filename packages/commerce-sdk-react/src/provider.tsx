@@ -18,29 +18,13 @@ import {
     ShopperSearch
 } from 'commerce-sdk-isomorphic'
 
-type ApiClientConfigParams = {
-    clientId: string
-    organizationId: string
-    siteId: string
-    shortCode: string
-}
+import {ApiClientConfigParams, ApiClients} from './hooks/types'
+
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
     locale: string
     currency: string
-}
-export interface ApiClients {
-    shopperBaskets: ShopperBaskets<ApiClientConfigParams>
-    shopperContexts: ShopperContexts<ApiClientConfigParams>
-    shopperCustomers: ShopperCustomers<ApiClientConfigParams>
-    shopperDiscoverySearch: ShopperDiscoverySearch<ApiClientConfigParams>
-    shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
-    shopperLogin: ShopperLogin<ApiClientConfigParams>
-    shopperOrders: ShopperOrders<ApiClientConfigParams>
-    shopperProducts: ShopperProducts<ApiClientConfigParams>
-    shopperPromotions: ShopperPromotions<ApiClientConfigParams>
-    shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
 /**

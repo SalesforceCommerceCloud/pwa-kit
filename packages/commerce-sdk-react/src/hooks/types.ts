@@ -52,6 +52,25 @@ export type ShopperPromotionsInstance = ShopperPromotions<
 export type ShopperSearchInstance = ShopperSearch<
     ShopperSearchTypes.ShopperSearchParameters & Record<string, unknown>
 >
+export type ApiClientConfigParams = {
+    clientId: string
+    organizationId: string
+    siteId: string
+    shortCode: string
+}
+
+export interface ApiClients {
+    shopperBaskets: ShopperBaskets<ApiClientConfigParams>
+    shopperContexts: ShopperContexts<ApiClientConfigParams>
+    shopperCustomers: ShopperCustomers<ApiClientConfigParams>
+    shopperDiscoverySearch: ShopperDiscoverySearch<ApiClientConfigParams>
+    shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
+    shopperLogin: ShopperLogin<ApiClientConfigParams>
+    shopperOrders: ShopperOrders<ApiClientConfigParams>
+    shopperProducts: ShopperProducts<ApiClientConfigParams>
+    shopperPromotions: ShopperPromotions<ApiClientConfigParams>
+    shopperSearch: ShopperSearch<ApiClientConfigParams>
+}
 
 export interface CommonHookResponse {
     error: Error | undefined
