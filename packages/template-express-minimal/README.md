@@ -9,7 +9,7 @@ You can use the template as a starting point to:
 -   Develop APIs.
 -   Run different frameworks (other than React) on Managed Runtime.
 
-## Setup and run
+## Setup
 
 ```bash
 npm ci
