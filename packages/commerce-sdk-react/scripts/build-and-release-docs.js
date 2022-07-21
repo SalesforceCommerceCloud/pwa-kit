@@ -19,24 +19,19 @@ const main = () => {
     }
 
     let latestVersion
-
+    let isNewPackage
     const {stdout, stderr} = sh.exec(`npm view ${packageJSON.name} version`, {silent: true})
-    if (stdout) {
-        latestVersion = stderr
-    } else {
-        // if 'commerce-sdk-react' is not in the npm registry
-        // assuming currentVersion to be the latest
-        const isNotPublished = stderr.includes(`'${packageJSON.name}' is not in the npm registry`)
-        if (isNotPublished) {
-            latestVersion = currentVersion
-        } else {
+    if (stderr) {
+        isNewPackage = stderr.includes(`'${packageJSON.name}' is not in the npm registry`)
+        if (!isNewPackage) {
             console.log('stderr', stderr)
             process.exit(0)
         }
+    } else {
+        latestVersion = stdout
     }
-    // check if current version is larger or equal than the latest one in npm,
-    // if it is true, build and publish the docs to the gh-pages branch
-    const isLatest = semver.gte(currentVersion, latestVersion)
+
+    const isLatest = isNewPackage || semver.gt(currentVersion, latestVersion)
     if (isLatest) {
         console.log(`Publish docs for version ${currentVersion} to gh-pages branch`)
         // build the docs
