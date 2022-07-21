@@ -230,9 +230,14 @@ jobs:
       - run:
           name: "Build and publish docs"
           command: |
+            git config user.email "bot-pwa-kit@salesforce.com"
+            git config user.name "bot-pwa-kit"
+            cd packages/commerce-sdk-react
+            node ./scripts/build-and-release-docs.js
             if [[ $RELEASE ]]; then
               git config user.email "bot-pwa-kit@salesforce.com"
               git config user.name "bot-pwa-kit"
+              cd packages/commerce-sdk-react
               node ./scripts/build-and-release-docs.js
             fi
   testNode14Windows:
