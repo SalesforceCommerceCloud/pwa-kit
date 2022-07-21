@@ -181,87 +181,80 @@ export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
     //TODO: Clean unused variables
     /* eslint-disable no-unused-vars */
     /* eslint-disable no-unreachable */
-    if (showDefaultsConfig) {
-        switch (true) {
-            case siteConfig === 'path' && localeConfig === 'path':
-                return (href, site, locale) =>
-                    `${site ? `/${site}` : ''}${locale ? `/${locale}` : ''}${href}`
-                break
-            case siteConfig === 'path' && localeConfig === 'query_param':
-                return (href, site, locale) => `/${site}${href}?locale=${locale}`
-                break
-            case siteConfig === 'path' && localeConfig === 'none':
-                return (href, site, locale) => `/${site}${href}`
-                break
-            case siteConfig === 'query_param' && localeConfig === 'path':
-                return (href, site, locale) => `/${locale}${href}?site=${site}`
-                break
-            case siteConfig === 'query_param' && localeConfig === 'query_param':
-                return (href, site, locale) => `/${href}?site=${site}&locale=${locale}`
-                break
-            case siteConfig === 'query_param' && localeConfig === 'none':
-                return (href, site, locale) => `/${href}?site=${site}`
-                break
-            case siteConfig === 'none' && localeConfig === 'path':
+
+    switch (true) {
+        // showDefaultsConfig
+        case siteConfig === 'path' && localeConfig === 'path' && showDefaultsConfig:
+            return (href, site, locale) =>
+                `${site ? `/${site}` : ''}${locale ? `/${locale}` : ''}${href}`
+            break
+        case siteConfig === 'path' && localeConfig === 'query_param' && showDefaultsConfig:
+            return (href, site, locale) => `/${site}${href}?locale=${locale}`
+            break
+        case siteConfig === 'path' && localeConfig === 'none' && showDefaultsConfig:
+            return (href, site, locale) => `/${site}${href}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'path' && showDefaultsConfig:
+            return (href, site, locale) => `/${locale}${href}?site=${site}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'query_param' && showDefaultsConfig:
+            return (href, site, locale) => `/${href}?site=${site}&locale=${locale}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'none' && showDefaultsConfig:
+            return (href, site, locale) => `/${href}?site=${site}`
+            break
+        case siteConfig === 'none' && localeConfig === 'path' && showDefaultsConfig:
+            return (href, site, locale) => `/${locale}${href}`
+            break
+        case siteConfig === 'none' && localeConfig === 'query_param' && showDefaultsConfig:
+            return (href, site, locale) => `/${href}?locale=${locale}`
+            break
+        // !showDefaultsConfig
+        case siteConfig === 'path' && localeConfig === 'path' && !showDefaultsConfig:
+            if (!isDefaultLocale && !isDefaultSite)
+                return (href, site, locale) => `/${site}/${locale}${href}`
+            if (!isDefaultLocale && isDefaultSite)
                 return (href, site, locale) => `/${locale}${href}`
-                break
-            case siteConfig === 'none' && localeConfig === 'query_param':
+            if (isDefaultLocale && !isDefaultSite) return (href, site, locale) => `/${site}${href}`
+            break
+        case siteConfig === 'path' && localeConfig === 'query_param' && !showDefaultsConfig:
+            if (!isDefaultLocale && !isDefaultSite)
+                return (href, site, locale) => `/${site}${href}?locale=${locale}`
+            if (!isDefaultLocale && isDefaultSite)
                 return (href, site, locale) => `/${href}?locale=${locale}`
-                break
-            default:
-                return (href, site, locale) => `/${href}`
-        }
-    } else {
-        switch (true) {
-            case siteConfig === 'path' && localeConfig === 'path':
-                if (!isDefaultLocale && !isDefaultSite)
-                    return (href, site, locale) => `/${site}/${locale}${href}`
-                if (!isDefaultLocale && isDefaultSite)
-                    return (href, site, locale) => `/${locale}${href}`
-                if (isDefaultLocale && !isDefaultSite)
-                    return (href, site, locale) => `/${site}${href}`
-                break
-            case siteConfig === 'path' && localeConfig === 'query_param':
-                if (!isDefaultLocale && !isDefaultSite)
-                    return (href, site, locale) => `/${site}${href}?locale=${locale}`
-                if (!isDefaultLocale && isDefaultSite)
-                    return (href, site, locale) => `/${href}?locale=${locale}`
-                if (isDefaultLocale && !isDefaultSite)
-                    return (href, site, locale) => `/${site}${href}`
-                break
-            case siteConfig === 'path' && localeConfig === 'none':
-                if (!isDefaultSite) return (href, site, locale) => `/${site}${href}`
-                break
-            case siteConfig === 'query_param' && localeConfig === 'path':
-                if (!defaultLocale && !defaultSite)
-                    return (href, site, locale) => `/${locale}${href}?site=${site}`
-                if (!defaultLocale && defaultSite)
-                    return (href, site, locale) => `/${locale}${href}`
-                if (defaultLocale && !defaultSite)
-                    return (href, site, locale) => `/${href}?site=${site}`
-                break
-            case siteConfig === 'query_param' && localeConfig === 'query_param':
-                if (!defaultLocale && !defaultSite)
-                    return (href, site, locale) => `/${href}?site=${site}&locale=${locale}`
-                if (!defaultLocale && defaultSite)
-                    return (href, site, locale) => `/${href}?locale=${locale}`
-                if (defaultLocale && !defaultSite)
-                    return (href, site, locale) => `/${href}?site=${site}`
-                break
-            case siteConfig === 'query_param' && localeConfig === 'none':
-                if (!defaultSite) return (href, site, locale) => `/${href}?site=${site}`
-                break
-            case siteConfig === 'none' && localeConfig === 'path':
-                if ((!defaultLocale && !defaultSite) || (!defaultLocale && defaultSite))
-                    return (href, site, locale) => `/${locale}${href}`
-                break
-            case siteConfig === 'none' && localeConfig === 'query_param':
-                if ((!defaultLocale && !defaultSite) || (!defaultLocale && defaultSite))
-                    return (href, site, locale) => `/${href}?locale=${locale}`
-                break
-            default:
-                return (href) => `${href ? `/${href}` : ''}`
-        }
+            if (isDefaultLocale && !isDefaultSite) return (href, site, locale) => `/${site}${href}`
+            break
+        case siteConfig === 'path' && localeConfig === 'none' && !showDefaultsConfig:
+            if (!isDefaultSite) return (href, site, locale) => `/${site}${href}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'path' && !showDefaultsConfig:
+            if (!defaultLocale && !defaultSite)
+                return (href, site, locale) => `/${locale}${href}?site=${site}`
+            if (!defaultLocale && defaultSite) return (href, site, locale) => `/${locale}${href}`
+            if (defaultLocale && !defaultSite)
+                return (href, site, locale) => `/${href}?site=${site}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'query_param' && !showDefaultsConfig:
+            if (!defaultLocale && !defaultSite)
+                return (href, site, locale) => `/${href}?site=${site}&locale=${locale}`
+            if (!defaultLocale && defaultSite)
+                return (href, site, locale) => `/${href}?locale=${locale}`
+            if (defaultLocale && !defaultSite)
+                return (href, site, locale) => `/${href}?site=${site}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'none' && !showDefaultsConfig:
+            if (!defaultSite) return (href, site, locale) => `/${href}?site=${site}`
+            break
+        case siteConfig === 'none' && localeConfig === 'path' && !showDefaultsConfig:
+            if ((!defaultLocale && !defaultSite) || (!defaultLocale && defaultSite))
+                return (href, site, locale) => `/${locale}${href}`
+            break
+        case siteConfig === 'none' && localeConfig === 'query_param' && !showDefaultsConfig:
+            if ((!defaultLocale && !defaultSite) || (!defaultLocale && defaultSite))
+                return (href, site, locale) => `/${href}?locale=${locale}`
+            break
+        default:
+            return (href) => `${href ? `/${href}` : ''}`
     }
 }
 
