@@ -14,11 +14,11 @@ const main = () => {
     const {stdout: currentVersion} = sh.exec(
         "cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g'"
     )
-    // const isPrerelease = semver.prerelease(currentVersion.trim())
-    // // if it is a pre-release version, do nothing
-    // if (isPrerelease) {
-    //     return
-    // }
+    const isPrerelease = semver.prerelease(currentVersion.trim())
+    // if it is a pre-release version, do nothing
+    if (isPrerelease) {
+        return
+    }
 
     let latestVersion
 
@@ -32,9 +32,6 @@ const main = () => {
         const {stdout} = sh.exec('npm view pwa-kit-react-sdk version', {silent: true})
         latestVersion = stdout
     }
-
-    console.log('currentVersion', currentVersion)
-    console.log('latestVersion', latestVersion)
 
     // check if current version is larger than the latest one in npm,
     // if it is true, it means we are about to release a new version to npm
