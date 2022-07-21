@@ -4,16 +4,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
+const packageJSON = require('../package.json')
 const sh = require('shelljs')
 const semver = require('semver')
 
 // this script is expected to run on release branch.
 const main = () => {
     // get the version number from package json
-    const {stdout: currentVersion} = sh.exec(
-        "cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g'"
-    )
+    const currentVersion = packageJSON.version
     const isPrerelease = semver.prerelease(currentVersion.trim())
     // if it is a pre-release version, do nothing
     if (isPrerelease) {
@@ -22,20 +20,23 @@ const main = () => {
 
     let latestVersion
 
-    //TODO: Refactor this after we've release first version of commerce-sdk-react
-    // get the latest version from npm registry
-    const {stdout, stderr} = sh.exec('npm view commerce-sdk-react version', {silent: true})
-    latestVersion = stdout
-    // if error, it means 'commerce-sdk-react' is not in the npm registry yet
-    if (stderr) {
-        // use the version of pwa-kit-react-sdk instead
-        const {stdout} = sh.exec('npm view pwa-kit-react-sdk version', {silent: true})
-        latestVersion = stdout
+    const {stdout, stderr} = sh.exec(`npm view ${packageJSON.name} version`, {silent: true})
+    if (stdout) {
+        latestVersion = stderr
+    } else {
+        // if 'commerce-sdk-react' is not in the npm registry
+        // set the latestVersion would become currentVersion
+        const isNotPublished = stderr.includes(`'${packageJSON.name}' is not in the npm registry`)
+        if (isNotPublished) {
+            latestVersion = currentVersion
+        } else {
+            console.log('stderr', stderr)
+            process.exit(0)
+        }
     }
-
-    // check if current version is larger than the latest one in npm,
-    // if it is true, it means we are about to release a new version to npm
-    const isLatest = semver.gt(currentVersion, latestVersion)
+    // check if current version is larger or equal than the latest one in npm,
+    // if it is true, build and publish the docs to the gh-pages branch
+    const isLatest = semver.gte(currentVersion, latestVersion)
     // we only want to publish the docs for latest release branch
     if (isLatest) {
         console.log(`Publish docs for version ${currentVersion} to gh-pages branch`)
