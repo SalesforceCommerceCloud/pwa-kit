@@ -17,13 +17,13 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
     const {site} = useSite()
     const {locale} = useLocale()
     const appConfig = useAppConfig()
-    const pathWithUrlConfig = appConfig.urlTemplateLiteral(_href, site.alias || site.id, locale.id)
+    const updatedHref = appConfig.urlTemplateLiteral(_href, site.alias || site.id, locale.id)
     return (
         <ChakraLink
             as={useNavLink ? NavSPALink : SPALink}
             {...(useNavLink && {exact: true})}
             {...props}
-            to={_href === '/' ? '/' : pathWithUrlConfig}
+            to={_href === '/' ? '/' : updatedHref}
             ref={ref}
         />
     )
