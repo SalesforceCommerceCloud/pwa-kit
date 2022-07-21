@@ -25,7 +25,7 @@ const main = () => {
         latestVersion = stderr
     } else {
         // if 'commerce-sdk-react' is not in the npm registry
-        // set the latestVersion would become currentVersion
+        // assuming currentVersion to be the latest
         const isNotPublished = stderr.includes(`'${packageJSON.name}' is not in the npm registry`)
         if (isNotPublished) {
             latestVersion = currentVersion
