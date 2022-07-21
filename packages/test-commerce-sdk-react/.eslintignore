@@ -1,0 +1,7 @@
+build
+coverage
+docs
+app/static
+jest.config.js
+webpack
+scripts/generator/assets
