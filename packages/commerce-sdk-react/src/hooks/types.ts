@@ -15,24 +15,24 @@ import {ShopperProducts} from 'commerce-sdk-isomorphic'
 import {ShopperPromotions} from 'commerce-sdk-isomorphic'
 import {ShopperSearch} from 'commerce-sdk-isomorphic'
 
-type CommerceApiProviderParams = {
+export type ApiClientConfigParams = {
     clientId: string
     organizationId: string
-    shortCode: string
     siteId: string
+    shortCode: string
 }
 
 export interface ApiClients {
-    shopperBaskets: ShopperBaskets<CommerceApiProviderParams>
-    shopperContexts: ShopperContexts<CommerceApiProviderParams>
-    shopperCustomers: ShopperCustomers<CommerceApiProviderParams>
-    shopperDiscoverySearch: ShopperDiscoverySearch<CommerceApiProviderParams>
-    shopperGiftCertificates: ShopperGiftCertificates<CommerceApiProviderParams>
-    shopperLogin: ShopperLogin<CommerceApiProviderParams>
-    shopperOrders: ShopperOrders<CommerceApiProviderParams>
-    shopperProducts: ShopperProducts<CommerceApiProviderParams>
-    shopperPromotions: ShopperPromotions<CommerceApiProviderParams>
-    shopperSearch: ShopperSearch<CommerceApiProviderParams>
+    shopperBaskets: ShopperBaskets<ApiClientConfigParams>
+    shopperContexts: ShopperContexts<ApiClientConfigParams>
+    shopperCustomers: ShopperCustomers<ApiClientConfigParams>
+    shopperDiscoverySearch: ShopperDiscoverySearch<ApiClientConfigParams>
+    shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
+    shopperLogin: ShopperLogin<ApiClientConfigParams>
+    shopperOrders: ShopperOrders<ApiClientConfigParams>
+    shopperProducts: ShopperProducts<ApiClientConfigParams>
+    shopperPromotions: ShopperPromotions<ApiClientConfigParams>
+    shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
 // These are the common params for all query hooks
