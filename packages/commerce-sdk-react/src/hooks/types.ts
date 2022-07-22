@@ -4,54 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBaskets, ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
-import {ShopperContexts, ShopperContextsTypes} from 'commerce-sdk-isomorphic'
-import {ShopperCustomers, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
-import {ShopperDiscoverySearch, ShopperDiscoverySearchTypes} from 'commerce-sdk-isomorphic'
-import {ShopperGiftCertificates, ShopperGiftCertificatesTypes} from 'commerce-sdk-isomorphic'
-import {ShopperLogin, ShopperLoginTypes} from 'commerce-sdk-isomorphic'
-import {ShopperOrders, ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
-import {ShopperProducts, ShopperProductsTypes} from 'commerce-sdk-isomorphic'
-import {ShopperPromotions, ShopperPromotionsTypes} from 'commerce-sdk-isomorphic'
-import {ShopperSearch, ShopperSearchTypes} from 'commerce-sdk-isomorphic'
+import {ShopperBaskets} from 'commerce-sdk-isomorphic'
+import {ShopperContexts} from 'commerce-sdk-isomorphic'
+import {ShopperCustomers} from 'commerce-sdk-isomorphic'
+import {ShopperDiscoverySearch} from 'commerce-sdk-isomorphic'
+import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
+import {ShopperLogin} from 'commerce-sdk-isomorphic'
+import {ShopperOrders} from 'commerce-sdk-isomorphic'
+import {ShopperProducts} from 'commerce-sdk-isomorphic'
+import {ShopperPromotions} from 'commerce-sdk-isomorphic'
+import {ShopperSearch} from 'commerce-sdk-isomorphic'
 
-export * from './ShopperBaskets/types'
-export * from './ShopperCustomers/types'
-export * from './ShopperOrders/types'
-export * from './ShopperProducts/types'
-export * from './ShopperPromotions/types'
-export * from './ShopperSearch/types'
-
-export type ShopperBasketsInstance = ShopperBaskets<
-    ShopperBasketsTypes.ShopperBasketsParameters & Record<string, unknown>
->
-export type ShopperContextsInstance = ShopperContexts<
-    ShopperContextsTypes.ShopperContextsParameters & Record<string, unknown>
->
-export type ShopperCustomersInstance = ShopperCustomers<
-    ShopperCustomersTypes.ShopperCustomersParameters & Record<string, unknown>
->
-export type ShopperDiscoverySearchInstance = ShopperDiscoverySearch<
-    ShopperDiscoverySearchTypes.ShopperDiscoverySearchParameters & Record<string, unknown>
->
-export type ShopperGiftCertificatesInstance = ShopperGiftCertificates<
-    ShopperGiftCertificatesTypes.ShopperGiftCertificatesParameters & Record<string, unknown>
->
-export type ShopperLoginInstance = ShopperLogin<
-    ShopperLoginTypes.ShopperLoginParameters & Record<string, unknown>
->
-export type ShopperOrdersInstance = ShopperOrders<
-    ShopperOrdersTypes.ShopperOrdersParameters & Record<string, unknown>
->
-export type ShopperProductsInstance = ShopperProducts<
-    ShopperProductsTypes.ShopperProductsParameters & Record<string, unknown>
->
-export type ShopperPromotionsInstance = ShopperPromotions<
-    ShopperPromotionsTypes.ShopperPromotionsParameters & Record<string, unknown>
->
-export type ShopperSearchInstance = ShopperSearch<
-    ShopperSearchTypes.ShopperSearchParameters & Record<string, unknown>
->
 export type ApiClientConfigParams = {
     clientId: string
     organizationId: string
@@ -72,11 +35,6 @@ export interface ApiClients {
     shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
-export interface CommonHookResponse {
-    error: Error | undefined
-    isLoading: boolean
-}
-
 // These are the common params for all query hooks
 // it allows user to override configs for specific query
 export interface QueryParams {
@@ -87,13 +45,43 @@ export interface QueryParams {
     shortCode?: string
 }
 
-export interface QueryResponse<T> extends CommonHookResponse {
-    data: T
+export type QueryResponse<T> =
+    | {
+          isLoading: boolean
+          error?: undefined
+          data?: undefined
+      }
+    | {
+          isLoading: true
+          error?: Error
+          data?: T
+      }
+    | {
+          isLoading: false
+          error: Error
+          data?: undefined
+      }
+    | {
+          isLoading: false
+          error?: undefined
+          data: T
+      }
+
+// TODO: Include action name as a key in addition to "execute"?
+export type ActionResponse<A, R> = QueryResponse<R> & {
+    execute: (arg: A) => void
 }
 
-export interface ActionResponse<T> extends CommonHookResponse {
-    // TODO: let's use the actual action name instead of "execute"
-    execute: T
+export type DependencyList = readonly unknown[]
+
+export type Argument<T extends (arg: any) => unknown> = T extends (arg: infer R) => any ? R : never
+
+export interface SdkMethod<A, R> {
+    (arg: A): Promise<R>
+    // Specifying `Response` separately is important so that `R` is just the data type
+    (arg: A, flag?: boolean): Promise<Response | R>
 }
 
-export type DependencyList = readonly any[]
+export type DataType<T extends (...args: any[]) => Promise<any>> = T extends SdkMethod<any, infer R>
+    ? R
+    : never
