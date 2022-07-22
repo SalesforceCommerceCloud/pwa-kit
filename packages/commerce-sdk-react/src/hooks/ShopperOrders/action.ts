@@ -45,7 +45,7 @@ paymentCard must be specified in the request.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=updatePaymentInstrumentForOrder} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#updatepaymentinstrumentfororder} for more information on the parameters and returned data type.
    */
-    UpdatePaymentInstrumentForOrder = 'updatePaymentInstrumentForOrder'
+    UpdatePaymentInstrumentForOrder = 'updatePaymentInstrumentForOrder',
 }
 
 /**
@@ -53,8 +53,8 @@ paymentCard must be specified in the request.
  */
 export function useShopperOrdersAction<Action extends ShopperOrdersActions>(
     action: Action
-): ActionResponse<Argument<Client[Action]>, DataType<Client[Action]>> {
-    type Arg = Argument<Client[Action]>
+): ActionResponse<Parameters<Client[Action]>, DataType<Client[Action]>> {
+    type Arg = Parameters<Client[Action]>
     type Data = DataType<Client[Action]>
     // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
     // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
@@ -70,5 +70,5 @@ export function useShopperOrdersAction<Action extends ShopperOrdersActions>(
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncExecute((arg: Arg) => method.call(client, arg))
+    return useAsyncExecute((...arg: Arg) => method.call(client, arg))
 }

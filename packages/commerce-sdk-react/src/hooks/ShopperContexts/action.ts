@@ -28,7 +28,7 @@ export enum ShopperContextsActions {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-contexts?meta=updateShopperContext} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercontexts.shoppercontexts-1.html#updateshoppercontext} for more information on the parameters and returned data type.
      */
-    UpdateShopperContext = 'updateShopperContext'
+    UpdateShopperContext = 'updateShopperContext',
 }
 
 /**
@@ -36,8 +36,8 @@ export enum ShopperContextsActions {
  */
 export function useShopperContextsAction<Action extends ShopperContextsActions>(
     action: Action
-): ActionResponse<Argument<Client[Action]>, DataType<Client[Action]>> {
-    type Arg = Argument<Client[Action]>
+): ActionResponse<Parameters<Client[Action]>, DataType<Client[Action]>> {
+    type Arg = Parameters<Client[Action]>
     type Data = DataType<Client[Action]>
     // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
     // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
@@ -53,5 +53,5 @@ export function useShopperContextsAction<Action extends ShopperContextsActions>(
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncExecute((arg: Arg) => method.call(client, arg))
+    return useAsyncExecute((...arg: Arg) => method.call(client, arg))
 }
