@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ActionResponse, ApiClients, Argument, DataType} from '../types'
-import {useAsyncExecute} from '../useAsync'
+import {useAsyncCallback} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
 type Client = ApiClients['shopperContexts']
@@ -28,7 +28,7 @@ export enum ShopperContextsActions {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-contexts?meta=updateShopperContext} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercontexts.shoppercontexts-1.html#updateshoppercontext} for more information on the parameters and returned data type.
      */
-    UpdateShopperContext = 'updateShopperContext'
+    UpdateShopperContext = 'updateShopperContext',
 }
 
 /**
@@ -53,5 +53,5 @@ export function useShopperContextsAction<Action extends ShopperContextsActions>(
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncExecute((...arg: Arg) => method.call(client, arg))
+    return useAsyncCallback((...arg: Arg) => method.call(client, arg))
 }

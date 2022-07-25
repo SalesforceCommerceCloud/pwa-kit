@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ActionResponse, ApiClients, Argument, DataType} from '../types'
-import {useAsyncExecute} from '../useAsync'
+import {useAsyncCallback} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
 type Client = ApiClients['shopperGiftCertificates']
@@ -16,7 +16,7 @@ export enum ShopperGiftCertificatesActions {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-gift-certificates?meta=getGiftCertificate} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppergiftcertificates.shoppergiftcertificates-1.html#getgiftcertificate} for more information on the parameters and returned data type.
      */
-    GetGiftCertificate = 'getGiftCertificate'
+    GetGiftCertificate = 'getGiftCertificate',
 }
 
 /**
@@ -41,5 +41,5 @@ export function useShopperGiftCertificatesAction<Action extends ShopperGiftCerti
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncExecute((...arg: Arg) => method.call(client, arg))
+    return useAsyncCallback((...arg: Arg) => method.call(client, arg))
 }

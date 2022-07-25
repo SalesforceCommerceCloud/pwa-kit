@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ActionResponse, ApiClients, Argument, DataType} from '../types'
-import {useAsyncExecute} from '../useAsync'
+import {useAsyncCallback} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
 type Client = ApiClients['shopperDiscoverySearch']
@@ -16,7 +16,7 @@ export enum ShopperDiscoverySearchActions {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-discovery-search?meta=retrieveResults} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperdiscoverysearch.shopperdiscoverysearch-1.html#retrieveresults} for more information on the parameters and returned data type.
      */
-    RetrieveResults = 'retrieveResults'
+    RetrieveResults = 'retrieveResults',
 }
 
 /**
@@ -41,5 +41,5 @@ export function useShopperDiscoverySearchAction<Action extends ShopperDiscoveryS
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncExecute((...arg: Arg) => method.call(client, arg))
+    return useAsyncCallback((...arg: Arg) => method.call(client, arg))
 }

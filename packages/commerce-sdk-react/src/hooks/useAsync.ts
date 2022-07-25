@@ -11,7 +11,7 @@ export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryRespon
     // This is a stub implementation to validate the types.
     // The real implementation will be more React-y.
     const result: QueryResponse<T> = {
-        isLoading: true
+        isLoading: true,
     }
     fn()
         .then((data) => {
@@ -25,7 +25,7 @@ export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryRespon
     return result
 }
 
-export const useAsyncExecute = <A extends any[], R>(fn: (...args: A) => Promise<R>) => {
+export const useAsyncCallback = <A extends any[], R>(fn: (...args: A) => Promise<R>) => {
     const [isLoading, setIsLoading] = useState(false)
     const [data, setData] = useState<R | undefined>(undefined)
     const [error, setError] = useState<Error | undefined>(undefined)
@@ -45,7 +45,7 @@ export const useAsyncExecute = <A extends any[], R>(fn: (...args: A) => Promise<
                 .finally(() => {
                     setIsLoading(false)
                 })
-        }
+        },
     }
     return result
 }

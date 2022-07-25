@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ActionResponse, ApiClients, Argument, DataType} from '../types'
-import {useAsyncExecute} from '../useAsync'
+import {useAsyncCallback} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
 type Client = ApiClients['shopperBaskets']
@@ -328,7 +328,7 @@ the body are the following properties if specified:
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasket} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasket} for more information on the parameters and returned data type.
      */
-    AddTaxesForBasket = 'addTaxesForBasket'
+    AddTaxesForBasket = 'addTaxesForBasket',
 }
 
 /**
@@ -353,5 +353,5 @@ export function useShopperBasketsAction<Action extends ShopperBasketsActions>(
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncExecute((...arg: Arg) => method.call(client, arg))
+    return useAsyncCallback((...arg: Arg) => method.call(client, arg))
 }
