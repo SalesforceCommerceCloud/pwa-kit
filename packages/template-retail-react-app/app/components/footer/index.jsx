@@ -140,7 +140,7 @@ const Footer = ({...otherProps}) => {
                                         // Update the `locale` in the URL.
                                         const newUrl = getPathWithLocale(target.value, {
                                             disallowParams: ['refine'],
-                                            fillUrlTemplate: fillUrlTemplate
+                                            fillUrlTemplate
                                         })
 
                                         window.location = newUrl

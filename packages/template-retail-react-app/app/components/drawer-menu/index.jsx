@@ -274,10 +274,13 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                         locales={supportedLocaleIds}
                                         onSelect={(newLocale) => {
                                             // Update the `locale` in the URL.
-                                            const newUrl = getPathWithLocale(newLocale, {
-                                                disallowParams: ['refine'],
-                                                fillUrlTemplate: fillUrlTemplate
-                                            })
+                                            const newUrl = getPathWithLocale(
+                                                newLocale,
+                                                fillUrlTemplate,
+                                                {
+                                                    disallowParams: ['refine']
+                                                }
+                                            )
                                             window.location = newUrl
                                         }}
                                     />

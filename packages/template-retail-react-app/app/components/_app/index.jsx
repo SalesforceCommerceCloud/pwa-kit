@@ -119,7 +119,7 @@ const App = (props) => {
         const path = homeUrlBuilder(HOME_HREF, {
             locale,
             site,
-            fillUrlTemplate: fillUrlTemplate
+            fillUrlTemplate
         })
         history.push(path)
 

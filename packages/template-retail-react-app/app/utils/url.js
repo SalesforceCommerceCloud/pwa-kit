@@ -122,15 +122,15 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * Based on your app configuration, this function will replace your current locale shortCode with a new one
  *
  * @param {String} shortCode - The locale short code.
+ * @param {function(*, *, *, *=): string} - Generates a site URL from the provided href, site and locale.
  * @param {Object} [opts] - Options, if there's any.
  * @param {Object} opts.location - location object to replace the default `window.location`
  * @returns {String} url - The relative URL for the specific locale.
  */
-export const getPathWithLocale = (shortCode, opts = {}) => {
+export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
     const location = opts.location ? opts.location : window.location
     let {siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
     let {pathname, search} = location
-    const fillUrlTemplate = opts.fillUrlTemplate
 
     // sanitize the site from current url if existing
     if (siteRef) {
