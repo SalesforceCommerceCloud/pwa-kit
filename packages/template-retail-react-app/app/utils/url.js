@@ -208,18 +208,22 @@ export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
         pathSite,
         pathLocale,
         isPathSiteAndLocale,
-        isQuery,
-        isQuerySiteAndLocale,
         querySite,
-        queryLocale
+        queryLocale,
+        isQuery,
+        isQuerySiteAndLocale
     }
 
-    return (href, site, locale, c = templateConfig) =>
-        `${c.pathSite && site ? `/${site}` : ''}${c.pathLocale && locale ? `/${locale}` : ''}` +
+    return (href, site, locale, config = templateConfig) =>
+        `${config.pathSite && site ? `/${site}` : ''}${
+            config.pathLocale && locale ? `/${locale}` : ''
+        }` +
         `${href}` +
-        `${c.isQuery && (site || locale) ? '?' : ''}${c.querySite && site ? `site=${site}` : ''}${
-            c.isQuerySiteAndLocale && locale ? '&' : ''
-        }${c.queryLocale && locale ? `locale=${locale}` : ''}`
+        `${config.isQuery && (site || locale) ? '?' : ''}${
+            config.querySite && site ? `site=${site}` : ''
+        }${config.isQuerySiteAndLocale && locale ? '&' : ''}${
+            config.queryLocale && locale ? `locale=${locale}` : ''
+        }`
 }
 
 /**
