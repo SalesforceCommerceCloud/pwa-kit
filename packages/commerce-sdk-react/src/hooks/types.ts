@@ -45,27 +45,11 @@ export interface QueryParams {
     shortCode?: string
 }
 
-export type QueryResponse<T> =
-    | {
-          isLoading: boolean
-          error?: undefined
-          data?: undefined
-      }
-    | {
-          isLoading: true
-          error?: Error
-          data?: T
-      }
-    | {
-          isLoading: false
-          error: Error
-          data?: undefined
-      }
-    | {
-          isLoading: false
-          error?: undefined
-          data: T
-      }
+export type QueryResponse<T> = {
+    isLoading: boolean
+    error?: Error | undefined
+    data?: T | undefined
+}
 
 // TODO: Include action name as a key in addition to "execute"?
 export type ActionResponse<A, R> = QueryResponse<R> & {

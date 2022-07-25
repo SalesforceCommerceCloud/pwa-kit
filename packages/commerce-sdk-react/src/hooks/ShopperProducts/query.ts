@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, DataType, QueryResponse} from '../types'
+import { ApiClients, Argument, DataType, QueryResponse} from '../types'
+import {ShopperProductsTypes} from "commerce-sdk-isomorphic";
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
@@ -18,10 +19,18 @@ type Client = ApiClients['shopperProducts']
  * @returns An object describing the state of the request.
  */
 export const useProducts = (
-    arg: Argument<Client['getProducts']>
+    arg: Argument<Client['getProducts']>, deps: unknown[] = []
 ): QueryResponse<DataType<Client['getProducts']>> => {
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getProducts(arg), [arg])
+    // how to get this right?
+    const {parameters: {ids}} : {parameters: {ids: ShopperProductsTypes.CompositeParameters<any, any>}}  = arg
+    // by default the source is the ids string
+    let source: unknown[] = [ids]
+    if (deps.length) {
+        source = deps
+    }
+    console.log('client', client)
+    return useAsync(() => client.getProducts(arg), [source])
 }
 /**
  * A hook for `ShopperProducts#getProduct`.

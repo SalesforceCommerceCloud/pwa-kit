@@ -5,15 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useShopperProducts} from 'commerce-sdk-react'
+import {useProducts} from 'commerce-sdk-react'
 import Json from '../components/Json'
 
 const UseShopperProducts = () => {
-    const result = useShopperProducts({}, [])
+    const ids = '25502228M, 25503045M'
+    console.log('useShopperProducts ===============', useProducts)
+    const result = useProducts({
+        parameters: {
+            ids: '25502228M, 25503045M'
+        }
+    }, [ids])
     return (
         <>
             <h1>useProducts</h1>
-            <Json data={result} />
+            {/*<Json data={[]} />*/}
         </>
     )
 }
