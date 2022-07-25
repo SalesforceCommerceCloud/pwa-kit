@@ -205,13 +205,13 @@ export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
     const isPathSiteAndLocale = pathSite && pathLocale
 
     const templateConfig = {
-        pathSite: pathSite,
-        pathLocale: pathLocale,
-        isPathSiteAndLocale: isPathSiteAndLocale,
-        isQuery: isQuery,
-        isQuerySiteAndLocale: isQuerySiteAndLocale,
-        querySite: querySite,
-        queryLocale: queryLocale
+        pathSite,
+        pathLocale,
+        isPathSiteAndLocale,
+        isQuery,
+        isQuerySiteAndLocale,
+        querySite,
+        queryLocale
     }
 
     return (href, site, locale, c = templateConfig) =>
