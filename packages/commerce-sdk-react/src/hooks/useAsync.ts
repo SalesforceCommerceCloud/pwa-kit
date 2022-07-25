@@ -26,7 +26,7 @@ export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryRespon
 }
 
 export const useAsyncExecute = <A extends any[], R>(fn: (...args: A) => Promise<R>) => {
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [data, setData] = useState<R | undefined>(undefined)
     const [error, setError] = useState<Error | undefined>(undefined)
     const result: ActionResponse<A, R> = {
