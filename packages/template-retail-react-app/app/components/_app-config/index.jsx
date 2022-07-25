@@ -19,11 +19,11 @@ import {
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
-import {AppConfigProvider} from '../../contexts'
+import {MultiSitesProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {getUrlTemplateLiteral} from '../../utils/url'
+import {createUrlTemplate} from '../../utils/url'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -38,7 +38,7 @@ const AppConfig = ({children, locals = {}}) => {
     const [customer, setCustomer] = useState(null)
 
     return (
-        <AppConfigProvider urlTemplateLiteral={locals.urlTemplateLiteral}>
+        <MultiSitesProvider fillUrlTemplate={locals.fillUrlTemplate}>
             <CommerceAPIProvider value={locals.api}>
                 <CustomerProvider value={{customer, setCustomer}}>
                     <BasketProvider value={{basket, setBasket}}>
@@ -48,7 +48,7 @@ const AppConfig = ({children, locals = {}}) => {
                     </BasketProvider>
                 </CustomerProvider>
             </CommerceAPIProvider>
-        </AppConfigProvider>
+        </MultiSitesProvider>
     )
 }
 
@@ -70,7 +70,7 @@ AppConfig.restore = (locals = {}) => {
     apiConfig.parameters.siteId = site.id
 
     locals.api = new CommerceAPI({...apiConfig, locale: locale.id, currency})
-    locals.urlTemplateLiteral = getUrlTemplateLiteral(appConfig, site, locale)
+    locals.fillUrlTemplate = createUrlTemplate(appConfig, site, locale)
 }
 
 AppConfig.freeze = () => undefined
@@ -78,7 +78,7 @@ AppConfig.freeze = () => undefined
 AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
         api: locals.api,
-        urlTemplateLiteral: locals.urlTemplateLiteral
+        fillUrlTemplate: locals.fillUrlTemplate
     }
 }
 

@@ -130,7 +130,7 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     const location = opts.location ? opts.location : window.location
     let {siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
     let {pathname, search} = location
-    const urlTemplateLiteral = opts.urlTemplateLiteral
+    const fillUrlTemplate = opts.fillUrlTemplate
 
     // sanitize the site from current url if existing
     if (siteRef) {
@@ -151,7 +151,7 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     const isDefaultLocaleOfDefaultSite = shortCode === defaultSite.l10n.defaultLocale
     const isDefaultSite = siteRef === defaultSite.alias || siteRef === defaultSite.id
     // rebuild the url with new locale,
-    const newUrl = urlTemplateLiteral(
+    const newUrl = fillUrlTemplate(
         `${pathname}${search}`,
         // By default, as for home page, when the values of site and locale belongs to the default site,
         // they will be not shown in the url just
@@ -172,7 +172,7 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
  * @param localeUrl Current selected Locale object.
  * @returns {function(*, *, *, *=): string} function providing href, site and locale generates a site URL.
  */
-export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
+export const createUrlTemplate = (appConfig, siteUrl, localeUrl) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
     const defaultSite = getDefaultSite()
     const sites = getSites()
@@ -238,13 +238,13 @@ export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
  * @returns {string}
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
-    const {locale, site, urlTemplateLiteral} = options
+    const {locale, site, fillUrlTemplate} = options
     const defaultSite = getDefaultSite()
     const isDefaultLocaleOfDefaultSite =
         locale.alias === defaultSite.l10n.defaultLocale ||
         locale.id === defaultSite.l10n.defaultLocale
     const isDefaultSite = site.id === defaultSite.id || site.alias === defaultSite.alias
-    const updatedUrl = urlTemplateLiteral(
+    const updatedUrl = fillUrlTemplate(
         homeHref,
         isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : site.alias || site.id,
         isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : locale.alias || locale.id

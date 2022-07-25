@@ -6,12 +6,12 @@
  */
 
 import {useContext} from 'react'
-import {AppConfigContext} from '../contexts'
+import {MultiSitesContext} from '../contexts'
 
 /**
  * Custom React hook to get the current site
  * @returns {site: Object, setSite: function}
  */
-const useAppConfig = () => useContext(AppConfigContext)
+const useUrlTemplate = () => useContext(MultiSitesContext)
 
-export default useAppConfig
+export default useUrlTemplate

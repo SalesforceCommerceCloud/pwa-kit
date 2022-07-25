@@ -30,7 +30,7 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import useSite from '../../hooks/use-site'
-import useAppConfig from '../../hooks/use-app-config'
+import useUrlTemplate from '../../hooks/use-url-template'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
@@ -38,7 +38,7 @@ const Footer = ({...otherProps}) => {
     const [locale, setLocale] = useState(intl.locale)
     const {site} = useSite()
     const {l10n} = site
-    const appConfig = useAppConfig()
+    const {fillUrlTemplate} = useUrlTemplate()
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
@@ -140,7 +140,7 @@ const Footer = ({...otherProps}) => {
                                         // Update the `locale` in the URL.
                                         const newUrl = getPathWithLocale(target.value, {
                                             disallowParams: ['refine'],
-                                            urlTemplateLiteral: appConfig.urlTemplateLiteral
+                                            fillUrlTemplate: fillUrlTemplate
                                         })
 
                                         window.location = newUrl

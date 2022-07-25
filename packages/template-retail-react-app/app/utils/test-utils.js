@@ -46,13 +46,13 @@ export const SUPPORTED_LOCALES = [
 export const DEFAULT_SITE = 'global'
 // Contexts
 import {
-    AppConfigProvider,
     CategoriesProvider,
     CurrencyProvider,
     LocaleProvider,
+    MultiSitesProvider,
     SiteProvider
 } from '../contexts'
-import {getUrlTemplateLiteral} from './url'
+import {createUrlTemplate} from './url'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -128,7 +128,7 @@ export const TestProviders = ({
         onClose: () => {}
     }
 
-    const urlTemplateLiteral = getUrlTemplateLiteral(appConfig, DEFAULT_SITE, locale)
+    const fillUrlTemplate = createUrlTemplate(appConfig, DEFAULT_SITE, locale)
 
     const {app} = mockConfig
     const defaultSite = {
@@ -138,7 +138,7 @@ export const TestProviders = ({
 
     return (
         <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-            <AppConfigProvider urlTemplateLiteral={urlTemplateLiteral}>
+            <MultiSitesProvider fillUrlTemplate={fillUrlTemplate}>
                 <CommerceAPIProvider value={api}>
                     <CategoriesProvider categories={initialCategories}>
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
@@ -169,7 +169,7 @@ export const TestProviders = ({
                         </CurrencyProvider>
                     </CategoriesProvider>
                 </CommerceAPIProvider>
-            </AppConfigProvider>
+            </MultiSitesProvider>
         </IntlProvider>
     )
 }
@@ -213,9 +213,9 @@ export const createPathWithDefaults = (path) => {
     const siteAlias = app.siteAliases[defaultSite.id]
     const defaultLocale = defaultSite.l10n.defaultLocale
 
-    const urlTemplateLiteral = getUrlTemplateLiteral(app, siteAlias || defaultSite, defaultLocale)
+    const fillUrlTemplate = createUrlTemplate(app, siteAlias || defaultSite, defaultLocale)
 
-    const updatedPath = urlTemplateLiteral(path, siteAlias || defaultSite.id, defaultLocale)
+    const updatedPath = fillUrlTemplate(path, siteAlias || defaultSite.id, defaultLocale)
     return updatedPath
 }
 

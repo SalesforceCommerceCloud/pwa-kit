@@ -49,7 +49,7 @@ import {resolveLocaleFromUrl} from '../../utils/utils'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import useAppConfig from '../../hooks/use-app-config'
+import useUrlTemplate from '../../hooks/use-url-template'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -63,7 +63,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
-    const appConfig = useAppConfig()
+    const {fillUrlTemplate} = useUrlTemplate()
 
     const {pathname, search} = useLocation()
     const site = useMemo(() => {
@@ -119,7 +119,7 @@ const App = (props) => {
         const path = homeUrlBuilder(HOME_HREF, {
             locale,
             site,
-            urlTemplateLiteral: appConfig.urlTemplateLiteral
+            fillUrlTemplate: fillUrlTemplate
         })
         history.push(path)
 
@@ -128,11 +128,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = appConfig.urlTemplateLiteral(
-            '/cart',
-            site.alias || site.id,
-            locale.alias || locale.id
-        )
+        const path = fillUrlTemplate('/cart', site.alias || site.id, locale.alias || locale.id)
         history.push(path)
 
         // Close the drawer.
@@ -142,7 +138,7 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = appConfig.urlTemplateLiteral(
+            const path = fillUrlTemplate(
                 '/account',
                 site.alias || site.id,
                 locale.alias || locale.id
@@ -156,7 +152,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = appConfig.urlTemplateLiteral(
+        const path = fillUrlTemplate(
             '/account/wishlist',
             site.alias || site.id,
             locale.alias || locale.id
@@ -209,7 +205,7 @@ const App = (props) => {
                                         <link
                                             rel="alternate"
                                             hrefLang={locale.id.toLowerCase()}
-                                            href={`${appOrigin}${appConfig.urlTemplateLiteral(
+                                            href={`${appOrigin}${fillUrlTemplate(
                                                 location.pathname,
                                                 site.alias || site.id,
                                                 locale.id
@@ -221,7 +217,7 @@ const App = (props) => {
                                     <link
                                         rel="alternate"
                                         hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                        href={`${appOrigin}${appConfig.urlTemplateLiteral(
+                                        href={`${appOrigin}${fillUrlTemplate(
                                             location.pathname,
                                             site.alias || site.id,
                                             site.l10n.defaultLocale

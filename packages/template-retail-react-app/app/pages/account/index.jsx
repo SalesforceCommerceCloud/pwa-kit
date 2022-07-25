@@ -39,7 +39,7 @@ import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import useLocale from '../../hooks/use-locale'
 import useSite from '../../hooks/use-site'
-import useAppConfig from '../../hooks/use-app-config'
+import useUrlTemplate from '../../hooks/use-url-template'
 
 const Account = () => {
     const {path} = useRouteMatch()
@@ -53,7 +53,7 @@ const Account = () => {
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
     const [showLoading, setShowLoading] = useState(false)
 
-    const appConfig = useAppConfig()
+    const {fillUrlTemplate} = useUrlTemplate()
 
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -93,7 +93,7 @@ const Account = () => {
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
     if (customer.authType != null && !customer.isRegistered) {
-        const path = appConfig.urlTemplateLiteral('/login', site.alias || site.id, locale.id)
+        const path = fillUrlTemplate('/login', site.alias || site.id, locale.id)
         return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
     }
 
