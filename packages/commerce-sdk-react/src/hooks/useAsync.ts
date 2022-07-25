@@ -36,7 +36,7 @@ export const useAsyncExecute = <A extends any[], R>(fn: (...args: A) => Promise<
         execute: (...arg) => {
             setIsLoading(true)
             fn(...arg)
-                .then((data: R) => {
+                .then((data) => {
                     setData(data)
                 })
                 .catch((error: Error) => {
