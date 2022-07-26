@@ -1,124 +1,36 @@
-# commerce-sdk-isomorphic
+# commerce-sdk-react hooks generator
 
-[![CircleCI][circleci-image]][circleci-url]
+A developer tool forked from commerce-sdk-isomorphic, used for generating SCAPI hooks for commerce-sdk-react.
 
-The Salesforce Commerce SDK Isomorphic allows easy interaction with the Salesforce B2C Commerce platform Shopper APIs through a lightweight SDK that works both on browsers and NodeJS applications. For a more robust SDK, which includes our B2C Data APIS and Shopper APIs, see [our Node.js Commerce SDK](https://github.com/SalesforceCommerceCloud/commerce-sdk).
+## Setup
 
-## Getting Started
+This is published as a branch of pwa-kit, but it's a fully separate project, so I recommend installing it in a separate directory.
 
-### Requirements
-
-- Node `^12.x`, `^14.x`, or `^16.x`
-
-### Installation
-
-```bash
-npm install commerce-sdk-isomorphic
+```sh
+# Recommended location: peer of your pwa-kit directory
+git clone -b wjh/hooks-generator --depth 1 git@github.com:SalesforceCommerceCloud/pwa-kit.git hooks-generator
+cd hooks generator
+yarn install
 ```
 
-### Usage
+## Editing templates
 
-> **Note:** These are required parameters.
+The templates (located in `./templates`) are handlebars templates, with some helpers from `handlebars-helpers` and some custom helpers that may or may not be used.
 
-| Parameter      | Description                                                                |
-| -------------- | :------------------------------------------------------------------------- |
-| clientId       | ID of the client account created with Salesforce Commerce.                 |
-| organizationId | The unique identifier for your Salesforce identity.                        |
-| shortCode      | Region-specific merchant ID.                                               |
-| siteId         | Name of the site to access data from, for example, RefArch or SiteGenesis. |
+The data is AMF document models loaded from the RAML specs in `./apis`. AMF is a pain to work with, as it doesn't follow standard JavaScript patterns for accessing data (it's generated from Scala code). Particularly, a _lot_ of the data is exposed as getter methods, and getting the actual value (e.g. as a string) requires invoking `.value()`. On top of the AMF layer is a thin `ApiMetadata` / `ApiModel` class, defined in raml-toolkit.
 
-```javascript
-/**
- * Configure required parameters
- *
- * To learn more about the parameters please refer to https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html
- */
-import {helpers, ShopperLogin, ShopperSearch} from 'commerce-sdk-isomorphic';
+Additional templates can be added by editing `./scripts/generate.ts`.
 
-// Create a configuration to use when creating API clients
-const config = {
-  proxy: 'https://localhost:3000', // Routes API calls through a proxy when set
-  headers: {},
-  parameters: {
-    clientId: '<your-client-id>',
-    organizationId: '<your-org-id>',
-    shortCode: '<your-short-code>',
-    siteId: '<your-site-id>',
-  },
-  throwOnBadResponse: true,
-};
+## Generating templates
 
-const shopperLogin = new ShopperLogin(config);
-// Execute Public Client OAuth with PKCE to acquire guest tokens
-const {access_token, refresh_token} = await helpers.loginGuestUser(
-  shopperLogin,
-  {redirectURI: `${config.proxy}/callback`} // Callback URL must be configured in SLAS Admin
-);
+You will need to generate the files in this project, and then copy them into pwa-kit. Note that the files are written for pwa-kit, so type checks in this directory will fail due to unresolved imports.
 
-const shopperSearch = new ShopperSearch({
-  ...config,
-  headers: {authorization: `Bearer ${access_token}`},
-});
+Generated files are placed in `./src/lib`. This can be changed in `./scripts/generate.ts`.
 
-const searchResult = await shopperSearch.productSearch({
-  parameters: {q: 'shirt'},
-});
+```sh
+yarn run renderTemplates
+# Assuming a `hooks-generator` is a peer of `pwa-kit`
+OUTDIR=../pwa-kit/packages/commerce-sdk-react/src/hooks
+rm -r $OUTDIR/Shopper* # There are non-generated files in the directory, don't delete them!
+cp -r ./src/lib/ $OUTDIR
 ```
-
-#### CORS
-
-The Salesforce Commerce API (SCAPI) does not support CORS, so a proxy must be used to be able to use the SDK. Code example on SDK usage with a proxy can be seen above.
-
-### Advanced options
-
-Commerce SDK Isomorphic supports Fetch API options for [node-fetch](https://github.com/node-fetch/node-fetch/1#api) on server and [whatwg-fetch](https://github.github.io/fetch/) on browser with a simple configuration.
-This sample code shows how to configure HTTP timeout and agent options.
-
-```javascript
-/**
- * Configure advanced timeout and agent parameters
- *
- * To learn more about the parameters please refer to the [Salesforce Developer Center](https://developer.salesforce.com/docs/commerce/commerce-api).
- */
-// Create a configuration to use when creating API clients
-const https = require('https');
-
-const config = {
-  proxy: 'https://localhost:3000',
-  headers: {},
-  parameters: {
-    clientId: '<your-client-id>',
-    organizationId: '<your-org-id>',
-    shortCode: '<your-short-code>',
-    siteId: '<your-site-id>',
-  },
-  fetchOptions: {
-    timeout: 2000, //request times out after 2 seconds
-    agent: new https.agent({
-      // a custom http agent
-      keepAlive: true,
-    }),
-  },
-};
-```
-
-### Additional Config Settings
-
-_headers:_ A collection of key/value string pairs representing additional headers to include with API requests.
-
-_throwOnBadResponse:_ Default value is false. When set to true, the SDK throws an Error on responses with statuses that are not 2xx or 304.
-
-### Public Client Shopper Login helpers
-
-A collection of helper functions are available in this SDK to simplify [Public
-Client Shopper Login OAuth
-flows](https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=shopper-login:Summary). See sample code above for guest login.
-
-## License Information
-
-The Commerce SDK Isomorphic is licensed under BSD-3-Clause license. See the [license](./LICENSE.txt) for details.
-
-<!-- Markdown link & img dfn's -->
-
-[circleci-image]: https://circleci.com/gh/SalesforceCommerceCloud/commerce-sdk-isomorphic.svg?style=svg&circle-token=379eaa6f00e0840e10dd80585b2b045d02a8f3b7
-[circleci-url]: https://circleci.com/gh/SalesforceCommerceCloud/commerce-sdk-isomorphic
