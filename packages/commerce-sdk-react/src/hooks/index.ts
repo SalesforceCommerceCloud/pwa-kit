@@ -5,7 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export * from './ShopperBaskets'
+export * from './ShopperContexts'
 export * from './ShopperCustomers'
+export * from './ShopperDiscoverySearch'
+export * from './ShopperGiftCertificates'
+export * from './ShopperLogin'
 export * from './ShopperOrders'
 export * from './ShopperProducts'
 export * from './ShopperPromotions'

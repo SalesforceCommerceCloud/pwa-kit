@@ -1,0 +1,6 @@
+{
+  "out": "docs",
+  "entryPoints": [
+    "src/index.ts"
+  ]
+}

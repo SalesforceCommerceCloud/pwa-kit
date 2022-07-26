@@ -218,6 +218,24 @@ commands:
           destination: local-npm-repo/verdaccio.log
 
 jobs:
+  docs_build_and_deploy:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "5b:0d:b0:de:e3:85:fa:c6:58:80:22:a6:0a:d2:73:3d"
+      - checkout
+      - setup
+      - run:
+          name: "Build and publish docs"
+          command: |
+            if [[ $RELEASE ]]; then
+              git config user.email "bot-pwa-kit@salesforce.com"
+              git config user.name "bot-pwa-kit"
+              cd packages/commerce-sdk-react
+              node ./scripts/build-and-release-docs.js
+            fi
   testNode14Windows:
     executor:
       name: win/default
@@ -257,6 +275,7 @@ jobs:
           command: |
               if [[ $DEVELOP || $RELEASE ]]; then
                 target=staging
+                target_commerce_sdk_react="commerce-sdk-react"
               elif [[ $RELEASE ]]; then
                 target=production
               else
@@ -267,6 +286,9 @@ jobs:
 
               if [[ $target ]]; then
                 npm run push --prefix packages/template-retail-react-app -- -s $project --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+              fi
+              if [[ $target_commerce_sdk_react ]]; then
+                npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target_commerce_sdk_react
               fi
       - checkclean
       - run:
@@ -418,6 +440,7 @@ workflows:
           matrix:
             parameters:
               template: [express-minimal-test-project, typescript-minimal-test-project]
+      - docs_build_and_deploy
   nightly-build:
     triggers:
       - schedule:
