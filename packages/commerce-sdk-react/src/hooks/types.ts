@@ -35,53 +35,31 @@ export interface ApiClients {
     shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
-// These are the common params for all query hooks
-// it allows user to override configs for specific query
-export interface QueryParams {
-    siteId?: string
-    locale?: string
-    currency?: string
-    organizationId?: string
-    shortCode?: string
-}
+/**
+ * Object returned by a "query" hook.
+ */
+export type QueryResponse<T> = {isLoading: boolean; error?: Error; data?: T}
 
-export type QueryResponse<T> =
-    | {
-          isLoading: boolean
-          error?: undefined
-          data?: undefined
-      }
-    | {
-          isLoading: true
-          error?: Error
-          data?: T
-      }
-    | {
-          isLoading: false
-          error: Error
-          data?: undefined
-      }
-    | {
-          isLoading: false
-          error?: undefined
-          data: T
-      }
-
-// TODO: Include action name as a key in addition to "execute"?
-export type ActionResponse<A, R> = QueryResponse<R> & {
-    execute: (arg: A) => void
+/**
+ * Object returned by an "action" hook.
+ */
+export type ActionResponse<Args extends unknown[], Data> = QueryResponse<Data> & {
+    execute: (args: Args) => void
 }
 
 export type DependencyList = readonly unknown[]
 
-export type Argument<T extends (arg: any) => unknown> = T extends (arg: infer R) => any ? R : never
+/**
+ * The first argument of a function.
+ */
+export type Argument<T extends (arg: any) => unknown> = Parameters<T>[0]
 
-export interface SdkMethod<A, R> {
-    (arg: A): Promise<R>
-    // Specifying `Response` separately is important so that `R` is just the data type
-    (arg: A, flag?: boolean): Promise<Response | R>
-}
-
-export type DataType<T extends (...args: any[]) => Promise<any>> = T extends SdkMethod<any, infer R>
+/**
+ * The data type returned by a commerce-sdk-isomorphic method when the raw response
+ * flag is not set.
+ */
+export type DataType<T extends (arg: any) => Promise<unknown>> = T extends (
+    arg: any
+) => Promise<Response | infer R>
     ? R
     : never
