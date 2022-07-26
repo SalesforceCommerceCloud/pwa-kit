@@ -11,7 +11,7 @@ export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryRespon
     // This is a stub implementation to validate the types.
     // The real implementation will be more React-y.
     const result: QueryResponse<T> = {
-        isLoading: true,
+        isLoading: true
     }
     fn()
         .then((data) => {
@@ -45,7 +45,7 @@ export const useAsyncCallback = <A extends any[], R>(fn: (...args: A) => Promise
                 .finally(() => {
                     setIsLoading(false)
                 })
-        },
+        }
     }
     return result
 }
