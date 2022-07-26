@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
+import {useQuery} from '@tanstack/react-query'
+import fetch from 'cross-fetch'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
@@ -82,6 +84,14 @@ h1 {
 
 const Home = ({value}: Props) => {
     const [counter, setCounter] = useState(0)
+    console.log('Inside home')
+
+    const query = useQuery(['my-query'], async () => {
+        const res = await fetch('https://api.chucknorris.io/jokes/random')
+        const data = await res.json()
+        console.log(data)
+        return data
+    })
 
     useEffect(() => {
         const interval = setInterval(() => {

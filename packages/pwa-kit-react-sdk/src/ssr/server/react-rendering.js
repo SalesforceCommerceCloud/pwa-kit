@@ -8,7 +8,8 @@
 /**
  * @module progressive-web-sdk/ssr/server/react-rendering
  */
-
+import { Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import ssrPrepass from 'react-ssr-prepass';
 import path from 'path'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
@@ -185,7 +186,7 @@ export const render = async (req, res, next) => {
         config
     }
     try {
-        renderResult = renderApp(args)
+        renderResult = await renderApp(args)
     } catch (e) {
         // This is an unrecoverable error.
         // (errors handled by the AppErrorBoundary are considered recoverable)
@@ -208,33 +209,52 @@ export const render = async (req, res, next) => {
     }
 }
 
-const renderAppHtml = (req, res, error, appData) => {
-    const {App, appState, routes, routerContext, location, extractor, deviceType} = appData
-
-    let appJSX = (
-        <Router location={location} context={routerContext}>
-            <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
-                </AppConfig>
-            </DeviceContext.Provider>
-        </Router>
+const getAppJSX = (req, res, error, appData) => {
+    const {App, appState, routes, routerContext, location, deviceType, queryClient} = appData
+    return (
+        <QueryClientProvider client={queryClient}>
+            <Hydrate state={{text: 'TODO'}}>
+                <Router location={location} context={routerContext}>
+                    <DeviceContext.Provider value={{type: deviceType}}>
+                        <AppConfig locals={res.locals}>
+                            <Switch error={error} appState={appState} routes={routes} App={App} />
+                        </AppConfig>
+                    </DeviceContext.Provider>
+                </Router>
+            </Hydrate>
+        </QueryClientProvider>
     )
+}
 
-    appJSX = extractor.collectChunks(appJSX)
+const prepass = async (req, res, error, appData) => {
+    return await ssrPrepass(getAppJSX(req, res, error, appData))
+}
+
+const renderAppHtml = (req, res, error, appData) => {
+    const {extractor} = appData
+    const appJSX = extractor.collectChunks(getAppJSX(req, res, error, appData))
     return ReactDOMServer.renderToString(appJSX)
 }
 
-const renderApp = (args) => {
+const renderApp = async (args) => {
     const {req, res, appStateError, App, appState, location, routes, config} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
+    const queryClient = new QueryClient()
     const routerContext = {}
-    const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
+    const appData = {App, appState, location, routes, routerContext, deviceType, extractor, queryClient}
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query
     const indent = prettyPrint ? 8 : 0
+
+    await prepass(req, res, appStateError, appData)
+
+    console.log('queryClient', queryClient)
+    console.log('queryClient', queryClient.isFetching())
+    console.log('queryClient.queryCache.queries[0]', queryClient.queryCache.queries[0])
+
+    await Promise.all(queryClient.queryCache.queries.map((q => q.fetch())))
 
     let appHtml
     let renderError
