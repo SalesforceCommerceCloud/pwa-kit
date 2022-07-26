@@ -44,10 +44,14 @@ export type QueryResponse<T> = {isLoading: boolean; error?: Error; data?: T}
  * Object returned by an "action" hook.
  */
 export type ActionResponse<Args extends unknown[], Data> = QueryResponse<Data> & {
-    execute: (args: Args) => void
+    execute: (...args: Args) => void
 }
 
-export type DependencyList = readonly unknown[]
+/**
+ * Object returned by a SCAPI "action" hook.
+ */
+export type ScapiActionResponse<Arg, Data, Name extends string> = ActionResponse<[Arg], Data> &
+    Record<Name, ActionResponse<[Arg], Data>['execute']>
 
 /**
  * The first argument of a function.

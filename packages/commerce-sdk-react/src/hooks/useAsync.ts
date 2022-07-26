@@ -24,14 +24,16 @@ export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryRespon
     return result
 }
 
-export const useAsyncExecute = <A, R>(fn: (arg: A) => Promise<R>) => {
+export const useAsyncExecute = <Args extends unknown[], Ret>(
+    fn: (...args: Args) => Promise<Ret>
+) => {
     // This is a stub implementation to validate the types.
     // The real implementation will be more React-y.
-    const result: ActionResponse<A, R> = {
+    const result: ActionResponse<Args, Ret> = {
         isLoading: false,
-        execute(arg: A) {
+        execute(...args: Args) {
             result.isLoading = true
-            fn(arg)
+            fn(...args)
                 .then((data) => {
                     result.isLoading = false
                     result.data = data
