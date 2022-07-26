@@ -1,0 +1,103 @@
+#%RAML 1.0 Library
+usage: |-
+
+  This is a collection of types, traits, security schemes, and more that follow the standards that are defined for Salesforce Commerce Cloud APIs. This standard library should be used, in conjuction with the standard Salesforce API Standards library, via:
+
+      uses:
+        ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.3/api-standards.raml
+        CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.5/commerce-cloud-standards.raml
+
+  The goal is to expose only the importable objects in these files, and keep other, internal details as 'private'. If you feel something that is used internally in the standard is something that should be exposed in `commerce-cloud-standards.raml`, or if you feel something should be added to the standard, contact the C4E team with your proposal.
+
+  # SecuritySchemes
+
+    This project provides the following reusable securitySchemes. Except in rare circumstances, an API should not need to define its own security scheme and should use the ones provided here or in the Salesforce API Standards:
+
+    - **`AmOAuth2`:** a security scheme for endpoints authenticated against [Account Manager](https://account.demandware.com/dw/account/Home#/) OAuth 2.0.
+    - **`ShopperToken`:** a security scheme for endpoints authenticated via Shopper JWTs.
+    - **`BearerToken`:** a security scheme that supplements APIs secured with `AmOAuth2` to support the usage of the mocking service.
+
+  # Types
+  This project provides the following reusable types. These types are referenced in a plurality of APIs, to the point where it makes sense to have a common definition where the documentation, validation, and usage of them can be well documented.
+
+    - **`SiteId`:** a type that describes the storefront context for requests by a Shopper. If you need to have a siteId queryParam, use the trait `SiteSpecific`.
+
+    ## Search Specific
+    - **`SearchRequest`:** a type commonly used for searching that takes a query in a body.
+    - **`PaginatedSearchResult`:** a type commonly used for a search response that took a query in a body.
+    - **`SimpleSearchResult`:** a type used for a search response that takes a query in a body, but does not return a paginated result.
+
+    ## Following Standards
+
+    - **`CurrencyCode`:** ISO 4217 compliant currency code.
+    - **`Money`:** A combination of a CurrencyCode and a number.
+    - **`LanguageCode`:** ISO 639-1 compliant language code.
+    - **`CountryCode  `:** ISO 3166-1 compliant country code.
+    - **`LocaleCode`:** A combination of LanguageCode and CountryCode.
+
+  # Resource Types
+
+  This project provides the following reusable resource types. These resource types are referenced in a plurality of APIs, to the point where it makes sense to have a common definition where the documentation, validation, and usage of them can be well documented.
+
+    - **`Organization`:** a type that describes the `organizationId` uri parameter that the majority of Commerce Cloud APIs require in the resource path after the `version`. The beginning of all API resource paths is expected to be `/organizations/{organizationId}`. This resource type will provide the documentation and validation of the `organizationId`.
+
+  # Traits
+  This project provides the following reusable traits. These traits are referenced in a plurality of APIs, to the point where it makes sense to have a common definition where the documentation, validation, and usage of them can be well documented.
+
+    - **`SiteSpecific`:** adds a query parameter called `siteId` of type `SiteId` to the request.
+    - **`QueryParamsLimit`:** adds an offset query parameter without the limit query parameter. Some Commerce Cloud use cases do not currently require both. Prefer the use of `ApiStandards.OffsetPaginated`, may be deprecated in the future if there is no use case for it.
+    - **`QueryParamsOffset`:** adds a limit query parameter without the offset query parameter. Some Commerce Cloud use cases do not currently require both. Prefer the use of `ApiStandards.OffsetPaginated`, may be deprecated in the future if there is no use case for it.
+
+
+uses:
+  AdditionalProperties: Types/additional-properties.raml
+  Search: Types/search-types.raml
+  Pagination: Types/pagination-types.raml
+  ISO: Types/ISO-standards.raml
+
+securitySchemes: 
+  AmOAuth2: !include SecuritySchemes/am-oauth-2.raml
+  ShopperToken: !include SecuritySchemes/shopper-token.raml
+  BearerToken: !include SecuritySchemes/bearer-token.raml
+
+types:
+  SiteId:
+    description: The identifer of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites
+    example:
+      SiteGenesis
+    type: string
+    minLength: 1
+  SearchRequest: Search.SearchRequestBase
+  PaginatedSearchResult: Search.PaginatedSearchResultBase
+  SimpleSearchResult: Search.SimpleSearchResultBase
+  
+  CurrencyCode: ISO.Currency
+  Money: ISO.MoneyMnemonic
+  LanguageCode: ISO.Language
+  CountryCode: ISO.Country
+  LocaleCode: ISO.Locale
+
+  ClosedObject: AdditionalProperties.NoPropertiesAllowed
+  OpenObject: AdditionalProperties.SpecifiedPropertiesAllowed
+  
+resourceTypes:
+  Organization:
+    uriParameters:
+      organizationId:
+        description: An identifier for the organization the request is being made by.
+        example:
+          f_ecom_zzxy_prd
+
+traits:
+  QueryParamsLimit:
+    usage: This trait should not be used unless there is no requirement for QueryParamsOffset. Prefer the usage of ApiStandards.OffsetPaginated.
+    queryParameters:
+      limit?: Pagination.Limit
+  QueryParamsOffset:
+    usage: This trait should not be used unless there is no requirement for QueryParamsLimit. Prefer the usage of ApiStandards.OffsetPaginated.
+    queryParameters:
+      offset?: Pagination.Offset
+  SiteSpecific:
+    usage: This trait should be used whenever a resource has the context of a site assoicated with its request. This will add a siteId query parameter
+    queryParameters:
+      siteId: SiteId

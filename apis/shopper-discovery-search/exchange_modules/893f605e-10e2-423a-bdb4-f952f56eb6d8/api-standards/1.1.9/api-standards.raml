@@ -1,0 +1,36 @@
+#%RAML 1.0 Library
+
+usage: |
+  REST and HTTP enforce a bunch of rules around Resources and Methods along with prescriptions around responding to requests with appropriate responses. What they don't do, and rightfully so, is attempt to standardize on the commonality for disparate services. In a particular Services ecosystem, example: Commerce Platform, having services obey a set of constraints around the way they are exposed helps achieve a level of commonality via convention that will enable them to interplay easily.
+
+  These RAML componenets will define those constraints that RESTful Services developed at Commerce Cloud will adhere to. This API implements the version **[1.1 of the REST standard](https://confluence.internal.salesforce.com/display/ENG/RESTful+APIs+Conventions+and+Standards+v1.1)**, please make sure this is the version you are meaning to use before leveraging these RAML components.
+
+  In order to ease the future generation of code, this artifact is meant to be used as a RAML Library. Refrain from using this as partial includes.
+
+  An example RAML is provided in `/example.raml`.
+
+securitySchemes: 
+  GDoT: !include securitySchemes/gdot.raml
+
+types:
+  ErrorResponse: !include dataTypes/error-response.raml
+  Offset: Pagination.offset
+  Limit: Pagination.limit
+  Uuid: Identifiers.UniversallyUniqueIdentifier
+  
+uses:
+  Pagination: dataTypes/pagination-types.raml
+  Identifiers: dataTypes/identifers.raml
+
+traits: 
+  RateLimited: !include traits/rate-limited.raml
+  RateLimited2: !include traits/rate-limited-2.raml
+  RateLimited3: !include traits/rate-limited-3.raml
+  RateLimited4: !include traits/rate-limited-4.raml
+  RateLimited5: !include traits/rate-limited-5.raml
+  SyncCreated: !include traits/sync-created.raml
+  AsyncCreated: !include traits/async-created.raml
+  DateConditionalRequest: !include traits/date-conditional-request.raml
+  EtagConditionalRequest: !include traits/etag-conditional-request.raml
+  EtagResponse: !include traits/etag-response.raml
+  OffsetPaginated: !include traits/offset-paginated.raml

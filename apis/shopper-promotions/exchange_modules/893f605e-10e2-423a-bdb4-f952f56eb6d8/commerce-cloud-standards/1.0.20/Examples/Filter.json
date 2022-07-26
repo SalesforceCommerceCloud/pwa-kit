@@ -1,0 +1,9 @@
+{
+  "termFilter": {
+    "field": "enabled",
+    "operator": "is",
+    "values": [
+      false
+      ]
+  }
+}

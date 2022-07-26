@@ -1,0 +1,6 @@
+{
+  "type": "https://discovery.commercecloud.salesforce.com/documentation/error/v2/errors/service-unavailable",
+  "title": "Service Unavailable",
+  "detail": "The server is temporarily unable to handle the request.", 
+  "instance": "{Resource URI}"
+}

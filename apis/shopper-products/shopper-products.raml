@@ -1,0 +1,1043 @@
+#%RAML 1.0
+title: Shopper Products
+version: v1
+mediaType: application/json
+protocols: HTTPS
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/product/shopper-products/{version}
+baseUriParameters:
+  shortCode:
+    description: A region-specific merchant identifier.
+    example: 0dnz6oep
+    pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
+
+description: Use the Shop Products & Catalogs API to interact with the API in the context of a shop customer to get products and categories by their IDs.
+
+uses:
+  ProdTraits: products-traits-library.raml
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.17/commerce-cloud-standards.raml
+
+types:
+  BundledProduct:
+    description: A bundle of products that can be bought together (all or nothing). Each product in the bundle can itself be bought independently, but this is outside of the context of the bundle. A bundle is a purchasing convenience. *Product bundle has a SKU and price.* 
+    properties:
+      id:
+        type: string
+        example: "823476"
+      product:
+        description: The product being bundled.
+        type: Product
+      quantity:
+        description: For the product being bundled, the quantity added to the bundle.
+        type: number
+        format: double
+        example: 5
+  Image:
+    description: Product image
+    properties:
+      alt:
+        description: The localized alternative text of the image.
+        type: string
+        required: false
+        example: "Apple iPod Shuffle, large"
+      disBaseLink:
+        description: Base URL for the Dynamic Image Service (DIS) address. This is only shown if the image is stored on the server and DIS is enabled.
+        type: string
+        required: false
+        example: "https://example.com/images/large/ipod-shuffle-silver.jpg"
+      link:
+        description: The URL of the actual image.
+        minLength: 1
+        type: string
+        example: "https://example.com/on/demandware.static/-/Sites-electronics-catalog/default/dwc2/images/large/ipod-shuffle.jpg"
+      title:
+        description: The localized title of the image.
+        type: string
+        required: false
+        example: "Apple iPod Shuffle"
+  ImageGroup:
+    description: Document representing an image group containing a list of images for a particular view type and an optional variation value.
+    properties:
+      images:
+        description: The images of the image group.
+        type: array
+        items:
+          type: Image
+      variationAttributes:
+        description: Returns a list of variation attributes applying to this image group.
+        type: array
+        items:
+          type: VariationAttribute
+        required: false
+      viewType:
+        description: The image view type.
+        type: string
+        example: "hi-res"
+  Inventory:
+    description: Document representing inventory information of the current product for a particular inventory list.
+    properties:
+      ats:
+        description: |-
+          The Available To Sell (ATS) of the product. If it is infinity, the return value is 999999. The value can be overwritten by the
+           OCAPI setting 'product.inventory.ats.max_threshold'.
+        type: number
+        format: double
+        required: false
+        example: 15
+      backorderable:
+        description: A flag indicating whether the product is backorderable.
+        type: boolean
+        required: false
+        example: true
+      id:
+        description: The inventory ID.
+        type: string
+        example: "SiteList"
+      inStockDate:
+        description: A flag indicating the date when the product will be in stock.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      orderable:
+        description: A flag indicating whether at least one of the products is available to sell.
+        type: boolean
+        required: false
+        example: true
+      preorderable:
+        description: A flag indicating whether the product is preorderable.
+        type: boolean
+        required: false
+        example: false
+      stockLevel:
+        description: |-
+          The stock level of the product. If it is infinity, the return value is 999999. The value can be overwritten by the
+           OCAPI setting 'product.inventory.stock_level.max_threshold'.
+        type: number
+        format: double
+        required: false
+        example: 10
+  Master:
+    description: The master product is a representation of a group of variant products. This is a non-buyable entity, provides inheritable attributes for its product variants, and is used for navigation. *Doesn't have a SKU.*
+    properties:
+      masterId:
+        description: The ID (SKU) of the master product.
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "82349"
+      orderable:
+        description: A flag indicating whether at least one of the variants is orderable.
+        type: boolean
+        required: false
+        example: true
+      price:
+        description: The minimum sales price of the related variants.
+        type: number
+        format: double
+        required: false
+        example: 15.99
+      priceMax:
+        description: The maximum sales price of the related variants.
+        type: number
+        format: double
+        required: false
+        example: 25.99
+      prices:
+        description: List of sale prices.
+        type: object
+        properties:
+          //:
+            type: number
+            format: double
+        required: false
+  Option:
+    description: Product options enable you to sell configurable products that have optional accessories, upgrades, or additional services. Options are always purchased with a product and can't be purchased separately. *Product Option has a SKU and a price associated with it.*
+    properties:
+      description:
+        description: The localized description of the option.
+        type: string
+        required: false
+        example: "Get this Option"
+      id:
+        description: The ID of the option.
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "Warranty"
+      image:
+        description: The URL to the option image.
+        type: string
+        required: false
+        example: "https://www.exampleimage.com/images/optionImage.jpg"
+      name:
+        description: The localized name of the option.
+        type: string
+        required: false
+        example: "Warranty"
+      values:
+        description: The array of option values. This array can be empty.
+        type: array
+        items:
+          type: OptionValue
+        required: false
+  OptionValue:
+    description: Document representing an option value.
+    properties:
+      default:
+        description: A flag indicating whether this option value is the default one.
+        type: boolean
+        required: false
+        example: true
+      id:
+        description: The ID of the option value.
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "5YR"
+      name:
+        description: The localized name of the option value.
+        type: string
+        required: false
+        example: "5 Year Warranty"
+      price:
+        description: The effective price of the option value.
+        type: number
+        format: double
+        required: false
+        example: 15.99
+  PriceRange:
+    description: Document representing price ranges for a product which happens to be a master product (per Pricebook)
+    properties:
+      maxPrice:
+        description: Maximum price for the given pricebook (usually for a master Product would be the price for the Variant which has the highest price out of all Variants in that pricebook)
+        type: number
+        format: double
+        required: false
+        example: 10.89
+      minPrice:
+        description: Minimum price for the given pricebook (usually for a master Product would be the price for the Variant which has the least price out of all Variants in that pricebook)
+        type: number
+        format: double
+        required: false
+        example: 10.89
+      pricebook:
+        description: The active pricebook from which the min and the max prices are calculated. The pricebook is based on the site context of the request as defined in ECOM.
+        type: string
+        required: false
+        example: usd-list-pricebook
+  Product:
+    description: Any product that is sold, shown alone, and does not have variations such as different sizes or colors. A product has no reliance on any other product for inheritance. *A product has a SKU and can have a product option, which has a different SKU*.
+    properties:
+      brand:
+        description: The product's brand.
+        type: string
+        required: false
+        example: "Apple"
+      bundledProducts:
+        description: The array of all bundled products of this product.
+        type: array
+        items:
+          type: BundledProduct
+        required: false
+      currency:
+        description: The ISO 4217 mnemonic code of the currency.
+        type: string
+        required: false
+        example: "USD"
+      ean:
+        description: The European Article Number of the product.
+        type: string
+        required: false
+        example: "8essdf9w3"
+      fetchDate:
+        type: integer
+        format: int32
+        required: false
+        example: 5
+      id:
+        description: The ID (SKU) of the product.
+        maxLength: 24
+        minLength: 1
+        type: string
+        example: "apple-ipod-classic"
+      imageGroups:
+        description: The array of product image groups.
+        type: array
+        items:
+          type: ImageGroup
+        required: false
+      inventories:
+        description: |-
+          The array of product inventories explicitly requested via the 'inventory_ids' query parameter. This property
+           is only returned in context of the 'availability' expansion.
+        type: array
+        items:
+          type: Inventory
+        required: false
+      inventory:
+        description: |-
+          The site default inventory information. This property is only
+           returned in context of the 'availability' expansion.
+        type: Inventory
+        required: false
+      longDescription:
+        description: The localized product's long description.
+        type: string
+        required: false
+        example: "Awesome long description of product"
+      manufacturerName:
+        description: The product's manufacturer name.
+        type: string
+        required: false
+        example: "Apple"
+      manufacturerSku:
+        description: The product's manufacturer SKU.
+        type: string
+        required: false
+        example: "2ND8834"
+      master:
+        description: 'The master product information, only for types: master, variation group, and variant.'
+        type: Master
+        required: false
+      minOrderQuantity:
+        description: The minimum order quantity for this product.
+        type: number
+        format: double
+        required: false
+        example: 2
+      name:
+        description: The localized product name.
+        type: string
+        required: false
+        example: "Apple IPod Classic"
+      options:
+        description: The array of product options, only for type option. This array can be empty.
+        type: array
+        items:
+          type: Option
+        required: false
+      pageDescription:
+        description: The localized product's page description.
+        type: string
+        required: false
+        example: "Really good Product"
+      pageKeywords:
+        description: The localized product's page description.
+        type: string
+        required: false
+        example: "Ipod, Music Player"
+      pageTitle:
+        description: The localized product's page title.
+        type: string
+        required: false
+        example: "Apple IPod Classic"
+      price:
+        description: |-
+          The sales price of the product. In case of complex products, like master or set, this is the minimum price of
+           related child products.
+        type: number
+        format: double
+        required: false
+        example: 59.99
+      pricePerUnit:
+        description: The price per unit if defined for the product
+        type: number
+        format: double
+        required: false
+        example: 19.99
+      pricePerUnitMax:
+        description: The max price per unit typically for a master product's variant.
+        type: number
+        format: double
+        required: false
+        example: 29.99
+      priceMax:
+        description: The maximum sales of related child products in complex products like master or set.
+        type: number
+        format: double
+        required: false
+        example: 69.99
+      priceRanges:
+        description: Array of one or more price range objects representing one or more Pricebooks in context for the site.
+        type: PriceRange[]
+        required: false
+      prices:
+        description: The prices map with pricebook IDs and their values.
+        type: object
+        properties:
+          //:
+            type: number
+            format: double
+        required: false
+      primaryCategoryId:
+        description: The ID of the products primary category.
+        type: string
+        required: false
+        example: "electronics"
+      productLinks:
+        description: The array of source and target product links information.
+        type: array
+        items:
+          type: ProductLink
+        required: false
+      productPromotions:
+        description: |-
+          The array of active customer product promotions for this product. This array can be empty.
+           Coupon promotions are not returned in this array.
+        type: array
+        items:
+          type: ProductPromotion
+        required: false
+      recommendations:
+        description: Returns a list of recommendations.
+        type: array
+        items:
+          type: Recommendation
+        required: false
+      setProducts:
+        description: The array of set products of this product.
+        type: array
+        items:
+          type: Product
+        required: false
+      shortDescription:
+        description: The localized product short description.
+        type: string
+        required: false
+        example: "Awesome Product"
+      stepQuantity:
+        description: |-
+          The steps in which the order amount of the product can be
+           increased.
+        type: number
+        format: double
+        required: false
+        example: 2
+      tieredPrices:
+        description: The document represents list of tiered prices if the product is a variant
+        type: ProductPriceTable[]
+        required: false
+      type:
+        description: 'The product type information. Can be one or more of the following values: item, master, variation_group, variant, bundle, and set.'
+        type: ProductType
+        required: false
+      unit:
+        description: The sales unit of the product.
+        type: string
+        required: false
+        example: "lbs"
+      upc:
+        description: The Universal Product Code (UPC).
+        type: string
+        required: false
+        example: "JSDU876"
+      validFrom:
+        description: The time a product is valid from.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      validTo:
+        description: The time a product is valid to.
+        type: datetime
+        required: false
+        example: 9999-12-31T23:59:59.0Z
+      variants:
+        description: The array of actual variants. Only for master, variation group, and variant types. This array can be empty.
+        type: array
+        items:
+          type: Variant
+        required: false
+      variationAttributes:
+        description: |-
+          Sorted array of variation attributes information. Only for master,
+           variation group, and variant types. This array can be empty.
+        type: array
+        items:
+          type: VariationAttribute
+        required: false
+      variationGroups:
+        description: The array of actual variation groups. Only for master, variation group, and variant types. This array can be empty.
+        type: array
+        items:
+          type: VariationGroup
+        required: false
+      variationValues:
+        description: |-
+          The actual variation attribute ID - value pairs. Only for variant and
+           variation group types.
+        type: object
+        properties:
+          //:
+            type: string
+        required: false
+  ProductLink:
+    description: |-
+      Document representing a link between two products. It contains the ID of the source and target products, the type of
+       product link, and the URLs to retrieve product data.
+    properties:
+      sourceProductId:
+        description: The semantic ID of the product this product link is coming from.
+        type: string
+        example: "824756924"
+      sourceProductLink:
+        description: The URL addressing the product this product link is coming from.
+        type: string
+        example: "Link"
+      targetProductId:
+        description: The semantic ID of the product this product link is pointing to.
+        type: string
+        example: "2TR93459"
+      targetProductLink:
+        description: The URL addressing the product this product link is pointing to.
+        type: string
+        example: "Link"
+      type:
+        description: The type of product link.
+        type: string
+        enum:
+          - cross_sell
+          - replacement
+          - up_sell
+          - accessory
+          - newer_version
+          - alt_orderunit
+          - spare_part
+          - other
+        example: up_sell
+  ProductPriceTable:
+    description: Tiered Price Level Object  
+    properties:
+      price:
+        description: Price for the product for the specified tier for the specified pricebook
+        type: number
+        format: double
+        required: false
+        example: 12.99
+      pricebook:
+        description: The active pricebook for which this price is defined
+        type: string
+        required: false
+        example: usd-list-pricebook
+      quantity:
+        description: Quantity tier for which the price is defined.
+        type: number
+        format: double
+        required: false
+        example: 1.00
+  ProductPromotion:
+    description: Document representing a product promotion.
+    properties:
+      calloutMsg:
+        description: The localized call-out message of the promotion.
+        type: string
+        example: "Fantastic promotion"
+      promotionId:
+        description: The unique ID of the promotion.
+        type: string
+        example: "summerSale"
+      promotionalPrice:
+        description: The promotional price for this product.
+        type: number
+        format: double
+        example: 12.99
+  ProductResult:
+    description: Result document containing an array of products.
+    properties:
+      limit:
+        description: The number of returned documents.
+        type: integer
+        format: int32
+        example: 12
+      data:
+        description: The array of product documents.
+        type: Product[]
+      total:
+        description: The total number of documents.
+        type: integer
+        format: int32
+        example: 12
+  ProductType:
+    description: Document representing a product type.
+    properties:
+      bundle:
+        description: A flag indicating whether the product is a bundle.
+        type: boolean
+        required: false
+        example: true
+      item:
+        description: A flag indicating whether the product is a standard item.
+        type: boolean
+        required: false
+        example: false
+      master:
+        description: A flag indicating whether the product is a master.
+        type: boolean
+        required: false
+        example: true
+      option:
+        description: A flag indicating whether the product is an option.
+        type: boolean
+        required: false
+        example: false
+      set:
+        description: A flag indicating whether the product is a set.
+        type: boolean
+        required: false
+        example: true
+      variant:
+        description: A flag indicating whether the product is a variant.
+        type: boolean
+        required: false
+        example: false
+      variationGroup:
+        description: A flag indicating whether the product is a variation group.
+        type: boolean
+        required: false
+        example: false
+  Recommendation:
+    description: Document representing a product recommendation.
+    properties:
+      calloutMsg:
+        description: The localized callout message of the recommendation.
+        type: string
+        required: false
+        example: "Absolutely recommended"
+      image:
+        description: The image of the recommendation.
+        type: Image
+        required: false
+      longDescription:
+        description: The localized long description of the recommendation.
+        type: string
+        required: false
+        example: "Really good detailed product description"
+      name:
+        description: The localized name of the recommendation.
+        type: string
+        required: false
+        example: "Apple Ipod Shuffle"
+      recommendationType:
+        description: The recommendation type of the recommendation.
+        type: RecommendationType
+      recommendedItemId:
+        description: The recommended item ID of the recommendation.
+        type: string
+        required: false
+        example: "apple-ipod-shuffle"
+      shortDescription:
+        description: The localized short description of the recommendation.
+        type: string
+        required: false
+        example: "Product description"
+  RecommendationType:
+    description: Document representing a recommendation type.
+    properties:
+      displayValue:
+        description: The localized display value of the recommendation type.
+        type: string
+        example: "UpSell"
+      value:
+        description: The value of the recommendation type.
+        type: integer
+        format: int32
+        example: 2
+  Variant:
+    description: A product which is a variation within a master product that describes different colors, sizes, or other variation attributes. *Has a SKU.*
+    properties:
+      orderable:
+        description: A flag indicating whether the variant is orderable.
+        type: boolean
+        required: false
+        example: true
+      price:
+        description: The sales price of the variant.
+        type: number
+        format: double
+        required: false
+        example: 25.99
+      productId:
+        description: The ID (SKU) of the variant.
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "8W4756834"
+      tieredPrices:
+        description: List of tiered prices if the product is a variant
+        type: ProductPriceTable[]
+        required: false
+      variationValues:
+        description: The actual variation attribute ID - value pairs.
+        type: object
+        properties:
+          //:
+            type: string
+        required: false
+  VariationAttribute:
+    description: Document representing a variation attribute.
+    properties:
+      id:
+        description: The ID of the variation attribute.
+        minLength: 1
+        type: string
+        example: "color"
+      name:
+        description: The localized display name of the variation attribute.
+        type: string
+        required: false
+        example: "Color"
+      values:
+        description: The sorted array of variation values. This array can be empty.
+        type: array
+        items:
+          type: VariationAttributeValue
+        required: false
+  VariationAttributeValue:
+    description: Document representing a variation attribute value.
+    properties:
+      description:
+        description: The localized description of the variation value.
+        type: string
+        required: false
+        example: "Color of the product"
+      image:
+        description: The first product image for the configured viewtype and this variation value.
+        type: Image
+        required: false
+      imageSwatch:
+        description: The first product image for the configured viewtype and this variation value (typically the swatch image).
+        type: Image
+        required: false
+      name:
+        description: The localized display name of the variation value.
+        type: string
+        required: false
+        example: "Red"
+      orderable:
+        description: A flag indicating whether at least one variant with this variation attribute value is available to sell.
+        type: boolean
+        required: false
+        example: true
+      value:
+        description: The actual variation value.
+        minLength: 1
+        type: string
+        example: "red"
+  VariationGroup:
+    description: Representation of a group of variant products by an attribute. This is a non-buyable entity, provides inheritable attributes for its product variants, and is used for navigation. *Doesn't have a SKU.*
+    properties:
+      orderable:
+        description: A flag indicating whether the variation group is orderable.
+        type: boolean
+        example: false
+      price:
+        description: The sales price of the variation group.
+        type: number
+        format: double
+        example: 24.99
+      productId:
+        description: The ID (SKU) of the variation group.
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "49345VG"
+      variationValues:
+        description: The actual variation attribute ID - value pairs.
+        type: object
+        properties:
+          //:
+            type: string
+  Category:
+    description: Categories allow products to be organized into hierarchical structures. Categories can have relationships to other parent categories. Each category can also provide a context inherited by subcategories. For example, a category may have an attribute value assigned to it, and any product assigned to the category or a subcategory would inherit the attribute value as long as the product is assigned. Once the product is removed from the category those attribute values would no longer be in the context of the product. Linking of categories is also used for Site hierarchical navigation. For example, inside 'Clothing' you may have 'Mens', and inside 'Mens' you may have 'Pants'. Categories are not *Tags.* 
+    properties:
+      categories:
+        description: Array of subcategories. Can be empty.
+        type: array
+        items:
+          type: Category
+        required: false
+      description:
+        description: The localized description of the category.
+        type: string
+        required: false
+        example: "Category description for Men's Category"
+      id:
+        description: The ID of the category.
+        type: string
+        example: "mens"
+      image:
+        description: The URL of the category image.
+        type: string
+        required: false
+      name:
+        description: The localized name of the category.
+        type: string
+        required: false
+        example: "Men's Category"
+      pageDescription:
+        description: The localized page description of the category.
+        type: string
+        required: false
+        example: "This category ahs all men's clothing"
+      pageKeywords:
+        description: The localized page keywords of the category.
+        type: string
+        required: false
+        example: "Mens, shirts"
+      pageTitle:
+        description: The localized page title of the category.
+        type: string
+        required: false
+        example: "Men's Category"
+      parentCategoryId:
+        description: The ID of the parent category.
+        type: string
+        required: false
+        example: "apparel"
+      parentCategoryTree:
+        description: The List of the parent categories.
+        type: array
+        items:
+          type: PathRecord
+        required: false
+      thumbnail:
+        description: The URL of the category thumbnail.
+        type: string
+        required: false
+        example: "https://www.exampleimage.com/images/categoryImage.jpg"
+  PathRecord:
+    description: Document representing most basic info (id and name) of a category or catalog.
+    properties:
+      id: 
+        description: The id of the category path.
+        type: string
+        example: "mens"
+        required: false
+      name:
+        description: The name of the category path.
+        type: string
+        example: "mens"
+        required: false
+  CategoryResult:
+    description: Result document containing an array of categories.
+    properties:
+      limit:
+        description: The number of returned documents.
+        type: integer
+        format: int32
+        example: 10
+      data:
+        description: The array of category documents.
+        type: array
+        items:
+          type: Category
+      total:
+        description: The total number of documents.
+        type: integer
+        format: int32
+        example: 5
+
+/organizations/{organizationId}:
+  type: CommerceCloudStandards.Organization
+  /products:
+    get:     
+      description: 'Allows access to multiple products by a single request. Only products that are online and assigned to a site catalog are returned. The maximum number of productIDs that can be requested are 24. Along with product details, the availability, images, price, promotions, and variations for the valid products will be included, as appropriate.' 
+      displayName: getProducts      
+      is:
+        - CommerceCloudStandards.SiteSpecific:
+        - ApiStandards.RateLimited:
+            responseStatus: 200
+        - ApiStandards.RateLimited:
+            responseStatus: 400
+        - ApiStandards.RateLimited:
+            responseStatus: 401
+        - ProdTraits.Unauthorized
+        - ProdTraits.BadRequest 
+      queryParameters:
+          ids: 
+            description: The IDs of the requested products (comma-separated, max 24 IDs).
+            type: string
+            required: true
+            example: "apple-ipod-shuffle,apple-ipod-nano"
+          inventoryIds:
+            description: The optional inventory list IDs, for which the availability should be shown (comma-separated, max 5 inventoryListIDs).
+            type: string
+            required: false
+            example: "Site1InventoryList,Site2InventoryList"
+          currency:
+            description: The currency mnemonic specified for price.
+            type: string
+            required: false
+            example: USD
+          locale:
+            description: The locale context.
+            type: string
+            required: false
+            example: default
+          allImages:
+            description: The flag that indicates whether to retrieve the whole image model for the requested product.
+            type: boolean
+            required: false
+            example: false
+          perPricebook:
+            description: The flag that indicates whether to retrieve the per PriceBook prices and tiered prices (if available) for requested Products. Available end of June, 2021.
+            type: boolean
+            required: false
+            example: false
+      responses:
+        '200':
+          description: Success.
+          body:
+            application/json:
+              type: ProductResult
+              examples:
+                product_result: !include Examples/product-result-example.raml
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-products] }
+    /{id}:
+      get:
+        description: 'Allows access to product details for a single product ID. Only products that are online and assigned to a site catalog are returned. Along with product details, the availability, images, price, bundled_products, set_products, recommedations, product options, variations, and promotions for the products will be included, as appropriate.'
+        displayName: getProduct
+        is: 
+          - CommerceCloudStandards.SiteSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 400
+          - ApiStandards.RateLimited:
+              responseStatus: 401 
+          - ApiStandards.RateLimited:
+              responseStatus: 404       
+          - ProdTraits.Unauthorized
+          - ProdTraits.BadRequest
+          - ProdTraits.NotFound
+        responses:
+          '200':
+            description: Success.
+            body:
+              application/json:
+                type: Product
+                examples:
+                  product: !include Examples/product-example.raml
+        queryParameters:
+          inventoryIds:
+            description: The optional inventory list IDs, for which the availability should be shown (comma-separated, max 5 inventoryListIDs).
+            type: string
+            required: false
+            example: "Site1InventoryList,Site2InventoryList"
+          currency:
+            description: The currency mnemonic specified for price.
+            type: string
+            required: false
+            example: USD
+          locale:
+            description: The locale context.
+            type: string
+            required: false
+            example: default
+          allImages:
+            description: The flag that indicates whether to retrieve the whole image model for the requested product.
+            type: boolean
+            required: false
+            example: false
+          perPricebook:
+            description: The flag that indicates whether to retrieve the per PriceBook prices and tiered prices (if available) for requested Products. Available end of June, 2021.
+            type: boolean
+            required: false
+            example: false
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-products] }
+      uriParameters:
+        id:
+          description: The ID of the requested product.
+          maxLength: 100
+          type: string
+          example: apple-ipod-shuffle
+
+  /categories:
+    get:
+      description: When you use the URL template, the server returns multiple categories (a result object of category documents). You can use this template as a convenient way of obtaining multiple categories in a single request, instead of issuing separate requests for each category. You can specify up to 50 multiple IDs. You must enclose the list of IDs in parentheses. If a category identifier contains parenthesis or the separator sign, you must URL encode the character. The server only returns online categories.
+      displayName: getCategories
+      is:
+        - CommerceCloudStandards.SiteSpecific:
+        - ApiStandards.RateLimited:
+            responseStatus: 200
+        - ApiStandards.RateLimited:
+            responseStatus: 400
+        - ApiStandards.RateLimited:
+            responseStatus: 401
+        - ProdTraits.BadRequest
+        - ProdTraits.Unauthorized
+      queryParameters:
+        ids:
+          description: The comma separated list of category IDs (max 50).
+          type: string
+          required: true
+          example: "electronics-digital-cameras,electronics-televisions"
+        levels:
+          minimum: 0
+          description: Specifies how many levels of nested subcategories you want the server to return. The default value is 1. Valid values are 0, 1, or 2.
+          type: integer
+          required: false
+          format: int32
+          enum: [0,1,2]
+          example: 0
+        locale:
+          description: The locale context.
+          example: default
+          type: string
+          required: false
+      responses:
+        '200':
+          description: Success.
+          body:
+            application/json:
+              type: CategoryResult
+              examples:
+                category: !include Examples/category-result-example.raml
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-categories] }
+    /{id}:
+      get:
+        description: |-
+          When you use the URL template below, the server returns a category identified by its ID; by default, the server
+          also returns the first level of subcategories, but you can specify another level by setting the levels
+          parameter. The server only returns online categories.
+        displayName: getCategory
+        is: 
+          - CommerceCloudStandards.SiteSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 400
+          - ApiStandards.RateLimited:
+              responseStatus: 401
+          - ApiStandards.RateLimited: 
+              responseStatus: 404
+          - ProdTraits.Unauthorized
+          - ProdTraits.BadRequest
+          - ProdTraits.NotFound
+        responses:
+          '200':
+            description: Success.
+            body:
+              application/json:
+                type: Category
+                examples:
+                  category: !include Examples/category-example.raml
+        queryParameters:
+          levels:
+            minimum: 0
+            type: integer
+            required: false
+            format: int32
+          locale:
+            type: string
+            required: false
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-categories] }
+      uriParameters:
+        id:
+          description: The ID of the requested category.
+          maxLength: 256
+          type: string
+          example: electronics

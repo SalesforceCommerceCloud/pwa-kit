@@ -1,0 +1,16 @@
+#%RAML 1.0 Trait
+description: 404 response when a customer is not found.
+responses:
+  '404':
+      description: |
+                Requested Resource Not Found
+      body:
+        application/problem+json:
+          type: ErrorResponse
+          example: 
+            {
+            "title": "Not Found",
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/not-found",
+            "detail": "No customer with ID 'abfTWMDZOgi3JPzkHjv9IhmziI' could be found.",
+            "customerId": "abfTWMDZOgi3JPzkHjv9IhmziI"
+            }

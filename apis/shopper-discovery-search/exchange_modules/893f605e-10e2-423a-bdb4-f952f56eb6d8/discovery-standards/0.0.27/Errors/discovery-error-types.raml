@@ -1,0 +1,156 @@
+#%RAML 1.0 Library
+
+# Discovery Error Response Types
+#
+# These types have been defined as part of the Discovery Mercury project (https://salesforce.quip.com/0EWTAH24eIMb).
+# All error types are based on the error response formats for HTTP APIs, following the standard [IETF rfc7807].
+# https://tools.ietf.org/html/rfc7807
+
+types:
+
+  BaseError: 
+    description: Standardized properties defined in the Commerce Cloud Standard error-response DataType raml file. Every error type consists of at least the four properties provided here of type, title, detail, and resource.
+    properties:
+      type:
+        description: | 
+          A URI reference [RFC3986] that identifies the
+          problem type.  This specification encourages that, when
+          dereferenced, it provide human-readable documentation for the
+          problem type (e.g., using HTML [W3C.REC-html5-20141028]).  When
+          this member is not present, its value is assumed to be
+          "about:blank". It accepts relative URIs; this means
+          that they must be resolved relative to the document's base URI, as
+          per [RFC3986], Section 5.
+        type: string
+        required: true
+        example: https://example.com/probs/out-of-credit
+      title:
+        description: | 
+          A short, human-readable summary of the problem
+          type.  It will not change from occurrence to occurrence of the
+          problem, except for purposes of localization.
+        type: string
+        required: false
+        example: You do not have enough credit.
+      detail:
+        description: | 
+          A human-readable explanation specific to this
+          occurrence of the problem.
+        type: string
+        required: false
+        example: Your current balance is 30, but that costs 50.
+      instance:
+        description: | 
+          A URI reference that identifies the specific
+          occurrence of the problem.  It may or may not yield further
+          information if dereferenced.  It accepts relative URIs; this means
+          that they must be resolved relative to the document's base URI, as
+          per [RFC3986], Section 5.
+        type: string
+        required: false
+        example: "/account/12345/msgs/abc"
+    additionalProperties: false
+
+  # Discovery Error Type Definitions:
+  AuthenticationFailure:
+    description: Error type indicating an error due to lack of authentication. Users are required to authenticate to access all Discovery API endpoints. Users should attempt to re-authenticate before retrying the request.
+    type: BaseError
+    example: !include Examples/Authentication.json
+
+  AuthorizationFailure:
+    description: Error type indicating an error due to lack of privilege. Users who are authenticated but attempt to access a resource which they don't have permission to access will receive this error.
+    type: BaseError
+    example: !include Examples/Authorization.json
+
+  NotFound:
+    description: Error type indicating the user attempted to access a resource or endpoint which doesn't exist.
+    type: BaseError
+    example: !include Examples/NotFound.json
+
+  ServiceUnavailable:
+    description:  Error type indicating the server temporarily cannot process the request due to internal issues, but the same request can be retried at a later point in time. 
+    type: BaseError
+    example: !include Examples/ServiceUnavailable.json
+
+  InternalServerError:
+    description: Error type indicating that the server could not fulfil the client’s request due to some unexpected condition.
+    type: BaseError
+    example: !include Examples/InternalServerError.json
+
+  RateLimitExceeded:
+    description: Error type indicating that the user has reached a rate limit for the server by sending requests too frequently. This error includes the limit of allowed requests to the resource.
+    type: BaseError
+    properties:
+      requestLimit:
+        description: A number returned indicating the maximum number of allowed requests for the instance being requested.
+        type: number
+    example: !include Examples/RateLimitExceeded.json
+
+  BadRequest:
+    description: Error indicating that the request was malformed. Provides multiple examples under the scope of one type.
+    type: BaseError
+    examples:
+      InvalidRequest: !include Examples/InvalidRequest.json
+      NonReadableHttpMessage: !include Examples/NonReadableHttpMessage.json
+
+  InvalidRequest:
+    description: Error type indicating that the server cannot or will not process the request due to something that is perceived to be a client error. An example of this would be providing a attribute value within a json body which is not one of the defined attribute types.
+    type: BadRequest
+    example: !include Examples/InvalidRequest.json
+
+  NonReadableHttpMessage:
+    description: Errors type indicating an invalid/non-parsable JSON was sent by the user. An example of this would be a JSON which is missing a bracket, and cannot be processed. 
+    type: BadRequest
+    example: !include Examples/NonReadableHttpMessage.json
+
+  ResourceBadRequest:
+    description: Error indicating that the request was malformed. Additionally thrown when the request was not processed due to violation of a server enforced quota or limit. This error will include a list of enums indicating the respective server limits which have been exceeded.
+    type: BaseError
+    properties:
+      limits?:
+        description: A list of limit objects providing the exceeded limits and the respective counts.
+        type: Limit[]
+    examples:
+      InvalidRequest: !include Examples/InvalidRequest.json
+      NonReadableHttpMessage: !include Examples/NonReadableHttpMessage.json
+      LimitExceeded: !include Examples/LimitExceeded.json
+
+  ResourceInvalidRequest:
+    description: Error type indicating that the server cannot or will not process the request due to something that is perceived to be a client error.
+    type: BadRequest
+    example: !include Examples/InvalidRequest.json
+
+  ResourceNonReadableHttpMessage:
+    description: Errors type indicating an invalid/non-parsable JSON was sent by the user. This case is normally handled by the spring framework before the request reaches the application endpoint.
+    type: ResourceBadRequest
+    example: !include Examples/NonReadableHttpMessage.json
+
+  Limit:
+    description: A type of resource limit which can be exceeded. Each enum corresponds to a different limit defined by the Discovery APIs non-functional requirements.
+    properties:
+      limitDetails:
+        description: An enum indicating the respective server limit which has been exceeded.
+        enum:
+          - ATTRIBUTE_DEFINITION_COUNT
+          - ITEM_IDENTIFIER_ATTRIBUTE_DEFINITION_COUNT
+          - ATTRIBUTE_USAGE_FACETABLE_COUNT 
+          - ATTRIBUTE_USAGE_FILTERABLE_COUNT 
+          - ATTRIBUTE_USAGE_GROUPABLE_COUNT 
+          - ATTRIBUTE_USAGE_SEARCHABLE_COUNT 
+          - ATTRIBUTE_USAGE_SORTABLE_COUNT
+          - ATTRIBUTE_CONFIGURATION_LOCALIZED_PATHS_COUNT
+          - QUERY_INPUT_PHRASE_COUNT
+          - QUERY_INPUT_TAG_IDS_COUNT
+          - QUERY_INPUT_FACETS_COUNT
+          - QUERY_INPUT_SORTING_COUNT
+          - QUERY_INPUT_GROUPING_COUNT
+          - QUERY_INPUT_REFINEMENTS_COUNT
+          - QUERY_INPUT_PAGINATION_COUNT
+      count: 
+        description: The current count of data associated with he provided enum.
+        type: integer
+        example: 51
+      limit:
+        description: The defined limit value associated with the provided enum.
+        type: integer
+        example: 50

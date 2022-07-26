@@ -1,0 +1,33 @@
+#%RAML 1.0 Library
+
+types:
+
+  Reference:
+    description: Location of a resource.
+    type: string
+
+  Self:
+    description: Link to the resource.
+    properties:
+      href: Reference
+    additionalProperties: false
+
+  SelfResourceLink:
+    description: Entity containing a HATEOS link to a resource.
+    properties:
+      self: Self
+    additionalProperties: false
+
+  Pagination:
+    description: Entity containing HATEOS links. These are links that allow navigating (paging) a result set.
+    properties:
+      prev?:
+        description: Link to the previous set of results.
+        type: Self
+      self:
+        description: Link to the current set of results.
+        type: Self
+      next?:
+        description: Link to the next set of results.
+        type: Self
+    additionalProperties: false

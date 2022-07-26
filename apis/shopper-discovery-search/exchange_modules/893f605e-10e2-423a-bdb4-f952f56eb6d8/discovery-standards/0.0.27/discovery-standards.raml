@@ -1,0 +1,50 @@
+#%RAML 1.0 Library
+usage: |
+  These RAML components look to define the common entities in the Discovery Domain, and are intended to be used in combination with the API Standards and Commerce Cloud Standards libraries to ensure consistency over all Discovery API contracts.
+
+uses:
+  DateTimes: Types/date-times.raml
+  IDs: Types/identifiers.raml
+  Links: Types/links.raml
+  UriParameters: Types/base-uri-parameters.raml
+  
+types:
+
+  # Base URI Parameters
+  Region: UriParameters.Region
+  Version: UriParameters.Version
+
+  # Resource Indentifiers
+  DataSetId: IDs.DataSetId
+  AttributeId: IDs.AttributeId
+
+  # Datetimes
+  CreationDateTime: DateTimes.CreationDateTime
+  LastUpdateDateTime: DateTimes.LastUpdateDateTime
+
+  # Links
+  ResourceLink: Links.SelfResourceLink
+
+  # Pagination
+  PaginationLinks: Links.Pagination
+
+  # Resources
+  ExpansionAttribute: !include Types/expansion-attribute.raml
+
+traits:
+
+  Traceable: !include Traits/traceable.raml
+
+  Filterable: !include Traits/bulk-retrieval-filters.raml
+
+  # Error Traits:
+  #
+  # Wraps Traits of the same status code to provide an optional response.
+  # Provides a CommonErrors trait for errors shared across all APIs.
+
+  CommonErrors: !include Errors/Traits/common-errors.raml
+  # Wraps: Invalid Request, NonReadableHttpMessage, AuthorizationFailure, AuthenticationFailure, NotFound, RateLimitExceeded, InternalServerError, ServiceUnavailable.
+
+  ResourceCommonErrors: !include Errors/Traits/resource-common-errors.raml
+  # Wraps: Invalid Request, NonReadableHttpMessage, AuthorizationFailure, AuthenticationFailure, NotFound, RateLimitExceeded, InternalServerError, ServiceUnavailable, LimitExceeded
+  

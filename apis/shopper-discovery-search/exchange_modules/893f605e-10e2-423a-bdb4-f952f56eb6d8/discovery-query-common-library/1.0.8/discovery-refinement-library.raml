@@ -1,0 +1,47 @@
+#%RAML 1.0 Library
+
+uses:
+  DiscoveryStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-standards/0.0.27/discovery-standards.raml
+  CommerceCloudStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/commerce-cloud-standards.raml
+
+types:
+
+  Refinement: 
+    description: The criteria for filtering search results. Search results can be filtered by filterable attributes to further narrow down the number of items being presented to the user. For example, search results can be filtered to only show items belonging to a specific brand.
+    type: object
+    properties:
+      attributeId: DiscoveryStandards.AttributeId
+      refinementType: 
+        description: The type of a refinement.
+        type: string
+    discriminator: refinementType
+  
+  ValueRefinement:
+    description: A type of refinement where one or more phrases are used for refining the search results for a given attribute. For example, you can refine a search result to only show items that are eligible for expedited shipping.
+    type: Refinement
+    discriminatorValue: VALUE_REFINEMENT
+    properties:
+      values:
+        description: One or more ways of refining the search results based on number, integer, date-only, datetime, boolean, or string types.
+        type: array
+        items:
+          type: any
+          example: "9, 99, 2019-12-31, 2019-12-31T23:59:59.000Z, true, skiing"
+        minItems: 1
+        uniqueItems: true
+    additionalProperties: false
+  
+  RangeRefinement:
+    description: A type of refinement where a range of values is used for refining the search results for a given attribute. For example, you can refine the search results to only show items that are below a specific price point.
+    type: Refinement
+    discriminatorValue: RANGE_REFINEMENT
+    properties:
+      min:
+        description: The minimum value in a range of type number, integer, date-only, datetime.
+        type: any
+        example: "9, 99, 2019-12-31, 2019-12-31T23:59:59.000Z"
+      max:
+        description: The maximum value in a range of type number, integer, date-only, or datetime.
+        type: any
+        example: "90, 990, 2020-12-31, 2020-12-31T23:59:59.000Z"
+    additionalProperties: false

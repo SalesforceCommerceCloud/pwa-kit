@@ -1,0 +1,50 @@
+#%RAML 1.0 Library
+
+uses:
+  DiscoveryStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-standards/0.0.27/discovery-standards.raml
+  CommerceCloudStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/commerce-cloud-standards.raml
+
+types:
+
+  ItemReference:
+    description: An entity that corresponds to an item in the search result. For example, in Commerce Cloud, this could be an item in a catalog of items that a merchant sells.
+    type: object
+    properties:
+      itemId: DiscoveryStandards.AttributeId
+      attributes?:
+        description: The attributes that were requested for when performing a search.
+        type: DiscoveryStandards.ExpansionAttribute[]
+  
+  Highlight:
+    description: An entity containing an attribute ID and the highlight value found for that attribute. Each highlight will have the matched segment from the input phrase wrapped in <em> and </em> tags.
+    type: object
+    properties:
+      attributeId: DiscoveryStandards.AttributeId
+      value:
+        type: string
+        description: The highlight value
+        example: This lightweight <em>jacket</em> is perfect for cool weather.
+
+  Result:
+    description: An entity referencing an item and the group to which it belongs. Items can be grouped based on attributes that are groupable. If such a grouping is asked for at the time of querying, then the grouped items are also returned.
+    type: CommerceCloudStandards.ClosedObject
+    properties:
+      matchedItem:
+        description: An entity that corresponds to an item in the search result.
+        type: ItemReference
+      highlights?:
+        description: A collection of highlights found for the matched item.
+        type: Highlight[]
+      groupId?:
+        description: Identifier of the grouped items.
+        type: string
+        example: 26194e28-9b2a-4a7e-b3e9-8328dd9acfca
+      totalGroupedItems?:
+        description: The total number of items grouped together if there are any grouped items.
+        type: number
+        example: 5
+      groupedItems?:
+        description: A collection of grouped items.
+        type: ItemReference[]
+        minItems: 1
+        uniqueItems: true

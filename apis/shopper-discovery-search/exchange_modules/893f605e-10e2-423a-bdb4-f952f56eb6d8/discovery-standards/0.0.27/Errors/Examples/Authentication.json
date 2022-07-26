@@ -1,0 +1,6 @@
+{
+  "type": "https://discovery.commercecloud.salesforce.com/documentation/error/v2/errors/authentication-failure",
+  "title": "Authentication Failure",
+  "detail": "Authentication failed due to missing or invalid token.",
+  "instance": "{Resource URI}"
+}

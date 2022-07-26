@@ -1,0 +1,119 @@
+#%RAML 1.0 NamedExample
+
+value:
+  {
+   "hits": [
+      {
+         "matchedItem": {
+            "itemId": "canon-powershot-sd990-is",
+            "attributes": [
+               {
+                  "attributeId": "name",
+                  "path": "name-text@L:en",
+                  "value": "Canon PowerShot A580 Digital Point and Shoot Camera"
+               },
+               {
+                  "attributeId": "relative-image-path",
+                  "path": "relative-image-path",
+                  "value": "large/canon-powershot-sd990-is.jpg"
+               },
+               {
+                  "attributeId": "price_usd-sale-prices",
+                  "path": "price_usd-sale-prices",
+                  "value": 399.99
+               }
+            ]
+         },
+         "groupId": "canon",
+         "groupedItems": [
+            {
+               "itemId": "canon-powershot-sd990-is",
+               "links": {
+                  "self": {
+                     "href": "https://example.api.commercecloud.salesforce.com/discovery/query/organizations/f_ecom_zzxy_prd/channels/ACME-US-Site/items/canon-eos-rebel-xs-wlens"
+                  }
+               }
+            },
+            {
+               "itemId": "canon-eos-rebel-xs-wlens"
+            }
+         ]
+      },
+      {
+         "matchedItem": {
+            "itemId": "canon-powershot-g10",
+            "attributes": [
+               {
+                  "attributeId": "name",
+                  "path": "name-text@L:en",
+                  "value": "Canon PowerShot G10 Digital Point and Shoot Camera"
+               },
+               {
+                  "attributeId": "relative-image-path",
+                  "path": "relative-image-path",
+                  "value": "large/canon-powershot-g10.jpg"
+               },
+               {
+                  "attributeId": "price_usd-sale-prices",
+                  "path": "price_usd-sale-prices",
+                  "value": 699.99
+               }
+            ]
+         },
+         "groupId": "canon",
+         "groupedItems": [
+            {
+               "itemId": "canon-powershot-g10",
+               "links": {
+                  "self": {
+                     "href": "https://example.api.commercecloud.salesforce.com/discovery/query/organizations/f_ecom_zzxy_prd/channels/ACME-US-Site/items/canon-powershot-g10"
+                  }
+               }
+            },
+            {
+               "itemId": "canon-powershot-sd990-is"
+            }
+         ]
+      }
+   ],
+   "facets": [
+      {
+        "attributeId": "category-id",
+        "facetType": "VALUE_FACET_OUTPUT",
+        "values": [
+            {
+                "value": "electronics",
+                "count": 4
+            },
+            {
+                "value": "newarrivals",
+                "count": 2
+            },
+        ]
+      },
+      {
+        "attributeId": "brand",
+        "facetType": "VALUE_FACET_OUTPUT",
+        "values": [
+            {
+                "value": "Canon",
+                "count": 4
+            }
+        ]
+      },
+      {
+        "facetType": "RANGE_FACET_INPUT",
+        "attributeId": "price_usd-sale-prices",
+        "min": 399.99,
+        "max": 699.99
+      }
+   ],
+   "limit": 10,
+   "offset": 0,
+   "total": 2,
+   "links": {
+      "self": {
+         "href": "https://example.api.commercecloud.salesforce.com/discovery/query/organizations/f_ecom_zzxy_prd/channels/ACME-US-Site/results?offset=0&limit=10"
+      }
+    }
+  }

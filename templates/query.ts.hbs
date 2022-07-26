@@ -1,0 +1,29 @@
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {ApiClients, Argument, DataType, QueryResponse} from '../types'
+import {useAsync} from '../useAsync'
+import useCommerceApi from '../useCommerceApi'
+
+type Client = ApiClients['{{name.lowerCamelCase}}']
+
+{{#each model.encodes.endPoints}}{{#each operations}}{{#if (is method 'get')~}}
+/**
+ * A hook for `{{@root.name.upperCamelCase}}#{{name}}`.
+ * {{{formatForTsDoc description}}}
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/{{@root.name.kebabCase}}?meta={{name~}} } for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/{{lowercase @root.name.lowerCamelCase}}.{{lowercase @root.name.lowerCamelCase}}-1.html#{{lowercase (getValue name)~}} } for more information on the parameters and returned data type.
+ * @returns An object describing the state of the request.
+ */
+export const use{{#startsWith 'get' (getValue name)~}}
+{{removeFirst (getValue name) 'get'}}
+{{~else~}}
+{{capitalize (getValue name)}}
+{{~/startsWith}} = (arg: Argument<Client['{{name}}']>): QueryResponse<DataType<Client['{{name}}']>> => {
+    const { {{~@root.name.lowerCamelCase}}: client} = useCommerceApi()
+    return useAsync(() => client.{{name}}(arg), [arg])
+}
+{{/if}}{{/each}}{{/each}}

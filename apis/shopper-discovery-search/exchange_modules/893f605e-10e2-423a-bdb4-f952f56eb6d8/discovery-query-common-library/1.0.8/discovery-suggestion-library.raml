@@ -1,0 +1,42 @@
+#%RAML 1.0 Library
+
+uses:
+  DiscoveryStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-standards/0.0.27/discovery-standards.raml
+  CommerceCloudStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/commerce-cloud-standards.raml
+
+types:
+  
+  SuggestionType:
+    description:
+      The different types of suggestions.
+        * RECENT - Search phrases that a shopper has recently executed.
+        * SUGGESTED - Search phrases presented to a shopper based on recent activity and a base search text.
+        * POPULAR - Search phrases that are trending in a shopper’s geolocation.
+    enum: 
+      - RECENT
+      - SUGGESTED
+      - POPULAR
+    example: SUGGESTED
+  
+  Suggestion:
+    description: A single suggested term for searching. For example, a suggested term can be handy when doing auto-complete as and when a user is searching for an item in an online store.
+    type: CommerceCloudStandards.ClosedObject
+    properties:
+      phrase:
+        description: The suggested phrase.
+        type: string
+        example: shoes
+  
+  Suggestions:
+    description: A collection of suggested terms for searching.
+    type: CommerceCloudStandards.ClosedObject
+    properties:
+      recentSearchPhrases?:
+        description: Most recent search phrases from the clients.
+        type: Suggestion[]
+      suggestedSearchPhrases?:
+        description: The suggested phrases based on the partial input.
+        type: Suggestion[]
+      popularSearchPhrases?:
+        description: Popular search phrases across the service.
+        type: Suggestion[]

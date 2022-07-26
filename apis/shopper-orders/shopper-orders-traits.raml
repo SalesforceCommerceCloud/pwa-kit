@@ -1,0 +1,11 @@
+#%RAML 1.0 Library
+
+uses:
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.15/commerce-cloud-standards.raml
+
+traits:
+  LocaleSpecific:
+    usage: This trait should be used whenever a resource uses the context of a locale associated with its request. This will add a locale query parameter.
+    queryParameters:
+      locale?:
+        type: CommerceCloudStandards.LocaleCode

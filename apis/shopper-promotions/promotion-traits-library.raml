@@ -1,0 +1,9 @@
+#%RAML 1.0 Library
+usage: Use the following traits for request and response status information
+
+types:
+  Error: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/dataTypes/error-response.raml
+
+traits:
+  PromotionNotFound: !include Traits/PromotionNotFound.raml
+  badrequest: !include Traits/badrequest.raml

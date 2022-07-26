@@ -1,0 +1,1 @@
+Get promotions by Promotion ID or Campaign ID

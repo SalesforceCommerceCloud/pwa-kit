@@ -1,0 +1,107 @@
+#%RAML 1.0 NamedExample
+value:
+  {
+    "type": "wish_list",
+      "name": "OurProductList",
+      "description": "our productlist",
+      "public": false,
+      "creationDate": "2019-10-18T22:06:28.965Z",
+      "currentShippingAddressInfo": {
+        "addressId": "home_address",
+        "title": "home_address, John Murphy, Burlington"
+      },
+      "customerProductListItems" : 
+          [
+            
+            {
+                "description" : "Description",
+                "id": "30f35c187ea255ccb633c3ba11",
+                "priority": 4,
+                "productId": "SimpleProduct",
+                "product" : 
+                    {
+                      "id" : "RedDress1",
+                      "imageGroups" : 
+                      [
+                          {
+                            "images" : 
+                            [
+                                {
+                                  "alt" : "ALT master detail",
+                                  "link" : "https://example.com/foo/bar/master_detail.jpg",
+                                  "title" : "TITLE master detail"
+                                }
+                            ],
+                            "viewType" : "detail"
+                          },
+                          {
+                            "images" : 
+                            [
+                                {
+                                  "alt" : "ALT master swatch",
+                                  "link" : "https://example.com/foo/bar/master_swatch.jpg",
+                                  "title" : "TITLE master swatch"
+                                }
+                            ],
+                            "viewType" : "swatch"
+                          },
+                          {
+                            "images" : 
+                            [
+                                {
+                                  "alt" : "ALT master thumbnail",
+                                  "link" : "https://example.com/foo/bar/master_thumbnail.jpg",
+                                  "title" : "TITLE master thumbnail"
+                                }
+                            ],
+                            "viewType" : "thumbnail"
+                          }
+                      ],
+                      "inventories" : 
+                      [
+                          {
+                            "ats" : 0,
+                            "backorderable" : false,
+                            "id" : "RedDress1Inventory",
+                            "orderable" : false,
+                            "preorderable" : false,
+                            "stockLevel" : 0
+                          }
+                      ],
+                      "minOrderQuantity" : 1,
+                      "stepQuantity" : 1
+                    },
+                "public": false,
+                "purchasedQuantity": 0,
+                "quantity": 2,
+                "type": "product"
+            }
+          ],
+      "coRegistrant" : 
+        {
+          "email" : "janedoe@example.com",
+          "firstName" : "Jane",
+          "lastName" : "Doe",
+          "role" : "Bride"
+        },
+      "registrant" : 
+        {
+          "email" : "johndoe@example.com",
+          "firstName" : "John",
+          "lastName" : "Doe",
+          "role" : "Groom"
+        },
+      "shippingAddressInfo" : 
+        {
+            "addressId" : "me",
+            "title" : "me, John Doe, Woburn"
+        },
+      "event" : 
+        {
+          "city" : "Washington",
+          "country" : "US",
+          "date" : "2015-09-05T17:12:56.670Z",
+          "state" : "DC",
+          "type" : "Wedding"
+        }
+  }

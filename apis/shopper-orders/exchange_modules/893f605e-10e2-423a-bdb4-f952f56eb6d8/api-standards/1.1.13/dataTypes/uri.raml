@@ -1,0 +1,16 @@
+#%RAML 1.0 Library
+usage:
+  URL types with regexes to validate them
+types:
+  absoluteUrl:
+    description: An absolute URL, beginning with a protocol
+    type: string
+    pattern: ^(https?|ftp):\/\/([-\.\w])+(:[\d]+)?(\/[-\w]*)*([-\w\&#\/\?=])*$
+    examples:
+      BasicUrl: https://www.salesforce.com
+      UrlWithParametersAndPort: https://www.salesforce.com:8080/api?detailed=true&lang=en
+#To be determined if we will support relative URL
+#  relativeUrl:
+#    description: A relative URL, without a protocol or domain. It may or may not begin with a leading `/`
+#    type: string
+#    pattern: ^/?(\/[-\w]*)*([-\w&#\/\?=])*$

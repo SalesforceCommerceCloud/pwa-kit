@@ -1,0 +1,7 @@
+{
+  "type": "https://discovery.commercecloud.salesforce.com/documentation/error/v2/errors/rate-limit-reached",
+  "title": "Rate Limit Reached",
+  "detail": "The request could not be processed due to the current volume of requests.",
+  "instance": "{Resource URI}",
+  "requestLimit": 1000
+}

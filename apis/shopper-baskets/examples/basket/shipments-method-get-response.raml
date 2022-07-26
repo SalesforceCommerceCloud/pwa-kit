@@ -1,0 +1,32 @@
+#%RAML 1.0 NamedExample
+value:
+  {
+      "applicableShippingMethods": [
+          {
+              "description": "Order received within 7-10 business days",
+              "id": "001",
+              "name": "Ground",
+              "price": 15.99
+          },
+          {
+              "description": "Order received in 2 business days",
+              "id": "002",
+              "name": "2-Day Express",
+              "price": 20.99
+          },
+          {
+              "description": "Order received the next business day",
+              "id": "003",
+              "name": "Overnight",
+              "price": 29.99
+          },
+          {
+              "description": "Store Pickup",
+              "id": "005",
+              "name": "Store Pickup",
+              "price": 0,
+              "c_storePickupEnabled": true
+          }
+      ],
+      "defaultShippingMethodId": "001"
+  }

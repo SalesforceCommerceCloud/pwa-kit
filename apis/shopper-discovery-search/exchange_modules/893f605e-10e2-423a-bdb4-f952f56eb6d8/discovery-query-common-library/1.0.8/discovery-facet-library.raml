@@ -1,0 +1,100 @@
+#%RAML 1.0 Library
+
+uses:
+  DiscoveryStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-standards/0.0.27/discovery-standards.raml
+  CommerceCloudStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/commerce-cloud-standards.raml
+
+types:
+
+  FacetRequest:
+    description: An entity describing the requested facet attributes. Explicit list of facet attributes can be requested in the "facets" field. Discovery will attempt to extend the result with most relevant facets up to the specified facet limit if one is set.
+    properties:
+      facetLimit?: 
+        description: The number of expected facet attributes in the result. Discovery will try to fill up the result with most relevant facet attributes up to the specified limit including the required facet attributes from the "facets" property. If the "facets" property is not provided or empty the result will be extended with most relevant facet attributes based on the query up to the specified limit. If one or more facet attributes are provided at the optional "facets" property, the attributes will be included in the result in addition to the most relevant facet attributes. If this property is not specified, only facet attributes from the "facets" property will be considered in the result. If the "facetLimit" property is less than the number of attributes in the "facets" property, then the "facetLimit" property will be ignored.
+        type: integer
+        format: int64
+        example: 8
+      facets?:  
+        description: Facet attributes which are required in the result.
+        type: FacetInput[]
+  
+  FacetInput:
+    description: An entity describing what type of faceting of the results is required. For example, results can be faceted by an attribute like color which has distinct values like red, blue, white etc. This is called value faceting. The results can also be faceted on a range of values having a lower and an upper bound like price. This is called range faceting.
+    type: object
+    properties:
+      attributeId: DiscoveryStandards.AttributeId
+      facetType: 
+        type: string
+        description: The type of faceting the results - either value based or based on a range.
+    discriminator: facetType
+
+  ValueFacetInput:
+      description: An entity describing the attributes that need to be faceted. For example, results can be faceted by an attribute like color, or brand. 
+      type: FacetInput
+      discriminatorValue: VALUE_FACET_INPUT
+      properties:
+        mask?:
+          description: Specifies the values that must be faceted. All other values are ignored in the results.
+          type: string[]
+          minItems: 1
+          uniqueItems: true
+          example: [red, blue]
+      additionalProperties: false
+    
+  RangeFacetInput:
+    description: An entity describing the attribute for which the range needs to be found in the returned results. For example, the results can be faceted by price; in which case, the min and max price of the items returned in the search results is made available.
+    type: FacetInput
+    discriminatorValue: RANGE_FACET_INPUT
+    additionalProperties: false
+
+  FacetOutput:
+    description: A specific view of the returned results. For example, if value faceting on the brand attribute, the output could be the brand name followed by how many of the items in the search results belong to that brand name - such as "Adidas - 5, Puma - 10, Nike - 15, New Balance - 2". If range faceting on price, the output is the price attribute followed by the minimum and maximum price of the items in the search results - such as "price - 9.99 (min), 549.99 (max)".
+    type: object
+    properties:
+      attributeId: DiscoveryStandards.AttributeId
+      facetType: 
+        type: string
+        description: The type of faceting the results - either value based or based on a range.
+    discriminator: facetType
+
+  ValueFacetOutputEntity:
+    description: An individual faceted entity. For example, when faceting by color, this will be a value like "red - 7" (color, followed by how many of the items in the search results have that color).
+    type: object
+    properties:
+      value:
+        description: The faceted value.
+        type: string
+        maxLength: 256
+        example: red
+      count:
+        description: The count of the faceted value.
+        type: integer
+        format: int64
+        example: 7
+  
+  ValueFacetOutput:
+    description: A specific view of the returned results with unique attributes and their counts. For example, when faceted by color, this will be a set of values like "red - 7, blue - 10, white - 21" (color, followed by how many of the items in the search results have that color).
+    type: FacetOutput
+    discriminatorValue: VALUE_FACET_OUTPUT
+    properties:
+      values?:
+        description: Optional one or more ValueFacetOutputEntity objects.
+        type: ValueFacetOutputEntity[]
+        uniqueItems: true
+        example: [{value: red, count: 7}, {value: blue, count: 8}]
+    additionalProperties: false
+
+  RangeFacetOutput:
+    description: A specific view of the returned results with the minimum and maximum values. For example, when faceted by price, this will be value like "price - 9.99 (min), 549.99 (max)" (range faceted attribute (price in this case), followed by the minimum and maximum value of that attribute in the search results).
+    type: FacetOutput
+    discriminatorValue: RANGE_FACET_OUTPUT
+    properties:
+      min:
+        description: The serialized minimum value in the faceting range of number, integer, date-only, or datetime type.
+        type: any
+        example: "10, 100, 2019-12-31, 2019-12-31T23:59:59.000Z"
+      max:
+        description: The serialized maximum value in the faceting range of number, integer, date-only, or datetime type.
+        type: any
+        example: "20, 200, 2020-12-31, 2020-12-31T23:59:59.000Z"
+    additionalProperties: false

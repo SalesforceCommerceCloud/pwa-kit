@@ -1,0 +1,51 @@
+#%RAML 1.0 NamedExample
+value:
+  {
+    "customerInfo": {
+      "email": "shopper@salesforce-test.com",
+      "customerNo" : "000000001"
+    },
+    "billingAddress": {
+      "firstName": "Stephanie",
+      "lastName": "Miller",
+      "address1": "104 Presidential Way",
+      "city": "Woburn",
+      "postalCode": "01801",
+      "stateCode": "MA",
+      "countryCode": "US"
+    },
+    "shipments": [
+      {
+        "shippingMethod": {
+          "id": "001"
+        },
+        "shippingAddress": {
+          "firstName": "Agustin",
+          "lastName": "Estes",
+          "address1": "4162  Turkey Pen Road",
+          "city": "New York",
+          "postalCode": "10016",
+          "stateCode": "NY",
+          "countryCode": "US"
+        }
+      }
+    ],
+    "paymentInstruments": [
+      {
+        "paymentMethodId": "CREDIT_CARD",
+        "paymentCard": {
+          "cardType": "Visa"
+        }
+      }
+    ],
+    "couponItems":[
+    { "code" : "5ties"
+    }
+  ],
+    "productItems": [
+      {
+        "productId": "green-umbrella",
+        "quantity": 3.00
+      }
+    ]
+  }

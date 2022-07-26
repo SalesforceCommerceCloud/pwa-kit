@@ -1,0 +1,16 @@
+#%RAML 1.0 Trait
+description: This trait represents API behavior for a 404 response in Shop Products API.
+responses:
+  404:
+    description:
+      Thrown when there is no promotion found with the given ID for the requested site.
+    body:
+      application/json:
+        type: Error
+        example: |
+          {
+            "type": "/PromotionNotFoundException",
+            "detail": "There is no promotion found with the given ID for the requested site.",
+            "title": "Not Found",
+            "instance":"/foo"
+          }

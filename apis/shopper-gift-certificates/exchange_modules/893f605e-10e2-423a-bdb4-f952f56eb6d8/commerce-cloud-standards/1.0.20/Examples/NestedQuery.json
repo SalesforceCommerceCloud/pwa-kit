@@ -1,0 +1,44 @@
+{
+  "path": "order.shippingAddresses",
+  "query": {
+    "boolQuery": {
+      "must": [
+        {
+          "boolQuery": {
+            "must": [
+              {
+                "termQuery": {
+                  "fields": [
+                    "order.shippingAddresses.firstName"
+                  ],
+                  "operator": "is",
+                  "values": [
+                    "John"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "boolQuery": {
+            "must": [
+              {
+                "termQuery": {
+                  "fields": [
+                    "order.shippingAddresses.lastName"
+                  ],
+                  "operator": "is",
+                  "values": [
+                    "Doe"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "scoreMode": "avg"
+}

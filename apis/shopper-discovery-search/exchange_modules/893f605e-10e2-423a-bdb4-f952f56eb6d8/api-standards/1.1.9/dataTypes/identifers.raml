@@ -1,0 +1,12 @@
+#%RAML 1.0 Library
+usage: Library for types that can act as well described identifers.
+
+types:
+  UniversallyUniqueIdentifier:
+    displayName: Uuid
+    description: A universally unique identifier (UUID) for the purpose of uniquely identifying an object in the system. It is defined as a 128-bit hex encoded string of 32 characters separated into 5 groups in a pattern of `{8-4-4-4-12}` (36 characters total, with the `-` separator).
+    type: string
+    pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+    example: 5cb34ffb-2543-4052-aea6-226749e4e478
+    maxLength: 36
+    minLength: 36

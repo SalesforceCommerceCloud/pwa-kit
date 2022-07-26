@@ -1,0 +1,6 @@
+{
+  "type": "https://discovery.commercecloud.salesforce.com/documentation/error/v2/errors/non-readable-http-message",
+  "title": "Non-Readable HTTP Message",
+  "detail": "The request could not be processed.", 
+  "instance": "{Resource URI}"
+}

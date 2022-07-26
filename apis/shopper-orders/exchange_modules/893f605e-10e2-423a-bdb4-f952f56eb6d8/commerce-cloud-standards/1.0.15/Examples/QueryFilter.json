@@ -1,0 +1,14 @@
+{
+  "query": {
+    "termQuery": {
+      "fields": [
+        "enabled",
+        "active"
+      ],
+      "operator": "is",
+      "values": [
+        false
+      ]
+    }
+  }
+}

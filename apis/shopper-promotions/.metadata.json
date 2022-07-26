@@ -1,0 +1,22 @@
+{
+  "id": "893f605e-10e2-423a-bdb4-f952f56eb6d8/shopper-promotions/1.0.21",
+  "name": "Shopper Promotions",
+  "description": "View details for active promotions.",
+  "groupId": "893f605e-10e2-423a-bdb4-f952f56eb6d8",
+  "assetId": "shopper-promotions",
+  "version": "1.0.21",
+  "categories": {
+    "API layer": [
+      "System"
+    ],
+    "CC API Family": [
+      "Pricing"
+    ],
+    "CC Version Status": [
+      "GA"
+    ],
+    "CC API Visibility": [
+      "External"
+    ]
+  }
+}

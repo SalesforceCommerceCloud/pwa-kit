@@ -1,0 +1,77 @@
+#%RAML 1.0 NamedExample
+value:
+  {
+      "applicablePaymentMethods": [
+          {
+              "id": "GIFT_CERTIFICATE",
+              "name": "Gift Certificate",
+              "paymentProcessorId": "BASIC_GIFT_CERTIFICATE"
+          },
+          {
+              "cards": [
+                  {
+                      "cardType": "Visa",
+                      "checksumVerificationEnabled": true,
+                      "name": "Visa",
+                      "numberLengths": [
+                          "13",
+                          "16"
+                      ],
+                      "numberPrefixes": [
+                          "4"
+                      ]
+                  },
+                  {
+                      "cardType": "Amex",
+                      "checksumVerificationEnabled": true,
+                      "name": "American Express",
+                      "numberLengths": [
+                          "15"
+                      ],
+                      "numberPrefixes": [
+                          "34",
+                          "37"
+                      ]
+                  },
+                  {
+                      "cardType": "Master Card",
+                      "checksumVerificationEnabled": true,
+                      "name": "MasterCard",
+                      "numberLengths": [
+                          "16"
+                      ],
+                      "numberPrefixes": [
+                          "51-55"
+                      ]
+                  },
+                  {
+                      "cardType": "Discover",
+                      "checksumVerificationEnabled": true,
+                      "name": "Discover",
+                      "numberLengths": [
+                          "16"
+                      ],
+                      "numberPrefixes": [
+                          "6011",
+                          "622126-622925",
+                          "644-649",
+                          "65"
+                      ]
+                  }
+              ],
+              "id": "CREDIT_CARD",
+              "name": "Credit Card",
+              "paymentProcessorId": "BASIC_CREDIT"
+          },
+          {
+              "id": "PayPal",
+              "name": "Pay Pal",
+              "paymentProcessorId": "PAYPAL_EXPRESS"
+          },
+          {
+              "id": "BML",
+              "name": "Bill Me Later",
+              "paymentProcessorId": "CYBERSOURCE_BML"
+          }
+      ]
+  }

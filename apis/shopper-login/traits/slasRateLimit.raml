@@ -1,0 +1,23 @@
+#%RAML 1.0 Trait
+
+usage: |
+  To be applied on SLAS endpoints for rate limiting.
+  Parameters:
+    - `responseStatus` (integer): |
+      The status #1 this endpoint will return.
+    - `responseStatus2` (integer): |
+      The status #2 this endpoint will return.
+    - `responseStatus3` (integer): |
+      The status #3 this endpoint will return.
+    - `responseStatus4` (integer): |
+      The status #4 this endpoint will return.
+
+responses: 
+  <<responseStatus>>:
+    !include private/slasRateLimitHeaders.raml
+  <<responseStatus2>>:
+    !include private/slasRateLimitHeaders.raml  
+  <<responseStatus3>>:
+    !include private/slasRateLimitHeaders.raml
+  <<responseStatus4>>:
+    !include private/slasRateLimitHeaders.raml

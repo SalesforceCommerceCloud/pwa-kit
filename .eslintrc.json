@@ -1,0 +1,115 @@
+{
+    "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true,
+        "jest/globals": true
+    },
+    "extends": [
+        "plugin:react/recommended",
+        "airbnb",
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react",
+        "@typescript-eslint",
+        "jest",
+        "header",
+        "prettier"
+    ],
+    "reportUnusedDisableDirectives": true,
+    "rules": {
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "import/extensions": ["error", "ignorePackages", {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }],
+      "import/no-extraneous-dependencies": "off",
+      "header/header": [
+        2,
+        "block",
+        [
+          "",
+          {
+            "pattern": "^ \\* Copyright \\(c\\) \\d{4}, (salesforce.com, inc|Salesforce, Inc)\\.$",
+            "template": " * Copyright (c) 2022, Salesforce, Inc."
+          },
+          " * All rights reserved.",
+          " * SPDX-License-Identifier: BSD-3-Clause",
+          " * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause",
+          " "
+        ]
+      ],
+      "max-lines": [
+        "error",
+        {
+          "max": 500
+        }
+      ],
+      "prettier/prettier": "warn"
+    },
+    "overrides": [
+      {
+        "files": [
+          "src/lib/**"
+        ],
+        "rules": {
+          "import/no-extraneous-dependencies": "error"
+        }
+      },
+      {
+        "files": [
+          "*.jsx",
+          "src/environment/**"
+        ],
+        "rules": {
+          "prettier/prettier": "off"
+        }
+      },
+      {
+        "files": [
+          "*.ts",
+          "*.tsx"
+        ],
+        "parserOptions": {
+          "project": ["./tsconfig.json"]
+        },
+        "extends": [
+          "plugin:@typescript-eslint/recommended-requiring-type-checking"
+        ],
+        "rules": {
+          "@typescript-eslint/explicit-module-boundary-types": "error"
+        }
+      }
+    ],
+    "settings": {
+      "react": {
+        "version": "detect"
+      },
+      "import/resolver": {
+        "node": {
+          "extensions": [
+            ".js",
+            ".jsx",
+            ".ts",
+            ".tsx"
+          ],
+          "moduleDirectory": [
+            "node_modules",
+            "src"
+          ]
+        }
+      }
+    }
+}

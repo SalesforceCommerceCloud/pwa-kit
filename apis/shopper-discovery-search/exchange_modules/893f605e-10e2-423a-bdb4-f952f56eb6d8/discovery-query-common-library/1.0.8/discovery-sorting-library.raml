@@ -1,0 +1,36 @@
+#%RAML 1.0 Library
+
+uses:
+  DiscoveryStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-standards/0.0.27/discovery-standards.raml
+  CommerceCloudStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/commerce-cloud-standards.raml
+
+types:
+
+  Sorting:
+    description: Describes what and how the returned results must be sorted. An attribute must be sortable before it can be used for sorting.
+    type: object
+    properties:
+      sortType: 
+        description: Specifies what is sorted. For example, an attribute like 'brand' can be sorted.
+        type: string
+    discriminator: sortType
+
+  AttributeSorting:
+    description: Describes which attribute the returned results must be sorted on. For example, sorting can be done based on the average user rating of the items returned in the results.
+    type: Sorting
+    discriminatorValue: ATTRIBUTE
+    properties:
+      attributeId: DiscoveryStandards.AttributeId
+      direction:
+        description: Specifies how to sort the returned results.
+        enum: 
+         - ASCENDING
+         - DESCENDING
+        example: ASCENDING
+    additionalProperties: false
+  
+  RelevanceSorting:
+    description: Describes if the results need to be sorted based on relevance score.
+    type: Sorting
+    discriminatorValue: RELEVANCE
+    additionalProperties: false

@@ -1,0 +1,37 @@
+#%RAML 1.0 DocumentationItem
+title: Error Response Mapping from OCAPI to Mulesoft
+
+content: |-
+
+  # NOTE: this documentation does not belong here any may be moved in the future.
+
+  - ErrorResponse defined in [API Standards RAML library](https://anypoint.mulesoft.com/exchange/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/) *MUST* be used in case of error. Teams MAY derive their own error response types from ErrorResponse.
+  - ErrorResponse.type *MUST* be unique CommerceCloud-wide. This is an unequivocal identification of the error and therefore should be unique.
+  - Work to write a common data weave that will transform the OCAPI Fault to [RFC 7807](https://tools.ietf.org/html/rfc7807) compliant messages
+    - Content-Type: `application/problem+json`
+    - `type`: URI in the format of https://api.commercecloud.salesforce.com/documentation/error/v1/errors/<kebab-case-`fault.type`>, with the word “Exception” removed from the last segment. 
+    - `title`: the `fault.type`, Upper Space Case, with the word “Exception” removed.
+    - `detail`: the content of fault.message
+    - Any attributes in `fault.arguments` just map to extra attributes of the same name, following all camelCase conventions.
+
+  ## Example Mapping:
+
+  ### OCAPI Fault Response
+        {
+            "_v" : "20.2",
+            "fault": {
+                "arguments": {
+                    "target_cartridge": "core"
+                },
+                "type": "InvalidOperationException",
+                "message": "Invalid operation on cartridge 'core'. The operation is only allowed on existing custom cartridge."
+            }
+        }
+
+  ### Mapped ErrorResponse
+        {
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/invalid-operation",
+            "title": "Invalid Operation",
+            "detail": "Invalid operation on cartridge 'core'. The operation is only allowed on existing custom cartridge.",
+            "targetCartridge": "core"
+        }

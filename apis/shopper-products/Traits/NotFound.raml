@@ -1,0 +1,17 @@
+#%RAML 1.0 Trait
+description: This trait represents API behavior for a 404 response.
+
+responses:
+  404:
+    description: Not Found.
+    body:
+      application/problem+json:
+        type: ErrorResponse
+        example: |
+          {
+            "title": "Product Not Found",
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/product-not-found",
+            "detail": "No product with ID 'pple-ipod-shuffle' for site 'SiteGenesis' could be found.",
+            "productId": "pple-ipod-shuffle",
+            "siteId": "SiteGenesis"
+          }

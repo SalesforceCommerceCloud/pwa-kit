@@ -1,0 +1,10 @@
+#%RAML 1.0 Trait
+
+usage: This trait allows for taking in an input header containing a request identifier.
+
+headers:
+  RequestId?:
+    description: Client defined unique identifier, used for tracking within the domain.
+    type: string
+    maxLength: 256
+    example: f20c37c8-f153-4001-b033-c7b32e1e8651

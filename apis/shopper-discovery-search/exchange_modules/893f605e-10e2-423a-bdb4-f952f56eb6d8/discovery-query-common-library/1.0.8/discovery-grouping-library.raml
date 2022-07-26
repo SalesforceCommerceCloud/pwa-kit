@@ -1,0 +1,30 @@
+#%RAML 1.0 Library
+
+uses:
+  DiscoveryStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-standards/0.0.27/discovery-standards.raml
+  CommerceCloudStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/commerce-cloud-standards.raml
+
+types:
+
+  Grouping:
+    description: Describes what the returned results must be grouped on. For example, results can be grouped by category such as 'Men's Shirts' or 'Kid's Toys'. They can also be grouped by a particular attribute variation - for example, grouping can be done on color, showing a collection of items that only vary by the color and nothing else.
+    type: object
+    properties:
+      groupType: 
+        description: Specifies what the returned results are grouped on.
+        type: string
+    discriminator: groupType
+
+  AttributeGrouping:
+    description: Describes which attribute the returned results must be grouped on. For example, results can be grouped by size and all items belonging to a specific size will be belong to one group, such as Men's XL sized t-shirts.
+    type: Grouping
+    discriminatorValue: ATTRIBUTE
+    properties:
+      attributeId: DiscoveryStandards.AttributeId
+      returnedAttributes?:
+        description: One or more attributes that should exclusively be returned for grouped items. If this field is not specified then it will inherit the returned attributes specified under Query Input. If no returned attributes are specified under Query Input then all returnable attributes will be returned.
+        type: DiscoveryStandards.AttributeId[]
+        minItems: 1
+        uniqueItems: true
+    additionalProperties: false
+    

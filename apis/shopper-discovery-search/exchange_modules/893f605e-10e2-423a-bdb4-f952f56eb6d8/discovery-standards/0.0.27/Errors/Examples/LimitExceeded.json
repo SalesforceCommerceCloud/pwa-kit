@@ -1,0 +1,18 @@
+{
+  "type": "https://discovery.commercecloud.salesforce.com/documentation/error/v2/errors/limit-exceeded",
+  "title": "Limit Exceeded",
+  "detail": "You have exceeded a limit for the provided attibutes.",
+  "instance": "{Resource URI}",
+  "limits": [
+    {
+      "limitDetails": "ATTRIBUTE_USAGE_FACETABLE_COUNT",
+      "count": 90,
+      "limit": 50
+    },
+    {
+      "limitDetails": "ATTRIBUTE_USAGE_FILTERABLE_COUNT",
+      "count": 15,
+      "limit": 12
+    }
+  ]
+}

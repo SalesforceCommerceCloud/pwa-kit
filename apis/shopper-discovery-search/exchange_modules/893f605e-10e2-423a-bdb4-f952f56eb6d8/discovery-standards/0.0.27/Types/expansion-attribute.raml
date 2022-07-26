@@ -1,0 +1,15 @@
+#%RAML 1.0 DataType
+
+uses:
+  IDs: identifiers.raml
+
+description: An entity containing an attribute ID, the attribute's path, and the attribute's value for a corresponding item.
+properties:
+  attributeId: IDs.AttributeId
+  path:
+    description: The path, using dot notation, that this attribute corresponds to.
+    type: string
+    example: item.brand
+  value:
+    description: The data for the given attribute.
+    type: any

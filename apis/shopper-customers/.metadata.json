@@ -1,0 +1,22 @@
+{
+  "id": "893f605e-10e2-423a-bdb4-f952f56eb6d8/shopper-customers/0.0.39",
+  "name": "Shopper Customers",
+  "description": "Allow customers to manage their own profiles and product lists.",
+  "groupId": "893f605e-10e2-423a-bdb4-f952f56eb6d8",
+  "assetId": "shopper-customers",
+  "version": "0.0.39",
+  "categories": {
+    "API layer": [
+      "Process"
+    ],
+    "CC API Family": [
+      "Customer"
+    ],
+    "CC Version Status": [
+      "GA"
+    ],
+    "CC API Visibility": [
+      "External"
+    ]
+  }
+}

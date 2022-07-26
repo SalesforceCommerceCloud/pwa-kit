@@ -1,0 +1,46 @@
+#%RAML 1.0 SecurityScheme
+
+description: |
+  AccountManager OAuth 2.0 bearer token Authentication.
+type: OAuth 2.0
+
+uses:
+
+describedBy:
+  headers:
+    Authorization:
+      description: |
+        OAuth 2.0 access-token in Bearer scheme
+      type: string
+      pattern: "Bearer .*"
+      examples: 
+        authenticatedUser: Bearer b325e95c-2cd7-11e5-b345-feff819cdc9f
+  responses:
+    401:
+      description: Unauthorized. Your access-token is invalid and could not be used to identify an API client or user.
+      headers:
+        WWW-Authenticate: 
+          example: |
+            WWW-Authenticate: Bearer realm="servers",
+                              error="invalid_token",
+                              error_description="The access-token expired"
+      body:
+        application/json:
+          type: !include ../Types/error-response.raml
+          example:
+            type: "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized"
+            title: Unauthorized
+            detail: Your access-token is invalid and could not be used to identify an API client or user.
+    403:
+      description: Forbidden. Your access-token is valid, but you have no permissions to access the resource.
+      body:
+        application/json:
+          type: !include ../Types/error-response.raml
+          example:
+            type: "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/forbidden"
+            title: Forbidden
+            detail: Your access-token is valid, but you have no permissions to access the resource.
+settings:
+  authorizationUri: https://account.demandware.com/dwsso/oauth2/authorize
+  accessTokenUri: https://account.demandware.com/dwsso/oauth2/access_token
+  authorizationGrants: [authorization_code, client_credentials]

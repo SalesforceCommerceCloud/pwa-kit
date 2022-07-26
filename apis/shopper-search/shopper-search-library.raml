@@ -1,0 +1,446 @@
+#%RAML 1.0 Library
+  
+uses:
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/commerce-cloud-standards.raml
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
+
+traits:
+   Unauthorized: !include Traits/Unauthorized.raml
+   
+types:
+  #types for product-search resource
+  ProductRef:
+    description: Document representing a product reference.
+    properties:
+      id:
+        description: The ID of the product reference.
+        type: string
+
+  ProductSearchHit:
+    description: Document representing a product search hit.
+    properties:
+      currency:
+        type: CommerceCloudStandards.CurrencyCode
+        required: false
+      hitType:
+        description: The type information for the search hit.
+        type: string
+        required: false
+      image:
+        description: The first image of the product hit for the configured viewtype.
+        type: Image
+        required: false
+
+      orderable:
+        description: A flag indicating whether the product is orderable.
+        type: boolean
+        required: false
+
+      price:
+        description: |-
+          The sales price of the product. In complex products, like master or set, this is the minimum price of
+           related child products.
+        type: number
+        format: double
+        required: false
+
+      priceMax:
+        description: The maximum sales of related child products in complex products like master or set.
+        type: number
+        format: double
+        required: false
+
+      prices:
+        description: The prices map with price book IDs and their values.
+        type: object
+        properties:
+          //:
+            type: number
+            format: double
+        required: false
+
+      productId:
+        description: The ID (SKU) of the product.
+        type: string
+
+      productName:
+        description: The localized name of the product.
+        type: string
+        required: false
+
+      productType:
+        description: The type information for the product.
+        type: ProductType
+        required: false
+
+      representedProduct:
+        description: The first represented product.
+        type: ProductRef
+        required: false
+
+      representedProducts:
+        description: All the represented products.
+        type: array
+        items:
+          type: ProductRef
+        required: false
+
+      variationAttributes:
+        description: The array of represented variation attributes, for the master product only. This array can be empty.
+        type: array
+        items:
+          type: VariationAttribute
+        required: false
+
+  ProductSearchRefinement:
+    description: Document representing a product search refinement attribute.
+    properties:
+      attributeId:
+        description: |-
+          The ID of the search refinement attribute. In the case of an attribute refinement, this is the attribute ID.
+           Custom attributes are marked by the prefix "c_" (for example, "c_refinementColor"). In the case of a
+           category refinement, the ID must be "cgid". In the case of a price refinement, the ID must be "price".
+        type: string
+      label:
+        description: The localized label of the refinement.
+        type: string
+        required: false
+      values:
+        description: The sorted array of refinement values. This array can be empty.
+        type: array
+        items:
+          type: ProductSearchRefinementValue
+        required: false
+
+  ProductSearchRefinementValue:
+    description: Document representing a product search refinement value.
+    properties:
+      description:
+        description: The localized description of the refinement value.
+        type: string
+        required: false
+      hitCount:
+        description: The number of search hits when selecting the refinement value. Can be 0.
+        type: integer
+        format: int32
+      label:
+        description: The localized label of the refinement value.
+        type: string
+      presentationId:
+        description: |-
+          The optional presentation ID associated with the refinement value.
+           The presentation ID can be used, for example, to associate an ID with
+           an HTML widget.
+        type: string
+        required: false
+      value:
+        description: |-
+          The refinement value. In the case of an attribute refinement, this is the bucket,
+           the attribute value, or a value range. In the case of a category refinement, this is the
+           category ID. In the case of a price refinement, this is the price range. Ranges are
+           enclosed by parentheses and separated by ".."; for example, "(100..999)" and "(Aa..Fa)"
+           are valid ranges.
+        type: string
+      values:
+        description: The array of hierarchical refinement values. This array can be empty.
+        type: array
+        items:
+          type: ProductSearchRefinementValue
+        required: false
+
+
+  ProductSearchSortingOption:
+    description: Document representing a product search sorting option.
+    properties:
+      id:
+        description: The ID of the sorting option.
+        type: string
+      label:
+        description: The localized label of the sorting option.
+        type: string
+
+  ProductType:
+    description: Document representing a product type.
+    properties:
+      bundle:
+        description: A flag indicating whether the product is a bundle.
+        type: boolean
+        required: false
+      item:
+        description: A flag indicating whether the product is a standard item.
+        type: boolean
+        required: false
+      master:
+        description: A flag indicating whether the product is a master.
+        type: boolean
+        required: false
+      option:
+        description: A flag indicating whether the product is an option.
+        type: boolean
+        required: false
+      set:
+        description: A flag indicating whether the product is a set.
+        type: boolean
+        required: false
+      variant:
+        description: A flag indicating whether the product is a variant.
+        type: boolean
+        required: false
+      variationGroup:
+        description: A flag indicating whether the product is a variation group.
+        type: boolean
+        required: false
+
+  VariationAttributeValue:
+    description: Document representing a variation attribute value.
+    properties:
+      description:
+        description: The localized description of the variation value.
+        type: string
+        required: false
+      image:
+        description: The first product image for the configured viewtype and this variation value.
+        type: Image
+        required: false
+      imageSwatch:
+        description: The first product image for the configured viewtype and this variation value. Typically the swatch image.
+        type: Image
+        required: false
+      name:
+        description: The localized display name of the variation value.
+        type: string
+        required: false
+      orderable:
+        description: A flag indicating whether at least one variant with this variation attribute value is available to sell.
+        type: boolean
+        required: false
+      value:
+        description: The actual variation value.
+        minLength: 1
+        type: string
+
+  VariationAttribute:
+    description: Document representing a variation attribute.
+    properties:
+      id:
+        description: The ID of the variation attribute.
+        minLength: 1
+        type: string
+      name:
+        description: The localized display name of the variation attribute.
+        type: string
+        required: false
+      values:
+        description: The sorted array of variation values. This array can be empty.
+        type: array
+        items:
+          type: VariationAttributeValue
+        required: false
+
+  ProductSearchResult:
+    description: Document representing a product search result.
+    properties:
+      limit:
+        description: The number of returned documents.
+        type: ApiStandards.Limit
+        format: int32
+      hits:
+        description: The sorted array of search hits. This array can be empty.
+        type: array
+        items:
+          type: ProductSearchHit
+      query:
+        description: The query string that was searched for.
+        type: string
+      refinements:
+        description: The sorted array of search refinements. This array can be empty.
+        type: array
+        items:
+          type: ProductSearchRefinement
+      searchPhraseSuggestions:
+        description: The suggestion given by the system for the submitted search phrase.
+        type: Suggestion
+      selectedRefinements:
+        description: A map of selected refinement attribute ID or value pairs. The sorting order is the same as in request URL.
+        type: object
+        properties:
+          //:
+            type: string
+        required: false
+      selectedSortingOption:
+        description: The ID of the applied sorting option.
+        type: string
+        required: false
+      sortingOptions:
+        description: The sorted array of search sorting options. This array can be empty.
+        type: array
+        items:
+          type: ProductSearchSortingOption
+      offset:
+        description: The zero-based index of the first search hit to include in the result.
+        minimum: 0
+        type: integer
+        format: int32
+      total:
+        description: The total number of documents.
+        type: integer
+        format: int32
+
+  #shared types: used in both resources 
+  Image:
+    properties:
+      alt:
+        type: string
+        required: false
+      disBaseLink:
+        type: string
+        required: false
+      link:
+        minLength: 1
+        type: string
+      title:
+        type: string
+        required: false
+
+  SuggestedPhrase:
+    description: Document representing a suggested search phrase.
+    properties:
+      exactMatch:
+        description: Returns whether this suggested phrase exactly matches the user input search phrase.
+        type: boolean
+      phrase:
+        description: Returns the suggested search phrase.
+        type: string
+  
+  SuggestedTerms:
+    description: Document representing a list of suggested terms for each term of a search phrase.
+    properties:
+      originalTerm:
+        description: Returns the original term that the suggested terms relates to.
+        type: string
+      terms:
+        description: Returns the suggested terms.
+        type: array
+        required: false
+        items:
+          type: SuggestedTerm
+
+  SuggestedTerm:
+    description: Document representing a suggested term.
+    properties:
+      completed:
+        description: Returns whether this term value is a completion match.
+        type: boolean
+      corrected:
+        description: Returns whether this term value is a correction match.
+        type: boolean
+      exactMatch:
+        description: Returns whether this term value is a exact match.
+        type: boolean
+      value:
+        description: Returns the term value.
+        type: string
+
+  Suggestion:
+    description: Document representing a suggestion.
+    properties:
+      suggestedPhrases:
+        description: A list of suggested phrases. This list can be empty.
+        type: array
+        required: false
+        items:
+          type: SuggestedPhrase
+      suggestedTerms:
+        description: A list of suggested terms. This list can be empty.
+        type: array
+        items:
+          type: SuggestedTerms
+
+  #types for product-search resource 
+  SuggestedProduct:
+    description: Document representing a product search hit.
+    properties:
+      currency:
+        type: CommerceCloudStandards.CurrencyCode
+      image:
+        description: The first image of the product hit for the configured viewtype.
+        type: Image
+        required: false
+      price:
+        description: |-
+          The sales price of the product. In the case of complex products like a master or a set, this is the minimum price of
+           related child products.
+        type: number
+        format: double
+      productId:
+        description: The ID (SKU) of the product.
+        type: string
+      productName:
+        description: The localized name of the product.
+        type: string
+
+  SuggestedCategory:
+    properties:
+      id:
+        description: The ID of the category.
+        type: string
+      name:
+        description: The localized name of the category.
+        type: string
+      parentCategoryName:
+        description: The name of the parent category.
+        type: string
+
+  CategorySuggestions:
+      type: Suggestion
+      properties:
+        categories:
+          required: false
+          description: The sorted list of suggested categories. This list can be empty.
+          type: array
+          items:
+            type: SuggestedCategory
+            
+  ProductSuggestions:
+    type: Suggestion
+    properties:
+      products:
+        required: false
+        description: The sorted list of suggested products. This list can be empty.
+        type: array
+        items:
+          type: SuggestedProduct
+
+  BrandSuggestions:
+    description: The suggested brand names are listed in suggested phrases. If this list is empty, no brand suggestion for a given search phrase was found.
+    type: Suggestion
+
+  CustomSuggestions:
+    description: The custom suggestions are listed in suggested phrases. If this list is empty, no custom suggestion for the given search phrase was found.
+    type: Suggestion
+    properties:
+      customSuggestion:
+        required: false
+
+  SuggestionResult:
+    description: Document representing a search suggestion result.
+    properties:
+      brandSuggestions:
+        required: false
+        description: Returns the suggested brands.
+        type: BrandSuggestions
+      categorySuggestions:
+        required: false
+        description: Returns the suggested categories.
+        type: CategorySuggestions
+      productSuggestions:
+        required: false
+        description: Returns the suggested products.
+        type: ProductSuggestions
+      customSuggestion:
+        required: false
+        description: Returns custom suggestions.
+        type: CustomSuggestions
+      searchPhrase:
+        description: The query phrase (q) for which suggestions where made.
+        type: string

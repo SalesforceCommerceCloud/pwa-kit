@@ -1,0 +1,47 @@
+#%RAML 1.0 DataType
+
+### DEPRECATED: Use the Library instead
+
+# Defines a "problem detail" as a way to carry machine-
+#  readable details of errors in a HTTP response to avoid the need to
+#  define new error response formats for HTTP APIs, it follows the [IETF rfc7807](https://tools.ietf.org/html/rfc7807).
+
+properties:
+  type:
+    description: | 
+      A URI reference [RFC3986] that identifies the
+      problem type.  This specification encourages that, when
+      dereferenced, it provide human-readable documentation for the
+      problem type (e.g., using HTML [W3C.REC-html5-20141028]).  When
+      this member is not present, its value is assumed to be
+      "about:blank". It accepts relative URIs; this means
+      that they must be resolved relative to the document's base URI, as
+      per [RFC3986], Section 5.
+    type: string
+    required: true
+    example: https://example.com/probs/out-of-credit
+  title:
+    description: | 
+      A short, human-readable summary of the problem
+      type.  It will not change from occurrence to occurrence of the
+      problem, except for purposes of localization.
+    type: string
+    required: false
+    example: You do not have enough credit.
+  detail:
+    description: | 
+      A human-readable explanation specific to this
+      occurrence of the problem.
+    type: string
+    required: false
+    example: Your current balance is 30, but that costs 50.
+  instance:
+    description: | 
+      A URI reference that identifies the specific
+      occurrence of the problem.  It may or may not yield further
+      information if dereferenced.  It accepts relative URIs; this means
+      that they must be resolved relative to the document's base URI, as
+      per [RFC3986], Section 5.
+    type: string
+    required: false
+    example: "/account/12345/msgs/abc"

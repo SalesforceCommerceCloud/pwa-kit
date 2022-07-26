@@ -1,0 +1,31 @@
+{
+  "id": "893f605e-10e2-423a-bdb4-f952f56eb6d8/shopper-login/1.32.0",
+  "name": "Shopper Login and API Access Service",
+  "description": "Enable shoppers to log in more easily, stay logged in for longer, and get a more fluid and personalized shopping experience powered by Shopper APIs.",
+  "groupId": "893f605e-10e2-423a-bdb4-f952f56eb6d8",
+  "assetId": "shopper-login",
+  "version": "1.32.0",
+  "categories": {
+    "API layer": [
+      "Process"
+    ],
+    "CC API Family": [
+      "Customer"
+    ],
+    "CC_Team_Name": [
+      "CC-C4E"
+    ],
+    "CC Version Status": [
+      "GA"
+    ],
+    "CC API Visibility": [
+      "External"
+    ],
+    "Status": [
+      "GA"
+    ],
+    "Visibility": [
+      "External"
+    ]
+  }
+}

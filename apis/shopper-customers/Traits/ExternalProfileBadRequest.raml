@@ -1,0 +1,15 @@
+#%RAML 1.0 Trait
+description: 400 response when there is a bad request for a customer.
+responses:
+  '400':
+      description: |
+                Customer ExternalId URL parameter is not valid.
+      body:
+        application/problem+json:
+          type: ErrorResponse
+          example: 
+            {
+              "title": "Invalid Customer External Profile",
+              "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/invalid-customer-external-profile",
+              "detail": "The customer external profile is invalid."
+            }

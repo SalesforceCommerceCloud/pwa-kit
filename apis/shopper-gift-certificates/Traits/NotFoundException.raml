@@ -1,0 +1,17 @@
+#%RAML 1.0 Trait
+description: This trait represents API behavior for a 404 response in Shop Gift Certificate API.
+
+responses:
+  404:
+    description: |
+      Thrown if the given gift certificate code is not valid.
+    body: 
+      application/json:
+        type: ApiStandards.ErrorResponse
+        example: |
+          {
+            "type": "/NotFoundException",
+            "detail": "The gift certificate with the provided code could not be retrieved.",
+            "title": "Not Found",
+            "instance":"/foo"
+          }

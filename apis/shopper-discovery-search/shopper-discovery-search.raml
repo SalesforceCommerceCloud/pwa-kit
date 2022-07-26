@@ -1,0 +1,101 @@
+#%RAML 1.0
+version: v1
+title: Shopper Discovery Search
+
+uses:
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.9/api-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/commerce-cloud-standards.raml
+  DiscoveryStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-standards/0.0.27/discovery-standards.raml
+  DiscoveryQueryLibrary: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-query-common-library/1.0.8/discovery-query-library.raml
+  DiscoverySuggestionLibrary: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-query-common-library/1.0.8/discovery-suggestion-library.raml
+  ErrorTypes: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-standards/0.0.27/Errors/discovery-error-types.raml
+  ISOStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/Types/ISO-standards.raml
+  RamlToJaxrs: ramltojaxrs.raml
+
+mediaType: application/json
+protocols: [ HTTPS ]
+
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/discovery/query/{version}
+baseUriParameters:
+  shortCode:
+    description: A region-specific merchant identifier.
+    pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
+    example: 0dnz6oep
+
+description: !include shopper-discovery-search-description.md
+
+(RamlToJaxrs.resources):
+  plugins:
+    - name: ramltojaxrs.displayName
+(RamlToJaxrs.responses):
+  plugins:
+    - name: ramltojaxrs.displayName
+(RamlToJaxrs.responseClasses):
+  plugins:
+    - name: ramltojaxrs.displayName
+(RamlToJaxrs.methods):
+  plugins:
+    - name: ramltojaxrs.displayName
+(RamlToJaxrs.types):
+  plugins:
+    - name: ramltojaxrs.chainSetter
+
+/organizations/{organizationId}/channels/{channelId}:
+  type: CommerceCloudStandards.Organization
+  is: 
+    - DiscoveryStandards.Traceable
+    - DiscoveryStandards.ResourceCommonErrors
+  uriParameters:
+    channelId: 
+      description: The unique identifier of a Channel.
+      type: string
+      maxLength: 256
+      example: ACME-US-Site
+  /results:      
+    type: CommerceCloudStandards.Organization
+    post:
+      description: This method retrieves search results for a Channel.
+      displayName: retrieveResults
+      is:
+        - ApiStandards.OffsetPaginated:
+            maxLimit: 240
+            defaultSize: 30
+      queryParameters:
+        locale: ISOStandards.LanguageCountry
+      body:
+        type: DiscoveryQueryLibrary.QueryInput
+      responses:
+        200:
+          description: The response after retrieving search results.
+          body:
+            type: DiscoveryQueryLibrary.QueryOutput
+            examples:
+              results: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-examples/1.0.2/results-example.raml
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-discovery-search] }
+  /suggestions:
+    type: CommerceCloudStandards.Organization
+    get:
+      description: This method gets suggestions for the user's search activity for a channel.
+      displayName: getSuggestions
+      queryParameters:
+        suggestionTypes:
+          description: The types of suggestions to return.
+          type: DiscoverySuggestionLibrary.SuggestionType[]
+          example: [ SUGGESTED, POPULAR ]
+        searchText?:
+          description: The optional text to retrieve suggestions for.
+          type: string
+          minLength: 3
+          maxLength: 10
+          example: wool
+        locale: ISOStandards.LanguageCountry
+      responses:
+        200:
+          description: The response on requesting for suggestions.
+          body:
+            type: DiscoverySuggestionLibrary.Suggestions
+            examples:
+              results: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-examples/1.0.2/suggestions-example.raml
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-discovery-search] }

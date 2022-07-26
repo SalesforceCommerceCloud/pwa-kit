@@ -1,0 +1,16 @@
+#%RAML 1.0 Trait
+description: 401 response when a customer is not authenticated.
+responses:
+  '401':
+      description: |
+                Case of type credentials the username is unknown or the password does not match. In case of type session, the session is not active anymore or the dwsecuretoken value is invalid. In both cases the customer is disabled or locked.
+      body:
+        application/problem+json:
+          type: ErrorResponse
+          example: 
+            {
+              "title": "Authentication Failed",
+              "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/authentication-failed",
+              "detail": "Customer authentication based on JohnSmith failed.",
+              "credentialType": "JohnSmith"
+            }

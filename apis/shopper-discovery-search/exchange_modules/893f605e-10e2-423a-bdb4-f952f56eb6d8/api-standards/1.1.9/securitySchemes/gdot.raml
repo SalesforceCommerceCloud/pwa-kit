@@ -1,0 +1,58 @@
+#%RAML 1.0 SecurityScheme
+
+description: |
+  GDoT bearer token Authentication. Users need to get the token following the GDoT process.
+type: x-custom
+displayName: GDoT
+
+describedBy:
+  headers:
+    Authorization:
+      description: |
+        Bearer token
+      type: string
+      pattern: "Bearer .*"
+      examples: 
+        authenticatedUser: Bearer b325e95c-2cd7-11e5-b345-feff819cdc9f
+  responses:
+    401:
+      description: Unauthorized. Your token is invalid and could not be identified as a user.
+      headers:
+        X-RateLimit-Limit:
+          description: The maximum number of requests permitted per hour.  
+        X-RateLimit-Remaining:     
+          description: The number of requests remaining in the current rate limit window.
+        X-RateLimit-Reset:
+          description: The time at which the current rate limit window resets in UTC epoch seconds.
+        WWW-Authenticate: 
+          example: |
+            WWW-Authenticate: Bearer realm="servers",
+                              error="invalid_token",
+                              error_description="The access token expired"
+        
+      body:
+        application/json:
+          type: !include ../dataTypes/error-response.raml
+          example:
+            type: "http://to-be-defined.com/errors/unauthorized"
+            title: Unauthorized
+            detail: Your token is invalid and could not be identified as a user.
+
+    403:
+      description: Forbidden. Your token is valid but you have no permissions to access the resource.
+      headers:
+        X-RateLimit-Limit:
+          description: The maximum number of requests permitted per hour.  
+        X-RateLimit-Remaining:     
+          description: The number of requests remaining in the current rate limit window.
+        X-RateLimit-Reset:
+          description: The time at which the current rate limit window resets in UTC epoch seconds.
+      body:
+        application/json:
+          type: !include ../dataTypes/error-response.raml
+          example:
+            type: "http://to-be-defined.com/errors/forbidden"
+            title: Forbidden
+            detail: Your token is valid but you have no permissions to access the resource.
+
+

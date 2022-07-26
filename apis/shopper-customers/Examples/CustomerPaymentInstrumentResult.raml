@@ -1,0 +1,48 @@
+#%RAML 1.0 NamedExample
+value:
+  {
+    "limit" : 2,
+    "data" : 
+    [
+        {
+          "paymentBankAccount" : 
+          {
+            "bankRoutingNumber" : "bankrouting3450"            
+          },
+          "paymentCard" : 
+          {
+              "cardType" : "Visa",
+              "creditCardExpired" : false,
+              "expirationMonth" : 2,
+              "expirationYear" : 2022,
+              "holder" : "John Smith",
+              "maskedNumber" : "***********1111",
+              "numberLastDigits" : "1111"
+          },
+          "paymentMethodId" : "CREDIT_CARD",
+          "paymentInstrumentId" : "cdlPgiWbN6LM2aaadkcia6MgbA"
+        },
+        
+        {
+          "bankRoutingNumber" : "bankrouting3446",
+          "giftCertificateCodeMasked" : "*****code",
+          "paymentBankAccount" : 
+          {
+              "driversLicenseLastDigits" : "e111",
+              "driversLicenseStateCode" : "MA",
+              "holder" : "John Smith",
+              "maskedDriversLicense" : "**********e111",
+              "maskedNumber" : "**********t111",
+              "numberLastDigits" : "t111"
+          },
+          "paymentCard" : 
+          {
+              "cardType": "None",
+              "creditCardExpired" : false
+          },
+          "paymentMethodId" : "OCAPI_Payment_Simple",
+          "paymentInstrumentId" : "cdTsgiWbN6DFEaaadkbia6MgbA"
+        }
+    ],
+    "total" : 2
+  }

@@ -1,0 +1,108 @@
+#%RAML 1.0
+title: Shopper Contexts
+description: Shopper Context APIs to create, update and delete shoppeer context i.e non-sensitive data that describes Shopper.
+version: v1
+mediaType: application/json
+protocols: HTTPS
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/shopper/shopper-context/{version}
+baseUriParameters:
+  shortCode:
+    description: A region-specific merchant identifier.
+    example: 0dnz6oep
+    pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
+traits:
+uses:
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.17/commerce-cloud-standards.raml
+types:
+  ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/dataTypes/error-response.raml
+  ShopperContext:
+    description: A Shoppers' context represented as key-value string pairs.
+    type: object
+    properties:
+      effectiveDateTime: 
+        required: false
+        type: datetime | nil
+        description: Qualifier to set the effective date time for the context to apply. For example -> Shop the Future use cases. If not provided, current dateTime will be assumed.
+      customQualifiers:
+        type: object
+        description: Map of qualifiers for the shopper context
+        properties:
+          //:
+            type: string | nil
+        required: true
+    example: !include Examples/shopper-context-example.raml
+      
+
+/organizations/{organizationId}:
+  type: CommerceCloudStandards.Organization
+  /shopper-context/{usid}:
+    get:
+      description: Gets the shopper's context based on the shopperJWT. ******** This API is currently a work in progress, and not available to use yet. ********
+      displayName: getShopperContext
+      responses: 
+        '200':
+          description: Success retrieving Shopper Context.
+          body: 
+            application/json:
+              type: ShopperContext
+              examples:
+                shopperContext: !include Examples/shopper-context-example.raml 
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-context, sfcc.shopper-context.rw] }    
+    put:
+      description: Creates the shopper's context based on shopperJWT.
+      displayName: createShopperContext
+      body:
+        application/json:
+          type: ShopperContext
+      responses: 
+        '201':
+          description: Created Shopper Context.
+          body: 
+            application/json:
+              type: ShopperContext
+              examples:
+                shopperContext: !include Examples/shopper-context-example.raml
+        '200':
+          description: Updated Shopper Context.
+          body: 
+            application/json:
+              type: ShopperContext
+              examples:
+                shopperContext: !include Examples/shopper-context-example.raml         
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-context.rw] }  
+    delete:
+      description: Gets the shopper's context based on the shopperJWT.
+      displayName: deleteShopperContext
+      responses: 
+        '204':
+          description: Delete successfull.
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-context.rw] }    
+    patch:
+      description: Updates the shopper's context based on the Shopper JWT. If the shopper context exists, it's updated with the patch body. If a customer qualifier or an `effectiveDateTime` is already present in the existing shopper context, its value is replaced by the corresponding value from the patch body. If a customer qualifers' value is set to `null` it's deleted from existing shopper context. If `effectiveDateTime` value is set to set to an empty string (""), it's deleted from existing shopper context. If `effectiveDateTime` value is set to `null` it's ignored. If an `effectiveDateTime` or customer qualifiiers' value is new, it's added to the existing Shopper context. 
+      displayName: updateShopperContext
+      body:
+        application/json:
+          type: ShopperContext
+          examples:
+            shopperContext: !include Examples/shopper-context-update-request-example.raml      
+      responses: 
+        '200':
+          description: Updated Shopper Context.
+          body: 
+            application/json:
+              type: ShopperContext
+              examples:
+                shopperContext: !include Examples/shopper-context-update-response-example.raml         
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-context.rw] }
+    uriParameters:
+      usid:
+        description: The Shopper's unique identifier if known. This is an optional field, a new shopper ID will be generated if this field is empty.
+        type: string
+        required: true
+        example: "54ad2c5a-91f0-44ab-817c-73d6b86872d9"      
+    

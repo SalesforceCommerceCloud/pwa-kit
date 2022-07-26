@@ -1,0 +1,55 @@
+#%RAML 1.0 NamedExample
+value: 
+  {
+    "id": "023513f915fad06573f330fb0d",
+    "priority": 0,
+    "product": {
+      "id": "RedDress1",
+      "imageGroups": [
+        {
+          "images": [
+            {
+              "alt": "ALT master detail",
+              "link": "https://example.com/foo/bar/master_detail.jpg",
+              "title": "TITLE master detail"
+            }
+          ],
+          "viewType": "detail"
+        },
+        {
+          "images": [
+            {
+              "alt": "ALT master swatch",
+              "link": "https://example.com/foo/bar/master_swatch.jpg",
+              "title": "TITLE master swatch"
+            }
+          ],
+          "viewType": "swatch"
+        },
+        {
+          "images": [
+            {
+              "alt": "ALT master thumbnail",
+              "link": "https://example.com/foo/bar/master_thumbnail.jpg",
+              "title": "TITLE master thumbnail"
+            }
+          ],
+          "viewType": "thumbnail"
+        }
+      ],
+      "inventories": [
+        {
+          "ats": 0,
+          "backorderable": false,
+          "id": "RedDress1Inventory",
+          "orderable": false,
+          "preorderable": false,
+          "stockLevel": 0
+        }
+      ],
+      "minOrderQuantity": 1,
+      "price": 99.99,
+      "stepQuantity": 1
+    },
+    "type": "product"
+  }

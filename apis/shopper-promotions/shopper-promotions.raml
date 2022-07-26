@@ -1,0 +1,177 @@
+#%RAML 1.0
+title: Shopper Promotions
+description: !include shopper-promotions-description.md
+version: v1
+protocols: https
+mediaType: application/json
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/pricing/shopper-promotions/{version}
+baseUriParameters:
+  shortCode:
+    description: A region-specific merchant identifier.
+    example: 0dnz6oep
+    pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
+uses:
+  PromotionTraits: promotion-traits-library.raml
+  ApiStandards: /exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml    
+  CommerceCloudStandards: /exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.20/commerce-cloud-standards.raml
+
+types:
+  Promotion:
+    description: Document representing a promotion.
+    properties:
+      calloutMsg:
+        description: The localized call-out message of the promotion.
+        type: string
+        required: false
+        example: $30 Fixed Shipping Amount Above 150
+      currency:
+        description: |-
+          The currency that a promotion can be applied to. A null value means that the promotion applies to all allowed
+           currencies.
+        type: string
+        required: false
+        example: USD
+      details:
+        description: The localized detailed description of the promotion.
+        type: string
+        required: false
+        example: $30 Fixed Shipping Amount Above 150
+      endDate:
+        description: |-
+          The end date of the promotion. This property follows the ISO8601 date time format: yyyy-MM-dd'T'HH:mmZ . The time
+           zone of the date time is always UTC.
+        type: datetime
+        required: false
+        example: 2015-07-04T21:00:00Z
+      id:
+        description: The unique ID of the promotion.
+        type: string
+        example: $30FixedShippingAmountAbove150  
+      image:
+        description: The URL to the promotion image.
+        type: string
+        required: false
+      name:
+        description: The localized name of the promotion.
+        type: string
+        required: false
+        example: $30 Fixed Shipping Amount Above 150
+      startDate:
+        description: |-
+          The start date of the promotion. This property follows the ISO8601 date time format: yyyy-MM-dd'T'HH:mmZ. The
+           time zone of the date time is always UTC.
+        type: datetime
+        required: false
+        example: 2015-07-04T21:00:00Z
+  PromotionResult:
+    description: Result document containing an array of promotions.
+    examples:
+      promotion: !include Examples/promotions_result.raml
+    properties:
+      count:
+        description: The number of returned documents.
+        type: integer
+        format: int32
+      data:
+        description: The array of promotion documents.
+        type: array
+        items:
+          type: Promotion
+      total:
+        description: The total number of documents.
+        type: integer
+        format: int32
+        
+'/organizations/{organizationId}/promotions':
+  type: CommerceCloudStandards.Organization
+  get:
+    description: |- 
+      Returns an array of enabled promotions for a list of specified IDs. In the request URL, you can specify up to 50 IDs. If you specify an ID that contains either parentheses or the separator characters, you must URL encode these characters. Each request returns only enabled promotions as the server does not consider promotion qualifiers or schedules.
+    displayName: getPromotions
+    is:
+        - PromotionTraits.PromotionNotFound
+        - ApiStandards.RateLimited:
+            responseStatus: 200
+        - ApiStandards.RateLimited:    
+            responseStatus: 404
+    responses:
+        '200':
+          description: Retrieved promotion information successfully.
+          body:
+            application/json:
+              type: PromotionResult
+              examples:
+                promotion: !include Examples/promotions_result.raml
+    queryParameters:
+      siteId:
+        type: CommerceCloudStandards.SiteId
+      ids:
+        maxLength: 256
+        type: string
+        example:
+          Buy5for50,$5_off_ties_promotion        
+      locale:
+        type: string
+        required: false      
+    securedBy:
+      - CommerceCloudStandards.ShopperToken: { scopes: [ sfcc.shopper-promotions ] }
+  '/campaigns/{campaignId}':
+    type: CommerceCloudStandards.Organization
+    uriParameters:
+      campaignId:
+        description: Find the promotions assigned to this campaign (mandatory).
+        maxLength: 256
+        minLength: 1
+        type: string
+        example: 5_off_ties_campaign
+    get:
+      description: |-
+        Handles get promotion by filter criteria. Returns an array of enabled promotions matching the specified filter
+        criteria. In the request URL, you must provide a campaign_id parameter, and you can optionally specify a date
+        range by providing start_date and end_date parameters. Both parameters are required to specify a date range, as 
+        omitting one causes the server to return a MissingParameterException fault. Each request returns only enabled
+        promotions, since the server does not consider promotion qualifiers or schedules.
+      displayName: getPromotionsForCampaign
+      is:
+        - PromotionTraits.PromotionNotFound
+        - PromotionTraits.badrequest
+        - ApiStandards.RateLimited:
+            responseStatus: 200
+        - ApiStandards.RateLimited:    
+            responseStatus: 400
+        - ApiStandards.RateLimited:    
+            responseStatus: 404
+      responses:
+        '200':
+          description: Retrieved Promotion Information successfully.
+          body:
+            application/json:
+              type: PromotionResult
+              examples:
+                promotion: !include Examples/promotions_result.raml
+        '400':
+          description: Thrown when a start date but no end date was given, when an end date but no start date was given, or when the given end date is before the given start date.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/get_campaings_400.raml
+      queryParameters:
+        siteId:
+          type: CommerceCloudStandards.SiteId        
+        startDate:
+          description: 'The start date of the promotion in ISO8601 date time format: yyyy-MM-dd''T''HH:mmZ'
+          type: string
+          required: false
+          example: 2015-07-04T21:00:00Z
+        endDate:
+          description: 'The end date of the promotion in ISO8601 date time format: yyyy-MM-dd''T''HH:mmZ'
+          type: string
+          required: false
+          example: 2015-07-04T21:00:00Z
+        currency:
+          description: The currency mnemonic specified for price. This parameter is effective only for product suggestions.
+          type: string
+          required: false
+          example: USD
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [ sfcc.shopper-promotions ] }

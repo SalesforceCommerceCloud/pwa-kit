@@ -1,0 +1,6 @@
+{
+  "type": "https://discovery.commercecloud.salesforce.com/documentation/error/v2/errors/not-found",
+  "title": "Resource Not Found",
+  "detail": "The requested {resource} was not found.",
+  "instance": "{Resource URI}"
+}

@@ -1,0 +1,6 @@
+{
+  "type": "https://discovery.commercecloud.salesforce.com/documentation/error/v2/errors/invalid-request",
+  "title": "Invalid Request",
+  "detail": "The provided request information is of an invalid format.", 
+  "instance": "{Resource URI}"
+}

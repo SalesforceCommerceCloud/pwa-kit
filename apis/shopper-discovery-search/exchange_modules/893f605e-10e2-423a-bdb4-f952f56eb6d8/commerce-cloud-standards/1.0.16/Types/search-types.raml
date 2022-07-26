@@ -1,0 +1,354 @@
+#%RAML 1.0 Library
+usage: A common set of search related request and response types for OCAPI Data resources. Data resources are expected to use the search request directly, and extend search response in their definition.
+
+uses:
+  Pagination: pagination-types.raml
+
+types:
+  BoolFilter:
+    description: Allows you to combine other filters into (possibly recursive) logical expression trees. A boolean filter is configured with a boolean operator (AND, OR, NOT) and a list of filters the operator relates to. If multiple filters are given to a boolean NOT operator, this is interpreted as a NOT upon a boolean AND of the given filters.
+    type: object    
+    example: !include ../Examples/BoolFilter.json
+    properties:
+      filters:
+        description: A list of filters, which are logically combined by an operator.
+        type: any[]
+        required: false
+      operator:
+        description: The logical operator the filters are combined with.
+        type: string
+        enum:
+          - and
+          - or
+          - not
+  BoolQuery:
+    description: |
+      A boolean query allows construction of full logical expression trees consisting of other queries (usually term and text queries). A boolean query basically has 3 sets of clauses:
+        
+        * must, which combines as an `AND`
+        * should, which combines as an `OR`, and
+        * must_not, which combines as a `NOT`.
+        
+      If 'must', 'mustNot', or 'should' appear in the same boolean query, they are combined logically using the AND operator. Syntactically, this amounts to:
+
+          (must-1 AND must-1 AND ...)
+            AND (should-1 OR should-2 OR ...)
+            AND NOT (must_not-1 OR must_not-2 OR ...)
+    type: object    
+    examples: !include ../Examples/BoolQuery.raml
+    properties:
+      must?:
+        description: List of queries to be evaluated as an `AND`.
+        type: any[]
+      mustNot?:
+        description:  List of queries to be evaluated as an `NOT`.
+        type: any[]
+      should?:
+        description:  List of queries to be evaluated as an `OR`.
+        type: any[]
+  Filter:
+    description: |-
+      Contains a set of objects that define criteria used to select records. A filter can contain one of the following:
+        * TermFilter
+         - Matches records where a field (or fields) exactly match some simple value (including null).
+        * RangeFilter
+         - Matches records where a field value lies in a specified range.
+        * Range2Filter
+         - Matches records in a specified range across fields.
+        * QueryFilter
+         - Matches records based on a query.
+        * BoolFilter
+         - Provides filtering of records using a set of filters combined using a specified operator.
+    type: object
+    example: !include ../Examples/Filter.json
+    minProperties: 1
+    maxProperties: 1
+    properties:
+      boolFilter?: BoolFilter
+      queryFilter?: QueryFilter
+      range2Filter?: Range2Filter
+      rangeFilter?: RangeFilter
+      termFilter?: TermFilter
+  FilteredQuery:
+    description: A filtered query allows to filter the result of a possibly complex query using a possibly complex filter.
+    type: object
+    example: !include ../Examples/FilteredQuery.json
+    properties:
+      filter:
+        description: The possibly complex filter object.
+        type: any
+      query:
+        description: The query object.
+        type: any
+  MatchAllQuery:
+    description: A match all query simply matches all documents (namespace and document type). This query comes in handy if you just want to filter a search result or really do not have any constraints.
+    type: object
+  NestedQuery:
+    description: |
+      Nested query allows to query upon nested documents that are part of a larger document. The classical example is a product master with variants, in one big document, where you want to constraint a search to masters that have variants that match multiple constraints. 
+
+      This Query is only applicable a subset of APIs. Consult your API documentation to see if NestedQuery is supported.
+    type: object    
+    example: !include ../Examples/NestedQuery.json 
+    properties:
+      path:
+        description: The path to the nested document.
+        type: string
+      query:
+        description: The query to run on the nested document.
+        type: any
+      scoreMode:
+        description:  |-
+          Indicates how scores for matching child objects affect the root parent document’s relevance score.
+        type: string
+        enum:
+          - avg
+          - total
+          - max
+          - none
+        required: false
+  Query:
+    description: |-
+      A set of objects that define criteria used to select records. A query can contain one of the following:
+      * MatchAllQuery
+       - Matches all documents.
+      * TermQuery
+       - Matches one or more documents against one or more document fields.
+      * TextQuery
+       - Matches text against one or more fields.
+      * BoolQuery
+       - Allows construction of a logical expression of multiple queries.
+      * FilteredQuery
+       - Allows a filter to be applied to a query.
+      * NestedQuery 
+       - Allows to query upon nested documents that are part of a larger document.
+       - _Only valid for a subset of APIs. See API documentation to determine if this is supported._
+    type: object
+    maxProperties: 1
+    minProperties: 1
+    example: !include ../Examples/Query.json     
+    properties:
+      boolQuery?: BoolQuery
+      filteredQuery?: FilteredQuery
+      matchAllQuery?: MatchAllQuery
+      nestedQuery?: NestedQuery
+      termQuery?: TermQuery
+      textQuery?: TextQuery
+  QueryFilter:
+    description: |-
+      Wraps any query and allows it to be used as a filter.
+    type: object    
+    example: !include ../Examples/QueryFilter.json 
+    properties:
+      query:
+        description: The query to use as a filter.
+        type: any
+  Range2Filter:
+    description: |-
+      Allows you to restrict a search result to hits where a range defined by specified attributes has a certain relationship to a specified range.
+
+      The first range (R1) is defined by a pair of attributes ("fromField" and "toField") that specify the extent of a range, such as attributes "validFrom" and "validTo".
+
+      The second range (R2) is defined by "fromValue" and "toValue".
+
+      The filter mode specifies the method used to compare the two ranges:
+
+      * overlap: R1 overlaps fully or partially with R2.
+      * containing: R1 contains R2.
+      * contained: R1 is contained in R2.
+      
+      The range filter supports several value types, and relies on the natural sorting of the value type for range interpretation. Value ranges can be open-ended, at one end only. You can configure whether the lower and upper bounds are inclusive or exclusive.
+
+      A range 2 filter is useful for general restrictions that can be shared between searches (like a static date range) because the filter result is cached in memory. Range filters are not appropriate if the range is expected to be different for every query (for example, if the user controls the date range down to the hour via a UI control). Range filters are inclusive by default.
+
+    type: object    
+    example: !include ../Examples/Range2Filter.json 
+    properties:
+      filterMode:
+        description: 'Compare mode: overlap, containing, or contained. If not specified, the default is overlap.'
+        type: string
+        enum:
+          - overlap
+          - containing
+          - contained
+        required: false
+      fromField:
+        description: The field name of the field that starts the first range.
+        type: string
+      fromInclusive:
+        description: Indicates whether the lower bound of the second range is inclusive. If not specified, the default is true. Set to false to make the lower bound exclusive.
+        type: boolean
+        required: false
+      fromValue:
+        description: The lower bound of the second range. If not specified, the range is open-ended with respect to the lower bound. You can't leave both the lower and upper bounds open-ended.
+        type: any
+        required: false
+      toField:
+        description: The field name of the field that ends the first range.
+        type: string
+      toInclusive:
+        description: Indicates whether the upper bound of the second range is inclusive. If not specified, the default is true. Set to false to make the lower bound exclusive.
+        type: boolean
+        required: false
+      toValue:
+        description: The upper bound of the second range. If not specified, the range is open-ended with respect to the upper bound. You can't leave both the upper and lower bounds open-ended.
+        type: any
+        required: false
+  RangeFilter:
+    description: |-
+      Allows you to restrict a search result to hits that have values for a given attribute that fall into a given value range. The range filter supports several value types, and relies on the natural sorting of the value type for range interpretation. Value ranges can be open-ended, at one end only. You can configure whether the lower and upper bounds are inclusive or exclusive.
+
+      A range filter is useful for general restrictions that can be shared between searches (like a static date range) because the filter result is cached in memory. Range filters are not appropriate if the range is expected to be different for every query (for example, if the user controls the date range down to the hour via a UI control). Range filters are inclusive by default.
+    type: object    
+    example: !include ../Examples/RangeFilter.json
+    properties:
+      field:
+        description: The search field.
+        type: string
+      from:
+        description: The lower bound of the filter range. If not specified, the range is open-ended with respect to the lower bound. You can't leave both the lower and upper bounds open-ended.
+        type: any
+        required: false
+      fromInclusive:
+        description: Indicates whether the lower bound of the range is inclusive. If not specified, the default is true. Set to false to make the lower bound exclusive.
+        type: boolean
+        required: false
+      to:
+        description: The upper bound of the filter range. If not specified, the range is open-ended with respect to the upper bound. You can't leave both the upper and lower bounds open-ended.
+        type: any
+        required: false
+      toInclusive:
+        description: Indicates whether the upper bound of the range is inclusive. If not specified, the default is true. Set to false to made the upper bound exclusive.
+        type: boolean
+        required: false
+  SearchRequestBase:
+    description: Document representing a search request for retrieving items within the Data API. The query is a potentially complex set of expressions. The fields and expands that each query supports are defined within the search resource.
+    type: object    
+    example: !include ../Examples/SearchRequestBase.json
+    properties:  
+      limit?: 
+        type: Pagination.Limit
+        maximum: 200
+        description: Maximum records to retrieve per request, not to exceed 200.
+      query:
+        description: |
+          The search query. See the API documentation for a list of supported queryable attributes. 
+        type: any
+      sorts:
+        description: The list of sort clauses configured for the search request. Sort clauses are optional; see the API documentation for the default sorting behavior if explicit sorts are not passed.
+        type: Sort[]
+        required: false
+      offset?: Pagination.Offset
+  PaginatedSearchResultBase:
+    description: Document representing a generic search result. Each search resource should extend this to define what is returned in the `hits`.
+    type: SimpleSearchResultBase  
+    example: !include ../Examples/PaginatedSearchResultBase.json
+    properties:
+      query:
+        description: The query passed into the search.
+        type: any
+      sorts:
+        description: The sorting that was applied to the result.
+        type: Sort[]
+        required: false
+  SimpleSearchResultBase:
+    description: Document representing a generic search result. Each search resource should extend this to define what is returned in the `hits`.
+    type: object    
+    example: !include ../Examples/SimpleSearchResultBase.json
+    properties:
+      limit: 
+        type: Pagination.Limit
+        maximum: 200
+        description: Maximum records to retrieve per request, not to exceed 200.
+      hits:
+        description: The sorted array of search hits. Can be empty.
+        type: object[]
+        required: false
+      offset: Pagination.Offset
+      total: Pagination.Total
+
+  Sort:
+    description: Document representing a sort request. Each API has a different default sort configured that can be modified in the request.
+    type: object    
+    example: { "field": "couponId", "sortOrder": "desc" }
+    properties:
+      field:
+        description: The name of the field to sort on.
+        type: string
+      sortOrder:
+        description: The sort order to be applied when sorting. When omitted, the default sort order (asc) is used.
+        type: string
+        default: asc
+        enum:
+          - asc
+          - desc
+        required: false
+  TermFilter:
+    description: |-
+      Allows you to restrict a search result to hits that match exactly one of the values configured for the filter. A term filter is useful for general restrictions that can be shared between searches. Use term filters whenever the criteria you filter on is a shared property of multiple searches (for example, like filtering by an order status). Use term filters for fields that have a discrete and small set of values only.
+    type: object    
+    example: !include ../Examples/TermFilter.json 
+    properties:
+      field:
+        description: The filter field.
+        type: string
+      operator:
+        description: The operator to compare the field's values with the given ones.
+        type: string
+        enum:
+          - is
+          - one_of
+          - is_null
+          - is_not_null
+          - less
+          - greater
+          - not_in
+          - neq
+      values:
+        description: The filter values.
+        type: any[]
+        required: false
+  TermQuery:
+    description: |-
+      A term query matches one or more values against one or more document fields. A document is considered a hit if one of the values matches exactly with at least one of the given fields.  The operator "is" can only take one value, while "one_of" can take multiple. If multiple fields are specified, they are combined using the OR operator.
+
+      **Limitations:**
+
+      * The `greater` and `less` operators are not supported under certain conditions. They are permitted unless the API documentation states that they are not supported.
+      * A subset of APIs have special handling when used with multiple fields. If used with multiple fields, the query is internally handled as a boolean OR of DisjointMaxQueries (with the dismax matching a value against all fields). The dismax makes sure that a document carrying a single term in multiple fields does not get higher scores than a document matching multiple terms in multiple fields. See your API documetation to see if that API has this behavior.
+    type: object    
+    example: !include ../Examples/TermQuery.json 
+    properties:
+      fields:
+        description: The document fields, the values are matched against, combined with the operator.
+        minItems: 1
+        type: string[]
+      operator:
+        description: Returns the operator to use for the term query.
+        type: string
+        enum:
+          - is
+          - one_of
+          - is_null
+          - is_not_null
+          - less
+          - greater
+          - not_in
+          - neq
+      values:
+        description: The values, the fields are compared against, combined with the operator.
+        type: any[]
+        required: false
+  TextQuery:
+    description: |-
+      A text query is used to match some text (for example, a search phrase possibly consisting of multiple terms) against one or multiple fields. When multiple fields are provided, the phrase conceptually forms a logical OR over the fields. In this case, the terms of the phrase basically have to match within the text, that would result in concatenating all given fields.
+    type: object    
+    example: !include ../Examples/TextQuery.json
+    properties:
+      fields:
+        description: The document fields the search phrase has to match against.
+        minItems: 1
+        type: string[]
+      searchPhrase:
+        description: A search phrase, which can consist of multiple terms separated by spaces.
+        type: string

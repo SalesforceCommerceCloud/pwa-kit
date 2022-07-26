@@ -1,0 +1,1636 @@
+#%RAML 1.0
+#In C4E review
+title: Shopper Baskets
+
+version: v1
+description: Provides access to Commerce Cloud Digital basket related functionality.
+protocols: [HTTPS]
+mediaType: application/json
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/checkout/shopper-baskets/{version}
+baseUriParameters:
+  shortCode:
+    description: Region-specific merchant identifier.
+    example: 0dnz6oep
+
+uses:
+  BasketTraits: shopper-baskets-traits.raml
+  dataTypes: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/checkout-data-types.raml
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.15/commerce-cloud-standards.raml
+
+types:
+  ErrorResponse: ApiStandards.ErrorResponse
+
+/organizations/{organizationId}:
+  type: CommerceCloudStandards.Organization
+  /baskets:
+    type: CommerceCloudStandards.Organization
+    post:
+      is: 
+        - CommerceCloudStandards.SiteSpecific:
+        - BasketTraits.LocaleSpecific:
+        - ApiStandards.RateLimited:
+            responseStatus: 200
+        - ApiStandards.RateLimited:
+            responseStatus: 400
+        - ApiStandards.RateLimited:
+            responseStatus: 404
+      description: |-
+        Creates a new basket.
+
+        The created basket is initialized with default values. Data provided in the body document is populated into the created basket. It can be updated with API endpoints listed below.
+
+        The taxMode query parameter can be used to choose the basket tax mode. The default is internal, in which case the tax calculation is done automatically based on internal tax tables. Alternatively, external taxation mode can be set which allows manual modification of the tax rates and values. External tax data is mandatory for product line items, option line items, shipping line items, coupon line items, and bonus discount line item. Gift certificate line items are optional and use zero tax rate per default, which can be overwritten. Price adjustments cannot be set because they are either calculated or inherited (depending on the type, the tax rate is either obtained from the related line item or computed as prorate of the basket).
+
+        API endpoints allowing further basket modification:
+
+        - customer information: PUT /baskets/{basketId}/customer
+
+        - billing address: PUT /baskets/{basketId}/billing-address
+
+        - shipments including shipping address and shipping method: POST /baskets/{basketId}/shipments
+
+        - product items: POST /baskets/{basketId}/items
+
+        - coupon items: POST /baskets/{basketId}/coupons
+
+        - gift certificate items: POST /baskets/{basketId}/gift-certificates
+
+        - basket taxation: PUT /baskets/{basketId}/taxes
+
+        - basket item taxation: PUT /baskets/{basketId}/items/{itemId}/taxes
+
+        - payment method and card type: POST /baskets/{basketId}/payment-instruments
+
+        - custom properties: PATCH /baskets/{basketId}
+
+        Related resource means with which resource you can specify the same data after the basket creation.
+        Identify the basket using the basketId property, which
+        should be integrated into the path of an update request (for example a POST to
+        /baskets/{basketId}/items).
+
+        A customer must provide a JSON Web Token (JWT), which specifies exactly one customer (it can be a guest or a registered
+        customer). In this case, the resource creates a basket for this customer.
+
+        The number of baskets which can be created per customer is limited. When a
+        basket is created, it is said to be open. It remains open until either an order is created from it
+        using a POST to resource /orders, or it is deleted using a DELETE to resource
+        /baskets/{basketId}. Each customer can have just one open basket.
+
+        Custom properties in the form c_<CUSTOM_NAME> are supported. A custom property must correspond to a custom
+        attribute (<CUSTOM_NAME>) defined for the basket system object, and its value must be valid for that custom
+        attribute.
+      displayName: createBasket
+      responses:
+        '200':
+          description: The initialized basket.
+          body:
+              type: dataTypes.Basket
+              examples:
+                dataTypes.Basket: !include examples/basket/basket-post-response.raml
+        '400':
+          description: |-
+            Possible reasons:
+            - the provided payment method is invalid or not applicable.
+            - the customerId URL parameter does not match the verified customer
+            represented by the JSON Web Token (JWT).
+            - a new basket cannot be created because the maximum number
+            of baskets per customer would be exceeded.
+            - the same shipment ID appeared twice in the body.
+            - the coupon number is not provided.
+            - a fixed price adjustment was added at order level which is disallowed.
+            - a promotion ID was
+            used twice, while attempting to add a price adjustment.
+            - a system promotion
+            ID was used as a manual promotion ID, while attempting to add a price adjustment.
+            - more than one hundred price adjustments would have been
+            created.
+          body:
+            application/problem+json:
+              type: ErrorResponse
+              examples:
+                dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+        '404':
+          description: Thrown if the shipment with the given shipment ID is unknown.
+          body:
+            application/problem+json:
+              type: ErrorResponse
+              examples:
+                dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/shipment-not-found.raml
+      queryParameters:
+        taxMode?:
+          type: string
+          enum:
+            - internal
+            - external
+          default: internal
+      body:
+          type: dataTypes.Basket
+          examples:
+            dataTypes.Basket: !include examples/basket/basket-post-request.raml
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+    /actions/transfer:
+      type: CommerceCloudStandards.Organization
+      post:
+        displayName: transferBasket
+        description: |-
+          Transfer the previous shopper's basket to the current shopper by updating the basket's owner. No other values change. You must obtain the shopper authorization token via SLAS, and it must contain both the previous and current shopper IDs.
+
+          A success response contains the transferred basket.
+
+          If the current shopper has an active basket, and the `overwriteExisting` request parameter is `false`, then the transfer request returns a BasketTransferException (HTTP status 409). You can proceed with one of these options:
+          - Keep the current shopper's active basket.
+          - Merge the previous and current shoppers' baskets by calling the `baskets/merge` endpoint.
+          - Force the transfer by calling the `baskets/transfer` endpoint again, with the parameter `overwriteExisting=true`. Forcing the transfer deletes the current shopper's active basket.
+        is:
+          - CommerceCloudStandards.SiteSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 403
+          - ApiStandards.RateLimited:
+              responseStatus: 409
+        responses:
+          '200':
+            description: |-
+              The transferred basket.
+            body:
+                type: dataTypes.Basket
+                examples:
+                  dataTypes.Basket: !include examples/basket/basket-post-response.raml
+          '403':
+            description: |-
+              The call returns this error if no SLAS token for a registered shopper is available.
+            body:
+                type: ErrorResponse
+                examples:
+                  SLASJWTException: !include examples/error/slas-jwt-exception.raml
+          '409':
+            description: |-
+              The call returns this response in either of these cases:
+              - The previous shopper has no active basket.
+              - The current shopper has an active basket and the `overwriteExisting` query parameter was `false` (default value).
+            body:
+              application/problem+json:
+                type: ErrorResponse
+                examples:
+                  SourceBasketException: !include examples/error/source-basket-exception.raml
+                  BasketTransferException: !include examples/error/basket-transfer-exception.raml
+        queryParameters:
+          overrideExisting?:
+            description: |-
+              If the current shopper has no active basket, this parameter is ignored. If the current shopper has an active basket, this parameter controls the behavior:
+              - `false` (default): Return a BasketTransferException (HTTP status 409). The basket owner doesn't change.
+              - `true`: Force the transfer by deleting the current shopper's active basket and making the current shopper the owner of the previous shopper's basket. Returns the transferred basket (HTTP status 200).
+            type: boolean
+            default: false
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+    /actions/merge:
+      type: CommerceCloudStandards.Organization
+      post:
+        displayName: mergeBasket
+        description: |-
+          Merge data from the previous shopper's basket into the current shopper's active basket and delete the previous shopper's basket. This endpoint doesn't merge Personally Identifiable Information (PII). You must obtain the shopper authorization token via SLAS, and it must contain both the previous and current shopper IDs. After the merge, all basket amounts are recalculated and totaled, including lookups for prices, taxes, shipping, and promotions.
+
+          The following information is merged:
+          - custom attributes on the basket and on all copied records
+          - product items
+          - gift certificate items
+          - coupon items
+          - shipments
+          - ad-hoc price adjustments
+
+          To control the merging of products that exist in both baskets, use the `productItemMergeMode` parameter. By default, the higher of the two basket quantities is used for each product. Products in both baskets are considered to be the same when all of the following values match (if one product doesn't have a value, the other product is a match only if it also doesn't have that value):
+          - shipment
+          - productId
+          - option values
+          - wishlist reference
+          - inventory list id
+          - gift flag & message
+          - ad-hoc price adjustments
+
+          If any of the listed values don't match, then the item in the previous shopper's basket is copied to a new line item in the current shopper's basket. If the listed values all match, but the matching products have different values for any custom attribute, the merged line item keeps the custom attribute value from the current shopper's basket.
+
+          A success response contains the current shopper's active basket. The previous guest shopper's active basket is deleted.
+
+          If the current shopper doesn't have an active basket, and the createDestinationBasket request parameter is false, then the merge request returns a BasketMergeException (HTTP status 409). You can proceed with one of these options:
+          - Transfer the previous shopper's active basket to the current logged-in shopper by calling the `baskets/transfer` endpoint.
+          - Force the merge by calling the `baskets/merge` endpoint again, with the parameter `createDestinationBasket=true`. Forcing the merge creates a new basket for the current shopper and copies information from the previous shopper's basket into it. Because the merge doesn't copy all basket data, a forced merge is not the same as a transfer. For example, the new basket doesn't contain any Personally Identifiable Information (PII) from the previous basket.
+
+          ### before merge
+          | Previous Shopper's Basket, SKU: Quantity, Custom Attributes | Current Shopper's Basket, SKU: Quantity, Custom Attributes  |
+          |-------------------------------------------------------------|-------------------------------------------------------------|
+          | SKU_A: 5<br> SKU_B: 3<br> SKU_C: 4<br> c_customAttr_1: 'ABC' <br> c_customAttr_2: 'DEF'   | SKU_A: 2<br> SKU_D: 6<br> SKU_E: 7<br> c_customAttr_1: 'UVW' <br> c_customAttr_3: 'XYZ'   |
+
+          ### after merge - (previous shopper's basket is deleted)
+          | productItemMergeMode | Current Shopper's Basket - SKU: Quantity, Custom Attributes  |
+          |----------------------|--------------------------------------------------------------|
+          | sum_quantities         | SKU_A: 7<br> SKU_B: 3<br> SKU_C: 4<br> SKU_D: 6<br> SKU_E: 7<br> c_customAttr_1: 'UVW' <br> c_customAttr_2: 'DEF' <br> c_customAttr_3: 'XYZ'              |
+          | higher_quantity      | SKU_A: 5<br> SKU_B: 3<br> SKU_C: 4<br> SKU_D: 6<br> SKU_E: 7<br> c_customAttr_1: 'UVW' <br> c_customAttr_2: 'DEF' <br> c_customAttr_3: 'XYZ'              |
+          | saved_quantity       | SKU_A: 2<br> SKU_B: 3<br> SKU_C: 4<br> SKU_D: 6<br> SKU_E: 7<br> c_customAttr_1: 'UVW' <br> c_customAttr_2: 'DEF' <br> c_customAttr_3: 'XYZ'              |
+          | separate_item        | SKU_A: 5<br> SKU_B: 3<br> SKU_C: 4<br> SKU_A: 2<br> SKU_D: 6<br> SKU_E: 7<br> c_customAttr_1: 'UVW' <br> c_customAttr_2: 'DEF' <br> c_customAttr_3: 'XYZ' |
+        is:
+          - CommerceCloudStandards.SiteSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 403
+          - ApiStandards.RateLimited:
+              responseStatus: 409
+        responses:
+          '200':
+            description: |-
+              The current shopper's active basket, including items merged from the previous shopper's basket.
+            body:
+                type: dataTypes.Basket
+                examples:
+                  dataTypes.Basket: !include examples/basket/basket-post-response.raml
+          '403':
+            description: |-
+              The call returns this error if no SLAS token for a registered shopper is available.
+            body:
+                type: ErrorResponse
+                examples:
+                  SLASJWTException: !include examples/error/slas-jwt-exception.raml
+          '409':
+            description: |-
+              The call returns this response in either of these cases:
+              - The previous shopper has no active basket.
+              - The current shopper has no active basket and the `createDestinationBasket` query parameter was `false` (default value).
+            body:
+              application/problem+json:
+                type: ErrorResponse
+                examples:
+                  SourceBasketException: !include examples/error/source-basket-exception.raml
+                  BasketMergeException: !include examples/error/basket-merge-exception.raml
+        queryParameters:
+          createDestinationBasket?:
+            description: |-
+              If the current shopper has an active basket, this parameter is ignored. If the current shopper has no active basket, this parameter controls the behavior:
+              - `false` (default): Return a BasketMergeException (HTTP status 409).
+              - `true`: Force the merge by creating a basket for the current shopper and copying information from the previous shopper's basket into it. Return success (HTTP status 200).
+            type: boolean
+            default: false
+          productItemMergeMode?:
+            description: |-
+              This parameter controls the quantity calculation for products that exist in both baskets.
+              - higher_quantity (default): Compare the product's quantities in each basket, and use the higher value.
+              - sum_quantities: Use the sum of the product's quantities from both baskets.
+              - saved_quantity: Use the product's quantity in the current shopper's active basket. Ignore the quantity from the previous shopper's basket.
+              - separate_item: Add a separate product item to the current shopper's basket for the quantity in the previous shopper's basket.
+            type: string
+            enum:
+            - higher_quantity
+            - sum_quantities
+            - saved_quantity
+            - separate_item
+            default: higher_quantity
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+    '/{basketId}':
+      type: CommerceCloudStandards.Organization
+      delete:
+        is: 
+        - CommerceCloudStandards.SiteSpecific:
+        - ApiStandards.RateLimited:
+            responseStatus: 204
+        - ApiStandards.RateLimited:
+            responseStatus: 400
+        - ApiStandards.RateLimited:
+            responseStatus: 404
+        description: Removes a basket.
+        displayName: deleteBasket
+        responses:
+          '204':
+            description: Success, without a body.
+          '400':
+            description: |-
+              The customer assigned to the basket does not
+              match the verified customer represented by the JSON Web Token (JWT).
+            body:
+              application/problem+json:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-auth.raml
+          '404':
+            description: The basket with the given basket ID is unknown. 
+            body:
+              application/problem+json:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+      get:
+        is: 
+        - CommerceCloudStandards.SiteSpecific:
+        - BasketTraits.LocaleSpecific:
+        - ApiStandards.RateLimited:
+            responseStatus: 200
+        - ApiStandards.RateLimited:
+            responseStatus: 400
+        - ApiStandards.RateLimited:
+            responseStatus: 404
+        description: Gets a basket.
+        displayName: getBasket
+        responses:
+          '200':
+            description: Success, the response body contains the retrieved basket.
+            body:
+                type: dataTypes.Basket
+                examples:
+                  dataTypes.Basket: !include examples/basket/basket-get-response.raml
+          '400':
+            description: |-
+              The customer assigned to the basket does not match the verified
+              customer represented by the JSON Web Token (JWT).
+            body:
+              application/problem+json:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-auth.raml
+          '404':
+            description: The basket with the given basket ID is unknown.
+            body:
+              application/problem+json:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders", "sfcc.shopper-baskets-orders.rw" ] }
+      patch:
+        is: 
+        - CommerceCloudStandards.SiteSpecific:
+        - BasketTraits.LocaleSpecific:
+        - ApiStandards.RateLimited:
+            responseStatus: 200
+        - ApiStandards.RateLimited:
+            responseStatus: 400
+        - ApiStandards.RateLimited:
+            responseStatus: 404
+        description: |-
+          Updates a basket. Only the currency of the basket, source code, the custom
+          properties of the basket, and the shipping items will be considered.
+        displayName: updateBasket
+        responses:
+          '200':
+            description: Success, the response body contains the updated basket.
+            body:
+                type: dataTypes.Basket
+                examples:
+                  Basket: !include examples/basket/basket-patch-response.raml
+          '400':
+            description: |-
+              Possible reasons:
+              - the customer assigned to the basket does not
+              match the verified customer represented by the JSON Web Token (JWT).
+              - the basket cannot be updated because the
+              requested currency is not supported by the site.
+              - the given shipping item ID is null or empty.
+              - a few shipping items with the same item ID are
+              provided.
+              - the provided code is not currently active.
+            body:
+              application/problem+json:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+          '404':
+            description: |-
+              Possible reasons:
+              - the basket with the given basket ID is unknown.
+              - the shipping item with the given item ID is
+              unknown for the basket.
+              - the provided code was not found.
+            body:
+              application/problem+json:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+        body:
+            type: dataTypes.Basket
+            examples:
+              dataTypes.Basket: !include examples/basket/basket-patch-request.raml
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+      uriParameters:
+        basketId:
+          description: The ID of the basket to be modified.
+          minLength: 1
+          type: string
+          example: a10ff320829cb0eef93ca5310a
+      /billing-address:
+        type: CommerceCloudStandards.Organization
+        put:
+          is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+          description: Sets the billing address of a basket.
+          displayName: updateBillingAddressForBasket
+          responses:
+            '200':
+              description: Success, the response body contains basket with the added billing address.
+              body:
+                  type: dataTypes.Basket
+                  examples:
+                    dataTypes.Basket: !include examples/basket/billing-address-put-response.raml
+            '400':
+              description: |-
+                The customer assigned to the basket does not
+                match the verified customer represented by the JSON Web Token (JWT).
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+            '404':
+              description: The basket with the given basket ID is unknown.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+          queryParameters:
+            useAsShipping?:
+              type: boolean
+            removeExternalTax?:
+              description: |-
+                Changing the billing/shipping address can trigger tax recalculation. If the basket's tax mode is internal, the tax is automatically recalculated using tax tables. If the basket's tax mode is external, this query parameter controls tax recalculation as follows:
+                - true: (default) The basket's tax values are set to null and must be recalculated.
+                - false: The basket's tax values don't change. Use this setting to prevent an unnecessary external tax call when the billing/shipping address change doesn't affect the tax calculation.          
+              type: boolean
+              default: true
+          body:
+              type: dataTypes.OrderAddress
+              examples:
+                dataTypes.OrderAddress: !include examples/basket/billing-address-put-request.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+      /coupons:
+        type: CommerceCloudStandards.Organization
+        post:
+          is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+          description: Adds a coupon to an existing basket.
+          displayName: addCouponToBasket
+          responses:
+            '200':
+              description: Success, the response body contains the basket with the added coupon.
+              body:
+                  type: dataTypes.Basket
+                  examples:
+                    dataTypes.Basket: !include examples/basket/coupon-code-post-response.raml
+            '400':
+              description: |-
+                Possible Reasons:
+                - the customer assigned to the basket does not
+                match the verified customer represented by the JSON Web Token (JWT).
+                - the coupon number is not provided.
+                - the coupon code specified is invalid.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+            '404':
+              description: |-
+                The basket with the given basket ID is unknown.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+          body:
+              type: dataTypes.CouponItem
+              examples:
+                dataTypes.CouponItem: !include examples/basket/coupon-code-post-request.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+        '/{couponItemId}':
+          type: CommerceCloudStandards.Organization
+          delete:
+            is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            description: Removes a coupon from the basket.
+            displayName: removeCouponFromBasket
+            responses:
+              '200':
+                description: Success, the response body contains the basket without the deleted coupon.
+                body:
+                    type: dataTypes.Basket
+                    examples:
+                      dataTypes.Basket: !include examples/basket/basket-post-response.raml
+              '400':
+                description: |-
+                  The customer assigned to the basket does not
+                  match the verified customer represented by the JSON Web Token (JWT).
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-auth.raml
+              '404':
+                description: |-
+                  Possible reasons:
+                  - the basket with the given basket ID is unknown.
+                  - the couponItemId URL parameter does not match any
+                  coupon item ID in the basket.
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          uriParameters:
+            couponItemId:
+              description: The ID of the coupon item to be removed.
+              minLength: 1
+              type: string
+              example: 9372d0f511dac8caf77afc4kj2
+      /customer:
+        type: CommerceCloudStandards.Organization
+        put:
+          is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+          description: Sets customer information for an existing basket.
+          displayName: updateCustomerForBasket
+          responses:
+            '200':
+              description: Success, the response body contains the basket with the added customer information.
+              body:
+                  type: dataTypes.Basket
+                  examples:
+                    dataTypes.Basket: !include examples/basket/customer-put-response.raml
+            '400':
+              description: |-
+                Possible reasons:
+                - the customer assigned to the basket does not match the verified
+                customer represented by the JSON Web Token (JWT).
+                - the customer cannot be set to the basket because the
+                max number of baskets per customer would be exceeded.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-auth.raml
+            '404':
+              description: |-
+                Possible reasons:
+                - the customer with the given customer number is unknown.
+                - the basket with the given basket ID is unknown.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+          body:
+              type: dataTypes.CustomerInfo
+              examples:
+                dataTypes.CustomerInfo: !include examples/basket/customer-put-request.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+      /gift-certificate-items:
+        type: CommerceCloudStandards.Organization
+        post:
+          is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+          description: Adds a gift certificate item to an existing basket.
+          displayName: addGiftCertificateItemToBasket
+          responses:
+            '200':
+              description: Success, the response body contains the basket with the added gift certificate.
+              body:
+                  type: dataTypes.Basket
+                  examples:
+                    Basket: !include examples/basket/gift-cert-post-response.raml
+            '400':
+              description: The gift certificate item amount is negative.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+            '404':
+              description: |-
+                Possible reasons:
+                - the basket with the given basket ID is unknown.
+                - the shipment with the given shipment ID is
+                unknown.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+          body:
+              type: dataTypes.GiftCertificateItem
+              examples:
+                dataTypes.GiftCertificateItem: !include examples/basket/gift-cert-post-request.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+        '/{giftCertificateItemId}':
+          type: CommerceCloudStandards.Organization
+          delete:
+            is: 
+              - CommerceCloudStandards.SiteSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 200
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+            description: Deletes a gift certificate item from an existing basket.
+            displayName: removeGiftCertificateItemFromBasket
+            responses:
+              '200':
+                description: Success, the response body contains the basket without the deleted gift certificate.
+                body:
+                    type: dataTypes.Basket
+                    examples:
+                      dataTypes.Basket: !include examples/basket/basket-post-response.raml
+              '404':
+                description: |-
+                  Possible reasons:
+                  - the basket with the given basket ID is unknown.
+                  - the gift certificate item with the given gift certificate item ID is unknown.
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          patch:
+            is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            description: Updates a gift certificate item of an existing basket.
+            displayName: updateGiftCertificateItemInBasket
+            responses:
+              '200':
+                description: Success, the response body contains the basket with the updated gift certificate.
+                body:
+                    type: dataTypes.Basket
+                    examples:
+                      dataTypes.Basket: !include examples/basket/gift-cert-patch-response.raml
+              '400':
+                description: The gift certificate item amount is negative.
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+              '404':
+                description: |-
+                  Possible reasons:
+                  - the basket with the given basket ID is unknown.
+                  - the gift certificate item with the given gift certificate item ID is unknown.
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            body:
+                type: dataTypes.GiftCertificateItem
+                examples:
+                  dataTypes.GiftCertificateItem: !include examples/basket/gift-cert-patch-request.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          uriParameters:
+            giftCertificateItemId:
+              description: the ID of the gift certificate item to be updated.
+              minLength: 1
+              type: string
+              example: 83726a8351540534af93f3b15f
+      /items:
+        type: CommerceCloudStandards.Organization
+        post:
+          is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+          description: |-
+            Adds new items to a basket. The added items are associated with the
+            specified shipment. If no shipment id is specified, the added items are associated with the default shipment.
+            Considered values from the request body, for each item are:
+
+            - productId: a valid product ID. This is the ID of the product to be added to the basket. If the
+            product is already in the basket, the API either increments the quantity of the existing product line item or
+            creates a new product line item, based on the site preference 'Add Product Behavior'. For option products and
+            product bundles containing variation masters, the API creates a new product line item regardless of the site
+            preference.
+            - shipmentId: a valid shipment ID (optional). This is the ID of the shipment in which the product item
+            is created.
+            - quantity: a number between 0.01 and 999. This is the quantity of the product to order.
+            - inventoryId: a valid inventory ID (optional). This is the ID of the inventory from which the item is
+            allocated.
+            - bonusDiscountLineItemId: a valid bonus discount line item ID (optional). This is the ID of the
+            bonus discount line item for which the added product is a selected bonus product.
+            - optionItems/optionValueId: a valid option value ID. This is an option value for an option item of
+            an option product.  This is only possible if the product item is an option
+            product. To set option values, you must specify a collection of option items in the optionItems
+            property. These option items must contain optionId and optionValueId. Also,
+            the values you specify must be valid for the option product that this product item represents. Otherwise, the
+            server throws an InvalidProductOptionItemException or an
+            InvalidProductOptionValueItemException.
+            - custom properties in the form c_<CUSTOM_NAME>: the custom property must correspond to a custom
+            attribute (<CUSTOM_NAME>) defined for ProductLineItem. The value of this property must be valid for the
+            type of custom attribute defined for ProductLineItem.
+
+          displayName: addItemToBasket
+          responses:
+            '200':
+              description: Success, the response body contains the basket with the added items.
+              body:
+                  type: dataTypes.Basket
+                  examples:
+                    dataTypes.Basket: !include examples/basket/item-post-response.raml
+            '400':
+              description: |-
+                Possible reasons:
+                - the given product ID is null or invalid.
+                - the product with the given product ID is unknown, offline or
+                not assigned to site catalog or the given product item quantity is null or invalid.
+                - a null quantity value.
+                - the requested product quantity is not available.
+                - the product cannot be added to the basket because of its type.
+                - an option with the specified option ID is unknown.
+                - an option with the specified option value ID is
+                unknown.
+                - the maximum allowed number of products added to the basket,
+                has been exceeded.
+                - the customer assigned to the basket does not match the verified
+                customer represented by the JSON Web Token (JWT).
+                - the provided bonus discount line item ID is not
+                present in the current basket.
+                - the quantity of the product to be added will result in the
+                number of selected bonus choice products to exceed the amount that the user is permitted to select.
+                - the selected bonus product is not an applicable product for
+                the bonus discount line item provided.
+                body:
+                application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+            '404':
+              description: |-
+                Possible reasons:
+                - the basket with the given basket ID is unknown.
+                - the basket does not contain a shipment with the given shipment ID.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+          body:
+              type: array
+              items: dataTypes.ProductItem
+              examples:
+                dataTypes.ProductItem: !include examples/basket/item-post-request.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+        '/{itemId}':
+          type: CommerceCloudStandards.Organization
+          delete:
+            is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            description: Removes a product item from the basket.
+            displayName: removeItemFromBasket
+            responses:
+              '200':
+                description: Success, the response body contains the basket without the deleted item.
+                body:
+                    type: dataTypes.Basket
+                    examples:
+                      dataTypes.Basket: !include examples/basket/basket-post-response.raml
+              '400':
+                description: |-
+                  The customer assigned to the basket doesn't
+                  match the verified customer represented by the JSON Web Token (JWT).
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-auth.raml
+              '404':
+                description: |-
+                  The basket with the given basket ID is unknown.
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          patch:
+            is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            description: |-
+              Updates an item in a basket. The
+              following values in the request body are considered by the server:
+
+              - productId: a valid product ID. The purpose of this
+              value is to exchange a variation of a variation product.
+              - shipmentId: a valid shipment ID. The purpose of
+              this value is to move a product item to another shipment.
+              - quantity: a number between 0 and 999. The purpose of
+              this value is to change quantity of the product item. If quantity is 0,
+              the product item is removed.
+              - optionItems/optionValueId: a valid option value
+              ID. The purpose of this value is to exchange an option value for an
+              option item of an option product.
+              This is only possible if the product item is an option product. To change
+              option values a collection of option items to be changed need to be
+              provided in property optionItems. Those
+              optionItems need to contain optionId
+              and optionValueId. The provided values must be valid
+              for the option product that this product item represents. Otherwise
+              InvalidProductOptionItemException or
+              InvalidProductOptionValueItemException will be thrown.
+              custom properties c_<CUSTOM_NAME>: a
+              value corresponding to the type defined for custom attribute
+              <CUSTOM_NAME> of ProductLineItem. The purpose of this value is to
+              add or change the value of a custom attribute defined for
+              ProductLineItem.
+
+            displayName: updateItemInBasket
+            responses:
+              '200':
+                description: Success, the response body contains the basket with the updated item.
+                body:
+                    type: dataTypes.Basket
+                    examples:
+                      dataTypes.Basket: !include examples/basket/item-patch-response.raml
+              '400':
+                description: |-
+                  Possible reasons:
+                  - no product item with given item ID was found for the basket.
+                  - the product with the given product ID in the
+                  request body is invalid.
+                  - a null quantity value.
+                  - an option with the specified option id is unknown.
+                  - an option with the specified option value id is unknown.
+                  - the given shipment ID is invalid.
+                  - the customer assigned to the basket does not.
+                  match the verified customer represented by the JWT token.
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+              '404':
+                description: |-
+                  Possible reasons:
+                  - the basket with the given basket ID is unknown.
+                  - a shipment with it's given ID is unknown.
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            queryParameters:
+              removeExternalTax?:
+                description: |-
+                  Updating the quantity of the product item can trigger tax recalculation. If the basket's tax mode is internal, the tax is automatically recalculated using tax tables. If the basket's tax mode is external, this query parameter controls tax recalculation as follows:
+                  - true: (default) The tax values for the product item are set to null and must be recalculated.
+                  - false: The tax value for the product item will be updated based on the external tax rate (if no tax value was externally computed). Use this setting to prevent an unnecessary external tax call. 
+                type: boolean
+                default: true
+            body:
+                type: dataTypes.ProductItem
+                examples:
+                  dataTypes.ProductItem: !include examples/basket/item-patch-request.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          uriParameters:
+            itemId:
+              description: The ID of the item to be updated.
+              minLength: 1
+              type: string
+              example: 43c38652bc3844e14cd482ff28
+          /taxes:
+            type: CommerceCloudStandards.Organization
+            put:
+              is:
+                - CommerceCloudStandards.SiteSpecific:
+                - ApiStandards.RateLimited:
+                    responseStatus: 204
+                - ApiStandards.RateLimited:
+                    responseStatus: 404
+                - ApiStandards.RateLimited:
+                    responseStatus: 409   
+              description: This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for a specific taxable line item. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
+              displayName: addTaxesForBasketItem
+              responses:
+                '204':
+                  description: Success, without body.
+                '404':
+                  description: |-
+                    Possible reasons:
+                    - The basket with the given basket ID is unknown.
+                    - The item with the given item ID is unknown. 
+                  body:
+                    application/problem+json:
+                        type: ErrorResponse
+                        examples:
+                          dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+                '409':
+                  description: In case of the referenced basket has not the tax mode EXTERNAL set. 
+              body:
+                  type: dataTypes.TaxItems
+                  examples:
+                    dataTypes.TaxItems: !include examples/basket/basket-item-tax-put-request.raml
+              securedBy:
+                - CommerceCloudStandards.BearerToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+                - CommerceCloudStandards.AmOAuth2
+      /payment-instruments:
+        type: CommerceCloudStandards.Organization
+        post:
+          is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+          description: |-
+            Adds a payment instrument to a basket.
+          displayName: addPaymentInstrumentToBasket
+          responses:
+            '200':
+              description: Success, the response body contains the basket with the added payment instrument.
+              body:
+                  type: dataTypes.Basket
+                  examples:
+                    dataTypes.Basket: !include examples/basket/payment-instrument-post-response.raml
+            '400':
+              description: |-
+                Possible reasons:
+                - the provided payment method is invalid or not applicable.
+                - the customer assigned to the basket does not match the verified
+                customer represented by the JSON Web Token (JWT).
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+            '404':
+              description: The basket with the given basket ID is unknown.
+              
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+          body:
+              type: dataTypes.BasketPaymentInstrumentRequest
+              examples:
+                dataTypes.BasketPaymentInstrumentRequest: !include examples/basket/payment-instrument-post-request.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+        '/{paymentInstrumentId}':
+          type: CommerceCloudStandards.Organization
+          delete:
+            is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            description: Removes a payment instrument of a basket.
+            displayName: removePaymentInstrumentFromBasket
+            responses:
+              '200':
+                description: Success, the response body contains the basket without the deleted payment instrument.
+                body:
+                    type: dataTypes.Basket
+                    examples:
+                      dataTypes.Basket: !include examples/basket/basket-post-response.raml
+              '400':
+                description: |-
+                  The customer assigned to the basket does not match the verified
+                  customer represented by the JSON Web Token (JWT).
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-auth.raml
+              '404':
+                description:  |-
+                  Possible reasons:
+                  - the basket with the given basket ID is unknown.
+                  - the payment instrument with the given basket payment
+                  instrument ID is unknown.
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          patch:
+            is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            description: Updates payment instrument of an existing basket.
+            displayName: updatePaymentInstrumentInBasket
+            responses:
+              '200':
+                description: Success, the response body contains the basket with the updated payment instrument.
+                body:
+                    type: dataTypes.Basket
+                    examples:
+                      dataTypes.Basket: !include examples/basket/payment-instrument-patch-response.raml
+              '400':
+                  description: |-
+                    Possible reasons:
+                    - the provided payment method is invalid or not applicable.
+                    - the basket payment intsrument with the given id is already permanently masked.
+                    - The customer assigned to the basket does not match the
+                    verified customer represented by the JSON Web Token (JWT).
+                  body:
+                      type: ErrorResponse
+                      examples:
+                        dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+              '404':
+                description: |-
+                  Possible reasons:
+                  - the basket with the given basket ID is unknown.
+                  - the payment instrument item with the given payment instrument ID is unknown.
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            queryParameters:
+              removeExternalTax?:
+                description: |-
+                  Updating the payment instrument can trigger tax recalculation. If the basket's tax mode is internal, the tax is automatically recalculated using tax tables. If the basket's tax mode is external, this query parameter controls tax recalculation as follows:
+                  - true: (default) The basket's tax values are set to null and must be recalculated.
+                  - false: The basket's tax values don't change. Use this setting to prevent an unnecessary external tax call when the payment instrument change doesn't affect the tax calculation. 
+                type: boolean
+                default: true
+            body:
+                type: dataTypes.OrderPaymentInstrument
+                examples:
+                  dataTypes.OrderPaymentInstrument: !include examples/basket/payment-instrument-patch-request.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+      /payment-methods:
+        type: CommerceCloudStandards.Organization
+        get:
+          is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+          description: Gets applicable payment methods for an existing basket considering the open payment amount only.
+          displayName: getPaymentMethodsForBasket
+          responses:
+            '200':
+              description: Success, the response body contains the applicable payment methods for the basket.
+              body:
+                  type: dataTypes.PaymentMethodResult
+                  examples:
+                    dataTypes.PaymentMethodResult: !include examples/basket/payment-methods-get-response.raml
+            '400':
+              description: |-
+                The customer assigned to the basket does not match the
+                verified customer represented by the JSON Web Token (JWT).
+              body:
+                application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-auth.raml
+            '404':
+              description: |-
+                The basket with the given basket ID is unknown.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders", "sfcc.shopper-baskets-orders.rw" ] }
+      /price-books:
+        type: CommerceCloudStandards.Organization
+        get:
+          is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+          description: Gets applicable price books for an existing basket.
+          displayName: getPriceBooksForBasket
+          responses:
+            '200':
+              description: Success, the response body contains the priceBookIds for the basket.
+              body:
+                  type: dataTypes.PriceBookIds
+                  examples:
+                    dataTypes.PriceBookIds: !include examples/basket/price-books.raml
+            '404':
+              description: |-
+                The basket with the given basket ID is unknown.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+          securedBy:
+            - CommerceCloudStandards.BearerToken: { scopes: [ "sfcc.shopper-baskets-orders", "sfcc.shopper-baskets-orders.rw" ] }
+            - CommerceCloudStandards.AmOAuth2
+        put:
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 204
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+          description: This method allows you to put an array of priceBookIds to an existing basket, which will be used for basket calculation.
+          displayName: addPriceBooksToBasket
+          responses:
+            '204':
+              description: Success, without body.
+            '404':
+              description: The basket with the given basket ID is unknown or contains a price book ID that does not correspond to an existing price book.
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+          body:
+            type: dataTypes.PriceBookIds
+            examples:
+              dataTypes.PriceBookIds:  !include examples/basket/price-books.raml
+          securedBy:
+            - CommerceCloudStandards.BearerToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+            - CommerceCloudStandards.AmOAuth2
+      /shipments:
+        type: CommerceCloudStandards.Organization
+        post:
+          is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+          description: |-
+            Creates a new shipment for a basket.
+
+            The created shipment is initialized with values provided in the body
+            document and can be updated with further data API calls. Considered from
+            the body are the following properties if specified:
+
+            - the ID
+            - the shipping address
+            - the shipping method
+            - gift boolean flag
+            - gift message
+            - custom properties
+
+          displayName: createShipmentForBasket
+          responses:
+            '200':
+              description: Success, the response body contains the basket with added shipment.
+              body:
+                  type: dataTypes.Basket
+                  examples:
+                    dataTypes.Basket: !include examples/basket/shipments-post-response.raml
+            '400':
+              description: |-
+                Possible reasons:
+                - a shipment id is not provided.
+                - a shipment with the provided ID already.
+                exists for the basket.
+                - a shipment with the provided shipment number
+                already exists for the basket.
+                - a shipping method with an ID was specified
+                which is not a valid shipping method ID.
+                - the customer assigned to the basket does not match the
+                verified customer represented by the JSON Web Token (JWT).
+              body:
+                application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+            '404':
+              description: |-
+                The basket with the given basket ID is
+                unknown.
+              body:
+                application/problem+json:
+                      type: ErrorResponse
+                      examples:
+                        dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+          body:
+              type: dataTypes.Shipment
+              examples:
+                dataTypes.Shipment: !include examples/basket/shipments-post-request.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+        '/{shipmentId}':
+          type: CommerceCloudStandards.Organization
+          delete:
+            is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 403
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            description: |-
+              Removes a specified shipment and all associated product, gift certificate,
+              shipping, and price adjustment line items from a basket.
+              It is not allowed to remove the default shipment.
+            displayName: removeShipmentFromBasket
+            responses:
+              '200':
+                description: Success, the response body contains the basket without the deleted shipment.
+                body:
+                    type: dataTypes.Basket
+                    examples:
+                      dataTypes.Basket: !include examples/basket/basket-post-response.raml
+              '400':
+                description: |-
+                  Possible reasons:
+                  - the given shipment ID is invalid.
+                  - the customer assigned to the basket does not match the
+                  verified customer represented by the JSON Web Token (JWT).
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-auth.raml
+              '403':
+                description: |-
+                  The given shipment ID corresponds to the
+                  default shipment and cannot be removed.
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/forbidden.raml
+              '404':
+                description: |-
+                  The basket with the given basket ID is
+                  unknown.
+                body:
+                  application/problem+json:
+                      type: ErrorResponse
+                      examples:
+                        dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          patch:
+            is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - BasketTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            description: |-
+              Updates a shipment for a basket.
+
+              The shipment is initialized with values provided in the body
+              document and can be updated with further data API calls. Considered from
+              the body are the following properties if specified:
+              - the ID
+              - the shipping address
+              - the shipping method
+              - gift boolean flag
+              - gift message
+              - custom properties
+
+            displayName: updateShipmentForBasket
+            responses:
+              '200':
+                description: Success, the response body contains the basket with the updated shipment.
+                body:
+                    type: dataTypes.Basket
+                    examples:
+                      dataTypes.Basket: !include examples/basket/shipments-patch-response.raml
+              '400':
+                description: |-
+                  Possible reasons:
+                  - the given shipment ID was invalid.
+                  - a shipment with the provided ID already
+                  exists for the basket.
+                  - a shipment with the provided shipment number
+                  already exists for the basket.
+                  - a missing shipping method.
+                  - an invalid shipping method.
+                  - the customer assigned to the basket does not match the
+                  verified customer represented by the JSON Web Token (JWT).
+                body:
+                  application/problem+json:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+              '404':
+                description: |-
+                  The basket with the given basket ID is unknown.
+                body:
+                  application/problem+json:
+                      type: ErrorResponse
+                      examples:
+                        dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            body:
+                type: dataTypes.Shipment
+                examples:
+                  dataTypes.Shipment: !include examples/basket/shipments-patch-request.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          uriParameters:
+            shipmentId:
+              description: The ID of the shipment to be modified.
+              minLength: 1
+              type: string
+              example: me
+          /shipping-address:
+            type: CommerceCloudStandards.Organization
+            put:
+              is: 
+              - CommerceCloudStandards.SiteSpecific:
+              - BasketTraits.LocaleSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 200
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+              description: Sets a shipping address of a specific shipment of a basket.
+              displayName: updateShippingAddressForShipment
+              responses:
+                '200':
+                  description: Success, the response body contains the basket with the added shipping address.
+                  body:
+                      type: dataTypes.Basket
+                      examples:
+                        dataTypes.Basket: !include examples/basket/shipments-address-put-response.raml
+                '400':
+                  description: |-
+                    Possible reasons:
+                    - the shipment with the given shipment ID is unknown.
+                    - the customer assigned to the basket does not
+                    match the verified customer represented by the JSON Web Token (JWT).
+                  body:
+                      type: ErrorResponse
+                      examples:
+                        dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+                '404':
+                  description: The basket with the given basket ID is unknown.
+                  
+                  body:
+                        type: ErrorResponse
+                        examples:
+                          dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+              queryParameters:
+                useAsBilling?:
+                  type: boolean
+                removeExternalTax?:
+                  description: |-
+                    Updating the shipping/billing address can trigger tax recalculation. If the basket's tax mode is internal, the tax is automatically recalculated using tax tables. If the basket's tax mode is external, this query parameter controls tax recalculation as follows:
+                    - true: (default) The basket's tax values are set to null and must be recalculated.
+                    - false: The basket's tax values don't change. Use this setting to prevent an unnecessary external tax call when the shipping/billing address change doesn't affect the tax calculation. 
+                  type: boolean
+                  default: true
+              body:
+                  type: dataTypes.OrderAddress
+                  examples:
+                    dataTypes.OrderAddress: !include examples/basket/shipments-address-put-request.raml
+              securedBy:
+                - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          /shipping-method:
+            type: CommerceCloudStandards.Organization
+            put:
+              is: 
+                - CommerceCloudStandards.SiteSpecific:
+                - BasketTraits.LocaleSpecific:
+                - ApiStandards.RateLimited:
+                    responseStatus: 200
+                - ApiStandards.RateLimited:
+                    responseStatus: 400
+                - ApiStandards.RateLimited:
+                    responseStatus: 404
+              description: Sets a shipping method to a specific shipment of a basket.
+              displayName: updateShippingMethodForShipment
+              responses:
+                '200':
+                  description: Success, the response body contains the basket with the added shipping method.
+                  body:
+                      type: dataTypes.Basket
+                      examples:
+                        dataTypes.Basket: !include examples/basket/shipments-method-put-response.raml
+                '400':
+                  description: |-
+                    Possible reasons:
+                    - the id of the shipping method is missing.
+                    - a shipping method with an ID was specified
+                    which is not a valid shipping method ID.
+                    - the customer assigned to the basket does not match the
+                    verified customer represented by the JSON Web Token (JWT).
+                  body:
+                      type: ErrorResponse
+                      examples:
+                        dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-example.raml
+                '404':
+                  description: |-
+                    The basket with the given basket ID is unknown.
+                  body:
+                        type: ErrorResponse
+                        examples:
+                          dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+              body:
+                  type: dataTypes.ShippingMethod
+                  examples:
+                    dataTypes.ShippingMethod: !include examples/basket/shipments-method-put-request.raml
+              securedBy:
+                - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          /shipping-methods:
+            type: CommerceCloudStandards.Organization
+            get:
+              is: 
+                - CommerceCloudStandards.SiteSpecific:
+                - BasketTraits.LocaleSpecific:
+                - ApiStandards.RateLimited:
+                    responseStatus: 200
+                - ApiStandards.RateLimited:
+                    responseStatus: 400
+                - ApiStandards.RateLimited:
+                    responseStatus: 404
+              description: |-
+                Gets the applicable shipping methods for a certain shipment of a basket.
+              displayName: getShippingMethodsForShipment
+              responses:
+                '200':
+                  description: Success, the response body contains the applicable shipping methods for a certain shipment of the basket.
+                  body:
+                      type: dataTypes.ShippingMethodResult
+                      examples:
+                        dataTypes.ShippingMethodResult: !include examples/basket/shipments-method-get-response.raml
+                '400':
+                  description: |-
+                    The customer assigned to the basket does not match the
+                    verified customer represented by the JSON Web Token (JWT).
+                  body:
+                      type: ErrorResponse
+                      examples:
+                        dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/bad-request-auth.raml
+                '404':
+                  description: |-
+                    Possible reasons:
+                    - The basket with the given basket ID is unknown.
+                    - The shipment with the given shipment ID is unknown.
+                  body:
+                        type: ErrorResponse
+                        examples:
+                          dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+              securedBy:
+                - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders", "sfcc.shopper-baskets-orders.rw" ] }
+      /taxes:
+        type: CommerceCloudStandards.Organization
+        get:
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            - ApiStandards.RateLimited:
+                responseStatus: 409  
+          description: This method gives you the external taxation data set by the PUT taxes API. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information. 
+          displayName: getTaxesFromBasket
+          responses:
+            '200':
+              description: Success, the response body contains the external taxation from all line items from the referenced basket.
+              body:
+                type: dataTypes.Taxes
+                examples:
+                  dataTypes.Taxes: !include examples/basket/basket-tax-get-response.raml
+            '404':
+              description: The basket with the given basket ID is unknown.
+              body:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            '409':
+              description: In case of the referenced basket has not the tax mode EXTERNAL set. 
+              body:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/invalid-tax-mode.raml         
+          securedBy:
+            - CommerceCloudStandards.BearerToken: { scopes: [ "sfcc.shopper-baskets-orders", "sfcc.shopper-baskets-orders.rw" ] }
+            - CommerceCloudStandards.AmOAuth2
+        put:
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 204
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            - ApiStandards.RateLimited:
+                responseStatus: 409   
+          description: This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for all taxable line items. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
+          displayName: addTaxesForBasket
+          responses:
+            '204':
+              description: Success, without body.
+            '404':
+              description: The basket with the given basket ID is unknown. 
+              body:
+                application/problem+json:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.58/examples/error/basket-not-found.raml
+            '409':
+              description: In case of the referenced basket has not the tax mode EXTERNAL set. 
+          body:
+            type: dataTypes.Taxes
+            examples:
+              dataTypes.Taxes:  !include examples/basket/basket-tax-put-request.raml
+          securedBy:
+            - CommerceCloudStandards.BearerToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+            - CommerceCloudStandards.AmOAuth2

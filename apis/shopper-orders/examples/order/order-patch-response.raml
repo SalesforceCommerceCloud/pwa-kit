@@ -1,0 +1,187 @@
+#%RAML 1.0 NamedExample
+value:
+  {
+  "resourceState": "bcd8438d70b68b8d7a2967bb5623f90b33882da52a11c130d84abc55004addcb",
+  "adjustedMerchandizeTotalTax": 30,
+  "adjustedShippingTotalTax": 0.8,
+  "billingAddress": {
+    "address1": "104 Presidential Way",
+    "city": "Woburn",
+    "countryCode": "US",
+    "firstName": "Stephanie",
+    "fullName": "Stephanie Miller",
+    "id": "5f695b6f4bb63cb686483d65a0",
+    "lastName": "Miller",
+    "postalCode": "01801",
+    "stateCode": "MA"
+  },
+  "channelType": "storefront",
+  "confirmationStatus": "not_confirmed",
+  "couponItems": [
+    {
+      "code": "5ties",
+      "couponItemId": "d3f7ae47e5897a6b5d2fd541f0",
+      "statusCode": "applied",
+      "valid": true
+    }
+  ],
+  "createdBy": "Customer",
+  "creationDate": "2019-10-22T12:17:28.341Z",
+  "currency": "USD",
+  "customerInfo": {
+    "customerId": "beQeANXJNsd0xcINsB6cSrobQa",
+    "customerName": "Stephanie Miller",
+    "email": "shopper@salesforce-test.com"
+  },
+  "customerName": "Stephanie Miller",
+  "exportStatus": "not_exported",
+  "giftCertificateItems": [
+    {
+      "amount": 1.00,
+      "giftCertificateItemId": "540db3ffe58bfb04ab673757d7",
+      "recipientEmail": "miller@salesforce-test.com",
+      "shipmentId": "me"
+    }
+  ],
+  "lastModified": "2019-10-22T12:17:28.376Z",
+  "merchandizeTotalTax": 30.00,
+  "notes": {
+  },
+  "orderNo": "00000410",
+  "orderPriceAdjustments": [
+    {
+      "appliedDiscount": {
+        "amount": 10,
+        "type": "amount"
+      },
+      "reasonCode": "customer service",
+      "createdBy": "support",
+      "creationDate": "2019-10-22T12:17:28.347Z",
+      "custom": true,
+      "lastModified": "2019-10-22T12:17:28.349Z",
+      "manual": true,
+      "price": -10,
+      "priceAdjustmentId": "63b9eb9b4a92bd3e5c6ee804c2",
+      "promotionId": "5ties"
+    }
+  ],
+  "orderToken": "7gJDIFlnho_mXrxfxVB9Neic3J7szzR9glvgU5Ath-I",
+  "orderTotal": 586.76,
+  "paymentInstruments": [
+    {
+      "amount": 20,
+      "paymentInstrumentId": "ca47e0da3d49b067b630db624a",
+      "paymentMethodId": "BML"
+    },
+    {
+      "amount": 566.76,
+      "paymentCard": {
+        "cardType": "Visa",
+        "creditCardExpired": false
+      },
+      "paymentInstrumentId": "6b970a04ca8a468a64b9936764",
+      "paymentMethodId": "CREDIT_CARD"
+    }
+  ],
+  "paymentStatus": "not_paid",
+  "productItems": [
+    {
+      "adjustedTax": 30.00,
+      "basePrice": 199.99,
+      "bonusProductLineItem": false,
+      "gift": false,
+      "itemId": "d9516eecc64bd90b0022714d26",
+      "itemText": "Green Umbrella - Sustained Edition",
+      "optionItems": [
+        {
+          "adjustedTax": 0.00,
+          "basePrice": 0.00,
+          "bonusProductLineItem": false,
+          "gift": false,
+          "itemId": "8991e8d7adf0f46ffbc584e175",
+          "itemText": "We will plant a tree for your order.",
+          "optionId": "plantATree",
+          "optionValueId": "000",
+          "price": 0.00,
+          "priceAfterItemDiscount": 0.00,
+          "priceAfterOrderDiscount": 0.00,
+          "productId": "000",
+          "productName": "Plant a tree.",
+          "quantity": 3,
+          "shipmentId": "me",
+          "tax": 0.00,
+          "taxBasis": 0.00,
+          "taxClassId": "standard",
+          "taxRate": 0.05
+        }
+      ],
+      "price": 599.99,
+      "priceAfterItemDiscount": 599.99,
+      "priceAfterOrderDiscount": 589.99,
+      "productId": "green-umbrella",
+      "productName": "Green Umbrella - Sustained Edition",
+      "quantity": 3,
+      "shipmentId": "me",
+      "tax": 30.00,
+      "taxBasis": 599.97,
+      "taxClassId": "standard",
+      "taxRate": 0.05
+    }
+  ],
+  "productSubTotal": 599.97,
+  "productTotal": 599.97,
+  "shipments": [
+    {
+      "adjustedMerchandizeTotalTax": 37.00,
+      "adjustedShippingTotalTax": 0.50,
+      "gift": false,
+      "merchandizeTotalTax": 30.00,
+      "productSubTotal": 599.97,
+      "productTotal": 599.97,
+      "shipmentId": "me",
+      "shipmentTotal": 646.76,
+      "shippingAddress": {
+        "address1": "4162  Turkey Pen Road",
+        "city": "New York",
+        "countryCode": "US",
+        "firstName": "Agustin",
+        "fullName": "Agustin Estes",
+        "id": "d5d95acf5381dc6e273b4336a7",
+        "lastName": "Estes",
+        "postalCode": "10016",
+        "stateCode": "NY"
+      },
+      "shippingMethod": {
+        "description": "Order received within 7-10 business days",
+        "id": "001",
+        "name": "Ground",
+        "price": 15.99
+      },
+      "shippingStatus": "not_shipped",
+      "shippingTotal": 15.99,
+      "shippingTotalTax": 0.8,
+      "taxTotal": 30.8
+    }
+  ],
+  "shippingItems": [
+    {
+      "adjustedTax": 0.8,
+      "basePrice": 15.99,
+      "itemId": "768abee75aa8015239a9696c7e",
+      "itemText": "Shipping",
+      "price": 15.99,
+      "priceAfterItemDiscount": 15.99,
+      "shipmentId": "me",
+      "tax": 0.8,
+      "taxBasis": 15.99,
+      "taxClassId": "standard",
+      "taxRate": 0.05
+    }
+  ],
+  "shippingStatus": "not_shipped",
+  "shippingTotal": 15.99,
+  "shippingTotalTax": 0.8,
+  "status": "failed",
+  "taxation": "net",
+  "taxTotal": 30.8
+}

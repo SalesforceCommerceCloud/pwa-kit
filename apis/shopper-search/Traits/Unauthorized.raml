@@ -1,0 +1,16 @@
+#%RAML 1.0 Trait
+description: This trait represents API behavior for a 401 response in case of authorization failure.
+
+responses:
+  401:
+    description: Unauthorized.
+    body:
+      application/problem+json:
+        type: ApiStandards.ErrorResponse
+        example:
+            {
+              "title": "Invalid Access Token",
+              "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/invalid-access-token",
+              "detail": "The request is unauthorized, the access token is invalid.",
+              "accessToken": "hbGciOiJIUzI1NiIsInR5cCI6Ikp"
+            }

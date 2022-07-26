@@ -1,0 +1,6 @@
+{
+  "type": "https://discovery.commercecloud.salesforce.com/documentation/error/v2/errors/internal-server-error",
+  "title": "Internal Server Error",
+  "detail": "There was an error completing your request.",
+  "instance": "{Resource URI}"
+}

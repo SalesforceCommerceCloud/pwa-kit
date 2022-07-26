@@ -1,0 +1,92 @@
+#%RAML 1.0
+version: v1
+title: restful-conventions
+baseUri: http://politeness.local/salutationAPI
+securedBy: conventions.GDoT
+protocols:
+  - HTTPS
+mediaType: 
+  - application/json
+description: A sample API demonstrating how to use the various standards available.
+
+uses:
+  conventions: api-standards.raml
+
+types:
+  salutation:
+    type: object
+    properties:
+      language: string
+      word: string
+    examples:
+      spanish:
+        language: es
+        word: Hola
+      italian:
+        language: it
+        word: Ciao
+      english:
+        language: en
+        word: Hello
+      german:
+        language: de
+        word: Hallo
+    
+/salutations:
+  get:
+    description: Get all salutations
+    is: 
+      - conventions.RateLimited:
+          responseStatus: 200
+      - conventions.OffsetPaginated:
+          defaultSize: 50
+          maxLimit: 50
+    responses:
+      200:
+        body:
+          application/json:
+            type: salutation[]
+
+  post:
+    description: Asynchronously create an annotation allowing the server to create an ID for it
+    is: 
+      - conventions.RateLimited:
+          responseStatus: 202
+      - conventions.AsyncCreated
+      - conventions.EtagResponse:
+          responseStatus: 202
+    body:
+      application/json:
+        type: salutation
+    responses:
+        202:
+          
+  /{id}:
+    put:
+      
+      is: 
+        - conventions.RateLimited2:
+            responseStatus: 201
+            responseStatus2: 404
+        - conventions.EtagResponse:
+            responseStatus: 201
+        - conventions.SyncCreated:
+            responseType: string
+      responses:
+        201:
+        404:
+
+    get:
+      is:
+        - conventions.DateConditionalRequest:
+            responseStatus: 202
+        - conventions.EtagConditionalRequest:
+            responseStatus: 202
+        - conventions.EtagResponse:
+            responseStatus: 202
+        - conventions.RateLimited:
+            responseStatus: 202
+      body:
+        application/json:
+          type: salutation
+        

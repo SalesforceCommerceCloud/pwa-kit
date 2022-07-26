@@ -1,0 +1,42 @@
+#%RAML 1.0 SecurityScheme
+description: A security scheme that supplements SLAS Service APIs secured with an SLAS access token. To permit access to Shopper APIs, this security scheme expects a valid SLAS access token as a bearer token passed in via the `Authorization` header.
+type: x-custom
+uses:
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.15/api-standards.raml
+
+displayName: BearerToken
+describedBy:
+  headers:
+    Authorization:
+      description: |-
+        Bearer token
+      type: string
+      pattern: "Bearer .*"
+      examples: 
+        slasAccessToken: Bearer eyJ2ZXIiOiIxLjAiLCJraWQiOiI0ZTQyNTFkOS0zM2Y2LTRjMTMtYjZmZC1mOWJkNTJmYTZhNDciLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4xLjAiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5wcm9kdWN0cy5ybyBzZmNjLmNhdGFsb2dzLnJvIHNmY2Muc2hvcHBlci5ydyIsInN1YiI6ImNjLXNsYXM6OnNsc2FfZGV2OjpzY2lkOjU1M2FjOGFjLTRkYjktNGVkMy04MjVjLTNhZTNiZjVkMzI3Yjo6dXNpZDoxY2E3OWZiNi0xYjIyLTRmOWItOGJiNi05YmU5NWNjMjA4NjMiLCJjdHgiOiJzbGFzLm5vdF9mb3JfZXh0ZXJuYWxfdXNlIiwiaXNzIjoic2xhcy9kZXYvc2xzYV9kZXYiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvZGV2L3Nsc2FfZGV2IiwibmJmIjoxNTk0NzY0MDgwLCJzdHkiOiJVc2VyIiwiaXNiIjoidWlkbzpzbGFzOjp1cG46R3Vlc3Q6OnVpZG46R3Vlc3QgVXNlciIsImV4cCI6MTU5NDc2NTkxMCwiaWF0IjoxNTk0NzY0MTEwLCJqdGkiOiJDMkMxNjM0NTE0NTEwLTE3MTQzMTg2NzY0MjcwNTcyNjQ2NTYxMzgifQ.UVYAsWXCn3hoUPy8vLlc7O96RZEHD3N3ZgdNH-ZVvJ1G-R6uJ2VPrYvwKmYXF41Ujm2bo83AYOHVqEEEPT8Kgw
+
+  responses:
+      401:
+        description: Unauthorized. Your access token is invalid and can’t be used to identify an API client or user.
+        headers:
+          WWW-Authenticate: 
+            example: |
+              WWW-Authenticate: Bearer realm="servers",
+                                error="invalid_token",
+                                error_description="The access token expired"
+        body:
+          application/json:
+            type: ApiStandards.ErrorResponse
+            example:
+              type: "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized"
+              title: Unauthorized
+              detail: Your access token is invalid and can’t be used to identify an API client or user.
+      403:
+        description: Forbidden. Your access token is valid, but you don’t have the required permissions to access the resource.
+        body:
+          application/json:
+            type: ApiStandards.ErrorResponse
+            example:
+              type: "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/forbidden"
+              title: Forbidden
+              detail: Your access token is valid, but you don’t have the required permissions to access the resource.

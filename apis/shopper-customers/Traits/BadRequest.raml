@@ -1,0 +1,15 @@
+#%RAML 1.0 Trait
+description: 400 response when there is a bad request for a customer.
+responses:
+  '400':
+      description: |
+                CustomerId URL parameter does not match the verified customer represented by the JWT token.
+      body:
+        application/problem+json:
+          type: ErrorResponse
+          example: 
+            {
+              "title": "Invalid Customer",
+              "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/invalid-customer",
+              "detail": "The customer is invalid."
+            }

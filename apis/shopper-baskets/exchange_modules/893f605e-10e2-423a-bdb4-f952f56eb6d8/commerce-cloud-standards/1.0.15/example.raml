@@ -1,0 +1,63 @@
+#%RAML 1.0
+title: Example API
+version: v1
+mediaType: 
+  - application/json
+protocols:
+  - HTTPS
+description: An example file demonstrating the usage of the commerce cloud standards library.
+
+# Copied from the documentation section.
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/standards/example/{version}
+baseUriParameters:
+  shortCode:
+    description: A region-specific merchant identifier.
+    example: 0dnz6oep
+    pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
+
+uses:
+  CommerceCloudStandards: commerce-cloud-standards.raml
+  tmp: Types/search-types.raml
+
+/organizations/{organizationId}/foo:
+  type: CommerceCloudStandards.Organization
+  description: An example Endpoint
+  get:
+    displayName: getFoo
+    description: Example get Method
+    securedBy:
+      - CommerceCloudStandards.AmOAuth2
+      - CommerceCloudStandards.BearerToken
+        
+    is: 
+      - CommerceCloudStandards.QueryParamsOffset:
+      - CommerceCloudStandards.QueryParamsLimit:
+      - CommerceCloudStandards.SiteSpecific:
+          objectType: SiteId
+          objectId: SiteGenesis
+    responses:
+      200:
+        description: an example response
+        body:
+          type: CommerceCloudStandards.LocaleCode | CommerceCloudStandards.Money
+
+/organizations/{organizationId}/bar:
+  type: CommerceCloudStandards.Organization
+  description: Another example endpoint
+  get:
+    displayName: getBar
+    description: Another example get method
+    securedBy:
+      - CommerceCloudStandards.ShopperToken
+        
+    is: 
+      - CommerceCloudStandards.SiteSpecific:
+          objectType: SiteId
+          objectId: SiteGenesis
+    body:
+      type: CommerceCloudStandards.SearchRequest
+    responses:
+      200:
+        description: another example response
+        body:
+          type: CommerceCloudStandards.PaginatedSearchResult

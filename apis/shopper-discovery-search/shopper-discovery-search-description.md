@@ -1,0 +1,1 @@
+These APIs provide the capability to search Discovery services based on channel identifier and also get Suggestions that show the most recently searched items, items that are popular in the user's locale, and items that are recommended based on the user's search history.

@@ -1,0 +1,43 @@
+#%RAML 1.0 SecurityScheme
+
+description: |
+  Shopper token Authentication.
+type: x-custom
+displayName: ShopperToken
+
+uses:
+  
+describedBy:
+  headers:
+    Authorization:
+      description: |
+        Bearer token
+      type: string
+      pattern: "Bearer .*"
+      examples: 
+        authenticatedUser: Bearer b325e95c-2cd7-11e5-b345-feff819cdc9f
+  responses:
+    401:
+      description: Unauthorized. Your access-token is invalid or expired and could not be used to identify an user.
+      headers:
+        WWW-Authenticate: 
+          example: |
+            WWW-Authenticate: Bearer realm="servers",
+                              error="invalid_token",
+                              error_description="The token expired"
+      body:
+        application/json:
+          type: !include ../Types/error-response.raml
+          example:
+            type: "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized"
+            title: Unauthorized
+            detail: Your access-token is invalid or expired and could not be used to identify an user.
+    403:
+      description: Forbidden. Your token is valid, but you have no permissions to access the resource.
+      body:
+        application/json:
+          type: !include ../Types/error-response.raml
+          example:
+            type: "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/forbidden"
+            title: Forbidden
+            detail: Your token is valid, but you have no permissions to access the resource.

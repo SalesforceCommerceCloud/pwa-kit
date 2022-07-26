@@ -1,0 +1,28 @@
+#%RAML 1.0 Trait
+
+usage: This trait allows for the filtering of resources using timestamps and resource identifiers.
+
+queryParameters:
+  ids?:
+    description: Collection of resource identifiers representing the desired resources to return.
+    type: string[]
+    uniqueItems: true
+    example:
+      - 1907c0db-3845-431a-b36b-61f7efc818cc
+      - dee3ce6a-bc2f-4893-b91c-59c9a677f42d
+  creationDateTimeStart?:
+    description: Filters by excluding the resources that have creationDateTime before the defined time.
+    type: datetime
+    example: 2020-02-27T00:00:00Z
+  creationDateTimeEnd?:
+    description: Filters by excluding the resources that have creationDateTime after the defined time.
+    type: datetime
+    example: 2020-02-28T10:41:50Z
+  lastUpdateDateTimeStart?:
+    description: Filters by excluding the resources that have lastUpdateDateTime before the defined time.
+    type: datetime
+    example: 2020-02-28T09:41:50Z
+  lastUpdateDateTimeEnd?:
+    description: Filters by excluding the resources that have lastUpdateDateTime after the defined time.
+    type: datetime
+    example: 2020-02-28T10:41:50Z

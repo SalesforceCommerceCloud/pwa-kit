@@ -1,0 +1,16 @@
+#%RAML 1.0 Trait
+description: This trait represents API behavior for a 400 response in Data Promotions API.
+responses:
+  400:
+    description:
+      Thrown when a start date but no end date was given, when an end date but no start date was given, or when the given end date is before the given start date.
+    body:
+      application/json:
+        type: Error
+        example: |
+          {
+            "type": "/InvalidDateException",
+            "detail": "Invalid Start or End Date",
+            "title": "Invalid Start or End Date",
+            "instance":"/foo"
+          }

@@ -1,0 +1,6 @@
+{
+  "type": "https://discovery.commercecloud.salesforce.com/documentation/error/v2/errors/authorization-failure",
+  "title": "Authorization Failure",
+  "detail": "The provided credentials are not authorized to access this resource.",
+  "instance": "{Resource URI}"
+}

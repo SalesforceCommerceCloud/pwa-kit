@@ -1,0 +1,4336 @@
+#%RAML 1.0
+title: Shopper Customers
+version: v1
+mediaType: application/json
+protocols: HTTPS
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/customer/shopper-customers/{version}
+baseUriParameters:
+  shortCode:
+    description: A region-specific merchant identifier.
+    example: 0dnz6oep
+    pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
+
+description: !include shopper-customers-description.md 
+
+uses:
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
+  CustomerTraits: Customer-traits-library.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.20/commerce-cloud-standards.raml
+
+types:
+  AuthRequest:
+    description: Document representing the authentication request type.
+    properties:
+      type:
+        description: 'Type of authentication request: guest, credentials or refresh'
+        type: string
+        enum:
+          - guest
+          - credentials
+          - refresh
+        required: false
+        example: credentials
+  Basket:   
+    description: |-
+      Document representing a basket.
+       
+    properties:
+      adjustedMerchandizeTotalTax:
+        description: |-
+          The products tax after applying discounts in the purchase currency.
+
+           Adjusted merchandize prices represent the sum of product prices before
+           services (such as shipping) have been added, but after adjustments from
+           promotions have been added.
+        type: number
+        format: double
+        example: 20.3
+      adjustedShippingTotalTax:
+        description: |-
+          The tax of all shipping line items of the line item container, after
+           shipping adjustments have been applied.
+        type: number
+        format: double
+        example: 15.5
+      agentBasket:
+        description: Is the basket created by an agent?
+        type: boolean
+        example: false
+      basketId:
+        description: The unique identifier for the basket.
+        type: string
+        example: "MyBasket"
+      billingAddress:
+        description: The billing address. This property is part of basket checkout information only.
+        type: OrderAddress
+        required: false
+      bonusDiscountLineItems:
+        description: The bonus discount line items of the line item container.
+        type: array
+        items:
+          type: BonusDiscountLineItem
+        required: false
+      channelType:
+        description: The sales channel for the order.
+        type: string
+        enum:
+          - storefront
+          - callcenter
+          - marketplace
+          - dss
+          - store
+          - pinterest
+          - twitter
+          - facebookads
+          - subscriptions
+          - onlinereservation
+          - customerservicecenter
+          - instagramcommerce
+      couponItems:
+        description: The sorted array of coupon items. This array can be empty.
+        type: array
+        items:
+          type: CouponItem
+        required: false
+      creationDate:
+        description: Returns the value of attribute 'creationDate'.
+        type: datetime
+      currency:
+        description: The ISO 4217 mnemonic code of the currency.
+        type: string
+        example: "USD"
+      customerInfo:
+        description: The customer information for logged in customers. This property is part of basket checkout information only.
+        type: CustomerInfo
+      giftCertificateItems:
+        description: The sorted array of gift certificate line items. This array can be empty.
+        type: array
+        items:
+          type: GiftCertificateItem
+        required: false
+      inventoryReservationExpiry:
+        description: Date on which the inventory reservation for this basket expires.
+        type: datetime
+        required: false
+      lastModified:
+        description: Returns the value of attribute 'lastModified'.
+        type: datetime
+      merchandizeTotalTax:
+        description: |-
+          The products total tax in purchase currency.
+
+           Merchandize total prices represent the sum of product prices before
+           services (such as shipping) or adjustments from promotions have
+           been added.
+        type: number
+        format: double
+        example: 10.0
+      notes:
+        description: The notes for the line item container.
+        type: SimpleLink
+      orderPriceAdjustments:
+        description: The array of order level price adjustments. This array can be empty.
+        type: array
+        items:
+          type: PriceAdjustment
+        required: false
+      orderTotal:
+        description: |-
+          The total price of the order, including products, shipping, and tax. This property is part of basket checkout information only.
+        type: number
+        format: double
+      paymentInstruments:
+        description: The payment instruments list for the order.
+        type: array
+        items:
+          type: OrderPaymentInstrument
+        required: false
+      productItems:
+        description: The sorted array of product items (up to a maximum of 50 items). This array can be empty.
+        type: array
+        items:
+          type: ProductItem
+        required: false
+      productSubTotal:
+        description: |-
+          The total price of all product items after all product discounts.
+           Depending on taxation policy the returned price is net or gross.
+        type: number
+        format: double
+        example: 150.99
+      productTotal:
+        description: |-
+          The total price of all product items after all product and order discounts.
+           Depending on taxation policy the returned price is net or gross.
+        type: number
+        format: double
+        example: 99.99
+      shipments:
+        description: The array of shipments. This property is part of basket checkout information only.
+        type: array
+        items:
+          type: Shipment
+      shippingItems:
+        description: The sorted array of shipping items. This array can be empty.
+        type: array
+        items:
+          type: ShippingItem
+      shippingTotal:
+        description: |-
+          The total shipping price of the order after all shipping discounts. Excludes tax if the taxation policy is net. Includes
+           tax if the taxation policy is gross. This property is part of the basket checkout information only.
+        type: number
+        format: double
+        example: 12.99
+      shippingTotalTax:
+        description: |-
+          The tax of all shipping line items of the line item container, before
+           shipping adjustments have been applied.
+        type: number
+        format: double
+        example: 2.99
+      sourceCode:
+        description: Gets the source code assigned to this basket.
+        type: string
+        required: false
+      taxTotal:
+        description: The total tax amount of the order. This property is part of basket checkout information only.
+        type: number
+        format: double
+        example: 5.99
+      taxation:
+        description: The taxation the line item container is based on.
+        type: string
+        enum:
+          - gross
+          - net
+        example: net
+
+  BasketsResult:
+    description: Result document containing an array of baskets.
+    properties:
+      baskets:
+        description: The list of baskets for a customer.
+        type: array
+        items:
+          type: Basket
+        required: false
+      total:
+        description: The total number of baskets.
+        type: integer
+        format: int32
+        example: 10
+  BonusDiscountLineItem:
+    description: Document representing a bonus discount line item.
+    properties:
+      bonusProducts:
+        description: The list of links to the bonus products the customer can choose from.
+        type: array
+        items:
+          type: ProductDetailsLink
+      couponCode:
+        description: The coupon code that triggered the promotion, if applicable.
+        type: string
+        example: "BOGO"
+      id:
+        description: The ID of the line item.
+        type: string
+        example: "45239"
+      maxBonusItems:
+        description: The maximum number of bonus items the user can select for this promotion.
+        type: integer
+        format: int32
+        example: 1
+      promotionId:
+        description: The ID of the promotion which triggered the creation of the line item.
+        type: string
+        example: "summer-sale"
+      
+  BundledProduct:
+    description: Document representing a bundled product within a product bundle.
+    properties:
+      id:
+        type: string
+        example: "awesome-bundle"
+      product:
+        description: The product being bundled.
+        type: Product
+      quantity:
+        description: For the product being bundled, the quantity added to the bundle.
+        type: number
+        format: double
+  CouponItem:
+    description: Document representing a coupon item.
+    properties:
+      code:
+        description: The coupon code.
+        maxLength: 256
+        type: string
+        example: "BOGO"
+      couponItemId:
+        description: The coupon item ID.
+        type: string
+        required: false
+        example: "934kkas"
+      statusCode:
+        description: The status of the coupon item.
+        type: string
+        enum:
+          - coupon_code_already_in_basket
+          - coupon_code_already_redeemed
+          - coupon_code_unknown
+          - coupon_disabled
+          - redemption_limit_exceeded
+          - customer_redemption_limit_exceeded
+          - timeframe_redemption_limit_exceeded
+          - no_active_promotion
+          - coupon_already_in_basket
+          - no_applicable_promotion
+          - applied
+          - adhoc
+        required: false
+        example: applied
+      valid:
+        description: |-
+          A flag indicating whether the coupon item is valid. A coupon line item is valid if
+           the status code is 'applied' or 'no_applicable_promotion'.
+        type: boolean
+        required: false
+        example: true
+  Customer:
+    description: Person or entity who shops on Commerce Cloud storefronts by creating a shopper account in Commerce Cloud.
+    properties:
+      addresses:
+        description: The customer's addresses.
+        type: array
+        items:
+          type: CustomerAddress
+        required: false
+      authType:
+        description: |-
+          The customer's authorization type (indicates if the customer is a guest
+           or a registered customer).
+        type: string
+        enum:
+          - guest
+          - registered
+        required: false
+        example: registered
+      birthday:
+        description: The customer's birthday.
+        type: date-only
+        required: false
+      companyName:
+        description: The customer's company name.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Acme"
+      creationDate:
+        description: Returns the value of attribute 'creationDate'.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      customerId:
+        description: |-
+          The customer's number (ID). Both registered and guest customers have a
+           customer ID.
+        maxLength: 28
+        type: string
+        required: false
+        example: "dfuisydifu2342usyf"
+      customerNo:
+        description: |-
+          The customer's number (ID). Only a registered customer has a customer
+           number.
+        maxLength: 100
+        type: string
+        required: false
+        example: "D0000123"
+      email:
+        description: The customer's email address.
+        maxLength: 256
+        type: string
+        required: false
+        example: "johnsmith@email.com"
+      enabled:
+        description: A flag indicating whether this customer is enabled and can log in.
+        type: boolean
+        required: false
+        example: true
+      fax:
+        description: The customer's fax number. The length is restricted to 32 characters.
+        maxLength: 32
+        type: string
+        required: false
+        example: 555-555-5555
+      firstName:
+        description: The customer's first name.
+        maxLength: 256
+        type: string
+        required: false
+        example: "John"
+      gender:
+        description: The customer's gender.
+        type: integer
+        format: int32
+        enum:
+          - 1
+          - 2
+        required: false
+        example: 1
+      jobTitle:
+        description: The customer's job title.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Supervisor"
+      lastLoginTime:
+        description: The time when the customer last logged in.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      lastModified:
+        description: Returns the value of attribute 'lastModified'.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      lastName:
+        description: The customer's last name.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Smith"
+      lastVisitTime:
+        description: The time when the customer last visited.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      login:
+        description: The customer's login.
+        maxLength: 256
+        type: string
+        required: false
+        example: "jsmith"
+      note:
+        description: The customer's note.
+        type: string
+        required: false
+        example: "customer-note"
+      paymentInstruments:
+        description: The customer's payment instruments.
+        type: array
+        items:
+          type: CustomerPaymentInstrument
+        required: false
+      phoneBusiness:
+        description: The customer's business phone number.
+        maxLength: 32
+        type: string
+        required: false
+        example: 555-555-5555
+      phoneHome:
+        description: The customer's home phone number.
+        maxLength: 32
+        type: string
+        required: false
+        example: 555-555-5555
+      phoneMobile:
+        description: The customer's mobile phone number.
+        maxLength: 32
+        type: string
+        required: false
+        example: 555-555-5555
+      preferredLocale:
+        description: The customer's preferred locale.
+        type: string
+        required: false
+        example: "us-en"
+      previousLoginTime:
+        description: The time when the customer previously logged in.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      previousVisitTime:
+        description: The time when the customer last visited the store.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      salutation:
+        description: The salutation to use for the customer.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Mr."
+      secondName:
+        description: The customer's second name.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Smith"
+      suffix:
+        description: The customer's suffix (for example, "Jr." or "Sr.").
+        maxLength: 256
+        type: string
+        required: false
+        example: "Jr."
+      title:
+        description: The customer's title (for example, "Mrs" or "Mr").
+        maxLength: 256
+        type: string
+        required: false
+        example: "Mr."
+  CustomerAddress:
+    description: Address that is associated with a shopper (billing, shipping, mailing, and so on).
+    properties:
+      address1:
+        description: The first address.
+        maxLength: 256
+        type: string
+        required: false
+        example: "10 Presidential Way"
+      address2:
+        description: The second address.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Apt-616"
+      addressId:
+        description: The ID of the address as specified by account owner.
+        maxLength: 256
+        type: string
+        example: "Home"
+      city:
+        description: The city.
+        maxLength: 256
+        type: string
+        required: false
+        example: "New York"
+      companyName:
+        description: The company name.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Acme Inc"
+      countryCode:
+        description: The two-letter ISO 3166-1 (Alpha-2) country code.
+        maxLength: 2
+        type: string
+        example: "US"
+        pattern: ^([A-Z][A-Z])$
+      creationDate:
+        description: Returns the value of attribute 'creationDate'.
+        type: datetime
+        required: false
+        example: 9999-12-31T17:12:56.670Z
+      firstName:
+        description: The first name.
+        maxLength: 256
+        type: string
+        required: false
+        example: "John"
+      fullName:
+        description: The full name.
+        maxLength: 256
+        type: string
+        required: false
+        example: "John Smith"
+      jobTitle:
+        description: The job title.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Supervisor"
+      lastModified:
+        description: Returns the value of attribute 'lastModified'.
+        type: datetime
+        required: false
+        example: 9999-12-31T17:12:56.670Z
+      lastName:
+        description: The last name.
+        maxLength: 256
+        type: string
+        example: "Smith"
+      phone:
+        description: The phone number.
+        maxLength: 32
+        type: string
+        required: false
+        example: "555-555-5555"
+      postBox:
+        description: The post box.
+        maxLength: 256
+        type: string
+        required: false
+        example: "12345"
+      postalCode:
+        description: The postal code.
+        maxLength: 256
+        type: string
+        required: false
+        example: "N5"
+      preferred:
+        description: The preferred attribute.
+        type: boolean
+        required: false
+        example: true
+      salutation:
+        description: The salutation.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Sir"
+      secondName:
+        description: The second name.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Smith"
+      stateCode:
+        description: The state code.
+        maxLength: 256
+        type: string
+        required: false
+        example: "UT"
+      suffix:
+        description: The suffix.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Sr."
+      suite:
+        description: The suite.
+        maxLength: 32
+        type: string
+        required: false
+        example: "100"
+      title:
+        description: The title.
+        maxLength: 256
+        type: string
+        required: false
+        example: "Supervisor"
+  CustomerAddressInfo:
+    description: Result document of product list addresses.
+    properties:
+      addressId:
+        description: The ID of the address.
+        maxLength: 256
+        type: string
+        example: "Home"
+      title:
+        description: The link title.
+        type: string
+        example: "title"
+  CustomerInfo:
+    description: Document representing information used to identify a customer.
+    properties:
+      customerId:
+        description: The customer's number (ID).
+        maxLength: 100
+        type: string
+        required: false
+        example: "3034s93875939348394hk3348"
+      customerName:
+        description: The customer's name.
+        type: string
+        required: false
+        example: "John Smith"
+      customerNo:
+        description: The customer's number (ID).
+        maxLength: 100
+        type: string
+        example: "123"
+      email:
+        description: The customer's email address.
+        type: string
+        example: "jsmith@email.com"
+  CustomerOrderResult:
+    description: Result document containing an array of customer orders.
+    properties:
+      limit:
+        description: The number of returned documents.
+        type: integer
+        format: int32
+        example: 3
+      data:
+        description: The array of customer order documents.
+        type: Order[]
+      offset:
+        description: The zero-based index of the first search hit to include in the result.
+        minimum: 0
+        type: integer
+        format: int32
+        example: 0
+      total:
+        description: The total number of documents.
+        type: integer
+        format: int32
+        example: 3
+  CustomerPaymentCardRequest:
+    description: Document representing a customer payment card request.
+    properties:
+      cardType:
+        description: The payment card type (for example, "Visa").
+        maxLength: 256
+        type: string
+        example: "Visa"
+      creditCardToken:
+        description: |-
+          A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data at the
+           token store.
+        type: string
+        required: false
+        example: "hk2jh293484"
+      expirationMonth:
+        description: The month the payment card expires.
+        type: integer
+        format: int32
+        example: 11
+      expirationYear:
+        description: The year the payment card expires.
+        type: integer
+        format: int32
+        example: 9999
+      holder:
+        description: The payment card holder.
+        maxLength: 256
+        type: string
+        example: "John Smith"
+      issueNumber:
+        description: The payment card issue number.
+        maxLength: 256
+        type: string
+        example: "92743927"
+      number:
+        description: The payment card number.
+        maxLength: 4000
+        type: string
+        example: "4454852652415965"
+      validFromMonth:
+        description: The month the payment card valid is from.
+        maximum: 12
+        minimum: 1
+        type: integer
+        format: int32
+        example: 11
+      validFromYear:
+        description: The year the payment card is valid from.
+        type: integer
+        format: int32
+        example: 23
+  CustomerPaymentInstrument:
+    description: Method for customers to pay for the goods purchased on an ecommerce site. Payment methods include - credit card, debit card, bank account, and gift card.
+    properties:
+      bankRoutingNumber:
+        description: The bank routing number.
+        maxLength: 256
+        type: string
+        required: false
+        example: "KDSJHKS"
+      creationDate:
+        description: Returns the value of attribute 'creationDate'.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      lastModified:
+        description: Returns the value of attribute 'lastModified'.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      maskedGiftCertificateCode:
+        description: The masked gift certificate code.
+        type: string
+        required: false
+        example: "gift-code"
+      paymentBankAccount:
+        description: The payment bank account.
+        type: PaymentBankAccount
+      paymentCard:
+        description: The payment card.
+        type: PaymentCard
+      paymentInstrumentId:
+        description: The payment instrument ID.
+        type: string
+        example: "Personal"
+      paymentMethodId:
+        description: The payment method ID. Optional if a customer payment instrument ID is specified.
+        maxLength: 256
+        type: string
+        example: "Personal"
+  CustomerPaymentInstrumentRequest:
+    description: Document representing a customer payment instrument request.
+    properties:
+      bankRoutingNumber:
+        description: The bank routing number.
+        maxLength: 256
+        type: string
+        example: "AB123"
+      giftCertificateCode:
+        description: The gift certificate code.
+        maxLength: 256
+        type: string
+        example: "gift-code"
+      paymentBankAccount:
+        description: The payment bank account request data.
+        type: PaymentBankAccountRequest
+        required: false
+      paymentCard:
+        description: The customer payment card.
+        type: CustomerPaymentCardRequest
+      paymentMethodId:
+        description: The payment method ID. Optional if a customer payment instrument ID is specified.
+        maxLength: 256
+        type: string
+        example: "Credit Card"
+  Discount:
+    description: Document representing a discount that was applied to the price.
+    properties:
+      amount:
+        description: The amount that is used with the amount and fixed price types.
+        type: number
+        format: double
+        required: false
+        example: 30.25
+      percentage:
+        description: The percentage that is used with percentage types.
+        type: number
+        format: double
+        required: false
+        example: 10.5
+      priceBookId:
+        description: The price book ID that is used with some types.
+        type: string
+        required: false
+        example: "sale-pricebook"
+      type:
+        description: The type of discount.
+        type: string
+        enum:
+          - percentage
+          - fixed_price
+          - amount
+          - free
+          - price_book_price
+          - bonus
+          - total_fixed_price
+          - bonus_choice
+          - percentage_off_options
+        example: percentage
+  CustomerProductList:
+    description: Document representing a customer product list.
+    properties:
+      coRegistrant:
+        description: The coregistrant of this product list.
+        type: CustomerProductListRegistrant
+        required: false
+      creationDate:
+        description: Returns the value of attribute 'creationDate'.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      currentShippingAddressInfo:
+        description: The resource link to the current shipping address of this customer product list.
+        type: CustomerAddressInfo
+        required: false
+      customerProductListItems:
+        description: The list of customer product list items.
+        type: array
+        required: false
+        items:
+          type: CustomerProductListItem
+      description:
+        description: The description of this product list.
+        type: string
+        required: false
+        example: "My Product List"
+      event:
+        description: The event of this product list.
+        type: ProductListEvent
+        required: false
+      id:
+        description: The ID of this product list.
+        minLength: 1
+        type: string
+        required: false
+        example: "MyList"
+      lastModified:
+        description: Returns the value of attribute 'lastModified'.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      name:
+        description: The name of this product list.
+        type: string
+        required: false
+        example: "Danny's Product List"
+      postEventShippingAddressInfo:
+        description: The resource link to the post event shipping address of this customer product list.
+        type: CustomerAddressInfo
+        required: false
+      productListShippingAddress:
+        description: The abbreviated shipping address of this product list representing what an anonymous user can see.
+        type: ProductListShippingAddress
+        required: false
+      public:
+        description: Indicates whether the owner made this product list available for access by other customers.
+        type: boolean
+        required: false
+        example: true
+      registrant:
+        description: The registrant of this product list.
+        type: CustomerProductListRegistrant
+        required: false
+      shippingAddressInfo:
+        description: The resource link to the shipping address of this customer product list.
+        type: CustomerAddressInfo
+        required: false
+      type:
+        description: The type of the product list.
+        type: string
+        required: false
+        enum:
+          - wish_list
+          - gift_registry
+          - shopping_list
+          - custom_1
+          - custom_2
+          - custom_3
+        example: "wish_list"
+  CustomerProductListItem:
+    description: Document representing a customer product list item.
+    properties:
+      id:
+        description: The ID of this product list item.
+        type: string
+        required: false
+        example: "Main Product"
+      priority:
+        description: The priority of the item.
+        type: integer
+        format: int32
+        example: 1
+      product:
+        description: The product item.
+        type: Product
+        required: false
+      productId:
+        description: The ID of the product.
+        type: string
+        required: false
+        example: "Toaster"
+      public:
+        description: Is this product list item available for access by other customers?
+        type: boolean
+        example: true
+      purchasedQuantity:
+        description: The quantity of products already purchased.
+        type: number
+        format: double
+        required: false
+        example: 1
+      quantity:
+        description: The quantity of this product list item.
+        minimum: 0
+        type: number
+        format: double
+        example: 2
+      type:
+        description: The type of the item.
+        type: string
+        required: false
+        enum:
+          - product
+          - gift_certificate
+        example: "product"
+  CustomerProductListItemPurchase:
+    description: Document representing a customer product list item purchase.
+    properties:
+      id:
+        description: The ID of this purchase.
+        type: string
+        example: "myId"
+      orderNo:
+        description: The order number of this purchase.
+        type: string
+        example: "28234"
+      productListItemId:
+        description: The ID of the product list item this purchase relates to.
+        type: string
+        example: "My Product List"
+      purchaserName:
+        description: The name of the purchaser.
+        type: string
+        example: "John Smith"
+      quantity:
+        description: The quantity of this product list item purchased.
+        minimum: 0
+        type: number
+        format: double
+        example: 1.0
+  CustomerProductListRegistrant:
+    description: Document representing a customer product list registrant.
+    properties:
+      email:
+        description: The email of the registrant.
+        type: string
+        example: "jsmith@mail.com"
+      firstName:
+        description: The first name of the registrant.
+        type: string
+        example: "John"
+      lastName:
+        description: The last name of the registrant.
+        type: string
+        example: "Smith"
+      role:
+        description: The role of the registrant.
+        type: string
+        example: "Friend"
+  CustomerProductListResult:
+    description: Document representing a customer product lists result.
+    properties:
+      limit:
+        description: The number of returned documents.
+        type: integer
+        format: int32
+        example: 13
+      data:
+        description: The customer product lists.
+        type: array
+        items:
+          type: CustomerProductList
+      total:
+        description: The total number of documents.
+        type: integer
+        format: int32
+        example: 3
+  CustomerRegistration:
+    description: Document representing the registration information for a customer.
+    properties:
+      customer:
+        description: The customer registration information. The mandatory properties for registration are login, last name and email.
+        type: Customer
+        example: 
+          {
+            "login": "jsmith",
+            "email":"jsmith@test.com",
+            "last_name":"Smith"
+          }
+      password:
+        description: The login password
+        type: string
+        example: "Abcd!1234"
+  GiftCertificateItem:
+    description: A gift certificate item.
+    properties:
+      amount:
+        description: The certificate item amount.
+        type: number
+        format: double
+        example: 120.5
+      giftCertificateItemId:
+        description: ID used to identify this item.
+        type: string
+        required: false
+        example: "myGiftId"
+      message:
+        description: The certificate's message.
+        maxLength: 4000
+        type: string
+        required: false
+        example: "Buy One Get One Free"
+      recipientEmail:
+        description: The recipient's email.
+        minLength: 1
+        type: string
+        example: "jsmith@mail.com"
+      recipientName:
+        description: The recipient's name.
+        type: string
+        required: false
+        example: "John Smith"
+      senderName:
+        description: The sender's name.
+        type: string
+        required: false
+        example: "Jane Smith"
+      shipmentId:
+        description: The shipment ID.
+        type: string
+        required: false
+        example: "Express"
+  Image:
+    description: Image of the product within a customer's productList.
+    properties:
+      alt:
+        type: string
+        required: false
+        example: "myImage"
+      disBaseLink:
+        type: string
+        required: false
+        example: "www.image.com/product.jpg"
+      link:
+        minLength: 1
+        type: string
+        example: "https://www.ecom.com/myProduct.jpg"
+      title:
+        type: string
+        required: false
+        example: "My Product Image"
+  ImageGroup:
+    description: Document representing an image group containing a list of images for a particular view type and an optional variation value.
+    properties:
+      images:
+        description: The images of the image group.
+        type: array
+        items:
+          type: Image
+      variationAttributes:
+        description: Returns a list of variation attributes applying to this image group.
+        type: array
+        items:
+          type: VariationAttribute
+        required: false
+      viewType:
+        description: The image view type.
+        type: string
+        example: "Hi-Res"
+  Inventory:
+    description: Document representing inventory information of the current product for a particular inventory list.
+    properties:
+      ats:
+        description: |-
+          The Available To Sell (ATS) of the product. If it is infinity, the return value is 999999. The value can be overwritten by the
+           OCAPI setting 'product.inventory.ats.max_threshold'.
+        type: number
+        format: double
+        required: false
+        example: 25.0
+      backorderable:
+        description: A flag indicating whether the product is backorderable.
+        type: boolean
+        required: false
+        example: true
+      id:
+        description: The inventory ID.
+        type: string
+        example: "listInventory"
+      inStockDate:
+        description: A flag indicating the date when the product will be in stock.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      orderable:
+        description: A flag indicating whether at least one product is available to sell.
+        type: boolean
+        required: false
+        example: true
+      preorderable:
+        description: A flag indicating whether the product is pre orderable.
+        type: boolean
+        required: false
+        example: true
+      stockLevel:
+        description: |-
+          The stock level of the product. If it is infinity, the return value is 999999. The value can be overwritten by the
+           OCAPI setting 'product.inventory.stock_level.max_threshold'.
+        type: number
+        format: double
+        required: false
+        example: 22
+  Master:
+    description: Representation of a group of variant products. This is a non-buyable entity, provides inheritable attributes for it's product variants, and is used for navigation. *Doesn't have a SKU.*
+    properties:
+      masterId:
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "Shirt"
+      orderable:
+        type: boolean
+        required: false
+        example: true
+      price:
+        type: number
+        format: double
+        required: false
+        example: 29.99
+      priceMax:
+        type: number
+        format: double
+        required: false
+        example: 39.99
+      prices:
+        type: object
+        properties:
+          //:
+            type: number
+            format: double
+        required: false
+  Option:
+    description: Document representing a product option.
+    properties:
+      description:
+        description: The localized description of the option.
+        type: string
+        required: false
+        example: "Great Option"
+      id:
+        description: The ID of the option.
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "Warranty"
+      image:
+        description: The URL to the option image.
+        type: string
+        required: false
+        example: "https://www.image.com/option.jpg"
+      name:
+        description: The localized name of the option.
+        type: string
+        required: false
+        example: "Warranty Option"
+      values:
+        description: The array of option values. This array can be empty.
+        type: array
+        items:
+          type: OptionValue
+        required: false
+  OptionItem:
+    description: Document representing an option item.
+    properties:
+      adjustedTax:
+        description: The tax of the product item after adjustments applying.
+        type: number
+        format: double
+        required: false
+        example: 2.52
+      basePrice:
+        description: |-
+          The base price for the line item, which is the
+           price of the unit before applying adjustments, in the purchase
+           currency. The base price may be net or gross of tax depending
+           on the configured taxation policy.
+        type: number
+        format: double
+        required: false
+        example: 29.99
+      bonusDiscountLineItemId:
+        description: The ID of the bonus discount line item this bonus product relates to.
+        type: string
+        required: false
+        example: "myProduct"
+      bonusProductLineItem:
+        description: A flag indicating whether the product item is a bonus.
+        type: boolean
+        required: false
+        example: true
+      bundledProductItems:
+        description: The array of bundled product items. Can be empty.
+        type: array
+        items:
+          type: ProductItem
+        required: false
+      gift:
+        description: Returns true if the item is a gift.
+        type: boolean
+        required: false
+        example: false
+      giftMessage:
+        description: The gift message.
+        type: string
+        required: false
+        example: "Enjoy!"
+      inventoryId:
+        description: The inventory list ID associated with this item.
+        maxLength: 256
+        type: string
+        required: false
+        example: "storeInventory"
+      itemId:
+        description: |-
+          The item identifier. Use this to identify an item when updating the item quantity or creating a custom price
+           adjustment for an item.
+        type: string
+        required: false
+        example: "Shirt"
+      itemText:
+        description: The text describing the item in more detail.
+        type: string
+        required: false
+        example: "Magical Shirt"
+      optionId:
+        description: The ID of the option.
+        maxLength: 256
+        type: string
+        example: "Warranty"
+      optionItems:
+        description: The array of option items. This array can be empty.
+        type: array
+        items:
+          type: OptionItem
+        required: false
+      optionValueId:
+        description: The ID of the option value.
+        maxLength: 256
+        type: string
+        example: "5 years"
+      price:
+        description: |-
+          The price of the line item before applying any adjustments. If the line item is based on net pricing
+           then the net price is returned. If the line item is based on gross
+           pricing then the gross price is returned.
+        type: number
+        format: double
+        required: false
+        example: 29.99
+      priceAdjustments:
+        description: Array of price adjustments. Can be empty.
+        type: array
+        items:
+          type: PriceAdjustment
+        required: false
+      priceAfterItemDiscount:
+        description: |-
+          The price of the product line item after applying all product-level
+           adjustments. For net pricing the adjusted net price is returned. For gross pricing, the adjusted
+           gross price is returned.
+        type: number
+        format: double
+        required: false
+        example: 19.99
+      priceAfterOrderDiscount:
+        description: |-
+          The price of this product line item after considering all
+           dependent price adjustments and prorating all order-level
+           price adjustments. For net pricing the net price is returned. For gross
+           pricing, the gross price is returned.
+        type: number
+        format: double
+        required: false
+        example: 19.99
+      productId:
+        description: The ID of the product.
+        maxLength: 100
+        type: string
+        required: false
+        example: "Shirt"
+      productListItem:
+        description: The product list item.
+        type: ProductListItemReference
+        required: false
+      productName:
+        description: The name of the product.
+        type: string
+        required: false
+        example: "Nice Shirt"
+      quantity:
+        description: The quantity of the products represented by this item.
+        maximum: 999
+        minimum: 0
+        type: number
+        format: double
+        required: false
+        example: 100.00
+      shipmentId:
+        description: The ID of the shipment which includes the product item.
+        type: string
+        required: false
+        example: "Express"
+      shippingItemId:
+        description: |-
+          The reference to the related shipping item if it exists. This is the case, if for example, when a surcharge is
+           defined for individual products using a particular a shipping method.
+        type: string
+        required: false
+        example: "Express"
+      tax:
+        description: The tax of the product item before adjustments applying.
+        type: number
+        format: double
+        required: false
+        example: 5.50
+      taxBasis:
+        description: The price used to calculate the tax for this product item.
+        type: number
+        format: double
+        required: false
+        example: 10
+      taxClassId:
+        description: |-
+          The tax class ID for the product item, or null
+           if no tax class ID is associated with the product item.
+        type: string
+        required: false
+        example: "Standard"
+      taxRate:
+        description: |-
+          The tax rate, which is the decimal tax rate to be applied
+           to the product represented by this item.
+        type: number
+        format: double
+        required: false
+        example: 8.5
+  OptionValue:
+    description: Document representing an option value.
+    properties:
+      default:
+        description: A flag indicating whether this option value is the default one.
+        type: boolean
+        required: false
+        example: true
+      id:
+        description: The ID of the option value.
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "5Years"
+      name:
+        description: The localized name of the option value.
+        type: string
+        required: false
+        example: "5 Year Warranty"
+      price:
+        description: The effective price of this option value.
+        type: number
+        format: double
+        required: false
+        example: 15.99
+  Order:
+    description: Document representing an order.
+    properties:
+      adjustedMerchandizeTotalTax:
+        description: |-
+          The products tax after discounts applying in purchase currency.
+
+           Adjusted merchandize prices represent the sum of product prices before
+           services (such as shipping) have been added, but after adjustments from
+           promotions have been added.
+        type: number
+        format: double
+        required: false
+        example: 6.50
+      adjustedShippingTotalTax:
+        description: |-
+          The tax of all shipping line items of the line item container after
+           shipping adjustments have been applied.
+        type: number
+        format: double
+        required: false
+        example: 5.5
+      billingAddress:
+        description: The billing address. This property is part of basket checkout information only.
+        type: OrderAddress
+        required: false
+      bonusDiscountLineItems:
+        description: The bonus discount line items of the line item container.
+        type: array
+        items:
+          type: BonusDiscountLineItem
+        required: false
+      channelType:
+        description: The sales channel for the order.
+        type: string
+        enum:
+          - storefront
+          - callcenter
+          - marketplace
+          - dss
+          - store
+          - pinterest
+          - twitter
+          - facebookads
+          - subscriptions
+          - onlinereservation
+          - customerservicecenter
+          - instagramcommerce
+        required: false
+        example: store
+      confirmationStatus:
+        description: The confirmation status of the order.
+        type: string
+        enum:
+          - not_confirmed
+          - confirmed
+      couponItems:
+        description: The sorted array of coupon items. This array can be empty.
+        type: array
+        items:
+          type: CouponItem
+        required: false
+      createdBy:
+        description: The name of the user who created the order.
+        type: string
+        required: false
+        example: "Someone"
+      creationDate:
+        description: Returns the value of attribute 'creationDate'.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      currency:
+        description: The ISO 4217 mnemonic code of the currency.
+        type: string
+        required: false
+        example: "USD"
+      customerInfo:
+        description: The customer information for logged in customers. This property is part of basket checkout information only.
+        type: CustomerInfo
+        required: false
+      customerName:
+        description: The name of the customer associated with this order.
+        type: string
+        required: false
+        example: "John Smith"
+      exportStatus:
+        description: The export status of the order.
+        type: string
+        enum:
+          - not_exported
+          - exported
+          - ready
+          - failed
+      externalOrderStatus:
+        description: The external status of the order.
+        type: string
+        required: false
+        example: "set"
+      giftCertificateItems:
+        description: The sorted array of gift certificate line items. This array can be empty.
+        type: array
+        items:
+          type: GiftCertificateItem
+        required: false
+      globalPartyId:
+        description: globalPartyId is managed by Customer 360. Its value can be changed.
+        type: string
+        required: false
+        example: "globalId"
+      lastModified:
+        description: Returns the value of attribute 'lastModified'.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      merchandizeTotalTax:
+        description: |-
+          The products total tax in purchase currency.
+
+           Merchandize total prices represent the sum of product prices before
+           services (such as shipping) or adjustments from promotions have
+           been added.
+        type: number
+        format: double
+        required: false
+        example: 5.5
+      notes:
+        description: The notes for the line item container.
+        type: SimpleLink
+        required: false
+      orderNo:
+        description: The order number of the order.
+        type: string
+        required: false
+        example: "firstOrder"
+      orderPriceAdjustments:
+        description: The array of order level price adjustments. This array can be empty.
+        type: array
+        items:
+          type: PriceAdjustment
+        required: false
+      orderToken:
+        description: |-
+          The order token used to secure the lookup of an order on base of the
+           plain order number. The order token contains only URL safe characters.
+        type: string
+        required: false
+        example: "token"
+      orderTotal:
+        description: |-
+          The total price of the order, including products, shipping, and tax. This property is part of basket checkout
+           information only.
+        type: number
+        format: double
+        required: false
+        example: 59.99
+      paymentInstruments:
+        description: Method for customer to pay for the goods purchased on an ecommerce site. Payment methods include credit card, debit card, bank account, and gift card.
+        type: array
+        items:
+          type: OrderPaymentInstrument
+        required: false
+      paymentStatus:
+        description: The payment status of the order.
+        type: string
+        enum:
+          - not_paid
+          - part_paid
+          - paid
+      productItems:
+        description: The sorted array of product items (up to a maximum of 50 items). This array can be empty.
+        type: array
+        items:
+          type: ProductItem
+        required: false
+      productSubTotal:
+        description: |-
+          The total price of all product items after all product discounts.
+           Depending on taxation policy the returned price is net or gross.
+        type: number
+        format: double
+        required: false
+        example: 29.99
+      productTotal:
+        description: |-
+          The total price of all product items after all product and order discounts.
+           Depending on taxation policy the returned price is net or gross.
+        type: number
+        format: double
+        required: false
+        example: 39.99
+      shipments:
+        description: The array of shipments. This property is part of basket checkout information only.
+        type: array
+        items:
+          type: Shipment
+        required: false
+      shippingItems:
+        description: The sorted array of shipping items. This array can be empty.
+        type: array
+        items:
+          type: ShippingItem
+        required: false
+      shippingStatus:
+        description: The shipping status of the order.
+        type: string
+        enum:
+          - not_shipped
+          - part_shipped
+          - shipped
+      shippingTotal:
+        description: |-
+          The total shipping price of the order after all shipping discounts. Excludes tax if the taxation policy is net. Includes
+           tax if the taxation policy is gross. This property is part of basket checkout information only.
+        type: number
+        format: double
+        required: false
+        example: 59.99
+      shippingTotalTax:
+        description: |-
+          The tax of all shipping line items of the line item container, before
+           shipping adjustments have been applied.
+        type: number
+        format: double
+        required: false
+        example: 5.99
+      siteId:
+        description: The site where the order resides.
+        type: string
+        required: false
+        example: "SiteGenesis"
+      sourceCode:
+        description: Gets the source code assigned to this basket.
+        type: string
+        required: false
+        example: "code"
+      status:
+        description: The status of the order.
+        type: string
+        enum:
+          - created
+          - new
+          - open
+          - completed
+          - cancelled
+          - replaced
+          - failed
+      taxTotal:
+        description: The total tax amount of the order. This property is part of basket checkout information only.
+        type: number
+        format: double
+        required: false
+        example: 15.99
+      taxation:
+        description: The taxation the line item container is based on.
+        type: string
+        enum:
+          - gross
+          - net
+        required: false
+        example: net
+  OrderAddress:
+    description: Document representing an order address.
+    properties:
+      address1:
+        description: The first address.
+        type: string
+        example: "10 Presidential Way"
+      address2:
+        description: The second address.
+        type: string
+        required: false
+        example: "Apt 10"
+      city:
+        description: The city.
+        type: string
+        example: "New York"
+      companyName:
+        description: The company name.
+        type: string
+        required: false
+        example: "Acme Inc"
+      countryCode:
+        description: The two-letter ISO 3166-1 (Alpha-2) country code.
+        type: string
+        example: "US"
+        pattern: ^([A-Z][A-Z])$
+      firstName:
+        description: The first name.
+        type: string
+        example: "John"
+      fullName:
+        description: The full name.
+        type: string
+        required: false
+        example: "John Smith"
+      id:
+        description: ID used to identify this address
+        type: string
+        required: false
+        example: "Home"
+      jobTitle:
+        description: The job title.
+        type: string
+        required: false
+        example: "Supervisor"
+      lastName:
+        description: The last name.
+        type: string
+        example: "Smith"
+      phone:
+        description: The phone number.
+        type: string
+        required: false
+        example: "555-555-5555"
+      postBox:
+        description: The post box.
+        type: string
+        required: false
+        example: "58426"
+      postalCode:
+        description: The postal code.
+        type: string
+        example: "N5"
+      salutation:
+        description: The salutation.
+        type: string
+        required: false
+        example: "Mr."
+      secondName:
+        description: The second name.
+        type: string
+        required: false
+        example: "Smith"
+      stateCode:
+        description: The state code.
+        type: string
+        required: false
+        example: "UT"
+      suffix:
+        description: The suffix.
+        type: string
+        required: false
+        example: "Sr."
+      suite:
+        description: The suite.
+        type: string
+        required: false
+        example: "100"
+      title:
+        description: The title.
+        type: string
+        required: false
+        example: "Engineer"
+  OrderPaymentInstrument:
+    description: Document representing an order payment instrument.
+    properties:
+      amount:
+        description: The payment transaction amount.
+        type: number
+        format: double
+        example: 101.99
+      authorizationStatus:
+        description: The authorization status of the payment transaction.
+        type: Status
+      bankRoutingNumber:
+        description: The bank routing number.
+        maxLength: 256
+        type: string
+        example: "ACB123"
+      maskedGiftCertificateCode:
+        description: The masked gift certificate code.
+        type: string
+        example: "*****"
+      paymentBankAccount:
+        description: The payment bank account.
+        type: PaymentBankAccount
+      paymentCard:
+        description: The payment card.
+        type: PaymentCard
+      paymentInstrumentId:
+        description: The payment instrument ID.
+        type: string
+        example: "myId"
+      paymentMethodId:
+        description: The payment method ID. Optional if a customer payment instrument ID is specified.
+        maxLength: 256
+        type: string
+        example: "CreditCard"
+  PasswordChangeRequest:
+    description: Document representing a password change request.
+    properties:
+      currentPassword:
+        description: The customer's current password.
+        maxLength: 4096
+        type: string
+        example: "p@ssword1"
+      password:
+        description: The customer's new password.
+        maxLength: 4096
+        type: string
+        example: "p@ssword2"
+  ResetPasswordRequest:
+    description: Document representing a reset password request.
+    properties:
+      resetToken:
+        description: Temporary token used to reset password.
+        maxLength: 4096
+        type: string
+        example: "R1e2s3e4t5T6o7k8e9n0"
+      login:
+        description: The customer's login.
+        pattern: ^(?!\s*$).+
+        maxLength: 256
+        type: string
+        example: "loginId"
+      newPassword:
+        description: New password to reset to.
+        type: string
+        maxLength: 4096
+        example: "p@ssword2"
+  ResetPasswordTokenRequest:
+    description: Document representing a reset password token request.
+    properties:
+      login:
+        description: The customer's login.
+        pattern: ^(?!\s*$).+
+        maxLength: 256
+        type: string
+        example: "loginId"
+  ResetPasswordToken:
+    description: Document representing reset password token response.
+    properties:
+      login:
+        description: The customer's login.
+        pattern: ^(?!\s*$).+
+        maxLength: 256
+        type: string
+        example: "loginId"
+      email:
+        description: The customer's email address.
+        maxLength: 256
+        type: string
+        example: "jdoe@customer.com"
+      resetToken:
+        description: Temporary token generated that will be used to reset password.
+        maxLength: 4096
+        type: string
+        example: "R1e2s3e4t5T6o7k8e9n0"
+      expiresInMinutes:
+        description: Reset token expiry (in minutes).
+        type: integer
+        format: int32
+        example: 30
+  PaymentBankAccount:
+    description: Document representing a payment bank account.
+    properties:
+      driversLicenseLastDigits:
+        description: |-
+          The last 4 characters of the decrypted drivers license number of the bank account associated with this payment
+           instrument.
+        maxLength: 256
+        type: string
+        required: false
+        example: "7435"
+      driversLicenseStateCode:
+        description: The driver license state code.
+        maxLength: 256
+        type: string
+        required: false
+        example: UT
+      holder:
+        description: The holder of the bank account.
+        maxLength: 256
+        type: string
+        required: false
+        example: "John Smith"
+      maskedDriversLicense:
+        description: |-
+          The decrypted drivers license number of the bank account with all but the last 4 characters replaced with a '*'.
+           character.
+        maxLength: 256
+        type: string
+        required: false
+        example: "****7658"
+      maskedNumber:
+        description: The masked bank account number.
+        maxLength: 256
+        type: string
+        required: false
+        example: "********"
+      numberLastDigits:
+        description: The last digits of the bank account number.
+        maxLength: 256
+        required: false
+        type: string
+        example: "6654"
+  PaymentBankAccountRequest:
+    description: Document representing a payment bank account request.
+    properties:
+      driversLicense:
+        description: The drivers license.
+        maxLength: 256
+        type: string
+        example: "84736485"
+      driversLicenseStateCode:
+        description: The driver license state code.
+        maxLength: 256
+        type: string
+        example: "UT"
+      holder:
+        description: The holder of the bank account.
+        maxLength: 256
+        type: string
+        example: "John Smith"
+      number:
+        description: The payment bank account number.
+        maxLength: 256
+        type: string
+        example: "9796976"
+  PaymentCard:
+    description: Document representing a payment card.
+    properties:
+      cardType:
+        description: The payment card type (for example, "Visa").
+        maxLength: 256
+        type: string
+        example: "Visa"
+      creditCardExpired:
+        description: A flag indicating if the credit card is expired.
+        type: boolean
+        required: false
+        example: false
+      creditCardToken:
+        description: |-
+          A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data at the
+           token store.
+        type: string
+        required: false
+        example: "969kJSD9"
+      expirationMonth:
+        description: The month the payment card expires.
+        type: integer
+        format: int32
+        required: false
+        example: 03
+      expirationYear:
+        description: The year the payment card expires.
+        type: integer
+        format: int32
+        required: false
+        example: 23
+      holder:
+        description: The payment card holder.
+        maxLength: 256
+        type: string
+        required: false
+        example: "John Smith"
+      issueNumber:
+        description: The payment card issue number.
+        maxLength: 256
+        type: string
+        required: false
+        example: "769969"
+      maskedNumber:
+        description: The masked credit card number.
+        maxLength: 4000
+        type: string
+        required: false
+        example: "*****************"
+      numberLastDigits:
+        description: The last digits of credit card number.
+        maxLength: 4000
+        type: string
+        required: false
+        example: "4579"
+      validFromMonth:
+        description: The month the payment card is valid from.
+        maximum: 12
+        minimum: 1
+        type: integer
+        format: int32
+        required: false
+        example: 11
+      validFromYear:
+        description: The year the payment card is valid from.
+        type: integer
+        format: int32
+        required: false
+        example: 15
+  PriceAdjustment:
+    description: |-
+      Document representing a price adjustment within a basket or order. Price adjustments
+       are assigned at the order, product, or shipping level. They are created by the
+       promotion engine if the custom flag is set to false, or are added by custom logic if the custom
+       flag is set to true. For custom price adjustments created by a user, the manual flag should be
+       set to true. This is always the case for price adjustments created using OCAPI.   
+    properties:
+      appliedDiscount:
+        description: |-
+          A price adjustment that provides details of the discount that was applied.
+           This is null for custom price adjustments created
+           without discount details.
+        type: Discount
+      couponCode:
+        description: |-
+          The coupon code that triggered the promotion, provided
+           the price adjustment was created as the result of a promotion
+           being triggered by a coupon.
+        type: string
+        example: "free"
+      createdBy:
+        description: The user who created the price adjustment.
+        type: string
+        example: "John Smith"
+      creationDate:
+        description: Returns the value of attribute 'creationDate'.
+        type: datetime
+        example: 9999-12-31T00:00:00.0Z
+      custom:
+        description: |-
+          A flag indicating whether this price adjustment was created by custom logic. This flag is
+           set to true unless the price adjustment was created by the promotion engine.
+        type: boolean
+        example: false
+      itemText:
+        description: The text describing the item in more detail.
+        type: string
+        example: "Brand New Item"
+      lastModified:
+        description: Returns the value of attribute 'lastModified'.
+        type: datetime
+        example: 9999-12-31T00:00:00.0Z
+      manual:
+        description: |-
+          A flag indicating whether this price adjustment was created in a manual process.
+           
+           For custom price adjustments created using the Shop API, this always
+           returns true. Using the scripting API, however, it is possible to set this to true
+           or false, according to the use case.
+        type: boolean
+        example: true
+      price:
+        description: The adjustment price.
+        type: number
+        format: double
+        example: 29.99
+      priceAdjustmentId:
+        description: The price adjustment ID (UUID).
+        type: string
+        example: "3845kj34593845hiuhf"
+      promotionId:
+        description: |-
+          The ID of the related promotion. Custom price adjustments
+           can be assigned any promotion ID so long it is not
+           used by a price adjustment belonging to the same item,
+           and is not used by a promotion defined in the promotion engine.
+           If not specified, a promotion ID is generated.
+        type: string
+        example: "BestPromotion"
+      promotionLink:
+        description: The URL addressing the related promotion.
+        type: string
+        example: "www.site.com/promotions"
+      reasonCode:
+        description: The reason why this price adjustment was made.
+        type: string
+        enum:
+          - PRICE_MATCH
+          - BACKORDER
+          - EVEN_EXCHANGE
+        example: BACKORDER
+  Product:
+    description: Document representing a product.
+    properties:
+      brand:
+        description: The product's brand.
+        type: string
+        required: false
+        example: "Apple"
+      bundledProducts:
+        description: The array of all bundled products of this product.
+        type: array
+        items:
+          type: BundledProduct
+        required: false
+      currency:
+        description: The ISO 4217 mnemonic code of the currency.
+        type: string
+        required: false
+        example: "USD"
+      ean:
+        description: The European Article Number.
+        type: string
+        required: false
+        example: "sidfhg97"
+      fetchDate:
+        type: integer
+        format: int32
+        required: false
+        example: 15
+      id:
+        description: The ID (SKU) of the product.
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "8746534"
+      imageGroups:
+        description: The array of product image groups.
+        type: array
+        items:
+          type: ImageGroup
+        required: false
+      inventories:
+        description: |-
+          The array of product inventories explicitly requested via 'inventory_ids' query parameter. This property
+           is only returned in context of the 'availability' expansion.
+        type: array
+        items:
+          type: Inventory
+        required: false
+      inventory:
+        description: |-
+          The site default inventory information. This property is only
+           returned in context of the 'availability' expansion.
+        type: Inventory
+        required: false
+      longDescription:
+        description: The localized product long description.
+        type: string
+        required: false
+        example: "Best Product Ever"
+      manufacturerName:
+        description: The product's manufacturer name.
+        type: string
+        required: false
+        example: "Apple"
+      manufacturerSku:
+        description: The product's manufacturer SKU.
+        type: string
+        required: false
+        example: "938579345"
+      master:
+        description: The master product information. Only for types master, variation group, and variant.
+        type: Master
+        required: false
+      minOrderQuantity:
+        description: The minimum order quantity for this product.
+        type: number
+        format: double
+        required: false
+        example: 10.0
+      name:
+        description: The localized product name.
+        type: string
+        required: false
+        example: "Best Product"
+      options:
+        description: The array of product options, for type option. This array can be empty.
+        type: array
+        items:
+          type: Option
+        required: false
+      pageDescription:
+        description: The localized products page description.
+        type: string
+        required: false
+      pageKeywords:
+        description: The localized products page description.
+        type: string
+        required: false
+        example: "Apple"
+      pageTitle:
+        description: The localized products page title.
+        type: string
+        required: false
+        example: "Product"
+      price:
+        description: |-
+          The sales price of the product. In case of complex products, like master or set, this is the minimum price of
+           related child products.
+        type: number
+        format: double
+        required: false
+        example: 59.99
+      priceMax:
+        description: The maximum sales of related child products in case of complex products like master or set.
+        type: number
+        format: double
+        required: false
+        example: 69.99
+      prices:
+        description: The prices map with pricebook IDs and their values.
+        type: object
+        properties:
+          //:
+            type: number
+            format: double
+        required: false
+      primaryCategoryId:
+        description: The ID of the products primary category.
+        type: string
+        required: false
+        example: "Mens"
+      productLinks:
+        description: The array of source and target products links information.
+        type: array
+        items:
+          type: ProductLink
+        required: false
+      productPromotions:
+        description: |-
+          The array of active customer product promotions for this product. This array can be empty.
+           Coupon promotions are not returned in this array.
+        type: array
+        items:
+          type: ProductPromotion
+        required: false
+      recommendations:
+        description: Returns a list of recommendations.
+        type: array
+        items:
+          type: Recommendation
+        required: false
+      setProducts:
+        description: The array of set products of this product.
+        type: array
+        items:
+          type: Product
+        required: false
+      shortDescription:
+        description: The localized product short description.
+        type: string
+        required: false
+        example: "What a Product!"
+      stepQuantity:
+        description: |-
+          The steps in which the order amount of the product can be
+           increased.
+        type: number
+        format: double
+        required: false
+        example: 1
+      type:
+        description: 'The product type information. Can be one or multiple of the following values: item, master, variation_group, variant,bundle, and set.'
+        type: ProductType
+        required: false
+      unit:
+        description: The sales unit of the product.
+        type: string
+        required: false
+        example: "kg"
+      upc:
+        description: The Universal Product Code (UPC).
+        type: string
+        required: false
+        example: "0384753lj4lj"
+      validFrom:
+        description: The time when product is valid from.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      validTo:
+        description: The time when product is valid to.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      variants:
+        description: The array of actual variants. This array can be empty. Only for types master, variation group, and variant.
+        type: array
+        items:
+          type: Variant
+        required: false
+      variationAttributes:
+        description: |-
+          Sorted array of variation attributes information. This array can be empty. Only for types master,
+           variation group, and variant.
+        type: array
+        items:
+          type: VariationAttribute
+        required: false
+      variationGroups:
+        description: The array of actual variation groups. This array can be empty. Only for types master, variation group, and variant.
+        type: array
+        items:
+          type: VariationGroup
+        required: false
+      variationValues:
+        description: |-
+          The actual variation attribute ID - value pairs. Only for type variant and
+           variation group.
+        type: object
+        properties:
+          //:
+            type: string
+        required: false
+  ProductLink:
+    description: |-
+      Document representing a link between two products. It contains the ID of the source and target products, the type of
+       product link, and URLs to retrieve product data.
+    properties:
+      sourceProductId:
+        description: The semantic ID of the product from which this product link is coming from.
+        type: string
+        example: "9475394"
+      sourceProductLink:
+        description: The URL addressing the product from which this product link is coming from.
+        type: string
+      targetProductId:
+        description: The semantic ID of the product to which this product link is pointing to.
+        type: string
+        example: "534583745"
+      targetProductLink:
+        description: The URL addressing the product to which this product link is pointing to.
+        type: string
+      type:
+        description: The type of product link.
+        type: string
+        enum:
+          - cross_sell
+          - replacement
+          - up_sell
+          - accessory
+          - newer_version
+          - alt_orderunit
+          - spare_part
+          - other
+        example: up_sell
+  ProductListEvent:
+    description: Document representing a product list event.
+    properties:
+      city:
+        description: The city where the event takes place.
+        type: string
+        required: false
+        example: "New York"
+      country:
+        description: The country where the event takes place.
+        type: string
+        required: false
+        example: "USA"
+      date:
+        description: The date when the event takes place.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      state:
+        description: The federal state where the event takes place.
+        type: string
+        required: false
+        example: "UT"
+      type:
+        description: Type of the event to celebrate.
+        type: string
+        example: "wedding"
+  ProductDetailsLink:
+    description: Document representing a link to the resource for product details.
+    properties:
+      productDescription:
+        description: The description of the product.
+        type: string
+        required: false
+        example: "Awesome Product"
+      productId:
+        description: The ID of the product.
+        type: string
+        example: "384756345"
+      productName:
+        description: The name of the product.
+        type: string
+        required: false
+        example: "WhatAProduct"
+      title:
+        description: The link title.
+        type: string
+        required: false
+        example: "ProductLink"
+  ProductListItemReference:
+    properties:
+      id:
+        description: The ID of the product list item.
+        type: string
+        example: "93475"
+      priority:
+        type: integer
+        format: int32
+        required: false
+        example: 1
+      productList:
+        description: The link of the product list the item is assigned to.
+        type: ProductListLink
+        required: false
+      public:
+        type: boolean
+        required: false
+        example: true
+      purchasedQuantity:
+        type: number
+        format: double
+        required: false
+        example: 12.0
+      quantity:
+        minimum: 0
+        type: number
+        format: double
+        required: false
+        example: 10.0
+      type:
+        type: string
+        enum:
+          - product
+          - gift_certificate
+        required: false
+        example: product
+  ProductListRegistrant:
+    description: |-
+
+       A ProductListRegistrant is typically associated with an event related product list such as a gift registry. It holds
+       information about a person associated with the event such as a bride or groom.
+       
+    properties:
+      firstName:
+        description: The first name of the registrant.
+        type: string
+        example: "John"
+      lastName:
+        description: The last name of the registrant.
+        type: string
+        example: "Smith"
+      role:
+        description: The role of the registrant.
+        type: string
+        example: "CEO"
+  ProductListShippingAddress:
+    description: Document representing a product list shipping address.
+    properties:
+      addressId:
+        description: The ID of this address.
+        minLength: 1
+        type: string
+        example: "Home"
+      city:
+        description: The city of this address.
+        type: string
+        required: false
+        example: "New York"
+      firstName:
+        description: The first name of this address.
+        type: string
+        required: false
+        example: "John"
+      lastName:
+        description: The last name of this address.
+        type: string
+        required: false
+        example: "Smith"
+  ProductListLink:
+    description: Document representing a link to a product list.
+    properties:
+      description:
+        description: The description of this product list.
+        type: string
+        example: "Awesome Product List"
+      link:
+        description: The target of the link.
+        type: string
+        example: "www.examplelist.com/myproductlist"
+      name:
+        description: The name of this product list.
+        type: string
+        example: "Super List"
+      public:
+        description: |-
+          A flag indicating whether the owner made this product list available for access
+           by other customers.
+        type: boolean
+        example: true
+      title:
+        description: The link title.
+        type: string
+        example: "My Product List"
+      type:
+        description: The type of the product list.
+        type: string
+        enum:
+          - wish_list
+          - gift_registry
+          - shopping_list
+          - custom_1
+          - custom_2
+          - custom_3
+        example: wish_list
+  ProductItem:
+    description: Document representing a product item.
+    properties:
+      adjustedTax:
+        description: The tax of the product item after adjustments applying.
+        type: number
+        format: double
+        required: false
+        example: 5.5
+      basePrice:
+        description: |-
+          The base price for the line item, which is the
+           price of the unit before applying adjustments, in the purchase
+           currency. The base price may be net or gross of tax depending
+           on the configured taxation policy.
+        type: number
+        format: double
+        required: false
+        example: 29.99
+      bonusDiscountLineItemId:
+        description: The ID of the bonus discount line item this bonus product relates to.
+        type: string
+        required: false
+        example: "someId"
+      bonusProductLineItem:
+        description: A flag indicating whether the product item is a bonus.
+        type: boolean
+        required: false
+        example: false
+      bundledProductItems:
+        description: The array of bundled product items. Can be empty.
+        type: array
+        items:
+          type: ProductItem
+        required: false
+      gift:
+        description: Returns true if the item is a gift.
+        type: boolean
+        required: false
+        example: true
+      giftMessage:
+        description: The gift message.
+        type: string
+        required: false
+        example: "Enjoy the gift"
+      inventoryId:
+        description: The inventory list ID associated with this item.
+        maxLength: 256
+        type: string
+        required: false
+        example: "someInventory"
+      itemId:
+        description: |-
+          The item identifier. Use this to identify an item when updating the item quantity or creating a custom price
+           adjustment for an item.
+        type: string
+        required: false
+        example: "simpleItemId"
+      itemText:
+        description: The text describing the item in more detail.
+        type: string
+        required: false
+        example: "Super Item"
+      optionItems:
+        description: The array of option items. This array can be empty.
+        type: array
+        items:
+          type: OptionItem
+        required: false
+      price:
+        description: |-
+          The price of the line item before applying any adjustments. If the line item is based on net pricing
+           then the net price is returned. If the line item is based on gross
+           pricing then the gross price is returned.
+        type: number
+        format: double
+        required: false
+        example: 39.99
+      priceAdjustments:
+        description: Array of price adjustments. Can be empty.
+        type: array
+        items:
+          type: PriceAdjustment
+        required: false
+      priceAfterItemDiscount:
+        description: |-
+          The price of the product line item after applying all product-level
+           adjustments. For net pricing the adjusted net price is returned. For gross pricing, the adjusted
+           gross price is returned.
+        type: number
+        format: double
+        required: false
+        example: 35.99
+      priceAfterOrderDiscount:
+        description: |-
+          The price of this product line item after considering all
+           dependent price adjustments and prorating all order-level
+           price adjustments. For net pricing the net price is returned. For gross
+           pricing, the gross price is returned.
+        type: number
+        format: double
+        required: false
+        example: 35.99
+      productId:
+        description: The ID of the product.
+        maxLength: 100
+        type: string
+        required: false
+        example: "8374524"
+      productListItem:
+        description: The product list item.
+        type: ProductListItemReference
+        required: false
+      productName:
+        description: The name of the product.
+        type: string
+        required: false
+        example: "Shirt"
+      quantity:
+        description: The quantity of the products represented by this item.
+        maximum: 999
+        minimum: 0
+        type: number
+        format: double
+        example: 5
+      shipmentId:
+        description: The ID of the shipment which includes the product item.
+        type: string
+        required: false
+        example: "Express"
+      shippingItemId:
+        description: |-
+          The reference to the related shipping item if it exists. This is the case if, for example, when a surcharge is
+           defined for individual products using a particular a shipping method.
+        type: string
+        required: false
+        example: "Express"
+      tax:
+        description: The tax of the product item before adjustments applying.
+        type: number
+        format: double
+        required: false
+        example: 5.5
+      taxBasis:
+        description: The price used to calculate the tax for this product item.
+        type: number
+        format: double
+        required: false
+        example: 39.99
+      taxClassId:
+        description: |-
+          The tax class ID for the product item, or null
+           if no tax class ID is associated with the product item.
+        type: string
+        required: false
+        example: "standard"
+      taxRate:
+        description: |-
+          The decimal tax rate to be applied
+           to the product represented by this item.
+        type: number
+        format: double
+        required: false
+        example: 12.5
+  ProductPromotion:
+    description: Document representing a product promotion.
+    properties:
+      calloutMsg:
+        description: The localized call-out message of the promotion.
+        type: string
+        example: "Super Promotion"
+      promotionId:
+        description: The unique ID of the promotion.
+        type: string
+        example: "summerBlowout"
+      promotionalPrice:
+        description: The promotional price for this product.
+        type: number
+        format: double
+        example: 15.99
+  ProductType:
+    description: Document representing a product type.
+    properties:
+      bundle:
+        description: A flag indicating whether the product is a bundle.
+        type: boolean
+        example: true
+      item:
+        description: A flag indicating whether the product is a standard item.
+        type: boolean
+        example: true
+      master:
+        description: A flag indicating whether the product is a master.
+        type: boolean
+        example: true
+      option:
+        description: A flag indicating whether the product is an option.
+        type: boolean
+        example: true
+      set:
+        description: A flag indicating whether the product is a set.
+        type: boolean
+        example: true
+      variant:
+        description: A flag indicating whether the product is a variant.
+        type: boolean
+        example: true
+      variationGroup:
+        description: A flag indicating whether the product is a variation group.
+        type: boolean
+        example: true
+  PublicProductListInfo:
+    description: Document representing a link to a public product list.
+    properties:
+      description:
+        description: The description of this product list.
+        type: string
+        required: false
+        example: "Super Awesome ProductList"
+      id:
+        description: The ID of the product-list document.
+        type: string
+        example: "3958739435"
+      name:
+        description: The name of this product list.
+        type: string
+        required: false
+        example: "My Product List"
+      title:
+        description: The link title.
+        type: string
+        example: "Product List Title"
+      type:
+        description: The type of the product list.
+        type: string
+        enum:
+          - wish_list
+          - gift_registry
+          - shopping_list
+          - custom_1
+          - custom_2
+          - custom_3
+        example: custom_1
+  PublicProductListResult:
+    description: Result document containing an array of public product list links.
+    properties:
+      limit:
+        description: The number of returned documents.
+        type: integer
+        format: int32
+        example: 10
+      data:
+        description: The array of product list link documents.
+        type: array
+        items:
+          type: PublicProductListInfo
+      total:
+        description: The total number of documents.
+        type: integer
+        format: int32
+        example: 12
+  PublicProductList:
+    description: Document representing a customer product list.
+    properties:
+      coRegistrant:
+        description: The coRegistrant of this product list.
+        type: ProductListRegistrant
+        required: false
+      creationDate:
+        description: Returns the value of attribute 'creationDate'.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      description:
+        description: The description of this product list.
+        type: string
+        required: false
+        example: "Super Product List"
+      event:
+        description: The event of this product list.
+        type: ProductListEvent
+        required: false
+      id:
+        description: The id of this product list.
+        minLength: 1
+        type: string
+        example: "873465834"
+      lastModified:
+        description: Returns the value of attribute 'lastModified'.
+        type: datetime
+        required: false
+        example: 9999-12-31T00:00:00.0Z
+      name:
+        description: The name of this product list.
+        type: string
+        required: false
+        example: "My Product List"
+      productListItems:
+        description: The product list items
+        type: array
+        items:
+          type: PublicProductListItem
+        required: false  
+      productListShippingAddress:
+        description: The abbreviated shipping address of this product list representing what anonymous users see.
+        type: ProductListShippingAddress
+        required: false
+      public:
+        description: Indicates whether the owner made this product list available for access by other customers.
+        type: boolean
+        example: true
+      registrant:
+        description: The registrant of this product list.
+        type: ProductListRegistrant
+        required: false
+      type:
+        description: The type of the product list.
+        type: string
+        enum:
+          - wish_list
+          - gift_registry
+          - shopping_list
+          - custom_1
+          - custom_2
+          - custom_3
+        example: gift_registry
+  PublicProductListItem:
+    description: Document representing a product list item.
+    properties:
+      id:
+        description: The ID of this product list item.
+        type: string
+        example: "8745345"
+      priority:
+        description: The priority of the item.
+        type: integer
+        format: int32
+        example: 2
+      product:
+        description: The product item.
+        type: Product
+        required: false
+      type:
+        description: The type of the item.
+        type: string
+        enum:
+          - product
+          - gift_certificate
+        example: product
+  Recommendation:
+    description: Document representing a product recommendation.
+    properties:
+      calloutMsg:
+        description: The localized callout message of the recommendation.
+        type: string
+        required: false
+        example: "Buy this too"
+      image:
+        description: The image of the recommendation.
+        type: Image
+        required: false
+      longDescription:
+        description: The localized long description of the recommendation.
+        type: string
+        required: false
+        example: "Goes well with..."
+      name:
+        description: The localized name of the recommendation.
+        type: string
+        required: false
+        example: "Reco Product"
+      recommendationType:
+        description: The recommendation type of the recommendation.
+        type: RecommendationType
+      recommendedItemId:
+        description: The recommended item ID of the recommendation.
+        type: string
+        required: false
+        example: "93457893"
+      recommendedItemLink:
+        description: The recommended item link of the recommendation.
+        type: string
+        required: false
+        example: "Link"
+      shortDescription:
+        description: The localized short description of the recommendation.
+        type: string
+        required: false
+        example: "Awesome Product"
+  RecommendationType:
+    description: Document representing a recommendation type.
+    properties:
+      displayValue:
+        description: The localized display value of the recommendation type.
+        type: string
+        example: "UpSell"
+      value:
+        description: The value of the recommendation type.
+        type: integer
+        format: int32
+        example: 2
+  Shipment:
+    description: Document representing a shipment.
+    properties:
+      adjustedMerchandizeTotalTax:
+        description: |-
+          The products tax after applying discounts in the purchase currency. Adjusted merchandize prices represent the sum of
+           product prices before services (such as shipping) have been added, but after adjustments from promotions have been
+           added.
+
+           Note that order level adjustments are considered if the Discount Taxation preference is set to
+           "Tax Products and Shipping Only Based on Adjusted Price".
+        type: number
+        format: double
+        required: false
+        example: 3.5
+      adjustedShippingTotalTax:
+        description: The tax of all shipping line items of the line item container, after shipping adjustments have been applied.
+        type: number
+        format: double
+        required: false
+        example: 2.4
+      gift:
+        description: A flag indicating whether the shipment is a gift.
+        type: boolean
+        required: false
+        example: true
+      giftMessage:
+        description: The gift message.
+        type: string
+        required: false
+        example: "Enjoy the Gift"
+      merchandizeTotalTax:
+        description: |-
+          The products total tax in purchase currency. Merchandize total prices represent the sum of product prices before
+           services (such as shipping), or adjustments from promotions, have been added.
+        type: number
+        format: double
+        required: false
+        example: 5.5
+      productSubTotal:
+        description: |-
+          The total price of all product items after all product discounts. Depending on taxation policy the returned price
+           is net or gross.
+        type: number
+        format: double
+        required: false
+        example: 15.99
+      productTotal:
+        description: |-
+          The total price of all product items after all product and order discounts. Depending on taxation policy the
+           returned price is net or gross.
+        type: number
+        format: double
+        required: false
+        example: 25.99
+      shipmentId:
+        description: The order specific ID to identify the shipment.
+        type: string
+        required: false
+        example: "384765kad"
+      shipmentNo:
+        description: |-
+          Returns the shipment number for this shipment.
+
+           This number is automatically generated.
+        type: string
+        required: false
+        example: "38453345"
+      shipmentTotal:
+        description: |-
+          The total price of the shipment, including products, shipping and tax.
+
+           Note that order level adjustments are not considered.
+        type: number
+        format: double
+        required: false
+        example: 10.99
+      shippingAddress:
+        description: The shipping address.
+        type: OrderAddress
+        required: false
+      shippingMethod:
+        description: The shipping method.
+        type: ShippingMethod
+        required: false
+      shippingStatus:
+        description: The shipping status of the shipment.
+        type: string
+        enum:
+          - not_shipped
+          - shipped
+        example: shipped
+      shippingTotal:
+        description: |-
+          The total shipping price of the shipment, after all shipping discounts. Excludes tax if the taxation policy is net.
+           Includes tax if the taxation policy is gross.
+        type: number
+        format: double
+        required: false
+        example: 12.99
+      shippingTotalTax:
+        description: The tax of all shipping line items of the line item container, before shipping adjustments have been applied.
+        type: number
+        format: double
+        required: false
+        example: 7.99
+      taxTotal:
+        description: |-
+          The total tax amount of the shipment.
+
+           Note that order level adjustments are considered if Discount Taxation preference is set to
+           "Tax Products and Shipping Only Based on Adjusted Price".
+        type: number
+        format: double
+        required: false
+        example: 7.99
+      trackingNumber:
+        description: The tracking number of the shipment.
+        type: string
+        required: false
+        example: "3394853khbdf9sdf"
+  ShippingItem:
+    description: Document representing a shipping item.
+    properties:
+      adjustedTax:
+        description: The tax of the product item after adjustments applying.
+        type: number
+        format: double
+        example: 5.5
+      basePrice:
+        description: |-
+          The base price for the line item, which is the
+           price of the unit before applying adjustments, in the purchase
+           currency. The base price may be net or gross of tax depending
+           on the configured taxation policy.
+        type: number
+        format: double
+        example: 15.99
+      itemId:
+        description: |-
+          The item identifier. Use this to identify an item when
+           updating the item quantity or creating a custom price adjustment for an
+           item.
+        type: string
+        example: "3984"
+      itemText:
+        description: The text describing the item in more detail.
+        type: string
+        example: "My Item"
+      price:
+        description: |-
+          The price of the line item before applying any adjustments. If the line item is based on net pricing
+           then the net price is returned. If the line item is based on gross
+           pricing then the gross price is returned.
+        type: number
+        format: double
+        example: 29.99
+      priceAdjustments:
+        description: Array of price adjustments. Can be empty.
+        type: array
+        items:
+          type: PriceAdjustment
+      priceAfterItemDiscount:
+        description: |-
+          The price of the product line item after applying all product-level
+           adjustments. For net pricing, the adjusted net price is returned. For gross pricing, the adjusted
+           gross price is returned.
+        type: number
+        format: double
+        example: 19.99
+      shipmentId:
+        description: The identifier of the shipment to which this item belongs.
+        type: string
+        example: "ssdf9sd34f"
+      tax:
+        description: The tax of the product item before adjustments applying.
+        type: number
+        format: double
+        example: 7.99
+      taxBasis:
+        description: The price used to calculate the tax for this product item.
+        type: number
+        format: double
+        example: 29.99
+      taxClassId:
+        description: |-
+          The tax class ID for the product item, or null
+           if no tax class ID is associated with the product item.
+        type: string
+        example: "standard"
+      taxRate:
+        description: |-
+          The decimal tax rate to be applied
+           to the product represented by this item.
+        type: number
+        format: double
+        example: 12.5
+  ShippingMethod:
+    description: Document representing a shipping method.
+    properties:
+      description:
+        description: The localized description of the shipping method.
+        type: string
+        required: false
+        example: "One Day Shipment"
+      externalShippingMethod:
+        description: The external shipping method.
+        type: string
+        required: false
+        example: "Air"
+      id:
+        description: The shipping method ID.
+        maxLength: 256
+        type: string
+        example: "9wrksdf"
+      name:
+        description: The localized name of the shipping method.
+        type: string
+        required: false
+        example: "Ship"
+      price:
+        description: |-
+          The shipping cost total, including shipment level costs,
+           product level fix, and surcharge costs.
+        type: number
+        format: double
+        required: false
+        example: 12.99
+      shippingPromotions:
+        description: |-
+          The array of active customer shipping promotions for this shipping
+           method. This array can be empty.
+        type: array
+        items:
+          type: ShippingPromotion
+        required: false
+  ShippingPromotion:
+    description: Document representing a shipping promotion.
+    properties:
+      calloutMsg:
+        description: The localized call-out message of the promotion.
+        type: string
+        example: "Free Shipping"
+      promotionId:
+        description: The unique ID of the promotion.
+        type: string
+        example: "wk23459234"
+      promotionName:
+        description: The localized promotion name.
+        type: string
+        example: "Free Shipping Week"
+  SimpleLink:
+    description: Document representing a link to another resource.
+    properties:
+      link:
+        description: The link to the resource.
+        type: string
+        example: "www.examplelink.com"
+  Status:
+    description: Document representing a status of an object.
+    properties:
+      code:
+        description: The status code.
+        type: string
+        example: "Success"
+      message:
+        description: The status message.
+        type: string
+        example: "Looking good"
+      status:
+        description: |-
+          The status.
+           
+           For more information on the status values see dw.system.Status.OK and
+           dw.system.Status.ERROR.
+        type: integer
+        format: int32
+        example: 2
+  TrustedSystemAuthRequest:
+    description: Document representing trusted system auth request.
+    properties:
+      clientId:
+        description: |-
+          The client ID of the shopping application to be encoded in the customer JSON Web Token (JWT).
+           This is not the same as the OAuth Client ID used to authenticate the API call, as
+           the OAuth Client ID is the trusted and private ID and this is the untrusted and public ID.
+        pattern: ^(?!\s*$).+
+        type: string
+        example: "349534859384534"
+      login:
+        description: The customer's login.
+        pattern: ^(?!\s*$).+
+        type: string
+        example: "loginId"
+  Variant:
+    description: Document representing a product variation.
+    properties:
+      orderable:
+        description: A flag indicating whether the variant is orderable.
+        type: boolean
+        required: false
+        example: true
+      price:
+        description: The sales price of the variant.
+        type: number
+        format: double
+        required: false
+        example: 25.99
+      productId:
+        description: The ID (SKU) of the variant.
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "489752348592"
+      variationValues:
+        description: The actual variation attribute ID - value pairs.
+        type: object
+        properties:
+          //:
+            type: string
+        required: false
+  VariationAttribute:
+    description: Document representing a variation attribute.
+    properties:
+      id:
+        description: The ID of the variation attribute.
+        minLength: 1
+        type: string
+        example: "color"
+      name:
+        description: The localized display name of the variation attribute.
+        type: string
+        required: false
+        example: "Color"
+      values:
+        description: The sorted array of variation values. This array can be empty.
+        type: array
+        items:
+          type: VariationAttributeValue
+        required: false
+  VariationAttributeValue:
+    description: Document representing a variation attribute value.
+    properties:
+      description:
+        description: The localized description of the variation value.
+        type: string
+        required: false
+        example: "Red"
+      image:
+        description: The first product image for the configured viewtype and this variation value.
+        type: Image
+        required: false
+      imageSwatch:
+        description: The first product image for the configured viewtype and this variation value (typically the swatch image).
+        type: Image
+        required: false
+      name:
+        description: The localized display name of the variation value.
+        type: string
+        required: false
+        example: "Red"
+      orderable:
+        description: A flag indicating whether at least one variant with this variation attribute value is available to sell.
+        type: boolean
+        required: false
+        example: true
+      value:
+        description: The actual variation value.
+        minLength: 1
+        type: string
+        example: "Red"
+  VariationGroup:
+    description: Document representing a variation group.
+    properties:
+      orderable:
+        description: A flag indicating whether the variation group is orderable.
+        type: boolean
+        example: true
+      price:
+        description: The sales price of the variation group.
+        type: number
+        format: double
+        example: 25.99
+      productId:
+        description: The ID (SKU) of the variation group.
+        maxLength: 100
+        minLength: 1
+        type: string
+        example: "93485793"
+      variationValues:
+        description: The actual variation attribute ID - value pairs.
+        type: object
+        properties:
+          //:
+            type: string
+  CustomerExtProfileRequest:
+    description: Document representing the External Profile Request.
+    properties:
+      authenticationProviderId:
+        description: The authentication Provider Id 
+        type: string
+        minLength: 1
+        required: true
+        example: "Google"
+      email:
+        description: The Email of the customer.
+        type: string
+        minLength: 1
+        required: false
+        example: "s@gmail.com"
+      externalId:
+        description: The ID of the customer.
+        type: string
+        minLength: 1
+        required: true
+        example: "jsmith@gmail.com"
+      firstName:
+        description: The First Name of the customer.
+        type: string
+        minLength: 1
+        required: false
+        example: "John"
+      lastName:
+        description: The Last Name of the customer.
+        type: string
+        minLength: 1
+        required: false
+        example: "Smith"
+  CustomerExternalProfile:
+    description: The Document representing the External Profile of a Customer.
+    type: CustomerExtProfileRequest
+    properties:
+      customerId:
+        description: The Id of the Customer
+        type: string
+        minLength: 1
+        required: true
+        example: "1234"
+/organizations/{organizationId}:
+  type: CommerceCloudStandards.Organization
+  /customers:
+    post:
+      description: Registers a new customer. The mandatory data are the credentials, profile last name, and email. This requires a JSON Web Token (JWT) which needs to be obtained using the POST /customers/auth API with type "guest".
+      displayName: registerCustomer
+      is:
+        - CommerceCloudStandards.SiteSpecific:
+        - ApiStandards.RateLimited:
+            responseStatus: 200
+        - ApiStandards.RateLimited:
+            responseStatus: 400
+        - ApiStandards.RateLimited:
+            responseStatus: 401
+        - CustomerTraits.BadRequest
+        - CustomerTraits.CustomerAuthenticationFailed
+      responses:
+        '200':
+          description: Success
+          body:
+            application/json:
+              type: Customer    
+              examples:
+                customer: !include Examples/CustomerRegistrationResponse.raml
+      body:
+        application/json:
+          type: CustomerRegistration
+          example: !include Examples/CustomerRegistrationRequest.raml
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-customers.register] }
+    /actions:
+      /logout:
+        delete:
+          description: |-
+            **DEPRECATION NOTICE**
+
+            To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
+
+            ---
+
+            Log the user out.
+          displayName: invalidateCustomerAuth
+          is: 
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 204            
+          responses:
+            '204':
+              description: No Content
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-customers.login] }
+      /login:
+        post:
+          description: |-
+            **DEPRECATION NOTICE**
+
+            To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
+
+            ---
+
+            Obtains a new JSON Web Token (JWT)for a guest or registered
+            customer. Tokens are returned as an HTTP Authorization:Bearer response
+            header entry. These kinds of request are supported, as specified by the
+            type:
+            
+            Type guest - creates a guest (non-authenticated) customer
+            and returns a token for the customer.
+            Request Body for guest : {"type": "guest"}
+            Type credentials - authenticates credentials passed in the
+            HTTP Authorization:Basic request header, returning a token for a
+            successfully authenticated customer, otherwise it throws an
+            AuthenticationFailedException.
+            Request Body for guest : {"type": "credentials"}
+            Type refresh - examines the token passed in the HTTP
+            Authorization:Bearer request header and when valid returns a new token
+            with an updated expiry time.
+            Request Body for guest : {"type": "refresh"}
+
+            For a request of type credentials:
+            
+            Updates profile attributes for the customer (for example,
+            "last-visited").
+            Handles the maximum number of failed login attempts.
+            
+            About JWT The token contains 3 sections:
+            
+            The header section (specifies token type and algorithm used),
+            the payload section (contains customer information, client ID,
+            issue, and expiration time),
+            finally the signature section records the token signature.
+            
+            A token is created and returned to the client whenever a registered
+            customer logs in (type "credentials") or a guest customer requests it (type
+            "guest"). The token is returned in the response header as 
+            Authorization: Bearer --token--
+            
+            The client has to include the token in the request header as 
+            Authorization: Bearer --token-- 
+            in any follow-up request. The server declines any follow-up requests
+            without a token or which cannot be verified based on the token signature
+            or expiration time. A token nearing its expiration time should be
+            exchanged for a new one (type "refresh").
+            
+            See "API Usage > JWT" for more details on using JWT as an authentication
+            mechanism.
+          displayName: authorizeCustomer
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 401
+            - CustomerTraits.BadRequest
+            - CustomerTraits.CustomerAuthenticationFailed
+          responses:
+            '200':
+              headers:
+                authorization: 
+                  type: string
+                  example: 'Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE1ODE3MTM4MzYsImlhdCI6MTU4MTcxMjAzNiwiaXNzIjoiZjY2ZjBlNGYtZmE0NC00MWViLTliMzUtODlkZTllZTY3ZTcxIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYmRScUlHTzdYeVFZR1JjTTlhbThKQTBHYWJcIixcImd1ZXN0XCI6dHJ1ZX19In0.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JsdfsgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRTy6Zh6rbi49JGjiXOvrVFjcqaztf64RUB41sWgQuORV30ic8a5D2bQta-TfsiCZTCBbXaKSnJCcdLdvbxTuppzLF0fW-yzpLi4caFUidewTrFoFBUj7M4UpF2gd0DtJhX2YEJCTn5jA4y-ue4oY7Vcp6Y2NpG_mOX_gOmYm_m7hJzKuY4zU90SGc-GYkbBKfRPK3GthTr0LNXVsknydirpsZDI1hlBjrCxNz689-ogulwX0CfkFVMfuEEr9Ac89UqOyfYkFg6VJ42htDRGVRpZR9T5sG6g49jnvkS9U-3-RoGsk4N6kLozoGuuA2mwZbgOr9uPQAHTGMF4XbA_zjhU62q4xiRFJs-L-ZpRyQfmjy50vHCU9wuriBAdc5zDJo7hjNMQSmsJGA774WTDA'
+              description: Success
+              body:
+                application/json:
+                  type: Customer
+                  examples:
+                    customer: !include Examples/guestAuthResponse.raml
+          headers:
+            Authorization:
+              description: |-
+                                Authorization:Basic for type credentials
+                                Authorization:Bearer for type refresh
+              type: string
+              required: false
+          queryParameters:
+            clientId:
+              type: string
+              description: Client ID for application identification
+              required: true
+              example: "f45f0e4f-fa44-63gh-9b35-91dc1dd78e82" 
+          body:
+            application/json:
+              type: AuthRequest
+              example:  { 
+                  "type" : "guest" 
+                }
+    /trusted-system/actions/login:
+      post:
+        description: |-
+            **DEPRECATION NOTICE**
+
+            To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
+
+            ---
+
+            Obtain the JSON Web Token (JWT) for registered customers whose credentials are stored using a third party system. Accepts loginId and 
+            clientId, returns a customer object in the response body and the JWT generated against the clientId in the response header.
+        displayName: authorizeTrustedSystem
+        is:
+          - CommerceCloudStandards.SiteSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 401            
+          - CustomerTraits.CustomerAuthenticationFailed
+        responses:
+          '200':
+            headers:
+              authorization: 
+                type: string
+                example: 'Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE1ODE3MTM4MzYsImlhdCI6MTU4MTcxMjAzNiwiaXNzIjoiZjY2ZjBlNGYtZmE0NC00MWViLTliMzUtODlkZTllZTY3ZTcxIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYmRScUlHTzdYeVFZR1JjTTlhbThKQTBHYWJcIixcImd1ZXN0XCI6dHJ1ZX19In0.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JsdfsgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRTy6Zh6rbi49JGjiXOvrVFjcqaztf64RUB41sWgQuORV30ic8a5D2bQta-TfsiCZTCBbXaKSnJCcdLdvbxTuppzLF0fW-yzpLi4caFUidewTrFoFBUj7M4UpF2gd0DtJhX2YEJCTn5jA4y-ue4oY7Vcp6Y2NpG_mOX_gOmYm_m7hJzKuY4zU90SGc-GYkbBKfRPK3GthTr0LNXVsknydirpsZDI1hlBjrCxNz689-ogulwX0CfkFVMfuEEr9Ac89UqOyfYkFg6VJ42htDRGVRpZR9T5sG6g49jnvkS9U-3-RoGsk4N6kLozoGuuA2mwZbgOr9uPQAHTGMF4XbA_zjhU62q4xiRFJs-L-ZpRyQfmjy50vHCU9wuriBAdc5zDJo7hjNMQSmsJGA774WTDA'            
+            description: Success
+            body:
+              application/json:
+                type: Customer
+                examples:
+                  customer: !include Examples/TrustedAuthResponse.raml
+        securedBy:
+          - CommerceCloudStandards.BearerToken: { scopes: [sfcc.shopper-customers.login] }
+          - CommerceCloudStandards.AmOAuth2
+        body:
+          application/json:
+            type: TrustedSystemAuthRequest
+            example: { 
+                "login" : "f0a43dc2-692a-43bf-b008-e10918ea935d",
+                "clientId": "abdtkZzH6sqInJGIHNR1yUw90A" 
+              }
+    /password/actions:
+      /reset:
+        post:
+          description: Reset customer password, after obtaining a reset token. This is the second step in the reset customer password flow, where a customer password is reset by providing the new credentials along with a reset token. This call should be preceded by a call to the /create-reset-token endpoint.
+          displayName: resetPassword
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 204
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - CustomerTraits.BadRequest
+          responses:
+            '204':
+              description: Reset password successful. No Content
+          securedBy:
+              - CommerceCloudStandards.BearerToken: { scopes: [sfcc.shopper-customers.login] }
+              - CommerceCloudStandards.AmOAuth2
+          body:
+            application/json:
+              type: ResetPasswordRequest
+              example: !include Examples/ResetPasswordRequest.raml
+      /create-reset-token:
+        post:
+          description: Get reset password token. This is the first step in the reset customer password flow, where a password reset token is requested for future use to reset a customer password. This call should be followed by a call to the /reset endpoint.
+          displayName: getResetPasswordToken
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - CustomerTraits.BadRequest
+          responses:
+            '200':
+              description: Reset password token generated and returned successfully.
+              body:
+                application/json:
+                  type: ResetPasswordToken
+                  example: !include Examples/ResetTokenResult.raml
+          securedBy:
+              - CommerceCloudStandards.BearerToken: { scopes: [sfcc.shopper-customers.login] }
+              - CommerceCloudStandards.AmOAuth2
+          body:
+            application/json:
+              type: ResetPasswordTokenRequest
+              example: {
+                "login": "janedoe@test.com"
+              }
+    /external-profile:
+      post:
+        description: Registers a new external profile for a customer. This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
+        displayName: registerExternalProfile
+        is:
+          - CommerceCloudStandards.SiteSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 400
+          - ApiStandards.RateLimited:
+              responseStatus: 401 
+          - CustomerTraits.BadRequest
+          - CustomerTraits.CustomerAuthenticationFailed
+        responses:
+          '200':
+            description: Success
+            body:
+              application/json:
+                type: CustomerExternalProfile
+                example: !include Examples/CustomerExternalProfile.raml
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-customers.register] }
+        body:
+          application/json:
+            type: CustomerExtProfileRequest
+            example: !include Examples/ExternalProfileRequest.raml
+      get:
+        description: Gets the new external profile for a customer.This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
+        displayName: getExternalProfile
+        is:
+          - CommerceCloudStandards.SiteSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 400
+          - ApiStandards.RateLimited:
+              responseStatus: 404
+          - CustomerTraits.CustomerExtProfileBadRequest
+          - CustomerTraits.CustomerExtProfileNotFound
+        queryParameters:
+          externalId: 
+            description: The External ID of the customer.
+            type: string
+            required: true
+            minLength: 1
+            example: "s@gmail.com"
+          authenticationProviderId:
+            description: The authentication Provider Id.
+            type: string
+            minLength: 1
+            required: true
+            example: "Google"
+        responses:
+          '200':
+            description: Success
+            body:
+              application/json:
+                type: CustomerExternalProfile
+                example: !include Examples/CustomerExternalProfile.raml
+        securedBy:
+          - CommerceCloudStandards.BearerToken: { scopes: [sfcc.shopper-customers.login] }
+          - CommerceCloudStandards.AmOAuth2
+
+
+    /{customerId}:
+      get:
+        description: Gets a customer with all existing addresses and payment instruments associated with the requested customer.
+        displayName: getCustomer
+        is:
+          - CommerceCloudStandards.SiteSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 400
+          - ApiStandards.RateLimited:
+              responseStatus: 404 
+          - CustomerTraits.BadRequest
+          - CustomerTraits.NotFound
+        responses:
+          '200':
+            description: Success
+            body:
+              application/json:
+                type: Customer
+                example: !include Examples/Customer.raml
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount,sfcc.shopper-myaccount.rw] }
+      patch:
+        description: Updates a customer.
+        displayName: updateCustomer
+        is:
+          - CommerceCloudStandards.SiteSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 400
+          - ApiStandards.RateLimited:
+              responseStatus: 404           
+          - CustomerTraits.BadRequest
+          - CustomerTraits.NotFound
+        responses:
+          '200':
+            description: Success
+            body:
+              application/json:
+                type: Customer
+                examples: 
+                  customer: !include Examples/UpdateCustomerResponse.raml
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.rw] }
+        body:
+          application/json:
+            type: Customer
+            example: 
+              customer: !include Examples/UpdateCustomerRequest.raml
+      uriParameters:
+        customerId:
+          description: The customer ID.
+          minLength: 1
+          type: string
+          example: abfTEMDZOgi3JPrkHjv9IhoziM
+      /addresses:
+        post:
+          description: Creates a new address with the given name for the given customer.
+          displayName: createCustomerAddress
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404 
+            - CustomerTraits.BadRequest
+            - CustomerTraits.NotFound
+          responses:
+            '200':
+              description: Success
+              body:
+                application/json:
+                  type: CustomerAddress
+                  examples: 
+                    customerAddress: !include Examples/CustomerAddressResponse.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.addresses.rw] }
+          body:
+            application/json:
+              type: CustomerAddress
+              examples: 
+                body: !include Examples/CustomerAddressRequest.raml
+        /{addressName}:
+          get:
+            description: Retrieves a customer's address by address name.
+            displayName: getCustomerAddress
+            is:
+              - CommerceCloudStandards.SiteSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 200
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+              - CustomerTraits.BadRequest
+              - CustomerTraits.NotFound
+            responses:
+              '200':
+                description: Success
+                body:
+                  application/json:
+                    type: CustomerAddress
+                    examples:
+                      CustomerAddress: !include Examples/CustomerAddressResponse.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.addresses,sfcc.shopper-myaccount.addresses.rw] }
+          delete:
+            description: Deletes a customer's address by address name.
+            displayName: removeCustomerAddress
+            is:
+              - CommerceCloudStandards.SiteSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 204
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+              - CustomerTraits.BadRequest
+              - CustomerTraits.NotFound
+            responses:
+              '204':
+                description: No Content
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.addresses.rw] }
+          patch:
+            description: Updates a customer's address by address name.
+            displayName: updateCustomerAddress
+            is:
+              - CommerceCloudStandards.SiteSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 200
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+              - CustomerTraits.BadRequest
+              - CustomerTraits.NotFound
+            responses:
+              '200':
+                description: Success
+                body:
+                  application/json:
+                    type: CustomerAddress
+                    examples: 
+                      customerAddress: !include Examples/CustomerAddressRequest.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.addresses.rw] }
+            body:
+              application/json:
+                type: CustomerAddress
+                examples: 
+                  body: !include Examples/CustomerAddressResponse.raml
+          uriParameters:
+            addressName:
+              description: The name of the address to update.
+              maxLength: 256
+              minLength: 1
+              type: string
+              example: home_address
+    
+      /baskets:
+        get:
+          description: Gets the baskets of a customer.
+          displayName: getCustomerBaskets
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            - CustomerTraits.BadRequest
+            - CustomerTraits.NotFound
+          responses:
+            '200':
+              description: Success
+              body:
+                application/json:
+                  type: BasketsResult
+                  examples: 
+                    basketsResult: !include Examples/CustomerBasketsResult.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.baskets] }
+      /orders:
+        get:
+          description: Returns a pageable list of all customer's orders. The default page size is 10.
+          displayName: getCustomerOrders
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            - CustomerTraits.BadRequest
+            - CustomerTraits.NotFound
+            - CustomerTraits.OffsetPaginated:
+                maxLimit: 50
+                defaultSize: 10
+          queryParameters:
+            crossSites:
+              type: boolean
+              required: false
+              example: false
+            from:
+              type: string
+              required: false
+              example: 2012-10-31 08:46
+            until:
+              type: string
+              required: false
+              example: 2012-10-31 08:46
+            status:
+              type: string
+              required: false
+              example: new  
+          responses:
+            '200':
+              description: Success
+              body:
+                application/json:
+                  type: CustomerOrderResult
+                  examples: 
+                    customerOrderResult: !include Examples/CustomersOrdersResult.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.orders] }
+      /password:
+        put:
+          description: Updates the customer's password.
+          displayName: updateCustomerPassword
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 204
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            - CustomerTraits.BadRequest
+            - CustomerTraits.NotFound
+          responses:
+            '204':
+              description: No Content
+          body:
+            application/json:
+              type: PasswordChangeRequest
+              example: {
+                  "currentPassword": "01dpass", 
+                  "password": "newpass"
+                }
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-customers.login] }
+      /payment-instruments:
+        post:
+          description: Adds a payment instrument to the customer information.
+          displayName: createCustomerPaymentInstrument
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            - CustomerTraits.BadRequest
+            - CustomerTraits.NotFound
+          responses:
+            '200':
+              description: Success
+              body:
+                application/json:
+                  type: CustomerPaymentInstrument
+                  examples: 
+                    customerPaymentInstrument: !include Examples/CustomerPaymentInstrument.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.paymentinstruments.rw] }
+          body:
+            application/json:
+              type: CustomerPaymentInstrumentRequest
+              examples: 
+                customerPaymentInstrumentRequest: !include Examples/CustomerPaymentInstrumentRequest.raml
+        /{paymentInstrumentId}:
+          delete:
+            description: Deletes a customer's payment instrument.
+            displayName: deleteCustomerPaymentInstrument
+            is:
+              - CommerceCloudStandards.SiteSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 204
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+              - CustomerTraits.BadRequest
+              - CustomerTraits.NotFound
+            responses:
+              '204':
+                description: No Content
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.paymentinstruments.rw] }
+          get:
+            description: Retrieves a customer's payment instrument by its ID.
+            displayName: getCustomerPaymentInstrument
+            is:
+              - CommerceCloudStandards.SiteSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 200
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+              - CustomerTraits.BadRequest
+              - CustomerTraits.NotFound
+            responses:
+              200:
+                description: Success
+                body:
+                  application/json:
+                    type: CustomerPaymentInstrument
+                    example: !include Examples/CustomerPaymentInstrument.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.paymentinstruments,sfcc.shopper-myaccount.paymentinstruments.rw] }
+          uriParameters:
+            paymentInstrumentId:
+              description: The ID of the payment instrument to be retrievedCustomer.
+              minLength: 1
+              type: string
+              example: cdOLciWbOsYl6aaadkwcsx9xHH
+      /product-lists:
+        get:
+          description: Returns all customer product lists.
+          displayName: getCustomerProductLists
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            - CustomerTraits.BadRequest
+            - CustomerTraits.NotFound
+          responses:
+            '200':
+              description: Success
+              body:
+                application/json:
+                  type: CustomerProductListResult
+                  examples: 
+                    customerProductListResult: !include Examples/CustomerProductListResult.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists,sfcc.shopper-myaccount.productlists.rw] }
+        post:
+          description: Creates a customer product list.
+          displayName: createCustomerProductList
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 400
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            - CustomerTraits.BadRequest
+            - CustomerTraits.NotFound
+          responses:
+            '200':
+              description: Success
+              body:
+                application/json:
+                  type: CustomerProductList
+                  examples: 
+                    customerProductList: !include Examples/PostCustomerProductList.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
+          body:
+            application/json:
+              type: CustomerProductList
+              examples: 
+                customerProductList: !include Examples/PostCustomerProductList.raml
+        /{listId}:
+          delete:
+            description: Deletes a customer product list.
+            displayName: deleteCustomerProductList
+            is:
+              - CommerceCloudStandards.SiteSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 204
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+              - CustomerTraits.BadRequest
+              - CustomerTraits.NotFound
+            responses:
+              '204':
+                description: No Content
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
+          get:
+            description: Returns a customer product list of the given customer and the items in the list.
+            displayName: getCustomerProductList
+            is:
+              - CommerceCloudStandards.SiteSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 200
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+              - CustomerTraits.BadRequest
+              - CustomerTraits.NotFound
+            responses:
+              '200':
+                description: Success
+                body:
+                  application/json:
+                    type: CustomerProductList
+                    examples: 
+                      customerProductList: !include Examples/GetCustomerProductListByListId.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists,sfcc.shopper-myaccount.productlists.rw] }
+          patch:
+            description: Changes a product list. Changeable properties are the name, description, and if the list is public.
+            displayName: updateCustomerProductList
+            is:
+              - CommerceCloudStandards.SiteSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 200
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+              - CustomerTraits.BadRequest
+              - CustomerTraits.NotFound
+            responses:
+              '200':
+                description: Success
+                body:
+                  application/json:
+                    type: CustomerProductList
+                    examples: 
+                      customerProductList: !include Examples/UpdateCustomerProductListByListId.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
+            body:
+              application/json:
+                type: CustomerProductList
+                example: {
+                    "description": "Description"
+                  }
+          uriParameters:
+            listId:
+              description: The product list ID.
+              maxLength: 28
+              minLength: 1
+              type: string
+              example: bcedkiWbxCM2MaaadkRhB2IBzM
+          /items:
+            post:
+              description: |-
+                Adds an item to the customer's product list. Considered values from the request body are:
+                
+                type: A valid type, mandatory. This is the type of the item to be added to the customer's product.
+                list.
+                priority: This is the priority of the item to be added to the customer's product list.
+                public: This is the flag whether the item to be added to the customer's product list is public.
+                product_id: A valid product ID, used for product item type only. This is the ID (SKU)
+                of the product related to the item to be added to the customer's product list. It is mandatory for
+                product item type, and it must be a valid product id, otherwise
+                ProductListProductIdMissingException or ProductListProductNotFoundException
+                will be thrown.
+                quantity: Used for product item type only. This is the quantity of the item to be
+                added to the customer's product list.
+                custom properties in the form c_<CUSTOM_NAME>: The custom property must correspond to a custom
+                attribute (<CUSTOM_NAME>) defined for ProductListItem. The value of this property must be valid for the
+                type of custom attribute defined for ProductListItem.
+                
+              displayName: createCustomerProductListItem
+              is:
+                - CommerceCloudStandards.SiteSpecific:
+                - ApiStandards.RateLimited:
+                    responseStatus: 200
+                - ApiStandards.RateLimited:
+                    responseStatus: 400
+                - ApiStandards.RateLimited:
+                    responseStatus: 404
+                - CustomerTraits.BadRequest
+                - CustomerTraits.NotFound
+              responses:
+                '200':
+                  description: Success
+                  body:
+                    application/json:
+                      type: CustomerProductListItem
+                      examples: 
+                        customerProductListItem: !include Examples/UpdateCustomerProductListItem.raml
+              securedBy:
+                - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
+              body:
+                application/json:
+                  type: CustomerProductListItem
+                  examples: 
+                      customerProductListItem: !include Examples/UpdateCustomerProductListItem.raml
+            /{itemId}:
+              delete:
+                description: Removes an item from a customer product list.
+                displayName: deleteCustomerProductListItem
+                is:
+                  - CommerceCloudStandards.SiteSpecific:
+                  - ApiStandards.RateLimited:
+                      responseStatus: 204
+                  - ApiStandards.RateLimited:
+                      responseStatus: 404
+                  - CustomerTraits.NotFound
+                responses:
+                  '204':
+                    description: No Content
+                securedBy:
+                  - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
+              get:
+                description: Returns an item of a customer product list and the actual product details like image, availability and price.
+                displayName: getCustomerProductListItem
+                is:
+                  - CommerceCloudStandards.SiteSpecific:
+                  - ApiStandards.RateLimited:
+                      responseStatus: 200
+                  - ApiStandards.RateLimited:
+                      responseStatus: 400
+                  - ApiStandards.RateLimited:
+                      responseStatus: 404
+                  - CustomerTraits.BadRequest              
+                  - CustomerTraits.NotFound
+                responses:
+                  '200':
+                    description: Success
+                    body:
+                      application/json:
+                        type: CustomerProductListItem
+                        example: !include Examples/CustomerProductListItem.raml
+                securedBy:
+                  - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists,sfcc.shopper-myaccount.productlists.rw] }
+              patch:
+                description: |-
+                  Updates an item of a customer's product list.
+                  Considered values from the request body are:
+                  
+                  priority: This is the priority of the customer's product list item.
+                  public: This is the flag whether the customer's product list item is public.
+                  quantity: This is the quantity of
+                  the customer's product list item. Used for product item type only. 
+                  custom properties in the form c_<CUSTOM_NAME>: The custom property
+                  must correspond to a custom attribute (<CUSTOM_NAME>) defined for ProductListItem.
+                  The value of this property must be valid for the type of custom attribute defined for ProductListItem.
+                  
+                displayName: updateCustomerProductListItem
+                is:
+                  - CommerceCloudStandards.SiteSpecific:
+                  - ApiStandards.RateLimited:
+                      responseStatus: 200
+                  - ApiStandards.RateLimited:
+                      responseStatus: 404
+                  - CustomerTraits.NotFound
+                responses:
+                  '200':
+                    description: Success
+                    body:
+                      application/json:
+                        type: CustomerProductListItem
+                        example: !include Examples/UpdateCustomerProductListItem.raml
+                securedBy:
+                  - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
+                body:
+                  application/json:
+                    type: CustomerProductListItem
+                    example: !include Examples/CustomerProductListItemRequest.raml
+              uriParameters:
+                itemId:
+                  description: The ID of the product list item to update.
+                  maxLength: 28
+                  minLength: 1
+                  type: string
+                  example: "nikon-d90-wlens"
+  /product-lists:
+    get:
+      description: Retrieves all public product lists as defined by the given search term (for example, email OR first name and last name).
+      displayName: getPublicProductListsBySearchTerm
+      queryParameters:
+        email:
+          description: The email address of the customer the product lists belong to.
+          type: string
+          required: false
+          example: jsmith@test.com
+        firstName:
+          description: The first name of the customer the product lists belong to.
+          type: string
+          required: false
+          example : John
+        lastName:
+          description: The last name of the customer the product lists belong to.
+          type: string
+          required: false
+          example: Smith
+      is:
+        - CommerceCloudStandards.SiteSpecific:
+        - ApiStandards.RateLimited:
+            responseStatus: 200
+        - ApiStandards.RateLimited:
+            responseStatus: 400
+        - ApiStandards.RateLimited:
+            responseStatus: 401
+        - ApiStandards.RateLimited:
+            responseStatus: 404
+        - CustomerTraits.BadRequest
+        - CustomerTraits.NotFound
+        - CustomerTraits.Unauthorized
+      responses:
+        '200':
+          description: Success
+          body:
+            application/json:
+              type: PublicProductListResult
+              examples: 
+                publicProductListResult: !include Examples/productLists-result-example.raml
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-productlists] }
+    /{listId}:
+      get:
+        description: Retrieves a public product list by ID and the items under that product list.
+        displayName: getPublicProductList
+        is:
+          - CommerceCloudStandards.SiteSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 400
+          - ApiStandards.RateLimited:
+              responseStatus: 401
+          - ApiStandards.RateLimited:
+              responseStatus: 404
+          - CustomerTraits.BadRequest
+          - CustomerTraits.NotFound
+          - CustomerTraits.Unauthorized
+        responses:
+          '200':
+            description: Success
+            body:
+              application/json:
+                type: PublicProductList
+                examples: 
+                  publicProductList:  !include Examples/productListsID-result-example.raml
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-productlists] }
+      uriParameters:
+        listId:
+          description: The ID of the list.
+          maxLength: 28
+          minLength: 1
+          type: string
+          example: bcqg6iWbw4XEYaaadjixFLTWP0
+      /items:
+        /{itemId}:
+          get:
+            description: Retrieves an item from a public product list and the actual product details like product, image, availability and price.
+            displayName: getProductListItem
+            responses:
+              '200':
+                description: Success
+                body:
+                  application/json:
+                    type: PublicProductListItem
+                    examples: 
+                      PublicProductListItem : !include Examples/PublicProductListItem.raml
+            is:
+              - CommerceCloudStandards.SiteSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 200
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 401
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+              - CustomerTraits.BadRequest
+              - CustomerTraits.NotFound
+              - CustomerTraits.Unauthorized      
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-productlists] }
+          uriParameters:
+            itemId:
+              description: The ID of the item.
+              minLength: 1
+              type: string
+              example: 023513f915fad06573f330fb0d
+
+                      

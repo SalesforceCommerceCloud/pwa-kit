@@ -1,0 +1,48 @@
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {ActionResponse, ApiClients, Argument, DataType} from '../types'
+import {useAsyncExecute} from '../useAsync'
+import useCommerceApi from '../useCommerceApi'
+
+type Client = ApiClients['{{name.lowerCamelCase}}']
+
+export enum {{name.upperCamelCase}}Actions {
+  {{~#each model.encodes.endPoints}}{{#each operations}}{{#if (not (is (getValue method) 'get'))}}
+  /**
+   * {{{formatForTsDoc description}}}
+   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/{{@root.name.kebabCase}}?meta={{name~}} } for more information about the API endpoint.
+   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/{{lowercase @root.name.lowerCamelCase}}.{{lowercase @root.name.lowerCamelCase}}-1.html#{{lowercase (getValue name)~}} } for more information on the parameters and returned data type.
+   */
+  {{capitalize (getValue name)}} = '{{name}}',
+  {{~/if}}{{/each}}{{/each}}
+}
+
+/**
+ * A hook for performing actions with the {{name.original}} API.
+ */
+export function use{{name.upperCamelCase}}Action<Action extends `${ {{~name.upperCamelCase}}Actions}`>(
+    action: Action
+): ActionResponse<Argument<Client[Action]>, DataType<Client[Action]>> {
+    type Arg = Argument<Client[Action]>
+    type Data = DataType<Client[Action]>
+    // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
+    // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
+    // confident, though, that it is safe, because it seems like we're mostly re-defining what we
+    // already have.
+    // In addition to the assertion required to get this to work, I have also simplified the
+    // overloaded SDK method to a single signature that just returns the data type. This makes it
+    // easier to work with when passing to other mapped types.
+    function assertMethod(fn: unknown): asserts fn is (arg: Arg) => Promise<Data> {
+        if (typeof fn !== 'function') throw new Error(`Unknown action: ${action}`)
+    }
+    const { {{~name.lowerCamelCase}}: client} = useCommerceApi()
+    const method = client[action]
+    assertMethod(method)
+
+    return useAsyncExecute((arg: Arg) => method.call(client, arg))
+}
+

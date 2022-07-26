@@ -1,0 +1,99 @@
+#%RAML 1.0
+title: Shopper Gift Certificates
+version: v1
+protocols:
+  - HTTPS
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/pricing/shopper-gift-certificates/{version}
+baseUriParameters:
+  shortCode:
+    description: A region-specific merchant identifier.
+    example: 0dnz6oep
+    pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
+description: !include shopper-gift-certificates-description.md
+mediaType: 
+  - application/json
+uses: 
+  GiftCertificateTraits: gift-certificate-traits-library.raml
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.20/commerce-cloud-standards.raml
+types:
+  GiftCertificate:
+    description: Document representing a gift certificate.
+    examples:
+      gift-certificate: !include Examples/gift-certificate-example.raml
+    properties:
+      amount:
+        description: The gift certificate original amount.
+        type: number
+        format: double
+      balance:
+        description: The gift certificate remaining balance.
+        type: number
+        format: double
+      description?:
+        description: The gift certificate description.
+        type: string
+      enabled:
+        description: Is the gift certificate is enabled?
+        type: boolean
+      maskedGiftCertificateCode:
+        description: The masked gift certificate code.
+        type: string
+      merchantId:
+        description: The merchant ID.
+        type: string
+      message?:
+        description: The message.
+        type: string
+      recipientEmail:
+        description: The recipient email.
+        type: string
+      recipientName:
+        description: The recipient name.
+        type: string
+      senderName:
+        description: The sender name.
+        type: string
+      status:
+        description: The gift certificate status.
+        type: string
+        enum:
+          - pending
+          - issued
+          - partially_redeemed
+          - redeemed
+  GiftCertificateRequest:
+    description: Document representing a gift certificate request data.
+    properties:
+      giftCertificateCode:
+        description: The gift certificate code.
+        type: string
+        example:
+           "MYGIFTCERTIFICATECODE"
+/organizations/{organizationId}/gift-certificate:
+  type: CommerceCloudStandards.Organization
+  post:
+    description: Action to retrieve an existing gift certificate.
+    displayName: getGiftCertificate
+    is:
+      - GiftCertificateTraits.NotFound
+      - ApiStandards.RateLimited:
+            responseStatus: 200
+      - ApiStandards.RateLimited:      
+            responseStatus: 404
+    responses:
+      '200':
+        description: Gift certificate retrieved sucessfully.
+        body:
+          application/json:
+            type: GiftCertificate
+            examples:
+              gift-certificate: !include Examples/gift-certificate-example.raml
+    queryParameters:
+      siteId:
+        type: CommerceCloudStandards.SiteId
+    body:
+      application/json:
+        type: GiftCertificateRequest
+    securedBy:
+      - CommerceCloudStandards.ShopperToken: { scopes: [ sfcc.shopper-gift-certificates ] }

@@ -1,0 +1,7 @@
+{
+  "fromField": "validFrom",
+  "toField": "validTo",
+  "filterMode": "overlap",
+  "fromValue": "2007-01-01T00:00:00.000Z",
+  "toValue": "2017-01-01T00:00:00.000Z"
+}

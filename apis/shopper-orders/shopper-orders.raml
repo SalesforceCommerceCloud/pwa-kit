@@ -1,0 +1,342 @@
+#%RAML 1.0
+#In C4E review
+title: Shopper Orders
+
+version: v1
+description: Provides access to Commerce Cloud Digital order related functionality.
+protocols: [HTTPS]
+mediaType: application/json
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/checkout/shopper-orders/{version}
+baseUriParameters:
+  shortCode:
+    description: Region-specific merchant identifier.
+    example: fd4gt8
+
+uses:
+  OrderTraits: shopper-orders-traits.raml
+  dataTypes: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/checkout-data-types.raml
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.15/commerce-cloud-standards.raml
+  
+types:
+    ErrorResponse: ApiStandards.ErrorResponse
+
+/organizations/{organizationId}:
+  type: CommerceCloudStandards.Organization
+  /orders:
+    type: CommerceCloudStandards.Organization
+    post:
+      is: 
+        - CommerceCloudStandards.SiteSpecific: 
+        - OrderTraits.LocaleSpecific:
+        - ApiStandards.RateLimited:
+            responseStatus: 200
+        - ApiStandards.RateLimited:
+            responseStatus: 400
+        - ApiStandards.RateLimited:
+            responseStatus: 404
+      description: |-
+        Submits an order based on a prepared basket. The only considered value from the request body is basketId.
+      displayName: createOrder
+      responses:
+        '200':
+          description: |-
+            Success, the response body contains the submitted order.
+          body:
+              type: dataTypes.Order
+              examples:
+                dataTypes.Order: !include examples/order/order-post-response.raml
+        '400':
+          description: |-
+            Possible reasons:
+            - a failure during the creation of a gift certificate
+            for a gift certificate item.
+            - the basket ID in the request body is null or
+            empty.
+            - an invalid product item.
+            - an option with the specified option ID is
+            unknown.
+            - an option with the specified option value ID
+            is unknown.
+            - a product item is not available.
+            - the customer assigned to the basket does not
+            match the verified customer represented by the JWT token.
+            - the basket contains flashes.
+          body:
+              type: ErrorResponse
+              examples:
+                dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/bad-request-example.raml
+        '404':
+          description: |-
+            The basket with the given basket ID is unknown.
+          body:
+              type: ErrorResponse
+              examples:
+                dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/basket-not-found.raml
+      body:
+          type: dataTypes.Basket
+          examples:
+            dataTypes.Basket: !include examples/order/order-post-request.raml
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+    '/{orderNo}':
+      type: CommerceCloudStandards.Organization
+      uriParameters:
+        orderNo:
+          description: The order number of the order to be modified.
+          minLength: 1
+          type: string
+          example: "00000410"
+      get:
+        is: 
+          - CommerceCloudStandards.SiteSpecific:  
+          - OrderTraits.LocaleSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 404
+        description: |-
+          Gets information for an order.
+        displayName: getOrder
+        responses:
+          '200':
+            description: |-
+              Success, the response body contains the order.
+            body:
+                type: dataTypes.Order
+                examples:
+                  dataTypes.Order: !include examples/order/order-get-response.raml
+          '404':
+            description: |-
+              The order with the given order number is unknown.
+            body:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/basket-not-found.raml
+        securedBy:
+          - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders", "sfcc.shopper-baskets-orders.rw" ] }
+      /payment-instruments:
+        type: CommerceCloudStandards.Organization
+        post:
+          is: 
+          - CommerceCloudStandards.SiteSpecific: 
+          - OrderTraits.LocaleSpecific:
+          - ApiStandards.RateLimited:
+              responseStatus: 200
+          - ApiStandards.RateLimited:
+              responseStatus: 400
+          - ApiStandards.RateLimited:
+              responseStatus: 404
+          description: |-
+            Adds a payment instrument to an order. 
+
+            Details:
+
+            The payment instrument is added with the provided details. The payment method must be applicable for the order see GET
+            /baskets/{basketId}/payment-methods, if the payment method is 'CREDIT_CARD' a paymentCard must be specified in the request.
+
+          displayName: createPaymentInstrumentForOrder
+          responses:
+            '200':
+              description: |-
+                Success, the response body contains the order with the added payment instrument.
+              body:
+                  type: dataTypes.Order
+                  examples:
+                    dataTypes.Order: !include examples/order/payment-instrument-post-response.raml
+            '400':
+              description: |-
+                Possible reasons:
+                - the given order number is invalid.
+                - the provided payment method is invalid or not applicable.
+              body:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/bad-request-example.raml
+            '404':
+              description: |-
+                The order with the given order number is unknown.
+               
+              body:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/order-not-found.raml
+          body:
+              type: dataTypes.OrderPaymentInstrumentRequest
+              examples:
+                dataTypes.OrderPaymentInstrumentRequest: !include examples/order/payment-instrument-post-request.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+        '/{paymentInstrumentId}':
+          type: CommerceCloudStandards.Organization
+          delete:
+            is: 
+              - CommerceCloudStandards.SiteSpecific: 
+              - OrderTraits.LocaleSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 200
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+            description: |-
+              Removes a payment instrument of an order.
+            displayName: removePaymentInstrumentFromOrder
+            responses:
+              '200':
+                description: Success, the response body contains the order without the deleted payment instrument.
+                body:
+                    type: dataTypes.Order
+              '404':
+                description: |-
+                  Possible reasons:
+                  - The order with the given order number is unknown.
+                  - The payment instrument with the given order payment
+                  instrument ID is unknown.
+                body:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/order-not-found.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          patch:
+            is: 
+              - CommerceCloudStandards.SiteSpecific: 
+              - OrderTraits.LocaleSpecific:
+              - ApiStandards.RateLimited:
+                  responseStatus: 200
+              - ApiStandards.RateLimited:
+                  responseStatus: 400
+              - ApiStandards.RateLimited:
+                  responseStatus: 404
+            description: |-
+              Updates a payment instrument of an order.
+
+              Details:
+
+              The payment instrument is updated with the provided details. The payment method must be applicable for the
+              order see GET /baskets/{basketId}/payment-methods, if the payment method is 'CREDIT_CARD' a
+              paymentCard must be specified in the request.
+
+            displayName: updatePaymentInstrumentForOrder
+            responses:
+              '200':
+                description: |-
+                  Success, the response body contains the order with the updated payment instrument.
+                body:
+                    type: dataTypes.Order
+                    examples:
+                      dataTypes.Order: !include examples/order/payment-instrument-patch-response.raml
+              '400':
+                description: |-
+                  Possible reasons:
+                  - the basket payment instrument with the given
+                  ID already is permanently masked.
+                  - the provided payment method is invalid or not applicable.
+                body:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/bad-request-example.raml
+              '404':
+                description: |-
+                  Possible reasons:
+                  - The order with the given order number is unknown.
+                  - The payment instrument with the given payment
+                  instrument ID is unknown.
+                body:
+                    type: ErrorResponse
+                    examples:
+                      dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/order-not-found.raml
+            body:
+                type: dataTypes.OrderPaymentInstrumentRequest
+                examples:
+                      dataTypes.Order: !include examples/order/payment-instrument-patch-request.raml
+            securedBy:
+              - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders.rw" ] }
+          uriParameters:
+            paymentInstrumentId:
+              description: |-
+                The ID of the payment instrument to be updated.
+              minLength: 1
+              type: string
+              example: b7679bea661819b2de78b9de7d
+      /payment-methods:
+        type: CommerceCloudStandards.Organization
+        get:
+          is: 
+            - CommerceCloudStandards.SiteSpecific: 
+            - OrderTraits.LocaleSpecific:
+            - ApiStandards.RateLimited:
+                  responseStatus: 200
+            - ApiStandards.RateLimited:
+                  responseStatus: 400
+            - ApiStandards.RateLimited:
+                  responseStatus: 404
+          description: |-
+            Gets the applicable payment methods for an existing order considering the open payment amount only.
+          displayName: getPaymentMethodsForOrder
+          responses:
+            '200':
+              description: |-
+                Success, the response body contains the applicable payment methods for the order.
+              body:
+                  type: dataTypes.PaymentMethodResult
+                  examples:
+                      dataTypes.PaymentMethodResult: !include examples/order/payment-methods-get-response.raml
+            '400':
+              description: |-
+                The customer assigned to the order does not
+                match the verified customer represented by the JSON Web Token (JWT).
+              body:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/bad-request-auth.raml
+            '404':
+              description: |-
+                The order with the given order number is unknown.
+              body:
+                  type: ErrorResponse
+                  examples:
+                    dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/order-not-found.raml
+          securedBy:
+            - CommerceCloudStandards.ShopperToken: { scopes: [ "sfcc.shopper-baskets-orders", "sfcc.shopper-baskets-orders.rw" ] }
+      /taxes:
+        type: CommerceCloudStandards.Organization
+        get:
+          is:
+            - CommerceCloudStandards.SiteSpecific:
+            - ApiStandards.RateLimited:
+                responseStatus: 200
+            - ApiStandards.RateLimited:
+                responseStatus: 404
+            - ApiStandards.RateLimited:
+                responseStatus: 409  
+          description: |-
+            This method gives you the external taxation data of the order transferred from the basket during 
+            order creation. This endpoint can be called only if external taxation was used. See POST /baskets 
+            for more information.         
+          displayName: getTaxesFromOrder
+          responses:
+            '200':
+              description: |-
+                Success, the response body contains the external taxation from all items from the referenced 
+                order.
+              body:
+                type: dataTypes.Taxes
+                examples:
+                  dataTypes.Taxes: !include examples/order/order-tax-get-response.raml
+            '404':
+              description: |-
+                The order with the given order number is unknown.
+              body:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/order-not-found.raml
+            '409':
+              description: |-
+                In case of the referenced order was not created from a basket with tax mode EXTERNAL.
+              body:
+                type: ErrorResponse
+                examples:
+                  dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/1.0.53/examples/error/invalid-tax-mode.raml   
+          securedBy:
+            - CommerceCloudStandards.BearerToken: { scopes: [ "sfcc.shopper-baskets-orders", "sfcc.shopper-baskets-orders.rw" ] }
+            - CommerceCloudStandards.AmOAuth2

@@ -1,0 +1,50 @@
+#%RAML 1.0 Trait
+
+usage: |
+  To be used to wrap common errors into a single trait include.
+
+uses:
+  ErrorTypes: ../discovery-error-types.raml
+
+responses:
+  400:
+    description: Bad Request.
+    body:
+      application/problem+json:
+        type: ErrorTypes.ResourceBadRequest
+  401:
+    description: Authentication Failure.
+    body:
+      application/problem+json:
+        type: ErrorTypes.AuthenticationFailure
+  403:
+    description: Authorization Failure.
+    body:
+      application/problem+json:
+        type: ErrorTypes.AuthorizationFailure
+  404:
+    description: Not Found.
+    body:
+      application/problem+json:
+        type: ErrorTypes.NotFound
+  429:
+    description: Too Many Requests.
+    headers: 
+      Retry-After:
+        examples:
+          after-seconds: "120"
+    body:
+      application/problem+json:
+        type: ErrorTypes.RateLimitExceeded
+  500:
+    description: Internal Server Error.
+    body:
+      application/problem+json:
+        type: ErrorTypes.InternalServerError
+  503:
+    description: Service Unavailable.
+    body:
+      application/problem+json:
+        type: ErrorTypes.ServiceUnavailable
+  
+  

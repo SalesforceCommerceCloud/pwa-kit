@@ -1,0 +1,58 @@
+#%RAML 1.0
+title: An example file showing the usage of the Discovery Standards library.
+version: v0
+mediaType: 
+  - application/json
+  
+uses:
+  Standards: discovery-standards.raml
+
+protocols: [ HTTPS ]
+
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/discovery/sample/{version}
+
+description: A sample file showing the various entities in this standards library.
+
+/organizations/{organizationId}:
+  /data-sets:
+    post:
+      description: A sample endpoint to create a resource.
+      displayName: createResource
+      is:
+        - Standards.ResourceCommonErrors
+      responses:
+        200:
+          description: Returns the identifier of the created resource.
+          body:
+            properties:
+              attributeId: Standards.AttributeId
+
+  /data-sets/{dataSetId}/attributes:
+    uriParameters:
+      dataSetId:
+        type: Standards.DataSetId
+    get:
+      description: A sample endpoint to get a resource.
+      displayName: getResource
+      is:
+        - Standards.CommonErrors
+      responses:
+        200:
+          description: The resource was retrieved.
+          body:
+            description: A collection of attribute identifiers.
+            properties:
+              type: Standards.DataSetId
+
+  /data-sets/{dataSetId}/attributes/{attributeId}:
+    uriParameters:
+      dataSetId:
+        type: Standards.DataSetId
+      attributeId:
+        type: Standards.AttributeId
+    delete:
+      description: A sample endpoint to delete a resource.
+      displayName: deleteResource
+      responses:
+        201:
+          description: The resource was deleted.

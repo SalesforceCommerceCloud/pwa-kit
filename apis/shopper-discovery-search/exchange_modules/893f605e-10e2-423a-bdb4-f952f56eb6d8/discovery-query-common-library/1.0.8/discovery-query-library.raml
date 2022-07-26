@@ -1,0 +1,138 @@
+#%RAML 1.0 Library
+
+uses:
+  ApiStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.9/api-standards.raml
+  DiscoveryStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/discovery-standards/0.0.27/discovery-standards.raml
+  CommerceCloudStandards: ../../../../exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/commerce-cloud-standards.raml
+  DiscoveryRefinementLibrary: discovery-refinement-library.raml
+  DiscoveryFacetLibrary: discovery-facet-library.raml
+  DiscoverySortingLibrary: discovery-sorting-library.raml
+  DiscoveryGroupingLibrary: discovery-grouping-library.raml
+  DiscoveryQueryOutputLibrary: discovery-query-output-library.raml
+
+types:
+  
+  Query:
+    description: An object which is used for performing a search. For example, a user can be search based on a phrase like "jacket" which looks for items containing that phrase in any searchable attribute. This type of querying is called a phrase query. Another example is to search a based on a phrase like "women's petite shirts" and constrain that search to a specific attribute like the item's description. This type of querying is called an attributes query.
+    type: object
+    properties:
+      queryType: 
+        description: The type of the query.
+        type: string
+      correctableAttributes?: CorrectableAttributes  
+      highlighting?: Highlighting
+    discriminator: queryType
+
+  CorrectableAttributes:
+    description: An entity which contains configuration used for checking the spelling of a search phrase in a query. The provided attributes are used as the sources for correctly spelled words.
+    type: object
+    properties:
+      attributes:
+            description: One or more Attribute Id objects.
+            type: DiscoveryStandards.AttributeId[]
+            minItems: 1
+            maxItems: 10
+            uniqueItems: true
+            example: [ name, brand ]  
+  
+  Highlighting:
+    description: An entity which contains configuration for returning snippets of attributes based on a phrase. Each result will return the most relevant highlight for the given search phrase used in the query.
+    type: object
+    properties:
+      attributes:
+            description: One or more Attribute Id objects.
+            type: DiscoveryStandards.AttributeId[]
+            minItems: 1
+            maxItems: 1
+            uniqueItems: true
+            example: [ name ]
+
+  PhraseQuery:
+    description: A type of query where the search is done for a phrase over all searchable fields. For example, a search based on a phrase like "thermometer" which will look for items containing that search phrase in any searchable attribute.
+    type: Query
+    discriminatorValue: PHRASE_QUERY
+    properties:
+      value:
+        description: The value to search for.
+        type: string
+        example: jacket
+    additionalProperties: false
+  
+  AttributesQuery:
+    description: A type of query where the search is done for a phrase in a specified set of searchable attributes. For exampe, a search for a phrase like "thermometer" only in selected attributes like "description" and "features".
+    type: Query
+    discriminatorValue: ATTRIBUTES_QUERY
+    properties:
+      value: 
+        description: A combination of one or more attributes, and the text to search for.
+        properties:
+          attributes:
+            description: One or more Attribute Id objects.
+            type: DiscoveryStandards.AttributeId[]
+            minItems: 1
+            uniqueItems: true
+            example: [ name, brand ]
+          phrase:
+            description: The value to search for in the attributes.
+            type: string
+            example: socks
+    additionalProperties: false
+  
+  QueryInput:
+    description: Body of the Query when a request is sent to do a search.
+    type: CommerceCloudStandards.ClosedObject
+    properties:
+      query?:
+        description: An object which is used for performing a search.
+        type: Query 
+      refinements?: 
+        description: One or more conditions which are used to filter the returned results.
+        type: DiscoveryRefinementLibrary.Refinement[]
+        minItems: 1
+        uniqueItems: true
+      returnedAttributes?:
+        description: One or more attributes that should exclusively be returned. If this field is not specified then all returnable attributes will be returned.
+        type: DiscoveryStandards.AttributeId[]
+        minItems: 1
+        uniqueItems: true
+      grouping?: DiscoveryGroupingLibrary.Grouping
+      facets?:
+        description: One or more attributes on which the returned results need to be faceted.
+        type: DiscoveryFacetLibrary.FacetInput[]
+        minItems: 1
+        uniqueItems: true
+      facetRequest?:
+        description: An entity describing the required facet attributes in the result.
+        type: DiscoveryFacetLibrary.FacetRequest
+      sorting: DiscoverySortingLibrary.Sorting
+
+  QueryOutput:
+    description: Body of the response after a search is completed.
+    type: CommerceCloudStandards.ClosedObject
+    properties:
+      hits:
+        description: A collection of result entities.
+        type: DiscoveryQueryOutputLibrary.Result[]
+        uniqueItems: true
+      facets?:
+        description: An optional collection of facet entities.
+        type: array
+        items: DiscoveryFacetLibrary.FacetOutput
+        minItems: 1
+        uniqueItems: true
+      links: 
+        type: DiscoveryStandards.PaginationLinks
+        examples:
+          links:
+            prev:
+              href: https://0dnz6oep.api.commercecloud.salesforce.com/discovery/query/v2/organizations/org-id/data-sets/c8e138bc-5aa0-48c7-b10a-eeb8d60fee0e/results?offset=0&limit=10
+            self:
+              href: https://0dnz6oep.api.commercecloud.salesforce.com/discovery/query/v2/organizations/org-id/data-sets/c8e138bc-5aa0-48c7-b10a-eeb8d60fee0e/results?offset=10&limit=10
+            next:
+              href: https://0dnz6oep.api.commercecloud.salesforce.com/discovery/query/v2/organizations/org-id/data-sets/c8e138bc-5aa0-48c7-b10a-eeb8d60fee0e/results?offset=20&limit=10
+      limit: ApiStandards.Limit
+      offset: ApiStandards.Offset
+      total:
+        description: The total number of matching items.
+        type: integer
+        format: int64
