@@ -20,40 +20,12 @@
     "README.md"
   ],
   "scripts": {
-    "build": "react-scripts build",
-    "build:lib": "rollup -c",
-    "check:size": "npm-pack-all --output commerce-sdk-isomorphic-with-deps.tgz && bundlesize",
     "check:types": "tsc --noEmit",
     "clean": "rm -rf build lib src/lib commerce-sdk-isomorphic-with-deps.tgz",
     "depcheck": "depcheck",
-    "diffApis": "raml-toolkit diff --dir temp/oldApis apis -f console -o temp/diffApis.txt",
-    "doc": "yarn run doc:generate",
-    "doc:generate": "typedoc --mode modules src/lib/** --external-modulemap \".*/src/lib/([\\w]+)\" --exclude \"src/lib/index.ts\"",
-    "eject": "react-scripts eject",
-    "fix": "yarn run lint -- --fix",
-    "fix:style": "yarn run lint:style -- --fix",
     "lint": "eslint --ext js,jsx,ts,tsx .",
-    "lint:style": "stylelint ./src/",
-    "prepare": "snyk protect",
     "renderTemplates": "ts-node --compiler-options '{\"module\": \"commonjs\", \"target\": \"ES6\" }' ./scripts/generate.ts",
-    "start": "HTTPS=true react-scripts start",
-    "pretest": "yarn run lint && yarn run lint:style && depcheck && yarn run check:size",
-    "test": "yarn run check:types && yarn run test:unit && CI=true yarn run test:react",
-    "test:react": "react-scripts test --env=jest-environment-jsdom-sixteen src/environment",
-    "test:unit": "jest --coverage --testPathIgnorePatterns node_modules src/environment --silent",
     "updateApis": "ts-node --compiler-options '{\"module\": \"commonjs\", \"target\": \"ES6\" }' ./scripts/updateApis.ts && yarn diffApis"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "CI=true yarn test --passWithNoTests"
-    }
-  },
-  "lint-staged": {
-    "package.json": "sort-package-json --check",
-    "*.css": "stylelint",
-    "*.js?(x)": "eslint --ext js,jsx",
-    "*.ts?(x)": "eslint --ext ts,tsx"
   },
   "browserslist": {
     "production": [
@@ -95,32 +67,12 @@
     "**/yargs": "<17",
     "depcheck/@babel/parser": "7.16.4"
   },
-  "dependencies": {
-    "cross-fetch": "^3.1.5",
-    "nanoid": "^3.3.4"
-  },
   "devDependencies": {
-    "@babel/cli": "7.18.6",
-    "@babel/core": "7.18.6",
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-transform-runtime": "^7.18.6",
-    "@babel/preset-env": "7.18.6",
-    "@babel/preset-react": "7.18.6",
-    "@babel/preset-typescript": "^7.18.6",
     "@commerce-apps/raml-toolkit": "^0.5.11",
-    "@rollup/plugin-babel": "5.3.1",
-    "@rollup/plugin-commonjs": "13.0.2",
-    "@rollup/plugin-node-resolve": "8.4.0",
-    "@testing-library/jest-dom": "5.16.4",
-    "@testing-library/react": "10.4.9",
     "@types/fs-extra": "^9.0.13",
     "@types/handlebars-helpers": "^0.5.3",
-    "@types/node-fetch": "^2.6.2",
-    "@types/react-dom": "^16.9.16",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
-    "autoprefixer": "9.8.8",
-    "bundlesize": "^0.18.1",
     "depcheck": "^1.4.3",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "18.2.1",
@@ -134,39 +86,9 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "fs-extra": "^9.1.0",
     "handlebars-helpers": "^0.10.0",
-    "husky": "4.3.8",
-    "jest-environment-jsdom-sixteen": "1.0.3",
-    "lint-staged": "10.5.4",
-    "nock": "^13.2.8",
-    "npm-pack-all": "^1.12.7",
-    "postcss-preset-env": "6.7.1",
     "prettier": "^2.7.1",
-    "prop-types": "^15.8.1",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
-    "react-scripts": "4.0.3",
-    "rollup": "2.77.0",
-    "rollup-plugin-filesize": "9.1.2",
-    "rollup-plugin-includepaths": "0.2.4",
-    "rollup-plugin-peer-deps-external": "2.2.4",
-    "rollup-plugin-postcss": "3.1.8",
-    "rollup-plugin-stylelint": "1.0.0",
-    "rollup-plugin-terser": "6.1.0",
-    "rollup-plugin-ts": "^2.0.7",
-    "snyk": "^1.973.0",
-    "sort-package-json": "^1.57.0",
-    "stylelint": "13.13.1",
-    "stylelint-config-standard": "20.0.0",
-    "stylelint-order": "4.1.0",
     "ts-node": "9.1.1",
-    "typedoc": "^0.17.7",
-    "typedoc-plugin-external-module-map": "1.2.1",
-    "typedoc-plugin-nojekyll": "^1.0.1",
     "typescript": "^4.4.4"
-  },
-  "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
   },
   "engines": {
     "node": ">=10"
