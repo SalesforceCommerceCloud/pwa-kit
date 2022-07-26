@@ -8,9 +8,6 @@ import React, {useEffect, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import fetch from 'cross-fetch'
 
-import HelloTS from '../components/hello-typescript'
-import HelloJS from '../components/hello-javascript'
-
 interface Props {
     value: number
 }
@@ -84,13 +81,10 @@ h1 {
 
 const Home = ({value}: Props) => {
     const [counter, setCounter] = useState(0)
-    console.log('Inside home')
 
     const query = useQuery(['my-query'], async () => {
         const res = await fetch('https://api.chucknorris.io/jokes/random')
-        const data = await res.json()
-        console.log(data)
-        return data
+        return await res.json()
     })
 
     useEffect(() => {
@@ -115,25 +109,9 @@ const Home = ({value}: Props) => {
                     <div className="divider"></div>
                 </div>
                 <div className="panel">
-                    <p style={{width: '300px'}} className="fade-in fade-in-0">
-                        <b>This page is written in Typescript</b>
-                        <br />
-                        <br />
-                        Server-side getProps works if this is a valid expression: &quot;5 times 7 is{' '}
-                        {value}
-                        &quot;
-                        <br />
-                        <br />
-                        Client-side JS works if this counter increments: {counter}
-                        <br />
-                        <br />
-                        <b>You can mix-and-match JS and TS</b>
-                        <br />
-                        <br />
-                        <HelloJS />
-                        &nbsp;
-                        <HelloTS message="it works!" />
-                    </p>
+                    <pre>
+                        {JSON.stringify(query.data, null, 2)}
+                    </pre>
                 </div>
             </div>
         </div>
@@ -142,17 +120,5 @@ const Home = ({value}: Props) => {
 
 Home.getTemplateName = () => 'home'
 
-Home.getProps = async () => {
-    // Note: This is simply a mock function to demo deferred execution for fetching props (e.g.: Making a call to the server to fetch data)
-    const getData = (a: number, b: number) => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(a * b)
-            }, 50)
-        })
-    }
-    const value = await getData(5, 7)
-    return {value}
-}
 
 export default Home
