@@ -54,7 +54,7 @@ import {
 } from '../contexts'
 
 import {createUrlTemplate} from './url'
-import {getSites} from './site-utils'
+import {getDefaultSite, getSites} from './site-utils'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -136,7 +136,7 @@ export const TestProviders = ({
     const site =
         sites.find((site) => {
             return site.alias === siteAlias || site.id === appConfig['site']
-        }) || DEFAULT_SITE
+        }) || getDefaultSite()
 
     const fillUrlTemplate = createUrlTemplate(appConfig, site.alias || site.id, locale)
 

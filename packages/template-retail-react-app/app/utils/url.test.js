@@ -306,7 +306,7 @@ describe('homeUrlBuilder', () => {
     ]
 
     cases.forEach(({urlConfig, site, locale, expectedRes}) => {
-        const fillUrlTemplate = createUrlTemplate({url: urlConfig}, site, locale)
+        const fillUrlTemplate = createUrlTemplate({url: urlConfig}, site.id, locale.id)
 
         test(`return expected URL with site ${site.alias}, locale ${
             locale.id

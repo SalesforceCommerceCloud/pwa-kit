@@ -168,26 +168,24 @@ export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
  * the current selected site/locale and the default App URL configuration.
  *
  * @param appConfig Application default configuration.
- * @param currentSite Current selected Site object.
- * @param currentLocale Current selected Locale object.
+ * @param siteRef Current selected Site reference. The value can be the Site id or alias.
+ * @param localeRef Current selected Locale reference. The value can be the Locale id or alias.
  * @returns {function(*, *, *, *=): string} function providing href, site and locale generates a site URL.
  */
-export const createUrlTemplate = (appConfig, currentSite, currentLocale) => {
+export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
     const defaultSite = getDefaultSite()
     const sites = getSites()
     const site =
         sites.find((site) => {
-            return site.alias === currentSite.alias || site.id === currentSite.id
+            return site.alias === siteRef || site.id === siteRef
         }) || defaultSite
     const defaultLocale = getLocaleByReference(site, site.l10n.defaultLocale)
 
     const isDefaultSite =
-        defaultSite.id === currentSite.id ||
-        (defaultSite.alias && defaultSite.alias === currentSite.alias)
+        defaultSite.id === siteRef || (defaultSite.alias && defaultSite.alias === siteRef)
     const isDefaultLocale =
-        defaultLocale.id === currentLocale.id ||
-        (defaultLocale.alias && defaultLocale.alias === currentLocale.alias)
+        defaultLocale.id === localeRef || (defaultLocale.alias && defaultLocale.alias === localeRef)
 
     const querySite =
         (siteConfig === urlPartPositions.QUERY_PARAM && showDefaultsConfig) ||
