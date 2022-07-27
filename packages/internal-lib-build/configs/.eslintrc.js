@@ -35,7 +35,6 @@ module.exports = {
     rules: {
         'prettier/prettier': ['error'],
         'no-console': 'off',
-        'no-unused-vars': ['warn', {ignoreRestSiblings: true}],
         // NOTE: converting these rules to warnings to pass CI tests for now
         // TODO: revisit these rules
         '@typescript-eslint/no-var-requires': ['warn'],

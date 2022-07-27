@@ -24,6 +24,7 @@
     "prepare": "npm run build",
     "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
     "build:watch": "watch 'npm run build' src/",
+    "build:docs": "typedoc",
     "lint": "npm run lint:js && tsc --noEmit",
     "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "internal-lib-build lint \"**/*.{js,jsx,ts,tsx}\"",
@@ -38,7 +39,9 @@
   "types": "dist/index.d.ts",
   "private": true,
   "devDependencies": {
-    "@types/node": "^18.0.6",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^12.1.5",
+    "@types/node": "^14.18.22",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "cross-env": "^5.2.0",
@@ -46,7 +49,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "typescript": "^4.7.2",
-    "watch": "^1.0.2"
+    "watch": "^1.0.2",
+    "typedoc": "^0.23.5"
   },
   "peerDependencies": {
     "react": "^17"
