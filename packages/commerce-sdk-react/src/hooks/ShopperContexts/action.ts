@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ActionResponse, ApiClients, Argument, DataType} from '../types'
-import {useAsyncExecute} from '../useAsync'
+import {ApiClients, Argument, DataType, ScapiActionResponse} from '../types'
+import {useAsyncCallback} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
 type Client = ApiClients['shopperContexts']
@@ -34,9 +34,11 @@ export enum ShopperContextsActions {
 /**
  * A hook for performing actions with the Shopper Contexts API.
  */
-export function useShopperContextsAction<Action extends ShopperContextsActions>(
+// TODO: Why does prettier not like "extends `${Actions}`"?
+// eslint-disable-next-line prettier/prettier
+export function useShopperContextsAction<Action extends `${ShopperContextsActions}`>(
     action: Action
-): ActionResponse<Argument<Client[Action]>, DataType<Client[Action]>> {
+): ScapiActionResponse<Argument<Client[Action]>, DataType<Client[Action]>, Action> {
     type Arg = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
     // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
@@ -53,5 +55,9 @@ export function useShopperContextsAction<Action extends ShopperContextsActions>(
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncExecute((arg: Arg) => method.call(client, arg))
+    const hook = useAsyncCallback((arg: Arg) => method.call(client, arg))
+    // TypeScript loses information when using a computed property name - it assumes `string`, but
+    // we know it's `Action`. This type assertion just restores that lost information.
+    const namedAction = {[action]: hook.execute} as Record<Action, typeof hook.execute>
+    return {...hook, ...namedAction}
 }
