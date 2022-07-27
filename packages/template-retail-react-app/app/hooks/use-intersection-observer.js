@@ -39,7 +39,7 @@ const useIntersectionObserver = (ref, options = {}) => {
 
             // We want to return early, but `useEffect` expects a function as the return value,
             // so we just return a noop function.
-            return () => null
+            return () => null // eslint-disable-line react/display-name
         }
 
         const observer = new IntersectionObserver(([entry]) => {
