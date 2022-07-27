@@ -58,15 +58,7 @@ const excludedPackages = [
 // standardize them.
 const commonConfigs = ['.prettierrc.yaml']
 
-// We are going to copy these devDependencies into each package from this script,
-// in order to standardize them.
-const commonDevDeps = {
-    'cross-env': '^7.0.3'
-}
-
 const readJSON = (path) => JSON.parse(fs.readFileSync(path))
-
-const writeJSON = (path, content) => fs.writeFileSync(path, JSON.stringify(content, null, 2))
 
 const listPackages = () => {
     return fs
@@ -76,26 +68,11 @@ const listPackages = () => {
 }
 
 /**
- * Try to fix errors by copying dependencies and configs into each package,
- * overwriting changes in the package. This isn't perfect and doesn't handle
- * lockfiles!
+ * Try to fix errors by copying configs into each package, overwriting changes
+ * in the package.
  */
 const fix = () => {
     listPackages().forEach((pkgDir) => {
-        const pkgFile = path.join(pkgDir, 'package.json')
-        const pkg = readJSON(pkgFile)
-        const all = {
-            ...(pkg.devDependencies || {}),
-            ...commonDevDeps
-        }
-        const final = {}
-        Object.keys(all)
-            .sort()
-            .forEach((k) => {
-                final[k] = all[k]
-            })
-        pkg.devDependencies = final
-        writeJSON(pkgFile, pkg)
         commonConfigs.forEach((name) =>
             fs.copyFileSync(path.join(assetsDir, name), path.join(pkgDir, name))
         )
@@ -152,16 +129,6 @@ const check = () => {
                 `Package "${pkg.name}" has engines.npm set to "${npmVersion}", but it must match the root package engines.npm at "${rootPkg.engines.npm}"`
             )
         }
-
-        Object.entries(commonDevDeps).forEach(([name, requiredVersion]) => {
-            const foundVersion = (pkg.devDependencies || {})[name] || (pkg.dependencies || {})[name]
-            if (foundVersion && foundVersion !== requiredVersion) {
-                errors.push(
-                    `Package "${pkg.name}" requires "${name}@${foundVersion}" but we've standardized on ` +
-                        `"${name}@${requiredVersion}" in the monorepo. To fix this, change the version in ${pkg.name} to match "${name}@${requiredVersion}."`
-                )
-            }
-        })
 
         commonConfigs.forEach((name) => {
             const src = path.join(assetsDir, name)
