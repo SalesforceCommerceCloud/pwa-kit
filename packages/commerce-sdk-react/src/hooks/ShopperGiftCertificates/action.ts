@@ -22,11 +22,9 @@ export enum ShopperGiftCertificatesActions {
 /**
  * A hook for performing actions with the Shopper Gift Certificates API.
  */
-// TODO: Why does prettier not like "extends `${Actions}`"?
-// eslint-disable-next-line prettier/prettier
-export function useShopperGiftCertificatesAction<Action extends `${ShopperGiftCertificatesActions}`>(
-    action: Action
-): ScapiActionResponse<Argument<Client[Action]>, DataType<Client[Action]>, Action> {
+export function useShopperGiftCertificatesAction<
+    Action extends `${ShopperGiftCertificatesActions}`
+>(action: Action): ScapiActionResponse<Argument<Client[Action]>, DataType<Client[Action]>, Action> {
     type Arg = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
     // Directly calling `client[action](arg)` doesn't work, because the methods don't fully

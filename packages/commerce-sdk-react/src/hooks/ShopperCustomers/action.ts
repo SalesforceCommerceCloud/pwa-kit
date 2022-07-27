@@ -223,8 +223,6 @@ The value of this property must be valid for the type of custom attribute define
 /**
  * A hook for performing actions with the Shopper Customers API.
  */
-// TODO: Why does prettier not like "extends `${Actions}`"?
-// eslint-disable-next-line prettier/prettier
 export function useShopperCustomersAction<Action extends `${ShopperCustomersActions}`>(
     action: Action
 ): ScapiActionResponse<Argument<Client[Action]>, DataType<Client[Action]>, Action> {
