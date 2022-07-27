@@ -44,13 +44,13 @@
     "@types/node": "^14.18.22",
     "@types/react": "^17.0.47",
     "@types/react-dom": "^17.0.17",
-    "cross-env": "^5.2.1",
+    "cross-env": "^7.0.3",
     "internal-lib-build": "^2.2.0-dev",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "typedoc": "^0.23.9",
     "typescript": "^4.7.4",
-    "watch": "^1.0.2",
-    "typedoc": "^0.23.9"
+    "watch": "^1.0.2"
   },
   "peerDependencies": {
     "react": "^17"

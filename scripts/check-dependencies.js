@@ -58,7 +58,7 @@ const commonConfigs = [
 // We are going to copy these devDependencies into each package from this script,
 // in order to standardize them.
 const commonDevDeps = {
-    'cross-env': '^5.2.0',
+    'cross-env': '^7.0.3',
 }
 
 const readJSON = (path) => JSON.parse(fs.readFileSync(path))

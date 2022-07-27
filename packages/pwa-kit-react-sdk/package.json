@@ -47,7 +47,6 @@
     "@loadable/babel-plugin": "^5.13.2",
     "@loadable/server": "^5.15.2",
     "@loadable/webpack-plugin": "^5.15.2",
-    "cross-env": "^5.2.1",
     "event-emitter": "^0.3.5",
     "glob": "7.2.3",
     "hoist-non-react-statics": "^3.3.2",
@@ -64,6 +63,7 @@
   "devDependencies": {
     "@loadable/component": "^5.15.2",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.7",
+    "cross-env": "^7.0.3",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "1.15.6",
     "internal-lib-build": "^2.2.0-dev",
