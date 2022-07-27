@@ -1,5 +1,10 @@
 #!/usr/bin/env node
-/* eslint-env node */
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 /**
  * This script sanity checks the package.json files in the monorepo.
  *
@@ -17,7 +22,7 @@
  *      and moving devDependencies to the root. We could never get this to work
  *      with packages that depend on each other within the monorepo.
  *
- *   2. When we generate a project we want to be able to make a copy of the 
+ *   2. When we generate a project we want to be able to make a copy of the
  *      template-retail-react-app package and give it to an end-user as a starting point.
  *      This is *much* easier to do if that package doesn't have "secret" dependencies on
  *      libraries installed at the root that aren't explicitly listed in the pwa's package.json.
@@ -31,8 +36,8 @@ const semver = require('semver')
 
 program.description(
     `Check that all packages are using the same versions of crucial libraries (eg.` +
-    `compilers, linters etc) and their config files\n` +
-    `Exits with a non-zero status if there is a problem with package dependencies.`
+        `compilers, linters etc) and their config files\n` +
+        `Exits with a non-zero status if there is a problem with package dependencies.`
 )
 
 program.option('--fix', 'try to fix errors by copying the right dependencies and configs packages')
@@ -51,20 +56,17 @@ const excludedPackages = [
 
 // We are going to copy these files into each package from this script, in order to
 // standardize them.
-const commonConfigs = [
-    '.prettierrc.yaml'
-]
+const commonConfigs = ['.prettierrc.yaml']
 
 // We are going to copy these devDependencies into each package from this script,
 // in order to standardize them.
 const commonDevDeps = {
-    'cross-env': '^7.0.3',
+    'cross-env': '^7.0.3'
 }
 
 const readJSON = (path) => JSON.parse(fs.readFileSync(path))
 
 const writeJSON = (path, content) => fs.writeFileSync(path, JSON.stringify(content, null, 2))
-
 
 const listPackages = () => {
     return fs
@@ -94,10 +96,9 @@ const fix = () => {
             })
         pkg.devDependencies = final
         writeJSON(pkgFile, pkg)
-        commonConfigs.forEach((name) => fs.copyFileSync(
-            path.join(assetsDir, name),
-            path.join(pkgDir, name)
-        ))
+        commonConfigs.forEach((name) =>
+            fs.copyFileSync(path.join(assetsDir, name), path.join(pkgDir, name))
+        )
     })
 }
 
@@ -132,29 +133,35 @@ const check = () => {
         const pkg = readJSON(pkgFile)
 
         if (pkg.version !== rootPkg.version) {
-            errors.push(`Package "${pkg.name}" is at version "${pkg.version}" but it needs to match the root package version at "${rootPkg.version}"`)
-        }
-        
-        const nodeVersion = (pkg.engines || {}).node
-        const npmVersion = (pkg.engines || {}).npm
-        
-        if (nodeVersion !== rootPkg.engines.node) {
-            errors.push(`Package "${pkg.name}" has engines.node set to "${nodeVersion}", but it must match the root package engines.node at "${rootPkg.engines.node}"`)
-        }
-        
-        if (npmVersion !== rootPkg.engines.npm) {
-            errors.push(`Package "${pkg.name}" has engines.npm set to "${npmVersion}", but it must match the root package engines.npm at "${rootPkg.engines.npm}"`)
+            errors.push(
+                `Package "${pkg.name}" is at version "${pkg.version}" but it needs to match the root package version at "${rootPkg.version}"`
+            )
         }
 
-        Object.entries(commonDevDeps)
-            .forEach(([name, requiredVersion]) => {
-                const foundVersion = (pkg.devDependencies || {})[name] || (pkg.dependencies || {})[name]
-                if (foundVersion && foundVersion !== requiredVersion) {
-                    errors.push(
-                        `Package "${pkg.name}" requires "${name}@${foundVersion}" but we've standardized on ` +
-                        `"${name}@${requiredVersion}" in the monorepo. To fix this, change the version in ${pkg.name} to match "${name}@${requiredVersion}."`)
-                }
-            })
+        const nodeVersion = (pkg.engines || {}).node
+        const npmVersion = (pkg.engines || {}).npm
+
+        if (nodeVersion !== rootPkg.engines.node) {
+            errors.push(
+                `Package "${pkg.name}" has engines.node set to "${nodeVersion}", but it must match the root package engines.node at "${rootPkg.engines.node}"`
+            )
+        }
+
+        if (npmVersion !== rootPkg.engines.npm) {
+            errors.push(
+                `Package "${pkg.name}" has engines.npm set to "${npmVersion}", but it must match the root package engines.npm at "${rootPkg.engines.npm}"`
+            )
+        }
+
+        Object.entries(commonDevDeps).forEach(([name, requiredVersion]) => {
+            const foundVersion = (pkg.devDependencies || {})[name] || (pkg.dependencies || {})[name]
+            if (foundVersion && foundVersion !== requiredVersion) {
+                errors.push(
+                    `Package "${pkg.name}" requires "${name}@${foundVersion}" but we've standardized on ` +
+                        `"${name}@${requiredVersion}" in the monorepo. To fix this, change the version in ${pkg.name} to match "${name}@${requiredVersion}."`
+                )
+            }
+        })
 
         commonConfigs.forEach((name) => {
             const src = path.join(assetsDir, name)
@@ -167,43 +174,60 @@ const check = () => {
         // If the current package, X, depends on a monorepo local package, Y, then
         // ensure that X installs all of Y's peerDependencies.
         Object.entries(peerDependenciesByPackage).forEach(([localPackageName, localPeerDeps]) => {
-            const dependsOnLocalPackage = !!((pkg.dependencies || {})[localPackageName] || (pkg.devDependencies || {})[localPackageName])
-            const dependencyIsOptional = Boolean((peerDependenciesMetaByPackage[pkg.name][localPackageName] || {})['optional'])
+            const dependsOnLocalPackage = !!(
+                (pkg.dependencies || {})[localPackageName] ||
+                (pkg.devDependencies || {})[localPackageName]
+            )
+            const dependencyIsOptional = Boolean(
+                (peerDependenciesMetaByPackage[pkg.name][localPackageName] || {})['optional']
+            )
 
             if (dependsOnLocalPackage) {
                 Object.entries(localPeerDeps).forEach(([requiredPackage, requiredRange]) => {
-                    const peerIsOptional = Boolean((peerDependenciesMetaByPackage[localPackageName][requiredPackage] || {})['optional'])
+                    const peerIsOptional = Boolean(
+                        (peerDependenciesMetaByPackage[localPackageName][requiredPackage] || {})[
+                            'optional'
+                        ]
+                    )
 
                     const isCircular = pkg.name === requiredPackage
 
                     if (isCircular) {
                         if (!dependencyIsOptional && !peerIsOptional) {
-                            errors.push([
-                                `Forbidden circular dependency found:`,
-                                ``,
-                                `  "${pkg.name}" => (${dependencyIsOptional ? 'optional' : 'required'}) "${localPackageName}" => (${peerIsOptional ? 'optional' : 'required'}) "${requiredPackage}".`,
-                                ``,
-                                `  If "${pkg.name}" and "${localPackageName}" have required dependencies on each other,`,
-                                `  they are better combined into one package – one can't work without the other.`,
-                                ``,
-                            ].join('\n'))
+                            errors.push(
+                                [
+                                    `Forbidden circular dependency found:`,
+                                    ``,
+                                    `  "${pkg.name}" => (${
+                                        dependencyIsOptional ? 'optional' : 'required'
+                                    }) "${localPackageName}" => (${
+                                        peerIsOptional ? 'optional' : 'required'
+                                    }) "${requiredPackage}".`,
+                                    ``,
+                                    `  If "${pkg.name}" and "${localPackageName}" have required dependencies on each other,`,
+                                    `  they are better combined into one package – one can't work without the other.`,
+                                    ``
+                                ].join('\n')
+                            )
                         } else {
                             // Optional circular dependencies are okay – eg. the runtime is usable without having
                             // build tools installed, but build tools might depend on the runtime.
                             const circularSatisfied = semver.satisfies(pkg.version, requiredRange)
-                            if(!circularSatisfied) {
+                            if (!circularSatisfied) {
                                 errors.push(
                                     `Circular dependency not satisfied "${pkg.name}@${pkg.version}" -> "${localPackageName}" -> "${requiredPackage}@${requiredRange}"`
                                 )
                             }
                         }
                     } else {
-                        const foundRange = (pkg.dependencies || {})[requiredPackage] || (pkg.devDependencies || {})[requiredPackage]
+                        const foundRange =
+                            (pkg.dependencies || {})[requiredPackage] ||
+                            (pkg.devDependencies || {})[requiredPackage]
                         const satisfied = foundRange && semver.subset(foundRange, requiredRange)
                         if (!peerIsOptional && !satisfied) {
                             errors.push(
                                 `Package "${pkg.name}" depends on package "${localPackageName}", but is missing one of` +
-                                ` its peerDependencies "${requiredPackage}@${requiredRange}"`
+                                    ` its peerDependencies "${requiredPackage}@${requiredRange}"`
                             )
                         }
                     }
@@ -239,7 +263,7 @@ const check = () => {
         if (mistakenlySuppliedPeers.size > 0) {
             errors.push(
                 `Package "${pkg.name}" has peerDependencies that also appear in its own dependencies: ` +
-                `${Array.from(mistakenlySuppliedPeers).join(", ").toString()}`
+                    `${Array.from(mistakenlySuppliedPeers).join(', ').toString()}`
             )
         }
 
@@ -248,24 +272,33 @@ const check = () => {
         const peersNotInstalledForDev = difference(peerDependencies, devDependencies)
 
         const optionalPeers = Object.entries(pkg.peerDependenciesMeta || {})
-            .map(([peer, data]) => Boolean((data || {})['optional']) ? peer : undefined)
+            .map(([peer, data]) => ((data || {})['optional'] ? peer : undefined))
             .filter(Boolean)
 
-        const peersNotInstalledForDevAndRequired = difference(peersNotInstalledForDev, optionalPeers)
+        const peersNotInstalledForDevAndRequired = difference(
+            peersNotInstalledForDev,
+            optionalPeers
+        )
 
         if (peersNotInstalledForDevAndRequired.size > 0) {
             errors.push(
                 `Package "${pkg.name}" has peerDependencies that are not installed as devDependencies: ` +
-                `${Array.from(peersNotInstalledForDev).join(", ").toString()}`
+                    `${Array.from(peersNotInstalledForDev).join(', ').toString()}`
             )
         }
 
         // The current package must not have the same library listed in both
         // dependencies and devDependencies – this triggers warnings on NPM install.
-        const duplicates = intersection(dependencies, devDependencies);
+        const duplicates = intersection(dependencies, devDependencies)
         if (duplicates.size > 0) {
             errors.push(
-                `Package "${pkg.name}" has libraries that appear in both dependencies and devDependencies: "${Array.from(duplicates).join(", ").toString()}"`
+                `Package "${
+                    pkg.name
+                }" has libraries that appear in both dependencies and devDependencies: "${Array.from(
+                    duplicates
+                )
+                    .join(', ')
+                    .toString()}"`
             )
         }
     })
@@ -275,7 +308,6 @@ const check = () => {
         process.exit(1)
     }
 }
-
 
 const main = (opts) => {
     const action = opts.fix ? fix : check

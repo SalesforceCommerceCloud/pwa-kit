@@ -1,5 +1,10 @@
 #!/usr/bin/env node
-/* eslint-env node */
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 
 const sh = require('shelljs')
 const program = require('commander')
@@ -25,9 +30,7 @@ const main = (opts) => {
     process.exit(0)
 }
 
-program.description(
-    `Print the count of unique dependencies installed for the package at <path>`
-)
+program.description(`Print the count of unique dependencies installed for the package at <path>`)
 
 program.arguments('<path>')
 
