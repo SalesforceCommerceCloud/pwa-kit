@@ -4,3 +4,4 @@ semi: false
 bracketSpacing: false
 tabWidth: 4
 arrowParens: 'always'
+trailingComma: 'none'
