@@ -25,26 +25,22 @@ export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryRespon
     return result
 }
 
-export const useAsyncCallback = <A extends any[], R>(fn: (...args: A) => Promise<R>) => {
+export const useAsyncCallback = <Args extends unknown[], Ret>(
+    fn: (...args: Args) => Promise<Ret>
+) => {
     const [isLoading, setIsLoading] = useState(false)
-    const [data, setData] = useState<R | undefined>(undefined)
+    const [data, setData] = useState<Ret | undefined>(undefined)
     const [error, setError] = useState<Error | undefined>(undefined)
-    const result: ActionResponse<A, R> = {
+    const result: ActionResponse<Args, Ret> = {
         data,
         error,
         isLoading,
         execute: (...arg) => {
             setIsLoading(true)
             fn(...arg)
-                .then((data) => {
-                    setData(data)
-                })
-                .catch((error: Error) => {
-                    setError(error)
-                })
-                .finally(() => {
-                    setIsLoading(false)
-                })
+                .then((data) => setData(data))
+                .catch((error: Error) => setError(error))
+                .finally(() => setIsLoading(false))
         }
     }
     return result
