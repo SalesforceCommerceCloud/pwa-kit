@@ -47,22 +47,22 @@ export const useAsync = <T>(fn: () => Promise<T>, deps: unknown[] = []): QueryRe
     return {data, isLoading, error}
 }
 
-export const useAsyncExecute = <A, R>(fn: (arg: A) => Promise<R>) => {
-    // This is a stub implementation to validate the types.
-    // The real implementation will be more React-y.
-    const result: ActionResponse<A, R> = {
-        isLoading: false,
-        execute(arg: A) {
-            result.isLoading = true
-            fn(arg)
-                .then((data) => {
-                    result.isLoading = false
-                    result.data = data
-                })
-                .catch((error) => {
-                    result.isLoading = false
-                    result.error = error
-                })
+export const useAsyncCallback = <Args extends unknown[], Ret>(
+    fn: (...args: Args) => Promise<Ret>
+) => {
+    const [isLoading, setIsLoading] = useState(false)
+    const [data, setData] = useState<Ret | undefined>(undefined)
+    const [error, setError] = useState<Error | undefined>(undefined)
+    const result: ActionResponse<Args, Ret> = {
+        data,
+        error,
+        isLoading,
+        execute: (...arg) => {
+            setIsLoading(true)
+            fn(...arg)
+                .then((data) => setData(data))
+                .catch((error: Error) => setError(error))
+                .finally(() => setIsLoading(false))
         }
     }
     return result
