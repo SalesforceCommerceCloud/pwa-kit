@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType, ScapiActionResponse} from '../types'
-import {useAsyncExecute} from '../useAsync'
+import {useAsyncCallback} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
 type Client = ApiClients['shopperBaskets']
@@ -355,7 +355,7 @@ export function useShopperBasketsAction<Action extends `${ShopperBasketsActions}
     const method = client[action]
     assertMethod(method)
 
-    const hook = useAsyncExecute((arg: Arg) => method.call(client, arg))
+    const hook = useAsyncCallback((arg: Arg) => method.call(client, arg))
     // TypeScript loses information when using a computed property name - it assumes `string`, but
     // we know it's `Action`. This type assertion just restores that lost information.
     const namedAction = {[action]: hook.execute} as Record<Action, typeof hook.execute>
