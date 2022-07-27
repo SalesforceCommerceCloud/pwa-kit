@@ -25,7 +25,9 @@ export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryRespon
     return result
 }
 
-export const useAsyncCallback = <Args extends unknown[], Ret>(fn: (...args: Args) => Promise<Ret>) => {
+export const useAsyncCallback = <Args extends unknown[], Ret>(
+    fn: (...args: Args) => Promise<Ret>
+) => {
     const [isLoading, setIsLoading] = useState(false)
     const [data, setData] = useState<Ret | undefined>(undefined)
     const [error, setError] = useState<Error | undefined>(undefined)
