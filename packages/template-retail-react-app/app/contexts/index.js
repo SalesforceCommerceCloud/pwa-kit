@@ -55,7 +55,7 @@ export const LocaleProvider = ({locale: initialLocale = {}, children}) => {
 
 LocaleProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    locale: PropTypes.object
+    locale: PropTypes.string
 }
 
 export const SiteContext = React.createContext()

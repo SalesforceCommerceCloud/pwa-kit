@@ -147,12 +147,7 @@ export const TestProviders = ({
                     <CategoriesProvider categories={initialCategories}>
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
                             <SiteProvider site={site}>
-                                <LocaleProvider
-                                    locale={{
-                                        id: locale,
-                                        preferredCurrency: DEFAULT_CURRENCY
-                                    }}
-                                >
+                                <LocaleProvider locale={locale}>
                                     <CustomerProvider value={{customer, setCustomer}}>
                                         <BasketProvider value={{basket, setBasket}}>
                                             <CustomerProductListsProvider>

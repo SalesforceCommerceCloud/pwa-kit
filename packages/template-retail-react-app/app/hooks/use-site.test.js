@@ -15,6 +15,10 @@ const wrapper = ({children}) => <SiteProvider>{children}</SiteProvider>
 
 let resultSite = {}
 
+beforeEach(() => {
+    resultSite = {}
+})
+
 const mockSetSite = jest.fn().mockImplementation((site) => {
     resultSite = {site}
 

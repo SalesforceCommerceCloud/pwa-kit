@@ -15,6 +15,10 @@ const wrapper = ({children}) => <LocaleProvider>{children}</LocaleProvider>
 
 let resultLocale = {}
 
+beforeEach(() => {
+    resultLocale = {}
+})
+
 const mockSetLocale = jest.fn().mockImplementation((locale) => {
     resultLocale = {locale}
 

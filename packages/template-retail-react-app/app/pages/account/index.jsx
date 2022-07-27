@@ -93,7 +93,7 @@ const Account = () => {
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
     if (customer.authType != null && !customer.isRegistered) {
-        const path = fillUrlTemplate('/login', site.alias || site.id, locale.id)
+        const path = fillUrlTemplate('/login', site.alias || site.id, locale)
         return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
     }
 

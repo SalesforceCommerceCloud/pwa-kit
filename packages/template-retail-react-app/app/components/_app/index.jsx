@@ -183,7 +183,7 @@ const App = (props) => {
                 <CategoriesProvider categories={allCategories}>
                     <CurrencyProvider currency={currency}>
                         <SiteProvider site={site}>
-                            <LocaleProvider locale={locale}>
+                            <LocaleProvider locale={targetLocale}>
                                 <Seo>
                                     <meta name="theme-color" content={THEME_COLOR} />
                                     <meta
