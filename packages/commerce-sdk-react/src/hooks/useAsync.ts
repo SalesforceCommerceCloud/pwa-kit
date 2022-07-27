@@ -11,8 +11,6 @@ export const useAsync = <T>(fn: () => Promise<T>, deps: unknown[] = []): QueryRe
     const [data, setData] = useState<T | undefined>()
     const [error, setError] = useState<Error | undefined>()
     const [isLoading, setIsLoading] = useState(true)
-    console.log('deps', deps)
-    console.log('isLoading', isLoading)
     useEffect(() => {
         // use this variable to avoid race condition
         let subscribe = true
@@ -22,7 +20,6 @@ export const useAsync = <T>(fn: () => Promise<T>, deps: unknown[] = []): QueryRe
             try {
                 if (subscribe) {
                     const res = await fn()
-                    console.log('res', res)
                     setData(res)
                     setIsLoading(false)
                 }
