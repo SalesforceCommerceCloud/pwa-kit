@@ -7,7 +7,9 @@
 import loadable from '@loadable/component'
 
 const Home = loadable(() => import('./pages/home'))
-const UseProducts = loadable(() => import('./pages/useShopperProducts'))
+const UseProducts = loadable(() => import('./pages/use-shopper-products'))
+const UseProduct = loadable(() => import('./pages/use-shopper-product'))
+const UseCategories = loadable(() => import('./pages/use-shopper-categories'))
 
 const routes = [
     {
@@ -16,8 +18,16 @@ const routes = [
         component: Home
     },
     {
-        path: '/useShopperProducts',
+        path: '/use-shopper-products',
         component: UseProducts
+    },
+    {
+        path: '/use-shopper-product/:productId',
+        component: UseProduct
+    },
+    {
+        path: '/use-shopper-categories',
+        component: UseCategories
     }
 ]
 

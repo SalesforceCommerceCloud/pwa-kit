@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.0",
+    "@types/loadable__component": "^5.13.4",
     "@types/react": "^17.0.2",
     "@types/react-router-dom": "^5.3.3",
     "commerce-sdk-react": "^2.2.0-dev",

@@ -4,34 +4,35 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useState, useEffect} from "react";
+import {useState, useEffect} from 'react'
 import {ActionResponse, QueryResponse} from './types'
 
 export const useAsync = <T>(fn: () => Promise<T>, deps: unknown[] = []): QueryResponse<T> => {
     const [data, setData] = useState<T | undefined>()
     const [error, setError] = useState<Error | undefined>()
-    const [isLoading, setIsLoading] =useState(true)
-
+    const [isLoading, setIsLoading] = useState(true)
+    console.log('deps', deps)
+    console.log('isLoading', isLoading)
     useEffect(() => {
         // use this variable to avoid race condition
         let subscribe = true
-        setIsLoading(false)
+        setIsLoading(true)
 
         const runAsync = async () => {
             try {
                 if (subscribe) {
                     const res = await fn()
-                    console.log('res', res )
+                    console.log('res', res)
                     setData(res)
                     setIsLoading(false)
                 }
             } catch (error) {
-               if (subscribe) {
-                   setIsLoading(false)
-                   if (error instanceof Error) {
-                       setError(error)
-                   }
-               }
+                if (subscribe) {
+                    setIsLoading(false)
+                    if (error instanceof Error) {
+                        setError(error)
+                    }
+                }
             }
         }
 
@@ -41,7 +42,7 @@ export const useAsync = <T>(fn: () => Promise<T>, deps: unknown[] = []): QueryRe
         return () => {
             subscribe = false
         }
-    }, [deps])
+    }, deps)
 
     return {data, isLoading, error}
 }

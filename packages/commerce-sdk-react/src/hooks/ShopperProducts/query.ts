@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { ApiClients, Argument, DataType, QueryResponse} from '../types'
-import {ShopperProductsTypes} from "commerce-sdk-isomorphic";
+import {ApiClients, Argument, DataType, QueryResponse} from '../types'
+import {ShopperProductsTypes} from 'commerce-sdk-isomorphic'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
@@ -19,18 +19,22 @@ type Client = ApiClients['shopperProducts']
  * @returns An object describing the state of the request.
  */
 export const useProducts = (
-    arg: Argument<Client['getProducts']>, deps: unknown[] = []
+    arg: Argument<Client['getProducts']>,
+    deps: unknown[] = []
 ): QueryResponse<DataType<Client['getProducts']>> => {
+    if (!arg) {
+        throw new Error('Missing ids in parameters to make request')
+    }
     const {shopperProducts: client} = useCommerceApi()
-    // how to get this right?
-    const {parameters: {ids}} : {parameters: {ids: ShopperProductsTypes.CompositeParameters<any, any>}}  = arg
+    const {
+        parameters: {ids}
+    } = arg
     // by default the source is the ids string
     let source: unknown[] = [ids]
     if (deps.length) {
         source = deps
     }
-    console.log('client', client)
-    return useAsync(() => client.getProducts(arg), [source])
+    return useAsync(() => client.getProducts(arg), source)
 }
 /**
  * A hook for `ShopperProducts#getProduct`.
@@ -40,10 +44,23 @@ export const useProducts = (
  * @returns An object describing the state of the request.
  */
 export const useProduct = (
-    arg: Argument<Client['getProduct']>
+    arg: Argument<Client['getProduct']>,
+    deps: unknown[] = []
 ): QueryResponse<DataType<Client['getProduct']>> => {
+    if (!arg) {
+        throw new Error('useProducts requires product id in parameters ')
+    }
+    const {
+        parameters: {id}
+    } = arg
+    // by default the source is the ids string
+    let source: unknown[] = [id]
+    if (deps.length) {
+        source = deps
+    }
+    console.log('source', source)
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getProduct(arg), [arg])
+    return useAsync(() => client.getProduct(arg), source)
 }
 /**
  * A hook for `ShopperProducts#getCategories`.
@@ -53,10 +70,21 @@ export const useProduct = (
  * @returns An object describing the state of the request.
  */
 export const useCategories = (
-    arg: Argument<Client['getCategories']>
+    arg: Argument<Client['getCategories']>,
+    deps: unknown[] = []
 ): QueryResponse<DataType<Client['getCategories']>> => {
+    if (!arg) {
+        throw new Error('useCategories requires categories ids string in parameters ')
+    }
+    const {
+        parameters: {ids, levels = 1}
+    } = arg
+    let source: unknown[] = [ids, levels]
+    if (deps.length) {
+        source = deps
+    }
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getCategories(arg), [arg])
+    return useAsync(() => client.getCategories(arg), source)
 }
 /**
  * A hook for `ShopperProducts#getCategory`.
