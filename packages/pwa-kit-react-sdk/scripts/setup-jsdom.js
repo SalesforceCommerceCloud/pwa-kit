@@ -9,7 +9,7 @@ global.document = require('jsdom').jsdom('<body></body>')
 global.window = document.defaultView
 global.window.matchMedia =
     global.window.matchMedia ||
-    function() {
+    function () {
         return {
             matches: false,
             addListener: () => {},

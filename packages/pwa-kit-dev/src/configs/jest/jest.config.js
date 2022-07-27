@@ -13,11 +13,8 @@ module.exports = {
     testEnvironment: 'jsdom',
     testPathIgnorePatterns: ['node_modules', 'build'],
     moduleNameMapper: {
-        '\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': path.join(
-            __dirname,
-            'mocks',
-            'fileMock.js'
-        ),
+        '\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
+            path.join(__dirname, 'mocks', 'fileMock.js'),
         '\\.(svg)$': path.join(__dirname, 'mocks', 'svgMock.js'),
         '\\.(css|less)$': path.join(__dirname, 'mocks', 'styleMock.js')
     },

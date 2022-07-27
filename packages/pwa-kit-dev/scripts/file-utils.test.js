@@ -10,13 +10,17 @@ const fs = require('fs')
 
 const fileUtils = require('./file-utils')
 
-const successCallbackAdapter = (value = true) => (...args) => {
-    args[args.length - 1](null, value)
-}
+const successCallbackAdapter =
+    (value = true) =>
+    (...args) => {
+        args[args.length - 1](null, value)
+    }
 
-const failureCallbackAdapter = (value = {}) => (...args) => {
-    args[args.length - 1](value)
-}
+const failureCallbackAdapter =
+    (value = {}) =>
+    (...args) => {
+        args[args.length - 1](value)
+    }
 
 const argsIgnoringCallback = (mock, index = 0) => mock.mock.calls[index].slice(0, -1)
 
