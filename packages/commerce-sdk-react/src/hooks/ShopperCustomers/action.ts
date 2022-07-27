@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ActionResponse, ApiClients, Argument, DataType} from '../types'
-import {useAsyncExecute} from '../useAsync'
+import {useAsyncCallback} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
 type Client = ApiClients['shopperCustomers']
@@ -225,8 +225,8 @@ The value of this property must be valid for the type of custom attribute define
  */
 export function useShopperCustomersAction<Action extends ShopperCustomersActions>(
     action: Action
-): ActionResponse<Argument<Client[Action]>, DataType<Client[Action]>> {
-    type Arg = Argument<Client[Action]>
+): ActionResponse<Parameters<Client[Action]>, DataType<Client[Action]>> {
+    type Arg = Parameters<Client[Action]>
     type Data = DataType<Client[Action]>
     // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
     // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
@@ -242,5 +242,5 @@ export function useShopperCustomersAction<Action extends ShopperCustomersActions
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncExecute((arg: Arg) => method.call(client, arg))
+    return useAsyncCallback((...arg: Arg) => method.call(client, arg))
 }
