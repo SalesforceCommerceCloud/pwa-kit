@@ -32,7 +32,7 @@ const useNavigation = () => {
          */
         (path, action = 'push', ...args) => {
             const locale = getLocaleByReference(site, localeShortCode)
-            const updatedHref = fillUrlTemplate(path, site.alias || site.id, locale.id)
+            const updatedHref = fillUrlTemplate(path, site.alias || site.id, locale.id || locale)
             history[action](path === '/' ? '/' : updatedHref, ...args)
         },
         [localeShortCode, site]

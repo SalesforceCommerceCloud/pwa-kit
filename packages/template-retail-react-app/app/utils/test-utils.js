@@ -21,7 +21,7 @@ import {
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
-import {app as appConfig} from '../../config/default'
+import {app as appDefaultConfig} from '../../config/default'
 import {IntlProvider} from 'react-intl'
 import {
     mockCategories as initialMockCategories,
@@ -52,7 +52,9 @@ import {
     MultiSitesProvider,
     SiteProvider
 } from '../contexts'
+
 import {createUrlTemplate} from './url'
+import {getSites} from './site-utils'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -66,8 +68,8 @@ export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Ro
 
 export const renderWithRouterAndCommerceAPI = (node) => {
     const api = new CommerceAPI({
-        ...appConfig.commerceAPI,
-        einsteinConfig: appConfig.einsteinAPI,
+        ...appDefaultConfig.commerceAPI,
+        einsteinConfig: appDefaultConfig.einsteinAPI,
         proxy: undefined
     })
     return renderWithReactIntl(
@@ -88,7 +90,9 @@ export const TestProviders = ({
     initialCustomer = null,
     initialCategories = initialMockCategories,
     locale = DEFAULT_LOCALE,
-    messages = fallbackMessages
+    messages = fallbackMessages,
+    appConfig = appDefaultConfig,
+    siteAlias = DEFAULT_SITE
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -128,13 +132,13 @@ export const TestProviders = ({
         onClose: () => {}
     }
 
-    const fillUrlTemplate = createUrlTemplate(appConfig, DEFAULT_SITE, locale)
+    const sites = getSites()
+    const site =
+        sites.find((site) => {
+            return site.alias === siteAlias || site.id === appConfig['site']
+        }) || DEFAULT_SITE
 
-    const {app} = mockConfig
-    const defaultSite = {
-        ...app.sites.find((site) => site.id === app.defaultSite),
-        alias: app.siteAliases[app.defaultSite]
-    }
+    const fillUrlTemplate = createUrlTemplate(appConfig, site.alias || site.id, locale)
 
     return (
         <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
@@ -142,10 +146,10 @@ export const TestProviders = ({
                 <CommerceAPIProvider value={api}>
                     <CategoriesProvider categories={initialCategories}>
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                            <SiteProvider site={defaultSite}>
+                            <SiteProvider site={site}>
                                 <LocaleProvider
                                     locale={{
-                                        id: DEFAULT_LOCALE,
+                                        id: locale,
                                         preferredCurrency: DEFAULT_CURRENCY
                                     }}
                                 >
@@ -181,7 +185,9 @@ TestProviders.propTypes = {
     initialCategories: PropTypes.element,
     initialProductLists: PropTypes.object,
     messages: PropTypes.object,
-    locale: PropTypes.string
+    locale: PropTypes.string,
+    appConfig: PropTypes.object,
+    siteAlias: PropTypes.string
 }
 
 /**
