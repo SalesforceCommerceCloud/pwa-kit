@@ -23,6 +23,7 @@ const server = setupServer(
         'http://localhost:3000/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products/1',
         (req, res, ctx) => {
             return res(
+                // TODO: will need file to store mocked data
                 ctx.json({
                     name: 'some product'
                 })
@@ -65,4 +66,6 @@ test('mocking api response', async () => {
 
     renderWithProviders(<Component />)
     await waitFor(() => screen.getByText('loading'))
+
+    expect(screen.getByText('loading')).toBeInTheDocument()
 })
