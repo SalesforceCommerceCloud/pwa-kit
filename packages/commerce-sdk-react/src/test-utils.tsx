@@ -6,11 +6,13 @@
  */
 
 import {render, RenderOptions} from '@testing-library/react'
+import {RequestHandler} from 'msw'
+import {setupServer, SetupServerApi} from 'msw/lib/node'
 import React from 'react'
 import CommerceApiProvider from './provider'
 
 const sampleProps = {
-    proxy: 'http://localhost:3000/mobify/proxy/api',
+    proxy: '/proxy',
     clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
     organizationId: 'f_ecom_zzrf_001',
     shortCode: '8o7m175y',
@@ -26,6 +28,14 @@ const TestProviders = (props: {children: React.ReactNode}) => {
 export const renderWithProviders = (
     ui: React.ReactElement,
     options?: Omit<RenderOptions, 'wrapper'>
-) => {
+): void => {
     render(ui, {wrapper: TestProviders, ...options})
+}
+
+export const setupMockServer = (...handlers: RequestHandler[]): SetupServerApi => {
+    return setupServer(
+        ...handlers
+        // TODO: Add handlers to mock the API responses for SLAS login flow
+        // (see `setupMockServer` in template-retail-react-app/app/utils/test-utils.js)
+    )
 }

@@ -9,18 +9,14 @@ import React, {useEffect, useState} from 'react'
 import '@testing-library/jest-dom'
 import {screen, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
 
-import {renderWithProviders} from '../test-utils'
+import {renderWithProviders, setupMockServer} from '../test-utils'
 import useCommerceApi from './useCommerceApi'
 import {useProduct} from './ShopperProducts'
 
-const server = setupServer(
-    rest.get('/greeting', (req, res, ctx) => {
-        return res(ctx.json({greeting: 'hello there'}))
-    }),
+const server = setupMockServer(
     rest.get(
-        'http://localhost:3000/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products/1',
+        '/proxy/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products/1',
         (req, res, ctx) => {
             return res(
                 // TODO: will need file to store mocked data
