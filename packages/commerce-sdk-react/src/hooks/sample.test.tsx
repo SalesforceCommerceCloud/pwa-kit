@@ -13,17 +13,13 @@ import {rest} from 'msw'
 import {renderWithProviders, setupMockServer} from '../test-utils'
 import useCommerceApi from './useCommerceApi'
 import {useProduct} from './ShopperProducts'
+import {product} from './mock-data'
 
 const server = setupMockServer(
     rest.get(
         '/proxy/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products/1',
         (req, res, ctx) => {
-            return res(
-                // TODO: will need file to store mocked data
-                ctx.json({
-                    name: 'some product'
-                })
-            )
+            return res(ctx.json(product))
         }
     )
 )
