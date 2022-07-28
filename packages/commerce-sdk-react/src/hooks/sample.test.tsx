@@ -52,6 +52,8 @@ test('useCommerceApi', () => {
 
 test('mocking api response', async () => {
     const Component = () => {
+        // I think this hook does not really work as expected
+        // because it relies on useAsync that still needs to be implemented correctly.
         const product = useProduct({parameters: {id: '1'}})
         return (
             <div>
