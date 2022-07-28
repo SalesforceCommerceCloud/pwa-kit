@@ -334,8 +334,6 @@ the body are the following properties if specified:
 /**
  * A hook for performing actions with the Shopper Baskets API.
  */
-// TODO: Why does prettier not like "extends `${Actions}`"?
-// eslint-disable-next-line prettier/prettier
 export function useShopperBasketsAction<Action extends `${ShopperBasketsActions}`>(
     action: Action
 ): ScapiActionResponse<Argument<Client[Action]>, DataType<Client[Action]>, Action> {

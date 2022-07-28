@@ -211,13 +211,8 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             }
 
             const {location: previousLocation, match: previousMatch} = previousProps
-            const {
-                location,
-                match,
-                onGetPropsComplete,
-                onGetPropsError,
-                onUpdateComplete
-            } = this.props
+            const {location, match, onGetPropsComplete, onGetPropsError, onUpdateComplete} =
+                this.props
 
             const {params} = match || {}
             const {params: previousParams} = previousMatch || {}

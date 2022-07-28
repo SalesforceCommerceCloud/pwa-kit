@@ -51,8 +51,6 @@ paymentCard must be specified in the request.
 /**
  * A hook for performing actions with the Shopper Orders API.
  */
-// TODO: Why does prettier not like "extends `${Actions}`"?
-// eslint-disable-next-line prettier/prettier
 export function useShopperOrdersAction<Action extends `${ShopperOrdersActions}`>(
     action: Action
 ): ScapiActionResponse<Argument<Client[Action]>, DataType<Client[Action]>, Action> {

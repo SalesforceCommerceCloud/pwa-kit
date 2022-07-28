@@ -16,17 +16,9 @@ const delay = (t) => new Promise((resolve) => setTimeout(resolve, t))
  * we want when testing shouldGetProps – always returning true would cause
  * an infinite loop.
  */
-const trueOnceThenFalse = () =>
-    jest
-        .fn()
-        .mockReturnValue(false)
-        .mockReturnValueOnce(true)
+const trueOnceThenFalse = () => jest.fn().mockReturnValue(false).mockReturnValueOnce(true)
 
-const falseOnceThenTrue = () =>
-    jest
-        .fn()
-        .mockReturnValue(true)
-        .mockReturnValueOnce(false)
+const falseOnceThenTrue = () => jest.fn().mockReturnValue(true).mockReturnValueOnce(false)
 
 jest.mock('../_app-config', () => {
     const React = require('react')

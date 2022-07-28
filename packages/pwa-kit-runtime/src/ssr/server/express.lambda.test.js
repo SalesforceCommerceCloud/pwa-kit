@@ -118,9 +118,7 @@ describe('SSRServer Lambda integration', () => {
             },
             route: (req, res) => {
                 // Return a binary payload
-                res.status(200)
-                    .set('Content-Type', 'image/png')
-                    .send(fakeBinaryPayload)
+                res.status(200).set('Content-Type', 'image/png').send(fakeBinaryPayload)
             }
         },
         {
@@ -245,12 +243,13 @@ describe('SSRServer Lambda integration', () => {
                 }
             }
 
-            const {handler, app, server: srv} = RemoteServerFactory.createHandler(
-                options,
-                (app) => {
-                    app.get('/*', testCase.route)
-                }
-            )
+            const {
+                handler,
+                app,
+                server: srv
+            } = RemoteServerFactory.createHandler(options, (app) => {
+                app.get('/*', testCase.route)
+            })
 
             server = srv
 
@@ -388,7 +387,11 @@ describe('SSRServer Lambda integration', () => {
             }
         }
 
-        const {app, handler, server: srv} = RemoteServerFactory.createHandler(options, (app) => {
+        const {
+            app,
+            handler,
+            server: srv
+        } = RemoteServerFactory.createHandler(options, (app) => {
             app.get('/*', route)
         })
 

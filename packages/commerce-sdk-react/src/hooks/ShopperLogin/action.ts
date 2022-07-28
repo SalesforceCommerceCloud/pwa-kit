@@ -70,8 +70,6 @@ export enum ShopperLoginActions {
 /**
  * A hook for performing actions with the Shopper Login API.
  */
-// TODO: Why does prettier not like "extends `${Actions}`"?
-// eslint-disable-next-line prettier/prettier
 export function useShopperLoginAction<Action extends `${ShopperLoginActions}`>(
     action: Action
 ): ScapiActionResponse<Argument<Client[Action]>, DataType<Client[Action]>, Action> {

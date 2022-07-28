@@ -1,5 +1,10 @@
 #!/usr/bin/env node
-/* eslint-env node */
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 
 const sh = require('shelljs')
 const program = require('commander')
@@ -12,7 +17,7 @@ const defaultDir = process.cwd()
 program.description(
     [
         `Smoke-tests uncommonly-run NPM scripts that get shipped with PWA Kit projects `,
-        `by simply checking that those scripts exit without errors.`,
+        `by simply checking that those scripts exit without errors.`
     ].join('\n')
 )
 program.option('--dir <dir>', `Path to a PWA Kit project`, defaultDir)
@@ -34,7 +39,7 @@ const main = (opts) => {
         /^build$/,
         /^start.*$/,
         /^compile-translations.*$/,
-        /^extract-default-translations.*$/,
+        /^extract-default-translations.*$/
     ]
 
     const scripts = Object.keys(pkg.scripts).filter(

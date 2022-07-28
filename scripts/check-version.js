@@ -1,5 +1,10 @@
 #!/usr/bin/env node
-/* eslint-env node */
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 
 const readline = require('readline')
 const path = require('path')
@@ -28,7 +33,7 @@ if (!fs.existsSync(path.join('node_modules', 'semver'))) {
         '--no-save',
         '--no-package-lock',
         '--ignore-scripts',
-        '--no-audit',
+        '--no-audit'
     ])
 }
 
@@ -54,7 +59,7 @@ const blue = (s) => `\x1b[36m${s}\u001b[0m`
 if (warnings.length) {
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout,
+        output: process.stdout
     })
     console.log(red('Pausing installation...'))
     console.log(

@@ -303,7 +303,7 @@ jest.mock('@loadable/server', () => {
         // Tests aren't being run through webpack, therefore no chunks or `loadable-stats.json`
         // file is being created. ChunkExtractor causes a file read exception. For this
         // reason, we mock the implementation to do nothing.
-        ChunkExtractor: function() {
+        ChunkExtractor: function () {
             return {
                 collectChunks: jest.fn().mockImplementation((x) => x),
                 getScriptElements: jest.fn().mockReturnValue([])
