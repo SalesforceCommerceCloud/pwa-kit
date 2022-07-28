@@ -30,7 +30,7 @@ function UseShopperCategories() {
         )
     }
     if (error) {
-        return <div>Something is wrong</div>
+        return <h1 style={{color: 'red'}}>Something is wrong</h1>
     }
     let flattened: Record<string, any> = {}
     if (result) {
@@ -38,11 +38,14 @@ function UseShopperCategories() {
     }
     return (
         <div>
+            <div>
+                <Link to={'/'}>Home</Link>
+            </div>
             <h1>useShopperCategories page</h1>
             {result &&
                 Object.keys(flattened).map((key) => (
                     <div key={key}>
-                        <Link to={`/use-shopper-categories/${key}`}>Category {key}</Link>
+                        <Link to={`/categories/${key}`}>Category {key}</Link>
                     </div>
                 ))}
 
@@ -55,4 +58,5 @@ function UseShopperCategories() {
     )
 }
 
+UseShopperCategories.getTemplateName = () => 'UserShopperCategories'
 export default UseShopperCategories

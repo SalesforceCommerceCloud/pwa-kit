@@ -13,6 +13,7 @@ type Node<K extends string> = {id: string} & Record<K, Array<Node<K>>>
  * @param key
  * @returns
  */
+// TODO: Need to work up on the Type
 export const flatten = <K extends string>(node: Node<K>, key: K): Record<string, any> => {
     const children = (node[key] || []).reduce((a, b) => {
         return Array.isArray(b[key]) && !!b[key].length

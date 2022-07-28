@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType, QueryResponse} from '../types'
-import {ShopperProductsTypes} from 'commerce-sdk-isomorphic'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
@@ -58,7 +57,6 @@ export const useProduct = (
     if (deps.length) {
         source = deps
     }
-    console.log('source', source)
     const {shopperProducts: client} = useCommerceApi()
     return useAsync(() => client.getProduct(arg), source)
 }
@@ -96,8 +94,18 @@ parameter. The server only returns online categories.
  * @returns An object describing the state of the request.
  */
 export const useCategory = (
-    arg: Argument<Client['getCategory']>
+    arg: Argument<Client['getCategory']>, deps: unknown[] = []
 ): QueryResponse<DataType<Client['getCategory']>> => {
+    if (!arg) {
+        throw new Error('useCategory requires categories ids string in parameters ')
+    }
+    const {
+        parameters: {id, levels = 1}
+    } = arg
+    let source: unknown[] = [id, levels]
+    if (deps.length) {
+        source = deps
+    }
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getCategory(arg), [arg])
+    return useAsync(() => client.getCategory(arg), source)
 }

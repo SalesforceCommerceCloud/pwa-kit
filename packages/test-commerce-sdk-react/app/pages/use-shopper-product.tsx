@@ -25,6 +25,9 @@ function UseShopperProduct() {
             </div>
         )
     }
+    if (error) {
+        return <h1 style={{color: 'red'}}>Something is wrong</h1>
+    }
     return (
         <>
             <div>
@@ -35,9 +38,7 @@ function UseShopperProduct() {
 
             {productId !== '25604455M' && (
                 <div>
-                    <Link to="/use-shopper-product/25604455M">
-                        See No-Iron Textured Dress Shirt{' '}
-                    </Link>
+                    <Link to="/products/25604455M">See No-Iron Textured Dress Shirt </Link>
                 </div>
             )}
             <hr />
