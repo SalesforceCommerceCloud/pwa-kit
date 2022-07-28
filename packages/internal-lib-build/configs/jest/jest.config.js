@@ -28,7 +28,9 @@ module.exports = {
         '/node_modules/',
         '/vendor/'
     ],
-    testRegex: '\\.?(test|spec)\\.jsx?$',
+    // TODO: should be safe to delete, because there's already default value that checks for js and ts files
+    // See https://jestjs.io/docs/26.x/configuration#testregex-string--arraystring
+    // testRegex: '\\.?(test|spec)\\.jsx?$',
     testEnvironment: 'jest-environment-jsdom-global',
     testEnvironmentOptions: {
         resources: 'usable'
