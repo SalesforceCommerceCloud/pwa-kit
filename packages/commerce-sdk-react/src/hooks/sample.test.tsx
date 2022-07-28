@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import '@testing-library/jest-dom'
 import {screen, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
@@ -13,7 +13,7 @@ import {rest} from 'msw'
 import {renderWithProviders, setupMockServer} from '../test-utils'
 import useCommerceApi from './useCommerceApi'
 import {useProduct} from './ShopperProducts'
-import {product} from './mock-data'
+import {product} from './ShopperProducts/mock'
 
 const server = setupMockServer(
     rest.get(
