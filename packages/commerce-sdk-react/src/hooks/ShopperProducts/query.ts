@@ -94,7 +94,8 @@ parameter. The server only returns online categories.
  * @returns An object describing the state of the request.
  */
 export const useCategory = (
-    arg: Argument<Client['getCategory']>, deps: unknown[] = []
+    arg: Argument<Client['getCategory']>,
+    deps: unknown[] = []
 ): QueryResponse<DataType<Client['getCategory']>> => {
     if (!arg) {
         throw new Error('useCategory requires categories ids string in parameters ')

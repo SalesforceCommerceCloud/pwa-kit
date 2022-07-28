@@ -8,7 +8,6 @@ import React, {ReactElement} from 'react'
 // @ts-ignore
 import {CommerceApiProvider} from 'commerce-sdk-react'
 
-
 interface AppConfigProps {
     children: React.ReactNode
 }

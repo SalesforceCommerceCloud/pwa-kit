@@ -10,6 +10,7 @@ const Home = loadable(() => import('./pages/home'))
 const UseProducts = loadable(() => import('./pages/use-shopper-products'))
 const UseProduct = loadable(() => import('./pages/use-shopper-product'))
 const UseCategories = loadable(() => import('./pages/use-shopper-categories'))
+const UseCategory = loadable(() => import('./pages/use-shopper-category'))
 
 const routes = [
     {
@@ -18,15 +19,19 @@ const routes = [
         component: Home
     },
     {
-        path: '/use-shopper-products',
-        component: UseProducts
-    },
-    {
-        path: '/use-shopper-product/:productId',
+        path: '/products/:productId',
         component: UseProduct
     },
     {
-        path: '/use-shopper-categories',
+        path: '/products',
+        component: UseProducts
+    },
+    {
+        path: '/categories/:categoryId',
+        component: UseCategory
+    },
+    {
+        path: '/categories',
         component: UseCategories
     }
 ]

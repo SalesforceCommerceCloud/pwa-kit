@@ -8,7 +8,7 @@
 // @ts-ignore
 import {useCategories} from 'commerce-sdk-react'
 
-import React, {useState} from 'react'
+import React from 'react'
 import Json from '../components/Json'
 import {Link} from 'react-router-dom'
 import {flatten} from '../utils/utils'
@@ -32,7 +32,7 @@ function UseShopperCategories() {
     if (error) {
         return <h1 style={{color: 'red'}}>Something is wrong</h1>
     }
-    let flattened: Record<string, any> = {}
+    let flattened = {}
     if (result) {
         flattened = flatten(result.data[0], 'categories')
     }
