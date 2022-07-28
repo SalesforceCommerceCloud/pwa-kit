@@ -39,10 +39,6 @@ test('useCommerceApi', () => {
     expect(screen.getByText('success')).toBeInTheDocument()
 })
 
-// TODO
-// https://testing-library.com/docs/react-testing-library/api#renderhook
-// test('renderHook', () => {})
-
 test('mocking api response', async () => {
     const Component = () => {
         // I think this hook does not really work as expected
