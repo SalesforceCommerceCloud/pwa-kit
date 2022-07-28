@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ActionResponse, ApiClients, Argument, DataType} from '../types'
+import {ApiClients, Argument, DataType, ScapiActionResponse} from '../types'
 import {useAsyncCallback} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
@@ -334,10 +334,12 @@ the body are the following properties if specified:
 /**
  * A hook for performing actions with the Shopper Baskets API.
  */
-export function useShopperBasketsAction<Action extends ShopperBasketsActions>(
+// TODO: Why does prettier not like "extends `${Actions}`"?
+// eslint-disable-next-line prettier/prettier
+export function useShopperBasketsAction<Action extends `${ShopperBasketsActions}`>(
     action: Action
-): ActionResponse<Parameters<Client[Action]>, DataType<Client[Action]>> {
-    type Arg = Parameters<Client[Action]>
+): ScapiActionResponse<Argument<Client[Action]>, DataType<Client[Action]>, Action> {
+    type Arg = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
     // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
     // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
@@ -353,5 +355,9 @@ export function useShopperBasketsAction<Action extends ShopperBasketsActions>(
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncCallback((...arg: Arg) => method.call(client, arg))
+    const hook = useAsyncCallback((arg: Arg) => method.call(client, arg))
+    // TypeScript loses information when using a computed property name - it assumes `string`, but
+    // we know it's `Action`. This type assertion just restores that lost information.
+    const namedAction = {[action]: hook.execute} as Record<Action, typeof hook.execute>
+    return {...hook, ...namedAction}
 }
