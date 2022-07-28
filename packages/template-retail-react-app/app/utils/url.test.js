@@ -350,7 +350,7 @@ describe('createUrlTemplate test cases', () => {
                 } else {
                     for (let isDefaultSite = 0; isDefaultSite < 2; isDefaultSite++) {
                         for (let isDefaultLocale = 0; isDefaultLocale < 2; isDefaultLocale++) {
-                            if (isDefaultSite == 0) {
+                            if (isDefaultSite === 0) {
                                 cases.push({
                                     urlConfig: {
                                         locale: configValues[i],
@@ -358,7 +358,7 @@ describe('createUrlTemplate test cases', () => {
                                         showDefaults: false
                                     },
                                     site: defaultSiteMock,
-                                    locale: isDefaultLocale == 0 ? {id: 'en-GB'} : {id: 'fr-FR'}
+                                    locale: isDefaultLocale === 0 ? {id: 'en-GB'} : {id: 'fr-FR'}
                                 })
                             } else {
                                 cases.push({
@@ -368,7 +368,7 @@ describe('createUrlTemplate test cases', () => {
                                         showDefaults: false
                                     },
                                     site: nonDefaultSiteMock,
-                                    locale: isDefaultLocale == 0 ? {id: 'en-US'} : {id: 'fr-FR'}
+                                    locale: isDefaultLocale === 0 ? {id: 'en-US'} : {id: 'fr-FR'}
                                 })
                             }
                         }
@@ -428,7 +428,7 @@ describe('createUrlTemplate test cases', () => {
     ]
 
     cases.forEach(({urlConfig, site, locale}, index) => {
-        test(`return expected URL with site ${site.alias}, locale ${
+        test(`URL template returns expected URL with site ${site.alias}, locale ${
             locale.id
         } and urlConfig as ${JSON.stringify(urlConfig)}`, () => {
             const fillUrlTemplate = createUrlTemplate({url: urlConfig}, site.id, locale.id)

@@ -33,7 +33,7 @@ test('renders a link with locale prepended', () => {
     expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')
 })
 
-test.only('renders a link with locale and site as query param', () => {
+test('renders a link with locale and site as query param', () => {
     const newConfig = {
         ...mockConfig,
         app: {
