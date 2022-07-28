@@ -322,7 +322,7 @@ describe('homeUrlBuilder', () => {
     })
 })
 
-describe('createUrlTemplate', () => {
+describe('createUrlTemplate test cases', () => {
     const defaultSite = mockConfig.app.sites[0]
     const defaultAlias = mockConfig.app.siteAliases[defaultSite.id]
     const defaultSiteMock = {...defaultSite, alias: defaultAlias}
@@ -331,7 +331,6 @@ describe('createUrlTemplate', () => {
     const nonDefaultAlias = mockConfig.app.siteAliases[nonDefaultSite.id]
     const nonDefaultSiteMock = {...nonDefaultSite, alias: nonDefaultAlias}
 
-    const path = 'path'
     const configValues = ['path', 'query_param', 'none']
 
     let cases = []
@@ -379,52 +378,53 @@ describe('createUrlTemplate', () => {
         }
     }
 
+    const path = '/path'
     const expectedResults = [
-        `/uk/en-GB/${path}`,
-        `/${path}`,
-        `/fr-FR/${path}`,
-        `/us/${path}`,
-        `/us/fr-FR/${path}`,
-        `/en-GB/${path}?site=uk`,
-        `/${path}`,
-        `/fr-FR/${path}`,
-        `/${path}?site=us`,
-        `/fr-FR/${path}?site=us`,
-        `/en-GB/${path}`,
-        `/${path}`,
-        `/fr-FR/${path}`,
-        `/${path}`,
-        `/fr-FR/${path}`,
-        `/uk/${path}?locale=en-GB`,
-        `/${path}`,
-        `/${path}?locale=fr-FR`,
-        `/us/${path}`,
-        `/us/${path}?locale=fr-FR`,
-        `/${path}?site=uk&locale=en-GB`,
-        `/${path}`,
-        `/${path}?locale=fr-FR`,
-        `/${path}?site=us`,
-        `/${path}?site=us&locale=fr-FR`,
-        `/${path}?locale=en-GB`,
-        `/${path}`,
-        `/${path}?locale=fr-FR`,
-        `/${path}`,
-        `/${path}?locale=fr-FR`,
-        `/uk/${path}`,
-        `/${path}`,
-        `/${path}`,
-        `/us/${path}`,
-        `/us/${path}`,
-        `/${path}?site=uk`,
-        `/${path}`,
-        `/${path}`,
-        `/${path}?site=us`,
-        `/${path}?site=us`,
-        `/${path}`,
-        `/${path}`,
-        `/${path}`,
-        `/${path}`,
-        `/${path}`
+        `/uk/en-GB${path}`,
+        `${path}`,
+        `/fr-FR${path}`,
+        `/us${path}`,
+        `/us/fr-FR${path}`,
+        `/en-GB${path}?site=uk`,
+        `${path}`,
+        `/fr-FR${path}`,
+        `${path}?site=us`,
+        `/fr-FR${path}?site=us`,
+        `/en-GB${path}`,
+        `${path}`,
+        `/fr-FR${path}`,
+        `${path}`,
+        `/fr-FR${path}`,
+        `/uk${path}?locale=en-GB`,
+        `${path}`,
+        `${path}?locale=fr-FR`,
+        `/us${path}`,
+        `/us${path}?locale=fr-FR`,
+        `${path}?site=uk&locale=en-GB`,
+        `${path}`,
+        `${path}?locale=fr-FR`,
+        `${path}?site=us`,
+        `${path}?site=us&locale=fr-FR`,
+        `${path}?locale=en-GB`,
+        `${path}`,
+        `${path}?locale=fr-FR`,
+        `${path}`,
+        `${path}?locale=fr-FR`,
+        `/uk${path}`,
+        `${path}`,
+        `${path}`,
+        `/us${path}`,
+        `/us${path}`,
+        `${path}?site=uk`,
+        `${path}`,
+        `${path}`,
+        `${path}?site=us`,
+        `${path}?site=us`,
+        `${path}`,
+        `${path}`,
+        `${path}`,
+        `${path}`,
+        `${path}`
     ]
 
     cases.forEach(({urlConfig, site, locale}, index) => {
