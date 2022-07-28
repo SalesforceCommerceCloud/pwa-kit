@@ -123,7 +123,7 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  *
  * @param {String} shortCode - The locale short code.
  * @param {function(*, *, *, *=): string} - Generates a site URL from the provided href, site and locale.
- * @param {Object} [opts] - Options, if there's any.
+ * @param {string[]} opts.disallowParams - URL parameters to remove
  * @param {Object} opts.location - location object to replace the default `window.location`
  * @returns {String} url - The relative URL for the specific locale.
  */
@@ -150,9 +150,21 @@ export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
 
     const isDefaultLocaleOfDefaultSite = shortCode === defaultSite.l10n.defaultLocale
     const isDefaultSite = siteRef === defaultSite.alias || siteRef === defaultSite.id
+
+    // Remove query parameters
+    const {disallowParams = []} = opts
+
+    let queryString = new URLSearchParams(`${search}`)
+
+    if (disallowParams.length) {
+        disallowParams.forEach((param) => {
+            queryString.delete(param)
+        })
+    }
+
     // rebuild the url with new locale,
     const newUrl = fillUrlTemplate(
-        `${pathname}${search}`,
+        `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`,
         // By default, as for home page, when the values of site and locale belongs to the default site,
         // they will be not shown in the url just
         isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
@@ -216,16 +228,20 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
         isQuerySiteAndLocale
     }
 
-    return (href, site, locale, config = templateConfig) =>
-        `${config.pathSite && site ? `/${site}` : ''}${
-            config.pathLocale && locale ? `/${locale}` : ''
-        }` +
-        `${href}` +
-        `${config.isQuery && (site || locale) ? '?' : ''}${
-            config.querySite && site ? `site=${site}` : ''
-        }${config.isQuerySiteAndLocale && locale ? '&' : ''}${
-            config.queryLocale && locale ? `locale=${locale}` : ''
-        }`
+    return (path, site, locale, config = templateConfig) => {
+        const sitePath = config.pathSite && site ? `/${site}` : ''
+        const localePath = config.pathLocale && locale ? `/${locale}` : ''
+
+        const hasQuery = config.isQuery && (site || locale)
+        let queryString = ''
+        if (hasQuery) {
+            const searchParams = new URLSearchParams()
+            config.querySite && site && searchParams.append('site', site)
+            config.queryLocale && locale && searchParams.append('locale', locale)
+            queryString = `?${searchParams.toString()}`
+        }
+        return `${sitePath}${localePath}${path}${queryString}`
+    }
 }
 
 /**

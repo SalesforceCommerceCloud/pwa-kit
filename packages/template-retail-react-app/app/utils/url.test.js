@@ -145,7 +145,7 @@ describe('getPathWithLocale', () => {
         expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
     })
 
-    test.skip('getPathWithLocale returns expected for PLP without refine param', () => {
+    test('getPathWithLocale returns expected for PLP without refine param', () => {
         const location = new URL(
             'http://localhost:3000/uk/it-IT/category/newarrivals-womens?limit=25&refine=c_refinementColor%3DBianco&sort=best-matches&offset=25'
         )
