@@ -110,7 +110,7 @@ export const categoryUrlBuilder = (category) => encodeURI(`/category/${category.
 export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`)
 
 /**
- * Given a search term, contructs a search url.
+ * Given a search term, constructs a search url.
  *
  * @param {string} searchTerm
  * @returns {string}
