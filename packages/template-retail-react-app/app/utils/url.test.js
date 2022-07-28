@@ -322,6 +322,124 @@ describe('homeUrlBuilder', () => {
     })
 })
 
+describe('createUrlTemplate', () => {
+    const defaultSite = mockConfig.app.sites[0]
+    const defaultAlias = mockConfig.app.siteAliases[defaultSite.id]
+    const defaultSiteMock = {...defaultSite, alias: defaultAlias}
+
+    const nonDefaultSite = mockConfig.app.sites[1]
+    const nonDefaultAlias = mockConfig.app.siteAliases[nonDefaultSite.id]
+    const nonDefaultSiteMock = {...nonDefaultSite, alias: nonDefaultAlias}
+
+    const path = 'path'
+    const configValues = ['path', 'query_param', 'none']
+
+    let cases = []
+    for (let i = 0; i < configValues.length; i++) {
+        for (let j = 0; j < configValues.length; j++) {
+            for (let showDefaultsValues = 0; showDefaultsValues < 2; showDefaultsValues++) {
+                if (showDefaultsValues === 0) {
+                    cases.push({
+                        urlConfig: {
+                            locale: configValues[i],
+                            site: configValues[j],
+                            showDefaults: true
+                        },
+                        site: defaultSiteMock,
+                        locale: {id: 'en-GB'}
+                    })
+                } else {
+                    for (let isDefaultSite = 0; isDefaultSite < 2; isDefaultSite++) {
+                        for (let isDefaultLocale = 0; isDefaultLocale < 2; isDefaultLocale++) {
+                            if (isDefaultSite == 0) {
+                                cases.push({
+                                    urlConfig: {
+                                        locale: configValues[i],
+                                        site: configValues[j],
+                                        showDefaults: false
+                                    },
+                                    site: defaultSiteMock,
+                                    locale: isDefaultLocale == 0 ? {id: 'en-GB'} : {id: 'fr-FR'}
+                                })
+                            } else {
+                                cases.push({
+                                    urlConfig: {
+                                        locale: configValues[i],
+                                        site: configValues[j],
+                                        showDefaults: false
+                                    },
+                                    site: nonDefaultSiteMock,
+                                    locale: isDefaultLocale == 0 ? {id: 'en-US'} : {id: 'fr-FR'}
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    const expectedResults = [
+        `/uk/en-GB/${path}`,
+        `/${path}`,
+        `/fr-FR/${path}`,
+        `/us/${path}`,
+        `/us/fr-FR/${path}`,
+        `/en-GB/${path}?site=uk`,
+        `/${path}`,
+        `/fr-FR/${path}`,
+        `/${path}?site=us`,
+        `/fr-FR/${path}?site=us`,
+        `/en-GB/${path}`,
+        `/${path}`,
+        `/fr-FR/${path}`,
+        `/${path}`,
+        `/fr-FR/${path}`,
+        `/uk/${path}?locale=en-GB`,
+        `/${path}`,
+        `/${path}?locale=fr-FR`,
+        `/us/${path}`,
+        `/us/${path}?locale=fr-FR`,
+        `/${path}?site=uk&locale=en-GB`,
+        `/${path}`,
+        `/${path}?locale=fr-FR`,
+        `/${path}?site=us`,
+        `/${path}?site=us&locale=fr-FR`,
+        `/${path}?locale=en-GB`,
+        `/${path}`,
+        `/${path}?locale=fr-FR`,
+        `/${path}`,
+        `/${path}?locale=fr-FR`,
+        `/uk/${path}`,
+        `/${path}`,
+        `/${path}`,
+        `/us/${path}`,
+        `/us/${path}`,
+        `/${path}?site=uk`,
+        `/${path}`,
+        `/${path}`,
+        `/${path}?site=us`,
+        `/${path}?site=us`,
+        `/${path}`,
+        `/${path}`,
+        `/${path}`,
+        `/${path}`,
+        `/${path}`
+    ]
+
+    cases.forEach(({urlConfig, site, locale}, index) => {
+        test(`return expected URL with site ${site.alias}, locale ${
+            locale.id
+        } and urlConfig as ${JSON.stringify(urlConfig)}`, () => {
+            const fillUrlTemplate = createUrlTemplate({url: urlConfig}, site.id, locale.id)
+            const path = '/path'
+            const resultUrl = fillUrlTemplate(path, mockConfig.app.siteAliases[site.id], locale.id)
+
+            expect(resultUrl).toEqual(expectedResults[index])
+        })
+    })
+})
+
 describe('rebuildPathWithParams test', () => {
     test('returns updated url', () => {
         const url = '/en/product/25501032M?color=black&size=M'

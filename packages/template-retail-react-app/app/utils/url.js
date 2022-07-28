@@ -182,7 +182,7 @@ export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
  * @param appConfig Application default configuration.
  * @param siteRef Current selected Site reference. The value can be the Site id or alias.
  * @param localeRef Current selected Locale reference. The value can be the Locale id or alias.
- * @returns {function(*, *, *, *=): string} function providing href, site and locale generates a site URL.
+ * @returns {function(*, *, *, *=): string} function providing path, site and locale generates a site URL.
  */
 export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
@@ -207,7 +207,6 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
         (localeConfig === urlPartPositions.QUERY_PARAM && !showDefaultsConfig && !isDefaultLocale)
 
     const isQuery = querySite || queryLocale
-    const isQuerySiteAndLocale = querySite && queryLocale
 
     const pathSite =
         (siteConfig === urlPartPositions.PATH && showDefaultsConfig) ||
@@ -216,16 +215,12 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
         (localeConfig === urlPartPositions.PATH && showDefaultsConfig) ||
         (localeConfig === urlPartPositions.PATH && !showDefaultsConfig && !isDefaultLocale)
 
-    const isPathSiteAndLocale = pathSite && pathLocale
-
     const templateConfig = {
         pathSite,
         pathLocale,
-        isPathSiteAndLocale,
         querySite,
         queryLocale,
-        isQuery,
-        isQuerySiteAndLocale
+        isQuery
     }
 
     return (path, site, locale, config = templateConfig) => {
