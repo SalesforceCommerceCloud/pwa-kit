@@ -14,9 +14,7 @@ import Json from '../components/Json'
 function UseShopperCategory() {
     const {categoryId}: {categoryId: string} = useParams()
     const {isLoading, error, data} = useCategory({
-        parameters: {
-            id: categoryId
-        }
+        id: categoryId
     })
     if (isLoading) {
         return (

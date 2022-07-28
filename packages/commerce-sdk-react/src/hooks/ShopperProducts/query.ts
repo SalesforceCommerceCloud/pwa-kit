@@ -7,9 +7,9 @@
 import {ApiClients, Argument, DataType, QueryResponse} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
+import {ShopperProductsTypes} from 'commerce-sdk-isomorphic'
 
 type Client = ApiClients['shopperProducts']
-
 /**
  * A hook for `ShopperProducts#getProducts`.
  * Allows access to multiple products by a single request. Only products that are online and assigned to a site catalog are returned. The maximum number of productIDs that can be requested are 24. Along with product details, the availability, images, price, promotions, and variations for the valid products will be included, as appropriate.
@@ -18,22 +18,25 @@ type Client = ApiClients['shopperProducts']
  * @returns An object describing the state of the request.
  */
 export const useProducts = (
-    arg: Argument<Client['getProducts']>,
-    deps: unknown[] = []
-): QueryResponse<DataType<Client['getProducts']>> => {
-    if (!arg) {
+    parameters: NonNullable<Argument<Client['getProducts']>>['parameters'],
+    deps: unknown[] = [],
+    opts?: {headers: NonNullable<Argument<Client['getProducts']>>['headers']; rawResponse: boolean}
+): QueryResponse<DataType<Client['getProducts']> | Response> => {
+    if (!parameters) {
         throw new Error('Missing ids in parameters to make request')
     }
+
     const {shopperProducts: client} = useCommerceApi()
-    const {
-        parameters: {ids}
-    } = arg
+    const {ids} = parameters
     // by default the source is the ids string
     let source: unknown[] = [ids]
     if (deps.length) {
         source = deps
     }
-    return useAsync(() => client.getProducts(arg), source)
+    return useAsync(
+        () => client.getProducts({parameters, headers: opts?.headers}, opts?.rawResponse),
+        source
+    )
 }
 /**
  * A hook for `ShopperProducts#getProduct`.
@@ -43,22 +46,23 @@ export const useProducts = (
  * @returns An object describing the state of the request.
  */
 export const useProduct = (
-    arg: Argument<Client['getProduct']>,
-    deps: unknown[] = []
-): QueryResponse<DataType<Client['getProduct']>> => {
-    if (!arg) {
-        throw new Error('useProducts requires product id in parameters ')
+    parameters: NonNullable<Argument<Client['getProduct']>>['parameters'],
+    deps: unknown[] = [],
+    opts?: {headers: NonNullable<Argument<Client['getProduct']>>['headers']; rawResponse: boolean}
+): QueryResponse<DataType<Client['getProduct']> | Response> => {
+    if (!parameters) {
+        throw new Error('useProducts requires product id ')
     }
-    const {
-        parameters: {id}
-    } = arg
     // by default the source is the ids string
-    let source: unknown[] = [id]
+    let source: unknown[] = [parameters.id]
     if (deps.length) {
         source = deps
     }
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getProduct(arg), source)
+    return useAsync(
+        () => client.getProduct({parameters, headers: opts?.headers}, opts?.rawResponse),
+        source
+    )
 }
 /**
  * A hook for `ShopperProducts#getCategories`.
@@ -68,21 +72,23 @@ export const useProduct = (
  * @returns An object describing the state of the request.
  */
 export const useCategories = (
-    arg: Argument<Client['getCategories']>,
-    deps: unknown[] = []
-): QueryResponse<DataType<Client['getCategories']>> => {
-    if (!arg) {
-        throw new Error('useCategories requires categories ids string in parameters ')
+    parameters: NonNullable<Argument<Client['getCategories']>>['parameters'],
+    deps: unknown[] = [],
+    opts?: {headers: NonNullable<Argument<Client['getProduct']>>['headers']; rawResponse: boolean}
+): QueryResponse<DataType<Client['getCategories']> | Response> => {
+    if (!parameters) {
+        throw new Error('useCategories requires categories ids string ')
     }
-    const {
-        parameters: {ids, levels = 1}
-    } = arg
+    const {ids, levels = 1} = parameters
     let source: unknown[] = [ids, levels]
     if (deps.length) {
         source = deps
     }
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getCategories(arg), source)
+    return useAsync(
+        () => client.getCategories({parameters, headers: opts?.headers}, opts?.rawResponse),
+        source
+    )
 }
 /**
  * A hook for `ShopperProducts#getCategory`.
@@ -94,19 +100,21 @@ parameter. The server only returns online categories.
  * @returns An object describing the state of the request.
  */
 export const useCategory = (
-    arg: Argument<Client['getCategory']>,
-    deps: unknown[] = []
-): QueryResponse<DataType<Client['getCategory']>> => {
-    if (!arg) {
+    parameters: NonNullable<Argument<Client['getCategory']>>['parameters'],
+    deps: unknown[] = [],
+    opts?: {headers: NonNullable<Argument<Client['getCategory']>>['headers']; rawResponse: boolean}
+): QueryResponse<DataType<Client['getCategory']> | Response> => {
+    if (!parameters) {
         throw new Error('useCategory requires categories ids string in parameters ')
     }
-    const {
-        parameters: {id, levels = 1}
-    } = arg
+    const {id, levels = 1} = parameters
     let source: unknown[] = [id, levels]
     if (deps.length) {
         source = deps
     }
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getCategory(arg), source)
+    return useAsync(
+        () => client.getCategory({parameters, headers: opts?.headers}, opts?.rawResponse),
+        source
+    )
 }

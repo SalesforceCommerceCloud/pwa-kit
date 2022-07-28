@@ -16,10 +16,8 @@ import {flatten} from '../utils/utils'
 function UseShopperCategories() {
     // how to get the categories type
     const {isLoading, error, data: result} = useCategories({
-        parameters: {
-            ids: 'root',
-            levels: 2
-        }
+        ids: 'root',
+        levels: 2
     })
     if (isLoading) {
         return (
