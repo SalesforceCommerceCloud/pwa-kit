@@ -45,6 +45,8 @@ module.exports = {
     externals: [],
     // Page not found url for your app
     pageNotFoundURL: '/page-not-found',
+    // Enable support for useServerEffect hooks
+    useServerEffect: true,
     // Enables or disables building the files necessary for server-side rendering.
     ssrEnabled: true,
     // This list determines which files are available exclusively to the server-side rendering system 

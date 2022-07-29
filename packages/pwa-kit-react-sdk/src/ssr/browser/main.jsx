@@ -14,6 +14,8 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
+import {ServerEffectProvider} from '../universal/hooks/use-server-effect'
+import {GetPropsArgsProvider} from '../universal/hooks/use-get-props-args'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -74,19 +76,24 @@ export const start = () => {
         .then(() => {
             ReactDOM.hydrate(
                 <Router>
-                    <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                        <AppConfig locals={locals}>
-                            <Switch
-                                error={error}
-                                appState={window.__PRELOADED_STATE__}
-                                routes={routes}
-                                App={WrappedApp}
-                            />
-                        </AppConfig>
-                    </DeviceContext.Provider>
+                    <GetPropsArgsProvider>
+                        <ServerEffectProvider value={window.__PRELOADED_STATE__["__SERVER_EFFECTS__"]}>
+                            <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
+                                <AppConfig locals={locals}>
+                                    <Switch
+                                        error={error}
+                                        appState={window.__PRELOADED_STATE__}
+                                        routes={routes}
+                                        App={WrappedApp}
+                                    />
+                                </AppConfig>
+                            </DeviceContext.Provider>
+                        </ServerEffectProvider>
+                    </GetPropsArgsProvider>
                 </Router>,
                 rootEl,
                 () => {
+                    console.log('setting hydrating to false')
                     window.__HYDRATING__ = false
                 }
             )

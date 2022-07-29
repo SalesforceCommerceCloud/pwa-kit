@@ -19,6 +19,8 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
+import {GetPropsArgsProvider} from '../universal/hooks/use-get-props-args'
+import {ServerEffectProvider, resolveAllEffects} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -52,6 +54,7 @@ const VALID_TAG_NAMES = [
 
 export const ALLOWLISTED_INLINE_SCRIPTS = []
 
+
 /**
  * Convert from thrown Error or String to {message, status} that we need for
  * rendering.
@@ -72,7 +75,7 @@ const logAndFormatError = (err) => {
     }
 }
 
-const initAppState = async ({App, component, match, route, req, res, location}) => {
+const initAppState = async ({App, config, component, match, route, routes, req, res, location}) => {
     if (component === Throw404) {
         // Don't init if there was no match
         return {
@@ -82,6 +85,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
     }
 
     const {params} = match
+    const enableServerEffect = !!config.useServerEffect
 
     const components = [App, route.component]
     const promises = components.map((c) =>
@@ -96,11 +100,20 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
     )
     let returnVal = {}
 
+    if (enableServerEffect) {
+        // Render the application with the sole intention to capture any uses of `useServerEffect`.
+        await renderApp({App, component, match, route, routes, req, res, location, appState: {}})
+        
+        // Push the async request onto the promises array.
+        promises.push(resolveAllEffects())
+    }
+
     try {
-        const [appProps, pageProps] = await Promise.all(promises)
+        const [appProps, pageProps, serverEffectData = {}] = await Promise.all(promises)
         const appState = {
             appProps,
             pageProps,
+            ...serverEffectData,
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
 
@@ -161,31 +174,29 @@ export const render = async (req, res, next) => {
     // Step 2 - Get the component
     const component = await route.component.getComponent()
 
-    // Step 3 - Init the app state
-    const {appState, error: appStateError} = await initAppState({
+    let args = {
         App: WrappedApp,
+        config,
         component,
+        location,
         match,
-        route,
         req,
         res,
-        location
-    })
+        routes,
+        route
+    }
+
+    // Step 3 - Init the app state
+    const {appState, error: appStateError} = await initAppState(args)
 
     // Step 4 - Render the App
     let renderResult
-    const args = {
-        App: WrappedApp,
-        appState,
-        appStateError: appStateError && logAndFormatError(appStateError),
-        routes,
-        req,
-        res,
-        location,
-        config
-    }
     try {
-        renderResult = renderApp(args)
+        renderResult = renderApp({
+            ...args,
+            appState,
+            appStateError: appStateError && logAndFormatError(appStateError)
+        })
     } catch (e) {
         // This is an unrecoverable error.
         // (errors handled by the AppErrorBoundary are considered recoverable)
@@ -213,11 +224,15 @@ const renderAppHtml = (req, res, error, appData) => {
 
     let appJSX = (
         <Router location={location} context={routerContext}>
-            <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
-                </AppConfig>
-            </DeviceContext.Provider>
+            <GetPropsArgsProvider serverProps={{req, res}}>
+                <ServerEffectProvider>
+                    <DeviceContext.Provider value={{type: deviceType}}>
+                        <AppConfig locals={res.locals}>
+                            <Switch error={error} appState={appState} routes={routes} App={App} />
+                        </AppConfig>
+                    </DeviceContext.Provider>
+                </ServerEffectProvider>
+            </GetPropsArgsProvider>
         </Router>
     )
 

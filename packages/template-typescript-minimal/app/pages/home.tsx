@@ -6,12 +6,11 @@
  */
 import React, {useEffect, useState} from 'react'
 
+import {useProducts} from '../scapi-hooks'
+import {useServerEffect} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
-
-interface Props {
-    value: number
-}
 
 const style = `
 body {
@@ -80,8 +79,10 @@ h1 {
 }
 `
 
-const Home = ({value}: Props) => {
+const Home = () => {
     const [counter, setCounter] = useState(0)
+
+    const {products} = useProducts([1, 2, 3], [])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -89,6 +90,41 @@ const Home = ({value}: Props) => {
         }, 1000)
         return () => clearInterval(interval)
     }, [counter, setCounter])
+
+    const {data: value1} = useServerEffect(async () => {
+        // Note: This is simply a mock function to demo deferred execution for fetching props (e.g.: Making a call to the server to fetch data)
+        const getData = (a: number, b: number) => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(a * b)
+                }, 50)
+            })
+        }
+        const value = await getData(5, 7)
+        return value
+    }, [])
+
+    const {error} = useServerEffect(async ({res}) => {
+        res.status(404)
+        throw new Error('Not found')
+    }, [])
+
+    const {data: value2} = useServerEffect(async () => {
+        // Note: This is simply a mock function to demo deferred execution for fetching props (e.g.: Making a call to the server to fetch data)
+        const getData = (a: number, b: number) => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(a * b)
+                }, 50)
+            })
+        }
+        const value = await getData(15, 70)
+        return value
+    }, [])
+
+    const {data: value3} = useServerEffect(() => {
+        return 15 * 70
+    }, [])
 
     return (
         <div>
@@ -109,8 +145,28 @@ const Home = ({value}: Props) => {
                         <b>This page is written in Typescript</b>
                         <br />
                         <br />
-                        Server-side getProps works if this is a valid expression: &quot;5 times 7 is{' '}
-                        {value}
+                        Server-side useServerEffect works if this is a valid expression: &quot;5
+                        times 7 is {value1 ? value1 : ''}
+                        &quot;
+                        <br />
+                        <br />
+                        Server-side useServerEffect works if this is a valid expression: &quot;15
+                        times 70 is {value2 ? value2 : ''}
+                        &quot;
+                        <br />
+                        <br />
+                        Server-side synchronous useServerEffect works if this is a valid expression: &quot;15
+                        times 70 is {value3 ? value3 : ''}
+                        &quot;
+                        <br />
+                        <br />
+                        Server-side useProducts works if this is a products show: &quot;{' '}
+                        {JSON.stringify(products)}
+                        &quot;
+                        <br />
+                        <br />
+                        Server-side useServerEffect errors work if this shows and error: &quot;{' '}
+                        {error && error.message}
                         &quot;
                         <br />
                         <br />
@@ -131,18 +187,5 @@ const Home = ({value}: Props) => {
 }
 
 Home.getTemplateName = () => 'home'
-
-Home.getProps = async () => {
-    // Note: This is simply a mock function to demo deferred execution for fetching props (e.g.: Making a call to the server to fetch data)
-    const getData = (a: number, b: number) => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(a * b)
-            }, 50)
-        })
-    }
-    const value = await getData(5, 7)
-    return {value}
-}
 
 export default Home

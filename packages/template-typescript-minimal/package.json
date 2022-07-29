@@ -30,6 +30,7 @@
         "push": "npm run build && pwa-kit-dev push"
     },
     "mobify": {
+        "useServerEffect": true,
         "ssrEnabled": true,
         "ssrOnly": [
             "ssr.js",

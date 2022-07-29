@@ -21,6 +21,7 @@ jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
         getConfig: () => ({
             externals: [],
             pageNotFoundURL: '/page-not-found',
+            useServerEffect: true,
             ssrEnabled: true,
             ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
             ssrShared: [
