@@ -104,6 +104,11 @@ const Home = () => {
         return value
     }, [])
 
+    const {error} = useServerEffect(async ({res}) => {
+        res.status(404)
+        throw new Error('Not found')
+    }, [])
+
     const {data: value2} = useServerEffect(async () => {
         // Note: This is simply a mock function to demo deferred execution for fetching props (e.g.: Making a call to the server to fetch data)
         const getData = (a: number, b: number) => {
@@ -157,6 +162,11 @@ const Home = () => {
                         <br />
                         Server-side useProducts works if this is a products show: &quot;{' '}
                         {JSON.stringify(products)}
+                        &quot;
+                        <br />
+                        <br />
+                        Server-side useServerEffect errors work if this shows and error: &quot;{' '}
+                        {error && error.message}
                         &quot;
                         <br />
                         <br />

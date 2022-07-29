@@ -15,7 +15,6 @@ import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import AppConfig from '../universal/components/_app-config'
-import mockUseServerEffect from '../universal/hooks/use-server-effect'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -41,12 +40,31 @@ const mobile =
 const tablet =
     'Mozilla/5.0 (iPad; CPU OS 6_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B141 Safari/8536.25'
 
+
 jest.mock('../universal/routes', () => {
     const React = require('react')
     const PropTypes = require('prop-types')
     const errors = require('../universal/errors')
     const {Redirect} = require('react-router-dom')
     const {Helmet} = require('react-helmet')
+    const useServerEffect = require('../universal/hooks/use-server-effect')
+    const createServerEffectContext = require('../universal/hooks/use-server-effect').createServerEffectContext
+
+    let serverEffectContext = 0
+    // Use a new `ServerEffectProvider` for each component to mimic the runtime having a new context per request.
+    const withServerEffectProvider = (Component) => {
+        const {ServerEffectProvider, useServerEffect} = createServerEffectContext((++serverEffectContext).toString())
+
+        const WrappedComponent = () => {
+            return (
+                <ServerEffectProvider>
+                    <Component useServerEffect={useServerEffect} />
+                </ServerEffectProvider>
+            )
+        }
+
+        return WrappedComponent
+    }
 
     // Test utility to exercise paths that work with @loadable/component.
     const fakeLoadable = (Wrapped) => {
@@ -86,13 +104,14 @@ jest.mock('../universal/routes', () => {
         }
     }
 
-    const UseServerEffectUnknownErrorPage = () => {
-        mockUseServerEffect(async () => {
-            throw new Error('This is an error')
-        }, [])
-
-        return <div>This should not be rendered</div>
-    }
+    const UseServerEffectUnknownErrorPage = 
+        withServerEffectProvider(({useServerEffect}) => {
+            useServerEffect(async () => {
+                throw new Error('This is an error')
+            }, [])
+    
+            return <div>This should not be rendered</div>
+        })
 
     class ThrowStringErrorPage extends React.Component {
         static getProps() {
@@ -104,13 +123,14 @@ jest.mock('../universal/routes', () => {
         }
     }
 
-    const UseServerEffectThrowStringErrorPage = () => {
-        mockUseServerEffect(async () => {
-            throw 'This is an error'
-        }, [])
-
-        return <div>This should not be rendered</div>
-    }
+    const UseServerEffectThrowStringErrorPage = 
+        withServerEffectProvider(({useServerEffect}) => {
+            useServerEffect(async () => {
+                throw 'This is an error'
+            }, [])
+    
+            return <div>This should not be rendered</div>
+        })
 
     class KnownErrorPage extends React.Component {
         static getProps() {
@@ -122,13 +142,14 @@ jest.mock('../universal/routes', () => {
         }
     }
 
-    const UseServerEffectKnownErrorPage = () => {
-        mockUseServerEffect(async () => {
-            throw new errors.HTTPError(503, 'Service not available')
-        }, [])
-
-        return <div>This should not be rendered</div>
-    }
+    const UseServerEffectKnownErrorPage = 
+        withServerEffectProvider(({useServerEffect}) => {
+            useServerEffect(async () => {
+                throw new errors.HTTPError(503, 'Service not available')
+            }, [])
+    
+            return <div>This should not be rendered</div>
+        })
 
     class GetProps404ErrorPage extends React.Component {
         static getProps() {
@@ -140,13 +161,14 @@ jest.mock('../universal/routes', () => {
         }
     }
 
-    const UseServerEffect404ErrorPage = () => {
-        mockUseServerEffect(async () => {
-            throw new errors.HTTPNotFound('Not found')
-        }, [])
-
-        return <div>This should not be rendered</div>
-    }
+    const UseServerEffect404ErrorPage = 
+        withServerEffectProvider(({useServerEffect}) => {
+            useServerEffect(async () => {
+                throw new errors.HTTPNotFound('Not found')
+            }, [])
+    
+            return <div>This should not be rendered</div>
+        })
 
     class InitSetsStatusPage extends React.Component {
         static getProps({res}) {
@@ -190,13 +212,14 @@ jest.mock('../universal/routes', () => {
         }
     }
 
-    const UseServerEffectReturnsObject = () => {
-        const {data} = mockUseServerEffect(() => {
-            return {prop: 'prop-value'}
-        }, [])
-
-        return <div>{data.prop}</div>
-    }
+    const UseServerEffectReturnsObject = 
+        withServerEffectProvider(({useServerEffect}) => {
+            const {data} = useServerEffect(() => {
+                return {prop: 'prop-value'}
+            }, [])
+    
+            return <div>{data.prop}</div>
+        })
 
     class RedirectPage extends React.Component {
         static getProps() {
@@ -540,13 +563,13 @@ describe('The Node SSR Environment', () => {
         //         expect(res.statusCode).toBe(404)
         //     }
         // },
-        // {
-        //     description: `404 when useServerEffect method throws a 404`,
-        //     req: {url: '/404-in-use-server-effect-error/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(404)
-        //     }
-        // },
+        {
+            description: `404 when useServerEffect method throws a 404`,
+            req: {url: '/404-in-use-server-effect-error/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(404)
+            }
+        },
         // {
         //     description: `supports react-routers redirect mechanism`,
         //     req: {url: '/redirect/'},
@@ -554,13 +577,13 @@ describe('The Node SSR Environment', () => {
         //         expect(res.statusCode).toBe(302)
         //     }
         // },
-        {
-            description: `500 on unknown errors in getProps`,
-            req: {url: '/unknown-error/'},
-            assertions: (res) => {
-                expect(res.statusCode).toBe(500)
-            }
-        },
+        // {
+        //     description: `500 on unknown errors in getProps`,
+        //     req: {url: '/unknown-error/'},
+        //     assertions: (res) => {
+        //         expect(res.statusCode).toBe(500)
+        //     }
+        // },
         {
             description: `500 on unknown errors in useServerEffect`,
             req: {url: '/unknown-error-in-use-server-effect/'},
@@ -593,7 +616,6 @@ describe('The Node SSR Environment', () => {
         //     description: `5XX on known HTTP errors in useServerEffect`,
         //     req: {url: '/known-error-in-use-server-effect/'},
         //     assertions: (res) => {
-        //         res.greeting = 'hello jello'
         //         expect(res.statusCode).toBe(503)
         //     }
         // },
@@ -618,7 +640,6 @@ describe('The Node SSR Environment', () => {
         //     description: `useServerEffect works if the user returns an Object of props, instead of a Promise`,
         //     req: {url: '/use-server-effect-returns-object/'},
         //     assertions: (res) => {
-        //         console.log('res: ', res.greeting)
         //         expect(res.statusCode).toBe(200)
         //         const html = res.text
         //         const include = ['<div>prop-value</div>']
@@ -706,7 +727,8 @@ describe('The Node SSR Environment', () => {
 
         //         expect(scriptContent).not.toContain('<script>')
         //     }
-        // },
+        // }
+        // ,
         // {
         //     description: `AppConfig errors are caught`,
         //     req: {url: '/pwa/'},

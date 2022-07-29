@@ -13,6 +13,7 @@ import useGetPropsArgs, {GetPropsArgs} from './use-get-props-args'
 export const DEFAULT_CONTEXT_KEY = '__SERVER_EFFECTS__'
 const contexts = []
 const isServer = typeof window === 'undefined'
+const isHydrating = () => !isServer && window.__HYDRATING__
 
 // Type Definitions
 type ServerEffectState = {
@@ -56,20 +57,20 @@ type ServerEffectContextValue = {
  * @returns 
  */
 const createServerEffect = (context) => {
-    const useServerEffect = (didUpdate: DidUpdateFn, source: any[], initial?: any) : ServerEffectState => {  
-        debugger  
+    const useServerEffect = (didUpdate: DidUpdateFn, source: any[], initial?: any) : ServerEffectState => {    
         const key = useUID()
         const ctx: ServerEffectContextValue = useContext(context)
 
         const getPropsArgs = useGetPropsArgs()
-        const [data, setData] = useState(ctx.data[key] || initial)
+        const [data, setData] = useState(ctx.data[key]?.data || initial)
         const [loading, setLoading] = useState(false)
-        const [error, setError] = useState(undefined)
+        const [error, setError] = useState(ctx.data[key]?.error ? JSON.parse(ctx.data[key]?.error) : undefined || undefined)
         const boundDidUpdate = didUpdate.bind(this, getPropsArgs)
 
         const wrappedDidUpdate = isServer ? 
             () => {} : 
             async () => {
+                console.log('ISHYDRATING: ', isHydrating())
                 // Set loading state to "true"
                 setLoading(true)
         
@@ -85,14 +86,25 @@ const createServerEffect = (context) => {
                 setLoading(false)
             }
     
-        console.log('PUSHING REQUEST: ', !ctx.resolved, isServer)
         if (!ctx.resolved && isServer) {
             
             ctx.requests.push(async () => {
-                const data = await boundDidUpdate()
-    
+                let data 
+                let error
+                const loading = false
+
+                try {
+                    data = await boundDidUpdate()
+                } catch(e) {
+                    error = JSON.stringify(e, Object.getOwnPropertyNames(e))
+                }
+
                 return {
-                    [key]: data
+                    [key]: {
+                        data, 
+                        error,
+                        loading
+                    }
                 }
             })
         }
@@ -123,7 +135,6 @@ const createServerEffect = (context) => {
  * @returns {ServerEffectProvider}
  */
 export const createServerEffectContext = (name: string): ServerEffectContext => {
-    console.log('--=-=-=---=-=-=-=---==--==-> createServerEffectContext')
     const ctxValue = {
         name,
         requests: [],

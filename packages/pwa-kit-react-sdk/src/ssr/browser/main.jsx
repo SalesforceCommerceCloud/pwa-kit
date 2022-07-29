@@ -93,6 +93,7 @@ export const start = () => {
                 </Router>,
                 rootEl,
                 () => {
+                    console.log('setting hydrating to false')
                     window.__HYDRATING__ = false
                 }
             )
