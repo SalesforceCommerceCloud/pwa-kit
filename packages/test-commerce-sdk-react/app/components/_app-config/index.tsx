@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {ReactElement} from 'react'
+// @ts-ignore
 import {CommerceApiProvider} from 'commerce-sdk-react'
 
 interface AppConfigProps {
