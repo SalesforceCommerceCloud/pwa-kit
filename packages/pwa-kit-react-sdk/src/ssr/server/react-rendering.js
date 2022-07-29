@@ -8,7 +8,7 @@
 /**
  * @module progressive-web-sdk/ssr/server/react-rendering
  */
-import { Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { dehydrate, Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ssrPrepass from 'react-ssr-prepass';
 import path from 'path'
 import React from 'react'
@@ -256,6 +256,9 @@ const renderApp = async (args) => {
 
     await Promise.all(queryClient.queryCache.queries.map((q => q.fetch())))
 
+    const dehydratedState = dehydrate(queryClient)
+
+    console.log('dehydratedState', dehydratedState)
     let appHtml
     let renderError
     // It's important that we render the App before extracting the script elements,
@@ -301,11 +304,14 @@ const renderApp = async (args) => {
     // object, client-side, by code in ssr/browser/main.jsx.
     //
     // Do *not* add to these without a very good reason - globals are a liability.
+    
     const windowGlobals = {
         __CONFIG__: config,
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
+        // NOTE: Maybe this belongs in `__PRELOADED_STATE__`
+        __DEHYDRATED_STATE__: dehydratedState,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
