@@ -181,9 +181,9 @@ const App = (props) => {
                 defaultLocale="en-US"
             >
                 <CategoriesProvider categories={allCategories}>
-                    <CurrencyProvider currency={currency}>
-                        <SiteProvider site={site}>
-                            <LocaleProvider locale={targetLocale}>
+                    <SiteProvider site={site}>
+                        <LocaleProvider locale={targetLocale}>
+                            <CurrencyProvider currency={currency}>
                                 <Seo>
                                     <meta name="theme-color" content={THEME_COLOR} />
                                     <meta
@@ -296,9 +296,9 @@ const App = (props) => {
                                         <AuthModal {...authModal} />
                                     </AddToCartModalProvider>
                                 </Box>
-                            </LocaleProvider>
-                        </SiteProvider>
-                    </CurrencyProvider>
+                            </CurrencyProvider>
+                        </LocaleProvider>
+                    </SiteProvider>
                 </CategoriesProvider>
             </IntlProvider>
         </Box>

@@ -12,6 +12,11 @@ import {LocaleContext} from '../contexts'
  * Custom React hook to get the locale
  * @returns {locale: Object, setLocale: function}
  */
-const useLocale = () => useContext(LocaleContext)
-
+const useLocale = () => {
+    const context = useContext(LocaleContext)
+    if (context === undefined) {
+        throw new Error('useLocale must be used within LocaleProvider')
+    }
+    return context
+}
 export default useLocale

@@ -70,16 +70,16 @@ SiteProvider.propTypes = {
     site: PropTypes.object
 }
 
-export const MultiSitesContext = React.createContext()
-export const MultiSitesProvider = ({fillUrlTemplate, children}) => {
+export const UrlTemplateContext = React.createContext()
+export const UrlTemplateProvider = ({fillUrlTemplate, children}) => {
     return (
-        <MultiSitesContext.Provider value={{fillUrlTemplate}}>
+        <UrlTemplateContext.Provider value={{fillUrlTemplate}}>
             {children}
-        </MultiSitesContext.Provider>
+        </UrlTemplateContext.Provider>
     )
 }
 
-MultiSitesProvider.propTypes = {
+UrlTemplateProvider.propTypes = {
     children: PropTypes.node.isRequired,
     fillUrlTemplate: PropTypes.func
 }

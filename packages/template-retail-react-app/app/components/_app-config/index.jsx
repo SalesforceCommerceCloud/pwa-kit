@@ -19,7 +19,7 @@ import {
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
-import {MultiSitesProvider} from '../../contexts'
+import {UrlTemplateProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
@@ -38,7 +38,7 @@ const AppConfig = ({children, locals = {}}) => {
     const [customer, setCustomer] = useState(null)
 
     return (
-        <MultiSitesProvider fillUrlTemplate={locals.fillUrlTemplate}>
+        <UrlTemplateProvider fillUrlTemplate={locals.fillUrlTemplate}>
             <CommerceAPIProvider value={locals.api}>
                 <CustomerProvider value={{customer, setCustomer}}>
                     <BasketProvider value={{basket, setBasket}}>
@@ -48,7 +48,7 @@ const AppConfig = ({children, locals = {}}) => {
                     </BasketProvider>
                 </CustomerProvider>
             </CommerceAPIProvider>
-        </MultiSitesProvider>
+        </UrlTemplateProvider>
     )
 }
 

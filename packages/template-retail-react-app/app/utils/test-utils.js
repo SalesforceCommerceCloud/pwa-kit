@@ -49,7 +49,7 @@ import {
     CategoriesProvider,
     CurrencyProvider,
     LocaleProvider,
-    MultiSitesProvider,
+    UrlTemplateProvider,
     SiteProvider
 } from '../contexts'
 
@@ -142,7 +142,7 @@ export const TestProviders = ({
 
     return (
         <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-            <MultiSitesProvider fillUrlTemplate={fillUrlTemplate}>
+            <UrlTemplateProvider fillUrlTemplate={fillUrlTemplate}>
                 <CommerceAPIProvider value={api}>
                     <CategoriesProvider categories={initialCategories}>
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
@@ -168,7 +168,7 @@ export const TestProviders = ({
                         </CurrencyProvider>
                     </CategoriesProvider>
                 </CommerceAPIProvider>
-            </MultiSitesProvider>
+            </UrlTemplateProvider>
         </IntlProvider>
     )
 }
