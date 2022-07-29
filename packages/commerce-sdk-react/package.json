@@ -46,11 +46,12 @@
     "@types/react-dom": "^17.0.2",
     "cross-env": "^5.2.0",
     "internal-lib-build": "^2.2.0-dev",
+    "msw": "^0.44.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "typedoc": "^0.23.5",
     "typescript": "^4.7.2",
-    "watch": "^1.0.2",
-    "typedoc": "^0.23.5"
+    "watch": "^1.0.2"
   },
   "peerDependencies": {
     "react": "^17"
