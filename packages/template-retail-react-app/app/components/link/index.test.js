@@ -28,7 +28,7 @@ test('renders a link with locale prepended', () => {
     delete window.location
     window.location = new URL('/us/en-US', 'https://www.example.com')
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
-        wrapperProps: {locale: 'en-US', siteAlias: 'us'}
+        wrapperProps: {locale: 'en-US', siteAlias: 'us', appConfig: mockConfig.app}
     })
     expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')
 })
@@ -60,7 +60,7 @@ test('accepts `to` prop as well', () => {
     delete window.location
     window.location = new URL('us/en-US', 'https://www.example.com')
     const {getByText} = renderWithProviders(<Link to="/mypage">My Page</Link>, {
-        wrapperProps: {locale: 'en-US', siteAlias: 'us'}
+        wrapperProps: {locale: 'en-US', siteAlias: 'us', appConfig: mockConfig.app}
     })
     expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')
 })
