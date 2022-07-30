@@ -173,7 +173,7 @@ describe('getPathWithLocale', () => {
     })
 })
 
-describe.only('createUrlTemplate tests', () => {
+describe('createUrlTemplate tests', () => {
     const defaultSite = mockConfig.app.sites[0]
     const defaultAlias = mockConfig.app.siteAliases[defaultSite.id]
     const defaultSiteMock = {...defaultSite, alias: defaultAlias}
