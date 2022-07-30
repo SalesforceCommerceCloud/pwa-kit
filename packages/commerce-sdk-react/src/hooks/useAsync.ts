@@ -4,24 +4,34 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {ActionResponse, QueryResponse} from './types'
 
 export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryResponse<T> => {
-    // This is a stub implementation to validate the types.
-    // The real implementation will be more React-y.
+    const [isLoading, setIsLoading] = useState(false)
+    const [data, setData] = useState<T | undefined>(undefined)
+    const [error, setError] = useState<Error | undefined>(undefined)
     const result: QueryResponse<T> = {
-        isLoading: true,
+        data,
+        error,
+        isLoading,
     }
-    fn()
-        .then((data) => {
-            result.isLoading = false
-            result.data = data
-        })
-        .catch((error) => {
-            result.isLoading = false
-            result.error = error
-        })
+
+    useEffect(() => {
+        setIsLoading(true)
+        fn()
+            .then((data) => {
+                setData(data)
+            })
+            .catch((error: Error) => {
+                console.error(error)
+                setError(error)
+            })
+            .finally(() => {
+                setIsLoading(false)
+            })
+    }, [])
+
     return result
 }
 

@@ -7,7 +7,7 @@
 import loadable from '@loadable/component'
 
 const Home = loadable(() => import('./pages/home'))
-const UseProducts = loadable(() => import('./pages/useShopperProducts'))
+const UseProducts = loadable(() => import('./pages/useProducts'))
 const UseShopperLoginHelper = loadable(() => import('./pages/useShopperLoginHelper'))
 
 const routes = [
@@ -17,7 +17,7 @@ const routes = [
         component: Home,
     },
     {
-        path: '/useShopperProducts',
+        path: '/useProducts',
         component: UseProducts,
     },
     {
