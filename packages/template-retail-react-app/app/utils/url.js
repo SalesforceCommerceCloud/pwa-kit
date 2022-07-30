@@ -122,7 +122,7 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * Based on your app configuration, this function will replace your current locale shortCode with a new one
  *
  * @param {String} shortCode - The locale short code.
- * @param {function(*, *, *, *=): string} - Generates a site URL from the provided href, site and locale.
+ * @param {function(*, *, *, *=): string} - Generates a site URL from the provided path, site and locale.
  * @param {string[]} opts.disallowParams - URL parameters to remove
  * @param {Object} opts.location - location object to replace the default `window.location`
  * @returns {String} url - The relative URL for the specific locale.
@@ -146,10 +146,6 @@ export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
     search = search.replace(/&$/, '')
 
     const defaultSite = getDefaultSite()
-    const isHomeRef = pathname === HOME_HREF
-
-    const isDefaultLocaleOfDefaultSite = shortCode === defaultSite.l10n.defaultLocale
-    const isDefaultSite = siteRef === defaultSite.alias || siteRef === defaultSite.id
 
     // Remove query parameters
     const {disallowParams = []} = opts
@@ -167,10 +163,8 @@ export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
         `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`,
         // By default, as for home page, when the values of site and locale belongs to the default site,
         // they will be not shown in the url just
-        isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
-            ? ''
-            : siteRef || defaultSite.alias || defaultSite.id,
-        isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef ? '' : shortCode
+        siteRef || defaultSite.alias || defaultSite.id,
+        shortCode
     )
     return newUrl
 }
@@ -218,16 +212,24 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
     const templateConfig = {
         pathSite,
         pathLocale,
+        isDefaultSite,
+        isDefaultLocale,
         querySite,
         queryLocale,
         isQuery
     }
 
     return (path, site, locale, config = templateConfig) => {
-        const sitePath = config.pathSite && site ? `/${site}` : ''
-        const localePath = config.pathLocale && locale ? `/${locale}` : ''
+        const isDefaultSiteHomepage = config.isDefaultSite && path === HOME_HREF
+        const isDefaultLocaleHomepage = config.isDefaultLocale && path === HOME_HREF
 
-        const hasQuery = config.isQuery && (site || locale)
+        const sitePath = config.pathSite && site && !isDefaultSiteHomepage ? `/${site}` : ''
+        const localePath =
+            config.pathLocale && locale && !isDefaultLocaleHomepage ? `/${locale}` : ''
+
+        const hasQuery =
+            config.isQuery &&
+            ((site && !isDefaultSiteHomepage) || (locale && !isDefaultLocaleHomepage))
         let queryString = ''
         if (hasQuery) {
             const searchParams = new URLSearchParams()
@@ -237,32 +239,6 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
         }
         return `${sitePath}${localePath}${path}${queryString}`
     }
-}
-
-/**
- * Builds the Home page URL for a given locale and site.
- * By default, when the values of site and locale belongs to the default site,
- * they will be not shown in the url.
- *
- * Adjust the logic here to fit your cases
- *
- * @param homeHref
- * @param options
- * @returns {string}
- */
-export const homeUrlBuilder = (homeHref, options = {}) => {
-    const {locale, site, fillUrlTemplate} = options
-    const defaultSite = getDefaultSite()
-    const isDefaultLocaleOfDefaultSite =
-        locale.alias === defaultSite.l10n.defaultLocale ||
-        locale.id === defaultSite.l10n.defaultLocale
-    const isDefaultSite = site.id === defaultSite.id || site.alias === defaultSite.alias
-    const updatedUrl = fillUrlTemplate(
-        homeHref,
-        isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : site.alias || site.id,
-        isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : locale.alias || locale.id
-    )
-    return encodeURI(updatedUrl)
 }
 
 /*

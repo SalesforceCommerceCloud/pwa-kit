@@ -42,7 +42,6 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder} from '../../utils/url'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 import {resolveLocaleFromUrl} from '../../utils/utils'
@@ -116,11 +115,8 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = homeUrlBuilder(HOME_HREF, {
-            locale,
-            site,
-            fillUrlTemplate
-        })
+        const path = fillUrlTemplate(HOME_HREF, site, locale)
+
         history.push(path)
 
         // Close the drawer.
