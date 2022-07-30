@@ -12,6 +12,7 @@ import SearchInput from './index'
 import Suggestions from './partials/suggestions'
 import {noop} from '../../utils/utils'
 import mockSearchResults from '../../commerce-api/mocks/searchResults'
+import mockConfig from '../../../config/mocks/default'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -53,7 +54,9 @@ test('renders Popover if recent searches populated', async () => {
 })
 
 test('changes url when enter is pressed', async () => {
-    renderWithProviders(<SearchInput />)
+    renderWithProviders(<SearchInput />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dresses{enter}')
     await waitFor(() => expect(window.location.pathname).toEqual(createPathWithDefaults('/search')))

@@ -211,7 +211,9 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test('Navigates to homepage when no order present', async () => {
-    renderWithProviders(<Confirmation />)
+    renderWithProviders(<Confirmation />, {
+        wrapperProps: {siteAlias: 'uk', locale: 'en-GB'}
+    })
     expect(screen.queryByTestId('sf-checkout-confirmation-container')).not.toBeInTheDocument()
     await waitFor(() => {
         expect(window.location.pathname).toEqual('/')

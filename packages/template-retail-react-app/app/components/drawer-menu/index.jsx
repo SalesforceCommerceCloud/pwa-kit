@@ -53,6 +53,7 @@ import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
 import useSite from '../../hooks/use-site'
+import useUrlTemplate from '../../hooks/use-url-template'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
@@ -84,8 +85,9 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
-    const site = useSite()
+    const {site} = useSite()
     const {l10n} = site
+    const {fillUrlTemplate} = useUrlTemplate()
     const [showLoading, setShowLoading] = useState(false)
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -272,9 +274,13 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                         locales={supportedLocaleIds}
                                         onSelect={(newLocale) => {
                                             // Update the `locale` in the URL.
-                                            const newUrl = getPathWithLocale(newLocale, {
-                                                disallowParams: ['refine']
-                                            })
+                                            const newUrl = getPathWithLocale(
+                                                newLocale,
+                                                fillUrlTemplate,
+                                                {
+                                                    disallowParams: ['refine']
+                                                }
+                                            )
                                             window.location = newUrl
                                         }}
                                     />

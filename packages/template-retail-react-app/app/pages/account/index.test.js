@@ -18,6 +18,7 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
+import mockConfig from '../../../config/mocks/default'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -75,12 +76,16 @@ test('Redirects to login page if the customer is not logged in', async () => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
         })
     )
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
     await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
 })
 
 test('Provides navigation for subpages', async () => {
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
     expect(await screen.findByTestId('account-page')).toBeInTheDocument()
 
     const nav = within(screen.getByTestId('account-detail-nav'))
@@ -108,7 +113,9 @@ test('Renders account detail page by default for logged-in customer', async () =
 })
 
 test('Allows customer to sign out', async () => {
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
     user.click(screen.getAllByText(/Log Out/)[0])
     await waitFor(() => {

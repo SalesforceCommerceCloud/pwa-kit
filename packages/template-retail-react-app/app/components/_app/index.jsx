@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
@@ -16,7 +16,7 @@ import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CategoriesProvider, CurrencyProvider} from '../../contexts'
+import {CategoriesProvider, CurrencyProvider, LocaleProvider, SiteProvider} from '../../contexts'
 
 // Local Project Components
 import Header from '../../components/header'
@@ -35,8 +35,6 @@ import useShopper from '../../commerce-api/hooks/useShopper'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
-import useSite from '../../hooks/use-site'
-import useLocale from '../../hooks/use-locale'
 import useWishlist from '../../hooks/use-wishlist'
 
 // Localization
@@ -44,12 +42,13 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder, getPathWithLocale, buildPathWithUrlConfig} from '../../utils/url'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
+import {resolveLocaleFromUrl} from '../../utils/utils'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
+import useUrlTemplate from '../../hooks/use-url-template'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -63,17 +62,18 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
+    const {fillUrlTemplate} = useUrlTemplate()
 
-    const site = useSite()
-    const locale = useLocale()
+    const {pathname, search} = useLocation()
+    const site = useMemo(() => {
+        return resolveSiteFromUrl(`${pathname}${search}`)
+    }, [pathname, search])
+    const locale = useMemo(() => {
+        return resolveLocaleFromUrl(`${pathname}${search}`)
+    }, [pathname, search, site])
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
-
-    const configValues = {
-        locale: locale.alias || locale.id,
-        site: site.alias || site.id
-    }
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -115,7 +115,8 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = homeUrlBuilder(HOME_HREF, {locale, site})
+        const path = fillUrlTemplate(HOME_HREF, site, locale)
+
         history.push(path)
 
         // Close the drawer.
@@ -123,7 +124,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', configValues)
+        const path = fillUrlTemplate('/cart', site.alias || site.id, locale.alias || locale.id)
         history.push(path)
 
         // Close the drawer.
@@ -133,7 +134,11 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', configValues)
+            const path = fillUrlTemplate(
+                '/account',
+                site.alias || site.id,
+                locale.alias || locale.id
+            )
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -143,7 +148,11 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', configValues)
+        const path = fillUrlTemplate(
+            '/account/wishlist',
+            site.alias || site.id,
+            locale.alias || locale.id
+        )
         history.push(path)
     }
 
@@ -168,102 +177,124 @@ const App = (props) => {
                 defaultLocale="en-US"
             >
                 <CategoriesProvider categories={allCategories}>
-                    <CurrencyProvider currency={currency}>
-                        <Seo>
-                            <meta name="theme-color" content={THEME_COLOR} />
-                            <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
-                            <link
-                                rel="apple-touch-icon"
-                                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                            />
-                            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+                    <SiteProvider site={site}>
+                        <LocaleProvider locale={targetLocale}>
+                            <CurrencyProvider currency={currency}>
+                                <Seo>
+                                    <meta name="theme-color" content={THEME_COLOR} />
+                                    <meta
+                                        name="apple-mobile-web-app-title"
+                                        content={DEFAULT_SITE_TITLE}
+                                    />
+                                    <link
+                                        rel="apple-touch-icon"
+                                        href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+                                    />
+                                    <link
+                                        rel="manifest"
+                                        href={getAssetUrl('static/manifest.json')}
+                                    />
 
-                            {/* Urls for all localized versions of this page (including current page)
+                                    {/* Urls for all localized versions of this page (including current page)
                             For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {site.l10n?.supportedLocales.map((locale) => (
-                                <link
-                                    rel="alternate"
-                                    hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${getPathWithLocale(locale.id, {
-                                        location
-                                    })}`}
-                                    key={locale.id}
-                                />
-                            ))}
-                            {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
-                            <link
-                                rel="alternate"
-                                hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${getPathWithLocale(site.l10n.defaultLocale, {
-                                    location
-                                })}`}
-                            />
-                            {/* A wider fallback for user locales that the app does not support */}
-                            <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
-                        </Seo>
+                                    {site.l10n?.supportedLocales.map((locale) => (
+                                        <link
+                                            rel="alternate"
+                                            hrefLang={locale.id.toLowerCase()}
+                                            href={`${appOrigin}${fillUrlTemplate(
+                                                location.pathname,
+                                                site.alias || site.id,
+                                                locale.id
+                                            )}`}
+                                            key={locale.id}
+                                        />
+                                    ))}
+                                    {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
+                                    <link
+                                        rel="alternate"
+                                        hrefLang={site.l10n.defaultLocale.slice(0, 2)}
+                                        href={`${appOrigin}${fillUrlTemplate(
+                                            location.pathname,
+                                            site.alias || site.id,
+                                            site.l10n.defaultLocale
+                                        )}`}
+                                    />
+                                    {/* A wider fallback for user locales that the app does not support */}
+                                    <link
+                                        rel="alternate"
+                                        hrefLang="x-default"
+                                        href={`${appOrigin}/`}
+                                    />
+                                </Seo>
 
-                        <ScrollToTop />
+                                <ScrollToTop />
 
-                        <Box id="app" display="flex" flexDirection="column" flex={1}>
-                            <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                                <Box id="app" display="flex" flexDirection="column" flex={1}>
+                                    <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
-                            <Box {...styles.headerWrapper}>
-                                {!isCheckout ? (
-                                    <Header
-                                        onMenuClick={onOpen}
-                                        onLogoClick={onLogoClick}
-                                        onMyCartClick={onCartClick}
-                                        onMyAccountClick={onAccountClick}
-                                        onWishlistClick={onWishlistClick}
-                                    >
-                                        <HideOnDesktop>
-                                            <DrawerMenu
-                                                isOpen={isOpen}
-                                                onClose={onClose}
+                                    <Box {...styles.headerWrapper}>
+                                        {!isCheckout ? (
+                                            <Header
+                                                onMenuClick={onOpen}
                                                 onLogoClick={onLogoClick}
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
-                                            />
-                                        </HideOnDesktop>
+                                                onMyCartClick={onCartClick}
+                                                onMyAccountClick={onAccountClick}
+                                                onWishlistClick={onWishlistClick}
+                                            >
+                                                <HideOnDesktop>
+                                                    <DrawerMenu
+                                                        isOpen={isOpen}
+                                                        onClose={onClose}
+                                                        onLogoClick={onLogoClick}
+                                                        root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                                        locale={locale}
+                                                    />
+                                                </HideOnDesktop>
 
-                                        <HideOnMobile>
-                                            <ListMenu root={allCategories[DEFAULT_ROOT_CATEGORY]} />
-                                        </HideOnMobile>
-                                    </Header>
-                                ) : (
-                                    <CheckoutHeader />
-                                )}
-                            </Box>
-
-                            {!isOnline && <OfflineBanner />}
-                            <AddToCartModalProvider>
-                                <SkipNavContent
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: 1,
-                                        outline: 0
-                                    }}
-                                >
-                                    <Box
-                                        as="main"
-                                        id="app-main"
-                                        role="main"
-                                        display="flex"
-                                        flexDirection="column"
-                                        flex="1"
-                                    >
-                                        <OfflineBoundary isOnline={false}>
-                                            {children}
-                                        </OfflineBoundary>
+                                                <HideOnMobile>
+                                                    <ListMenu
+                                                        root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                                        locale={locale}
+                                                    />
+                                                </HideOnMobile>
+                                            </Header>
+                                        ) : (
+                                            <CheckoutHeader />
+                                        )}
                                     </Box>
-                                </SkipNavContent>
 
-                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                    {!isOnline && <OfflineBanner />}
+                                    <AddToCartModalProvider>
+                                        <SkipNavContent
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                flex: 1,
+                                                outline: 0
+                                            }}
+                                        >
+                                            <Box
+                                                as="main"
+                                                id="app-main"
+                                                role="main"
+                                                display="flex"
+                                                flexDirection="column"
+                                                flex="1"
+                                            >
+                                                <OfflineBoundary isOnline={false}>
+                                                    {children}
+                                                </OfflineBoundary>
+                                            </Box>
+                                        </SkipNavContent>
 
-                                <AuthModal {...authModal} />
-                            </AddToCartModalProvider>
-                        </Box>
-                    </CurrencyProvider>
+                                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
+
+                                        <AuthModal {...authModal} />
+                                    </AddToCartModalProvider>
+                                </Box>
+                            </CurrencyProvider>
+                        </LocaleProvider>
+                    </SiteProvider>
                 </CategoriesProvider>
             </IntlProvider>
         </Box>

@@ -6,18 +6,12 @@
  */
 
 import {useContext} from 'react'
-import {SiteContext} from '../contexts'
+import {UrlTemplateContext} from '../contexts'
 
 /**
  * Custom React hook to get the current site
  * @returns {site: Object, setSite: function}
  */
-const useSite = () => {
-    const context = useContext(SiteContext)
-    if (context === undefined) {
-        throw new Error('useSite must be used within SiteProvider')
-    }
-    return context
-}
+const useUrlTemplate = () => useContext(UrlTemplateContext)
 
-export default useSite
+export default useUrlTemplate

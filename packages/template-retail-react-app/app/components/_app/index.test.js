@@ -37,8 +37,10 @@ afterEach(() => {
 
 describe('App', () => {
     const site = {
-        ...mockConfig.app.sites[0],
-        alias: 'uk'
+        site: {
+            ...mockConfig.app.sites[0],
+            alias: 'uk'
+        }
     }
     test('App component is rendered appropriately', () => {
         useSite.mockImplementation(() => site)
@@ -77,7 +79,7 @@ describe('App', () => {
         const hasGeneralLocale = ({hrefLang}) => hrefLang === DEFAULT_LOCALE.slice(0, 2)
 
         // `length + 2` because one for a general locale and the other with x-default value
-        expect(hreflangLinks.length).toBe(site.l10n.supportedLocales.length + 2)
+        expect(hreflangLinks.length).toBe(site.site.l10n.supportedLocales.length + 2)
 
         expect(hreflangLinks.some((link) => hasGeneralLocale(link))).toBe(true)
         expect(hreflangLinks.some((link) => link.hrefLang === 'x-default')).toBe(true)

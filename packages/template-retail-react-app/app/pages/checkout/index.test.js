@@ -23,6 +23,7 @@ import {
     mockedCustomerProductLists,
     productsResponse
 } from '../../commerce-api/mock-data'
+import mockConfig from '../../../config/mocks/default'
 
 jest.setTimeout(60000)
 
@@ -238,7 +239,9 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    renderWithProviders(<WrappedCheckout history={history} />)
+    renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
 
     // Wait for checkout to load and display first step
     await screen.findByText(/checkout as guest/i)
@@ -446,7 +449,9 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    renderWithProviders(<WrappedCheckout history={history} />)
+    renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {siteAlias: 'uk', locale: 'en-GB', appConfig: mockConfig.app}
+    })
 
     // Switch to login
     const haveAccountButton = await screen.findByText(/already have an account/i)
@@ -580,7 +585,9 @@ test('Can edit address during checkout as a registered customer', async () => {
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    renderWithProviders(<WrappedCheckout history={history} />)
+    renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {siteAlias: 'uk', locale: 'en-GB'}
+    })
 
     // Switch to login
     const haveAccountButton = await screen.findByText(/already have an account/i)
@@ -685,7 +692,9 @@ test('Can add address during checkout as a registered customer', async () => {
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    renderWithProviders(<WrappedCheckout history={history} />)
+    renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {siteAlias: 'us', locale: 'en-US'}
+    })
 
     // Switch to login
     const haveAccountButton = await screen.findByText(/already have an account/i)

@@ -14,6 +14,7 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
+import mockConfig from '../../../config/mocks/default'
 
 jest.setTimeout(60000)
 
@@ -139,7 +140,9 @@ test('Allows customer to sign in to their account', async () => {
         })
     )
     // render our test component
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', locale: 'en-GB', appConfig: mockConfig.app}
+    })
 
     // enter credentials and submit
     user.type(screen.getByLabelText('Email'), 'darek@test.com')
@@ -160,7 +163,9 @@ test('Renders error when given incorrect log in credentials', async () => {
     )
 
     // render our test component
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', locale: 'en-GB', appConfig: mockConfig.app}
+    })
 
     // enter credentials and submit
     user.type(screen.getByLabelText('Email'), 'foo@test.com')
@@ -179,7 +184,9 @@ test('Renders error when given incorrect log in credentials', async () => {
 
 test('should navigate to sign in page when the user clicks Create Account', async () => {
     // render our test component
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', locale: 'en-GB', appConfig: mockConfig.app}
+    })
     user.click(screen.getByText(/Create Account/i))
 
     // wait for sign up page to appear
@@ -188,7 +195,9 @@ test('should navigate to sign in page when the user clicks Create Account', asyn
 
 test('should navigate to reset password page when the user clicks Forgot Password', async () => {
     // render our test component
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', locale: 'en-GB', appConfig: mockConfig.app}
+    })
     user.click(screen.getByText(/forgot password/i))
 
     // wait for sign up page to appear

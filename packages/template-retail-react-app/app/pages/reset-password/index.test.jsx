@@ -10,6 +10,7 @@ import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import ResetPassword from '.'
+import mockConfig from '../../../config/mocks/default'
 
 jest.setTimeout(60000)
 
@@ -87,7 +88,9 @@ afterAll(() => server.close())
 
 test('Allows customer to go to sign in page', async () => {
     // render our test component
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
 
     user.click(screen.getByText('Sign in'))
     await waitFor(() => {
@@ -112,7 +115,9 @@ test('Allows customer to generate password token', async () => {
     )
 
     // render our test component
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
 
     // enter credentials and submit
     user.type(screen.getByLabelText('Email'), 'foo@test.com')

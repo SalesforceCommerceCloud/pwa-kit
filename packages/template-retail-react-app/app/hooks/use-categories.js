@@ -11,4 +11,10 @@ import {CategoriesContext} from '../contexts'
  * Custom React hook to get the categories
  * @returns {{categories: Object, setCategories: function}[]}
  */
-export const useCategories = () => useContext(CategoriesContext)
+export const useCategories = () => {
+    const context = useContext(CategoriesContext)
+    if (context === undefined) {
+        throw new Error('useCategories must be used within CategoriesProvider')
+    }
+    return context
+}

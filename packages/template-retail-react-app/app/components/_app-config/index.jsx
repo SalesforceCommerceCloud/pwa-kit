@@ -19,9 +19,11 @@ import {
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
+import {UrlTemplateProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {createUrlTemplate} from '../../utils/url'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -36,15 +38,17 @@ const AppConfig = ({children, locals = {}}) => {
     const [customer, setCustomer] = useState(null)
 
     return (
-        <CommerceAPIProvider value={locals.api}>
-            <CustomerProvider value={{customer, setCustomer}}>
-                <BasketProvider value={{basket, setBasket}}>
-                    <CustomerProductListsProvider>
-                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                    </CustomerProductListsProvider>
-                </BasketProvider>
-            </CustomerProvider>
-        </CommerceAPIProvider>
+        <UrlTemplateProvider fillUrlTemplate={locals.fillUrlTemplate}>
+            <CommerceAPIProvider value={locals.api}>
+                <CustomerProvider value={{customer, setCustomer}}>
+                    <BasketProvider value={{basket, setBasket}}>
+                        <CustomerProductListsProvider>
+                            <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                        </CustomerProductListsProvider>
+                    </BasketProvider>
+                </CustomerProvider>
+            </CommerceAPIProvider>
+        </UrlTemplateProvider>
     )
 }
 
@@ -66,13 +70,15 @@ AppConfig.restore = (locals = {}) => {
     apiConfig.parameters.siteId = site.id
 
     locals.api = new CommerceAPI({...apiConfig, locale: locale.id, currency})
+    locals.fillUrlTemplate = createUrlTemplate(appConfig, site, locale)
 }
 
 AppConfig.freeze = () => undefined
 
 AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
-        api: locals.api
+        api: locals.api,
+        fillUrlTemplate: locals.fillUrlTemplate
     }
 }
 
