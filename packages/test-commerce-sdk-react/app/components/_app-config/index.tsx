@@ -18,7 +18,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
             shortCode="8o7m175y"
             clientId="c9c45bfd-0ed3-4aa2-9971-40f88962b836"
             organizationId="f_ecom_zzrf_001"
-            proxy="/mobify/proxy/api"
+            proxy="http://localhost:3000/mobify/proxy/api"
             locale="en-US"
             currency="USD"
         >

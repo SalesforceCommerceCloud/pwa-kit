@@ -217,7 +217,7 @@ The value of this property must be valid for the type of custom attribute define
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomerProductListItem} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomerproductlistitem} for more information on the parameters and returned data type.
    */
-    UpdateCustomerProductListItem = 'updateCustomerProductListItem'
+    UpdateCustomerProductListItem = 'updateCustomerProductListItem',
 }
 
 /**
@@ -242,5 +242,5 @@ export function useShopperCustomersAction<Action extends ShopperCustomersActions
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncCallback((...arg: Arg) => method.call(client, arg))
+    return useAsyncCallback((...args: Arg) => method.call(client, args))
 }

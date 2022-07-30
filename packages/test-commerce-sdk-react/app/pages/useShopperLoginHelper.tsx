@@ -9,12 +9,22 @@ import {ShopperLoginHelpers, useShopperLoginHelper} from 'commerce-sdk-react'
 import Json from '../components/Json'
 
 const UseShopperLoginHelper = () => {
-    const {execute: loginGuestUser} = useShopperLoginHelper(ShopperLoginHelpers.LoginGuestUser)
+    const loginGuestUser = useShopperLoginHelper(ShopperLoginHelpers.LoginGuestUser)
 
     return (
         <>
-            <h1>useProducts</h1>
-            <button onClick={loginGuestUser}>loginGuestUser</button>
+            <h1>LoginGuestUser</h1>
+            <Json data={loginGuestUser} />
+            <button
+                onClick={() =>
+                    loginGuestUser.execute({redirectURI: 'http://localhost:3000/callback'})
+                }
+            >
+                loginGuestUser
+            </button>
+            {loginGuestUser.error?.message && (
+                <p style={{color: 'red'}}>Error: {loginGuestUser.error?.message}</p>
+            )}
         </>
     )
 }

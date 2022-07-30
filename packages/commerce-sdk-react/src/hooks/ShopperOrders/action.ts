@@ -45,7 +45,7 @@ paymentCard must be specified in the request.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=updatePaymentInstrumentForOrder} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#updatepaymentinstrumentfororder} for more information on the parameters and returned data type.
    */
-    UpdatePaymentInstrumentForOrder = 'updatePaymentInstrumentForOrder'
+    UpdatePaymentInstrumentForOrder = 'updatePaymentInstrumentForOrder',
 }
 
 /**
@@ -70,5 +70,5 @@ export function useShopperOrdersAction<Action extends ShopperOrdersActions>(
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncCallback((...arg: Arg) => method.call(client, arg))
+    return useAsyncCallback((...args: Arg) => method.call(client, args))
 }

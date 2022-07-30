@@ -6,8 +6,11 @@
  */
 import {helpers} from 'commerce-sdk-isomorphic'
 
+import {ActionResponse, DataType} from '../types'
 import {useAsyncCallback} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
+
+type Helpers = typeof helpers
 
 export enum ShopperLoginHelpers {
     LoginGuestUser = 'loginGuestUser',
@@ -15,48 +18,36 @@ export enum ShopperLoginHelpers {
     Logout = 'logout',
 }
 
+// The first argument of the isomorphic SLAS helpers
+// is always the ShopperLogin client, we pass the client to helpers internally
+// so users don't need to do that. This makes the interface better.
+type Tail<T extends any[]> = T extends [infer A, ...infer R] ? R : never
+
 /**
  * A hook for performing actions with the Shopper Login API.
  */
-export function useShopperLoginHelper<Action extends ShopperLoginHelpers>(action: Action) {
-    const {shopperLogin: client} = useCommerceApi()
-    switch (action) {
-        case ShopperLoginHelpers.LoginGuestUser: {
-            const method = helpers.loginGuestUser
-            return useAsyncCallback((parameters) => method.call(helpers, client, parameters))
-        }
-        case ShopperLoginHelpers.LoginRegisteredUserB2C: {
-            const method = helpers.loginRegisteredUserB2C
-            return useAsyncCallback((credentials, parameters) =>
-                method.call(helpers, client, credentials, parameters)
-            )
-        }
-        case ShopperLoginHelpers.Logout: {
-            const method = helpers.logout
-            return useAsyncCallback((parameters) => method.call(helpers, client, parameters))
-        }
-        default: {
-            throw new Error(
-                'Unknown helper. Avaliable options: loginGuestUser, loginRegisteredUserB2C and logout.'
-            )
-        }
+export function useShopperLoginHelper<Action extends ShopperLoginHelpers>(
+    action: Action
+): ActionResponse<Tail<Parameters<Helpers[Action]>>, DataType<Helpers[Action]>> {
+    type Arg = Tail<Parameters<Helpers[Action]>>
+    type Data = DataType<Helpers[Action]>
+    // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
+    // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
+    // confident, though, that it is safe, because it seems like we're mostly re-defining what we
+    // already have.
+    // In addition to the assertion required to get this to work, I have also simplified the
+    // overloaded SDK method to a single signature that just returns the data type. This makes it
+    // easier to work with when passing to other mapped types.
+    function assertMethod(fn: unknown): asserts fn is (arg: Arg) => Promise<Data> {
+        if (typeof fn !== 'function') throw new Error(`Unknown action: ${action}`)
     }
+    const {shopperLogin: client} = useCommerceApi()
+    const method = helpers[action]
+    assertMethod(method)
 
-    // type Arg = Parameters<Helpers[Action]>
-    // type Data = DataType<Helpers[Action]>
-    // // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
-    // // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
-    // // confident, though, that it is safe, because it seems like we're mostly re-defining what we
-    // // already have.
-    // // In addition to the assertion required to get this to work, I have also simplified the
-    // // overloaded SDK method to a single signature that just returns the data type. This makes it
-    // // easier to work with when passing to other mapped types.
-    // function assertMethod(fn: unknown): asserts fn is (arg: Arg) => Promise<Data> {
-    //     if (typeof fn !== 'function') throw new Error(`Unknown action: ${action}`)
-    // }
-    // const {shopperLogin: client} = useCommerceApi()
-    // const method = helpers[action]
-    // assertMethod(method)
-
-    // return useAsyncCallback((...arg: Arg) => method.call(client, arg))
+    return useAsyncCallback((...args: Arg) =>
+        // @ts-ignore how to deal with the typescript error
+        // that args potentially have different length?
+        method(client, ...args)
+    )
 }
