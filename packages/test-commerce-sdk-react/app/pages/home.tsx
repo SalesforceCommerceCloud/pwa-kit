@@ -19,7 +19,12 @@ const Home = () => {
             </p>
             <p>Happy coding.</p>
             <h2>Hooks</h2>
-            <Link to="/useShopperProducts">useShopperProducts</Link>
+            <div>
+                <Link to="/useShopperProducts">useShopperProducts</Link>
+            </div>
+            <div>
+                <Link to="/useShopperLoginHelper">useShopperLoginHelper</Link>
+            </div>
         </>
     )
 }
