@@ -21,6 +21,9 @@ export enum ShopperLoginHelpers {
 // The first argument of the isomorphic SLAS helpers
 // is always the ShopperLogin client, we pass the client to helpers internally
 // so users don't need to do that. This makes the interface better.
+// TODO: the login helpers require users to pass in redirectURI and usid
+// 1. for redirectURI, we can move it as a config value for Provider
+// 2. for usid, the library should manage usid internally
 type Tail<T extends any[]> = T extends [infer A, ...infer R] ? R : never
 
 /**
