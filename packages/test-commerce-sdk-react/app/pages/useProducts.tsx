@@ -10,7 +10,7 @@ import Json from '../components/Json'
 
 const UseProducts = () => {
     const result = useProducts({parameters: {ids: '25697800M'}})
-    console.log(result)
+
     return (
         <>
             <h1>useProducts</h1>

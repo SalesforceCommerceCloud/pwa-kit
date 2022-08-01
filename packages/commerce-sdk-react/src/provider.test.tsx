@@ -20,7 +20,8 @@ const sampleProps = {
     shortCode: '8o7m175y',
     siteId: 'RefArchGlobal',
     locale: 'en_US',
-    currency: 'USD'
+    redirectURI: 'http://localhost:3000/callback',
+    currency: 'USD',
 }
 const SampleProvider = (props: {children: React.ReactNode}) => {
     return <CommerceApiProvider {...sampleProps}>{props.children}</CommerceApiProvider>

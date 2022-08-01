@@ -17,9 +17,15 @@ export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryRespon
         isLoading,
     }
 
+    const waitForAuth = async () => {
+        console.log('auth')
+        return Promise.resolve()
+    }
+
     useEffect(() => {
         setIsLoading(true)
-        fn()
+        waitForAuth()
+            .then(fn)
             .then((data) => {
                 setData(data)
             })
