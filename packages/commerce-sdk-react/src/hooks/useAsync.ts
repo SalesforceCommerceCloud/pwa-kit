@@ -1,3 +1,4 @@
+import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 /*
  * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
@@ -5,26 +6,36 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useState, useEffect} from 'react'
+import useAuth from './useAuth'
 import {ActionResponse, QueryResponse} from './types'
 
-export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryResponse<T> => {
+/**
+ * This is a ultility hook that wraps around promises with data/error/loading react states.
+ *
+ * Important: it uses the Auth module to block calls until there is valid access token.
+ *
+ * @internal
+ */
+export const useAsync = <T>(
+    fn: (accessToken: string) => Promise<T>,
+    deps?: unknown[]
+): QueryResponse<T> => {
     const [isLoading, setIsLoading] = useState(false)
     const [data, setData] = useState<T | undefined>(undefined)
     const [error, setError] = useState<Error | undefined>(undefined)
+    const auth = useAuth()
     const result: QueryResponse<T> = {
         data,
         error,
         isLoading,
     }
 
-    const waitForAuth = async () => {
-        console.log('auth')
-        return Promise.resolve()
-    }
-
     useEffect(() => {
         setIsLoading(true)
-        waitForAuth()
+        auth.ready()
+            .then((tokenResponse) => {
+                return tokenResponse.access_token
+            })
             .then(fn)
             .then((data) => {
                 setData(data)

@@ -7,6 +7,7 @@
 import {ApiClients, Argument, DataType, QueryResponse} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
+import {withAccessToken} from '../../auth'
 
 type Client = ApiClients['shopperProducts']
 
@@ -21,7 +22,9 @@ export const useProducts = (
     arg: Argument<Client['getProducts']>
 ): QueryResponse<DataType<Client['getProducts']>> => {
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getProducts(arg), [arg])
+    console.log('useProducts')
+
+    return useAsync((accessToken) => client.getProducts(withAccessToken(arg, accessToken)), [arg])
 }
 /**
  * A hook for `ShopperProducts#getProduct`.
