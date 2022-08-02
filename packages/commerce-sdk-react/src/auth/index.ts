@@ -40,19 +40,32 @@ export interface AuthData {
     // usid: string
 }
 
+type AuthDataProperties = 'accessToken' | 'refreshTokenGuest' | 'refreshTokenRegistered'
+type AuthDataMap = Record<
+    AuthDataProperties,
+    {
+        storage: BaseStorage
+        key: string
+        callback?: () => void
+    }
+>
+
+/**
+ *
+ * @Internal
+ */
 class Auth {
     client: ShopperLogin<ApiClientConfigParams>
     redirectURI: string
 
-    KEYS = {
-        ACCESS_TOKEN: 'cc-ax',
-        REFRESH_TOKEN_GUEST: 'cc-nx-g',
-        REFRESH_TOKEN_REGISTERED: 'cc-nx',
-    }
-
     private _onClient = typeof window !== 'undefined'
     private pending: Promise<AuthData> | undefined
-    private storage: BaseStorage
+    private localStorage: LocalStorage
+    private cookieStorage: CookieStorage
+
+    static COOKIE = 'COOKIE'
+    static LOCAL_STORAGE = 'LOCAL_STORAGE'
+    REFRESH_TOKEN_EXPIRATION_DAYS = 90
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
@@ -66,20 +79,59 @@ class Auth {
         })
 
         this.redirectURI = config.redirectURI
-        this.storage = this._onClient ? new LocalStorage() : new Map()
+        this.localStorage = this._onClient ? new LocalStorage() : new Map()
+        this.cookieStorage = this._onClient ? new CookieStorage() : new Map()
     }
 
-    get accessToken(): string {
-        return this.storage.get(this.KEYS.ACCESS_TOKEN)
+    private get(name: AuthDataProperties) {
+        const storage = this.DATA_MAP[name].storage
+        const key = this.DATA_MAP[name].key
+        return storage.get(key)
     }
 
-    set accessToken(value: string) {
-        this.storage.set(this.KEYS.ACCESS_TOKEN, `Bearer ${value}`)
+    private set(name: AuthDataProperties, value: string, options?: any) {
+        const key = this.DATA_MAP[name].key as AuthDataProperties
+        const storage = this.DATA_MAP[name].storage
+        storage.set(key, value, options)
+
+        if (this.DATA_MAP[name].callback) {
+            this.DATA_MAP[name].callback?.()
+        }
+    }
+
+    /**
+     * A map of the data that this auth module stores. This maps the name of the property to
+     * the storage and the key when stored in that storage. You can also pass in a "callback"
+     * function to do extra operation after a property is set.
+     *
+     * @Internal
+     */
+    get DATA_MAP(): AuthDataMap {
+        return {
+            accessToken: {
+                storage: this.localStorage,
+                key: 'cc-ax',
+            },
+            refreshTokenGuest: {
+                storage: this.cookieStorage,
+                key: 'cc-nx-g',
+                callback: () => {
+                    this.cookieStorage.delete('cc-nx')
+                },
+            },
+            refreshTokenRegistered: {
+                storage: this.cookieStorage,
+                key: 'cc-nx',
+                callback: () => {
+                    this.cookieStorage.delete('cc-nx-g')
+                },
+            },
+        }
     }
 
     get data(): AuthData {
         return {
-            accessToken: this.accessToken,
+            accessToken: this.get('accessToken'),
         }
     }
 
@@ -100,30 +152,45 @@ class Auth {
     /**
      * This function follows the public client auth flow to get
      * access token for the user. Following the flow:
-     * 1. If has valid access token - use it
-     * 2. If has valid refresh token - refresh token flow
+     * 1. If we have valid access token - use it
+     * 2. If we have valid refresh token - refresh token flow
      * 3. PKCE flow
      *
      * Only call this from the "ready" function, so "ready" can manage the pending state.
      *
      * @internal
      */
-    async init() {
+    private async init() {
         console.log('init')
 
-        if (!this.isTokenExpired(this.accessToken)) {
+        if (!this.isTokenExpired(this.get('accessToken'))) {
             console.log('Re-using access token from previous session.')
             return this.data
         }
 
+        const refreshToken = this.get('refreshTokenRegistered') || this.get('refreshTokenGuest')
+
+        if (refreshToken) {
+            console.log('Using refresh token to get new access token.')
+            // TODO: error handling
+            const res = await helpers.refreshAccessToken(this.client, {refreshToken})
+            this.handleTokenResponse(res, true)
+            return this.data
+        }
+
+        // TODO: error handling
         const res = await helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI})
-        this.handleTokenResponse(res)
+        this.handleTokenResponse(res, true)
 
         return this.data
     }
 
-    handleTokenResponse(res: ShopperLoginTypes.TokenResponse) {
-        this.accessToken = res.access_token
+    handleTokenResponse(res: ShopperLoginTypes.TokenResponse, isGuest: boolean) {
+        const refreshTokenKey = isGuest ? 'refreshTokenGuest' : 'refreshTokenRegistered'
+        this.set('accessToken', `Bearer ${res.access_token}`)
+        this.set(refreshTokenKey, res.refresh_token, {
+            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS,
+        })
     }
 
     /**
@@ -133,8 +200,6 @@ class Auth {
      *
      * We use this method to block those commerce api calls that
      * requires an access token.
-     *
-     * @internal
      */
     ready() {
         console.log('ready')

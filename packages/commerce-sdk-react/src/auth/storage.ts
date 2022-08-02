@@ -31,7 +31,7 @@ export class LocalStorage extends BaseStorage {
             throw new Error('LocalStorage is not avaliable on the current environment.')
         }
     }
-    set(key: string, value: string) {
+    set(key: string, value: string, options?: any) {
         window.localStorage.setItem(key, value)
     }
     get(key: string) {
