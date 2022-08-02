@@ -10,6 +10,7 @@ import Json from '../components/Json'
 
 const UseShopperLoginHelper = () => {
     const loginGuestUser = useShopperLoginHelper(ShopperLoginHelpers.LoginGuestUser)
+    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
 
     return (
         <>
@@ -24,6 +25,22 @@ const UseShopperLoginHelper = () => {
             </button>
             {loginGuestUser.error?.message && (
                 <p style={{color: 'red'}}>Error: {loginGuestUser.error?.message}</p>
+            )}
+            <hr />
+            <h1>LoginRegisteredUserB2C</h1>
+            <Json data={loginRegisteredUser} />
+            <button
+                onClick={() =>
+                    loginRegisteredUser.execute(
+                        {username: 'kobe@test.com', password: 'Test1234!'},
+                        {redirectURI: 'http://localhost:3000/callback'}
+                    )
+                }
+            >
+                loginRegisteredUser
+            </button>
+            {loginRegisteredUser.error?.message && (
+                <p style={{color: 'red'}}>Error: {loginRegisteredUser.error?.message}</p>
             )}
         </>
     )

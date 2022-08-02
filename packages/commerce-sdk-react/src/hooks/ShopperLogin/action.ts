@@ -89,5 +89,5 @@ export function useShopperLoginAction<Action extends ShopperLoginActions>(
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncCallback((...args: Arg) => method.call(client, args))
+    return useAsyncCallback((...arg: Arg) => method.call(client, arg))
 }

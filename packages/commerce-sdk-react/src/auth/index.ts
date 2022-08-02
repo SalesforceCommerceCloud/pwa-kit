@@ -3,6 +3,7 @@ import jwtDecode from 'jwt-decode'
 import {ApiClientConfigParams} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage} from './storage'
 
+type Helpers = typeof helpers
 interface AuthConfig {
     shortCode: string
     organizationId: string
@@ -30,6 +31,7 @@ interface JWTHeaders {
 
 export interface AuthData {
     accessToken: string
+    usid: string
     // customer_id: string
     // enc_user_id: string
     // expires_in: number
@@ -37,10 +39,9 @@ export interface AuthData {
     // idp_access_token: null | string
     // refresh_token: string
     // token_type: string
-    // usid: string
 }
 
-type AuthDataProperties = 'accessToken' | 'refreshTokenGuest' | 'refreshTokenRegistered'
+type AuthDataProperties = 'accessToken' | 'refreshTokenGuest' | 'refreshTokenRegistered' | 'usid'
 type AuthDataMap = Record<
     AuthDataProperties,
     {
@@ -55,17 +56,16 @@ type AuthDataMap = Record<
  * @Internal
  */
 class Auth {
-    client: ShopperLogin<ApiClientConfigParams>
-    redirectURI: string
-
+    private client: ShopperLogin<ApiClientConfigParams>
+    private redirectURI: string
     private _onClient = typeof window !== 'undefined'
     private pending: Promise<AuthData> | undefined
     private localStorage: LocalStorage
     private cookieStorage: CookieStorage
+    private REFRESH_TOKEN_EXPIRATION_DAYS = 90
 
     static COOKIE = 'COOKIE'
     static LOCAL_STORAGE = 'LOCAL_STORAGE'
-    REFRESH_TOKEN_EXPIRATION_DAYS = 90
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
@@ -106,11 +106,15 @@ class Auth {
      *
      * @Internal
      */
-    get DATA_MAP(): AuthDataMap {
+    private get DATA_MAP(): AuthDataMap {
         return {
             accessToken: {
                 storage: this.localStorage,
                 key: 'cc-ax',
+            },
+            usid: {
+                storage: this.localStorage,
+                key: 'usid',
             },
             refreshTokenGuest: {
                 storage: this.cookieStorage,
@@ -129,13 +133,14 @@ class Auth {
         }
     }
 
-    get data(): AuthData {
+    private get data(): AuthData {
         return {
             accessToken: this.get('accessToken'),
+            usid: this.get('usid'),
         }
     }
 
-    isTokenExpired(token: string) {
+    private isTokenExpired(token: string) {
         if (!token) {
             return true
         }
@@ -185,7 +190,7 @@ class Auth {
         return this.data
     }
 
-    handleTokenResponse(res: ShopperLoginTypes.TokenResponse, isGuest: boolean) {
+    private handleTokenResponse(res: ShopperLoginTypes.TokenResponse, isGuest: boolean) {
         const refreshTokenKey = isGuest ? 'refreshTokenGuest' : 'refreshTokenRegistered'
         this.set('accessToken', `Bearer ${res.access_token}`)
         this.set(refreshTokenKey, res.refresh_token, {
@@ -207,6 +212,33 @@ class Auth {
             console.log('no ready promise, initializing')
             this.pending = this.init()
         }
+        return this.pending
+    }
+
+    async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
+        const redirectURI = this.redirectURI
+        const usid = this.get('usid')
+        const request = async () => {
+            const res = await helpers.loginRegisteredUserB2C(this.client, credentials, {
+                redirectURI,
+                ...(usid && {usid}),
+            })
+            await this.handleTokenResponse(res, true)
+            return this.data
+        }
+        this.pending = request()
+        return this.pending
+    }
+
+    async logout() {
+        const request = async () => {
+            const res = await helpers.logout(this.client, {
+                refreshToken: this.get('refreshTokenRegistered'),
+            })
+            await this.handleTokenResponse(res, true)
+            return this.data
+        }
+        this.pending = request()
         return this.pending
     }
 }
