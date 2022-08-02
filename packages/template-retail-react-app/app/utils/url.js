@@ -209,31 +209,20 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
         (localeConfig === urlPartPositions.PATH && showDefaultsConfig) ||
         (localeConfig === urlPartPositions.PATH && !showDefaultsConfig && !isDefaultLocale)
 
-    const templateConfig = {
-        pathSite,
-        pathLocale,
-        isDefaultSite,
-        isDefaultLocale,
-        querySite,
-        queryLocale,
-        isQuery
-    }
-
-    return (path, site, locale, config = templateConfig) => {
+    return (path, site, locale) => {
         const isHomeWithDefaultSiteAndLocale =
-            path === HOME_HREF && config.isDefaultSite && config.isDefaultLocale
+            path === HOME_HREF && isDefaultSite && isDefaultLocale
 
-        const sitePath =
-            config.pathSite && site && !isHomeWithDefaultSiteAndLocale ? `/${site}` : ''
+        const sitePath = pathSite && site && !isHomeWithDefaultSiteAndLocale ? `/${site}` : ''
         const localePath =
-            config.pathLocale && locale && !isHomeWithDefaultSiteAndLocale ? `/${locale}` : ''
+            pathLocale && locale && !isHomeWithDefaultSiteAndLocale ? `/${locale}` : ''
 
-        const hasQuery = config.isQuery && (site || locale) && !isHomeWithDefaultSiteAndLocale
+        const hasQuery = isQuery && (site || locale) && !isHomeWithDefaultSiteAndLocale
         let queryString = ''
         if (hasQuery) {
             const searchParams = new URLSearchParams()
-            config.querySite && site && searchParams.append('site', site)
-            config.queryLocale && locale && searchParams.append('locale', locale)
+            querySite && site && searchParams.append('site', site)
+            queryLocale && locale && searchParams.append('locale', locale)
             queryString = `?${searchParams.toString()}`
         }
         return `${sitePath}${localePath}${path}${queryString}`
