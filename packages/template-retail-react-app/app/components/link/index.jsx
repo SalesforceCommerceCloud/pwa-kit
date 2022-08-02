@@ -8,8 +8,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Link as ChakraLink} from '@chakra-ui/react'
 import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
-import useSite from '../../hooks/use-site'
-import useLocale from '../../hooks/use-locale'
 import useUrlTemplate from '../../hooks/use-url-template'
 
 const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {

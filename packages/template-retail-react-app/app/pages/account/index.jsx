@@ -37,17 +37,13 @@ import {useLocation} from 'react-router-dom'
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-import useLocale from '../../hooks/use-locale'
-import useSite from '../../hooks/use-site'
 import useUrlTemplate from '../../hooks/use-url-template'
 
 const Account = () => {
     const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
     const customer = useCustomer()
-    const {locale} = useLocale()
     const location = useLocation()
-    const {site} = useSite()
     const navigate = useNavigation()
 
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)

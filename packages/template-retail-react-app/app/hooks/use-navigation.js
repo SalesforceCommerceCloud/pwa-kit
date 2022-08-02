@@ -8,7 +8,6 @@ import {useCallback} from 'react'
 import {useHistory} from 'react-router'
 import {useIntl} from 'react-intl'
 import useSite from './use-site'
-import {getLocaleByReference} from '../utils/utils'
 import useUrlTemplate from './use-url-template'
 
 /**
@@ -31,7 +30,6 @@ const useNavigation = () => {
          * @param  {...any} args - additional args passed to `.push` or `.replace`
          */
         (path, action = 'push', ...args) => {
-            const locale = getLocaleByReference(site, localeShortCode)
             const updatedHref = fillUrlTemplate(path)
             history[action](path === '/' ? '/' : updatedHref, ...args)
         },

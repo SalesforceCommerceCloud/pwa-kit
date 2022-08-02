@@ -9,8 +9,6 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getLocaleByReference, getParamsFromPath} from './utils'
 import {getDefaultSite, getSites} from './site-utils'
 import {HOME_HREF, urlPartPositions} from '../constants'
-import {useContext} from 'react'
-import {LocaleContext} from '../contexts'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
