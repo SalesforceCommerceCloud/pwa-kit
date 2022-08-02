@@ -9,9 +9,15 @@ import {useContext} from 'react'
 import {UrlTemplateContext} from '../contexts'
 
 /**
- * Custom React hook to get the current site
- * @returns {site: Object, setSite: function}
+ * Custom React hook to get the function that generates URLs following the App configuration.
+ * @returns {fillUrlTemplate: function}
  */
-const useUrlTemplate = () => useContext(UrlTemplateContext)
+const useUrlTemplate = () => {
+    const context = useContext(UrlTemplateContext)
+    if (context === undefined) {
+        throw new Error('useUrlTemplate must be used within UrlTemplateProvider')
+    }
+    return context
+}
 
 export default useUrlTemplate

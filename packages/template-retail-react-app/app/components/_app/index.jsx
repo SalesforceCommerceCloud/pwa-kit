@@ -124,7 +124,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = fillUrlTemplate('/cart', site.alias || site.id, locale.alias || locale.id)
+        const path = fillUrlTemplate('/cart', site.alias || site.id, locale.id)
         history.push(path)
 
         // Close the drawer.
@@ -134,11 +134,7 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = fillUrlTemplate(
-                '/account',
-                site.alias || site.id,
-                locale.alias || locale.id
-            )
+            const path = fillUrlTemplate('/account', site.alias || site.id, locale.id)
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -148,11 +144,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = fillUrlTemplate(
-            '/account/wishlist',
-            site.alias || site.id,
-            locale.alias || locale.id
-        )
+        const path = fillUrlTemplate('/account/wishlist', site.alias || site.id, locale.id)
         history.push(path)
     }
 

@@ -163,7 +163,7 @@ export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
         `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`,
         // By default, as for home page, when the values of site and locale belongs to the default site,
         // they will be not shown in the url just
-        siteRef || defaultSite.alias || defaultSite.id,
+        defaultSite.alias || defaultSite.id,
         shortCode
     )
     return newUrl
