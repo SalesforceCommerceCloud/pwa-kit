@@ -220,16 +220,15 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
     }
 
     return (path, site, locale, config = templateConfig) => {
-        const isDefaultSiteHomepage = config.isDefaultSite && path === HOME_HREF
-        const isDefaultLocaleHomepage = config.isDefaultLocale && path === HOME_HREF
+        const isHomeWithDefaultSiteAndLocale =
+            path === HOME_HREF && config.isDefaultSite && config.isDefaultLocale
 
-        const sitePath = config.pathSite && site && !isDefaultSiteHomepage ? `/${site}` : ''
+        const sitePath =
+            config.pathSite && site && !isHomeWithDefaultSiteAndLocale ? `/${site}` : ''
         const localePath =
-            config.pathLocale && locale && !isDefaultLocaleHomepage ? `/${locale}` : ''
+            config.pathLocale && locale && !isHomeWithDefaultSiteAndLocale ? `/${locale}` : ''
 
-        const hasQuery =
-            config.isQuery &&
-            ((site && !isDefaultSiteHomepage) || (locale && !isDefaultLocaleHomepage))
+        const hasQuery = config.isQuery && (site || locale) && !isHomeWithDefaultSiteAndLocale
         let queryString = ''
         if (hasQuery) {
             const searchParams = new URLSearchParams()

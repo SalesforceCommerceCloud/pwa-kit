@@ -115,7 +115,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = fillUrlTemplate(HOME_HREF, site, locale)
+        const path = fillUrlTemplate(HOME_HREF, site.alias || site.id, locale.id)
 
         history.push(path)
 

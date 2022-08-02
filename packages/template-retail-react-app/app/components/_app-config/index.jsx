@@ -70,7 +70,11 @@ AppConfig.restore = (locals = {}) => {
     apiConfig.parameters.siteId = site.id
 
     locals.api = new CommerceAPI({...apiConfig, locale: locale.id, currency})
-    locals.fillUrlTemplate = createUrlTemplate(appConfig, site, locale)
+    locals.fillUrlTemplate = createUrlTemplate(
+        appConfig,
+        site.alias || site.id,
+        locale.id || locale
+    )
 }
 
 AppConfig.freeze = () => undefined

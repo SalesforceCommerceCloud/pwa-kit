@@ -126,12 +126,9 @@ describe('url builder test', () => {
 describe('getPathWithLocale', () => {
     getUrlConfig.mockImplementation(() => mockConfig.app.url)
 
-    const fillUrlTemplate = jest.fn().mockImplementation((href, site, locale) => {
-        return `${site ? `/${site}` : ''}${locale ? `/${locale}` : ''}${href}`
-    })
-
     test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
+        const fillUrlTemplate = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', fillUrlTemplate, {location})
         expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
@@ -139,6 +136,7 @@ describe('getPathWithLocale', () => {
 
     test('getPathWithLocale uses default site for siteRef when it is no defined in the url', () => {
         const location = new URL('http://localhost:3000/category/newarrivals-womens')
+        const fillUrlTemplate = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', fillUrlTemplate, {location})
         expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
@@ -148,6 +146,7 @@ describe('getPathWithLocale', () => {
         const location = new URL(
             'http://localhost:3000/uk/it-IT/category/newarrivals-womens?limit=25&refine=c_refinementColor%3DBianco&sort=best-matches&offset=25'
         )
+        const fillUrlTemplate = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', fillUrlTemplate, {
             disallowParams: ['refine'],
@@ -160,13 +159,15 @@ describe('getPathWithLocale', () => {
 
     test('getPathWithLocale returns expected for Homepage', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/')
+        const fillUrlTemplate = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', fillUrlTemplate, {location})
         expect(relativeUrl).toEqual(`/uk/fr-FR/`)
     })
 
     test('getPathWithLocale returns / when both site and locale are default', () => {
-        const location = new URL('http://localhost:3000/uk/it-IT/')
+        const location = new URL('http://localhost:3000/')
+        const fillUrlTemplate = createUrlTemplate(mockConfig.app, 'uk', 'en-GB')
 
         const relativeUrl = getPathWithLocale('en-GB', fillUrlTemplate, {location})
         expect(relativeUrl).toEqual(`/`)
