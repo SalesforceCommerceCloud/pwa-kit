@@ -47,6 +47,7 @@
     "cross-env": "^5.2.0",
     "internal-lib-build": "^2.2.0-dev",
     "msw": "^0.44.2",
+    "nock": "^13.2.9",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "typedoc": "^0.23.5",
