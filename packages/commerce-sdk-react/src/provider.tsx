@@ -38,19 +38,6 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
  */
 export const AuthContext = React.createContext({} as Auth)
 
-// // TODO: re-use ApiClientConfigParams
-// interface ApiClientConfigs {
-//     proxy: string
-//     headers: Record<string, string>
-//     parameters: {
-//         clientId: string
-//         organizationId: string
-//         shortCode: string
-//         siteId: string
-//     }
-//     throwOnBadResponse: boolean
-// }
-
 /**
  * Initialize a set of Commerce API clients and make it available to all of descendant components
  *
@@ -97,7 +84,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             redirectURI,
         })
     )
-    console.log('provider render')
 
     // TODO: to be replaced by useServerEffect
     useEffect(() => {

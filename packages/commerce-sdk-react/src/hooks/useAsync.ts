@@ -33,8 +33,8 @@ export const useAsync = <T>(
     useEffect(() => {
         setIsLoading(true)
         auth.ready()
-            .then((tokenResponse) => {
-                return tokenResponse.access_token
+            .then(({accessToken}) => {
+                return accessToken
             })
             .then(fn)
             .then((data) => {
