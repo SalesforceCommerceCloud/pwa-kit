@@ -9,6 +9,8 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getLocaleByReference, getParamsFromPath} from './utils'
 import {getDefaultSite, getSites} from './site-utils'
 import {HOME_HREF, urlPartPositions} from '../constants'
+import {useContext} from 'react'
+import {LocaleContext} from '../contexts'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
@@ -176,17 +178,20 @@ export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
  * @param appConfig Application default configuration.
  * @param siteRef Current selected Site reference. The value can be the Site id or alias.
  * @param localeRef Current selected Locale reference. The value can be the Locale id or alias.
- * @returns {function(*, *, *, *=): string} function providing path, site and locale generates a URL.
+ * @returns {function(*, *, *): string} function providing: path, site and locale generates a URL.
  */
 export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
     const defaultSite = getDefaultSite()
     const sites = getSites()
-    const site =
+    const siteAliasOrIdRef =
         sites.find((site) => {
             return site.alias === siteRef || site.id === siteRef
         }) || defaultSite
-    const defaultLocale = getLocaleByReference(site, site.l10n.defaultLocale)
+    const defaultLocale = getLocaleByReference(
+        siteAliasOrIdRef,
+        siteAliasOrIdRef.l10n.defaultLocale
+    )
 
     const isDefaultSite =
         defaultSite.id === siteRef || (defaultSite.alias && defaultSite.alias === siteRef)

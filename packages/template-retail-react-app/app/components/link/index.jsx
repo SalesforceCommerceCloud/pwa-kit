@@ -14,10 +14,8 @@ import useUrlTemplate from '../../hooks/use-url-template'
 
 const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {
     const _href = to || href
-    const {site} = useSite()
-    const {locale} = useLocale()
     const {fillUrlTemplate} = useUrlTemplate()
-    const updatedHref = fillUrlTemplate(_href, site.alias || site.id, locale)
+    const updatedHref = fillUrlTemplate(_href)
     return (
         <ChakraLink
             as={useNavLink ? NavSPALink : SPALink}
