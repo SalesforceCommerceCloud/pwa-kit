@@ -176,7 +176,7 @@ export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
  * @param appConfig Application default configuration.
  * @param siteRef Current selected Site reference. The value can be the Site id or alias.
  * @param localeRef Current selected Locale reference. The value can be the Locale id or alias.
- * @returns {function(*, *, *, *=): string} function providing path, site and locale generates a site URL.
+ * @returns {function(*, *, *, *=): string} function providing path, site and locale generates a URL.
  */
 export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
@@ -211,7 +211,9 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
 
     return (path, site, locale) => {
         const isHomeWithDefaultSiteAndLocale =
-            path === HOME_HREF && isDefaultSite && isDefaultLocale
+            path === HOME_HREF &&
+            (defaultSite.id === site || (defaultSite.alias && defaultSite.alias === site)) &&
+            (defaultLocale.id === locale || (defaultLocale.alias && defaultLocale.alias === locale))
 
         const sitePath = pathSite && site && !isHomeWithDefaultSiteAndLocale ? `/${site}` : ''
         const localePath =
