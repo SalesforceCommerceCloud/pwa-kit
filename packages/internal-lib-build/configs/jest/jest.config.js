@@ -28,7 +28,6 @@ module.exports = {
         '/node_modules/',
         '/vendor/'
     ],
-    testRegex: '\\.?(test|spec)\\.jsx?$',
     testEnvironment: 'jest-environment-jsdom-global',
     testEnvironmentOptions: {
         resources: 'usable'
