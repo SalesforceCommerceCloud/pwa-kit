@@ -19,7 +19,7 @@ import {
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
-import {UrlTemplateProvider} from '../../contexts'
+import {LocaleProvider, SiteProvider, UrlTemplateProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
@@ -38,17 +38,21 @@ const AppConfig = ({children, locals = {}}) => {
     const [customer, setCustomer] = useState(null)
 
     return (
-        <UrlTemplateProvider fillUrlTemplate={locals.fillUrlTemplate}>
-            <CommerceAPIProvider value={locals.api}>
-                <CustomerProvider value={{customer, setCustomer}}>
-                    <BasketProvider value={{basket, setBasket}}>
-                        <CustomerProductListsProvider>
-                            <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                        </CustomerProductListsProvider>
-                    </BasketProvider>
-                </CustomerProvider>
-            </CommerceAPIProvider>
-        </UrlTemplateProvider>
+        <SiteProvider site={locals.site}>
+            <LocaleProvider locale={locals.locale}>
+                <UrlTemplateProvider fillUrlTemplate={locals.fillUrlTemplate}>
+                    <CommerceAPIProvider value={locals.api}>
+                        <CustomerProvider value={{customer, setCustomer}}>
+                            <BasketProvider value={{basket, setBasket}}>
+                                <CustomerProductListsProvider>
+                                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                                </CustomerProductListsProvider>
+                            </BasketProvider>
+                        </CustomerProvider>
+                    </CommerceAPIProvider>
+                </UrlTemplateProvider>
+            </LocaleProvider>
+        </SiteProvider>
     )
 }
 
@@ -75,6 +79,8 @@ AppConfig.restore = (locals = {}) => {
         site.alias || site.id,
         locale.id || locale
     )
+    locals.site = site
+    locals.locale = locale.id
 }
 
 AppConfig.freeze = () => undefined
@@ -82,7 +88,9 @@ AppConfig.freeze = () => undefined
 AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
         api: locals.api,
-        fillUrlTemplate: locals.fillUrlTemplate
+        fillUrlTemplate: locals.fillUrlTemplate,
+        site: locals.site,
+        locale: locals.locale
     }
 }
 
