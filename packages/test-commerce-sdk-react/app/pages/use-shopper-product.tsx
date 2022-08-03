@@ -12,9 +12,7 @@ import {Link, useParams} from 'react-router-dom'
 
 function UseShopperProduct() {
     const {productId}: {productId: string} = useParams()
-    const {data, isLoading, error} = useProduct({
-        id: productId
-    })
+    const {data, isLoading, error} = useProduct({id: productId}, [], false, {})
     if (isLoading) {
         return (
             <div>

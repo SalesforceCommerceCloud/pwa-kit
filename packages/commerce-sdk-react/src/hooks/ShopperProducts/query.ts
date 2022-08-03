@@ -7,7 +7,7 @@
 import {ApiClients, Argument, DataType, QueryResponse} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
-import {ShopperProductsTypes} from 'commerce-sdk-isomorphic'
+import {getDependencySource} from '../../utils/util'
 
 type Client = ApiClients['shopperProducts']
 /**
@@ -17,26 +17,27 @@ type Client = ApiClients['shopperProducts']
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproducts} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useProducts = (
+function useProducts(
+    parameters: NonNullable<Argument<Client['getProducts']>>['parameters'],
+    deps: unknown[],
+    headers?: NonNullable<Argument<Client['getProducts']>>['headers'],
+    rawResponse?: false
+): QueryResponse<DataType<Client['getProducts']>>
+function useProducts(
+    parameters: NonNullable<Argument<Client['getProducts']>>['parameters'],
+    deps: unknown[],
+    headers?: NonNullable<Argument<Client['getProducts']>>['headers'],
+    rawResponse?: true
+): QueryResponse<Response>
+function useProducts(
     parameters: NonNullable<Argument<Client['getProducts']>>['parameters'],
     deps: unknown[] = [],
-    opts?: {headers: NonNullable<Argument<Client['getProducts']>>['headers']; rawResponse: boolean}
-): QueryResponse<DataType<Client['getProducts']> | Response> => {
-    if (!parameters) {
-        throw new Error('Missing ids in parameters to make request')
-    }
-
+    headers?: NonNullable<Argument<Client['getProducts']>>['headers'],
+    rawResponse?: boolean
+): QueryResponse<DataType<Client['getProducts']> | Response> {
+    const source = getDependencySource(parameters, deps, ['ids'])
     const {shopperProducts: client} = useCommerceApi()
-    const {ids} = parameters
-    // by default the source is the ids string
-    let source: unknown[] = [ids]
-    if (deps.length) {
-        source = deps
-    }
-    return useAsync(
-        () => client.getProducts({parameters, headers: opts?.headers}, opts?.rawResponse),
-        source
-    )
+    return useAsync(() => client.getProducts({parameters, headers}, rawResponse), source)
 }
 /**
  * A hook for `ShopperProducts#getProduct`.
@@ -45,24 +46,27 @@ export const useProducts = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproduct} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useProduct = (
+function useProduct(
+    parameters: NonNullable<Argument<Client['getProduct']>>['parameters'],
+    deps: unknown[],
+    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
+    rawResponse?: false
+): QueryResponse<DataType<Client['getProduct']>>
+function useProduct(
+    parameters: NonNullable<Argument<Client['getProduct']>>['parameters'],
+    deps: unknown[],
+    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
+    rawResponse?: true
+): QueryResponse<Response>
+function useProduct(
     parameters: NonNullable<Argument<Client['getProduct']>>['parameters'],
     deps: unknown[] = [],
-    opts?: {headers: NonNullable<Argument<Client['getProduct']>>['headers']; rawResponse: boolean}
-): QueryResponse<DataType<Client['getProduct']> | Response> => {
-    if (!parameters) {
-        throw new Error('useProducts requires product id ')
-    }
-    // by default the source is the ids string
-    let source: unknown[] = [parameters.id]
-    if (deps.length) {
-        source = deps
-    }
+    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
+    rawResponse?: boolean
+): QueryResponse<DataType<Client['getProduct']> | Response> {
+    const source = getDependencySource(parameters, deps, ['id'])
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(
-        () => client.getProduct({parameters, headers: opts?.headers}, opts?.rawResponse),
-        source
-    )
+    return useAsync(() => client.getProduct({parameters, headers}, rawResponse), source)
 }
 /**
  * A hook for `ShopperProducts#getCategories`.
@@ -71,24 +75,27 @@ export const useProduct = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategories} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCategories = (
+function useCategories(
+    parameters: NonNullable<Argument<Client['getCategories']>>['parameters'],
+    deps: unknown[],
+    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
+    rawResponse?: false
+): QueryResponse<DataType<Client['getCategories']>>
+function useCategories(
+    parameters: NonNullable<Argument<Client['getCategories']>>['parameters'],
+    deps: unknown[],
+    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
+    rawResponse?: true
+): QueryResponse<Response>
+function useCategories(
     parameters: NonNullable<Argument<Client['getCategories']>>['parameters'],
     deps: unknown[] = [],
-    opts?: {headers: NonNullable<Argument<Client['getProduct']>>['headers']; rawResponse: boolean}
-): QueryResponse<DataType<Client['getCategories']> | Response> => {
-    if (!parameters) {
-        throw new Error('useCategories requires categories ids string ')
-    }
-    const {ids, levels = 1} = parameters
-    let source: unknown[] = [ids, levels]
-    if (deps.length) {
-        source = deps
-    }
+    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
+    rawResponse?: boolean
+): QueryResponse<DataType<Client['getCategories']> | Response> {
+    const source = getDependencySource(parameters, deps, ['ids'], ['levels'])
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(
-        () => client.getCategories({parameters, headers: opts?.headers}, opts?.rawResponse),
-        source
-    )
+    return useAsync(() => client.getCategories({parameters, headers}, rawResponse), source)
 }
 /**
  * A hook for `ShopperProducts#getCategory`.
@@ -99,22 +106,27 @@ parameter. The server only returns online categories.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategory} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCategory = (
+function useCategory(
+    parameters: NonNullable<Argument<Client['getCategory']>>['parameters'],
+    deps: unknown[],
+    headers?: NonNullable<Argument<Client['getCategory']>>['headers'],
+    rawResponse?: false
+): QueryResponse<DataType<Client['getCategory']>>
+function useCategory(
+    parameters: NonNullable<Argument<Client['getCategory']>>['parameters'],
+    deps: unknown[],
+    headers?: NonNullable<Argument<Client['getCategory']>>['headers'],
+    rawResponse?: true
+): QueryResponse<Response>
+function useCategory(
     parameters: NonNullable<Argument<Client['getCategory']>>['parameters'],
     deps: unknown[] = [],
-    opts?: {headers: NonNullable<Argument<Client['getCategory']>>['headers']; rawResponse: boolean}
-): QueryResponse<DataType<Client['getCategory']> | Response> => {
-    if (!parameters) {
-        throw new Error('useCategory requires categories ids string in parameters ')
-    }
-    const {id, levels = 1} = parameters
-    let source: unknown[] = [id, levels]
-    if (deps.length) {
-        source = deps
-    }
+    headers?: NonNullable<Argument<Client['getCategory']>>['headers'],
+    rawResponse?: boolean
+): QueryResponse<DataType<Client['getCategory']> | Response> {
+    const source = getDependencySource(parameters, deps, ['id'], ['levels'])
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(
-        () => client.getCategory({parameters, headers: opts?.headers}, opts?.rawResponse),
-        source
-    )
+    return useAsync(() => client.getCategory({parameters, headers}, rawResponse), source)
 }
+
+export {useProducts, useProduct, useCategories, useCategory}
