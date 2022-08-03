@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useContext} from 'react'
+import {useCallback, useContext} from 'react'
 import {MultiSiteContext} from '../contexts'
 
 /**
@@ -19,13 +19,16 @@ const useMultiSite = () => {
     }
     const {fillUrlTemplate: originalFn, site, locale} = context
 
-    const fillUrlTemplate = (path, siteRef, localeRef) => {
-        return originalFn(
-            path,
-            siteRef ? siteRef : site?.alias || site?.id,
-            localeRef ? localeRef : locale
-        )
-    }
+    const fillUrlTemplate = useCallback(
+        (path, siteRef, localeRef) => {
+            return originalFn(
+                path,
+                siteRef ? siteRef : site?.alias || site?.id,
+                localeRef ? localeRef : locale
+            )
+        },
+        [originalFn, site, locale]
+    )
     return {site, locale, fillUrlTemplate}
 }
 

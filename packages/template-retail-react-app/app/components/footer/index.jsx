@@ -36,9 +36,6 @@ const Footer = ({...otherProps}) => {
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
     const {site, fillUrlTemplate} = useMultiSite()
-
-    console.log('Footer site:', site)
-    console.log('Footer site:', site)
     const {l10n} = site
 
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
