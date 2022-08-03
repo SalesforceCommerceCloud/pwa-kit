@@ -127,7 +127,7 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @param {Object} opts.location - location object to replace the default `window.location`
  * @returns {String} url - The relative URL for the specific locale.
  */
-export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
+export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     const location = opts.location ? opts.location : window.location
     let {siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
     let {pathname, search} = location
@@ -159,7 +159,7 @@ export const getPathWithLocale = (shortCode, fillUrlTemplate, opts = {}) => {
     }
 
     // rebuild the url with new locale,
-    const newUrl = fillUrlTemplate(
+    const newUrl = buildUrl(
         `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`,
         // By default, as for home page, when the values of site and locale belongs to the default site,
         // they will be not shown in the url just

@@ -49,7 +49,7 @@ const Account = () => {
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
     const [showLoading, setShowLoading] = useState(false)
 
-    const {fillUrlTemplate} = useMultiSite()
+    const {buildUrl} = useMultiSite()
 
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -89,7 +89,7 @@ const Account = () => {
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
     if (customer.authType != null && !customer.isRegistered) {
-        const path = fillUrlTemplate('/login')
+        const path = buildUrl('/login')
         return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
     }
 

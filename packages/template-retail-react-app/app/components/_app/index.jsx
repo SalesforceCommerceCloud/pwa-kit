@@ -61,7 +61,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
-    const {site, locale, fillUrlTemplate} = useMultiSite()
+    const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
@@ -106,7 +106,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = fillUrlTemplate(HOME_HREF)
+        const path = buildUrl(HOME_HREF)
 
         history.push(path)
 
@@ -115,7 +115,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = fillUrlTemplate('/cart')
+        const path = buildUrl('/cart')
         history.push(path)
 
         // Close the drawer.
@@ -125,7 +125,7 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = fillUrlTemplate('/account')
+            const path = buildUrl('/account')
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -135,7 +135,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = fillUrlTemplate('/account/wishlist')
+        const path = buildUrl('/account/wishlist')
         history.push(path)
     }
 
@@ -176,7 +176,7 @@ const App = (props) => {
                                 <link
                                     rel="alternate"
                                     hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${fillUrlTemplate(location.pathname)}`}
+                                    href={`${appOrigin}${buildUrl(location.pathname)}`}
                                     key={locale.id}
                                 />
                             ))}
@@ -184,7 +184,7 @@ const App = (props) => {
                             <link
                                 rel="alternate"
                                 hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${fillUrlTemplate(location.pathname)}`}
+                                href={`${appOrigin}${buildUrl(location.pathname)}`}
                             />
                             {/* A wider fallback for user locales that the app does not support */}
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />

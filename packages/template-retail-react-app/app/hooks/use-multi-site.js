@@ -9,17 +9,18 @@ import {useCallback, useContext} from 'react'
 import {MultiSiteContext} from '../contexts'
 
 /**
- * Custom React hook to get the function that generates URLs following the App configuration.
- * @returns {{site, fillUrlTemplate: (function(*, *, *): *), locale}}
+ * Custom React hook to get the function that returns usefule multi-site values, the site, the locale and
+ * the funtion used to build URLs following the App configuration.
+ * @returns {{site, locale, buildUrl: (function(*, *, *): *)}}
  */
 const useMultiSite = () => {
     const context = useContext(MultiSiteContext)
     if (context === undefined) {
         throw new Error('useMultiSite must be used within MultiSiteProvider')
     }
-    const {fillUrlTemplate: originalFn, site, locale} = context
+    const {buildUrl: originalFn, site, locale} = context
 
-    const fillUrlTemplate = useCallback(
+    const buildUrl = useCallback(
         (path, siteRef, localeRef) => {
             return originalFn(
                 path,
@@ -29,7 +30,7 @@ const useMultiSite = () => {
         },
         [originalFn, site, locale]
     )
-    return {site, locale, fillUrlTemplate}
+    return {site, locale, buildUrl}
 }
 
 export default useMultiSite

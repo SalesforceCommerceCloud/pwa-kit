@@ -16,7 +16,7 @@ import useMultiSite from './use-multi-site'
 const useNavigation = () => {
     const history = useHistory()
 
-    const {site, locale: localeShortCode, fillUrlTemplate} = useMultiSite()
+    const {site, locale: localeShortCode, buildUrl} = useMultiSite()
 
     return useCallback(
         /**
@@ -26,7 +26,7 @@ const useNavigation = () => {
          * @param  {...any} args - additional args passed to `.push` or `.replace`
          */
         (path, action = 'push', ...args) => {
-            const updatedHref = fillUrlTemplate(path)
+            const updatedHref = buildUrl(path)
             history[action](path === '/' ? '/' : updatedHref, ...args)
         },
         [localeShortCode, site]

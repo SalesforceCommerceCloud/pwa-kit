@@ -64,21 +64,21 @@ CategoriesProvider.propTypes = {
  *
  * import {useMultiSite} from './hooks'
  *
- * const {site, locale, fillUrlTemplate} = useMultiSite()
+ * const {site, locale, buildUrl} = useMultiSite()
  * @type {React.Context<unknown>}
  */
 export const MultiSiteContext = React.createContext()
 export const MultiSiteProvider = ({
     site: initialSite = {},
     locale: initialLocale = {},
-    fillUrlTemplate,
+    buildUrl,
     children
 }) => {
     const [site, setSite] = useState(initialSite)
     const [locale, setLocale] = useState(initialLocale)
 
     return (
-        <MultiSiteContext.Provider value={{site, setSite, locale, setLocale, fillUrlTemplate}}>
+        <MultiSiteContext.Provider value={{site, setSite, locale, setLocale, buildUrl}}>
             {children}
         </MultiSiteContext.Provider>
     )
@@ -86,7 +86,7 @@ export const MultiSiteProvider = ({
 
 MultiSiteProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    fillUrlTemplate: PropTypes.func,
+    buildUrl: PropTypes.func,
     site: PropTypes.object,
     locale: PropTypes.string
 }

@@ -43,14 +43,14 @@ describe('App', () => {
 
     const locale = DEFAULT_LOCALE
 
-    const fillUrlTemplate = jest.fn().mockImplementation((href, site, locale) => {
+    const buildUrl = jest.fn().mockImplementation((href, site, locale) => {
         return `${site ? `/${site}` : ''}${locale ? `/${locale}` : ''}${href}`
     })
 
     const resultUseMultiSite = {
         site,
         locale,
-        fillUrlTemplate
+        buildUrl
     }
 
     test('App component is rendered appropriately', () => {

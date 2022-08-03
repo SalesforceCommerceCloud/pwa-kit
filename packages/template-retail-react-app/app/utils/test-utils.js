@@ -132,11 +132,11 @@ export const TestProviders = ({
             return site.alias === siteAlias || site.id === appConfig['site']
         }) || getDefaultSite()
 
-    const fillUrlTemplate = createUrlTemplate(appConfig, site.alias || site.id, locale)
+    const buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale)
 
     return (
         <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-            <MultiSiteProvider site={site} locale={locale} fillUrlTemplate={fillUrlTemplate}>
+            <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
                 <CommerceAPIProvider value={api}>
                     <CategoriesProvider categories={initialCategories}>
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
@@ -204,9 +204,9 @@ export const createPathWithDefaults = (path) => {
     const siteAlias = app.siteAliases[defaultSite.id]
     const defaultLocale = defaultSite.l10n.defaultLocale
 
-    const fillUrlTemplate = createUrlTemplate(app, siteAlias || defaultSite, defaultLocale)
+    const buildUrl = createUrlTemplate(app, siteAlias || defaultSite, defaultLocale)
 
-    const updatedPath = fillUrlTemplate(path, siteAlias || defaultSite.id, defaultLocale)
+    const updatedPath = buildUrl(path, siteAlias || defaultSite.id, defaultLocale)
     return updatedPath
 }
 

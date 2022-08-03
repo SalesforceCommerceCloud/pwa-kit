@@ -12,8 +12,8 @@ import useMultiSite from '../../hooks/use-multi-site'
 
 const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {
     const _href = to || href
-    const {fillUrlTemplate} = useMultiSite()
-    const updatedHref = fillUrlTemplate(_href)
+    const {buildUrl} = useMultiSite()
+    const updatedHref = buildUrl(_href)
     return (
         <ChakraLink
             as={useNavLink ? NavSPALink : SPALink}

@@ -27,14 +27,14 @@ const site = {
 
 const locale = DEFAULT_LOCALE
 
-const fillUrlTemplate = jest.fn().mockImplementation((href, site, locale) => {
+const buildUrl = jest.fn().mockImplementation((href, site, locale) => {
     return `${site ? `/${site}` : ''}${locale ? `/${locale}` : ''}${href}`
 })
 
 const mockResultuseMultiSite = {
     site,
     locale,
-    fillUrlTemplate
+    buildUrl
 }
 
 const mockUseContext = jest.fn().mockImplementation(() => mockResultuseMultiSite)

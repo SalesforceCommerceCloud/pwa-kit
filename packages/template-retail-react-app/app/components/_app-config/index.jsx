@@ -38,11 +38,7 @@ const AppConfig = ({children, locals = {}}) => {
     const [customer, setCustomer] = useState(null)
 
     return (
-        <MultiSiteProvider
-            site={locals.site}
-            locale={locals.locale}
-            fillUrlTemplate={locals.fillUrlTemplate}
-        >
+        <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
             <CommerceAPIProvider value={locals.api}>
                 <CustomerProvider value={{customer, setCustomer}}>
                     <BasketProvider value={{basket, setBasket}}>
@@ -74,11 +70,7 @@ AppConfig.restore = (locals = {}) => {
     apiConfig.parameters.siteId = site.id
 
     locals.api = new CommerceAPI({...apiConfig, locale: locale.id, currency})
-    locals.fillUrlTemplate = createUrlTemplate(
-        appConfig,
-        site.alias || site.id,
-        locale.id || locale
-    )
+    locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
     locals.site = site
     locals.locale = locale.id
 }
@@ -88,7 +80,7 @@ AppConfig.freeze = () => undefined
 AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
         api: locals.api,
-        fillUrlTemplate: locals.fillUrlTemplate,
+        buildUrl: locals.buildUrl,
         site: locals.site,
         locale: locals.locale
     }
