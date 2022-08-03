@@ -6,6 +6,7 @@
  */
 
 import {render, RenderOptions} from '@testing-library/react'
+import nock from 'nock'
 import React from 'react'
 import CommerceApiProvider from './provider'
 
@@ -29,3 +30,14 @@ export const renderWithProviders = (
 ): void => {
     render(ui, {wrapper: TestProviders, ...options})
 }
+
+const recordHttpResponses = (pathToFixturesDirectory: string): nock.Back => {
+    const nockBack = nock.back
+    nockBack.fixtures = pathToFixturesDirectory
+    nockBack.setMode('record')
+
+    return nockBack
+}
+
+export const recordHookResponses = (): nock.Back =>
+    recordHttpResponses(`${__dirname}/hooks/mock-responses`)

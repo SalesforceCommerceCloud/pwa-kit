@@ -8,20 +8,17 @@
 import React, {useEffect, useState} from 'react'
 import '@testing-library/jest-dom'
 import {screen, waitFor} from '@testing-library/react'
-import nock from 'nock'
 
-import {renderWithProviders} from '../test-utils'
+import {recordHookResponses, renderWithProviders} from '../test-utils'
 import useCommerceApi from './useCommerceApi'
 
 // TODO: uninstall `msw`
 
-const nockBack = nock.back
-// TODO
-nockBack.fixtures = __dirname + '/nock-fixtures'
-nockBack.setMode('record')
+// TODO: iterate
+const nockBack = recordHookResponses()
 
 test('useCommerceApi', async () => {
-    const {nockDone} = await nockBack('foo.json')
+    const {nockDone} = await nockBack('use-commerce-api.json')
 
     const Component = () => {
         const api = useCommerceApi()
