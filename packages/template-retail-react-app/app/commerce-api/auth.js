@@ -210,16 +210,15 @@ class Auth {
             } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
             }
-            return this[authorizationMethod](credentials)
-                .catch((error) => {
-                    const retryErrors = [INVALID_TOKEN, EXPIRED_TOKEN]
-                    if (retries === 0 && retryErrors.includes(error.message)) {
-                        retries = 1 // we only retry once
-                        this._clearAuth()
-                        return startLoginFlow()
-                    }
-                    throw error
-                })
+            return this[authorizationMethod](credentials).catch((error) => {
+                const retryErrors = [INVALID_TOKEN, EXPIRED_TOKEN]
+                if (retries === 0 && retryErrors.includes(error.message)) {
+                    retries = 1 // we only retry once
+                    this._clearAuth()
+                    return startLoginFlow()
+                }
+                throw error
+            })
         }
 
         this._pendingLogin = startLoginFlow().finally(() => {
