@@ -35,7 +35,7 @@ const UseShopperProducts = () => {
 
             <h1>Products</h1>
             <div>Click on the link to go to a product page</div>
-            {result?.data.map(({id, name}: {id: string; name: string}) => {
+            {result?.data.map(({id, name}) => {
                 return (
                     <div key={id}>
                         <Link to={`/products/${id}`}>{name}</Link>

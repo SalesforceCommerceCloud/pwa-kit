@@ -19,13 +19,13 @@ type Client = ApiClients['shopperProducts']
  */
 function useProducts(
     parameters: NonNullable<Argument<Client['getProducts']>>['parameters'],
-    deps: unknown[],
+    deps?: unknown[],
     headers?: NonNullable<Argument<Client['getProducts']>>['headers'],
     rawResponse?: false
 ): QueryResponse<DataType<Client['getProducts']>>
 function useProducts(
     parameters: NonNullable<Argument<Client['getProducts']>>['parameters'],
-    deps: unknown[],
+    deps?: unknown[],
     headers?: NonNullable<Argument<Client['getProducts']>>['headers'],
     rawResponse?: true
 ): QueryResponse<Response>
@@ -48,13 +48,13 @@ function useProducts(
  */
 function useProduct(
     parameters: NonNullable<Argument<Client['getProduct']>>['parameters'],
-    deps: unknown[],
+    deps?: unknown[],
     headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
     rawResponse?: false
 ): QueryResponse<DataType<Client['getProduct']>>
 function useProduct(
     parameters: NonNullable<Argument<Client['getProduct']>>['parameters'],
-    deps: unknown[],
+    deps?: unknown[],
     headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
     rawResponse?: true
 ): QueryResponse<Response>
@@ -77,13 +77,13 @@ function useProduct(
  */
 function useCategories(
     parameters: NonNullable<Argument<Client['getCategories']>>['parameters'],
-    deps: unknown[],
+    deps?: unknown[],
     headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
     rawResponse?: false
 ): QueryResponse<DataType<Client['getCategories']>>
 function useCategories(
     parameters: NonNullable<Argument<Client['getCategories']>>['parameters'],
-    deps: unknown[],
+    deps?: unknown[],
     headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
     rawResponse?: true
 ): QueryResponse<Response>
@@ -108,13 +108,13 @@ parameter. The server only returns online categories.
  */
 function useCategory(
     parameters: NonNullable<Argument<Client['getCategory']>>['parameters'],
-    deps: unknown[],
+    deps?: unknown[],
     headers?: NonNullable<Argument<Client['getCategory']>>['headers'],
     rawResponse?: false
 ): QueryResponse<DataType<Client['getCategory']>>
 function useCategory(
     parameters: NonNullable<Argument<Client['getCategory']>>['parameters'],
-    deps: unknown[],
+    deps?: unknown[],
     headers?: NonNullable<Argument<Client['getCategory']>>['headers'],
     rawResponse?: true
 ): QueryResponse<Response>
