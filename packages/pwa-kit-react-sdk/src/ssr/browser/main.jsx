@@ -14,7 +14,6 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
-import {Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -69,28 +68,23 @@ export const start = () => {
 
     const WrappedApp = routeComponent(App, false, locals)
     const error = window.__ERROR__
-    const queryClient = new QueryClient()
 
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
             ReactDOM.hydrate(
-                <QueryClientProvider client={queryClient}>
-                    <Hydrate state={window.__DEHYDRATED_STATE__}>
-                        <Router>
-                            <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                                <AppConfig locals={locals}>
-                                    <Switch
-                                        error={error}
-                                        appState={window.__PRELOADED_STATE__}
-                                        routes={routes}
-                                        App={WrappedApp}
-                                    />
-                                </AppConfig>
-                            </DeviceContext.Provider>
-                        </Router>
-                    </Hydrate>
-                </QueryClientProvider>,
+                <Router>
+                    <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
+                        <AppConfig locals={locals}>
+                            <Switch
+                                error={error}
+                                appState={window.__PRELOADED_STATE__}
+                                routes={routes}
+                                App={WrappedApp}
+                            />
+                        </AppConfig>
+                    </DeviceContext.Provider>
+                </Router>,
                 rootEl,
                 () => {
                     window.__HYDRATING__ = false

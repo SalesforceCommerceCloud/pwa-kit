@@ -8,7 +8,6 @@
 /**
  * @module progressive-web-sdk/ssr/server/react-rendering
  */
-import { dehydrate, Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ssrPrepass from 'react-ssr-prepass';
 import path from 'path'
 import React from 'react'
@@ -99,10 +98,13 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
 
     try {
         const [appProps, pageProps] = await Promise.all(promises)
+        let externalState = await Promise.resolve()
+            .then(() => AppConfig.freeze(res.locals))
+
         const appState = {
             appProps,
             pageProps,
-            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
+            __STATE_MANAGEMENT_LIBRARY: externalState
         }
 
         returnVal = {
@@ -162,6 +164,22 @@ export const render = async (req, res, next) => {
     // Step 2 - Get the component
     const component = await route.component.getComponent()
 
+    // Step 2.5 - Prepass
+    console.log('Prepass Enabled? ', !!config.ssrParameters.enablePrepass)
+    if (!!config.ssrParameters.enablePrepass) {
+        await prepass(req, res, undefined, {
+            App: WrappedApp,
+            appState: {},
+            component,
+            match,
+            route,
+            routes,
+            req,
+            res,
+            location
+        })
+    }
+
     // Step 3 - Init the app state
     const {appState, error: appStateError} = await initAppState({
         App: WrappedApp,
@@ -210,19 +228,15 @@ export const render = async (req, res, next) => {
 }
 
 const getAppJSX = (req, res, error, appData) => {
-    const {App, appState, routes, routerContext, location, deviceType, queryClient} = appData
+    const {App, appState, routes, routerContext, location, deviceType} = appData
     return (
-        <QueryClientProvider client={queryClient}>
-            <Hydrate state={{text: 'TODO'}}>
-                <Router location={location} context={routerContext}>
-                    <DeviceContext.Provider value={{type: deviceType}}>
-                        <AppConfig locals={res.locals}>
-                            <Switch error={error} appState={appState} routes={routes} App={App} />
-                        </AppConfig>
-                    </DeviceContext.Provider>
-                </Router>
-            </Hydrate>
-        </QueryClientProvider>
+        <Router location={location} context={routerContext}>
+            <DeviceContext.Provider value={{type: deviceType}}>
+                <AppConfig locals={res.locals}>
+                    <Switch error={error} appState={appState} routes={routes} App={App} />
+                </AppConfig>
+            </DeviceContext.Provider>
+        </Router>
     )
 }
 
@@ -240,25 +254,13 @@ const renderApp = async (args) => {
     const {req, res, appStateError, App, appState, location, routes, config} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
-    const queryClient = new QueryClient()
     const routerContext = {}
-    const appData = {App, appState, location, routes, routerContext, deviceType, extractor, queryClient}
+    const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query
     const indent = prettyPrint ? 8 : 0
 
-    await prepass(req, res, appStateError, appData)
-
-    console.log('queryClient', queryClient)
-    console.log('queryClient', queryClient.isFetching())
-    console.log('queryClient.queryCache.queries[0]', queryClient.queryCache.queries[0])
-
-    await Promise.all(queryClient.queryCache.queries.map((q => q.fetch())))
-
-    const dehydratedState = dehydrate(queryClient)
-
-    console.log('dehydratedState', dehydratedState)
     let appHtml
     let renderError
     // It's important that we render the App before extracting the script elements,
@@ -310,8 +312,6 @@ const renderApp = async (args) => {
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
-        // NOTE: Maybe this belongs in `__PRELOADED_STATE__`
-        __DEHYDRATED_STATE__: dehydratedState,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)

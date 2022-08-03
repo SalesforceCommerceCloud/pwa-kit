@@ -59,7 +59,8 @@
                     "host": "api.cquotient.com",
                     "path": "einstein"
                 }
-            ]
+            ],
+            "enablePrepass": true
         }
     }
 }

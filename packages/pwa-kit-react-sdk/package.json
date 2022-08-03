@@ -47,7 +47,6 @@
     "@loadable/babel-plugin": "^5.13.2",
     "@loadable/server": "^5.15.0",
     "@loadable/webpack-plugin": "^5.15.0",
-    "@tanstack/react-query": "^4.0.10",
     "cross-env": "^5.2.0",
     "event-emitter": "^0.3.5",
     "glob": "7.1.1",
