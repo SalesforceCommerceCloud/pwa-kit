@@ -45,13 +45,7 @@ export const SUPPORTED_LOCALES = [
 ]
 export const DEFAULT_SITE = 'global'
 // Contexts
-import {
-    CategoriesProvider,
-    CurrencyProvider,
-    LocaleProvider,
-    UrlTemplateProvider,
-    SiteProvider
-} from '../contexts'
+import {CategoriesProvider, CurrencyProvider, MultiSiteProvider} from '../contexts'
 
 import {createUrlTemplate} from './url'
 import {getDefaultSite, getSites} from './site-utils'
@@ -142,33 +136,29 @@ export const TestProviders = ({
 
     return (
         <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-            <UrlTemplateProvider fillUrlTemplate={fillUrlTemplate}>
+            <MultiSiteProvider site={site} locale={locale} fillUrlTemplate={fillUrlTemplate}>
                 <CommerceAPIProvider value={api}>
                     <CategoriesProvider categories={initialCategories}>
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                            <SiteProvider site={site}>
-                                <LocaleProvider locale={locale}>
-                                    <CustomerProvider value={{customer, setCustomer}}>
-                                        <BasketProvider value={{basket, setBasket}}>
-                                            <CustomerProductListsProvider>
-                                                <Router>
-                                                    <ChakraProvider theme={theme}>
-                                                        <AddToCartModalContext.Provider
-                                                            value={addToCartModal}
-                                                        >
-                                                            {children}
-                                                        </AddToCartModalContext.Provider>
-                                                    </ChakraProvider>
-                                                </Router>
-                                            </CustomerProductListsProvider>
-                                        </BasketProvider>
-                                    </CustomerProvider>
-                                </LocaleProvider>
-                            </SiteProvider>
+                            <CustomerProvider value={{customer, setCustomer}}>
+                                <BasketProvider value={{basket, setBasket}}>
+                                    <CustomerProductListsProvider>
+                                        <Router>
+                                            <ChakraProvider theme={theme}>
+                                                <AddToCartModalContext.Provider
+                                                    value={addToCartModal}
+                                                >
+                                                    {children}
+                                                </AddToCartModalContext.Provider>
+                                            </ChakraProvider>
+                                        </Router>
+                                    </CustomerProductListsProvider>
+                                </BasketProvider>
+                            </CustomerProvider>
                         </CurrencyProvider>
                     </CategoriesProvider>
                 </CommerceAPIProvider>
-            </UrlTemplateProvider>
+            </MultiSiteProvider>
         </IntlProvider>
     )
 }

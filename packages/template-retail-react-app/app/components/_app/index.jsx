@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect, useMemo} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
@@ -44,7 +44,6 @@ import {IntlProvider} from 'react-intl'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
-import {resolveLocaleFromUrl} from '../../utils/utils'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
@@ -62,15 +61,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
-    const {fillUrlTemplate} = useUrlTemplate()
-
-    const {pathname, search} = useLocation()
-    const site = useMemo(() => {
-        return resolveSiteFromUrl(`${pathname}${search}`)
-    }, [pathname, search])
-    const locale = useMemo(() => {
-        return resolveLocaleFromUrl(`${pathname}${search}`)
-    }, [pathname, search, site])
+    const {site, locale, fillUrlTemplate} = useUrlTemplate()
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')

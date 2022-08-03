@@ -29,16 +29,18 @@ import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
-import useSite from '../../hooks/use-site'
 import useUrlTemplate from '../../hooks/use-url-template'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
-    const {site} = useSite()
+    const {site, fillUrlTemplate} = useUrlTemplate()
+
+    console.log('Footer site:', site)
+    console.log('Footer site:', site)
     const {l10n} = site
-    const {fillUrlTemplate} = useUrlTemplate()
+
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 

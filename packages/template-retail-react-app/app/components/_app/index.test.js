@@ -11,10 +11,10 @@ import {Helmet} from 'react-helmet'
 import App from './index.jsx'
 import {renderWithProviders} from '../../utils/test-utils'
 import {DEFAULT_LOCALE} from '../../utils/test-utils'
-import useSite from '../../hooks/use-site'
+import useUrlTemplate from '../../hooks/use-url-template'
 import messages from '../../translations/compiled/en-GB.json'
 import mockConfig from '../../../config/mocks/default'
-jest.mock('../../hooks/use-site', () => jest.fn())
+jest.mock('../../hooks/use-url-template', () => jest.fn())
 let windowSpy
 beforeAll(() => {
     jest.spyOn(console, 'log').mockImplementation(jest.fn())
@@ -37,13 +37,24 @@ afterEach(() => {
 
 describe('App', () => {
     const site = {
-        site: {
-            ...mockConfig.app.sites[0],
-            alias: 'uk'
-        }
+        ...mockConfig.app.sites[0],
+        alias: 'uk'
     }
+
+    const locale = DEFAULT_LOCALE
+
+    const fillUrlTemplate = jest.fn().mockImplementation((href, site, locale) => {
+        return `${site ? `/${site}` : ''}${locale ? `/${locale}` : ''}${href}`
+    })
+
+    const resultUseUrlTemplate = {
+        site,
+        locale,
+        fillUrlTemplate
+    }
+
     test('App component is rendered appropriately', () => {
-        useSite.mockImplementation(() => site)
+        useUrlTemplate.mockImplementation(() => resultUseUrlTemplate)
         renderWithProviders(
             <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <p>Any children here</p>
@@ -68,7 +79,7 @@ describe('App', () => {
     })
 
     test('The localized hreflang links exist in the html head', () => {
-        useSite.mockImplementation(() => site)
+        useUrlTemplate.mockImplementation(() => resultUseUrlTemplate)
         renderWithProviders(
             <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages} />
         )
@@ -79,7 +90,9 @@ describe('App', () => {
         const hasGeneralLocale = ({hrefLang}) => hrefLang === DEFAULT_LOCALE.slice(0, 2)
 
         // `length + 2` because one for a general locale and the other with x-default value
-        expect(hreflangLinks.length).toBe(site.site.l10n.supportedLocales.length + 2)
+        expect(hreflangLinks.length).toBe(
+            resultUseUrlTemplate.site.l10n.supportedLocales.length + 2
+        )
 
         expect(hreflangLinks.some((link) => hasGeneralLocale(link))).toBe(true)
         expect(hreflangLinks.some((link) => link.hrefLang === 'x-default')).toBe(true)

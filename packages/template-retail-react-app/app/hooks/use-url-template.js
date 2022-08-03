@@ -6,29 +6,27 @@
  */
 
 import {useContext} from 'react'
-import {LocaleContext, SiteContext, UrlTemplateContext} from '../contexts'
+import {MultiSiteContext} from '../contexts'
 
 /**
  * Custom React hook to get the function that generates URLs following the App configuration.
- * @returns {{fillUrlTemplate: (function(*, *, *): *)}}
+ * @returns {{site, fillUrlTemplate: (function(*, *, *): *), locale}}
  */
 const useUrlTemplate = () => {
-    const {fillUrlTemplate: originalFn} = useContext(UrlTemplateContext)
-    const context = useContext(UrlTemplateContext)
+    const context = useContext(MultiSiteContext)
     if (context === undefined) {
-        throw new Error('useUrlTemplate must be used within UrlTemplateProvider')
+        throw new Error('useUrlTemplate must be used within MultiSiteProvider')
     }
-    const siteContext = useContext(SiteContext)
-    const localeContext = useContext(LocaleContext)
+    const {fillUrlTemplate: originalFn, site, locale} = context
 
-    const fillUrlTemplate = (path, site, locale) => {
+    const fillUrlTemplate = (path, siteRef, localeRef) => {
         return originalFn(
             path,
-            site ? site : siteContext?.site?.alias || siteContext?.site?.id,
-            locale ? locale : localeContext?.locale
+            siteRef ? siteRef : site?.alias || site?.id,
+            localeRef ? localeRef : locale
         )
     }
-    return {fillUrlTemplate}
+    return {site, locale, fillUrlTemplate}
 }
 
 export default useUrlTemplate

@@ -6,8 +6,6 @@
  */
 import {useCallback} from 'react'
 import {useHistory} from 'react-router'
-import {useIntl} from 'react-intl'
-import useSite from './use-site'
 import useUrlTemplate from './use-url-template'
 
 /**
@@ -18,9 +16,7 @@ import useUrlTemplate from './use-url-template'
 const useNavigation = () => {
     const history = useHistory()
 
-    const {locale: localeShortCode} = useIntl()
-    const {site} = useSite()
-    const {fillUrlTemplate} = useUrlTemplate()
+    const {site, locale: localeShortCode, fillUrlTemplate} = useUrlTemplate()
 
     return useCallback(
         /**

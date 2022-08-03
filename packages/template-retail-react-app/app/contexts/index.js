@@ -46,42 +46,49 @@ CategoriesProvider.propTypes = {
     categories: PropTypes.object
 }
 
-export const LocaleContext = React.createContext()
-export const LocaleProvider = ({locale: initialLocale = {}, children}) => {
+/**
+ * This is the global state for the multiples sites and locales supported in the App.
+ *
+ * To use the context simply import them into the component requiring context
+ * like the below example:
+ *
+ * import React, {useContext} from 'react'
+ * import {MultiSiteContext} from './contexts'
+ *
+ * export const RootCurrencyLabel = () => {
+ *    const {site,locale,urlTemplate} = useContext(MultiSiteContext)
+ *    return <div>{site} {locale}</div>
+ * }
+ *
+ * Alternatively you can use the hook provided by us:
+ *
+ * import {useUrlTemplate} from './hooks'
+ *
+ * const {site, locale, fillUrlTemplate} = useUrlTemplate()
+ * @type {React.Context<unknown>}
+ */
+export const MultiSiteContext = React.createContext()
+export const MultiSiteProvider = ({
+    site: initialSite = {},
+    locale: initialLocale = {},
+    fillUrlTemplate,
+    children
+}) => {
+    const [site, setSite] = useState(initialSite)
     const [locale, setLocale] = useState(initialLocale)
 
-    return <LocaleContext.Provider value={{locale, setLocale}}>{children}</LocaleContext.Provider>
-}
-
-LocaleProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-    locale: PropTypes.string
-}
-
-export const SiteContext = React.createContext()
-export const SiteProvider = ({site: initialSite = {}, children}) => {
-    const [site, setSite] = useState(initialSite)
-
-    return <SiteContext.Provider value={{site, setSite}}>{children}</SiteContext.Provider>
-}
-
-SiteProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-    site: PropTypes.object
-}
-
-export const UrlTemplateContext = React.createContext()
-export const UrlTemplateProvider = ({fillUrlTemplate, children}) => {
     return (
-        <UrlTemplateContext.Provider value={{fillUrlTemplate}}>
+        <MultiSiteContext.Provider value={{site, setSite, locale, setLocale, fillUrlTemplate}}>
             {children}
-        </UrlTemplateContext.Provider>
+        </MultiSiteContext.Provider>
     )
 }
 
-UrlTemplateProvider.propTypes = {
+MultiSiteProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    fillUrlTemplate: PropTypes.func
+    fillUrlTemplate: PropTypes.func,
+    site: PropTypes.object,
+    locale: PropTypes.string
 }
 
 /**
