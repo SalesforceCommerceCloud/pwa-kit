@@ -47,7 +47,7 @@ import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import useUrlTemplate from '../../hooks/use-url-template'
+import useMultiSite from '../../hooks/use-multi-site'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -61,7 +61,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
-    const {site, locale, fillUrlTemplate} = useUrlTemplate()
+    const {site, locale, fillUrlTemplate} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')

@@ -62,9 +62,9 @@ CategoriesProvider.propTypes = {
  *
  * Alternatively you can use the hook provided by us:
  *
- * import {useUrlTemplate} from './hooks'
+ * import {useMultiSite} from './hooks'
  *
- * const {site, locale, fillUrlTemplate} = useUrlTemplate()
+ * const {site, locale, fillUrlTemplate} = useMultiSite()
  * @type {React.Context<unknown>}
  */
 export const MultiSiteContext = React.createContext()

@@ -7,17 +7,17 @@
 
 import React from 'react'
 import {renderHook} from '@testing-library/react-hooks'
-import useUrlTemplate from './use-url-template'
+import useMultiSite from './use-multi-site'
 import {MultiSiteProvider} from '../contexts'
 import mockConfig from '../../config/mocks/default'
 import {DEFAULT_LOCALE} from '../utils/test-utils'
 
 const wrapper = ({children}) => <MultiSiteProvider>{children}</MultiSiteProvider>
 
-let resultUseUrlTemplate = {}
+let resultuseMultiSite = {}
 
 beforeEach(() => {
-    resultUseUrlTemplate = {}
+    resultuseMultiSite = {}
 })
 
 const site = {
@@ -31,20 +31,20 @@ const fillUrlTemplate = jest.fn().mockImplementation((href, site, locale) => {
     return `${site ? `/${site}` : ''}${locale ? `/${locale}` : ''}${href}`
 })
 
-const mockResultUseUrlTemplate = {
+const mockResultuseMultiSite = {
     site,
     locale,
     fillUrlTemplate
 }
 
-const mockUseContext = jest.fn().mockImplementation(() => mockResultUseUrlTemplate)
+const mockUseContext = jest.fn().mockImplementation(() => mockResultuseMultiSite)
 
 React.useContext = mockUseContext
-describe('useUrlTemplate', () => {
+describe('useMultiSite', () => {
     it('should set initial values', () => {
-        expect(resultUseUrlTemplate).toMatchObject({})
+        expect(resultuseMultiSite).toMatchObject({})
 
-        const {result} = renderHook(() => useUrlTemplate(), {wrapper})
+        const {result} = renderHook(() => useMultiSite(), {wrapper})
 
         expect(mockUseContext).toHaveBeenCalled()
         expect(result.current).toHaveProperty('site')

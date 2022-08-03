@@ -6,7 +6,7 @@
  */
 import {useCallback} from 'react'
 import {useHistory} from 'react-router'
-import useUrlTemplate from './use-url-template'
+import useMultiSite from './use-multi-site'
 
 /**
  * A convenience hook for programmatic navigation uses history's `push` or `replace`. The proper locale
@@ -16,7 +16,7 @@ import useUrlTemplate from './use-url-template'
 const useNavigation = () => {
     const history = useHistory()
 
-    const {site, locale: localeShortCode, fillUrlTemplate} = useUrlTemplate()
+    const {site, locale: localeShortCode, fillUrlTemplate} = useMultiSite()
 
     return useCallback(
         /**

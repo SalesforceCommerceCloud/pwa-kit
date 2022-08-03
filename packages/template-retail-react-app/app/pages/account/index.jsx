@@ -37,7 +37,7 @@ import {useLocation} from 'react-router-dom'
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-import useUrlTemplate from '../../hooks/use-url-template'
+import useMultiSite from '../../hooks/use-multi-site'
 
 const Account = () => {
     const {path} = useRouteMatch()
@@ -49,7 +49,7 @@ const Account = () => {
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
     const [showLoading, setShowLoading] = useState(false)
 
-    const {fillUrlTemplate} = useUrlTemplate()
+    const {fillUrlTemplate} = useMultiSite()
 
     const onSignoutClick = async () => {
         setShowLoading(true)

@@ -29,13 +29,13 @@ import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
-import useUrlTemplate from '../../hooks/use-url-template'
+import useMultiSite from '../../hooks/use-multi-site'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
-    const {site, fillUrlTemplate} = useUrlTemplate()
+    const {site, fillUrlTemplate} = useMultiSite()
 
     console.log('Footer site:', site)
     console.log('Footer site:', site)

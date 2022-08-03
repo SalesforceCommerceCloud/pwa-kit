@@ -12,10 +12,10 @@ import {MultiSiteContext} from '../contexts'
  * Custom React hook to get the function that generates URLs following the App configuration.
  * @returns {{site, fillUrlTemplate: (function(*, *, *): *), locale}}
  */
-const useUrlTemplate = () => {
+const useMultiSite = () => {
     const context = useContext(MultiSiteContext)
     if (context === undefined) {
-        throw new Error('useUrlTemplate must be used within MultiSiteProvider')
+        throw new Error('useMultiSite must be used within MultiSiteProvider')
     }
     const {fillUrlTemplate: originalFn, site, locale} = context
 
@@ -29,4 +29,4 @@ const useUrlTemplate = () => {
     return {site, locale, fillUrlTemplate}
 }
 
-export default useUrlTemplate
+export default useMultiSite
