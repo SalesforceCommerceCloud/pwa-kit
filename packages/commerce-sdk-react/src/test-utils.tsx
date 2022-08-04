@@ -31,10 +31,16 @@ export const renderWithProviders = (
     render(ui, {wrapper: TestProviders, ...options})
 }
 
-const mockHttpResponses = (pathToFixturesDirectory: string) => {
+type NockBackOptions = {
+    directory: string
+    mode?: nock.BackMode
+}
+export const mockHttpResponses = (options: NockBackOptions) => {
     const nockBack = nock.back
-    nockBack.fixtures = pathToFixturesDirectory
-    nockBack.setMode('record')
+    const mode = (process.env.NOCK_BACK_MODE as nock.BackMode) || options.mode || 'record'
+
+    nockBack.fixtures = options.directory
+    nockBack.setMode(mode)
 
     const withMocks = (testFn: () => Promise<void>) => {
         return async () => {
@@ -49,8 +55,6 @@ const mockHttpResponses = (pathToFixturesDirectory: string) => {
 
     return {withMocks}
 }
-
-export const mockHookResponses = () => mockHttpResponses(`${__dirname}/hooks/mock-responses`)
 
 const slugify = (text: string) => {
     return text

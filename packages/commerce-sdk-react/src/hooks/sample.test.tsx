@@ -9,12 +9,12 @@ import React, {useEffect, useState} from 'react'
 import '@testing-library/jest-dom'
 import {screen, waitFor} from '@testing-library/react'
 
-import {mockHookResponses, renderWithProviders} from '../test-utils'
+import {mockHttpResponses, renderWithProviders} from '../test-utils'
 import useCommerceApi from './useCommerceApi'
 
 // TODO: uninstall `msw`
 
-const {withMocks} = mockHookResponses()
+const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`})
 
 test(
     'useCommerceApi hook',
