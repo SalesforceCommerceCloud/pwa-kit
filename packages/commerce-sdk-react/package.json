@@ -39,6 +39,7 @@
   "types": "dist/index.d.ts",
   "private": true,
   "devDependencies": {
+    "@tanstack/react-query": "^4.0.10",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.5",
     "@types/node": "^14.18.22",
@@ -48,11 +49,12 @@
     "internal-lib-build": "^2.2.0-dev",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "typedoc": "^0.23.5",
     "typescript": "^4.7.2",
-    "watch": "^1.0.2",
-    "typedoc": "^0.23.5"
+    "watch": "^1.0.2"
   },
   "peerDependencies": {
+    "@tanstack/react-query": "^4.0.10",
     "react": "^17"
   },
   "dependencies": {
