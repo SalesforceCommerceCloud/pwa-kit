@@ -36,20 +36,23 @@ type NockBackOptions = {
     mode?: nock.BackMode
 }
 export const mockHttpResponses = (options: NockBackOptions) => {
-    const nockBack = nock.back
     const mode = (process.env.NOCK_BACK_MODE as nock.BackMode) || options.mode || 'record'
 
+    const nockBack = nock.back
     nockBack.fixtures = options.directory
-    nockBack.setMode(mode)
 
     const withMocks = (testFn: () => Promise<void> | void) => {
         return async () => {
             const testName = expect.getState().currentTestName
             const fileName = `${slugify(testName)}.json`
 
+            nockBack.setMode(mode)
             const {nockDone} = await nockBack(fileName)
             await testFn()
             nockDone()
+
+            // Make sure nock do not interfere with other tests that do not call `withMocks`
+            nockBack.setMode('wild')
         }
     }
 
