@@ -42,7 +42,7 @@ export const mockHttpResponses = (options: NockBackOptions) => {
     nockBack.fixtures = options.directory
     nockBack.setMode(mode)
 
-    const withMocks = (testFn: () => Promise<void>) => {
+    const withMocks = (testFn: () => Promise<void> | void) => {
         return async () => {
             const testName = expect.getState().currentTestName
             const fileName = `${slugify(testName)}.json`
