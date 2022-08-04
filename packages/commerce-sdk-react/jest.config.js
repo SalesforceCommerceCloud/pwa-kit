@@ -17,5 +17,5 @@ module.exports = {
             statements: 0
         }
     },
-    collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/mock/*']
+    collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}']
 }
