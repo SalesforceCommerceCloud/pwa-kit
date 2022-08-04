@@ -12,8 +12,6 @@ import {screen, waitFor} from '@testing-library/react'
 import {mockHttpResponses, renderWithProviders} from '../test-utils'
 import useCommerceApi from './useCommerceApi'
 
-// TODO: uninstall `msw`
-
 const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`})
 
 test(
