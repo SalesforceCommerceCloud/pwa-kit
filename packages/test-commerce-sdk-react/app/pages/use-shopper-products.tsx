@@ -19,7 +19,7 @@ const UseShopperProducts = () => {
         return (
             <div>
                 <h1>Products</h1>
-                <h1 style={{background: 'aqua'}}>Loading...</h1>
+                <h2 style={{background: 'aqua'}}>Loading...</h2>
             </div>
         )
     }

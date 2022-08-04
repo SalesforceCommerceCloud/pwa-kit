@@ -10,7 +10,7 @@ import {ActionResponse, QueryResponse} from './types'
 export const useAsync = <T>(fn: () => Promise<T>, deps: unknown[] = []): QueryResponse<T> => {
     const [data, setData] = useState<T | undefined>()
     const [error, setError] = useState<Error | undefined>()
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
     useEffect(() => {
         // use this variable to avoid race condition
         let subscribe = true

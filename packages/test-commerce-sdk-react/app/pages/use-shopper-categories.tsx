@@ -23,16 +23,12 @@ function UseShopperCategories() {
         return (
             <div>
                 <h1>useShopperCategories page</h1>
-                <div style={{background: 'yellow'}}>Loading...</div>
+                <h2 style={{background: 'aqua'}}>Loading...</h2>
             </div>
         )
     }
     if (error) {
         return <h1 style={{color: 'red'}}>Something is wrong</h1>
-    }
-    let flattened = {}
-    if (result) {
-        flattened = flatten(result.data[0], 'categories')
     }
     return (
         <div>
@@ -41,7 +37,7 @@ function UseShopperCategories() {
             </div>
             <h1>useShopperCategories page</h1>
             {result &&
-                Object.keys(flattened).map((key) => (
+                Object.keys(flatten(result.data[0], 'categories')).map((key) => (
                     <div key={key}>
                         <Link to={`/categories/${key}`}>Category {key}</Link>
                     </div>

@@ -17,7 +17,7 @@ function UseShopperProduct() {
         return (
             <div>
                 <h1>useProducts page</h1>
-                <div style={{background: 'aqua'}}>Loading....</div>
+                <h2 style={{background: 'aqua'}}>Loading...</h2>
             </div>
         )
     }
