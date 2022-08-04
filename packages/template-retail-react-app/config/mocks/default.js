@@ -29,6 +29,7 @@ module.exports = {
                 id: 'site-1',
                 l10n: {
                     defaultLocale: 'en-GB',
+                    defaultCurrency: 'GBP',
                     supportedLocales: [
                         {
                             id: 'en-GB',
@@ -50,6 +51,7 @@ module.exports = {
                 id: 'site-2',
                 l10n: {
                     defaultLocale: 'en-US',
+                    defaultCurrency: 'USD',
                     supportedLocales: [
                         {
                             id: 'en-US',
