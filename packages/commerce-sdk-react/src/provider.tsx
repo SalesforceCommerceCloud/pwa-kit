@@ -41,7 +41,7 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {children, clientId, organizationId, shortCode, siteId, proxy} = props
 
-    // DEBUG
+    // DEBUG: copy access token from browser
     const headers = {
         authorization: ''
     }
