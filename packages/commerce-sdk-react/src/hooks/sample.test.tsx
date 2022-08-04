@@ -14,6 +14,10 @@ import useCommerceApi from './useCommerceApi'
 
 const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`})
 
+// NOTE: how to easily _update_ the mocked responses:
+// - Globally, via `npm run test:update-mocked-responses`
+// - Per individual test file, by passing in `mode` value -> mockHttpResponses({mode: 'update', directory})
+
 test(
     'useCommerceApi hook',
     withMocks(async () => {
