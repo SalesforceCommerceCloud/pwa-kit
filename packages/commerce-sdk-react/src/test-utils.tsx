@@ -19,22 +19,41 @@ const sampleProps = {
     locale: 'en_US',
     currency: 'USD'
 }
-
 const TestProviders = (props: {children: React.ReactNode}) => {
     return <CommerceApiProvider {...sampleProps}>{props.children}</CommerceApiProvider>
 }
 
+/**
+ * Render your component, which will be wrapped with all the necessary Provider components
+ *
+ * @param component
+ * @param options - additional options for testing-library's render function
+ */
 export const renderWithProviders = (
-    ui: React.ReactElement,
+    component: React.ReactElement,
     options?: Omit<RenderOptions, 'wrapper'>
 ): void => {
-    render(ui, {wrapper: TestProviders, ...options})
+    render(component, {wrapper: TestProviders, ...options})
 }
 
 type NockBackOptions = {
     directory: string
     mode?: nock.BackMode
 }
+
+/**
+ * Enable recording and mocking of the http responses
+ *
+ * @param options -
+ *
+ * @example
+ * ```
+ * const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`})
+ * test('some hook', withMocks(() => {
+ *   // your test that makes http requests
+ * }))
+ * ```
+ */
 export const mockHttpResponses = (options: NockBackOptions) => {
     const mode = (process.env.NOCK_BACK_MODE as nock.BackMode) || options.mode || 'record'
 
