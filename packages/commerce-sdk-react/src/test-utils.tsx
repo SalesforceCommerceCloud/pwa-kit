@@ -31,13 +31,34 @@ export const renderWithProviders = (
     render(ui, {wrapper: TestProviders, ...options})
 }
 
-const recordHttpResponses = (pathToFixturesDirectory: string): nock.Back => {
+const mockHttpResponses = (pathToFixturesDirectory: string) => {
     const nockBack = nock.back
     nockBack.fixtures = pathToFixturesDirectory
     nockBack.setMode('record')
 
-    return nockBack
+    const withMocks = (testFn: () => Promise<void>) => {
+        return async () => {
+            const testName = expect.getState().currentTestName
+            const fileName = `${slugify(testName)}.json`
+
+            const {nockDone} = await nockBack(fileName)
+            await testFn()
+            nockDone()
+        }
+    }
+
+    return {withMocks}
 }
 
-export const recordHookResponses = (): nock.Back =>
-    recordHttpResponses(`${__dirname}/hooks/mock-responses`)
+export const mockHookResponses = () => mockHttpResponses(`${__dirname}/hooks/mock-responses`)
+
+const slugify = (text: string) => {
+    return text
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w-]+/g, '')
+        .replace(/--+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '')
+}

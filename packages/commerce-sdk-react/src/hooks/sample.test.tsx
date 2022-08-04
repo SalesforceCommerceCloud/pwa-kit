@@ -9,40 +9,38 @@ import React, {useEffect, useState} from 'react'
 import '@testing-library/jest-dom'
 import {screen, waitFor} from '@testing-library/react'
 
-import {recordHookResponses, renderWithProviders} from '../test-utils'
+import {mockHookResponses, renderWithProviders} from '../test-utils'
 import useCommerceApi from './useCommerceApi'
 
 // TODO: uninstall `msw`
 
-// TODO: iterate
-const nockBack = recordHookResponses()
+const {withMocks} = mockHookResponses()
 
-test('useCommerceApi', async () => {
-    const {nockDone} = await nockBack('use-commerce-api.json')
+test(
+    'useCommerceApi hook',
+    withMocks(async () => {
+        const Component = () => {
+            const api = useCommerceApi()
+            const [productName, setProductName] = useState('')
 
-    const Component = () => {
-        const api = useCommerceApi()
-        const [productName, setProductName] = useState('')
+            useEffect(() => {
+                const fetchProductName = async () => {
+                    const product = await api.shopperProducts.getProduct({
+                        parameters: {id: '25591862M'}
+                    })
+                    setProductName(product.name as string)
+                }
+                fetchProductName()
+            }, [])
 
-        useEffect(() => {
-            const fetchProductName = async () => {
-                const product = await api.shopperProducts.getProduct({
-                    parameters: {id: '25591862M'}
-                })
-                setProductName(product.name as string)
-            }
-            fetchProductName()
-        }, [])
+            return <div>{productName}</div>
+        }
+        // This util function would automatically integrate the provider components for you
+        renderWithProviders(<Component />)
 
-        return <div>{productName}</div>
-    }
-    // This util function would automatically integrate the provider components for you
-    renderWithProviders(<Component />)
+        const productName = 'Stripe Walking Short'
+        await waitFor(() => screen.getByText(productName))
 
-    const productName = 'Stripe Walking Short'
-    await waitFor(() => screen.getByText(productName))
-
-    expect(screen.getByText(productName)).toBeInTheDocument()
-
-    nockDone()
-})
+        expect(screen.getByText(productName)).toBeInTheDocument()
+    })
+)
