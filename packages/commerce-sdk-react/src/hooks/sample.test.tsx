@@ -18,7 +18,9 @@ const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`}
 
 // NOTE: how to easily _update_ the mocked responses:
 // - Globally, via `npm run test:update-mocked-responses`
-// - Per individual test file, by passing in `mode` value -> mockHttpResponses({mode: 'update', directory})
+// - Per individual test file,
+//   - by temporarily passing in `mode: update` -> mockHttpResponses({mode: 'update', directory})
+//   - OR by manually removing the mock-responses folder and re-running the tests
 
 const ProductName = ({id}: {id: string}) => {
     const api = useCommerceApi()
