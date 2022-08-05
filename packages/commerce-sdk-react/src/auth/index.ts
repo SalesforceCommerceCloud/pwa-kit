@@ -215,6 +215,21 @@ class Auth {
         return this.pending
     }
 
+    async loginGuestUser() {
+        const redirectURI = this.redirectURI
+        const usid = this.get('usid')
+        const request = async () => {
+            const res = await helpers.loginGuestUser(this.client, {
+                redirectURI,
+                ...(usid && {usid}),
+            })
+            this.handleTokenResponse(res, true)
+            return this.data
+        }
+        this.pending = request()
+        return this.pending
+    }
+
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
@@ -223,7 +238,7 @@ class Auth {
                 redirectURI,
                 ...(usid && {usid}),
             })
-            await this.handleTokenResponse(res, true)
+            this.handleTokenResponse(res, true)
             return this.data
         }
         this.pending = request()
@@ -235,7 +250,7 @@ class Auth {
             const res = await helpers.logout(this.client, {
                 refreshToken: this.get('refreshTokenRegistered'),
             })
-            await this.handleTokenResponse(res, true)
+            this.handleTokenResponse(res, true)
             return this.data
         }
         this.pending = request()
