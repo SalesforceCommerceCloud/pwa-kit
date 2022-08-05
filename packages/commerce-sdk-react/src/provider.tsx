@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {ReactElement, useEffect, useState} from 'react'
+import React, {ReactElement, useEffect, useState, useRef} from 'react'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -59,8 +59,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
     }
 
-    // Warning: do not set state, it will trigger Provider re-render
-    const [apiClients] = useState<ApiClients>({
+    const {current: apiClients} = useRef<ApiClients>({
         shopperBaskets: new ShopperBaskets(config),
         shopperContexts: new ShopperContexts(config),
         shopperCustomers: new ShopperCustomers(config),
@@ -73,8 +72,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shopperSearch: new ShopperSearch(config),
     })
 
-    // Warning: do not set state, it will trigger Provider re-render
-    const [auth] = useState(
+    const {current: auth} = useRef(
         new Auth({
             clientId,
             organizationId,

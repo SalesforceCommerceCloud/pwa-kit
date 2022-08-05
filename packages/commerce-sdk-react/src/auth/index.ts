@@ -14,21 +14,15 @@ interface AuthConfig {
 }
 
 interface JWTHeaders {
-    aud: string
-    aut: string
-    ctx: string
     exp: number
     iat: number
-    isb: string
-    iss: string
-    ist: number
-    jti: string
-    nbf: number
-    scp: string
-    sty: string
-    sub: string
 }
 
+// this type is slightly different from ShopperLoginTypes.TokenResponse, reasons:
+// 1. TokenResponse is too generic (with & {[key:string]: any}), we need a more
+//    restrictive type to make sure type safe
+// 2. The refresh tokens are stored separately for guest and registered user. Instead
+//    of refresh_token, we have refresh_token_guest and refresh_token_registered
 type AuthDataKeys =
     | 'access_token'
     | 'customer_id'
