@@ -4,25 +4,42 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {ActionResponse, QueryResponse} from './types'
 
+// NOTE: temporary implementation, so that I can test other hooks besides `useCommerceApi`
+// TODO: revert this change
 export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryResponse<T> => {
-    // This is a stub implementation to validate the types.
-    // The real implementation will be more React-y.
-    const result: QueryResponse<T> = {
-        isLoading: true
-    }
-    fn()
-        .then((data) => {
-            result.isLoading = false
-            result.data = data
-        })
-        .catch((error) => {
-            result.isLoading = false
-            result.error = error
-        })
-    return result
+    const [data, setData] = useState<T>()
+    const [error, setError] = useState<Error>()
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        let subscribed = true
+
+        fn().then(
+            (r) => {
+                if (subscribed) {
+                    console.log('--- got response', r)
+                    setIsLoading(false)
+                    setData(r)
+                }
+            },
+            (e) => {
+                if (subscribed) {
+                    console.log('--- got error', e)
+                    setIsLoading(false)
+                    setError(e)
+                }
+            }
+        )
+
+        return function cleanup() {
+            subscribed = false
+        }
+    }, deps || [])
+
+    return {data, error, isLoading}
 }
 
 export const useAsyncCallback = <Args extends unknown[], Ret>(
