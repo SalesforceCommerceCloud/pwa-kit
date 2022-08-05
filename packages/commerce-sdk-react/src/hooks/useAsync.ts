@@ -27,7 +27,7 @@ export const useAsync = <T>(
     const result: QueryResponse<T> = {
         data,
         error,
-        isLoading,
+        isLoading
     }
 
     useEffect(() => {
@@ -74,7 +74,7 @@ export const useAsyncCallback = <A extends any[], R>(fn: (...args: A) => Promise
                 .finally(() => {
                     setIsLoading(false)
                 })
-        },
+        }
     }
     return result
 }
