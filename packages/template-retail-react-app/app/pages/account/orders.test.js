@@ -13,6 +13,7 @@ import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../.
 import {mockOrderHistory, mockOrderProducts} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
+import mockConfig from '../../../config/mocks/default'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -66,7 +67,9 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test('Renders order history and details', async () => {
-    renderWithProviders(<MockedComponent history={history} />)
+    renderWithProviders(<MockedComponent history={history} />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
     expect(await screen.findAllByText(/Ordered: /i)).toHaveLength(3)
     expect(

@@ -11,11 +11,10 @@ import {
     productUrlBuilder,
     searchUrlBuilder,
     getPathWithLocale,
-    homeUrlBuilder,
     rebuildPathWithParams,
     removeQueryParamsFromPath,
-    buildPathWithUrlConfig,
-    absoluteUrl
+    absoluteUrl,
+    createUrlTemplate
 } from './url'
 import {getUrlConfig} from './utils'
 import mockConfig from '../../config/mocks/default'
@@ -126,17 +125,20 @@ describe('url builder test', () => {
 
 describe('getPathWithLocale', () => {
     getUrlConfig.mockImplementation(() => mockConfig.app.url)
+
     test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
+        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
-        const relativeUrl = getPathWithLocale('fr-FR', {location})
+        const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
         expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
     })
 
     test('getPathWithLocale uses default site for siteRef when it is no defined in the url', () => {
         const location = new URL('http://localhost:3000/category/newarrivals-womens')
+        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
-        const relativeUrl = getPathWithLocale('fr-FR', {location})
+        const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
         expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
     })
 
@@ -144,8 +146,9 @@ describe('getPathWithLocale', () => {
         const location = new URL(
             'http://localhost:3000/uk/it-IT/category/newarrivals-womens?limit=25&refine=c_refinementColor%3DBianco&sort=best-matches&offset=25'
         )
+        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
-        const relativeUrl = getPathWithLocale('fr-FR', {
+        const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {
             disallowParams: ['refine'],
             location
         })
@@ -156,20 +159,22 @@ describe('getPathWithLocale', () => {
 
     test('getPathWithLocale returns expected for Homepage', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/')
+        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
-        const relativeUrl = getPathWithLocale('fr-FR', {location})
+        const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
         expect(relativeUrl).toEqual(`/uk/fr-FR/`)
     })
 
     test('getPathWithLocale returns / when both site and locale are default', () => {
-        const location = new URL('http://localhost:3000/uk/it-IT/')
+        const location = new URL('http://localhost:3000/')
+        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'en-GB')
 
-        const relativeUrl = getPathWithLocale('en-GB', {location})
+        const relativeUrl = getPathWithLocale('en-GB', buildUrl, {location})
         expect(relativeUrl).toEqual(`/`)
     })
 })
 
-describe('homeUrlBuilder', () => {
+describe('createUrlTemplate tests', () => {
     const defaultSite = mockConfig.app.sites[0]
     const defaultAlias = mockConfig.app.siteAliases[defaultSite.id]
     const defaultSiteMock = {...defaultSite, alias: defaultAlias}
@@ -177,139 +182,162 @@ describe('homeUrlBuilder', () => {
     const nonDefaultSite = mockConfig.app.sites[1]
     const nonDefaultAlias = mockConfig.app.siteAliases[nonDefaultSite.id]
     const nonDefaultSiteMock = {...nonDefaultSite, alias: nonDefaultAlias}
-    const cases = [
-        {
-            urlConfig: {
-                locale: 'path',
-                site: 'path',
-                showDefaults: true
-            },
-            site: defaultSiteMock,
-            locale: {id: 'en-GB'},
-            expectedRes: '/'
-        },
-        {
-            urlConfig: {
-                locale: 'query_param',
-                site: 'query_param',
-                showDefaults: true
-            },
-            site: defaultSiteMock,
-            locale: {id: 'en-GB'},
-            expectedRes: '/'
-        },
-        {
-            urlConfig: {
-                locale: 'path',
-                site: 'path',
-                showDefaults: false
-            },
-            site: defaultSiteMock,
-            locale: {id: 'en-GB'},
-            expectedRes: '/'
-        },
-        {
-            urlConfig: {
-                locale: 'query_param',
-                site: 'query_param',
-                showDefaults: false
-            },
-            site: defaultSiteMock,
-            locale: {id: 'en-GB'},
-            expectedRes: '/'
-        },
-        {
-            urlConfig: {
-                locale: 'path',
-                site: 'path',
-                showDefaults: true
-            },
-            site: defaultSiteMock,
-            locale: {id: 'fr-FR'},
-            expectedRes: '/uk/fr-FR/'
-        },
-        {
-            urlConfig: {
-                locale: 'path',
-                site: 'path',
-                showDefaults: false
-            },
-            site: defaultSiteMock,
-            locale: {id: 'fr-FR'},
-            expectedRes: '/fr-FR/'
-        },
-        {
-            urlConfig: {
-                locale: 'query_param',
-                site: 'query_param',
-                showDefaults: true
-            },
-            site: defaultSiteMock,
-            locale: {id: 'fr-FR'},
-            expectedRes: '/?site=uk&locale=fr-FR'
-        },
-        {
-            urlConfig: {
-                locale: 'path',
-                site: 'path',
-                showDefaults: true
-            },
-            site: nonDefaultSiteMock,
-            locale: {id: 'en-US'},
-            expectedRes: '/us/en-US/'
-        },
-        {
-            urlConfig: {
-                locale: 'query_param',
-                site: 'path',
-                showDefaults: true
-            },
-            site: nonDefaultSiteMock,
-            locale: {id: 'en-US'},
-            expectedRes: '/us/?locale=en-US'
-        },
-        {
-            urlConfig: {
-                locale: 'path',
-                site: 'path',
-                showDefaults: false
-            },
-            site: nonDefaultSiteMock,
-            locale: {id: 'en-US'}, // default locale of the nonDefault Site
-            expectedRes: '/us/'
-        },
-        {
-            urlConfig: {
-                locale: 'query_param',
-                site: 'path',
-                showDefaults: false
-            },
-            site: nonDefaultSiteMock,
-            locale: {id: 'en-US'}, // default locale of the nonDefault Site
-            expectedRes: '/us/'
-        },
-        {
-            urlConfig: {
-                locale: 'query_param',
-                site: 'query_param',
-                showDefaults: true
-            },
-            site: nonDefaultSiteMock,
-            locale: {id: 'en-US'}, // default locale of the nonDefault Site
-            expectedRes: '/?site=us&locale=en-US'
-        }
-    ]
 
-    cases.forEach(({urlConfig, site, locale, expectedRes}) => {
-        test(`return expected URL with site ${site.alias}, locale ${
-            locale.id
-        } and urlConfig as ${JSON.stringify(urlConfig)}`, () => {
-            getUrlConfig.mockImplementation(() => urlConfig)
-            const homeUrl = homeUrlBuilder('/', {
-                site,
-                locale
+    const configValues = ['path', 'query_param', 'none']
+
+    let cases = []
+    for (let i = 0; i < configValues.length; i++) {
+        for (let j = 0; j < configValues.length; j++) {
+            for (let showDefaultsValues = 0; showDefaultsValues < 2; showDefaultsValues++) {
+                if (showDefaultsValues === 0) {
+                    cases.push({
+                        urlConfig: {
+                            locale: configValues[i],
+                            site: configValues[j],
+                            showDefaults: true
+                        },
+                        site: defaultSiteMock,
+                        locale: {id: 'en-GB'}
+                    })
+                } else {
+                    for (let isDefaultSite = 0; isDefaultSite < 2; isDefaultSite++) {
+                        for (let isDefaultLocale = 0; isDefaultLocale < 2; isDefaultLocale++) {
+                            if (isDefaultSite === 0) {
+                                cases.push({
+                                    urlConfig: {
+                                        locale: configValues[i],
+                                        site: configValues[j],
+                                        showDefaults: false
+                                    },
+                                    site: defaultSiteMock,
+                                    locale: isDefaultLocale === 0 ? {id: 'en-GB'} : {id: 'fr-FR'}
+                                })
+                            } else {
+                                cases.push({
+                                    urlConfig: {
+                                        locale: configValues[i],
+                                        site: configValues[j],
+                                        showDefaults: false
+                                    },
+                                    site: nonDefaultSiteMock,
+                                    locale: isDefaultLocale === 0 ? {id: 'en-US'} : {id: 'fr-FR'}
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    const paths = ['/testpath', '/']
+    const expectedResults = (path) => {
+        return path !== '/'
+            ? [
+                  `/uk/en-GB${path}`,
+                  `${path}`,
+                  `/fr-FR${path}`,
+                  `/us${path}`,
+                  `/us/fr-FR${path}`,
+                  `/en-GB${path}?site=uk`,
+                  `${path}`,
+                  `/fr-FR${path}`,
+                  `${path}?site=us`,
+                  `/fr-FR${path}?site=us`,
+                  `/en-GB${path}`,
+                  `${path}`,
+                  `/fr-FR${path}`,
+                  `${path}`,
+                  `/fr-FR${path}`,
+                  `/uk${path}?locale=en-GB`,
+                  `${path}`,
+                  `${path}?locale=fr-FR`,
+                  `/us${path}`,
+                  `/us${path}?locale=fr-FR`,
+                  `${path}?site=uk&locale=en-GB`,
+                  `${path}`,
+                  `${path}?locale=fr-FR`,
+                  `${path}?site=us`,
+                  `${path}?site=us&locale=fr-FR`,
+                  `${path}?locale=en-GB`,
+                  `${path}`,
+                  `${path}?locale=fr-FR`,
+                  `${path}`,
+                  `${path}?locale=fr-FR`,
+                  `/uk${path}`,
+                  `${path}`,
+                  `${path}`,
+                  `/us${path}`,
+                  `/us${path}`,
+                  `${path}?site=uk`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}?site=us`,
+                  `${path}?site=us`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}`
+              ]
+            : [
+                  `${path}`,
+                  `${path}`,
+                  `/fr-FR${path}`,
+                  `/us${path}`,
+                  `/us/fr-FR${path}`,
+                  `${path}`,
+                  `${path}`,
+                  `/fr-FR${path}`,
+                  `${path}?site=us`,
+                  `/fr-FR${path}?site=us`,
+                  `${path}`,
+                  `${path}`,
+                  `/fr-FR${path}`,
+                  `${path}`,
+                  `/fr-FR${path}`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}?locale=fr-FR`,
+                  `/us${path}`,
+                  `/us${path}?locale=fr-FR`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}?locale=fr-FR`,
+                  `${path}?site=us`,
+                  `${path}?site=us&locale=fr-FR`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}?locale=fr-FR`,
+                  `${path}`,
+                  `${path}?locale=fr-FR`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}`,
+                  `/us${path}`,
+                  `/us${path}`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}?site=us`,
+                  `${path}?site=us`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}`,
+                  `${path}`
+              ]
+    }
+    paths.forEach((path) => {
+        cases.forEach(({urlConfig, site, locale}, index) => {
+            test(`URL template path:${path}, site:${site.alias}, locale:${
+                locale.id
+            } and urlConfig:${JSON.stringify(urlConfig)}`, () => {
+                const buildUrl = createUrlTemplate({url: urlConfig}, site.id, locale.id)
+                const resultUrl = buildUrl(path, mockConfig.app.siteAliases[site.id], locale.id)
+
+                expect(resultUrl).toEqual(expectedResults(path)[index])
             })
-            expect(homeUrl).toEqual(expectedRes)
         })
     })
 })
@@ -327,94 +355,6 @@ describe('removeQueryParamsFromPath test', () => {
         const url = '/en/product/25501032M?color=black&size=M&something=123'
         const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'])
         expect(updatedUrl).toEqual('/en/product/25501032M?something=123')
-    })
-})
-
-describe('buildPathWithUrlConfig', () => {
-    test('return a new url with locale and site a part of path', () => {
-        getUrlConfig.mockImplementation(() => ({
-            locale: 'path',
-            site: 'path',
-            showDefaults: true
-        }))
-        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
-        expect(url).toEqual('/uk/en-GB/women/dresses')
-    })
-
-    test('return an expected url with no site, no locale for default values when the showDefaults is off', () => {
-        getUrlConfig.mockImplementation(() => ({
-            locale: 'path',
-            site: 'path',
-            showDefaults: false
-        }))
-        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
-        expect(url).toEqual('/women/dresses')
-    })
-
-    test('return a new url with locale value as a query param and site in the path', () => {
-        getUrlConfig.mockImplementation(() => ({
-            locale: 'query_param',
-            site: 'path',
-            showDefaults: true
-        }))
-        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
-        expect(url).toEqual('/uk/women/dresses?locale=en-GB')
-    })
-
-    test('return a new url with locale value as a path, site as query_param', () => {
-        getUrlConfig.mockImplementation(() => ({
-            locale: 'path',
-            site: 'query_param',
-            showDefaults: true
-        }))
-        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
-        expect(url).toEqual('/en-GB/women/dresses?site=uk')
-    })
-
-    test('return a new url with locale value as a path, site as query_param when showDefault is off', () => {
-        getUrlConfig.mockImplementation(() => ({
-            locale: 'path',
-            site: 'query_param',
-            showDefaults: false
-        }))
-        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
-        expect(url).toEqual('/women/dresses')
-    })
-
-    test('return a new url without a disallow param but respect other params', () => {
-        getUrlConfig.mockImplementation(() => ({
-            locale: 'query_param',
-            site: 'path',
-            showDefaults: true
-        }))
-        const url = buildPathWithUrlConfig(
-            '/women/dresses?something=else&refine=c_color',
-            {locale: 'en-GB', site: 'uk'},
-            {disallowParams: ['refine']}
-        )
-        expect(url).toEqual('/uk/women/dresses?something=else&locale=en-GB')
-    })
-
-    test('return a new url as configured when the values are not defaults and showDefault is off', () => {
-        getUrlConfig.mockImplementation(() => ({
-            locale: 'query_param',
-            site: 'path',
-            showDefaults: false
-        }))
-        const url = buildPathWithUrlConfig(
-            '/women/dresses?something=else&refine=c_color',
-            {locale: 'en-CA', site: 'us'},
-            {disallowParams: ['refine']}
-        )
-        expect(url).toEqual('/us/women/dresses?something=else&locale=en-CA')
-    })
-
-    test('throw an error when url config is not defined', () => {
-        getUrlConfig.mockImplementation(() => undefined)
-
-        expect(() => {
-            buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
-        }).toThrow()
     })
 })
 

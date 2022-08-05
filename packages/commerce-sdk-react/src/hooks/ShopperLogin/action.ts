@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ActionResponse, ApiClients, Argument, DataType} from '../types'
+import {ApiClients, DataType, ScapiActionResponse} from '../types'
 import {useAsyncCallback} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 
@@ -64,15 +64,17 @@ export enum ShopperLoginActions {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-login?meta=introspectToken} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperlogin.shopperlogin-1.html#introspecttoken} for more information on the parameters and returned data type.
      */
-    IntrospectToken = 'introspectToken'
+    IntrospectToken = 'introspectToken',
 }
 
 /**
  * A hook for performing actions with the Shopper Login API.
  */
-export function useShopperLoginAction<Action extends ShopperLoginActions>(
+// TODO: Why does prettier not like "extends `${Actions}`"?
+// eslint-disable-next-line prettier/prettier
+export function useShopperLoginAction<Action extends `${ShopperLoginActions}`>(
     action: Action
-): ActionResponse<Parameters<Client[Action]>, DataType<Client[Action]>> {
+): ScapiActionResponse<Parameters<Client[Action]>, DataType<Client[Action]>, Action> {
     type Arg = Parameters<Client[Action]>
     type Data = DataType<Client[Action]>
     // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
@@ -89,5 +91,9 @@ export function useShopperLoginAction<Action extends ShopperLoginActions>(
     const method = client[action]
     assertMethod(method)
 
-    return useAsyncCallback((...arg: Arg) => method.call(client, arg))
+    const hook = useAsyncCallback((...args: Arg) => method.call(client, args))
+    // TypeScript loses information when using a computed property name - it assumes `string`, but
+    // we know it's `Action`. This type assertion just restores that lost information.
+    const namedAction = {[action]: hook.execute} as Record<Action, typeof hook.execute>
+    return {...hook, ...namedAction}
 }
