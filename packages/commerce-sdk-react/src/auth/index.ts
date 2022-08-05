@@ -62,9 +62,6 @@ class Auth {
     private cookieStorage: CookieStorage
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
 
-    static COOKIE = 'COOKIE'
-    static LOCAL_STORAGE = 'LOCAL_STORAGE'
-
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
             proxy: config.proxy,
