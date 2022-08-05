@@ -19,7 +19,7 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
             as={useNavLink ? NavSPALink : SPALink}
             {...(useNavLink && {exact: true})}
             {...props}
-            to={_href === '/' ? '/' : updatedHref}
+            to={updatedHref}
             ref={ref}
         />
     )
