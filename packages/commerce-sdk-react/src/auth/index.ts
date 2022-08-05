@@ -56,7 +56,7 @@ type AuthDataMap = Record<
 class Auth {
     private client: ShopperLogin<ApiClientConfigParams>
     private redirectURI: string
-    private _onClient = typeof window !== 'undefined'
+    private onClient = typeof window !== 'undefined'
     private pending: Promise<ShopperLoginTypes.TokenResponse> | undefined
     private localStorage: LocalStorage
     private cookieStorage: CookieStorage
@@ -77,8 +77,8 @@ class Auth {
         })
 
         this.redirectURI = config.redirectURI
-        this.localStorage = this._onClient ? new LocalStorage() : new Map()
-        this.cookieStorage = this._onClient ? new CookieStorage() : new Map()
+        this.localStorage = this.onClient ? new LocalStorage() : new Map()
+        this.cookieStorage = this.onClient ? new CookieStorage() : new Map()
     }
 
     private get(name: AuthDataKeys) {
