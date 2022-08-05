@@ -11,7 +11,6 @@ import {screen, waitFor} from '@testing-library/react'
 
 import {mockHttpResponses, renderWithProviders} from '../test-utils'
 import useCommerceApi from './useCommerceApi'
-import {useProduct} from './ShopperProducts'
 import {useAsync} from './useAsync'
 
 const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`})
@@ -110,12 +109,3 @@ test(
 )
 
 // TODO: install eslint plugin https://github.com/testing-library/eslint-plugin-testing-library
-
-// TODO: new tests that demonstrate:
-// pwa kit domain:
-// - mimic async network requests by delaying the response. And also checking the return value of our hooks _twice_
-// - common patterns when testing hooks <- is this for a separate PR?
-//
-// nock domain: <- is this necessary?
-// - a new recording / json file created for every test
-// - multiple requests to the same endpoint in the same test would result in multiple results in the json file
