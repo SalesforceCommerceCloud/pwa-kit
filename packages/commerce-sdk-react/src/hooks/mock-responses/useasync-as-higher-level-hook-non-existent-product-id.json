@@ -1,0 +1,43 @@
+[
+    {
+        "scope": "http://localhost:3000",
+        "method": "GET",
+        "path": "/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products/1?siteId=RefArchGlobal",
+        "body": "",
+        "status": 401,
+        "response": {
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized",
+            "title": "Unauthorized",
+            "detail": "Your shopper JWT is invalid and could not be used to identify the API client."
+        },
+        "rawHeaders": [
+            "date",
+            "Fri, 05 Aug 2022 23:17:08 GMT",
+            "content-length",
+            "206",
+            "connection",
+            "close",
+            "cf-ray",
+            "73633e978d59a715-PHX",
+            "strict-transport-security",
+            "max-age=31536000; includeSubdomains;",
+            "cf-cache-status",
+            "DYNAMIC",
+            "expect-ct",
+            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+            "x-correlation-id",
+            "73633e978d59a715",
+            "x-ratelimit-limit",
+            "28000",
+            "x-ratelimit-remaining",
+            "27999",
+            "vary",
+            "Accept-Encoding",
+            "server",
+            "cloudflare",
+            "x-proxy-request-url",
+            "https://kv7kzm78.api.commercecloud.salesforce.com/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products/1?siteId=RefArchGlobal"
+        ],
+        "responseIsBinary": false
+    }
+]
