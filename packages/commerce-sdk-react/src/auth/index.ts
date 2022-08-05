@@ -99,7 +99,7 @@ class Auth {
         return {
             access_token: {
                 storage: this.localStorage,
-                key: 'cc-ax',
+                key: 'access_token',
             },
             customer_id: {
                 storage: this.localStorage,
@@ -187,7 +187,6 @@ class Auth {
      */
     private async init() {
         if (!this.isTokenExpired(this.get('access_token'))) {
-            console.log('Re-using access token from previous session.')
             return this.data
         }
 
@@ -206,8 +205,16 @@ class Auth {
     }
 
     private handleTokenResponse(res: ShopperLoginTypes.TokenResponse, isGuest: boolean) {
-        const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         this.set('access_token', `Bearer ${res.access_token}`)
+        this.set('customer_id', res.customer_id)
+        this.set('enc_user_id', res.enc_user_id)
+        this.set('expires_in', `${res.expires_in}`)
+        this.set('id_token', res.id_token)
+        this.set('idp_access_token', res.idp_access_token)
+        this.set('token_type', res.token_type)
+        this.set('usid', res.usid)
+
+        const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         this.set(refreshTokenKey, res.refresh_token, {
             expires: this.REFRESH_TOKEN_EXPIRATION_DAYS,
         })
@@ -221,7 +228,7 @@ class Auth {
      * We use this method to block those commerce api calls that
      * requires an access token.
      */
-    ready() {
+    async ready() {
         if (!this.pending) {
             this.pending = this.init()
         }

@@ -22,7 +22,6 @@ export const useProducts = (
     arg: Argument<Client['getProducts']>
 ): QueryResponse<DataType<Client['getProducts']>> => {
     const {shopperProducts: client} = useCommerceApi()
-    console.log('useProducts')
 
     return useAsync((accessToken) => client.getProducts(withAccessToken(arg, accessToken)), [arg])
 }
