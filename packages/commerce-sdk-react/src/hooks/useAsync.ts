@@ -1,4 +1,3 @@
-import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 /*
  * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
@@ -16,6 +15,7 @@ import {ActionResponse, QueryResponse} from './types'
  *
  * @internal
  */
+// TODO: implementation to be replaced by ReactQuery / SWR
 export const useAsync = <T>(
     fn: (accessToken: string) => Promise<T>,
     deps?: unknown[]
@@ -52,6 +52,7 @@ export const useAsync = <T>(
     return result
 }
 
+// TODO: implementation to be replaced by ReactQuery / SWR
 export const useAsyncCallback = <A extends any[], R>(fn: (...args: A) => Promise<R>) => {
     const [isLoading, setIsLoading] = useState(false)
     const [data, setData] = useState<R | undefined>(undefined)

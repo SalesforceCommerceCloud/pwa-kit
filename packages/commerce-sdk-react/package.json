@@ -42,6 +42,7 @@
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.5",
     "@types/js-cookie": "^3.0.2",
+    "@types/jwt-decode": "^3.1.0",
     "@types/node": "^14.18.22",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",

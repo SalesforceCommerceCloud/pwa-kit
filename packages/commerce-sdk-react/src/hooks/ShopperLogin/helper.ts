@@ -1,3 +1,4 @@
+import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 /*
  * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
@@ -8,7 +9,6 @@ import {ActionResponse, Argument} from '../types'
 import {useAsyncCallback} from '../useAsync'
 import useAuth from '../useAuth'
 import Auth from '../../auth'
-import type {AuthData} from '../../auth'
 
 export enum ShopperLoginHelpers {
     LoginGuestUser = 'loginGuestUser',
@@ -18,16 +18,16 @@ export enum ShopperLoginHelpers {
 
 export function useShopperLoginHelper<Action extends ShopperLoginHelpers.LoginRegisteredUserB2C>(
     action: Action
-): ActionResponse<Parameters<Auth['loginRegisteredUserB2C']>, AuthData>
+): ActionResponse<Parameters<Auth['loginRegisteredUserB2C']>, ShopperLoginTypes.TokenResponse>
 export function useShopperLoginHelper<Action extends ShopperLoginHelpers.LoginGuestUser>(
     action: Action
-): ActionResponse<never, AuthData>
+): ActionResponse<never, ShopperLoginTypes.TokenResponse>
 export function useShopperLoginHelper<Action extends ShopperLoginHelpers.Logout>(
     action: Action
-): ActionResponse<never, AuthData>
+): ActionResponse<never, ShopperLoginTypes.TokenResponse>
 export function useShopperLoginHelper<Action extends ShopperLoginHelpers>(
     action: Action
-): ActionResponse<any[], AuthData> {
+): ActionResponse<any[], ShopperLoginTypes.TokenResponse> {
     const auth = useAuth()
     if (action === ShopperLoginHelpers.LoginGuestUser) {
         return useAsyncCallback(() => auth.loginGuestUser())

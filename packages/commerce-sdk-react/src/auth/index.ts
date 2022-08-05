@@ -29,21 +29,19 @@ interface JWTHeaders {
     sub: string
 }
 
-export interface AuthData {
-    accessToken: string
-    usid: string
-    // customer_id: string
-    // enc_user_id: string
-    // expires_in: number
-    // id_token: string
-    // idp_access_token: null | string
-    // refresh_token: string
-    // token_type: string
-}
-
-type AuthDataProperties = 'accessToken' | 'refreshTokenGuest' | 'refreshTokenRegistered' | 'usid'
+type AuthDataKeys =
+    | 'access_token'
+    | 'customer_id'
+    | 'enc_user_id'
+    | 'expires_in'
+    | 'id_token'
+    | 'idp_access_token'
+    | 'refresh_token_guest'
+    | 'refresh_token_registered'
+    | 'token_type'
+    | 'usid'
 type AuthDataMap = Record<
-    AuthDataProperties,
+    AuthDataKeys,
     {
         storage: BaseStorage
         key: string
@@ -59,7 +57,7 @@ class Auth {
     private client: ShopperLogin<ApiClientConfigParams>
     private redirectURI: string
     private _onClient = typeof window !== 'undefined'
-    private pending: Promise<AuthData> | undefined
+    private pending: Promise<ShopperLoginTypes.TokenResponse> | undefined
     private localStorage: LocalStorage
     private cookieStorage: CookieStorage
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
@@ -83,20 +81,17 @@ class Auth {
         this.cookieStorage = this._onClient ? new CookieStorage() : new Map()
     }
 
-    private get(name: AuthDataProperties) {
+    private get(name: AuthDataKeys) {
         const storage = this.DATA_MAP[name].storage
         const key = this.DATA_MAP[name].key
         return storage.get(key)
     }
 
-    private set(name: AuthDataProperties, value: string, options?: any) {
-        const key = this.DATA_MAP[name].key as AuthDataProperties
+    private set(name: AuthDataKeys, value: string, options?: any) {
+        const key = this.DATA_MAP[name].key
         const storage = this.DATA_MAP[name].storage
         storage.set(key, value, options)
-
-        if (this.DATA_MAP[name].callback) {
-            this.DATA_MAP[name].callback?.()
-        }
+        this.DATA_MAP[name].callback?.()
     }
 
     /**
@@ -108,22 +103,46 @@ class Auth {
      */
     private get DATA_MAP(): AuthDataMap {
         return {
-            accessToken: {
+            access_token: {
                 storage: this.localStorage,
                 key: 'cc-ax',
+            },
+            customer_id: {
+                storage: this.localStorage,
+                key: 'customer_id',
             },
             usid: {
                 storage: this.localStorage,
                 key: 'usid',
             },
-            refreshTokenGuest: {
+            enc_user_id: {
+                storage: this.localStorage,
+                key: 'enc_user_id',
+            },
+            expires_in: {
+                storage: this.localStorage,
+                key: 'expires_in',
+            },
+            id_token: {
+                storage: this.localStorage,
+                key: 'id_token',
+            },
+            idp_access_token: {
+                storage: this.localStorage,
+                key: 'idp_access_token',
+            },
+            token_type: {
+                storage: this.localStorage,
+                key: 'token_type',
+            },
+            refresh_token_guest: {
                 storage: this.cookieStorage,
                 key: 'cc-nx-g',
                 callback: () => {
                     this.cookieStorage.delete('cc-nx')
                 },
             },
-            refreshTokenRegistered: {
+            refresh_token_registered: {
                 storage: this.cookieStorage,
                 key: 'cc-nx',
                 callback: () => {
@@ -133,9 +152,16 @@ class Auth {
         }
     }
 
-    private get data(): AuthData {
+    private get data(): ShopperLoginTypes.TokenResponse {
         return {
-            accessToken: this.get('accessToken'),
+            access_token: this.get('access_token'),
+            customer_id: this.get('customer_id'),
+            enc_user_id: this.get('enc_user_id'),
+            expires_in: parseInt(this.get('expires_in')),
+            id_token: this.get('id_token'),
+            idp_access_token: this.get('idp_access_token'),
+            refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
+            token_type: this.get('token_type'),
             usid: this.get('usid'),
         }
     }
@@ -166,24 +192,19 @@ class Auth {
      * @internal
      */
     private async init() {
-        console.log('init')
-
-        if (!this.isTokenExpired(this.get('accessToken'))) {
+        if (!this.isTokenExpired(this.get('access_token'))) {
             console.log('Re-using access token from previous session.')
             return this.data
         }
 
-        const refreshToken = this.get('refreshTokenRegistered') || this.get('refreshTokenGuest')
+        const refreshToken = this.get('refresh_token_registered') || this.get('refresh_token_guest')
 
         if (refreshToken) {
-            console.log('Using refresh token to get new access token.')
-            // TODO: error handling
             const res = await helpers.refreshAccessToken(this.client, {refreshToken})
             this.handleTokenResponse(res, true)
             return this.data
         }
 
-        // TODO: error handling
         const res = await helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI})
         this.handleTokenResponse(res, true)
 
@@ -191,8 +212,8 @@ class Auth {
     }
 
     private handleTokenResponse(res: ShopperLoginTypes.TokenResponse, isGuest: boolean) {
-        const refreshTokenKey = isGuest ? 'refreshTokenGuest' : 'refreshTokenRegistered'
-        this.set('accessToken', `Bearer ${res.access_token}`)
+        const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+        this.set('access_token', `Bearer ${res.access_token}`)
         this.set(refreshTokenKey, res.refresh_token, {
             expires: this.REFRESH_TOKEN_EXPIRATION_DAYS,
         })
@@ -207,9 +228,7 @@ class Auth {
      * requires an access token.
      */
     ready() {
-        console.log('ready')
         if (!this.pending) {
-            console.log('no ready promise, initializing')
             this.pending = this.init()
         }
         return this.pending
@@ -248,7 +267,7 @@ class Auth {
     async logout() {
         const request = async () => {
             const res = await helpers.logout(this.client, {
-                refreshToken: this.get('refreshTokenRegistered'),
+                refreshToken: this.get('refresh_token_registered'),
             })
             this.handleTokenResponse(res, true)
             return this.data

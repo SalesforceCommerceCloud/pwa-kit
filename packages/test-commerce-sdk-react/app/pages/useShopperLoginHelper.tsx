@@ -16,13 +16,7 @@ const UseShopperLoginHelper = () => {
         <>
             <h1>LoginGuestUser</h1>
             <Json data={loginGuestUser} />
-            <button
-                onClick={() =>
-                    loginGuestUser.execute({redirectURI: 'http://localhost:3000/callback'})
-                }
-            >
-                loginGuestUser
-            </button>
+            <button onClick={() => loginGuestUser.execute()}>loginGuestUser</button>
             {loginGuestUser.error?.message && (
                 <p style={{color: 'red'}}>Error: {loginGuestUser.error?.message}</p>
             )}
@@ -31,10 +25,7 @@ const UseShopperLoginHelper = () => {
             <Json data={loginRegisteredUser} />
             <button
                 onClick={() =>
-                    loginRegisteredUser.execute(
-                        {username: 'kobe@test.com', password: 'Test1234!'},
-                        {redirectURI: 'http://localhost:3000/callback'}
-                    )
+                    loginRegisteredUser.execute({username: 'kobe@test.com', password: 'Test1234!'})
                 }
             >
                 loginRegisteredUser
