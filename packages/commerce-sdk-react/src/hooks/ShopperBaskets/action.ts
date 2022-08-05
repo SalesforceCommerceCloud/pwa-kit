@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {useMutation} from '@tanstack/react-query'
 import {ActionResponse, ApiClients, Argument, DataType} from '../types'
 import {useAsyncExecute} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
@@ -328,30 +329,19 @@ the body are the following properties if specified:
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasket} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasket} for more information on the parameters and returned data type.
      */
-    AddTaxesForBasket = 'addTaxesForBasket'
+    AddTaxesForBasket = 'addTaxesForBasket',
 }
 
 /**
  * A hook for performing actions with the Shopper Baskets API.
  */
-export function useShopperBasketsAction<Action extends ShopperBasketsActions>(
-    action: Action
-): ActionResponse<Argument<Client[Action]>, DataType<Client[Action]>> {
-    type Arg = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
-    // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
-    // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
-    // confident, though, that it is safe, because it seems like we're mostly re-defining what we
-    // already have.
-    // In addition to the assertion required to get this to work, I have also simplified the
-    // overloaded SDK method to a single signature that just returns the data type. This makes it
-    // easier to work with when passing to other mapped types.
-    function assertMethod(fn: unknown): asserts fn is (arg: Arg) => Promise<Data> {
-        if (typeof fn !== 'function') throw new Error(`Unknown action: ${action}`)
-    }
+export function useShopperBasketsAction<Action extends ShopperBasketsActions>(action: Action) {
     const {shopperBaskets: client} = useCommerceApi()
     const method = client[action]
-    assertMethod(method)
-
-    return useAsyncExecute((arg: Arg) => method.call(client, arg))
+    // @ts-ignore
+    return useMutation((arg: Argument<Client[Action]>) => method.call(client, arg))
 }
+
+// auto-complete works!
+// const m = useShopperBasketsAction(ShopperBasketsActions.CreateBasket)
+// const basket = m.mutate({parameters:{}, headers:{}, body: {}})
