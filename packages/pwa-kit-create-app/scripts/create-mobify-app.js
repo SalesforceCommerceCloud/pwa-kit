@@ -270,7 +270,7 @@ const retailReactAppPrompts = () => {
         },
         {
             name: 'clientId',
-            message: 'What is your SLAS API Client ID in Account Manager?',
+            message: 'What is your SLAS Client ID?',
             validate: validClientId
         },
         {
