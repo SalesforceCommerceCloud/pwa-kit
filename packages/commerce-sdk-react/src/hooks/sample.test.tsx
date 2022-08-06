@@ -107,5 +107,3 @@ test(
         // And can we assume that the isomorphic sdk is well-tested already?
     })
 )
-
-// TODO: install eslint plugin https://github.com/testing-library/eslint-plugin-testing-library
