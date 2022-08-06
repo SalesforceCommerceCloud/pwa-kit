@@ -20,14 +20,12 @@ export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryRespon
         fn().then(
             (r) => {
                 if (subscribed) {
-                    console.log('--- got response', r)
                     setIsLoading(false)
                     setData(r)
                 }
             },
             (e) => {
                 if (subscribed) {
-                    console.log('--- got error', e)
                     setIsLoading(false)
                     setError(e)
                 }

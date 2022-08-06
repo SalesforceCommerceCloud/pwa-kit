@@ -54,25 +54,27 @@ const ProductName2 = ({id}: {id: string}) => {
     )
 }
 
-test(
-    'useCommerceApi as lower-level hook',
-
-    // Every test that calls `withMocks` would get associated with its own recording file,
-    // whose filename matches the name of the current test.
-    withMocks(async () => {
-        // This util function would automatically integrate the provider components for you
-        renderWithProviders(<ProductName id="25591862M" />)
-
-        const productName = 'Stripe Walking Short'
-        await waitFor(() => screen.getByText(productName))
-
-        expect(screen.getByText(productName)).toBeInTheDocument()
-    })
-)
-
-describe('useAsync as higher-level hook', () => {
+describe('lower-level hook', () => {
     test(
-        'happy path',
+        'useCommerceApi',
+
+        // Every test that calls `withMocks` would get associated with its own recording file,
+        // whose filename matches the name of the current test.
+        withMocks(async () => {
+            // This util function would automatically integrate the provider components for you
+            renderWithProviders(<ProductName id="25591862M" />)
+
+            const productName = 'Stripe Walking Short'
+            await waitFor(() => screen.getByText(productName))
+
+            expect(screen.getByText(productName)).toBeInTheDocument()
+        })
+    )
+})
+
+describe('higher-level hook', () => {
+    test(
+        'useAsync happy path',
         withMocks(async () => {
             renderWithProviders(<ProductName2 id="25591862M" />)
             const productName = 'Stripe Walking Short'
@@ -88,22 +90,26 @@ describe('useAsync as higher-level hook', () => {
     )
 
     test(
-        'non-existent product id',
+        'useAsync error',
         withMocks(async () => {
+            // Pass in a non-existent product id
             renderWithProviders(<ProductName2 id="1" />)
             expect(screen.getByText('Loading...')).toBeInTheDocument()
 
             await waitFor(() => screen.getByText('error'))
             expect(screen.getByText('error')).toBeInTheDocument()
+            expect(screen.queryByText('Loading...')).toBeNull()
         })
     )
 })
 
-test(
-    'useProduct as highest-level hook',
-    withMocks(async () => {
-        // TODO: what should get tested in a highest-level hook (like useProduct)?
-        // If we've tested the lower-level hooks (useCommerceApi, useAsync), would that be sufficient?
-        // And can we assume that the isomorphic sdk is well-tested already?
-    })
-)
+describe('highest-level hook', () => {
+    test(
+        'useProduct',
+        withMocks(async () => {
+            // TODO: what should get tested in a highest-level hook (like useProduct)?
+            // If we've tested the lower-level hooks (useCommerceApi, useAsync), would that be sufficient?
+            // And can we assume that the isomorphic sdk is well-tested already?
+        })
+    )
+})
