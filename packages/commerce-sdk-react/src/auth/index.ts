@@ -193,11 +193,13 @@ class Auth {
             return this.data
         }
 
-        const refreshToken = this.get('refresh_token_registered') || this.get('refresh_token_guest')
+        const refreshTokenRegistered = this.get('refresh_token_registered')
+        const refreshTokenGuest = this.get('refresh_token_guest')
+        const refreshToken = refreshTokenRegistered || refreshTokenGuest
 
         if (refreshToken) {
             const res = await helpers.refreshAccessToken(this.client, {refreshToken})
-            this.handleTokenResponse(res, true)
+            this.handleTokenResponse(res, !!refreshTokenGuest)
             return this.data
         }
 
@@ -261,7 +263,7 @@ class Auth {
                 redirectURI,
                 ...(usid && {usid})
             })
-            this.handleTokenResponse(res, true)
+            this.handleTokenResponse(res, false)
             return this.data
         }
         this.pending = request()
