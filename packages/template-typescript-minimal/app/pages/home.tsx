@@ -82,17 +82,18 @@ h1 {
 const Home = ({value}: Props) => {
     const [counter, setCounter] = useState(0)
 
-    const query = useQuery(['my-query'], async () => {
-        const res = await fetch('https://api.chucknorris.io/jokes/random')
+    console.log('useQuery')
+    const query = useQuery(['my-query', counter], async () => {
+        const res = await fetch(`https://api.chucknorris.io/jokes/random?couter=${counter}`)
         return await res.json()
     })
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCounter(counter + 1)
-        }, 1000)
-        return () => clearInterval(interval)
-    }, [counter, setCounter])
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         setCounter(counter + 1)
+    //     }, 1000)
+    //     return () => clearInterval(interval)
+    // }, [counter, setCounter])
 
     return (
         <div>
@@ -104,14 +105,13 @@ const Home = ({value}: Props) => {
                         <br />
                         Support!
                     </h1>
+                    <button onClick={() => {setCounter(counter + 1)}}>click me</button>
                 </div>
                 <div className="panel">
                     <div className="divider"></div>
                 </div>
                 <div className="panel">
-                    <pre>
-                        {JSON.stringify(query.data, null, 2)}
-                    </pre>
+                    <pre>{JSON.stringify(query.data, null, 2)}</pre>
                 </div>
             </div>
         </div>
@@ -119,6 +119,5 @@ const Home = ({value}: Props) => {
 }
 
 Home.getTemplateName = () => 'home'
-
 
 export default Home

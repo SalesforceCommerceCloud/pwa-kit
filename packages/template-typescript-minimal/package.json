@@ -45,6 +45,7 @@
             "**/*.json"
         ],
         "ssrParameters": {
+            "ssrPrepassEnabled": true,
             "ssrFunctionNodeVersion": "14.x",
             "proxyConfigs": [
                 {

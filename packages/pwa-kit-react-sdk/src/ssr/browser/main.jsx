@@ -14,7 +14,7 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
-import {Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -69,14 +69,27 @@ export const start = () => {
 
     const WrappedApp = routeComponent(App, false, locals)
     const error = window.__ERROR__
-    const queryClient = new QueryClient()
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                // refetchOnMount: (query) => {
+                //     console.log('REFETCH ON MOUNT: ', query, !window.__HYDRATING__)
+                //     // return !window.__HYDRATING__
+                //     return false
+                // },
+                // enabled: !window.__HYDRATING__,
+                staleTime: 1000
+            }
+        }
+    })
 
+    const hydrateOptions = {}
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
             ReactDOM.hydrate(
                 <QueryClientProvider client={queryClient}>
-                    <Hydrate state={window.__DEHYDRATED_STATE__}>
+                    <Hydrate state={window.__PRELOADED_STATE__.__REACT_QUERY_STATE__}>
                         <Router>
                             <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                                 <AppConfig locals={locals}>

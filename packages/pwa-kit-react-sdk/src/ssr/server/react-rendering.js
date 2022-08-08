@@ -8,8 +8,8 @@
 /**
  * @module progressive-web-sdk/ssr/server/react-rendering
  */
-import { dehydrate, Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import ssrPrepass from 'react-ssr-prepass';
+import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import ssrPrepass from 'react-ssr-prepass'
 import path from 'path'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
@@ -73,7 +73,7 @@ const logAndFormatError = (err) => {
     }
 }
 
-const initAppState = async ({App, component, match, route, req, res, location}) => {
+const initAppState = async ({App, component, match, route, req, res, location, queryClient}) => {
     if (component === Throw404) {
         // Don't init if there was no match
         return {
@@ -85,16 +85,19 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
     const {params} = match
 
     const components = [App, route.component]
-    const promises = components.map((c) =>
-        c.getProps
-            ? c.getProps({
-                  req,
-                  res,
-                  params,
-                  location
-              })
-            : Promise.resolve({})
-    )
+    const queries = queryClient.queryCache.queries.map((q) => q.fetch())
+    const promises = components
+        .map((c) =>
+            c.getProps
+                ? c.getProps({
+                      req,
+                      res,
+                      params,
+                      location
+                  })
+                : Promise.resolve({})
+        )
+        .concat(queries)
     let returnVal = {}
 
     try {
@@ -102,6 +105,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
         const appState = {
             appProps,
             pageProps,
+            __REACT_QUERY_STATE__: dehydrate(queryClient),
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
 
@@ -145,6 +149,7 @@ export const render = async (req, res, next) => {
         pathname,
         search: search ? `?${search}` : ''
     }
+    const queryClient = new QueryClient()
 
     // Step 1 - Find the match.
     let route
@@ -162,6 +167,16 @@ export const render = async (req, res, next) => {
     // Step 2 - Get the component
     const component = await route.component.getComponent()
 
+    // Step 2.5 - Prepass render for `useQuery` server-side support.
+    if (config?.ssrParameters?.ssrPrepassEnabled) {
+        await prepassApp(req, res, {
+            App: WrappedApp,
+            location,
+            routes,
+            queryClient
+        })
+    }
+
     // Step 3 - Init the app state
     const {appState, error: appStateError} = await initAppState({
         App: WrappedApp,
@@ -170,7 +185,8 @@ export const render = async (req, res, next) => {
         route,
         req,
         res,
-        location
+        location,
+        queryClient
     })
 
     // Step 4 - Render the App
@@ -183,7 +199,8 @@ export const render = async (req, res, next) => {
         req,
         res,
         location,
-        config
+        config,
+        queryClient
     }
     try {
         renderResult = await renderApp(args)
@@ -210,24 +227,26 @@ export const render = async (req, res, next) => {
 }
 
 const getAppJSX = (req, res, error, appData) => {
-    const {App, appState, routes, routerContext, location, deviceType, queryClient} = appData
+    const {
+        App,
+        appState = {},
+        routes,
+        location,
+        deviceType, // We DO need this.. if it's not passed we might have different queries.
+        queryClient
+    } = appData
+
     return (
         <QueryClientProvider client={queryClient}>
-            <Hydrate state={{text: 'TODO'}}>
-                <Router location={location} context={routerContext}>
-                    <DeviceContext.Provider value={{type: deviceType}}>
-                        <AppConfig locals={res.locals}>
-                            <Switch error={error} appState={appState} routes={routes} App={App} />
-                        </AppConfig>
-                    </DeviceContext.Provider>
-                </Router>
-            </Hydrate>
+            <Router location={location}>
+                <DeviceContext.Provider value={{type: deviceType}}>
+                    <AppConfig locals={res.locals}>
+                        <Switch error={error} appState={appState} routes={routes} App={App} />
+                    </AppConfig>
+                </DeviceContext.Provider>
+            </Router>
         </QueryClientProvider>
     )
-}
-
-const prepass = async (req, res, error, appData) => {
-    return await ssrPrepass(getAppJSX(req, res, error, appData))
 }
 
 const renderAppHtml = (req, res, error, appData) => {
@@ -236,29 +255,40 @@ const renderAppHtml = (req, res, error, appData) => {
     return ReactDOMServer.renderToString(appJSX)
 }
 
+const prepassApp = async (req, res, appData) => {
+    let appStateError
+    const deviceType = detectDeviceType(req)
+
+    // Update "appData" with device type incase it influences the JSX elements that
+    // react ssr prepass processes.
+    appData = {
+        ...appData,
+        deviceType
+    }
+
+    await ssrPrepass(getAppJSX(req, res, appStateError, appData))
+}
+
 const renderApp = async (args) => {
-    const {req, res, appStateError, App, appState, location, routes, config} = args
+    const {req, res, appStateError, App, appState, location, routes, config, queryClient} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
-    const queryClient = new QueryClient()
     const routerContext = {}
-    const appData = {App, appState, location, routes, routerContext, deviceType, extractor, queryClient}
+    const appData = {
+        App,
+        appState,
+        location,
+        routes,
+        routerContext,
+        deviceType,
+        extractor,
+        queryClient
+    }
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query
     const indent = prettyPrint ? 8 : 0
 
-    await prepass(req, res, appStateError, appData)
-
-    console.log('queryClient', queryClient)
-    console.log('queryClient', queryClient.isFetching())
-    console.log('queryClient.queryCache.queries[0]', queryClient.queryCache.queries[0])
-
-    await Promise.all(queryClient.queryCache.queries.map((q => q.fetch())))
-
-    const dehydratedState = dehydrate(queryClient)
-
-    console.log('dehydratedState', dehydratedState)
     let appHtml
     let renderError
     // It's important that we render the App before extracting the script elements,
@@ -304,14 +334,12 @@ const renderApp = async (args) => {
     // object, client-side, by code in ssr/browser/main.jsx.
     //
     // Do *not* add to these without a very good reason - globals are a liability.
-    
+
     const windowGlobals = {
         __CONFIG__: config,
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
-        // NOTE: Maybe this belongs in `__PRELOADED_STATE__`
-        __DEHYDRATED_STATE__: dehydratedState,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
