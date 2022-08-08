@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, DataType, QueryResponse} from '../types'
+import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
+import {UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperLogin']
 
@@ -19,9 +20,11 @@ type Client = ApiClients['shopperLogin']
  */
 export const useRetrieveCredQualityUserInfo = (
     arg: Argument<Client['retrieveCredQualityUserInfo']>
-): QueryResponse<DataType<Client['retrieveCredQualityUserInfo']>> => {
+): UseQueryResult<DataType<Client['retrieveCredQualityUserInfo']>, Error> => {
     const {shopperLogin: client} = useCommerceApi()
-    return useAsync(() => client.retrieveCredQualityUserInfo(arg), [arg])
+    return useAsync(['retrieve-cred-quality-user-info', arg], () =>
+        client.retrieveCredQualityUserInfo(arg)
+    )
 }
 /**
  * A hook for `ShopperLogin#logoutCustomer`.
@@ -32,9 +35,9 @@ export const useRetrieveCredQualityUserInfo = (
  */
 export const useLogoutCustomer = (
     arg: Argument<Client['logoutCustomer']>
-): QueryResponse<DataType<Client['logoutCustomer']>> => {
+): UseQueryResult<DataType<Client['logoutCustomer']>, Error> => {
     const {shopperLogin: client} = useCommerceApi()
-    return useAsync(() => client.logoutCustomer(arg), [arg])
+    return useAsync(['logout', arg], () => client.logoutCustomer(arg))
 }
 /**
  * A hook for `ShopperLogin#authorizeCustomer`.
@@ -45,9 +48,9 @@ export const useLogoutCustomer = (
  */
 export const useAuthorizeCustomer = (
     arg: Argument<Client['authorizeCustomer']>
-): QueryResponse<DataType<Client['authorizeCustomer']>> => {
+): UseQueryResult<DataType<Client['authorizeCustomer']>, Error> => {
     const {shopperLogin: client} = useCommerceApi()
-    return useAsync(() => client.authorizeCustomer(arg), [arg])
+    return useAsync(['authorize-customer', arg], () => client.authorizeCustomer(arg))
 }
 /**
  * A hook for `ShopperLogin#getUserInfo`.
@@ -58,9 +61,9 @@ export const useAuthorizeCustomer = (
  */
 export const useUserInfo = (
     arg: Argument<Client['getUserInfo']>
-): QueryResponse<DataType<Client['getUserInfo']>> => {
+): UseQueryResult<DataType<Client['getUserInfo']>, Error> => {
     const {shopperLogin: client} = useCommerceApi()
-    return useAsync(() => client.getUserInfo(arg), [arg])
+    return useAsync(['user-info', 'arg'], () => client.getUserInfo(arg))
 }
 /**
  * A hook for `ShopperLogin#getWellknownOpenidConfiguration`.
@@ -71,9 +74,11 @@ export const useUserInfo = (
  */
 export const useWellknownOpenidConfiguration = (
     arg: Argument<Client['getWellknownOpenidConfiguration']>
-): QueryResponse<DataType<Client['getWellknownOpenidConfiguration']>> => {
+): UseQueryResult<DataType<Client['getWellknownOpenidConfiguration']>, Error> => {
     const {shopperLogin: client} = useCommerceApi()
-    return useAsync(() => client.getWellknownOpenidConfiguration(arg), [arg])
+    return useAsync(['wellknown-openid-config', arg], () =>
+        client.getWellknownOpenidConfiguration(arg)
+    )
 }
 /**
  * A hook for `ShopperLogin#getJwksUri`.
@@ -84,7 +89,7 @@ export const useWellknownOpenidConfiguration = (
  */
 export const useJwksUri = (
     arg: Argument<Client['getJwksUri']>
-): QueryResponse<DataType<Client['getJwksUri']>> => {
+): UseQueryResult<DataType<Client['getJwksUri']>, Error> => {
     const {shopperLogin: client} = useCommerceApi()
-    return useAsync(() => client.getJwksUri(arg), [arg])
+    return useAsync(['jwksUri', arg], () => client.getJwksUri(arg))
 }
