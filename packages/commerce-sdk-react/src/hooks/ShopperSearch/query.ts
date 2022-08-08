@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, DataType, QueryResponse} from '../types'
+import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
+import {UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperSearch']
 
@@ -20,9 +21,9 @@ the product search hit. The search result contains only products that are online
  */
 export const useProductSearch = (
     arg: Argument<Client['productSearch']>
-): QueryResponse<DataType<Client['productSearch']>> => {
+): UseQueryResult<DataType<Client['productSearch']>, Error> => {
     const {shopperSearch: client} = useCommerceApi()
-    return useAsync(() => client.productSearch(arg), [arg])
+    return useAsync(['product-search', arg], () => client.productSearch(arg))
 }
 /**
  * A hook for `ShopperSearch#getSearchSuggestions`.
@@ -33,7 +34,7 @@ export const useProductSearch = (
  */
 export const useSearchSuggestions = (
     arg: Argument<Client['getSearchSuggestions']>
-): QueryResponse<DataType<Client['getSearchSuggestions']>> => {
+): UseQueryResult<DataType<Client['getSearchSuggestions']>, Error> => {
     const {shopperSearch: client} = useCommerceApi()
-    return useAsync(() => client.getSearchSuggestions(arg), [arg])
+    return useAsync(['search-suggestions', arg], () => client.getSearchSuggestions(arg))
 }
