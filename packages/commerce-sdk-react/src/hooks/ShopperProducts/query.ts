@@ -8,7 +8,6 @@ import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import {useQuery} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
 /**
