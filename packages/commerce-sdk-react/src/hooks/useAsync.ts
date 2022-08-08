@@ -4,44 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useState, useEffect} from 'react'
-import {ActionResponse, QueryResponse} from './types'
+import {useState} from 'react'
+import {ActionResponse} from './types'
+import {useQuery, UseQueryOptions} from '@tanstack/react-query'
 
-export const useAsync = <T>(fn: () => Promise<T>, deps: unknown[] = []): QueryResponse<T> => {
-    const [data, setData] = useState<T | undefined>()
-    const [error, setError] = useState<Error | undefined>()
-    const [isLoading, setIsLoading] = useState(false)
-    useEffect(() => {
-        // use this variable to avoid race condition
-        let subscribe = true
-        setIsLoading(true)
-
-        const runAsync = async () => {
-            try {
-                if (subscribe) {
-                    const res = await fn()
-                    setData(res)
-                    setIsLoading(false)
-                }
-            } catch (error) {
-                if (subscribe) {
-                    setIsLoading(false)
-                    if (error instanceof Error) {
-                        setError(error)
-                    }
-                }
-            }
-        }
-
-        runAsync()
-
-        // clean up
-        return () => {
-            subscribe = false
-        }
-    }, deps)
-
-    return {data, isLoading, error}
+export const useAsync = <T>(
+    queryKey: unknown[],
+    fn: () => Promise<T>,
+    queryOptions?: UseQueryOptions<T, Error>
+) => {
+    // add more logic in here
+    return useQuery<T, Error>(queryKey, fn, queryOptions)
 }
 
 export const useAsyncCallback = <Args extends unknown[], Ret>(

@@ -18,7 +18,7 @@ import {
     ShopperSearch,
     helpers
 } from 'commerce-sdk-isomorphic'
-import {QueryClientProvider, QueryClient, useQueryClient} from '@tanstack/react-query'
+import {QueryClientProvider, QueryClient} from '@tanstack/react-query'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 const queryClient = new QueryClient()
 

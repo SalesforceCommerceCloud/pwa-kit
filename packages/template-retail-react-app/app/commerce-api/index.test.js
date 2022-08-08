@@ -24,7 +24,6 @@ import {
     ocapiBasketResponse,
     ocapiFaultResponse
 } from './mock-data'
-import Auth from './auth'
 
 jest.mock('cross-fetch', () => jest.requireActual('jest-fetch-mock'))
 
@@ -101,8 +100,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
         }
     }
 })
-
-jest.spyOn(Auth.prototype, 'createOCAPISession').mockImplementation(() => jest.fn())
 
 beforeEach(() => {
     jest.resetModules()
