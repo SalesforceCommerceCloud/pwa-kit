@@ -30,9 +30,6 @@ function UseShopperCategory() {
     }
     return (
         <div>
-            <div>
-                <Link to={'/'}>Home</Link>
-            </div>
             <h1>useCategory Page</h1>
             <h2>Categories {data?.name}</h2>
             {data && data.categories && (

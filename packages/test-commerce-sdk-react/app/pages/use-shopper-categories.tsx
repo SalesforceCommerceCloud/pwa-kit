@@ -32,9 +32,6 @@ function UseShopperCategories() {
     }
     return (
         <div>
-            <div>
-                <Link to={'/'}>Home</Link>
-            </div>
             <h1>useShopperCategories page</h1>
             {result &&
                 Object.keys(flatten(result.data[0], 'categories')).map((key) => (

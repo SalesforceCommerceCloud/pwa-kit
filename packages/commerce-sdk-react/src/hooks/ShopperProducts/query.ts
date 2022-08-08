@@ -56,7 +56,7 @@ function useProducts(
         throw new Error('parameters are required')
     }
     const {shopperProducts: client} = useCommerceApi()
-    return useQuery<DataType<Client['getProducts']> | Response, Error>(
+    return useAsync(
         ['products', parameters],
         () => client.getProducts({parameters, headers: options?.headers}, options?.rawResponse),
         options?.queryOptions
@@ -104,7 +104,7 @@ function useProduct(
     }
 ): UseQueryResult<DataType<Client['getProduct']> | Response, Error> {
     const {shopperProducts: client} = useCommerceApi()
-    return useQuery<DataType<Client['getProduct']> | Response, Error>(
+    return useAsync(
         ['product', parameters],
         () => client.getProduct({parameters, headers: options?.headers}, options?.rawResponse),
         options?.queryOptions
@@ -152,7 +152,7 @@ function useCategories(
     }
 ): UseQueryResult<DataType<Client['getCategories']> | Response, Error> {
     const {shopperProducts: client} = useCommerceApi()
-    return useQuery<DataType<Client['getCategories']> | Response, Error>(
+    return useAsync(
         ['categories', parameters],
         () => client.getCategories({parameters, headers: options?.headers}, options?.rawResponse),
         options?.queryOptions
@@ -202,7 +202,7 @@ function useCategory(
     }
 ): UseQueryResult<DataType<Client['getCategory']> | Response, Error> {
     const {shopperProducts: client} = useCommerceApi()
-    return useQuery<DataType<Client['getCategory']> | Response, Error>(
+    return useAsync(
         ['category', parameters],
         () => client.getCategory({parameters, headers: options?.headers}, options?.rawResponse),
         options?.queryOptions

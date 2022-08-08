@@ -26,9 +26,6 @@ function UseShopperProduct() {
     }
     return (
         <>
-            <div>
-                <Link to={'/'}>Home</Link>
-            </div>
             <h1>useProducts page</h1>
             <h2>{data?.name}</h2>
 
