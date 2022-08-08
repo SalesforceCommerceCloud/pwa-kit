@@ -19,13 +19,14 @@ import {
 } from 'commerce-sdk-isomorphic'
 
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
     locale: string
     currency: string
 }
+const queryClient = new QueryClient()
 
 /**
  * @internal
@@ -77,7 +78,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     // TODO: wrap the children with:
     // - context for enabling useServerEffect hook
     // - context for sharing the auth object that would manage the tokens -> this will probably be for internal use only
-    return <CommerceApiContext.Provider value={apiClients}>{children}</CommerceApiContext.Provider>
+    return (
+        <QueryClientProvider client={queryClient}>
+            <CommerceApiContext.Provider value={apiClients}>{children}</CommerceApiContext.Provider>
+        </QueryClientProvider>
+    )
 }
 
 export default CommerceApiProvider

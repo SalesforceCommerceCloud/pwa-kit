@@ -4,40 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useState, useEffect} from 'react'
-import {ActionResponse, QueryResponse} from './types'
+import {useState} from 'react'
+import {ActionResponse} from './types'
+import {useQuery, UseQueryOptions} from '@tanstack/react-query'
 
-// NOTE: temporary implementation, so that I can test other hooks besides `useCommerceApi`
-// TODO: revert this change
-export const useAsync = <T>(fn: () => Promise<T>, deps?: unknown[]): QueryResponse<T> => {
-    const [data, setData] = useState<T>()
-    const [error, setError] = useState<Error>()
-    const [isLoading, setIsLoading] = useState(true)
-
-    useEffect(() => {
-        let subscribed = true
-
-        fn().then(
-            (r) => {
-                if (subscribed) {
-                    setIsLoading(false)
-                    setData(r)
-                }
-            },
-            (e) => {
-                if (subscribed) {
-                    setIsLoading(false)
-                    setError(e)
-                }
-            }
-        )
-
-        return function cleanup() {
-            subscribed = false
-        }
-    }, deps || [])
-
-    return {data, error, isLoading}
+export const useAsync = <T>(
+    queryKey: unknown[],
+    fn: () => Promise<T>,
+    queryOptions?: UseQueryOptions<T, Error>
+) => {
+    // add more logic in here
+    return useQuery<T, Error>(queryKey, fn, queryOptions)
 }
 
 export const useAsyncCallback = <Args extends unknown[], Ret>(
