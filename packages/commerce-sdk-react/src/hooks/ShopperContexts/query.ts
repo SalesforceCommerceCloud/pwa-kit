@@ -7,6 +7,7 @@
 import {ApiClients, Argument, DataType, QueryResponse} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
+import {UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperContexts']
 
@@ -19,7 +20,7 @@ type Client = ApiClients['shopperContexts']
  */
 export const useShopperContext = (
     arg: Argument<Client['getShopperContext']>
-): QueryResponse<DataType<Client['getShopperContext']>> => {
+): UseQueryResult<DataType<Client['getShopperContext']>, Error> => {
     const {shopperContexts: client} = useCommerceApi()
-    return useAsync(() => client.getShopperContext(arg), [arg])
+    return useAsync(['shopper-context', arg], () => client.getShopperContext(arg))
 }
