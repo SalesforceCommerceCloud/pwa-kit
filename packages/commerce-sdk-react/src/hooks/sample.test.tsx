@@ -41,8 +41,10 @@ const ProductName = ({id}: {id: string}) => {
 const ProductName2 = ({id}: {id: string}) => {
     const api = useCommerceApi()
     const {data, isLoading, error} = useAsync(
-        () => api.shopperProducts.getProduct({parameters: {id}}),
-        [id]
+        ['getProduct', {id}],
+        async () => api.shopperProducts.getProduct({parameters: {id}}),
+        // For testing, if there's error, we want to immediately fail and no retry
+        {retry: false}
     )
 
     return (
