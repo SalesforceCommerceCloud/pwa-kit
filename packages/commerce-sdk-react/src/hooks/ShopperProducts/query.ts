@@ -7,7 +7,8 @@
 import {ApiClients, Argument, DataType, QueryResponse} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
-import {getDependencySource} from '../../utils/util'
+import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
+import {useQuery} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
 /**
@@ -17,27 +18,49 @@ type Client = ApiClients['shopperProducts']
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproducts} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
+type UseProductsParameters = NonNullable<Argument<Client['getProducts']>>['parameters']
+type UseProductsHeaders = NonNullable<Argument<Client['getProducts']>>['headers']
 function useProducts(
-    parameters: NonNullable<Argument<Client['getProducts']>>['parameters'],
-    deps?: unknown[],
-    headers?: NonNullable<Argument<Client['getProducts']>>['headers'],
-    rawResponse?: false
-): QueryResponse<DataType<Client['getProducts']>>
+    parameters: UseProductsParameters,
+    options?: {
+        headers: UseProductsHeaders
+        rawResponse: false
+        queryOptions: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getProducts']>, Error>
 function useProducts(
-    parameters: NonNullable<Argument<Client['getProducts']>>['parameters'],
-    deps?: unknown[],
-    headers?: NonNullable<Argument<Client['getProducts']>>['headers'],
-    rawResponse?: true
-): QueryResponse<Response>
+    parameters: UseProductsParameters,
+    options?: {
+        headers: UseProductsHeaders
+        rawResponse: true
+        queryOptions?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
+    }
+): UseQueryResult<Response, Error>
 function useProducts(
-    parameters: NonNullable<Argument<Client['getProducts']>>['parameters'],
-    deps: unknown[] = [],
-    headers?: NonNullable<Argument<Client['getProducts']>>['headers'],
-    rawResponse?: boolean
-): QueryResponse<DataType<Client['getProducts']> | Response> {
-    const source = getDependencySource(parameters, deps, ['ids'])
+    parameters: UseProductsParameters,
+    options?: {
+        headers: UseProductsHeaders
+        rawResponse: boolean
+        queryOptions?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getProducts']> | Response, Error>
+function useProducts(
+    parameters: UseProductsParameters,
+    options?: {
+        headers: UseProductsHeaders
+        rawResponse: boolean
+        queryOptions?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
+    }
+) {
+    if (!parameters) {
+        throw new Error('parameters are required')
+    }
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getProducts({parameters, headers}, rawResponse), source)
+    return useQuery<DataType<Client['getProducts']> | Response, Error>(
+        ['products', parameters],
+        () => client.getProducts({parameters, headers: options?.headers}, options?.rawResponse),
+        options?.queryOptions
+    )
 }
 /**
  * A hook for `ShopperProducts#getProduct`.
@@ -46,27 +69,46 @@ function useProducts(
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproduct} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
+type UseProductParameters = NonNullable<Argument<Client['getProduct']>>['parameters']
+type UseProductHeaders = NonNullable<Argument<Client['getProduct']>>['headers']
 function useProduct(
-    parameters: NonNullable<Argument<Client['getProduct']>>['parameters'],
-    deps?: unknown[],
-    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
-    rawResponse?: false
-): QueryResponse<DataType<Client['getProduct']>>
+    parameters: UseProductParameters,
+    options?: {
+        headers: UseProductHeaders
+        rawResponse: false
+        queryOptions: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getProduct']>, Error>
 function useProduct(
-    parameters: NonNullable<Argument<Client['getProduct']>>['parameters'],
-    deps?: unknown[],
-    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
-    rawResponse?: true
-): QueryResponse<Response>
+    parameters: UseProductParameters,
+    options?: {
+        headers: UseProductHeaders
+        rawResponse: true
+        queryOptions: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
+    }
+): UseQueryResult<Response, Error>
 function useProduct(
-    parameters: NonNullable<Argument<Client['getProduct']>>['parameters'],
-    deps: unknown[] = [],
-    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
-    rawResponse?: boolean
-): QueryResponse<DataType<Client['getProduct']> | Response> {
-    const source = getDependencySource(parameters, deps, ['id'])
+    parameters: UseProductParameters,
+    options?: {
+        headers: UseProductHeaders
+        rawResponse: boolean
+        queryOptions: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getProduct']> | Response, Error>
+function useProduct(
+    parameters: UseProductParameters,
+    options?: {
+        headers: UseProductHeaders
+        rawResponse: boolean
+        queryOptions: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getProduct']> | Response, Error> {
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getProduct({parameters, headers}, rawResponse), source)
+    return useQuery<DataType<Client['getProduct']> | Response, Error>(
+        ['product', parameters],
+        () => client.getProduct({parameters, headers: options?.headers}, options?.rawResponse),
+        options?.queryOptions
+    )
 }
 /**
  * A hook for `ShopperProducts#getCategories`.
@@ -75,27 +117,46 @@ function useProduct(
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategories} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
+type UseCategoriesParameters = NonNullable<Argument<Client['getCategories']>>['parameters']
+type UseCategoriesHeaders = NonNullable<Argument<Client['getCategories']>>['headers']
 function useCategories(
-    parameters: NonNullable<Argument<Client['getCategories']>>['parameters'],
-    deps?: unknown[],
-    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
-    rawResponse?: false
-): QueryResponse<DataType<Client['getCategories']>>
+    parameters: UseCategoriesParameters,
+    options?: {
+        headers?: UseCategoriesHeaders
+        rawResponse: false
+        queryOptions: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getCategories']>, Error>
 function useCategories(
-    parameters: NonNullable<Argument<Client['getCategories']>>['parameters'],
-    deps?: unknown[],
-    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
-    rawResponse?: true
-): QueryResponse<Response>
+    parameters: UseCategoriesParameters,
+    options?: {
+        headers?: UseCategoriesHeaders
+        rawResponse: true
+        queryOptions: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
+    }
+): UseQueryResult<Response, Error>
 function useCategories(
-    parameters: NonNullable<Argument<Client['getCategories']>>['parameters'],
-    deps: unknown[] = [],
-    headers?: NonNullable<Argument<Client['getProduct']>>['headers'],
-    rawResponse?: boolean
-): QueryResponse<DataType<Client['getCategories']> | Response> {
-    const source = getDependencySource(parameters, deps, ['ids'], ['levels'])
+    parameters: UseCategoriesParameters,
+    options?: {
+        headers?: UseCategoriesHeaders
+        rawResponse?: boolean
+        queryOptions: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getCategories']> | Response, Error>
+function useCategories(
+    parameters: UseCategoriesParameters,
+    options?: {
+        headers?: UseCategoriesHeaders
+        rawResponse?: boolean
+        queryOptions: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getCategories']> | Response, Error> {
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getCategories({parameters, headers}, rawResponse), source)
+    return useQuery<DataType<Client['getCategories']> | Response, Error>(
+        ['categories', parameters],
+        () => client.getCategories({parameters, headers: options?.headers}, options?.rawResponse),
+        options?.queryOptions
+    )
 }
 /**
  * A hook for `ShopperProducts#getCategory`.
@@ -106,27 +167,46 @@ parameter. The server only returns online categories.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategory} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
+type UseCategoryParameters = NonNullable<Argument<Client['getCategory']>>['parameters']
+type UseCategoryHeaders = NonNullable<Argument<Client['getCategory']>>['headers']
 function useCategory(
-    parameters: NonNullable<Argument<Client['getCategory']>>['parameters'],
-    deps?: unknown[],
-    headers?: NonNullable<Argument<Client['getCategory']>>['headers'],
-    rawResponse?: false
-): QueryResponse<DataType<Client['getCategory']>>
+    parameters: UseCategoryParameters,
+    options?: {
+        headers?: UseCategoryHeaders
+        rawResponse: false
+        queryOptions: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getCategory']>, Error>
 function useCategory(
-    parameters: NonNullable<Argument<Client['getCategory']>>['parameters'],
-    deps?: unknown[],
-    headers?: NonNullable<Argument<Client['getCategory']>>['headers'],
-    rawResponse?: true
-): QueryResponse<Response>
+    parameters: UseCategoryParameters,
+    options?: {
+        headers?: UseCategoryHeaders
+        rawResponse: true
+        queryOptions: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
+    }
+): UseQueryResult<Response, Error>
 function useCategory(
-    parameters: NonNullable<Argument<Client['getCategory']>>['parameters'],
-    deps: unknown[] = [],
-    headers?: NonNullable<Argument<Client['getCategory']>>['headers'],
-    rawResponse?: boolean
-): QueryResponse<DataType<Client['getCategory']> | Response> {
-    const source = getDependencySource(parameters, deps, ['id'], ['levels'])
+    parameters: UseCategoryParameters,
+    options?: {
+        headers?: UseCategoryHeaders
+        rawResponse?: boolean
+        queryOptions: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getCategory']> | Response, Error>
+function useCategory(
+    parameters: UseCategoryParameters,
+    options?: {
+        headers?: UseCategoryHeaders
+        rawResponse?: boolean
+        queryOptions: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
+    }
+): UseQueryResult<DataType<Client['getCategory']> | Response, Error> {
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getCategory({parameters, headers}, rawResponse), source)
+    return useQuery<DataType<Client['getCategory']> | Response, Error>(
+        ['category', parameters],
+        () => client.getCategory({parameters, headers: options?.headers}, options?.rawResponse),
+        options?.queryOptions
+    )
 }
 
 export {useProducts, useProduct, useCategories, useCategory}
