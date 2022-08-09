@@ -19,9 +19,19 @@ import Auth from '../../auth'
 export enum ShopperLoginHelpers {
     LoginGuestUser = 'loginGuestUser',
     LoginRegisteredUserB2C = 'loginRegisteredUserB2C',
-    Logout = 'logout'
+    Logout = 'logout',
 }
 
+/**
+ * A hook for Public Client Shopper Login OAuth helpers.
+ * The hook calls the SLAS helpers imported from commerce-sdk-isomorphic.
+ * For more, see https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/#public-client-shopper-login-helpers
+ *
+ * Avaliable helpers:
+ * - loginRegisteredUserB2C
+ * - loginGuestUser
+ * - logout
+ */
 export function useShopperLoginHelper<Action extends ShopperLoginHelpers.LoginRegisteredUserB2C>(
     action: Action
 ): ActionResponse<Parameters<Auth['loginRegisteredUserB2C']>, ShopperLoginTypes.TokenResponse>

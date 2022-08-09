@@ -50,6 +50,10 @@ type AuthDataMap = Record<
 >
 
 /**
+ * This singleton class is used to handle shopper authentication.
+ * It is responsible for initializing shopper session, manage access
+ * and refresh tokens on server/browser environments. As well as providing
+ * a mechanism to queue network calls before having a valid access token.
  *
  * @Internal
  */
@@ -69,8 +73,8 @@ class Auth {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
                 shortCode: config.shortCode,
-                siteId: config.siteId
-            }
+                siteId: config.siteId,
+            },
         })
 
         this.redirectURI = config.redirectURI
@@ -95,60 +99,61 @@ class Auth {
      * A map of the data that this auth module stores. This maps the name of the property to
      * the storage and the key when stored in that storage. You can also pass in a "callback"
      * function to do extra operation after a property is set.
-     *
-     * @Internal
      */
     private get DATA_MAP(): AuthDataMap {
         return {
             access_token: {
                 storage: this.localStorage,
-                key: 'access_token'
+                key: 'access_token',
             },
             customer_id: {
                 storage: this.localStorage,
-                key: 'customer_id'
+                key: 'customer_id',
             },
             usid: {
                 storage: this.localStorage,
-                key: 'usid'
+                key: 'usid',
             },
             enc_user_id: {
                 storage: this.localStorage,
-                key: 'enc_user_id'
+                key: 'enc_user_id',
             },
             expires_in: {
                 storage: this.localStorage,
-                key: 'expires_in'
+                key: 'expires_in',
             },
             id_token: {
                 storage: this.localStorage,
-                key: 'id_token'
+                key: 'id_token',
             },
             idp_access_token: {
                 storage: this.localStorage,
-                key: 'idp_access_token'
+                key: 'idp_access_token',
             },
             token_type: {
                 storage: this.localStorage,
-                key: 'token_type'
+                key: 'token_type',
             },
             refresh_token_guest: {
                 storage: this.cookieStorage,
                 key: 'cc-nx-g',
                 callback: () => {
                     this.cookieStorage.delete('cc-nx')
-                }
+                },
             },
             refresh_token_registered: {
                 storage: this.cookieStorage,
                 key: 'cc-nx',
                 callback: () => {
                     this.cookieStorage.delete('cc-nx-g')
-                }
-            }
+                },
+            },
         }
     }
 
+    /**
+     * Every promise method in this class returns the same data via this method.
+     */
     private get data(): ShopperLoginTypes.TokenResponse {
         return {
             access_token: this.get('access_token'),
@@ -159,10 +164,13 @@ class Auth {
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
-            usid: this.get('usid')
+            usid: this.get('usid'),
         }
     }
 
+    /**
+     * Used to validate JWT token expiration.
+     */
     private isTokenExpired(token: string) {
         if (!token) {
             return true
@@ -186,7 +194,6 @@ class Auth {
      *
      * Only call this from the "ready" function, so "ready" can manage the pending state.
      *
-     * @internal
      */
     private async init() {
         if (!this.isTokenExpired(this.get('access_token'))) {
@@ -209,6 +216,10 @@ class Auth {
         return this.data
     }
 
+    /**
+     * This method stores the TokenResponse object retrived from SLAS, and
+     * store the data in storage.
+     */
     private handleTokenResponse(res: ShopperLoginTypes.TokenResponse, isGuest: boolean) {
         this.set('access_token', `Bearer ${res.access_token}`)
         this.set('customer_id', res.customer_id)
@@ -221,7 +232,7 @@ class Auth {
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
+            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS,
         })
     }
 
@@ -240,13 +251,17 @@ class Auth {
         return this.pending
     }
 
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: loginGuestUser.
+     *
+     */
     async loginGuestUser() {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const request = async () => {
             const res = await helpers.loginGuestUser(this.client, {
                 redirectURI,
-                ...(usid && {usid})
+                ...(usid && {usid}),
             })
             this.handleTokenResponse(res, true)
             return this.data
@@ -255,13 +270,17 @@ class Auth {
         return this.pending
     }
 
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
+     *
+     */
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const request = async () => {
             const res = await helpers.loginRegisteredUserB2C(this.client, credentials, {
                 redirectURI,
-                ...(usid && {usid})
+                ...(usid && {usid}),
             })
             this.handleTokenResponse(res, false)
             return this.data
@@ -270,10 +289,14 @@ class Auth {
         return this.pending
     }
 
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: logout.
+     *
+     */
     async logout() {
         const request = async () => {
             const res = await helpers.logout(this.client, {
-                refreshToken: this.get('refresh_token_registered')
+                refreshToken: this.get('refresh_token_registered'),
             })
             this.handleTokenResponse(res, true)
             return this.data
@@ -303,7 +326,7 @@ export const withAccessToken = <T extends ArgWithHeaders>(arg: T, accessToken: s
         ...arg,
         headers: {
             Authorization: accessToken,
-            ...arg?.headers
-        }
+            ...arg?.headers,
+        },
     }
 }
