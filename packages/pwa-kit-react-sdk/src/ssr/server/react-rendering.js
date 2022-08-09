@@ -8,11 +8,12 @@
 /**
  * @module progressive-web-sdk/ssr/server/react-rendering
  */
-import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import ssrPrepass from 'react-ssr-prepass'
+
 import path from 'path'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
+import {dehydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import ssrPrepass from 'react-ssr-prepass'
 import {Helmet} from 'react-helmet'
 import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
@@ -20,6 +21,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
+import {ExpressContext} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -237,15 +239,17 @@ const getAppJSX = (req, res, error, appData) => {
     } = appData
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <Router location={location}>
-                <DeviceContext.Provider value={{type: deviceType}}>
-                    <AppConfig locals={res.locals}>
-                        <Switch error={error} appState={appState} routes={routes} App={App} />
-                    </AppConfig>
-                </DeviceContext.Provider>
-            </Router>
-        </QueryClientProvider>
+        <ExpressContext.Provider value={{req, res}}>
+            <QueryClientProvider client={queryClient}>
+                <Router location={location}>
+                    <DeviceContext.Provider value={{type: deviceType}}>
+                        <AppConfig locals={res.locals}>
+                            <Switch error={error} appState={appState} routes={routes} App={App} />
+                        </AppConfig>
+                    </DeviceContext.Provider>
+                </Router>
+            </QueryClientProvider>
+        </ExpressContext.Provider>
     )
 }
 

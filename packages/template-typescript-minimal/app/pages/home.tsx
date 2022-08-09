@@ -7,7 +7,7 @@
 import React, {useEffect, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import fetch from 'cross-fetch'
-
+import {useExpress} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 interface Props {
     value: number
 }
@@ -82,9 +82,12 @@ h1 {
 const Home = ({value}: Props) => {
     const [counter, setCounter] = useState(0)
 
-    console.log('useQuery')
+    const {res: appRes} = useExpress()
     const query = useQuery(['my-query', counter], async () => {
         const res = await fetch(`https://api.chucknorris.io/jokes/random?couter=${counter}`)
+        if (appRes) {
+            appRes.status(404)
+        }
         return await res.json()
     })
 

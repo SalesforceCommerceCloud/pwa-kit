@@ -8,7 +8,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
-import DeviceContext from '../universal/device-context'
+import {DeviceContext, ExpressContext} from '../universal/contexts'
 import App from '../universal/components/_app'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
@@ -88,22 +88,24 @@ export const start = () => {
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
             ReactDOM.hydrate(
-                <QueryClientProvider client={queryClient}>
-                    <Hydrate state={window.__PRELOADED_STATE__.__REACT_QUERY_STATE__}>
-                        <Router>
-                            <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                                <AppConfig locals={locals}>
-                                    <Switch
-                                        error={error}
-                                        appState={window.__PRELOADED_STATE__}
-                                        routes={routes}
-                                        App={WrappedApp}
-                                    />
-                                </AppConfig>
-                            </DeviceContext.Provider>
-                        </Router>
-                    </Hydrate>
-                </QueryClientProvider>,
+                <ExpressContext.Provider value={{}}>
+                    <QueryClientProvider client={queryClient}>
+                        <Hydrate state={window.__PRELOADED_STATE__.__REACT_QUERY_STATE__}>
+                            <Router>
+                                <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
+                                    <AppConfig locals={locals}>
+                                        <Switch
+                                            error={error}
+                                            appState={window.__PRELOADED_STATE__}
+                                            routes={routes}
+                                            App={WrappedApp}
+                                        />
+                                    </AppConfig>
+                                </DeviceContext.Provider>
+                            </Router>
+                        </Hydrate>
+                    </QueryClientProvider>
+                </ExpressContext.Provider>,
                 rootEl,
                 () => {
                     window.__HYDRATING__ = false
