@@ -19,38 +19,28 @@ type Client = ApiClients['shopperProducts']
  */
 type UseProductsParameters = NonNullable<Argument<Client['getProducts']>>['parameters']
 type UseProductsHeaders = NonNullable<Argument<Client['getProducts']>>['headers']
+type UseProductsArg = {headers?: UseProductsHeaders; rawResponse?: boolean} & UseProductsParameters
 function useProducts(
-    parameters: UseProductsParameters,
-    options?: {
-        headers: UseProductsHeaders
-        rawResponse: false
-        queryOptions: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
-    }
+    arg: Omit<UseProductsArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ): UseQueryResult<DataType<Client['getProducts']>, Error>
 function useProducts(
-    parameters: UseProductsParameters,
-    options: {
-        headers: UseProductsHeaders
-        rawResponse: true
-        queryOptions?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
-    }
+    arg: Omit<UseProductsArg, 'rawResponse'> & {rawResponse: true},
+    options: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ): UseQueryResult<Response, Error>
 function useProducts(
-    parameters: UseProductsParameters,
-    options?: {
-        headers: UseProductsHeaders
-        rawResponse: boolean
-        queryOptions?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
-    }
+    arg: UseProductsArg,
+    options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ) {
-    if (!parameters) {
-        throw new Error('parameters are required')
+    if (!arg.ids) {
+        throw new Error('ids is required for useProducts')
     }
     const {shopperProducts: client} = useCommerceApi()
+    const {headers, rawResponse, ...parameters} = arg
     return useAsync(
-        ['products', parameters],
-        () => client.getProducts({parameters, headers: options?.headers}, options?.rawResponse),
-        options?.queryOptions
+        ['products', arg],
+        () => client.getProducts({parameters, headers}, rawResponse),
+        options
     )
 }
 /**
@@ -62,35 +52,28 @@ function useProducts(
  */
 type UseProductParameters = NonNullable<Argument<Client['getProduct']>>['parameters']
 type UseProductHeaders = NonNullable<Argument<Client['getProduct']>>['headers']
+type UseProductArg = {headers?: UseProductHeaders; rawResponse?: boolean} & UseProductParameters
 function useProduct(
-    parameters: UseProductParameters,
-    options?: {
-        headers: UseProductHeaders
-        rawResponse: false
-        queryOptions: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
-    }
+    arg: Omit<UseProductArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
 ): UseQueryResult<DataType<Client['getProduct']>, Error>
 function useProduct(
-    parameters: UseProductParameters,
-    options: {
-        headers: UseProductHeaders
-        rawResponse: true
-        queryOptions: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
-    }
+    arg: Omit<UseProductArg, 'rawResponse'> & {rawResponse: true},
+    options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
 ): UseQueryResult<Response, Error>
 function useProduct(
-    parameters: UseProductParameters,
-    options?: {
-        headers: UseProductHeaders
-        rawResponse: boolean
-        queryOptions: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
-    }
+    arg: UseProductArg,
+    options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
 ): UseQueryResult<DataType<Client['getProduct']> | Response, Error> {
+    if (!arg.id) {
+        throw new Error('id is required for useProduct.')
+    }
+    const {headers, rawResponse, ...parameters} = arg
     const {shopperProducts: client} = useCommerceApi()
     return useAsync(
-        ['product', parameters],
-        () => client.getProduct({parameters, headers: options?.headers}, options?.rawResponse),
-        options?.queryOptions
+        ['product', arg],
+        () => client.getProduct({parameters, headers}, rawResponse),
+        options
     )
 }
 /**
@@ -102,35 +85,33 @@ function useProduct(
  */
 type UseCategoriesParameters = NonNullable<Argument<Client['getCategories']>>['parameters']
 type UseCategoriesHeaders = NonNullable<Argument<Client['getCategories']>>['headers']
+type UseCategoriesArg = {
+    headers?: UseCategoriesHeaders
+    rawResponse?: boolean
+} & UseCategoriesParameters
+
 function useCategories(
-    parameters: UseCategoriesParameters,
-    options?: {
-        headers: UseCategoriesHeaders
-        rawResponse: false
-        queryOptions: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
-    }
+    arg: Omit<UseCategoriesArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategories']>, Error>
 function useCategories(
-    parameters: UseCategoriesParameters,
-    options: {
-        headers: UseCategoriesHeaders
-        rawResponse: true
-        queryOptions: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
-    }
+    arg: Omit<UseCategoriesArg, 'rawResponse'> & {rawResponse: true},
+    options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
 ): UseQueryResult<Response, Error>
 function useCategories(
-    parameters: UseCategoriesParameters,
-    options?: {
-        headers?: UseCategoriesHeaders
-        rawResponse?: boolean
-        queryOptions: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
-    }
+    arg: UseCategoriesArg,
+    options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategories']> | Response, Error> {
+    if (!arg.ids) {
+        throw new Error('ids is required for useCategories')
+    }
+    const {headers, rawResponse, ...parameters} = arg
+
     const {shopperProducts: client} = useCommerceApi()
     return useAsync(
-        ['categories', parameters],
-        () => client.getCategories({parameters, headers: options?.headers}, options?.rawResponse),
-        options?.queryOptions
+        ['categories', arg],
+        () => client.getCategories({parameters, headers}, rawResponse),
+        options
     )
 }
 /**
@@ -144,35 +125,29 @@ parameter. The server only returns online categories.
  */
 type UseCategoryParameters = NonNullable<Argument<Client['getCategory']>>['parameters']
 type UseCategoryHeaders = NonNullable<Argument<Client['getCategory']>>['headers']
+type UseCategoryArg = {
+    headers?: UseCategoryHeaders
+    rawResponse?: boolean
+} & UseCategoryParameters
 function useCategory(
-    parameters: UseCategoryParameters,
-    options?: {
-        headers?: UseCategoryHeaders
-        rawResponse: false
-        queryOptions: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
-    }
+    arg: Omit<UseCategoryArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategory']>, Error>
 function useCategory(
-    parameters: UseCategoryParameters,
-    options: {
-        headers?: UseCategoryHeaders
-        rawResponse: true
-        queryOptions: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
-    }
+    arg: Omit<UseCategoryArg, 'rawResponse'> & {rawResponse: true},
+    options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
 ): UseQueryResult<Response, Error>
 function useCategory(
-    parameters: UseCategoryParameters,
-    options?: {
-        headers?: UseCategoryHeaders
-        rawResponse?: boolean
-        queryOptions: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
-    }
+    arg: UseCategoryArg,
+    options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategory']> | Response, Error> {
+    const {headers, rawResponse, ...parameters} = arg
+
     const {shopperProducts: client} = useCommerceApi()
     return useAsync(
-        ['category', parameters],
-        () => client.getCategory({parameters, headers: options?.headers}, options?.rawResponse),
-        options?.queryOptions
+        ['category', arg],
+        () => client.getCategory({parameters, headers}, rawResponse),
+        options
     )
 }
 
