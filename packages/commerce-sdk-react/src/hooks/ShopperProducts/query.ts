@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, DataType, QueryResponse} from '../types'
+import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
 import {withAccessToken} from '../../auth'
+import {UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
 
@@ -20,10 +21,11 @@ type Client = ApiClients['shopperProducts']
  */
 export const useProducts = (
     arg: Argument<Client['getProducts']>
-): QueryResponse<DataType<Client['getProducts']>> => {
+): UseQueryResult<DataType<Client['getProducts']>, Error> => {
     const {shopperProducts: client} = useCommerceApi()
 
-    return useAsync((accessToken) => client.getProducts(withAccessToken(arg, accessToken)), [arg])
+    // return useAsync((accessToken) => client.getProducts(withAccessToken(arg, accessToken)), [arg])
+    return useAsync(['products', arg], () => client.getProducts(arg))
 }
 /**
  * A hook for `ShopperProducts#getProduct`.
@@ -34,9 +36,9 @@ export const useProducts = (
  */
 export const useProduct = (
     arg: Argument<Client['getProduct']>
-): QueryResponse<DataType<Client['getProduct']>> => {
+): UseQueryResult<DataType<Client['getProduct']>, Error> => {
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getProduct(arg), [arg])
+    return useAsync(['product', arg], () => client.getProduct(arg))
 }
 /**
  * A hook for `ShopperProducts#getCategories`.
@@ -47,9 +49,9 @@ export const useProduct = (
  */
 export const useCategories = (
     arg: Argument<Client['getCategories']>
-): QueryResponse<DataType<Client['getCategories']>> => {
+): UseQueryResult<DataType<Client['getCategories']>, Error> => {
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getCategories(arg), [arg])
+    return useAsync(['categories'], () => client.getCategories(arg))
 }
 /**
  * A hook for `ShopperProducts#getCategory`.
@@ -62,7 +64,7 @@ parameter. The server only returns online categories.
  */
 export const useCategory = (
     arg: Argument<Client['getCategory']>
-): QueryResponse<DataType<Client['getCategory']>> => {
+): UseQueryResult<DataType<Client['getCategory']>, Error> => {
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(() => client.getCategory(arg), [arg])
+    return useAsync(['category'], () => client.getCategory(arg))
 }

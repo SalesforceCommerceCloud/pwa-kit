@@ -12,6 +12,7 @@ import '@testing-library/jest-dom'
 
 import useCommerceApi from './hooks/useCommerceApi'
 import CommerceApiProvider from './provider'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 const sampleProps = {
     proxy: 'http://localhost:3000/mobify/proxy/api',
@@ -23,8 +24,14 @@ const sampleProps = {
     redirectURI: 'http://localhost:3000/callback',
     currency: 'USD'
 }
+const queryClient = new QueryClient()
+
 const SampleProvider = (props: {children: React.ReactNode}) => {
-    return <CommerceApiProvider {...sampleProps}>{props.children}</CommerceApiProvider>
+    return (
+        <QueryClientProvider client={queryClient}>
+            <CommerceApiProvider {...sampleProps}>{props.children}</CommerceApiProvider>
+        </QueryClientProvider>
+    )
 }
 
 test('useCommerceApi returns a set of api clients', () => {
