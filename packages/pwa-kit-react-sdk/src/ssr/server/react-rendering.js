@@ -117,7 +117,7 @@ const initAppState = async ({App, component, match, route, req, res, location, q
         }
     } catch (error) {
         returnVal = {
-            error: error || new Error(),
+            error: logAndFormatError(error || new Error()),
             appState: {}
         }
     }
@@ -170,8 +170,9 @@ export const render = async (req, res, next) => {
     const component = await route.component.getComponent()
 
     // Step 2.5 - Prepass render for `useQuery` server-side support.
+    let prepassResult
     if (config?.ssrParameters?.ssrPrepassEnabled) {
-        await prepassApp(req, res, {
+        prepassResult = await prepassApp(req, res, {
             App: WrappedApp,
             location,
             routes,
@@ -180,23 +181,26 @@ export const render = async (req, res, next) => {
     }
 
     // Step 3 - Init the app state
-    const {appState, error: appStateError} = await initAppState({
-        App: WrappedApp,
-        component,
-        match,
-        route,
-        req,
-        res,
-        location,
-        queryClient
-    })
+    const {appState, error: appStateError} = prepassResult.error
+        ? {}
+        : await initAppState({
+              App: WrappedApp,
+              component,
+              match,
+              route,
+              req,
+              res,
+              location,
+              queryClient
+          })
 
     // Step 4 - Render the App
     let renderResult
     const args = {
         App: WrappedApp,
         appState,
-        appStateError: appStateError && logAndFormatError(appStateError),
+        appStateError,
+        prepassError: prepassResult.error,
         routes,
         req,
         res,
@@ -229,15 +233,7 @@ export const render = async (req, res, next) => {
 }
 
 const getAppJSX = (req, res, error, appData) => {
-    const {
-        App,
-        appState = {},
-        deviceType,
-        location,
-        queryClient,
-        routerContext,
-        routes
-    } = appData
+    const {App, appState = {}, deviceType, location, queryClient, routerContext, routes} = appData
 
     return (
         <ExpressContext.Provider value={{req, res}}>
@@ -261,7 +257,8 @@ const renderAppHtml = (req, res, error, appData) => {
 }
 
 const prepassApp = async (req, res, appData) => {
-    let appStateError
+    let error
+    let prepassError
     const deviceType = detectDeviceType(req)
 
     // Update "appData" with device type incase it influences the JSX elements that
@@ -271,11 +268,31 @@ const prepassApp = async (req, res, appData) => {
         deviceType
     }
 
-    await ssrPrepass(getAppJSX(req, res, appStateError, appData))
+    try {
+        await ssrPrepass(getAppJSX(req, res, error, appData))
+    } catch (e) {
+        prepassError = logAndFormatError(e)
+    }
+
+    return {
+        success: !prepassError,
+        error: prepassError
+    }
 }
 
 const renderApp = async (args) => {
-    const {req, res, appStateError, App, appState, location, routes, config, queryClient} = args
+    const {
+        req,
+        res,
+        appStateError,
+        prepassError,
+        App,
+        appState,
+        location,
+        routes,
+        config,
+        queryClient
+    } = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
     const routerContext = {}
@@ -299,7 +316,7 @@ const renderApp = async (args) => {
     // It's important that we render the App before extracting the script elements,
     // otherwise it won't return the correct chunks.
     try {
-        appHtml = renderAppHtml(req, res, appStateError, appData)
+        appHtml = renderAppHtml(req, res, appStateError || prepassError, appData)
     } catch (e) {
         // This will catch errors thrown from the app and pass the error
         // to the AppErrorBoundary component, and renders the error page.

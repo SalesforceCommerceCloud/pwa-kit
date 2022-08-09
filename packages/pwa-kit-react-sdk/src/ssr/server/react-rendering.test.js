@@ -45,6 +45,7 @@ jest.mock('../universal/routes', () => {
     const errors = require('../universal/errors')
     const {Redirect} = require('react-router-dom')
     const {Helmet} = require('react-helmet')
+    const {useQuery} = require('@tanstack/react-query')
 
     // Test utility to exercise paths that work with @loadable/component.
     const fakeLoadable = (Wrapped) => {
@@ -228,6 +229,12 @@ jest.mock('../universal/routes', () => {
         }
     }
 
+    const UseQueryResolvesObject = () => {
+        const {data} = useQuery(['use-query-resolves-object'], async () => ({prop: 'prop-value'}))
+
+        return <div>{data.prop}</div>
+    }
+
     GetPropsReturnsObject.propTypes = {
         prop: PropTypes.node
     }
@@ -282,6 +289,10 @@ jest.mock('../universal/routes', () => {
             {
                 path: '/xss/',
                 component: XSSPage
+            },
+            {
+                path: '/use-query-resolves-object/',
+                component: UseQueryResolvesObject
             }
         ]
     }
@@ -617,6 +628,16 @@ describe('The Node SSR Environment', () => {
                 expect(html).toContain(
                     shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error'
                 )
+            }
+        },
+        {
+            description: `Works if the user resolves an Object with useQuery`,
+            req: {url: '/use-query-resolves-object/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                const include = ['<div>prop-value</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
             }
         }
     ]

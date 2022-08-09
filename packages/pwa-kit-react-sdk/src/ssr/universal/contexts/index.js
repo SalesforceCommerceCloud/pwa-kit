@@ -10,7 +10,4 @@ import DeviceContext from '../device-context'
 
 const ExpressContext = React.createContext()
 
-export {
-    DeviceContext,
-    ExpressContext
-}
+export {DeviceContext, ExpressContext}

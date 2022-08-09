@@ -31,6 +31,7 @@ jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
                 '**/*.json'
             ],
             ssrParameters: {
+                ssrPrepassEnabled: true,
                 ssrFunctionNodeVersion: '14.x',
                 proxyConfigs: [
                     {
