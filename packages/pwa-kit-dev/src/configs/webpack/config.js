@@ -26,7 +26,6 @@ const projectDir = process.cwd()
 const sdkDir = resolve(path.join(__dirname, '..', '..', '..', '..', 'pwa-kit-react-sdk'))
 const devDir = resolve(path.join(__dirname, '..', '..', '..', '..', 'pwa-kit-dev'))
 
-
 const pkg = require(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
     ? resolve(process.env.PWA_KIT_BUILD_DIR)
@@ -133,7 +132,7 @@ const baseConfig = (target) => {
                         'react-router-dom': findInProjectThenSDK('react-router-dom'),
                         'react-dom': findInProjectThenSDK('react-dom'),
                         'react-helmet': findInProjectThenSDK('react-helmet'),
-                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware')
+                        'webpack-hot-middleware': findInProjectThenDev('webpack-hot-middleware')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },

@@ -6,8 +6,9 @@
  */
 import React, {useEffect, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
-import fetch from 'cross-fetch'
-import {useExpress} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+
+import HelloTS from '../components/hello-typescript'
+import HelloJS from '../components/hello-javascript'
 interface Props {
     value: number
 }
@@ -82,21 +83,21 @@ h1 {
 const Home = ({value}: Props) => {
     const [counter, setCounter] = useState(0)
 
-    const {res: appRes} = useExpress()
-    const query = useQuery(['my-query', counter], async () => {
-        const res = await fetch(`https://api.chucknorris.io/jokes/random?couter=${counter}`)
-        if (appRes) {
-            appRes.status(404)
+    const query = useQuery(['my-query'], async () => {
+        // Mock network delay.
+        await new Promise((resolve) => setTimeout(resolve, 80))
+
+        return {
+            message: 'react query works!'
         }
-        return await res.json()
     })
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         setCounter(counter + 1)
-    //     }, 1000)
-    //     return () => clearInterval(interval)
-    // }, [counter, setCounter])
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCounter(counter + 1)
+        }, 1000)
+        return () => clearInterval(interval)
+    }, [counter, setCounter])
 
     return (
         <div>
@@ -108,13 +109,41 @@ const Home = ({value}: Props) => {
                         <br />
                         Support!
                     </h1>
-                    <button onClick={() => {setCounter(counter + 1)}}>click me</button>
+                    <button
+                        onClick={() => {
+                            setCounter(counter + 1)
+                        }}
+                    >
+                        click me
+                    </button>
                 </div>
                 <div className="panel">
                     <div className="divider"></div>
                 </div>
                 <div className="panel">
-                    <pre>{JSON.stringify(query.data, null, 2)}</pre>
+                    <p style={{width: '300px'}} className="fade-in fade-in-0">
+                        <b>This page is written in Typescript</b>
+                        <br />
+                        <br />
+                        Server-side <b>getProps</b> works if this is a valid expression: &quot;5
+                        times 7 is {value}
+                        &quot;
+                        <br />
+                        <br />
+                        Server-side <b>useQuery</b> works if you see a message: &quot;
+                        {query.data.message}&quot;
+                        <br />
+                        <br />
+                        Client-side JS works if this counter increments: {counter}
+                        <br />
+                        <br />
+                        <b>You can mix-and-match JS and TS</b>
+                        <br />
+                        <br />
+                        <HelloJS />
+                        &nbsp;
+                        <HelloTS message="it works!" />
+                    </p>
                 </div>
             </div>
         </div>
@@ -122,5 +151,18 @@ const Home = ({value}: Props) => {
 }
 
 Home.getTemplateName = () => 'home'
+
+Home.getProps = async () => {
+    // Note: This is simply a mock function to demo deferred execution for fetching props (e.g.: Making a call to the server to fetch data)
+    const getData = (a: number, b: number) => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(a * b)
+            }, 50)
+        })
+    }
+    const value = await getData(5, 7)
+    return {value}
+}
 
 export default Home
