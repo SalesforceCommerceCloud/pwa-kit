@@ -1,10 +1,10 @@
-import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 /*
  * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'

@@ -15,7 +15,7 @@ import {
     ShopperPromotions,
     ShopperDiscoverySearch,
     ShopperGiftCertificates,
-    ShopperSearch,
+    ShopperSearch
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
@@ -55,9 +55,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientId,
             organizationId,
             shortCode,
-            siteId,
+            siteId
         },
-        throwOnBadResponse: true,
+        throwOnBadResponse: true
     }
 
     const {current: apiClients} = useRef<ApiClients>({
@@ -70,7 +70,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shopperOrders: new ShopperOrders(config),
         shopperProducts: new ShopperProducts(config),
         shopperPromotions: new ShopperPromotions(config),
-        shopperSearch: new ShopperSearch(config),
+        shopperSearch: new ShopperSearch(config)
     })
 
     const {current: auth} = useRef(
@@ -80,7 +80,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shortCode,
             siteId,
             proxy,
-            redirectURI,
+            redirectURI
         })
     )
 

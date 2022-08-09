@@ -5,12 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
-/*
- * Copyright (c) 2022, Salesforce, Inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
 import {ActionResponse, Argument} from '../types'
 import {useAsyncCallback} from '../useAsync'
 import useAuth from '../useAuth'
@@ -19,7 +13,7 @@ import Auth from '../../auth'
 export enum ShopperLoginHelpers {
     LoginGuestUser = 'loginGuestUser',
     LoginRegisteredUserB2C = 'loginRegisteredUserB2C',
-    Logout = 'logout',
+    Logout = 'logout'
 }
 
 /**
