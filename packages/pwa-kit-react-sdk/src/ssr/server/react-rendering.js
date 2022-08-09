@@ -232,16 +232,17 @@ const getAppJSX = (req, res, error, appData) => {
     const {
         App,
         appState = {},
-        routes,
+        deviceType,
         location,
-        deviceType, // We DO need this.. if it's not passed we might have different queries.
-        queryClient
+        queryClient,
+        routerContext,
+        routes
     } = appData
 
     return (
         <ExpressContext.Provider value={{req, res}}>
             <QueryClientProvider client={queryClient}>
-                <Router location={location}>
+                <Router location={location} context={routerContext}>
                     <DeviceContext.Provider value={{type: deviceType}}>
                         <AppConfig locals={res.locals}>
                             <Switch error={error} appState={appState} routes={routes} App={App} />
