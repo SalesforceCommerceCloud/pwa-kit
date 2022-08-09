@@ -29,20 +29,12 @@ function useProducts(
 ): UseQueryResult<DataType<Client['getProducts']>, Error>
 function useProducts(
     parameters: UseProductsParameters,
-    options?: {
+    options: {
         headers: UseProductsHeaders
         rawResponse: true
         queryOptions?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
     }
 ): UseQueryResult<Response, Error>
-function useProducts(
-    parameters: UseProductsParameters,
-    options?: {
-        headers: UseProductsHeaders
-        rawResponse: boolean
-        queryOptions?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
-    }
-): UseQueryResult<DataType<Client['getProducts']> | Response, Error>
 function useProducts(
     parameters: UseProductsParameters,
     options?: {
@@ -80,20 +72,12 @@ function useProduct(
 ): UseQueryResult<DataType<Client['getProduct']>, Error>
 function useProduct(
     parameters: UseProductParameters,
-    options?: {
+    options: {
         headers: UseProductHeaders
         rawResponse: true
         queryOptions: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
     }
 ): UseQueryResult<Response, Error>
-function useProduct(
-    parameters: UseProductParameters,
-    options?: {
-        headers: UseProductHeaders
-        rawResponse: boolean
-        queryOptions: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
-    }
-): UseQueryResult<DataType<Client['getProduct']> | Response, Error>
 function useProduct(
     parameters: UseProductParameters,
     options?: {
@@ -121,27 +105,19 @@ type UseCategoriesHeaders = NonNullable<Argument<Client['getCategories']>>['head
 function useCategories(
     parameters: UseCategoriesParameters,
     options?: {
-        headers?: UseCategoriesHeaders
+        headers: UseCategoriesHeaders
         rawResponse: false
         queryOptions: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
     }
 ): UseQueryResult<DataType<Client['getCategories']>, Error>
 function useCategories(
     parameters: UseCategoriesParameters,
-    options?: {
-        headers?: UseCategoriesHeaders
+    options: {
+        headers: UseCategoriesHeaders
         rawResponse: true
         queryOptions: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
     }
 ): UseQueryResult<Response, Error>
-function useCategories(
-    parameters: UseCategoriesParameters,
-    options?: {
-        headers?: UseCategoriesHeaders
-        rawResponse?: boolean
-        queryOptions: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
-    }
-): UseQueryResult<DataType<Client['getCategories']> | Response, Error>
 function useCategories(
     parameters: UseCategoriesParameters,
     options?: {
@@ -178,20 +154,12 @@ function useCategory(
 ): UseQueryResult<DataType<Client['getCategory']>, Error>
 function useCategory(
     parameters: UseCategoryParameters,
-    options?: {
+    options: {
         headers?: UseCategoryHeaders
         rawResponse: true
         queryOptions: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
     }
 ): UseQueryResult<Response, Error>
-function useCategory(
-    parameters: UseCategoryParameters,
-    options?: {
-        headers?: UseCategoryHeaders
-        rawResponse?: boolean
-        queryOptions: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
-    }
-): UseQueryResult<DataType<Client['getCategory']> | Response, Error>
 function useCategory(
     parameters: UseCategoryParameters,
     options?: {
