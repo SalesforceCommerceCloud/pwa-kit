@@ -69,21 +69,8 @@ export const start = () => {
 
     const WrappedApp = routeComponent(App, false, locals)
     const error = window.__ERROR__
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: {
-                // refetchOnMount: (query) => {
-                //     console.log('REFETCH ON MOUNT: ', query, !window.__HYDRATING__)
-                //     // return !window.__HYDRATING__
-                //     return false
-                // },
-                // enabled: !window.__HYDRATING__,
-                staleTime: 1000
-            }
-        }
-    })
+    const queryClient = new QueryClient()
 
-    const hydrateOptions = {}
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
