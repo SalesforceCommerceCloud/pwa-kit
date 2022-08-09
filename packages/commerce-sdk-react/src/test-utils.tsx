@@ -20,7 +20,16 @@ const sampleProps = {
     currency: 'USD'
 }
 const TestProviders = (props: {children: React.ReactNode}) => {
-    return <CommerceApiProvider {...sampleProps}>{props.children}</CommerceApiProvider>
+    return (
+        <CommerceApiProvider
+            {...sampleProps}
+            queryClientConfig={{
+                defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
+            }}
+        >
+            {props.children}
+        </CommerceApiProvider>
+    )
 }
 
 /**
