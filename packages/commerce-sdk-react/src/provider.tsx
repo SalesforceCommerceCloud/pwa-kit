@@ -18,15 +18,16 @@ import {
     ShopperSearch,
     helpers
 } from 'commerce-sdk-isomorphic'
-import {QueryClientProvider, QueryClient} from '@tanstack/react-query'
+
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-const queryClient = new QueryClient()
+import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
     locale: string
     currency: string
+    queryClientConfig?: QueryClientConfig
 }
 
 /**
@@ -59,7 +60,7 @@ const localhost = 'http://localhost:3000'
 const token =
     'eyJ2ZXIiOiIxLjAiLCJraWQiOiI2ZWQ2M2RmZC1iOTQzLTQ1ZjctOWMzNC01MjEyMDkwZGNjNmQiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOjJkMTBiN2UwLTg5YjQtNGVjNy05NTA3LWVjODkxNTNjNWEwMSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY1OTk4MjQ5Mywic3R5IjoiVXNlciIsImlzYiI6InVpZG86c2xhczo6dXBuOkd1ZXN0Ojp1aWRuOkd1ZXN0IFVzZXI6OmdjaWQ6YmVrS29Wa2VnMXhyYVJtY0pHbGJZWXh1azEiLCJleHAiOjE2NTk5ODQzMjMsImlhdCI6MTY1OTk4MjUyMywianRpIjoiQzJDNDg1NjIwMTg2MC0xODkwNjc4OTAzMTc5NTcyNDEyMzc0ODUzMTkifQ.wIs-x3dGb-QZvaRTFkLDkJerN1S_9ohARvytsbNgCP9uJilQL1msIVF3y9cMjI54BYCXuD7a5NMj8QG_wQkLag'
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
-    const {children, clientId, organizationId, shortCode, siteId} = props
+    const {children, clientId, organizationId, shortCode, siteId, queryClientConfig} = props
 
     const defaultConfig: configType = {
         proxy: `${localhost}${props.proxy}`,
@@ -147,6 +148,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shopperPromotions: new ShopperPromotions(config),
         shopperSearch: new ShopperSearch(config)
     }
+
+    const queryClient = new QueryClient(queryClientConfig)
 
     // TODO: wrap the children with:
     // - context for enabling useServerEffect hook
