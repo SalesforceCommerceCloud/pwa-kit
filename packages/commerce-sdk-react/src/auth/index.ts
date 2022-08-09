@@ -237,9 +237,8 @@ class Auth {
     }
 
     /**
-     * The ready function returns a promise, signaling whether or not
-     * the access token is avaliable. If access token is not avaliable
-     * this method will try to re-initialize.
+     * The ready function returns a promise indicating whether we have
+     * a valid access token.
      *
      * We use this method to block those commerce api calls that
      * requires an access token.
@@ -266,7 +265,7 @@ class Auth {
             this.handleTokenResponse(res, true)
             return this.data
         }
-        this.pending = request()
+        this.pending = this.pending ? this.pending.then(request) : request()
         return this.pending
     }
 
@@ -285,7 +284,7 @@ class Auth {
             this.handleTokenResponse(res, false)
             return this.data
         }
-        this.pending = request()
+        this.pending = this.pending ? this.pending.then(request) : request()
         return this.pending
     }
 
@@ -301,7 +300,7 @@ class Auth {
             this.handleTokenResponse(res, true)
             return this.data
         }
-        this.pending = request()
+        this.pending = this.pending ? this.pending.then(request) : request()
         return this.pending
     }
 }
@@ -321,7 +320,7 @@ type ArgWithHeaders =
  *
  * @Internal
  */
-export const withAccessToken = <T extends ArgWithHeaders>(arg: T, accessToken: string) => {
+export const injectAccessToken = <T extends ArgWithHeaders>(arg: T, accessToken: string) => {
     return {
         ...arg,
         headers: {

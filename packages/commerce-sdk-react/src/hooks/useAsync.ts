@@ -1,3 +1,4 @@
+import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 /*
  * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
@@ -5,16 +6,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useState} from 'react'
+import useAuth from './useAuth'
 import {ActionResponse} from './types'
 import {useQuery, UseQueryOptions} from '@tanstack/react-query'
 
 export const useAsync = <T>(
     queryKey: unknown[],
-    fn: () => Promise<T>,
+    fn: (tokenResponse: ShopperLoginTypes.TokenResponse) => Promise<T>,
     queryOptions?: UseQueryOptions<T, Error>
 ) => {
-    // add more logic in here
-    return useQuery<T, Error>(queryKey, fn, queryOptions)
+    const auth = useAuth()
+    const authenticatedFn = () => auth.ready().then(fn)
+    return useQuery<T, Error>(queryKey, authenticatedFn, queryOptions)
 }
 
 export const useAsyncCallback = <Args extends unknown[], Ret>(

@@ -1,3 +1,4 @@
+import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 /*
  * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
@@ -7,7 +8,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
-import {withAccessToken} from '../../auth'
+import {injectAccessToken} from '../../auth'
 import {UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
@@ -24,8 +25,9 @@ export const useProducts = (
 ): UseQueryResult<DataType<Client['getProducts']>, Error> => {
     const {shopperProducts: client} = useCommerceApi()
 
-    // return useAsync((accessToken) => client.getProducts(withAccessToken(arg, accessToken)), [arg])
-    return useAsync(['products', arg], () => client.getProducts(arg))
+    return useAsync(['products', arg], ({access_token}: ShopperLoginTypes.TokenResponse) =>
+        client.getProducts(injectAccessToken(arg, access_token))
+    )
 }
 /**
  * A hook for `ShopperProducts#getProduct`.
