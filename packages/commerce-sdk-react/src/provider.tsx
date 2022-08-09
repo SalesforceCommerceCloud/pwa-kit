@@ -45,8 +45,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
 
     // DEBUG: copy access token from browser
     const headers = {
-        authorization:
-            ''
+        authorization: ''
     }
 
     const config = {
