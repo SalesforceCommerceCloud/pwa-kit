@@ -86,8 +86,11 @@ const initAppState = async ({App, component, match, route, req, res, location, q
 
     const {params} = match
 
+    const queryCache = queryClient.getQueryCache()
+    const queries = queryCache.getAll()
+    const queryPromises = queries.map(({fetch, enabled}) => enabled && fetch())
     const components = [App, route.component]
-    const queries = queryClient.queryCache.queries.map((q) => q.fetch())
+
     const promises = components
         .map((c) =>
             c.getProps
@@ -99,7 +102,7 @@ const initAppState = async ({App, component, match, route, req, res, location, q
                   })
                 : Promise.resolve({})
         )
-        .concat(queries)
+        .concat(queryPromises)
     let returnVal = {}
 
     try {

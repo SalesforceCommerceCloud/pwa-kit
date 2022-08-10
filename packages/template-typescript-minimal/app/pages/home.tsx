@@ -131,7 +131,7 @@ const Home = ({value}: Props) => {
                         <br />
                         <br />
                         Server-side <b>useQuery</b> works if you see a message: &quot;
-                        {query.data.message}&quot;
+                        {query?.data?.message}&quot;
                         <br />
                         <br />
                         Client-side JS works if this counter increments: {counter}

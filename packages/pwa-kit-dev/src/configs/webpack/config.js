@@ -24,6 +24,7 @@ import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-
 
 const projectDir = process.cwd()
 const sdkDir = resolve(path.join(__dirname, '..', '..', '..'))
+console.log('SDK DIR: ', sdkDir)
 
 const pkg = require(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
