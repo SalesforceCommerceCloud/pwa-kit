@@ -120,6 +120,7 @@ const baseConfig = (target) => {
                         '@loadable/webpack-plugin': findInProjectThenSDK(
                             '@loadable/webpack-plugin'
                         ),
+                        '@tanstack/react-query': findInProjectThenSDK('@tanstack/react-query'),
                         'svg-sprite-loader': findInProjectThenSDK('svg-sprite-loader'),
                         react: findInProjectThenSDK('react'),
                         'react-router-dom': findInProjectThenSDK('react-router-dom'),
