@@ -101,50 +101,50 @@ class Auth {
         return {
             access_token: {
                 storage: this.localStorage,
-                key: 'access_token',
+                key: 'access_token'
             },
             customer_id: {
                 storage: this.localStorage,
-                key: 'customer_id',
+                key: 'customer_id'
             },
             usid: {
                 storage: this.localStorage,
-                key: 'usid',
+                key: 'usid'
             },
             enc_user_id: {
                 storage: this.localStorage,
-                key: 'enc_user_id',
+                key: 'enc_user_id'
             },
             expires_in: {
                 storage: this.localStorage,
-                key: 'expires_in',
+                key: 'expires_in'
             },
             id_token: {
                 storage: this.localStorage,
-                key: 'id_token',
+                key: 'id_token'
             },
             idp_access_token: {
                 storage: this.localStorage,
-                key: 'idp_access_token',
+                key: 'idp_access_token'
             },
             token_type: {
                 storage: this.localStorage,
-                key: 'token_type',
+                key: 'token_type'
             },
             refresh_token_guest: {
                 storage: this.cookieStorage,
                 key: 'cc-nx-g',
                 callback: () => {
                     this.cookieStorage.delete('cc-nx')
-                },
+                }
             },
             refresh_token_registered: {
                 storage: this.cookieStorage,
                 key: 'cc-nx',
                 callback: () => {
                     this.cookieStorage.delete('cc-nx-g')
-                },
-            },
+                }
+            }
         }
     }
 
@@ -161,7 +161,7 @@ class Auth {
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
-            usid: this.get('usid'),
+            usid: this.get('usid')
         }
     }
 
@@ -229,7 +229,7 @@ class Auth {
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS,
+            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
         })
     }
 
@@ -257,7 +257,7 @@ class Auth {
         const request = async () => {
             const res = await helpers.loginGuestUser(this.client, {
                 redirectURI,
-                ...(usid && {usid}),
+                ...(usid && {usid})
             })
             this.handleTokenResponse(res, true)
             return this.data
@@ -276,7 +276,7 @@ class Auth {
         const request = async () => {
             const res = await helpers.loginRegisteredUserB2C(this.client, credentials, {
                 redirectURI,
-                ...(usid && {usid}),
+                ...(usid && {usid})
             })
             this.handleTokenResponse(res, false)
             return this.data
@@ -292,7 +292,7 @@ class Auth {
     async logout() {
         const request = async () => {
             const res = await helpers.logout(this.client, {
-                refreshToken: this.get('refresh_token_registered'),
+                refreshToken: this.get('refresh_token_registered')
             })
             this.handleTokenResponse(res, true)
             return this.data
@@ -322,7 +322,7 @@ export const injectAccessToken = <T extends ArgWithHeaders>(arg: T, accessToken:
         ...arg,
         headers: {
             Authorization: accessToken,
-            ...arg?.headers,
-        },
+            ...arg?.headers
+        }
     }
 }

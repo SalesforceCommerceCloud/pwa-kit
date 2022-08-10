@@ -18,14 +18,14 @@ const sampleProps = {
     redirectURI: 'http://localhost:3000/callback',
     siteId: 'RefArchGlobal',
     locale: 'en_US',
-    currency: 'USD',
+    currency: 'USD'
 }
 const TestProviders = (props: {children: React.ReactNode}) => {
     return (
         <CommerceApiProvider
             {...sampleProps}
             queryClientConfig={{
-                defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+                defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
             }}
         >
             {props.children}

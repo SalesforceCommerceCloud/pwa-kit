@@ -19,7 +19,7 @@ const sampleProps = {
     siteId: 'RefArchGlobal',
     locale: 'en_US',
     redirectURI: 'http://localhost:3000/callback',
-    currency: 'USD',
+    currency: 'USD'
 }
 const queryClient = new QueryClient()
 

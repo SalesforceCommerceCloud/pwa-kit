@@ -36,7 +36,7 @@ export const useAsyncCallback = <Args extends unknown[], Ret>(
                 .then((data) => setData(data))
                 .catch((error: Error) => setError(error))
                 .finally(() => setIsLoading(false))
-        },
+        }
     }
     return result
 }
