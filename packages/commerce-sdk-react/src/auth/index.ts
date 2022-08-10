@@ -50,7 +50,7 @@ type AuthDataMap = Record<
 >
 
 /**
- * This singleton class is used to handle shopper authentication.
+ * This class is used to handle shopper authentication.
  * It is responsible for initializing shopper session, manage access
  * and refresh tokens on server/browser environments. As well as providing
  * a mechanism to queue network calls before having a valid access token.
