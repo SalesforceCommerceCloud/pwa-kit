@@ -73,8 +73,9 @@ class Auth {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
                 shortCode: config.shortCode,
-                siteId: config.siteId,
+                siteId: config.siteId
             },
+            throwOnBadResponse: true
         })
 
         this.redirectURI = config.redirectURI
