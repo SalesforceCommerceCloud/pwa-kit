@@ -15,19 +15,20 @@ import {
     ShopperPromotions,
     ShopperDiscoverySearch,
     ShopperGiftCertificates,
-    ShopperSearch
+    ShopperSearch,
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
+
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
     locale: string
     currency: string
     redirectURI: string
+    queryClientConfig?: QueryClientConfig
 }
-const queryClient = new QueryClient()
 
 /**
  * @internal
@@ -46,18 +47,26 @@ export const AuthContext = React.createContext({} as Auth)
  * @returns Provider to wrap your app with
  */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
-    const {children, clientId, organizationId, shortCode, siteId, proxy, redirectURI} = props
+    const {
+        children,
+        clientId,
+        organizationId,
+        shortCode,
+        siteId,
+        proxy,
+        redirectURI,
+        queryClientConfig,
+    } = props
 
     const config = {
         proxy,
-        headers: {},
         parameters: {
             clientId,
             organizationId,
             shortCode,
-            siteId
+            siteId,
         },
-        throwOnBadResponse: true
+        throwOnBadResponse: true,
     }
 
     const {current: apiClients} = useRef<ApiClients>({
@@ -70,7 +79,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shopperOrders: new ShopperOrders(config),
         shopperProducts: new ShopperProducts(config),
         shopperPromotions: new ShopperPromotions(config),
-        shopperSearch: new ShopperSearch(config)
+        shopperSearch: new ShopperSearch(config),
     })
 
     const {current: auth} = useRef(
@@ -80,7 +89,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shortCode,
             siteId,
             proxy,
-            redirectURI
+            redirectURI,
         })
     )
 
@@ -89,6 +98,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         // trigger auth initialization flow
         auth.ready()
     }, [])
+
+    const queryClient = new QueryClient(queryClientConfig)
 
     // TODO: wrap the children with:
     // - context for enabling useServerEffect hook
