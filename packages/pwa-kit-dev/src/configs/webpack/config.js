@@ -23,8 +23,7 @@ import {createModuleReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
-const sdkDir = resolve(path.join(__dirname, '..', '..', '..', '..', 'pwa-kit-react-sdk'))
-const devDir = resolve(path.join(__dirname, '..', '..', '..', '..', 'pwa-kit-dev'))
+const sdkDir = resolve(path.join(__dirname, '..', '..', '..'))
 
 const pkg = require(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
@@ -68,11 +67,6 @@ const entryPointExists = (segments) => {
 const findInProjectThenSDK = (pkg) => {
     const projectPath = resolve(projectDir, 'node_modules', pkg)
     return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
-}
-
-const findInProjectThenDev = (pkg) => {
-    const projectPath = resolve(projectDir, 'node_modules', pkg)
-    return fs.existsSync(projectPath) ? projectPath : resolve(devDir, 'node_modules', pkg)
 }
 
 const baseConfig = (target) => {
@@ -120,19 +114,18 @@ const baseConfig = (target) => {
                 resolve: {
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        'babel-runtime': findInProjectThenDev('babel-runtime'),
-                        '@tanstack/react-query': findInProjectThenSDK('@tanstack/react-query'),
+                        'babel-runtime': findInProjectThenSDK('babel-runtime'),
                         '@loadable/component': findInProjectThenSDK('@loadable/component'),
                         '@loadable/server': findInProjectThenSDK('@loadable/server'),
                         '@loadable/webpack-plugin': findInProjectThenSDK(
                             '@loadable/webpack-plugin'
                         ),
-                        'svg-sprite-loader': findInProjectThenDev('svg-sprite-loader'),
+                        'svg-sprite-loader': findInProjectThenSDK('svg-sprite-loader'),
                         react: findInProjectThenSDK('react'),
                         'react-router-dom': findInProjectThenSDK('react-router-dom'),
                         'react-dom': findInProjectThenSDK('react-dom'),
                         'react-helmet': findInProjectThenSDK('react-helmet'),
-                        'webpack-hot-middleware': findInProjectThenDev('webpack-hot-middleware')
+                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -158,11 +151,11 @@ const baseConfig = (target) => {
                         ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenDev('svg-sprite-loader')
+                            loader: findInProjectThenSDK('svg-sprite-loader')
                         },
                         target === 'web' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenDev('ignore-loader')
+                            loader: findInProjectThenSDK('ignore-loader')
                         },
                         {
                             test: /\.html$/,
@@ -223,7 +216,7 @@ const ruleForBabelLoader = (babelPlugins) => {
         exclude: /node_modules/,
         use: [
             {
-                loader: findInProjectThenDev('babel-loader'),
+                loader: findInProjectThenSDK('babel-loader'),
                 options: {
                     rootMode: 'upward',
                     cacheDirectory: true,
