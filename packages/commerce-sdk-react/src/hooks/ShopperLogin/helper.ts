@@ -26,18 +26,21 @@ export enum ShopperLoginHelpers {
  * - loginGuestUser
  * - logout
  */
-export function useShopperLoginHelper<Action extends ShopperLoginHelpers.LoginRegisteredUserB2C>(
-    action: Action
+export function useShopperLoginHelper(
+    action: ShopperLoginHelpers.LoginRegisteredUserB2C
 ): ActionResponse<Parameters<Auth['loginRegisteredUserB2C']>, ShopperLoginTypes.TokenResponse>
-export function useShopperLoginHelper<Action extends ShopperLoginHelpers.LoginGuestUser>(
-    action: Action
+export function useShopperLoginHelper(
+    action: ShopperLoginHelpers.LoginGuestUser
 ): ActionResponse<never, ShopperLoginTypes.TokenResponse>
-export function useShopperLoginHelper<Action extends ShopperLoginHelpers.Logout>(
-    action: Action
+export function useShopperLoginHelper(
+    action: ShopperLoginHelpers.Logout
 ): ActionResponse<never, ShopperLoginTypes.TokenResponse>
-export function useShopperLoginHelper<Action extends ShopperLoginHelpers>(
-    action: Action
-): ActionResponse<any[], ShopperLoginTypes.TokenResponse> {
+export function useShopperLoginHelper(
+    action: ShopperLoginHelpers
+): ActionResponse<
+    Parameters<Auth['loginRegisteredUserB2C']> | never,
+    ShopperLoginTypes.TokenResponse
+> {
     const auth = useAuth()
     if (action === ShopperLoginHelpers.LoginGuestUser) {
         return useAsyncCallback(() => auth.loginGuestUser())
