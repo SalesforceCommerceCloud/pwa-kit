@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {ReactElement, useEffect, useState, useRef} from 'react'
+import React, {ReactElement, useEffect, useState} from 'react'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -69,7 +69,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
     }
 
-    const {current: apiClients} = useRef<ApiClients>({
+    const [apiClients, setApiClients] = useState<ApiClients>({
         shopperBaskets: new ShopperBaskets(config),
         shopperContexts: new ShopperContexts(config),
         shopperCustomers: new ShopperCustomers(config),
@@ -82,7 +82,23 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shopperSearch: new ShopperSearch(config),
     })
 
-    const {current: auth} = useRef(
+    useEffect(() => {
+        const newApiClients = {
+            shopperBaskets: new ShopperBaskets(config),
+            shopperContexts: new ShopperContexts(config),
+            shopperCustomers: new ShopperCustomers(config),
+            shopperDiscoverySearch: new ShopperDiscoverySearch(config),
+            shopperGiftCertificates: new ShopperGiftCertificates(config),
+            shopperLogin: new ShopperLogin(config),
+            shopperOrders: new ShopperOrders(config),
+            shopperProducts: new ShopperProducts(config),
+            shopperPromotions: new ShopperPromotions(config),
+            shopperSearch: new ShopperSearch(config),
+        }
+        setApiClients(newApiClients)
+    }, [clientId, organizationId, shortCode, siteId, proxy])
+
+    const [auth, setAuth] = useState(
         new Auth({
             clientId,
             organizationId,
@@ -93,11 +109,18 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         })
     )
 
-    // TODO: to be replaced by useServerEffect
     useEffect(() => {
-        // trigger auth initialization flow
-        auth.ready()
-    }, [])
+        const newAuth = new Auth({
+            clientId,
+            organizationId,
+            shortCode,
+            siteId,
+            proxy,
+            redirectURI,
+        })
+        newAuth.ready()
+        setAuth(newAuth)
+    }, [clientId, organizationId, shortCode, siteId, proxy, redirectURI])
 
     const queryClient = new QueryClient(queryClientConfig)
 
