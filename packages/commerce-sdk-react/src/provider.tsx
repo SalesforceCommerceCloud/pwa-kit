@@ -98,28 +98,18 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         setApiClients(newApiClients)
     }, [clientId, organizationId, shortCode, siteId, proxy])
 
-    const [auth, setAuth] = useState(
-        new Auth({
-            clientId,
-            organizationId,
-            shortCode,
-            siteId,
-            proxy,
-            redirectURI,
-        })
-    )
-
-    useEffect(() => {
+    const auth = useMemo(() => {
         const newAuth = new Auth({
             clientId,
             organizationId,
             shortCode,
             siteId,
             proxy,
-            redirectURI,
+            redirectURI
         })
         newAuth.ready()
-        setAuth(newAuth)
+
+        return newAuth
     }, [clientId, organizationId, shortCode, siteId, proxy, redirectURI])
 
     const queryClient = new QueryClient(queryClientConfig)
