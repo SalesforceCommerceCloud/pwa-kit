@@ -15,6 +15,7 @@ import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import AppConfig from '../universal/components/_app-config'
+import SSRConfig, {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -230,9 +231,10 @@ jest.mock('../universal/routes', () => {
     }
 
     const UseQueryResolvesObject = () => {
-        const {data} = useQuery(['use-query-resolves-object'], async () => ({prop: 'prop-value'}))
-
-        return <div>{data.prop}</div>
+        const {data, isLoading} = useQuery(['use-query-resolves-object'], async () => ({
+            prop: 'prop-value'
+        }))
+        return <div>{isLoading ? 'loading' : data.prop}</div>
     }
 
     GetPropsReturnsObject.propTypes = {
@@ -633,38 +635,50 @@ describe('The Node SSR Environment', () => {
         {
             description: `Works if the user resolves an Object with useQuery`,
             req: {url: '/use-query-resolves-object/'},
-            assertions: (res) => {
+            assertions: (res, config) => {
                 expect(res.statusCode).toBe(200)
                 const html = res.text
-                const include = ['<div>prop-value</div>']
-                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                const expectedString = config.ssrParameters.ssrPrepassEnabled
+                    ? '<div>prop-value</div>'
+                    : '<div>loading</div>'
+                expect(html).toEqual(expect.stringContaining(expectedString))
             }
         }
     ]
 
     const isRemoteValues = [true, false]
+    const ssrPrepassValues = [true, false]
 
-    isRemoteValues.forEach((isRemoteValue) => {
-        // Run test cases
-        cases.forEach(({description, req, assertions, mocks}) => {
-            test(`renders PWA pages properly when ${
-                isRemoteValue ? 'remote' : 'local'
-            } (${description})`, () => {
-                // Mock `isRemote` per test execution.
-                isRemote.mockReturnValue(isRemoteValue)
-                process.env.NODE_ENV = isRemoteValue ? 'production' : 'development'
+    ssrPrepassValues.forEach((ssrPrepassEnabled) => {
+        isRemoteValues.forEach((isRemoteValue) => {
+            // Run test cases
+            cases.forEach(({description, req, assertions, mocks}) => {
+                test(`renders PWA pages properly when ${isRemoteValue ? 'remote' : 'local'} ${
+                    ssrPrepassEnabled ? 'with' : 'without'
+                } prepass (${description})`, () => {
+                    // Mock `isRemote` per test execution.
+                    isRemote.mockReturnValue(isRemoteValue)
 
-                const {url, headers, query} = req
-                const app = RemoteServerFactory._createApp(opts())
-                app.get('/*', render)
-                if (mocks) {
-                    mocks()
-                }
-                return request(app)
-                    .get(url)
-                    .set(headers || {})
-                    .query(query || {})
-                    .then((res) => assertions(res))
+                    // Update mocked config value.
+                    const mockedConfigValue = getConfig()
+                    mockedConfigValue.ssrParameters.ssrPrepassEnabled = ssrPrepassEnabled
+
+                    jest.spyOn(SSRConfig, 'getConfig').mockImplementation(() => mockedConfigValue)
+
+                    process.env.NODE_ENV = isRemoteValue ? 'production' : 'development'
+
+                    const {url, headers, query} = req
+                    const app = RemoteServerFactory._createApp(opts())
+                    app.get('/*', render)
+                    if (mocks) {
+                        mocks()
+                    }
+                    return request(app)
+                        .get(url)
+                        .set(headers || {})
+                        .query(query || {})
+                        .then((res) => assertions(res, mockedConfigValue))
+                })
             })
         })
     })

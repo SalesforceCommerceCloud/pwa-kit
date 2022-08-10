@@ -170,18 +170,18 @@ export const render = async (req, res, next) => {
     const component = await route.component.getComponent()
 
     // Step 2.5 - Prepass render for `useQuery` server-side support.
-    let prepassResult
+    let prepassError
     if (config?.ssrParameters?.ssrPrepassEnabled) {
-        prepassResult = await prepassApp(req, res, {
+        ;({error: prepassError} = await prepassApp(req, res, {
             App: WrappedApp,
             location,
             routes,
             queryClient
-        })
+        }))
     }
 
     // Step 3 - Init the app state
-    const {appState, error: appStateError} = prepassResult.error
+    const {appState, error: appStateError} = prepassError
         ? {}
         : await initAppState({
               App: WrappedApp,
@@ -200,7 +200,7 @@ export const render = async (req, res, next) => {
         App: WrappedApp,
         appState,
         appStateError,
-        prepassError: prepassResult.error,
+        prepassError,
         routes,
         req,
         res,
@@ -275,7 +275,6 @@ const prepassApp = async (req, res, appData) => {
     }
 
     return {
-        success: !prepassError,
         error: prepassError
     }
 }
