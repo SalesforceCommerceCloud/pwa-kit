@@ -10,11 +10,7 @@ import {ApiClientConfigParams} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage} from './storage'
 
 type Helpers = typeof helpers
-interface AuthConfig {
-    shortCode: string
-    organizationId: string
-    clientId: string
-    siteId: string
+interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
 }
