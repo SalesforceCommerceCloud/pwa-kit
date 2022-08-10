@@ -83,14 +83,20 @@ h1 {
 const Home = ({value}: Props) => {
     const [counter, setCounter] = useState(0)
 
-    const query = useQuery(['my-query'], async () => {
-        // Mock network delay.
-        await new Promise((resolve) => setTimeout(resolve, 80))
+    const query = useQuery(
+        ['my-query'],
+        async () => {
+            // Mock network delay.
+            await new Promise((resolve) => setTimeout(resolve, 80))
 
-        return {
-            message: 'react query works!'
+            return {
+                message: 'react query works!'
+            }
+        },
+        {
+            enabled: typeof window === 'undefined' // Only run on the server.
         }
-    })
+    )
 
     useEffect(() => {
         const interval = setInterval(() => {

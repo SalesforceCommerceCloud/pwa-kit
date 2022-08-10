@@ -88,7 +88,10 @@ const initAppState = async ({App, component, match, route, req, res, location, q
 
     const queryCache = queryClient.getQueryCache()
     const queries = queryCache.getAll()
-    const queryPromises = queries.map(({fetch, enabled}) => enabled && fetch())
+    const queryPromises = queries
+        .filter(({options}) => options.enabled !== false)
+        .map((query) => query.fetch())
+
     const components = [App, route.component]
 
     const promises = components

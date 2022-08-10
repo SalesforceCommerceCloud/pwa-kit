@@ -237,6 +237,19 @@ jest.mock('../universal/routes', () => {
         return <div>{isLoading ? 'loading' : data.prop}</div>
     }
 
+    const DisabledUseQueryIsntResolved = () => {
+        const {data, isLoading} = useQuery(
+            ['use-query-resolves-object'],
+            async () => ({
+                prop: 'prop-value'
+            }),
+            {
+                enabled: false
+            }
+        )
+        return <div>{isLoading ? 'loading' : data.prop}</div>
+    }
+
     GetPropsReturnsObject.propTypes = {
         prop: PropTypes.node
     }
@@ -295,6 +308,10 @@ jest.mock('../universal/routes', () => {
             {
                 path: '/use-query-resolves-object/',
                 component: UseQueryResolvesObject
+            },
+            {
+                path: '/disabled-use-query-isnt-resolved/',
+                component: DisabledUseQueryIsntResolved
             }
         ]
     }
@@ -641,6 +658,16 @@ describe('The Node SSR Environment', () => {
                 const expectedString = config.ssrParameters.ssrPrepassEnabled
                     ? '<div>prop-value</div>'
                     : '<div>loading</div>'
+                expect(html).toEqual(expect.stringContaining(expectedString))
+            }
+        },
+        {
+            description: `Disabled useQuery queries aren't run on the server`,
+            req: {url: '/disabled-use-query-isnt-resolved/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                const expectedString = '<div>loading</div>'
                 expect(html).toEqual(expect.stringContaining(expectedString))
             }
         }
