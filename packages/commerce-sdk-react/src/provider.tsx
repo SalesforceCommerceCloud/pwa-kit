@@ -19,14 +19,15 @@ import {
 } from 'commerce-sdk-isomorphic'
 
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
+
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
     locale: string
     currency: string
+    queryClientConfig?: QueryClientConfig
 }
-const queryClient = new QueryClient()
 
 /**
  * @internal
@@ -40,11 +41,16 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
  * @returns Provider to wrap your app with
  */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
-    const {children, clientId, organizationId, shortCode, siteId, proxy} = props
+    const {children, clientId, organizationId, shortCode, siteId, proxy, queryClientConfig} = props
+
+    // DEBUG: copy access token from browser
+    const headers = {
+        authorization: ''
+    }
 
     const config = {
         proxy,
-        headers: {},
+        headers,
         parameters: {
             clientId,
             organizationId,
@@ -69,6 +75,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shopperPromotions: new ShopperPromotions(config),
         shopperSearch: new ShopperSearch(config)
     }
+
+    const queryClient = new QueryClient(queryClientConfig)
 
     // TODO: wrap the children with:
     // - context for enabling useServerEffect hook
