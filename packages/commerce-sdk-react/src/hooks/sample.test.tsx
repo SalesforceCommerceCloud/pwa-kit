@@ -6,12 +6,12 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import '@testing-library/jest-dom'
 import {screen, waitFor} from '@testing-library/react'
 
 import {mockHttpResponses, renderWithProviders} from '../test-utils'
 import useCommerceApi from './useCommerceApi'
 import {useAsync} from './useAsync'
+import useAuth from './useAuth'
 
 const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`})
 
@@ -23,12 +23,17 @@ const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`}
 
 const ProductName = ({id}: {id: string}) => {
     const api = useCommerceApi()
+    const auth = useAuth()
     const [productName, setProductName] = useState('')
 
     useEffect(() => {
         const fetchProductName = async () => {
+            const {access_token} = await auth.ready()
             const product = await api.shopperProducts.getProduct({
-                parameters: {id}
+                parameters: {id},
+                headers: {
+                    Authorization: access_token,
+                },
             })
             setProductName(product.name as string)
         }
@@ -40,8 +45,13 @@ const ProductName = ({id}: {id: string}) => {
 
 const ProductName2 = ({id}: {id: string}) => {
     const api = useCommerceApi()
-    const {data, isLoading, error} = useAsync(['getProduct', {id}], async () =>
-        api.shopperProducts.getProduct({parameters: {id}})
+    const {data, isLoading, error} = useAsync(['getProduct', {id}], async ({access_token}) =>
+        api.shopperProducts.getProduct({
+            parameters: {id},
+            headers: {
+                Authorization: access_token,
+            },
+        })
     )
 
     return (
