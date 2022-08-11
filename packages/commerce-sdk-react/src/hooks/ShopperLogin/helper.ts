@@ -13,7 +13,7 @@ import Auth from '../../auth'
 export enum ShopperLoginHelpers {
     LoginGuestUser = 'loginGuestUser',
     LoginRegisteredUserB2C = 'loginRegisteredUserB2C',
-    Logout = 'logout'
+    Logout = 'logout',
 }
 
 /**

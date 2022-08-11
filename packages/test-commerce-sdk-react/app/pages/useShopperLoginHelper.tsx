@@ -11,6 +11,7 @@ import Json from '../components/Json'
 const UseShopperLoginHelper = () => {
     const loginGuestUser = useShopperLoginHelper(ShopperLoginHelpers.LoginGuestUser)
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
 
     return (
         <>
@@ -33,6 +34,11 @@ const UseShopperLoginHelper = () => {
             {loginRegisteredUser.error?.message && (
                 <p style={{color: 'red'}}>Error: {loginRegisteredUser.error?.message}</p>
             )}
+            <hr />
+            <h1>Logout</h1>
+            <Json data={logout} />
+            <button onClick={() => logout.execute()}>logout</button>
+            {logout.error?.message && <p style={{color: 'red'}}>Error: {logout.error?.message}</p>}
         </>
     )
 }

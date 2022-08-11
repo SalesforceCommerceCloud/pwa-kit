@@ -223,7 +223,7 @@ class Auth {
      * store the data in storage.
      */
     private handleTokenResponse(res: ShopperLoginTypes.TokenResponse, isGuest: boolean) {
-        this.set('access_token', `Bearer ${res.access_token}`)
+        this.set('access_token', res.access_token)
         this.set('customer_id', res.customer_id)
         this.set('enc_user_id', res.enc_user_id)
         this.set('expires_in', `${res.expires_in}`)
@@ -279,16 +279,11 @@ class Auth {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const request = async () => {
-            let res
-            try {
-                res = await helpers.loginRegisteredUserB2C(this.client, credentials, {
-                    redirectURI,
-                    ...(usid && {usid}),
-                })
-                this.handleTokenResponse(res, false)
-            } catch (e) {
-                console.log(e)
-            }
+            const res = await helpers.loginRegisteredUserB2C(this.client, credentials, {
+                redirectURI,
+                ...(usid && {usid}),
+            })
+            this.handleTokenResponse(res, false)
 
             return this.data
         }
@@ -302,8 +297,13 @@ class Auth {
      */
     async logout() {
         const request = async () => {
-            const res = await helpers.logout(this.client, {
+            const redirectURI = this.redirectURI
+            await helpers.logout(this.client, {
+                accessToken: this.get('access_token'),
                 refreshToken: this.get('refresh_token_registered'),
+            })
+            const res = await helpers.loginGuestUser(this.client, {
+                redirectURI,
             })
             this.handleTokenResponse(res, true)
             return this.data
@@ -332,7 +332,7 @@ export const injectAccessToken = <T extends ArgWithHeaders>(arg: T, accessToken:
     return {
         ...arg,
         headers: {
-            Authorization: accessToken,
+            Authorization: `Bearer ${accessToken}`,
             ...arg?.headers,
         },
     }
