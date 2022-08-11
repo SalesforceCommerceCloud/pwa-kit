@@ -32,8 +32,8 @@ const ProductName = ({id}: {id: string}) => {
             const product = await api.shopperProducts.getProduct({
                 parameters: {id},
                 headers: {
-                    Authorization: `Bearer ${access_token}`,
-                },
+                    Authorization: `Bearer ${access_token}`
+                }
             })
             setProductName(product.name as string)
         }
@@ -49,8 +49,8 @@ const ProductName2 = ({id}: {id: string}) => {
         api.shopperProducts.getProduct({
             parameters: {id},
             headers: {
-                Authorization: `Bearer ${access_token}`,
-            },
+                Authorization: `Bearer ${access_token}`
+            }
         })
     )
 
