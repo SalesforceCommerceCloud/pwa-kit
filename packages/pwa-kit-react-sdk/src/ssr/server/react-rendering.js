@@ -84,7 +84,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
     }
 
     const {params} = match
-    const queryPromises = AppConfig.getQueryPromises ? AppConfig.getQueryPromises() : []
+    const queryPromises = AppConfig.getAllQueryPromises ? AppConfig.getAllQueryPromises() : []
     const components = [App, route.component]
 
     const promises = components
