@@ -11,7 +11,7 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
 const USAGE_WARNING = `This HOC can only be used on your PWA-Kit AppConfig component. We cannot guarantee it's functionality if used elsewhere.`
 
 /**
- * This higher order component will configure your PWA-Kit application with React Query. Uses of 
+ * This higher order component will configure your PWA-Kit application with React Query. Uses of
  * the `useQuery` hook will also work server-side.
  */
 const withQueryClientProvider = (Component) => {
@@ -23,12 +23,15 @@ const withQueryClientProvider = (Component) => {
 
     const queryClient = new QueryClient()
     const WrappedComponent = ({...passThroughProps}) => {
-        const state = typeof window === 'undefined' ? {} : window?.__PRELOADED_STATE__?.__REACT_QUERY_STATE__ || {}
+        const state =
+            typeof window === 'undefined'
+                ? {}
+                : window?.__PRELOADED_STATE__?.__REACT_QUERY_STATE__ || {}
 
         return (
             <QueryClientProvider client={queryClient}>
                 <Hydrate state={state}>
-                    <Component {...passThroughProps}/>
+                    <Component {...passThroughProps} />
                 </Hydrate>
             </QueryClientProvider>
         )
@@ -36,7 +39,7 @@ const withQueryClientProvider = (Component) => {
 
     /**
      * Runs the `dehydrate` method on the HOCs query client object.
-     * 
+     *
      * @returns {Object} The query clients dehydrated state.
      */
     WrappedComponent.dehydrate = () => {
@@ -44,10 +47,10 @@ const withQueryClientProvider = (Component) => {
     }
 
     /**
-     * Returns all the enabled fetch promises for the current 
+     * Returns all the enabled fetch promises for the current
      * queryClient object.
-     * 
-     * @returns {Promise<TData>[]} An array of promises that resole with the value 
+     *
+     * @returns {Promise<TData>[]} An array of promises that resole with the value
      * returned in the query fetch.
      */
     WrappedComponent.getAllQueryPromises = () => {
@@ -67,6 +70,5 @@ const withQueryClientProvider = (Component) => {
 
     return WrappedComponent
 }
-
 
 export default withQueryClientProvider

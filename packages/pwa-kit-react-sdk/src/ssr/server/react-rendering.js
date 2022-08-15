@@ -273,17 +273,7 @@ const prepassApp = async (req, res, appData) => {
 }
 
 const renderApp = async (args) => {
-    const {
-        req,
-        res,
-        appStateError,
-        prepassError,
-        App,
-        appState,
-        location,
-        routes,
-        config
-    } = args
+    const {req, res, appStateError, prepassError, App, appState, location, routes, config} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
     const routerContext = {}
