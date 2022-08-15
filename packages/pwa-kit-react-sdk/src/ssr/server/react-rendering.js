@@ -12,7 +12,6 @@
 import path from 'path'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import {dehydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ssrPrepass from 'react-ssr-prepass'
 import {Helmet} from 'react-helmet'
 import {ChunkExtractor} from '@loadable/server'
@@ -75,7 +74,7 @@ const logAndFormatError = (err) => {
     }
 }
 
-const initAppState = async ({App, component, match, route, req, res, location, queryClient}) => {
+const initAppState = async ({App, component, match, route, req, res, location}) => {
     if (component === Throw404) {
         // Don't init if there was no match
         return {
@@ -85,13 +84,7 @@ const initAppState = async ({App, component, match, route, req, res, location, q
     }
 
     const {params} = match
-
-    const queryCache = queryClient.getQueryCache()
-    const queries = queryCache.getAll()
-    const queryPromises = queries
-        .filter(({options}) => options.enabled !== false)
-        .map((query) => query.fetch())
-
+    const queryPromises = AppConfig.getQueryPromises ? AppConfig.getQueryPromises() : []
     const components = [App, route.component]
 
     const promises = components
@@ -113,7 +106,7 @@ const initAppState = async ({App, component, match, route, req, res, location, q
         const appState = {
             appProps,
             pageProps,
-            __REACT_QUERY_STATE__: dehydrate(queryClient),
+            __REACT_QUERY_STATE__: AppConfig.dehydrate ? AppConfig.dehydrate() : {},
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
 
@@ -157,7 +150,6 @@ export const render = async (req, res, next) => {
         pathname,
         search: search ? `?${search}` : ''
     }
-    const queryClient = new QueryClient()
 
     // Step 1 - Find the match.
     let route
@@ -177,12 +169,11 @@ export const render = async (req, res, next) => {
 
     // Step 2.5 - Prepass render for `useQuery` server-side support.
     let prepassError
-    if (config?.ssrParameters?.ssrPrepassEnabled) {
+    if (AppConfig.displayName.startsWith('WithQueryClientProvider')) {
         ;({error: prepassError} = await prepassApp(req, res, {
             App: WrappedApp,
             location,
-            routes,
-            queryClient
+            routes
         }))
     }
 
@@ -196,8 +187,7 @@ export const render = async (req, res, next) => {
               route,
               req,
               res,
-              location,
-              queryClient
+              location
           })
 
     // Step 4 - Render the App
@@ -211,8 +201,7 @@ export const render = async (req, res, next) => {
         req,
         res,
         location,
-        config,
-        queryClient
+        config
     }
     try {
         renderResult = await renderApp(args)
@@ -239,19 +228,17 @@ export const render = async (req, res, next) => {
 }
 
 const getAppJSX = (req, res, error, appData) => {
-    const {App, appState = {}, deviceType, location, queryClient, routerContext, routes} = appData
+    const {App, appState = {}, deviceType, location, routerContext, routes} = appData
 
     return (
         <ExpressContext.Provider value={{req, res}}>
-            <QueryClientProvider client={queryClient}>
-                <Router location={location} context={routerContext}>
-                    <DeviceContext.Provider value={{type: deviceType}}>
-                        <AppConfig locals={res.locals}>
-                            <Switch error={error} appState={appState} routes={routes} App={App} />
-                        </AppConfig>
-                    </DeviceContext.Provider>
-                </Router>
-            </QueryClientProvider>
+            <Router location={location} context={routerContext}>
+                <DeviceContext.Provider value={{type: deviceType}}>
+                    <AppConfig locals={res.locals}>
+                        <Switch error={error} appState={appState} routes={routes} App={App} />
+                    </AppConfig>
+                </DeviceContext.Provider>
+            </Router>
         </ExpressContext.Provider>
     )
 }
@@ -295,8 +282,7 @@ const renderApp = async (args) => {
         appState,
         location,
         routes,
-        config,
-        queryClient
+        config
     } = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
@@ -308,8 +294,7 @@ const renderApp = async (args) => {
         routes,
         routerContext,
         deviceType,
-        extractor,
-        queryClient
+        extractor
     }
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
