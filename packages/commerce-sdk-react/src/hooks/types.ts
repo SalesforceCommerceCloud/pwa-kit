@@ -4,90 +4,66 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBaskets, ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
-import {ShopperContexts, ShopperContextsTypes} from 'commerce-sdk-isomorphic'
-import {ShopperCustomers, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
-import {ShopperDiscoverySearch, ShopperDiscoverySearchTypes} from 'commerce-sdk-isomorphic'
-import {ShopperGiftCertificates, ShopperGiftCertificatesTypes} from 'commerce-sdk-isomorphic'
-import {ShopperLogin, ShopperLoginTypes} from 'commerce-sdk-isomorphic'
-import {ShopperOrders, ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
-import {ShopperProducts, ShopperProductsTypes} from 'commerce-sdk-isomorphic'
-import {ShopperPromotions, ShopperPromotionsTypes} from 'commerce-sdk-isomorphic'
-import {ShopperSearch, ShopperSearchTypes} from 'commerce-sdk-isomorphic'
+import {ShopperBaskets} from 'commerce-sdk-isomorphic'
+import {ShopperContexts} from 'commerce-sdk-isomorphic'
+import {ShopperCustomers} from 'commerce-sdk-isomorphic'
+import {ShopperDiscoverySearch} from 'commerce-sdk-isomorphic'
+import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
+import {ShopperLogin} from 'commerce-sdk-isomorphic'
+import {ShopperOrders} from 'commerce-sdk-isomorphic'
+import {ShopperProducts} from 'commerce-sdk-isomorphic'
+import {ShopperPromotions} from 'commerce-sdk-isomorphic'
+import {ShopperSearch} from 'commerce-sdk-isomorphic'
 
-export * from './ShopperBaskets/types'
-export * from './ShopperCustomers/types'
-export * from './ShopperOrders/types'
-export * from './ShopperProducts/types'
-export * from './ShopperPromotions/types'
-export * from './ShopperSearch/types'
-
-export type ShopperBasketsInstance = ShopperBaskets<
-    ShopperBasketsTypes.ShopperBasketsParameters & Record<string, unknown>
->
-export type ShopperContextsInstance = ShopperContexts<
-    ShopperContextsTypes.ShopperContextsParameters & Record<string, unknown>
->
-export type ShopperCustomersInstance = ShopperCustomers<
-    ShopperCustomersTypes.ShopperCustomersParameters & Record<string, unknown>
->
-export type ShopperDiscoverySearchInstance = ShopperDiscoverySearch<
-    ShopperDiscoverySearchTypes.ShopperDiscoverySearchParameters & Record<string, unknown>
->
-export type ShopperGiftCertificatesInstance = ShopperGiftCertificates<
-    ShopperGiftCertificatesTypes.ShopperGiftCertificatesParameters & Record<string, unknown>
->
-export type ShopperLoginInstance = ShopperLogin<
-    ShopperLoginTypes.ShopperLoginParameters & Record<string, unknown>
->
-export type ShopperOrdersInstance = ShopperOrders<
-    ShopperOrdersTypes.ShopperOrdersParameters & Record<string, unknown>
->
-export type ShopperProductsInstance = ShopperProducts<
-    ShopperProductsTypes.ShopperProductsParameters & Record<string, unknown>
->
-export type ShopperPromotionsInstance = ShopperPromotions<
-    ShopperPromotionsTypes.ShopperPromotionsParameters & Record<string, unknown>
->
-export type ShopperSearchInstance = ShopperSearch<
-    ShopperSearchTypes.ShopperSearchParameters & Record<string, unknown>
->
+export type ApiClientConfigParams = {
+    clientId: string
+    organizationId: string
+    siteId: string
+    shortCode: string
+}
 
 export interface ApiClients {
-    shopperBaskets: ShopperBasketsInstance
-    shopperContexts: ShopperContextsInstance
-    shopperCustomers: ShopperCustomersInstance
-    shopperDiscoverySearch: ShopperDiscoverySearchInstance
-    shopperGiftCertificates: ShopperGiftCertificatesInstance
-    shopperLogin: ShopperLoginInstance
-    shopperOrders: ShopperOrdersInstance
-    shopperProducts: ShopperProductsInstance
-    shopperPromotions: ShopperPromotionsInstance
-    shopperSearch: ShopperSearchInstance
+    shopperBaskets: ShopperBaskets<ApiClientConfigParams>
+    shopperContexts: ShopperContexts<ApiClientConfigParams>
+    shopperCustomers: ShopperCustomers<ApiClientConfigParams>
+    shopperDiscoverySearch: ShopperDiscoverySearch<ApiClientConfigParams>
+    shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
+    shopperLogin: ShopperLogin<ApiClientConfigParams>
+    shopperOrders: ShopperOrders<ApiClientConfigParams>
+    shopperProducts: ShopperProducts<ApiClientConfigParams>
+    shopperPromotions: ShopperPromotions<ApiClientConfigParams>
+    shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
-export interface CommonHookResponse {
-    error: Error | undefined
-    isLoading: boolean
+/**
+ * Object returned by a "query" hook.
+ */
+export type QueryResponse<T> = {isLoading: boolean; error?: Error; data?: T}
+
+/**
+ * Object returned by an "action" hook.
+ */
+export type ActionResponse<Args extends unknown[], Data> = QueryResponse<Data> & {
+    execute: (...args: Args) => void
 }
 
-// These are the common params for all query hooks
-// it allows user to override configs for specific query
-export interface QueryParams {
-    siteId?: string
-    locale?: string
-    currency?: string
-    organizationId?: string
-    shortCode?: string
-}
+/**
+ * Object returned by a SCAPI "action" hook.
+ */
+export type ScapiActionResponse<Arg, Data, Name extends string> = ActionResponse<[Arg], Data> &
+    Record<Name, ActionResponse<[Arg], Data>['execute']>
 
-export interface QueryResponse<T> extends CommonHookResponse {
-    data: T
-}
+/**
+ * The first argument of a function.
+ */
+export type Argument<T extends (arg: any) => unknown> = Parameters<T>[0]
 
-export interface ActionResponse<T> extends CommonHookResponse {
-    // TODO: let's use the actual action name instead of "execute"
-    execute: T
-}
-
-export type DependencyList = readonly any[]
+/**
+ * The data type returned by a commerce-sdk-isomorphic method when the raw response
+ * flag is not set.
+ */
+export type DataType<T extends (arg: any) => Promise<unknown>> = T extends (
+    arg: any
+) => Promise<Response | infer R>
+    ? R
+    : never

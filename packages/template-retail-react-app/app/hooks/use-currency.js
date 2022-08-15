@@ -11,4 +11,10 @@ import {CurrencyContext} from '../contexts'
  * Custom React hook to get the currency for the active locale and to change it to a different currency
  * @returns {{currency: string, setCurrency: function}[]}
  */
-export const useCurrency = () => useContext(CurrencyContext)
+export const useCurrency = () => {
+    const context = useContext(CurrencyContext)
+    if (context === undefined) {
+        throw new Error('useCurrency must be used within CurrencyProvider')
+    }
+    return context
+}
