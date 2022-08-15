@@ -4,14 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {Fragment, ReactElement, ReactNode} from 'react'
 import withQueryClientProvider from 'pwa-kit-react-sdk/ssr/universal/components/with-query-client-provider'
 
-const AppConfig = (props) => {
+interface AppConfigProps {
+    children: ReactNode
+}
+
+const AppConfig = (props: AppConfigProps): ReactElement => {
     return (
-        <React.Fragment>
+        <Fragment>
             {props.children}
-        </React.Fragment>
+        </Fragment>
     )
 }
 

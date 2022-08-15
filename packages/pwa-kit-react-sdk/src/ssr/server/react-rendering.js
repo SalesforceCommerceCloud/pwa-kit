@@ -169,7 +169,7 @@ export const render = async (req, res, next) => {
 
     // Step 2.5 - Prepass render for `useQuery` server-side support.
     let prepassError
-    if (AppConfig.displayName.startsWith('WithQueryClientProvider')) {
+    if (AppConfig?.displayName?.startsWith('WithQueryClientProvider')) {
         ;({error: prepassError} = await prepassApp(req, res, {
             App: WrappedApp,
             location,
