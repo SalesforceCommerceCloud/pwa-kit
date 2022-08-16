@@ -40,7 +40,9 @@ export const useProduct = (
     arg: Argument<Client['getProduct']>
 ): UseQueryResult<DataType<Client['getProduct']>, Error> => {
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(['product', arg], () => client.getProduct(arg))
+    return useAsync(['product', arg], ({access_token}) =>
+        client.getProduct(injectAccessToken(arg, access_token))
+    )
 }
 /**
  * A hook for `ShopperProducts#getCategories`.
@@ -68,5 +70,7 @@ export const useCategory = (
     arg: Argument<Client['getCategory']>
 ): UseQueryResult<DataType<Client['getCategory']>, Error> => {
     const {shopperProducts: client} = useCommerceApi()
-    return useAsync(['category'], () => client.getCategory(arg))
+    return useAsync(['category'], ({access_token}) =>
+        client.getCategory(injectAccessToken(arg, access_token))
+    )
 }

@@ -211,7 +211,6 @@ class Auth {
                 // we continue with the PKCE guest user flow.
             }
         }
-
         const res = await helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI})
         this.handleTokenResponse(res, true)
 
