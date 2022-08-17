@@ -108,6 +108,8 @@ export const render = async (req, res, next) => {
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
 
+    // NOTE: I think the recommened functionality by Oli is to not apply this enchancement if there is an
+    // existing api applied to the application? I need to get clarification on this.
     const WrappedApp = withQueryClientAPI(App)
     const deviceType = detectDeviceType(req)
     const routes = WrappedApp.getRoutes ? WrappedApp.getRoutes(res.locals) : getRoutes(res.locals)
