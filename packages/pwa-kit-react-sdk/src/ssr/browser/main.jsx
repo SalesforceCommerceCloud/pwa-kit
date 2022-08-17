@@ -14,6 +14,7 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
+import withStateAPI from '../universal/hocs'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -54,7 +55,6 @@ export const start = () => {
 
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
-    const routes = getRoutes(locals)
 
     // We need to tell the routeComponent HOC when the app is hydrating in order to
     // prevent pages from re-fetching data on the first client-side render. The
@@ -66,7 +66,11 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
-    const WrappedApp = routeComponent(App, false, locals)
+    // const WrappedApp = routeComponent(App, false, locals)
+    const WrappedApp = withStateAPI(App)
+    // NOTE: It's kinda weird how frozn state is loaded in the JSX here. Would be nice if it was 
+    // "added" via or in, the hoc.
+    const routes = WrappedApp.getRoutes(locals)
     const error = window.__ERROR__
 
     return Promise.resolve()

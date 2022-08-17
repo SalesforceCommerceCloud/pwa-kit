@@ -115,13 +115,6 @@ const Home = ({value}: Props) => {
                         <br />
                         Support!
                     </h1>
-                    <button
-                        onClick={() => {
-                            setCounter(counter + 1)
-                        }}
-                    >
-                        click me
-                    </button>
                 </div>
                 <div className="panel">
                     <div className="divider"></div>

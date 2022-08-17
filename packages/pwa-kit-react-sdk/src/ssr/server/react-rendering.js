@@ -12,7 +12,6 @@
 import path from 'path'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import ssrPrepass from 'react-ssr-prepass'
 import {Helmet} from 'react-helmet'
 import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
@@ -28,13 +27,16 @@ import Throw404 from '../universal/components/throw-404'
 
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
-import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import {detectDeviceType, isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
+
+import withQueryClientAPI from '../universal/hocs'
+import withLoadableResolver from '../universal/hocs/with-loadable-resolver'
+import routes from '../universal/routes'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -74,54 +76,18 @@ const logAndFormatError = (err) => {
     }
 }
 
-const initAppState = async ({App, component, match, route, req, res, location}) => {
-    if (component === Throw404) {
-        // Don't init if there was no match
+const getRoutes = (locals) => {
+    let _routes = routes
+    if (typeof routes === 'function') {
+        _routes = routes()
+    }
+    const allRoutes = [..._routes, {path: '*', component: Throw404}]
+    return allRoutes.map(({component, ...rest}) => {
         return {
-            error: new errors.HTTPNotFound('Not found'),
-            appState: {}
+            component: component ? withLoadableResolver(component, true, locals) : component,
+            ...rest
         }
-    }
-
-    const {params} = match
-    const queryPromises = AppConfig.getAllQueryPromises ? AppConfig.getAllQueryPromises() : []
-    const components = [App, route.component]
-
-    const promises = components
-        .map((c) =>
-            c.getProps
-                ? c.getProps({
-                      req,
-                      res,
-                      params,
-                      location
-                  })
-                : Promise.resolve({})
-        )
-        .concat(queryPromises)
-    let returnVal = {}
-
-    try {
-        const [appProps, pageProps] = await Promise.all(promises)
-        const appState = {
-            appProps,
-            pageProps,
-            __REACT_QUERY_STATE__: AppConfig.dehydrate ? AppConfig.dehydrate() : {},
-            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
-        }
-
-        returnVal = {
-            error: undefined,
-            appState: appState
-        }
-    } catch (error) {
-        returnVal = {
-            error: logAndFormatError(error || new Error()),
-            appState: {}
-        }
-    }
-
-    return returnVal
+    })
 }
 
 /**
@@ -142,8 +108,9 @@ export const render = async (req, res, next) => {
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
 
-    const routes = getRoutes(res.locals)
-    const WrappedApp = routeComponent(App, false, res.locals)
+    const WrappedApp = withQueryClientAPI(App)
+    const deviceType = detectDeviceType(req)
+    const routes = WrappedApp.getRoutes ? WrappedApp.getRoutes(res.locals) : getRoutes(res.locals)
 
     const [pathname, search] = req.originalUrl.split('?')
     const location = {
@@ -167,36 +134,42 @@ export const render = async (req, res, next) => {
     // Step 2 - Get the component
     const component = await route.component.getComponent()
 
-    // Step 2.5 - Prepass render for `useQuery` server-side support.
-    let prepassError
-    if (AppConfig?.displayName?.startsWith('WithQueryClientProvider')) {
-        ;({error: prepassError} = await prepassApp(req, res, {
-            App: WrappedApp,
-            location,
-            routes
-        }))
+    // Step 3 - Init the app state
+    let appState = {}
+    let routerContext = {}
+    let error
+    let html
+    let appStateError
+
+    // Step 3. Bail if there is a 404.
+    if (component === Throw404) {
+        error = new errors.HTTPNotFound('Not found')
     }
 
-    // Step 3 - Init the app state
-    const {appState, error: appStateError} = prepassError
-        ? {}
-        : await initAppState({
-              App: WrappedApp,
-              component,
-              match,
-              route,
-              req,
-              res,
-              location
-          })
+    if (!error) {
+        const AppJSX = getAppJSX(req, res, error, {
+            App: WrappedApp, 
+            appState, 
+            deviceType, 
+            location, 
+            routerContext, 
+            routes
+        })
+        console.log('INITAPPSTATE: ', WrappedApp)
+        ;({appState, error: appStateError} = await WrappedApp.initAppState({App, AppJSX, location, req, res, deviceType, route, routes, match}))
+
+        console.log('APPSTATE|ERROR: ', appState, appStateError)
+    }
+
+    // Support the AppConfig freeze API. NOTE: Could this be another HOC with its
+    // own initAppState function defined?
+    appState.__STATE_MANAGEMENT_LIBRARY = AppConfig.freeze(res.locals)
 
     // Step 4 - Render the App
-    let renderResult
     const args = {
         App: WrappedApp,
         appState,
         appStateError,
-        prepassError,
         routes,
         req,
         res,
@@ -204,7 +177,7 @@ export const render = async (req, res, next) => {
         config
     }
     try {
-        renderResult = await renderApp(args)
+        ;({html, routerContext, error} = await renderApp(args))
     } catch (e) {
         // This is an unrecoverable error.
         // (errors handled by the AppErrorBoundary are considered recoverable)
@@ -216,7 +189,6 @@ export const render = async (req, res, next) => {
 
     // Step 5 - Determine what is going to happen, redirect, or send html with
     // the correct status code.
-    const {html, routerContext, error} = renderResult
     const redirectUrl = routerContext.url
     const status = (error && error.status) || res.statusCode
 
@@ -249,31 +221,8 @@ const renderAppHtml = (req, res, error, appData) => {
     return ReactDOMServer.renderToString(appJSX)
 }
 
-const prepassApp = async (req, res, appData) => {
-    let error
-    let prepassError
-    const deviceType = detectDeviceType(req)
-
-    // Update "appData" with device type incase it influences the JSX elements that
-    // react ssr prepass processes.
-    appData = {
-        ...appData,
-        deviceType
-    }
-
-    try {
-        await ssrPrepass(getAppJSX(req, res, error, appData))
-    } catch (e) {
-        prepassError = logAndFormatError(e)
-    }
-
-    return {
-        error: prepassError
-    }
-}
-
 const renderApp = async (args) => {
-    const {req, res, appStateError, prepassError, App, appState, location, routes, config} = args
+    const {req, res, appStateError, App, appState, location, routes, config} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
     const routerContext = {}
@@ -296,7 +245,7 @@ const renderApp = async (args) => {
     // It's important that we render the App before extracting the script elements,
     // otherwise it won't return the correct chunks.
     try {
-        appHtml = renderAppHtml(req, res, appStateError || prepassError, appData)
+        appHtml = renderAppHtml(req, res, appStateError, appData)
     } catch (e) {
         // This will catch errors thrown from the app and pass the error
         // to the AppErrorBoundary component, and renders the error page.

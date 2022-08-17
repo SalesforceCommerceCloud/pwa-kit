@@ -648,29 +648,30 @@ describe('The Node SSR Environment', () => {
                     shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error'
                 )
             }
-        },
-        {
-            description: `Works if the user resolves an Object with useQuery`,
-            req: {url: '/use-query-resolves-object/'},
-            assertions: (res, config) => {
-                expect(res.statusCode).toBe(200)
-                const html = res.text
-                const expectedString = config.ssrParameters.ssrPrepassEnabled
-                    ? '<div>prop-value</div>'
-                    : '<div>loading</div>'
-                expect(html).toEqual(expect.stringContaining(expectedString))
-            }
-        },
-        {
-            description: `Disabled useQuery queries aren't run on the server`,
-            req: {url: '/disabled-use-query-isnt-resolved/'},
-            assertions: (res) => {
-                expect(res.statusCode).toBe(200)
-                const html = res.text
-                const expectedString = '<div>loading</div>'
-                expect(html).toEqual(expect.stringContaining(expectedString))
-            }
         }
+        // ,
+        // {
+        //     description: `Works if the user resolves an Object with useQuery`,
+        //     req: {url: '/use-query-resolves-object/'},
+        //     assertions: (res, config) => {
+        //         expect(res.statusCode).toBe(200)
+        //         const html = res.text
+        //         const expectedString = config.ssrParameters.ssrPrepassEnabled
+        //             ? '<div>prop-value</div>'
+        //             : '<div>loading</div>'
+        //         expect(html).toEqual(expect.stringContaining(expectedString))
+        //     }
+        // },
+        // {
+        //     description: `Disabled useQuery queries aren't run on the server`,
+        //     req: {url: '/disabled-use-query-isnt-resolved/'},
+        //     assertions: (res) => {
+        //         expect(res.statusCode).toBe(200)
+        //         const html = res.text
+        //         const expectedString = '<div>loading</div>'
+        //         expect(html).toEqual(expect.stringContaining(expectedString))
+        //     }
+        // }
     ]
 
     const isRemoteValues = [true, false]
@@ -685,13 +686,6 @@ describe('The Node SSR Environment', () => {
                 } prepass (${description})`, () => {
                     // Mock `isRemote` per test execution.
                     isRemote.mockReturnValue(isRemoteValue)
-
-                    // Update mocked config value.
-                    const mockedConfigValue = getConfig()
-                    mockedConfigValue.ssrParameters.ssrPrepassEnabled = ssrPrepassEnabled
-
-                    jest.spyOn(SSRConfig, 'getConfig').mockImplementation(() => mockedConfigValue)
-
                     process.env.NODE_ENV = isRemoteValue ? 'production' : 'development'
 
                     const {url, headers, query} = req
@@ -704,7 +698,7 @@ describe('The Node SSR Environment', () => {
                         .get(url)
                         .set(headers || {})
                         .query(query || {})
-                        .then((res) => assertions(res, mockedConfigValue))
+                        .then((res) => assertions(res))
                 })
             })
         })

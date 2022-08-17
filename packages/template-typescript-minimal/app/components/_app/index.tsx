@@ -5,11 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {Fragment, ReactElement, ReactNode} from 'react'
-interface AppConfigProps {
+import {withLegacyGetPropsAPI} from 'pwa-kit-react-sdk/ssr/universal/hocs'
+
+interface AppProps {
     children: ReactNode
 }
 
-const AppConfig = (props: AppConfigProps): ReactElement => {
+const App = (props: AppProps): ReactElement => {
     return (
         <Fragment>
             {props.children}
@@ -17,8 +19,4 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     )
 }
 
-AppConfig.restore = () => {}
-AppConfig.extraGetPropsArgs = () => {}
-AppConfig.freeze = () => {}
-
-export default AppConfig
+export default withLegacyGetPropsAPI(App)
