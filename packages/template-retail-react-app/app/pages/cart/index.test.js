@@ -275,7 +275,7 @@ test('Can apply and remove product-level coupon code with promotion', async () =
                         price_adjustment_id: 'eda472de37d9c7fdae7251c4a1',
                         promotion_id: '10offsuits',
                         promotion_link:
-                            'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/10offsuits'
+                            'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/10offsuits'
                     }
                 ],
                 price_after_item_discount: 269.99,
