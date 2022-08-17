@@ -22,17 +22,17 @@ const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...o
             {searchQuery && <Text>Search Results for</Text>}
             {/* Category Title */}
             <Flex>
-                <Heading as="h2" size="lg" marginRight={2}>
-                    {`${category?.name || searchQuery || ''}`}
-                </Heading>
-                <Heading as="h2" size="lg" marginRight={2}>
-                    {isServer ? (
-                        <Fragment>({productSearchResult?.total})</Fragment>
-                    ) : (
-                        // Fade in the total when available. When it's changed or not available yet, do not render it
-                        !isLoading && <Fade in={true}>({productSearchResult?.total})</Fade>
-                    )}
-                </Heading>
+                {/*<Heading as="h2" size="lg" marginRight={2}>*/}
+                {/*    {`${category?.name || searchQuery || ''}`}*/}
+                {/*</Heading>*/}
+                {/*<Heading as="h2" size="lg" marginRight={2}>*/}
+                {/*    {isServer ? (*/}
+                {/*        <Fragment>({productSearchResult?.total})</Fragment>*/}
+                {/*    ) : (*/}
+                {/*        // Fade in the total when available. When it's changed or not available yet, do not render it*/}
+                {/*        !isLoading && <Fade in={true}>({productSearchResult?.total})</Fade>*/}
+                {/*    )}*/}
+                {/*</Heading>*/}
             </Flex>
         </Box>
     )

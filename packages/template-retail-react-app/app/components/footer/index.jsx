@@ -123,42 +123,42 @@ const Footer = ({...otherProps}) => {
                         <Subscribe />
                     </HideOnDesktop>
 
-                    {showLocaleSelector && (
-                        <Box {...styles.localeSelector}>
-                            <FormControl
-                                data-testid="sf-footer-locale-selector"
-                                id="locale_selector"
-                                width="auto"
-                                {...otherProps}
-                            >
-                                <Select
-                                    value={locale}
-                                    onChange={({target}) => {
-                                        setLocale(target.value)
+                    {/*{showLocaleSelector && (*/}
+                    {/*    <Box {...styles.localeSelector}>*/}
+                    {/*        <FormControl*/}
+                    {/*            data-testid="sf-footer-locale-selector"*/}
+                    {/*            id="locale_selector"*/}
+                    {/*            width="auto"*/}
+                    {/*            {...otherProps}*/}
+                    {/*        >*/}
+                    {/*            <Select*/}
+                    {/*                value={locale}*/}
+                    {/*                onChange={({target}) => {*/}
+                    {/*                    setLocale(target.value)*/}
 
-                                        // Update the `locale` in the URL.
-                                        const newUrl = getPathWithLocale(target.value, buildUrl, {
-                                            disallowParams: ['refine']
-                                        })
+                    {/*                    // Update the `locale` in the URL.*/}
+                    {/*                    const newUrl = getPathWithLocale(target.value, buildUrl, {*/}
+                    {/*                        disallowParams: ['refine']*/}
+                    {/*                    })*/}
 
-                                        window.location = newUrl
-                                    }}
-                                    variant="filled"
-                                    {...styles.localeDropdown}
-                                >
-                                    {supportedLocaleIds.map((locale) => (
-                                        <LocaleText
-                                            as="option"
-                                            value={locale}
-                                            shortCode={locale}
-                                            key={locale}
-                                            {...styles.localeDropdownOption}
-                                        />
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                    )}
+                    {/*                    window.location = newUrl*/}
+                    {/*                }}*/}
+                    {/*                variant="filled"*/}
+                    {/*                {...styles.localeDropdown}*/}
+                    {/*            >*/}
+                    {/*                {supportedLocaleIds.map((locale) => (*/}
+                    {/*                    <LocaleText*/}
+                    {/*                        as="option"*/}
+                    {/*                        value={locale}*/}
+                    {/*                        shortCode={locale}*/}
+                    {/*                        key={locale}*/}
+                    {/*                        {...styles.localeDropdownOption}*/}
+                    {/*                    />*/}
+                    {/*                ))}*/}
+                    {/*            </Select>*/}
+                    {/*        </FormControl>*/}
+                    {/*    </Box>*/}
+                    {/*)}*/}
 
                     <Divider {...styles.horizontalRule} />
 

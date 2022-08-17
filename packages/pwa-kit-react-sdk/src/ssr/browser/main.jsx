@@ -6,7 +6,8 @@
  */
 /* global __webpack_require__ */
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {hydrateRoot} from 'react-dom/client'
+
 import {BrowserRouter as Router} from 'react-router-dom'
 import DeviceContext from '../universal/device-context'
 import App from '../universal/components/_app'
@@ -72,7 +73,8 @@ export const start = () => {
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
-            ReactDOM.hydrate(
+            hydrateRoot(
+                rootEl,
                 <Router>
                     <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                         <AppConfig locals={locals}>
@@ -85,7 +87,6 @@ export const start = () => {
                         </AppConfig>
                     </DeviceContext.Provider>
                 </Router>,
-                rootEl,
                 () => {
                     window.__HYDRATING__ = false
                 }
