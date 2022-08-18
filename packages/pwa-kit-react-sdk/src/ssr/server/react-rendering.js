@@ -316,6 +316,7 @@ const renderApp = (args) => {
             beforeBodyEnd={scripts}
             htmlAttributes={helmet.htmlAttributes.toComponent()}
             bodyAttributes={helmet.bodyAttributes.toComponent()}
+            res={res}
         />
     )
 

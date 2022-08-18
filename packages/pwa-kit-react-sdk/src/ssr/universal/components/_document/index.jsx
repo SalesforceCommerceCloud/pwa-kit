@@ -34,13 +34,14 @@ import PropTypes from 'prop-types'
  * @param {Array.<Object>} props.head - The elements to be placed inside the documents head tag.
  * @param {string} [props.html] - The HTML to be rendered in your documents html tag.
  * @param {object} [props.htmlAttributes] - The attributes to be applied to the documents html tag.
+ * @param {object} [props.res] - Response object.
  *      <br/>
  *      <br/>
  *      <i>These are set by using `react-helmet`. Please refer to their {@link https://github.com/nfl/react-helmet/tree/5.2.0#readme|docs}
  *      for its usage.</i>
  */
 const Document = (props) => {
-    const {head, html, afterBodyStart, beforeBodyEnd, htmlAttributes, bodyAttributes} = props
+    const {head, html, afterBodyStart, beforeBodyEnd, htmlAttributes, bodyAttributes, res} = props
     return (
         <html lang="en-US" {...htmlAttributes}>
             <head>
@@ -67,7 +68,8 @@ Document.propTypes = {
     head: PropTypes.arrayOf(PropTypes.node).isRequired,
     html: PropTypes.string.isRequired,
     htmlAttributes: PropTypes.object,
-    bodyAttributes: PropTypes.object
+    bodyAttributes: PropTypes.object,
+    res: PropTypes.object
 }
 
 Document.defaultProps = {
@@ -76,7 +78,8 @@ Document.defaultProps = {
     head: [],
     html: '',
     htmlAttributes: {},
-    bodyAttributes: {}
+    bodyAttributes: {},
+    res: {}
 }
 
 export default Document
