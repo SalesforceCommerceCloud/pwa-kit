@@ -9,9 +9,7 @@ import React from 'react'
 import {withRouter} from 'react-router-dom'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {AppErrorContext} from '../../components/app-error-boundary'
-import Throw404 from '../../components/throw-404'
 import AppConfig from '../../components/_app-config'
-import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
 
 const noop = () => undefined
@@ -44,7 +42,7 @@ const withErrorHandling = (Wrapped) => {
     // Expose statics from the wrapped component on the HOC
     hoistNonReactStatic(WithErrorHandling, Wrapped)
 
-    WithErrorHandling.displayName = `WithErrorHandling(${wrappedComponentName})`
+    WithErrorHandling.displayName = `withErrorHandling(${wrappedComponentName})`
     return WithErrorHandling
 }
 
@@ -106,7 +104,7 @@ export const routeComponent = (Wrapped, isPage, locals) => {
                 const {previousLocation, location} = args
                 return !previousLocation || previousLocation.pathname !== location.pathname
             }
-            const component = await RouteComponent.getComponent()
+            const component = await Wrapped.getComponent()
 
             return component.shouldGetProps ? component.shouldGetProps(args) : defaultImpl()
         }
@@ -153,37 +151,15 @@ export const routeComponent = (Wrapped, isPage, locals) => {
          */
         // eslint-disable-next-line
         static getProps(args) {
-            RouteComponent._latestPropsPromise = RouteComponent.getComponent().then((component) =>
+            // console.log('GETPROPS: ', Wrapped.getComponent)
+            // if (!Wrapped.getComponent) {
+            //     console.log('THE FOLLOWING COMPONENT SHOULD HAVE GETPROPS: ', Wrapped.name)
+            //     return
+            // }
+            RouteComponent._latestPropsPromise = Wrapped.getComponent().then((component) =>
                 component.getProps ? component.getProps({...args, ...extraArgs}) : Promise.resolve()
             )
             return RouteComponent._latestPropsPromise
-        }
-
-        /**
-         * Get the underlying component this HoC wraps. This handles loading of
-         * `@loadable/component` components.
-         *
-         * @return {Promise<React.Component>}
-         */
-        static async getComponent() {
-            return Wrapped.load
-                ? Wrapped.load().then((module) => module.default)
-                : Promise.resolve(Wrapped)
-        }
-
-        /**
-         * Route-components implement `getTemplateName()` to return a readable
-         * name for the component that is used internally for analytics-tracking –
-         * eg. performance/page-view events.
-         *
-         * If not implemented defaults to the `displayName` of the React component.
-         *
-         * @return {Promise<String>}
-         */
-        static async getTemplateName() {
-            return RouteComponent.getComponent().then((c) =>
-                c.getTemplateName ? c.getTemplateName() : Promise.resolve(wrappedComponentName)
-            )
         }
 
         /**
@@ -261,8 +237,13 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             //
             // Since the time is overwhelmingly spent fetching data on soft-navs,
             // we think this is a good approximation in both cases.
-
-            const templateName = await RouteComponent.getTemplateName()
+            console.log(
+                'WRAPPED COMPONENT: ',
+                Wrapped.name,
+                Wrapped.displayName,
+                Wrapped.getTemplateName
+            )
+            const templateName = await Wrapped.getTemplateName()
 
             const start = now()
 
@@ -379,32 +360,11 @@ export const routeComponent = (Wrapped, isPage, locals) => {
     }
 
     const excludes = {
-        shouldGetProps: true,
-        getProps: true,
-        getTemplateName: true
+        // shouldGetProps: true,
+        // getProps: true,
+        // getTemplateName: true
     }
     hoistNonReactStatic(RouteComponent, Wrapped, excludes)
 
     return withErrorHandling(withRouter(RouteComponent))
-}
-
-/**
- * Wrap all the components found in the application's route config with the
- * route-component HOC so that they all support `getProps` methods server-side
- * and client-side in the same way.
- *
- * @private
- */
-export const getRoutes = (locals) => {
-    let _routes = routes
-    if (typeof routes === 'function') {
-        _routes = routes()
-    }
-    const allRoutes = [..._routes, {path: '*', component: Throw404}]
-    return allRoutes.map(({component, ...rest}) => {
-        return {
-            component: component ? routeComponent(component, true, locals) : component,
-            ...rest
-        }
-    })
 }

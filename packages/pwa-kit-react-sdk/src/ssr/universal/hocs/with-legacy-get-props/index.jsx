@@ -6,72 +6,81 @@
  */
 import React from 'react'
 import hoistNonReactStatic from 'hoist-non-react-statics'
-import {getRoutes, routeComponent} from '../../components/route-component'
+import {routeComponent} from '../../components/route-component'
+import withLoadableResolver from '../with-loadable-resolver'
 
-const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee it's functionality if used elsewhere.`
+const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee its functionality if used elsewhere.`
 
 /**
  * This higher order component will configure your PWA-Kit application with the legacy getProps API.
  */
 const withGetPropsAPI = (Component) => {
-    console.log('withGetPropsAPI')
+    // This will add all the getProps like features to the App component.
+    Component = routeComponent(withLoadableResolver(Component))
+
     const wrappedComponentName = Component.displayName || Component.name
-    console.log(`Adding getProps API to: `, wrappedComponentName)
+
     if (wrappedComponentName !== 'App') {
         console.warn(USAGE_WARNING)
     }
 
-    // This will add all the getProps like features to the App component.
-    Component = routeComponent(Component)
-
     const WrappedComponent = ({...passThroughProps}) => {
-        return (
-            <Component {...passThroughProps} />
-        )
+        return <Component {...passThroughProps} />
     }
 
-    WrappedComponent.getRoutes = () => {
-        // NOTE: We need to add logic that will allow use to iteratively enchance the
-        // route components.
-        return getRoutes()
+    // Expose statics from the wrapped component on the HOC
+    hoistNonReactStatic(WrappedComponent, Component)
+
+    /**
+     *
+     * @param {*} routes
+     * @returns
+     */
+    WrappedComponent.enhanceRoutes = (routes = [], isPage, locals) => {
+        routes = Component.enhanceRoutes ? Component.enhanceRoutes(routes) : routes
+
+        return routes.map(({component, ...rest}) => ({
+            component: component ? routeComponent(component, isPage, locals) : component,
+            ...rest
+        }))
     }
 
     /**
-     * 
+     *
+     * @param {*} args
+     * @returns
      */
-    WrappedComponent.initAppState = async (args) => {
-        const {App, AppJSX, route, match, req, res, location} = args 
-        console.log('initAppState: ', AppJSX)
-        
+    WrappedComponent.resolveAPIState = async (args) => {
+        const {App, route, match, req, res, location} = args
+
         // NOTE: This should not be blocking, so lets make it parallel before releasing.
         let wrappeeState
-        if (Component.initAppState) {
-            wrappeeState = await Component.initAppState()
+        if (Component.resolveAPIState) {
+            wrappeeState = await Component.resolveAPIState()
         }
 
         const {params} = match
         const components = [App, route.component]
-    
-        const promises = components
-            .map((c) =>
-                c.getProps
-                    ? c.getProps({
-                          req,
-                          res,
-                          params,
-                          location
-                      })
-                    : Promise.resolve({})
-            )
+
+        const promises = components.map((c) =>
+            c.getProps
+                ? c.getProps({
+                      req,
+                      res,
+                      params,
+                      location
+                  })
+                : Promise.resolve({})
+        )
         let returnVal = {}
-    
+
         try {
             const [appProps, pageProps] = await Promise.all(promises)
             const appState = {
                 appProps,
                 pageProps
             }
-    
+
             returnVal = {
                 error: undefined,
                 appState: {
@@ -85,14 +94,11 @@ const withGetPropsAPI = (Component) => {
                 appState: {}
             }
         }
-    
+
         return returnVal
     }
 
-    // Expose statics from the wrapped component on the HOC
-    hoistNonReactStatic(WrappedComponent, Component)
-
-    WrappedComponent.displayName = `WithQueryClientProvider(${wrappedComponentName})`
+    WrappedComponent.displayName = `withGetPropsAPI(${wrappedComponentName})`
 
     return WrappedComponent
 }

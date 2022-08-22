@@ -34,7 +34,7 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
-import withQueryClientAPI from '../universal/hocs'
+import withDefaultDataAPI from '../universal/hocs'
 import withLoadableResolver from '../universal/hocs/with-loadable-resolver'
 import routes from '../universal/routes'
 
@@ -76,6 +76,14 @@ const logAndFormatError = (err) => {
     }
 }
 
+/**
+ * Wrap all the components found in the application's route config with the
+ * with-loadable-resolver HoC so the appropriate component will be loaded
+ * before rendering of the application.
+ *
+ * @private
+ */
+// NOTE: Move this somewhere shared for main and ssr.js
 const getRoutes = (locals) => {
     let _routes = routes
     if (typeof routes === 'function') {
@@ -84,7 +92,7 @@ const getRoutes = (locals) => {
     const allRoutes = [..._routes, {path: '*', component: Throw404}]
     return allRoutes.map(({component, ...rest}) => {
         return {
-            component: component ? withLoadableResolver(component, true, locals) : component,
+            component: component ? withLoadableResolver(component) : component,
             ...rest
         }
     })
@@ -110,9 +118,15 @@ export const render = async (req, res, next) => {
 
     // NOTE: I think the recommened functionality by Oli is to not apply this enchancement if there is an
     // existing api applied to the application? I need to get clarification on this.
-    const WrappedApp = withQueryClientAPI(App)
+    // NOTE: We shouldn't have to wrap the App with withLoadableResolver since it's required to be in the
+    // bundle, we can probably clean up the logive for getProps somehow.
+    const WrappedApp = withDefaultDataAPI(App)
     const deviceType = detectDeviceType(req)
-    const routes = WrappedApp.getRoutes ? WrappedApp.getRoutes(res.locals) : getRoutes(res.locals)
+    let routes = getRoutes(res.locals)
+
+    if (WrappedApp.enhanceRoutes) {
+        routes = WrappedApp.enhanceRoutes(routes, true, res.locals)
+    }
 
     const [pathname, search] = req.originalUrl.split('?')
     const location = {
@@ -150,21 +164,29 @@ export const render = async (req, res, next) => {
 
     if (!error) {
         const AppJSX = getAppJSX(req, res, error, {
-            App: WrappedApp, 
-            appState, 
-            deviceType, 
-            location, 
-            routerContext, 
+            App: WrappedApp,
+            appState,
+            deviceType,
+            location,
+            routerContext,
             routes
         })
-        console.log('INITAPPSTATE: ', WrappedApp)
-        ;({appState, error: appStateError} = await WrappedApp.initAppState({App, AppJSX, location, req, res, deviceType, route, routes, match}))
 
-        console.log('APPSTATE|ERROR: ', appState, appStateError)
+        ;({appState, error: appStateError} = await WrappedApp.resolveAPIState({
+            App,
+            AppJSX,
+            location,
+            req,
+            res,
+            deviceType,
+            route,
+            routes,
+            match
+        }))
     }
 
     // Support the AppConfig freeze API. NOTE: Could this be another HOC with its
-    // own initAppState function defined?
+    // own resolveAPIState function defined?
     appState.__STATE_MANAGEMENT_LIBRARY = AppConfig.freeze(res.locals)
 
     // Step 4 - Render the App

@@ -13,15 +13,18 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
 const withLoadableResolver = (Component) => {
-
     /* istanbul ignore next */
     const wrappedComponentName = Component.displayName || Component.name
 
-    const WrappedComponent = ({...passThroughProps}) => {
-        return (
-            <Component {...passThroughProps} />
-        )
+    if (wrappedComponentName.includes('withLoadableResolver')) {
+        return Component
     }
+
+    const WrappedComponent = ({...passThroughProps}) => {
+        return <Component {...passThroughProps} />
+    }
+
+    hoistNonReactStatic(WrappedComponent, Component)
 
     /**
      * Get the underlying component this HoC wraps. This handles loading of
@@ -29,15 +32,30 @@ const withLoadableResolver = (Component) => {
      *
      * @return {Promise<React.Component>}
      */
-     WrappedComponent.getComponent = async () => {
+    WrappedComponent.getComponent = async () => {
         return Component.load
             ? Component.load().then((module) => module.default)
             : Promise.resolve(Component)
     }
 
-    WrappedComponent.displayName = `withLoadableResolver(${wrappedComponentName})`
+    /**
+     * Route-components implement `getTemplateName()` to return a readable
+     * name for the component that is used internally for analytics-tracking –
+     * eg. performance/page-view events.
+     *
+     * If not implemented defaults to the `displayName` of the React component.
+     *
+     * @return {Promise<String>}
+     */
+    WrappedComponent.getTemplateName = async () => {
+        return Component.getComponent
+            ? Component.getComponent().then((c) =>
+                  c.getTemplateName ? c.getTemplateName() : Promise.resolve(wrappedComponentName)
+              )
+            : Promise.resolve(Component)
+    }
 
-    hoistNonReactStatic(WrappedComponent, Component)
+    WrappedComponent.displayName = `withLoadableResolver(${wrappedComponentName})`
 
     return WrappedComponent
 }

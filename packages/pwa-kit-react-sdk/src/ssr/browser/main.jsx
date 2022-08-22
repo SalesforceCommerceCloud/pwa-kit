@@ -12,9 +12,25 @@ import {DeviceContext, ExpressContext} from '../universal/contexts'
 import App from '../universal/components/_app'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
-import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
-import withStateAPI from '../universal/hocs'
+import withQueryClientAPI from '../universal/hocs'
+import withLoadableResolver from '../universal/hocs/with-loadable-resolver'
+import routes from '../universal/routes'
+import Throw404 from '../universal/components/throw-404'
+
+const getRoutes = (locals) => {
+    let _routes = routes
+    if (typeof routes === 'function') {
+        _routes = routes()
+    }
+    const allRoutes = [..._routes, {path: '*', component: Throw404}]
+    return allRoutes.map(({component, ...rest}) => {
+        return {
+            component: component ? withLoadableResolver(component) : component,
+            ...rest
+        }
+    })
+}
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -67,10 +83,22 @@ export const start = () => {
     window.__HYDRATING__ = true
 
     // const WrappedApp = routeComponent(App, false, locals)
-    const WrappedApp = withStateAPI(App)
-    // NOTE: It's kinda weird how frozn state is loaded in the JSX here. Would be nice if it was 
+    const WrappedApp = withQueryClientAPI(App)
+    console.log(
+        'WRAPPED COMPONENT (MAIN): ',
+        WrappedApp.name,
+        WrappedApp.displayName,
+        WrappedApp.getTemplateName
+    )
+
+    // NOTE: It's kinda weird how frozn state is loaded in the JSX here. Would be nice if it was
     // "added" via or in, the hoc.
-    const routes = WrappedApp.getRoutes(locals)
+    let routes = getRoutes(locals)
+
+    if (WrappedApp.enhanceRoutes) {
+        routes = WrappedApp.enhanceRoutes(routes)
+    }
+
     const error = window.__ERROR__
 
     return Promise.resolve()

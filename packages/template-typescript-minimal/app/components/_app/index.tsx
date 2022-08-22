@@ -19,4 +19,8 @@ const App = (props: AppProps): ReactElement => {
     )
 }
 
+App.getProps = () => {
+    return {greeting: 'Hello from the App component.'}
+}
+
 export default withLegacyGetPropsAPI(App)
