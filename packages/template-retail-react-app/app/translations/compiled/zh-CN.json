@@ -425,44 +425,6 @@
       "value": "添加新付款方式"
     }
   ],
-  "cart.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": " 件商品"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": " 件商品"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "已添加至愿望清单"
-    }
-  ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
@@ -593,6 +555,12 @@
     {
       "type": 0,
       "value": "下订单"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "结帐期间发生意外错误。"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -934,13 +902,13 @@
   "contact_info.button.already_have_account": [
     {
       "type": 0,
-      "value": "已经有账户？登录"
+      "value": "已有账户？登录"
     }
   ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
-      "value": "以访客身份结账"
+      "value": "以访客身份结算"
     }
   ],
   "contact_info.button.login": [
@@ -965,6 +933,18 @@
     {
       "type": 0,
       "value": "联系信息"
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code": [
+    {
+      "type": 0,
+      "value": "此 3 位数代码可在卡的背面找到。"
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
+    {
+      "type": 0,
+      "value": "此 4 位数代码可在卡的正面找到。"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1317,10 +1297,54 @@
       "value": "出现错误。重试。"
     }
   ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "已添加至愿望清单"
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
       "value": "从愿望清单中移除商品"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "查看"
     }
   ],
   "header.button.assistive_msg.logo": [
@@ -1380,13 +1404,13 @@
   "home.description.here_to_help": [
     {
       "type": 0,
-      "value": "联系我们的支持人员，他们将为您"
+      "value": "联系我们的支持人员。"
     }
   ],
   "home.description.here_to_help_line_2": [
     {
       "type": 0,
-      "value": "提供适当指导。"
+      "value": "他们将为您提供适当指导。"
     }
   ],
   "home.description.shop_products": [
@@ -1555,6 +1579,12 @@
     {
       "type": 0,
       "value": "销售"
+    }
+  ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "请在上面选择所有选项"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -2187,44 +2217,6 @@
       "value": "即将到货"
     }
   ],
-  "product_detail.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": " 件商品"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": " 件商品"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "已添加至愿望清单"
-    }
-  ],
   "product_detail.recommended_products.title.complete_set": [
     {
       "type": 0,
@@ -2269,44 +2261,6 @@
     {
       "type": 0,
       "value": "排序标准"
-    }
-  ],
-  "product_list.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": " 件商品"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": " 件商品"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "已添加至愿望清单"
     }
   ],
   "product_list.modal.button.clear_filters": [
@@ -2447,44 +2401,6 @@
       "value": "最近搜索"
     }
   ],
-  "recommended_products.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": " 件商品"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": " 件商品"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "已添加至愿望清单"
-    }
-  ],
   "register_form.action.sign_in": [
     {
       "type": 0,
@@ -2506,7 +2422,7 @@
   "register_form.message.agree_to_policy_terms": [
     {
       "type": 0,
-      "value": "创建账户即表明您同意 Salesforce "
+      "value": "隐私创建账户即表明您同意 Salesforce "
     },
     {
       "children": [
@@ -2520,7 +2436,7 @@
     },
     {
       "type": 0,
-      "value": "以及"
+      "value": "和"
     },
     {
       "children": [
@@ -3223,6 +3139,18 @@
     {
       "type": 0,
       "value": "新密码"
+    }
+  ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "添加到购物车"
+    }
+  ],
+  "wishlist_primary_action.button.select_options": [
+    {
+      "type": 0,
+      "value": "选择选项"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [
