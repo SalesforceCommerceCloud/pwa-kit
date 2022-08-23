@@ -34,8 +34,7 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
-import withDefaultDataAPI from '../universal/hocs'
-import withLoadableResolver from '../universal/hocs/with-loadable-resolver'
+import {withLegacyGetProps, withLoadableResolver} from '../universal/hocs'
 import routes from '../universal/routes'
 
 const CWD = process.cwd()
@@ -120,7 +119,7 @@ export const render = async (req, res, next) => {
     // existing api applied to the application? I need to get clarification on this.
     // NOTE: We shouldn't have to wrap the App with withLoadableResolver since it's required to be in the
     // bundle, we can probably clean up the logive for getProps somehow.
-    const WrappedApp = withDefaultDataAPI(App)
+    const WrappedApp = withLegacyGetProps(App)
     const deviceType = detectDeviceType(req)
     let routes = getRoutes(res.locals)
 
@@ -172,7 +171,7 @@ export const render = async (req, res, next) => {
             routes
         })
 
-        ;({appState, error: appStateError} = await WrappedApp.resolveAPIState({
+        ;({appState, error: appStateError} = await WrappedApp.fetchState({
             App,
             AppJSX,
             location,
@@ -185,8 +184,7 @@ export const render = async (req, res, next) => {
         }))
     }
 
-    // Support the AppConfig freeze API. NOTE: Could this be another HOC with its
-    // own resolveAPIState function defined?
+    // Support the AppConfig freeze API.
     appState.__STATE_MANAGEMENT_LIBRARY = AppConfig.freeze(res.locals)
 
     // Step 4 - Render the App

@@ -237,12 +237,6 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             //
             // Since the time is overwhelmingly spent fetching data on soft-navs,
             // we think this is a good approximation in both cases.
-            console.log(
-                'WRAPPED COMPONENT: ',
-                Wrapped.name,
-                Wrapped.displayName,
-                Wrapped.getTemplateName
-            )
             const templateName = await Wrapped.getTemplateName()
 
             const start = now()

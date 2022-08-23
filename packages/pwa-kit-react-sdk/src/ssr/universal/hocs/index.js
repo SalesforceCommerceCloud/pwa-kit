@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import withQueryClientAPI from './with-react-query'
-import withLegacyGetPropsAPI from './with-legacy-get-props'
+import withReactQuery from './with-react-query'
+import withLegacyGetProps from './with-legacy-get-props'
+import withLoadableResolver from './with-loadable-resolver'
 
-export {withQueryClientAPI, withLegacyGetPropsAPI}
-
-export default withQueryClientAPI
+export {withLegacyGetProps, withLoadableResolver, withReactQuery}

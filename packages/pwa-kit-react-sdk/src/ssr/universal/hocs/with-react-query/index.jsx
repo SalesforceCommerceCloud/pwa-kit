@@ -15,8 +15,11 @@ const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. 
 /**
  * This higher order component will configure your PWA-Kit application with React Query. Uses of
  * the `useQuery` hook will also work server-side.
+ * 
+ * @param {*} Component 
+ * @returns 
  */
-const withQueryClientAPI = (Component) => {
+const withReactQuery = (Component) => {
     Component = withLoadableResolver(Component)
 
     const wrappedComponentName = Component.displayName || Component.name
@@ -63,16 +66,16 @@ const withQueryClientAPI = (Component) => {
      * @param {*} args
      * @returns
      */
-    WrappedComponent.resolveAPIState = async (args) => {
+    WrappedComponent.fetchState = async (args) => {
         // NOTE: Do we really need to pass in the AppJSX as a whole for prepass? Can we get away with
         // creating a simplified AppJSX with the App and Page components.
         const {AppJSX} = args
 
-        // NOTE: IT would be nice to push this logic out of this function and put it in the render function,
+        // NOTE: It would be nice to push this logic out of this function and put it in the render function,
         // something like resolving with an array of values.
         let wrappeeState
-        if (Component.resolveAPIState) {
-            wrappeeState = await Component.resolveAPIState(args)
+        if (Component.fetchState) {
+            wrappeeState = await Component.fetchState(args)
         }
 
         let error
@@ -97,15 +100,19 @@ const withQueryClientAPI = (Component) => {
             error = e
         }
 
+        console.log('REACT QUERY: ', {
+            appState,
+            error
+        })
         return {
             appState,
             error
         }
     }
 
-    WrappedComponent.displayName = `withQueryClientAPI(${wrappedComponentName})`
+    WrappedComponent.displayName = `withReactQuery(${wrappedComponentName})`
 
     return WrappedComponent
 }
 
-export default withQueryClientAPI
+export default withReactQuery

@@ -13,14 +13,17 @@ const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. 
 
 /**
  * This higher order component will configure your PWA-Kit application with the legacy getProps API.
+ * 
+ * @param {*} Component 
+ * @returns 
  */
-const withGetPropsAPI = (Component) => {
+const withGetProps = (Component) => {
     // This will add all the getProps like features to the App component.
     Component = routeComponent(withLoadableResolver(Component))
 
     const wrappedComponentName = Component.displayName || Component.name
 
-    if (wrappedComponentName !== 'App') {
+    if (!wrappedComponentName.includes('App')) {
         console.warn(USAGE_WARNING)
     }
 
@@ -50,13 +53,13 @@ const withGetPropsAPI = (Component) => {
      * @param {*} args
      * @returns
      */
-    WrappedComponent.resolveAPIState = async (args) => {
+    WrappedComponent.fetchState = async (args) => {
         const {App, route, match, req, res, location} = args
 
         // NOTE: This should not be blocking, so lets make it parallel before releasing.
         let wrappeeState
-        if (Component.resolveAPIState) {
-            wrappeeState = await Component.resolveAPIState()
+        if (Component.fetchState) {
+            wrappeeState = await Component.fetchState(args)
         }
 
         const {params} = match
@@ -95,12 +98,14 @@ const withGetPropsAPI = (Component) => {
             }
         }
 
+        console.log('LEGACY GET PROPS: ', returnVal)
+
         return returnVal
     }
 
-    WrappedComponent.displayName = `withGetPropsAPI(${wrappedComponentName})`
+    WrappedComponent.displayName = `withLegacyGetProps(${wrappedComponentName})`
 
     return WrappedComponent
 }
 
-export default withGetPropsAPI
+export default withGetProps

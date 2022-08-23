@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {Fragment, ReactElement, ReactNode} from 'react'
-import {withLegacyGetPropsAPI} from 'pwa-kit-react-sdk/ssr/universal/hocs'
+import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/hocs'
 
 interface AppProps {
     children: ReactNode
@@ -23,4 +23,4 @@ App.getProps = () => {
     return {greeting: 'Hello from the App component.'}
 }
 
-export default withLegacyGetPropsAPI(App)
+export default withReactQuery(App)
