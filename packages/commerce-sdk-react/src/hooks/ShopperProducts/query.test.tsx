@@ -7,38 +7,10 @@
 import React, {ReactElement} from 'react'
 import '@testing-library/jest-dom'
 import {mockHttpResponses, renderWithProviders} from '../../test-utils'
-import {useCategories, useProduct, useProducts} from './query'
+import {useCategories, useCategory, useProduct, useProducts} from './query'
 import {screen, waitFor} from '@testing-library/react'
 
 const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`})
-
-// const testCases = {
-//     useProducts: [
-//         {
-//             name: 'returns data',
-//             component: <div>test</div>,
-//             assertion:
-//         }
-//     ]
-// }
-
-// const returnDataCase = (Component: ReactElement, output) => {
-//
-// }
-
-// const returnErrorCase = (Component: any) => {
-//     return test(
-//         'return error',
-//         withMocks(async () => {
-//             renderWithProviders(<Component />)
-//
-//             expect(screen.getByText('Loading...')).toBeInTheDocument()
-//             await waitFor(() => screen.getByText('error'))
-//             expect(screen.getByText('error')).toBeInTheDocument()
-//             expect(screen.queryByText('Loading...')).toBeNull()
-//         })
-//     )
-// }
 
 describe('useProducts', () => {
     const ids = '25502228M,25503045M'
@@ -185,9 +157,55 @@ describe('useCategories', () => {
     test(
         'returns an error',
         withMocks(async () => {
-            // limit of id is 25, generating 26 random ids here to get an 400 error from server
-            const fakeIds = [...new Array(26)].map((i) => Math.floor(Math.random() * 26)).join(',')
+            // limit of id is 50, generating 51 random ids here to get an 400 error from server
+            const fakeIds = [...new Array(51)].map((i) => Math.floor(Math.random() * 26)).join(',')
+            console.log('fakeIds', fakeIds)
             renderWithProviders(<Categories ids={fakeIds} />)
+
+            expect(screen.getByText('Loading...')).toBeInTheDocument()
+            await waitFor(() => screen.getByText('error'))
+            expect(screen.getByText('error')).toBeInTheDocument()
+            expect(screen.queryByText('Loading...')).toBeNull()
+        })
+    )
+})
+
+describe('useCategory', () => {
+    const id = 'newarrivals'
+
+    const Category = ({id}: {id: string}): ReactElement => {
+        const {data, isLoading, error} = useCategory({
+            id
+        })
+        return (
+            <div>
+                {isLoading && <span>Loading...</span>}
+                {data && <div>{data.name}</div>}
+                {error && <span>error</span>}
+            </div>
+        )
+    }
+
+    test(
+        'returns data',
+        withMocks(async () => {
+            renderWithProviders(<Category id={id} />)
+            const categoryName = 'New Arrivals'
+
+            expect(screen.queryByText(categoryName)).toBeNull()
+            expect(screen.getByText('Loading...')).toBeInTheDocument()
+
+            await waitFor(() => screen.getByText(categoryName))
+
+            expect(screen.getByText(categoryName)).toBeInTheDocument()
+            expect(screen.queryByText('Loading...')).toBeNull()
+        })
+    )
+
+    test(
+        'returns an error',
+        withMocks(async () => {
+            renderWithProviders(<Category id="abc" />)
 
             expect(screen.getByText('Loading...')).toBeInTheDocument()
             await waitFor(() => screen.getByText('error'))
