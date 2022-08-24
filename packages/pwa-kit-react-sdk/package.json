@@ -71,7 +71,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "5.2.0",
-    "react-router-dom": "^5.1.2",
+    "react-router-dom": "^5.3.3",
     "regenerator-runtime": "^0.13.9",
     "replace-in-file": "^6.2.0",
     "rimraf": "2.6.1",
@@ -83,6 +83,6 @@
     "react": ">=16.14 || <18",
     "react-dom": ">=16.14 || <18",
     "react-helmet": "6",
-    "react-router-dom": "^5.1.2"
+    "react-router-dom": "5.3.3"
   }
 }
