@@ -168,9 +168,6 @@
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "Aggiungi nuovo metodo di pagamento"
   },
-  "cart.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} alla lista desideri"
-  },
   "cart.info.removed_from_cart": {
     "defaultMessage": "Articolo rimosso dal carrello"
   },
@@ -216,11 +213,14 @@
   "checkout.button.place_order": {
     "defaultMessage": "Invia ordine"
   },
+  "checkout.message.generic_error": {
+    "defaultMessage": "Si è verificato un errore inatteso durante il checkout."
+  },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Crea account"
   },
   "checkout_confirmation.heading.billing_address": {
-    "defaultMessage": "Indirizzo fatturazione"
+    "defaultMessage": "Indirizzo di fatturazione"
   },
   "checkout_confirmation.heading.create_account": {
     "defaultMessage": "Crea un account per un checkout più veloce"
@@ -299,7 +299,7 @@
     "defaultMessage": "Termini e condizioni"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce o sue società affiliate. Tutti i diritti riservati. Questo è un negozio fittizio a scopo dimostrativo. Gli ordini effettuati NON VERRANNO evasi."
+    "defaultMessage": "2021 Salesforce o società affiliate. Tutti i diritti riservati. Questo è un negozio fittizio a scopo dimostrativo. Gli ordini effettuati NON VERRANNO evasi."
   },
   "checkout_header.link.cart": {
     "defaultMessage": "Torna al carrello"
@@ -378,6 +378,14 @@
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "Informazioni di contatto"
+  },
+  "credit_card_fields.tool_tip.security_code": {
+    "defaultMessage": "Questo codice a 3 cifre è presente sul retro della carta.",
+    "description": "Generic credit card security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code.american_express": {
+    "defaultMessage": "Questo codice a 4 cifre è presente sul fronte della carta.",
+    "description": "American Express security code help text"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Dettagli account"
@@ -538,8 +546,14 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "Si è verificato un problema. Riprova!"
   },
+  "global.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} alla lista desideri"
+  },
   "global.info.removed_from_wishlist": {
     "defaultMessage": "Articolo rimosso dalla lista desideri"
+  },
+  "global.link.added_to_wishlist.view_wishlist": {
+    "defaultMessage": "Visualizza"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
@@ -548,7 +562,7 @@
     "defaultMessage": "Menu"
   },
   "header.button.assistive_msg.my_account": {
-    "defaultMessage": "Il  mio account"
+    "defaultMessage": "Il mio account"
   },
   "header.button.assistive_msg.my_cart": {
     "defaultMessage": "Il mio carrello"
@@ -569,14 +583,14 @@
     "defaultMessage": "Funzionalità pronte all'uso, così potrai dedicare il tuo tempo all'aggiunta di miglioramenti."
   },
   "home.description.here_to_help": {
-    "defaultMessage": "Contatta il nostro personale di assistenza, che ti fornirà"
+    "defaultMessage": "Contatta il nostro personale di assistenza."
   },
   "home.description.here_to_help_line_2": {
-    "defaultMessage": "le indicazioni giuste."
+    "defaultMessage": "Ti fornirà le indicazioni giuste."
   },
   "home.description.shop_products": {
     "defaultMessage": "Questa sezione presenta contenuti del catalogo. {docLink} su come sostituirli.",
-    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos"
+    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
     "defaultMessage": "Best practice di e-commerce per l'esperienza di carrello e checkout di un acquirente."
@@ -653,6 +667,9 @@
   "item_image.label.sale": {
     "defaultMessage": "Saldi",
     "description": "A sale badge placed on top of a product image"
+  },
+  "lCPCxk": {
+    "defaultMessage": "Selezionare tutte le opzioni sopra riportate"
   },
   "locale_text.message.ar-SA": {
     "defaultMessage": "Arabo (Arabia Saudita)"
@@ -955,9 +972,6 @@
   "product_detail.accordion.message.coming_soon": {
     "defaultMessage": "In arrivo"
   },
-  "product_detail.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} alla lista desideri"
-  },
   "product_detail.recommended_products.title.complete_set": {
     "defaultMessage": "Completamento del set"
   },
@@ -978,9 +992,6 @@
   },
   "product_list.drawer.title.sort_by": {
     "defaultMessage": "Ordina per"
-  },
-  "product_list.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} alla lista desideri"
   },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "Cancella filtri"
@@ -1044,9 +1055,6 @@
   },
   "recent_searches.heading.recent_searches": {
     "defaultMessage": "Ricerche recenti"
-  },
-  "recommended_products.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} alla lista desideri"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "Accedi"
@@ -1387,6 +1395,12 @@
   },
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "Nuova password"
+  },
+  "wishlist_primary_action.button.add_to_cart": {
+    "defaultMessage": "Aggiungi al carrello"
+  },
+  "wishlist_primary_action.button.select_options": {
+    "defaultMessage": "Seleziona opzioni"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} al carrello"
