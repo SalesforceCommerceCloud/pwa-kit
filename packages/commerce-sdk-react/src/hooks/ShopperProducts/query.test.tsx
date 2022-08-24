@@ -138,7 +138,7 @@ const tests = [
                 })
             },
             {
-                name: 'returns data',
+                name: 'returns error',
                 assertions: withMocks(async () => {
                     renderWithProviders(<Product id="abc" />)
 
@@ -169,7 +169,7 @@ const tests = [
                 })
             },
             {
-                name: 'returns data',
+                name: 'returns error',
                 assertions: withMocks(async () => {
                     // limit of id is 50, generating 51 random ids here to get an 400 error from server
                     const fakeIds = [...new Array(51)]

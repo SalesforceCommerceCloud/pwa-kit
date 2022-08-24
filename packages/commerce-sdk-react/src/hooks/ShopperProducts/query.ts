@@ -10,13 +10,7 @@ import useCommerceApi from '../useCommerceApi'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
-/**
- * A hook for `ShopperProducts#getProducts`.
- * Allows access to multiple products by a single request. Only products that are online and assigned to a site catalog are returned. The maximum number of productIDs that can be requested are 24. Along with product details, the availability, images, price, promotions, and variations for the valid products will be included, as appropriate.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProducts} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproducts} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
- */
+
 type UseProductsParameters = NonNullable<Argument<Client['getProducts']>>['parameters']
 type UseProductsHeaders = NonNullable<Argument<Client['getProducts']>>['headers']
 type UseProductsArg = {headers?: UseProductsHeaders; rawResponse?: boolean} & UseProductsParameters
@@ -26,8 +20,15 @@ function useProducts(
 ): UseQueryResult<DataType<Client['getProducts']>, Error>
 function useProducts(
     arg: Omit<UseProductsArg, 'rawResponse'> & {rawResponse: true},
-    options: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
+    options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ): UseQueryResult<Response, Error>
+/**
+ * A hook for `ShopperProducts#getProducts`.
+ * Allows access to multiple products by a single request. Only products that are online and assigned to a site catalog are returned. The maximum number of productIDs that can be requested are 24. Along with product details, the availability, images, price, promotions, and variations for the valid products will be included, as appropriate.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProducts} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproducts} for more information on the parameters and returned data type.
+ * @returns An object describing the state of the request.
+ */
 function useProducts(
     arg: UseProductsArg,
     options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
@@ -43,13 +44,7 @@ function useProducts(
         options
     )
 }
-/**
- * A hook for `ShopperProducts#getProduct`.
- * Allows access to product details for a single product ID. Only products that are online and assigned to a site catalog are returned. Along with product details, the availability, images, price, bundled_products, set_products, recommedations, product options, variations, and promotions for the products will be included, as appropriate.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProduct} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproduct} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
- */
+
 type UseProductParameters = NonNullable<Argument<Client['getProduct']>>['parameters']
 type UseProductHeaders = NonNullable<Argument<Client['getProduct']>>['headers']
 type UseProductArg = {headers?: UseProductHeaders; rawResponse?: boolean} & UseProductParameters
@@ -61,6 +56,13 @@ function useProduct(
     arg: Omit<UseProductArg, 'rawResponse'> & {rawResponse: true},
     options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
 ): UseQueryResult<Response, Error>
+/**
+ * A hook for `ShopperProducts#getProduct`.
+ * Allows access to product details for a single product ID. Only products that are online and assigned to a site catalog are returned. Along with product details, the availability, images, price, bundled_products, set_products, recommedations, product options, variations, and promotions for the products will be included, as appropriate.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProduct} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproduct} for more information on the parameters and returned data type.
+ * @returns An object describing the state of the request.
+ */
 function useProduct(
     arg: UseProductArg,
     options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
@@ -76,13 +78,7 @@ function useProduct(
         options
     )
 }
-/**
- * A hook for `ShopperProducts#getCategories`.
- * When you use the URL template, the server returns multiple categories (a result object of category documents). You can use this template as a convenient way of obtaining multiple categories in a single request, instead of issuing separate requests for each category. You can specify up to 50 multiple IDs. You must enclose the list of IDs in parentheses. If a category identifier contains parenthesis or the separator sign, you must URL encode the character. The server only returns online categories.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getCategories} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategories} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
- */
+
 type UseCategoriesParameters = NonNullable<Argument<Client['getCategories']>>['parameters']
 type UseCategoriesHeaders = NonNullable<Argument<Client['getCategories']>>['headers']
 type UseCategoriesArg = {
@@ -98,6 +94,13 @@ function useCategories(
     arg: Omit<UseCategoriesArg, 'rawResponse'> & {rawResponse: true},
     options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
 ): UseQueryResult<Response, Error>
+/**
+ * A hook for `ShopperProducts#getCategories`.
+ * When you use the URL template, the server returns multiple categories (a result object of category documents). You can use this template as a convenient way of obtaining multiple categories in a single request, instead of issuing separate requests for each category. You can specify up to 50 multiple IDs. You must enclose the list of IDs in parentheses. If a category identifier contains parenthesis or the separator sign, you must URL encode the character. The server only returns online categories.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getCategories} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategories} for more information on the parameters and returned data type.
+ * @returns An object describing the state of the request.
+ */
 function useCategories(
     arg: UseCategoriesArg,
     options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
@@ -114,15 +117,7 @@ function useCategories(
         options
     )
 }
-/**
- * A hook for `ShopperProducts#getCategory`.
- * When you use the URL template below, the server returns a category identified by its ID; by default, the server
-also returns the first level of subcategories, but you can specify another level by setting the levels
-parameter. The server only returns online categories.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getCategory} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategory} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
- */
+
 type UseCategoryParameters = NonNullable<Argument<Client['getCategory']>>['parameters']
 type UseCategoryHeaders = NonNullable<Argument<Client['getCategory']>>['headers']
 type UseCategoryArg = {
@@ -137,6 +132,15 @@ function useCategory(
     arg: Omit<UseCategoryArg, 'rawResponse'> & {rawResponse: true},
     options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
 ): UseQueryResult<Response, Error>
+/**
+ * A hook for `ShopperProducts#getCategory`.
+ * When you use the URL template below, the server returns a category identified by its ID; by default, the server
+ also returns the first level of subcategories, but you can specify another level by setting the levels
+ parameter. The server only returns online categories.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getCategory} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategory} for more information on the parameters and returned data type.
+ * @returns An object describing the state of the request.
+ */
 function useCategory(
     arg: UseCategoryArg,
     options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
