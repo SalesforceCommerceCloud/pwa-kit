@@ -8,8 +8,10 @@ import React from 'react'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {routeComponent} from '../../components/route-component'
 import withLoadableResolver from '../with-loadable-resolver'
+import {compose} from '../../utils'
 
 const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee its functionality if used elsewhere.`
+const STATE_KEY = '__LEGACY_GET_PROPS__'
 
 /**
  * This higher order component will configure your PWA-Kit application with the legacy getProps API.
@@ -19,7 +21,12 @@ const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. 
  */
 const withGetProps = (Component) => {
     // This will add all the getProps like features to the App component.
-    Component = routeComponent(withLoadableResolver(Component))
+    // Component = routeComponent(withLoadableResolver(Component))
+    Component = 
+        compose(
+            withLoadableResolver, 
+            routeComponent
+        )(Component)
 
     const wrappedComponentName = Component.displayName || Component.name
 
@@ -53,54 +60,43 @@ const withGetProps = (Component) => {
      * @param {*} args
      * @returns
      */
-    WrappedComponent.fetchState = async (args) => {
+    WrappedComponent.getDataPromises = (args) => {
         const {App, route, match, req, res, location} = args
 
-        // NOTE: This should not be blocking, so lets make it parallel before releasing.
-        let wrappeeState
-        if (Component.fetchState) {
-            wrappeeState = await Component.fetchState(args)
+        const dataPromise = 
+            Promise.resolve()
+                .then(() => {
+                    const {params} = match
+                    const components = [App, route.component]
+                    const promises = components.map((c) =>
+                        c.getProps
+                            ? c.getProps({
+                                req,
+                                res,
+                                params,
+                                location
+                            })
+                            : Promise.resolve({})
+                    )
+
+                    return Promise.all(promises)
+                })
+                .then(([appProps, pageProps]) => {
+                    return {
+                        [STATE_KEY]: {
+                            appProps,
+                            pageProps
+                        }
+                    }
+                })
+        
+        let promises = [dataPromise]
+        
+        if (Component.getDataPromises) {
+            promises = [...promises, ...Component.getDataPromises(args)]
         }
 
-        const {params} = match
-        const components = [App, route.component]
-
-        const promises = components.map((c) =>
-            c.getProps
-                ? c.getProps({
-                      req,
-                      res,
-                      params,
-                      location
-                  })
-                : Promise.resolve({})
-        )
-        let returnVal = {}
-
-        try {
-            const [appProps, pageProps] = await Promise.all(promises)
-            const appState = {
-                appProps,
-                pageProps
-            }
-
-            returnVal = {
-                error: undefined,
-                appState: {
-                    ...appState,
-                    ...wrappeeState?.appState
-                }
-            }
-        } catch (error) {
-            returnVal = {
-                error: logAndFormatError(error || new Error()),
-                appState: {}
-            }
-        }
-
-        console.log('LEGACY GET PROPS: ', returnVal)
-
-        return returnVal
+        return promises
     }
 
     WrappedComponent.displayName = `withLegacyGetProps(${wrappedComponentName})`

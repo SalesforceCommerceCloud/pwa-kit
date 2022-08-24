@@ -8,6 +8,9 @@
  * @module progressive-web-sdk/ssr/universal/utils
  */
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
+import {withLoadableResolver} from './hocs'
+import routes from './routes'
+import Throw404 from './components/throw-404'
 
 const onClient = typeof window !== 'undefined'
 
@@ -52,3 +55,43 @@ export const getProxyConfigs = () => {
     // Clone to avoid accidental mutation of important configuration variables.
     return configs.map((config) => ({...config}))
 }
+
+/**
+ * Wrap all the components found in the application's route config with the
+ * with-loadable-resolver HoC so the appropriate component will be loaded
+ * before rendering of the application.
+ *
+ * @private
+ */
+export const getRoutes = (locals) => {
+    let _routes = routes
+    if (typeof routes === 'function') {
+        _routes = routes()
+    }
+    const allRoutes = [..._routes, {path: '*', component: Throw404}]
+    return allRoutes.map(({component, ...rest}) => {
+        return {
+            component: component ? withLoadableResolver(component) : component,
+            ...rest
+        }
+    })
+}
+
+/**
+ * Utility function to enhance a component with multiple higher-order components,
+ * without having to nest.
+ * 
+ * const WrappedComponent = 
+ *       compose(
+ *          withHocA, 
+ *          withHocB,
+ *          withHocc,
+ *       )(Component)
+ * 
+ * @param  {...any} funcs 
+ * @returns 
+ * 
+ * @private
+ */
+ export const compose = (...funcs) =>
+    funcs.reduce((a, b) => (...args) => a(b(...args)), arg => arg)

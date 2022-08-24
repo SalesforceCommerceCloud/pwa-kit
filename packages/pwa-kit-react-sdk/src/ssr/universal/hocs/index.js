@@ -7,5 +7,6 @@
 import withReactQuery from './with-react-query'
 import withLegacyGetProps from './with-legacy-get-props'
 import withLoadableResolver from './with-loadable-resolver'
+import withBensData from './with-bens-data'
 
-export {withLegacyGetProps, withLoadableResolver, withReactQuery}
+export {withBensData, withLegacyGetProps, withLoadableResolver, withReactQuery}

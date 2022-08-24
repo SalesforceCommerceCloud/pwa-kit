@@ -12,7 +12,7 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
  * route-config. It provides an interface, via static methods on React components,
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
-const withLoadableResolver = (Component) => {
+const withLoadableResolver = (Component, ...rest) => {
     /* istanbul ignore next */
     const wrappedComponentName = Component.displayName || Component.name
 

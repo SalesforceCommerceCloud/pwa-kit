@@ -5,14 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import hoistNonReactStatic from 'hoist-non-react-statics'
-import ssrPrepass from 'react-ssr-prepass'
 import withLoadableResolver from '../with-loadable-resolver'
 import {compose} from '../../utils'
 
 const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee its functionality if used elsewhere.`
-const STATE_KEY = '__REACT_QUERY__'
+const STATE_KEY = '__BENS_DATA__'
 
 /**
  * This higher order component will configure your PWA-Kit application with React Query. Uses of
@@ -21,13 +19,13 @@ const STATE_KEY = '__REACT_QUERY__'
  * @param {*} Component 
  * @returns 
  */
-const withReactQuery = (Component) => {
+const withBensData = (Component) => {
     // Component = withLoadableResolver(Component)
     Component = 
         compose(
             withLoadableResolver
         )(Component)
-
+        
     const wrappedComponentName = Component.displayName || Component.name
 
     // NOTE: Is this a reliable way to determine the component type (e.g. will this work in prodution
@@ -36,26 +34,13 @@ const withReactQuery = (Component) => {
         console.warn(USAGE_WARNING)
     }
 
-    const queryClient = new QueryClient()
     const WrappedComponent = ({...passThroughProps}) => {
-        const state =
-            typeof window === 'undefined'
-                ? {}
-                : window?.__PRELOADED_STATE__?.[STATE_KEY] || {}
-
-        return (
-            <QueryClientProvider client={queryClient}>
-                <Hydrate state={state}>
-                    <Component {...passThroughProps} />
-                </Hydrate>
-            </QueryClientProvider>
-        )
+        return <Component {...passThroughProps} />
     }
 
     // Expose statics from the wrapped component on the HOC
     // NOTE: THIS MUST COME BEFORE WE DEFINE ANY NEW CLASS STATIC FUNCTIONS.
     hoistNonReactStatic(WrappedComponent, Component)
-
 
 
     /**
@@ -75,22 +60,7 @@ const withReactQuery = (Component) => {
      * @returns
      */
     WrappedComponent.getDataPromises = (args) => {
-        const {AppJSX} = args
-
-        const dataPromise = 
-            Promise.resolve()
-                .then(() => ssrPrepass(AppJSX))
-                .then(() => {
-                    const queryCache = queryClient.getQueryCache()
-                    const queries = queryCache.getAll()
-                    const promises = queries
-                        .filter(({options}) => options.enabled !== false)
-                        .map((query) => query.fetch())
-                    
-                    return Promise.all(promises)
-                })
-                .then(() => ({[STATE_KEY]: dehydrate(queryClient)}))
-        
+        const dataPromise = Promise.resolve({[STATE_KEY]: {greeting: 'hello jello'}})
         let promises = [dataPromise]
         
         if (Component.getDataPromises) {
@@ -100,9 +70,9 @@ const withReactQuery = (Component) => {
         return promises
     }
 
-    WrappedComponent.displayName = `withReactQuery(${wrappedComponentName})`
+    WrappedComponent.displayName = `withBensData(${wrappedComponentName})`
 
     return WrappedComponent
 }
 
-export default withReactQuery
+export default withBensData

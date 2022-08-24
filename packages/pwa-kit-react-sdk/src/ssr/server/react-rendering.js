@@ -17,7 +17,7 @@ import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
-import {getAssetUrl} from '../universal/utils'
+import {getAssetUrl, getRoutes} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
 import {ExpressContext} from '../universal/contexts'
 
@@ -34,8 +34,7 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
-import {withLegacyGetProps, withLoadableResolver} from '../universal/hocs'
-import routes from '../universal/routes'
+import {withLegacyGetProps} from '../universal/hocs'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -73,28 +72,6 @@ const logAndFormatError = (err) => {
         const safeMessage = 'Internal Server Error'
         return {message: safeMessage, status: 500, stack: err.stack}
     }
-}
-
-/**
- * Wrap all the components found in the application's route config with the
- * with-loadable-resolver HoC so the appropriate component will be loaded
- * before rendering of the application.
- *
- * @private
- */
-// NOTE: Move this somewhere shared for main and ssr.js
-const getRoutes = (locals) => {
-    let _routes = routes
-    if (typeof routes === 'function') {
-        _routes = routes()
-    }
-    const allRoutes = [..._routes, {path: '*', component: Throw404}]
-    return allRoutes.map(({component, ...rest}) => {
-        return {
-            component: component ? withLoadableResolver(component) : component,
-            ...rest
-        }
-    })
 }
 
 /**
@@ -171,17 +148,29 @@ export const render = async (req, res, next) => {
             routes
         })
 
-        ;({appState, error: appStateError} = await WrappedApp.fetchState({
-            App,
-            AppJSX,
-            location,
-            req,
-            res,
-            deviceType,
-            route,
-            routes,
-            match
-        }))
+        try {
+            // Get all the data fetching promises for the various API's attached to the App component.
+            // This is the react query, and getProps enhancements.
+            const allPromises = WrappedApp.getDataPromises({
+                App,
+                AppJSX,
+                location,
+                req,
+                res,
+                deviceType,
+                route,
+                routes,
+                match
+            })
+            const data = await Promise.all(allPromises)
+
+            appState = data.reduce((acc, appState = {}) => ({
+                ...acc,
+                ...appState
+            }), {})
+        } catch (e) {
+            appStateError = e
+        } 
     }
 
     // Support the AppConfig freeze API.

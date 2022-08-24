@@ -25,14 +25,14 @@ const Switch = (props) => {
         <UIDReset>
             <AppErrorBoundary error={error}>
                 {!error && (
-                    <App preloadedProps={appState.appProps}>
+                    <App preloadedProps={appState?.['__LEGACY_GET_PROPS__']?.appProps}>
                         <RouterSwitch>
                             {routes.map((route, i) => {
                                 const {component: Component, ...routeProps} = route
                                 return (
                                     <Route key={i} {...routeProps}>
                                         <UIDFork>
-                                            <Component preloadedProps={appState.pageProps} />
+                                            <Component preloadedProps={appState?.['__LEGACY_GET_PROPS__']?.pageProps} />
                                         </UIDFork>
                                     </Route>
                                 )

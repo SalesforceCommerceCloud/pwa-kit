@@ -13,23 +13,8 @@ import App from '../universal/components/_app'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {loadableReady} from '@loadable/component'
-import {withLegacyGetProps, withLoadableResolver} from '../universal/hocs'
-import routes from '../universal/routes'
-import Throw404 from '../universal/components/throw-404'
-
-const getRoutes = (locals) => {
-    let _routes = routes
-    if (typeof routes === 'function') {
-        _routes = routes()
-    }
-    const allRoutes = [..._routes, {path: '*', component: Throw404}]
-    return allRoutes.map(({component, ...rest}) => {
-        return {
-            component: component ? withLoadableResolver(component) : component,
-            ...rest
-        }
-    })
-}
+import {withLegacyGetProps} from '../universal/hocs'
+import {getRoutes} from '../universal/utils'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
