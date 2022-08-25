@@ -1,5 +1,9 @@
-## v2.2.0-alpha.0 (Aug 25, 2022)
+## v2.2.0 (Aug 25, 2022)
+## v2.1.0 (Jul 05, 2022)
+
 ## v2.0.0 (May 16, 2022)
+- Drop node 12 support for [#589](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/589)
+- Improve test coverage [#550](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/550)
 - Make the createApp API idiomatic for Express, fix service-worker loading. [#536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/536)
 - Add environment specific configuration support via `getConfig`. [#447](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
 - Remove legacy remote proxy, which allowed remote environments to use proxy configs in package.json [#425](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/425)
