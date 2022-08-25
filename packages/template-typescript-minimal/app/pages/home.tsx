@@ -6,7 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 
-// this works! page-home.css is correctly generated and fetched
+// this works! page-home.css is correctly generated and fetched by Loadable
 // but only when this is not imported in the main bundle
 // otherwise this won't work either. weird!
 import '@fontsource/manrope/800.css'
