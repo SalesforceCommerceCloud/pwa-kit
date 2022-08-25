@@ -6,6 +6,13 @@
  */
 import React, {useEffect, useState} from 'react'
 
+// this works! page-home.css is correctly generated and fetched
+// but only when this is not imported in the main bundle
+// otherwise this won't work either. weird!
+import '@fontsource/manrope/800.css'
+import '@fontsource/manrope/700.css'
+import '@fontsource/manrope/400.css'
+
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
 
@@ -95,11 +102,8 @@ const Home = ({value}: Props) => {
             <style dangerouslySetInnerHTML={{__html: style}} />
             <div className="loading-screen">
                 <div className="panel title">
-                    <h1>
-                        Typescript
-                        <br />
-                        Support!
-                    </h1>
+                    <h1 style={{fontFamily: "'Manrope'"}}>Manrope</h1>
+                    <h1 style={{fontFamily: 'sans-serif'}}>sans serif</h1>
                 </div>
                 <div className="panel">
                     <div className="divider"></div>
