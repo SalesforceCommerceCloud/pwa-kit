@@ -24,8 +24,6 @@ const withLoadableResolver = (Component, ...rest) => {
         return <Component {...passThroughProps} />
     }
 
-    hoistNonReactStatic(WrappedComponent, Component)
-
     /**
      * Get the underlying component this HoC wraps. This handles loading of
      * `@loadable/component` components.
@@ -48,12 +46,18 @@ const withLoadableResolver = (Component, ...rest) => {
      * @return {Promise<String>}
      */
     WrappedComponent.getTemplateName = async () => {
-        return Component.getComponent
-            ? Component.getComponent().then((c) =>
+        return WrappedComponent.getComponent
+            ? WrappedComponent.getComponent().then((c) =>
                   c.getTemplateName ? c.getTemplateName() : Promise.resolve(wrappedComponentName)
               )
-            : Promise.resolve(Component)
+            : Promise.resolve(Component) // BUG?
     }
+
+    const excludes = {
+        getTemplateName: true
+    }
+
+    hoistNonReactStatic(WrappedComponent, Component, excludes)
 
     WrappedComponent.displayName = `withLoadableResolver(${wrappedComponentName})`
 

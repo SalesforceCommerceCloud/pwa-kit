@@ -10,7 +10,7 @@ import {withRouter} from 'react-router-dom'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import AppConfig from '../../components/_app-config'
 import {pages as pageEvents} from '../../events'
-import {withErrorHandling} from '../../components'
+import {withErrorHandling, withLoadableResolver} from '../../components'
 import {compose} from '../../utils'
 
 // const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee its functionality if used elsewhere.`
@@ -35,12 +35,14 @@ const now = () => {
  * route-config. It provides an interface, via static methods on React components,
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
-export const withGetProps = (Wrapped, isPage, locals) => {
+export const withLegacyGetProps = (Wrapped, isPage, locals) => {
     const extraArgs = AppConfig.extraGetPropsArgs(locals)
+
+    // NOTE SURE IF THIS IS THE RIGHT PLACE TO BE DOING THIS?
+    Wrapped = withLoadableResolver(Wrapped)
 
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
-
     class RouteComponent extends React.Component {
         constructor(props, context) {
             super(props, context)
@@ -67,7 +69,7 @@ export const withGetProps = (Wrapped, isPage, locals) => {
             routes = Wrapped.enhanceRoutes ? Wrapped.enhanceRoutes(routes) : routes
 
             return routes.map(({component, ...rest}) => ({
-                component: component ? withGetProps(component, isPage, locals) : component,
+                component: component ? withLegacyGetProps(component, isPage, locals) : component,
                 ...rest
             }))
         }
@@ -110,13 +112,10 @@ export const withGetProps = (Wrapped, isPage, locals) => {
                         }
                     })
             
-            let promises = [dataPromise]
-            
-            if (Wrapped.getDataPromises) {
-                promises = [...promises, ...Wrapped.getDataPromises(renderContext)]
-            }
-    
-            return promises
+            return [
+                dataPromise, 
+                ...(Wrapped.getDataPromises ? Wrapped.getDataPromises(renderContext) : [])
+            ]
         }
 
         /**
@@ -398,7 +397,6 @@ export const withGetProps = (Wrapped, isPage, locals) => {
     const excludes = {
         shouldGetProps: true,
         getProps: true,
-        getTemplateName: true,
         enhanceRoutes: true,
         getDataPromises: true
     }
@@ -411,4 +409,4 @@ export const withGetProps = (Wrapped, isPage, locals) => {
     )(RouteComponent)
 }
 
-export default withGetProps
+export default withLegacyGetProps

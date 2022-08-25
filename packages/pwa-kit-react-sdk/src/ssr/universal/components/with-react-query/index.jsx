@@ -91,13 +91,10 @@ const withReactQuery = (Component) => {
                 })
                 .then(() => ({[STATE_KEY]: dehydrate(queryClient)}))
         
-        let promises = [dataPromise]
-        
-        if (Component.getDataPromises) {
-            promises = [...promises, ...Component.getDataPromises(renderContext)]
-        }
-
-        return promises
+        return [
+            dataPromise, 
+            ...(Component.getDataPromises ? Component.getDataPromises(renderContext) : [])
+        ]
     }
 
     WrappedComponent.displayName = `withReactQuery(${wrappedComponentName})`
