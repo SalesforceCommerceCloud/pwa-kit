@@ -10,7 +10,7 @@ import {withRouter} from 'react-router-dom'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import AppConfig from '../../components/_app-config'
 import {pages as pageEvents} from '../../events'
-import {withErrorHandling} from '../../hocs'
+import {withErrorHandling} from '../../components'
 import {compose} from '../../utils'
 
 // const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee its functionality if used elsewhere.`
@@ -113,7 +113,7 @@ export const withGetProps = (Wrapped, isPage, locals) => {
             let promises = [dataPromise]
             
             if (Wrapped.getDataPromises) {
-                promises = [...promises, ...Wrapped.getDataPromises(args)]
+                promises = [...promises, ...Wrapped.getDataPromises(renderContext)]
             }
     
             return promises

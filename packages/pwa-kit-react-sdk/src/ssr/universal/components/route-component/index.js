@@ -11,7 +11,7 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
 import {AppErrorContext} from '../../components/app-error-boundary'
 import AppConfig from '../../components/_app-config'
 import {pages as pageEvents} from '../../events'
-import {withErrorHandling} from '../../hocs'
+import {withErrorHandling} from '../../components'
 
 const noop = () => undefined
 

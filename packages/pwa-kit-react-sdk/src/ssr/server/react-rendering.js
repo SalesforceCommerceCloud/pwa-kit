@@ -34,7 +34,7 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
-import {withLegacyGetProps} from '../universal/hocs'
+import {withLegacyGetProps} from '../universal/components'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')

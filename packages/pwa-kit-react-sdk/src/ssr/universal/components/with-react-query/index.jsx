@@ -10,7 +10,7 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
 import withLoadableResolver from '../with-loadable-resolver'
 import {compose} from '../../utils'
-import {withErrorHandling} from '../../hocs'
+import {withErrorHandling} from '../../components'
 
 const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee its functionality if used elsewhere.`
 const STATE_KEY = '__REACT_QUERY__'
@@ -94,7 +94,7 @@ const withReactQuery = (Component) => {
         let promises = [dataPromise]
         
         if (Component.getDataPromises) {
-            promises = [...promises, ...Component.getDataPromises(args)]
+            promises = [...promises, ...Component.getDataPromises(renderContext)]
         }
 
         return promises

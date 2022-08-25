@@ -13,7 +13,7 @@ import App from '../universal/components/_app'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {loadableReady} from '@loadable/component'
-import {withLegacyGetProps} from '../universal/hocs'
+import {withLegacyGetProps} from '../universal/components'
 import {getRoutes} from '../universal/utils'
 
 /* istanbul ignore next */

@@ -8,7 +8,7 @@
  * @module progressive-web-sdk/ssr/universal/utils
  */
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
-import {withLoadableResolver} from './hocs'
+import {withLoadableResolver} from './components'
 import routes from './routes'
 import Throw404 from './components/throw-404'
 
