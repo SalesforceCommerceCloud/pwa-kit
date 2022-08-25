@@ -253,6 +253,7 @@ const renderApp = (args) => {
     const scriptProps = ssrOnly ? {type: 'application/json'} : {}
 
     let bundles = []
+    let styles = []
     /* istanbul ignore next */
     if (extractor) {
         bundles = extractor.getScriptElements().map((el) =>
@@ -261,6 +262,9 @@ const renderApp = (args) => {
                 ...scriptProps
             })
         )
+        styles = extractor.getStyleElements()
+        console.log('styles!!!')
+        console.log(styles)
     }
 
     const helmet = Helmet.renderStatic()
@@ -310,7 +314,7 @@ const renderApp = (args) => {
 
     const html = ReactDOMServer.renderToString(
         <Document
-            head={[...helmetHeadTags]}
+            head={[...helmetHeadTags, ...styles]}
             html={appHtml}
             afterBodyStart={svgs}
             beforeBodyEnd={scripts}

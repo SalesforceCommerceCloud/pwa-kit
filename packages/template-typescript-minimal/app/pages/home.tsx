@@ -9,9 +9,9 @@ import React, {useEffect, useState} from 'react'
 // this works! page-home.css is correctly generated and fetched by Loadable
 // but only when this is not imported in the main bundle
 // otherwise this won't work either. weird!
-import '@fontsource/manrope/800.css'
-import '@fontsource/manrope/700.css'
-import '@fontsource/manrope/400.css'
+// import '@fontsource/manrope/800.css'
+// import '@fontsource/manrope/700.css'
+// import '@fontsource/manrope/400.css'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
