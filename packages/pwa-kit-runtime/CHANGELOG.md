@@ -1,3 +1,4 @@
+## v2.2.0-alpha.0 (Aug 25, 2022)
 ## v2.0.0 (May 16, 2022)
 - Make the createApp API idiomatic for Express, fix service-worker loading. [#536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/536)
 - Add environment specific configuration support via `getConfig`. [#447](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)

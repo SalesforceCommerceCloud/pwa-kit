@@ -1,3 +1,4 @@
+## v2.2.0-alpha.0 (Aug 25, 2022)
 ## v2.1.0 (Jul 05, 2022)
 
 -   Replace `Mobify` references/links with proper PWA Kit values. [#619](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/619)
