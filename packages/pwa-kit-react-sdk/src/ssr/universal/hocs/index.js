@@ -7,6 +7,11 @@
 import withReactQuery from './with-react-query'
 import withLegacyGetProps from './with-legacy-get-props'
 import withLoadableResolver from './with-loadable-resolver'
-import withBensData from './with-bens-data'
+import withErrorHandling from './with-error-handling'
 
-export {withBensData, withLegacyGetProps, withLoadableResolver, withReactQuery}
+export {
+    withErrorHandling, 
+    withLegacyGetProps, 
+    withLoadableResolver, 
+    withReactQuery
+}

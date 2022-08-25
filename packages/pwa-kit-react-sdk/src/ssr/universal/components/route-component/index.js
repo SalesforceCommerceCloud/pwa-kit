@@ -11,6 +11,7 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
 import {AppErrorContext} from '../../components/app-error-boundary'
 import AppConfig from '../../components/_app-config'
 import {pages as pageEvents} from '../../events'
+import {withErrorHandling} from '../../hocs'
 
 const noop = () => undefined
 
@@ -24,26 +25,6 @@ const now = () => {
     return hasPerformanceAPI
         ? window.performance.timing.navigationStart + window.performance.now()
         : Date.now()
-}
-
-/**
- * @private
- */
-const withErrorHandling = (Wrapped) => {
-    /* istanbul ignore next */
-    const wrappedComponentName = Wrapped.displayName || Wrapped.name
-
-    const WithErrorHandling = (props) => (
-        <AppErrorContext.Consumer>
-            {(ctx) => <Wrapped {...props} {...ctx} />}
-        </AppErrorContext.Consumer>
-    )
-
-    // Expose statics from the wrapped component on the HOC
-    hoistNonReactStatic(WithErrorHandling, Wrapped)
-
-    WithErrorHandling.displayName = `withErrorHandling(${wrappedComponentName})`
-    return WithErrorHandling
 }
 
 /**

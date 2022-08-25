@@ -10,6 +10,7 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
 import withLoadableResolver from '../with-loadable-resolver'
 import {compose} from '../../utils'
+import {withErrorHandling} from '../../hocs'
 
 const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee its functionality if used elsewhere.`
 const STATE_KEY = '__REACT_QUERY__'
@@ -22,10 +23,10 @@ const STATE_KEY = '__REACT_QUERY__'
  * @returns 
  */
 const withReactQuery = (Component) => {
-    // Component = withLoadableResolver(Component)
     Component = 
         compose(
-            withLoadableResolver
+            withLoadableResolver,
+            withErrorHandling
         )(Component)
 
     const wrappedComponentName = Component.displayName || Component.name
@@ -56,8 +57,6 @@ const withReactQuery = (Component) => {
     // NOTE: THIS MUST COME BEFORE WE DEFINE ANY NEW CLASS STATIC FUNCTIONS.
     hoistNonReactStatic(WrappedComponent, Component)
 
-
-
     /**
      *
      * @param {*} routes
@@ -70,16 +69,17 @@ const withReactQuery = (Component) => {
     }
 
     /**
-     *
-     * @param {*} args
+     *  
+     * 
+     * @param {*} renderContext
      * @returns
      */
-    WrappedComponent.getDataPromises = (args) => {
-        const {AppJSX} = args
+    WrappedComponent.getDataPromises = (renderContext) => {
+        const {AppJSX} = renderContext
 
         const dataPromise = 
             Promise.resolve()
-                .then(() => ssrPrepass(AppJSX))
+                .then(() => ssrPrepass(AppJSX)) // NOTE: ssrPrepass will be included in the vendor bundle. BAD
                 .then(() => {
                     const queryCache = queryClient.getQueryCache()
                     const queries = queryCache.getAll()
