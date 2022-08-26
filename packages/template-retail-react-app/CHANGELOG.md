@@ -1,3 +1,4 @@
+## v2.3.0-dev (Aug 25, 2022)
 ## v2.2.0 (Aug 25, 2022)
 - Update zzrf-001 url [#694](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/694)
 - Optimize Server-side performance [#667](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/667)
