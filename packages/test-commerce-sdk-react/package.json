@@ -1,6 +1,6 @@
 {
   "name": "test-commerce-sdk-react",
-  "version": "2.2.0",
+  "version": "2.3.0-dev",
   "private": true,
   "engines": {
     "node": "^14.0.0",
@@ -10,10 +10,10 @@
     "@loadable/component": "^5.15.0",
     "@tanstack/react-query": "^4.0.10",
     "@types/react": "^17.0.2",
-    "commerce-sdk-react": "^2.2.0",
-    "pwa-kit-dev": "^2.2.0",
-    "pwa-kit-react-sdk": "^2.2.0",
-    "pwa-kit-runtime": "^2.2.0",
+    "commerce-sdk-react": "^2.3.0-dev",
+    "pwa-kit-dev": "^2.3.0-dev",
+    "pwa-kit-react-sdk": "^2.3.0-dev",
+    "pwa-kit-runtime": "^2.3.0-dev",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
