@@ -34,7 +34,7 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
-import {withLegacyGetProps} from '../universal/components'
+import {withReactQuery} from '../universal/components'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -96,7 +96,7 @@ export const render = async (req, res, next) => {
     // existing api applied to the application? I need to get clarification on this.
     // NOTE: We shouldn't have to wrap the App with withLoadableResolver since it's required to be in the
     // bundle, we can probably clean up the logive for getProps somehow.
-    const WrappedApp = withLegacyGetProps(App)
+    const WrappedApp = withReactQuery(App)
     const deviceType = detectDeviceType(req)
     let routes = getRoutes(res.locals)
 

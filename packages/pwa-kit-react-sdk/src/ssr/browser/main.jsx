@@ -13,7 +13,7 @@ import App from '../universal/components/_app'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {loadableReady} from '@loadable/component'
-import {withLegacyGetProps} from '../universal/components'
+import {withReactQuery} from '../universal/components'
 import {getRoutes} from '../universal/utils'
 
 /* istanbul ignore next */
@@ -67,7 +67,7 @@ export const start = () => {
     window.__HYDRATING__ = true
 
     // const WrappedApp = routeComponent(App, false, locals)
-    const WrappedApp = withLegacyGetProps(App)
+    const WrappedApp = withReactQuery(App)
 
     // NOTE: It's kinda weird how frozn state is loaded in the JSX here. Would be nice if it was
     // "added" via or in, the hoc.
