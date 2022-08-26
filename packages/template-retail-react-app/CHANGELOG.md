@@ -1,24 +1,22 @@
-### Bug Fixes
+## v2.3.0-dev (Aug 25, 2022)
+## v2.2.0 (Aug 25, 2022)
+- Update zzrf-001 url [#694](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/694)
+- Optimize Server-side performance [#667](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/667)
+- Remove references to session bridging [#684](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/684)
 
-- Various instances of hard-coded text have been replaced with translatable messages (see [Translations](#translations)).
-- Recommended Products tiles now show localized product names, rather than using the default locale.
-
-### Translations
-
-- Updated text for many fields
-- Added `checkout.message.generic_error`
-- Added `wishlist_primary_action.button.add_to_cart`
-- Added `wishlist_primary_action.button.select_options`
-- Added `global.link.added_to_wishlist.view_wishlist`
-- Added `credit_card_fields.tool_tip.security_code.american_express`
-- Changed `credit_card_fields.tool_tip.security_code` from a template that accepts values to a static string
-- Changed `home.description.contact_our_staff` to `home.description.here_to_help`
-- Changed `home.description.get_you_to_the_right_place` to `home.description.here_to_help_line_2`
-- Combined `product_list.info.removed_from_wishlist` and `recommended_products.info.removed_from_wishlist` into `global.info.removed_from_wishlist`
-- Combined `cart.info.added_to_wishlist`, `product_detail.info.added_to_wishlist`, `product_list.info.added_to_wishlist`, and `recommended_products.info.added_to_wishlist` into `global.info.added_to_wishlist`
+## v2.1.0 (Jul 05, 2022)
+- Update translations [#643](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/643)
+- Update translations [#653](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/653)
+- Add bundlesize test back into CI [#652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/652)
+- Fix UI bug on notifications badge [#620](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/620)
 
 ## v2.0.0 (May 16, 2022)
 
+- Update translation docs [#570](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/570)
+- Fixed loading correct amount of skeletons [#576] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/576)
+- Remove manifest path [#582](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/582)
+- Fix Verbose ShellJS Command [#588](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/588)
+- Drop node 12 support for [#589](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/589)
 - Multi-site, Fix the case when no site aliases is set [#551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/551)
 - Fix invalid refresh token [#528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/528)
 - Add valid token check before using refresh token on login [#533](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/533)
