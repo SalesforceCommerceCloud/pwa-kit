@@ -506,8 +506,7 @@ describe('The Node SSR Environment', () => {
             assertions: (res) => {
                 expect(res.statusCode).toBe(404)
             }
-        }
-        ,
+        },
         {
             description: `404 when getProps method throws a 404`,
             req: {url: '/404-in-get-props-error/'},
@@ -659,39 +658,35 @@ describe('The Node SSR Environment', () => {
                     shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error'
                 )
             }
+        },
+        {
+            description: `Works if the user resolves an Object with useQuery`,
+            req: {url: '/use-query-resolves-object/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                expect(html).toEqual(expect.stringContaining('<div>prop-value</div>'))
+            }
+        },
+        {
+            description: `Disabled useQuery queries aren't run on the server`,
+            req: {url: '/disabled-use-query-isnt-resolved/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                expect(html).toEqual(expect.stringContaining('<div>loading</div>'))
+            }
         }
-        // ,
-        // {
-        //     description: `Works if the user resolves an Object with useQuery`,
-        //     req: {url: '/use-query-resolves-object/'},
-        //     assertions: (res, config) => {
-        //         expect(res.statusCode).toBe(200)
-        //         const html = res.text
-        //         const expectedString = config.ssrParameters.ssrPrepassEnabled
-        //             ? '<div>prop-value</div>'
-        //             : '<div>loading</div>'
-        //         expect(html).toEqual(expect.stringContaining(expectedString))
-        //     }
-        // },
-        // {
-        //     description: `Disabled useQuery queries aren't run on the server`,
-        //     req: {url: '/disabled-use-query-isnt-resolved/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(200)
-        //         const html = res.text
-        //         const expectedString = '<div>loading</div>'
-        //         expect(html).toEqual(expect.stringContaining(expectedString))
-        //     }
-        // }
     ]
 
     const isRemoteValues = [true, false]
-    // const isRemoteValues = [false]
 
     isRemoteValues.forEach((isRemoteValue) => {
         // Run test cases
         cases.forEach(({description, req, assertions, mocks}) => {
-            test(`renders PWA pages properly when ${isRemoteValue ? 'remote' : 'local'} (${description})`, () => {
+            test(`renders PWA pages properly when ${
+                isRemoteValue ? 'remote' : 'local'
+            } (${description})`, () => {
                 // Mock `isRemote` per test execution.
                 isRemote.mockReturnValue(isRemoteValue)
                 process.env.NODE_ENV = isRemoteValue ? 'production' : 'development'

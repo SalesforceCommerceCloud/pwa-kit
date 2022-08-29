@@ -60,11 +60,11 @@ export const withLegacyGetProps = (Wrapped, isPage, locals) => {
 
         /**
          * Enhance route components with the `withLegacyGetProps` higher order component.
-         * 
+         *
          * @param {Object[]} routes
          * @param {Boolean} isPage
          * @param {Object} locals
-         * 
+         *
          * @return {Object[]}
          */
         static enhanceRoutes(routes = [], isPage, locals) {

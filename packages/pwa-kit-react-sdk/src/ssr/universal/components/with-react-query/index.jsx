@@ -53,11 +53,11 @@ export const withReactQuery = (Component) => {
 
     /**
      * Returns an array of primises. The first is a promise that resolved to the query data, the subsequest
-     * promises are those primises resolving in query data from child components that implement the 
+     * promises are those primises resolving in query data from child components that implement the
      * `getDataPromises` function.
      *
      * @param {Object} renderContext
-     * 
+     *
      * @return {Promise<Object[]>}
      */
     WrappedComponent.getDataPromises = (renderContext) => {
