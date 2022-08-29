@@ -391,175 +391,175 @@ describe('The Node SSR Environment', () => {
     const dataFromHTML = (doc) => JSON.parse(doc.querySelector('#mobify-data').innerHTML)
 
     const cases = [
-        // {
-        //     description: `rendering PWA's for desktop`,
-        //     req: {url: '/pwa/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(200)
-        //         const html = res.text
-        //         console.error(html)
-        //         const doc = parse(html)
-        //         const include = ['<div>This is a PWA</div>']
-        //         const data = dataFromHTML(doc)
-        //         const dataScript = doc.querySelectorAll('script[id=mobify-data]')[0]
-        //         expect(dataScript.innerHTML.split(/\r\n|\r|\n/).length).toBe(1)
-        //         expect(data.__DEVICE_TYPE__).toEqual('DESKTOP')
-        //         include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
-        //         expect(scriptsAreSafe(doc)).toBe(true)
-        //     }
-        // },
-        // {
-        //     description: `rendering PWA's for tablet`,
-        //     req: {
-        //         url: '/pwa/',
-        //         headers: {
-        //             'User-Agent': tablet
-        //         }
-        //     },
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(200)
-        //         const html = res.text
-        //         const doc = parse(html)
-        //         const data = dataFromHTML(doc)
-        //         expect(data.__DEVICE_TYPE__).toEqual('TABLET')
-        //         const include = ['<div>This is a PWA</div>']
-        //         include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
-        //         expect(scriptsAreSafe(doc)).toBe(true)
-        //     }
-        // },
-        // {
-        //     description: `rendering PWA's for mobile`,
-        //     req: {
-        //         url: '/pwa/',
-        //         headers: {
-        //             'User-Agent': mobile
-        //         }
-        //     },
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(200)
-        //         const html = res.text
-        //         const doc = parse(html)
-        //         const data = dataFromHTML(doc)
-        //         expect(data.__DEVICE_TYPE__).toEqual('PHONE')
-        //         const include = ['<div>This is a PWA</div>']
-        //         include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
-        //         expect(scriptsAreSafe(doc)).toBe(true)
-        //     }
-        // },
-        // {
-        //     description: `rendering PWA's in "mobify-server-only" mode should not execute scripts on the client`,
-        //     req: {url: '/pwa/', query: {mobify_server_only: '1'}},
-        //     assertions: (res) => {
-        //         const html = res.text
-        //         const doc = parse(html)
-        //         const include = ['<div>This is a PWA</div>']
-        //         include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
-        //         doc.querySelectorAll('script').forEach((script) => {
-        //             // application/json prevents execution!
-        //             expect(script.getAttribute('type')).toBe('application/json')
-        //         })
-        //     }
-        // },
-        // {
-        //     description: `rendering PWA's in "__server-only" mode should not execute scripts on the client`,
-        //     req: {url: '/pwa/', query: {__server_only: '1'}},
-        //     assertions: (res) => {
-        //         const html = res.text
-        //         const doc = parse(html)
-        //         const include = ['<div>This is a PWA</div>']
-        //         include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
-        //         doc.querySelectorAll('script').forEach((script) => {
-        //             // application/json prevents execution!
-        //             expect(script.getAttribute('type')).toBe('application/json')
-        //         })
-        //     }
-        // },
-        // {
-        //     description: `rendering PWA's with legacy "mobify_pretty" mode should print stylized global state`,
-        //     req: {url: '/pwa/', query: {mobify_pretty: '1'}},
-        //     assertions: (res) => {
-        //         const html = res.text
-        //         const doc = parse(html)
-        //         const include = ['<div>This is a PWA</div>']
-        //         include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
-        //         const script = doc.querySelectorAll('script[id=mobify-data]')[0]
+        {
+            description: `rendering PWA's for desktop`,
+            req: {url: '/pwa/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                console.error(html)
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                const data = dataFromHTML(doc)
+                const dataScript = doc.querySelectorAll('script[id=mobify-data]')[0]
+                expect(dataScript.innerHTML.split(/\r\n|\r|\n/).length).toBe(1)
+                expect(data.__DEVICE_TYPE__).toEqual('DESKTOP')
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                expect(scriptsAreSafe(doc)).toBe(true)
+            }
+        },
+        {
+            description: `rendering PWA's for tablet`,
+            req: {
+                url: '/pwa/',
+                headers: {
+                    'User-Agent': tablet
+                }
+            },
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                const doc = parse(html)
+                const data = dataFromHTML(doc)
+                expect(data.__DEVICE_TYPE__).toEqual('TABLET')
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                expect(scriptsAreSafe(doc)).toBe(true)
+            }
+        },
+        {
+            description: `rendering PWA's for mobile`,
+            req: {
+                url: '/pwa/',
+                headers: {
+                    'User-Agent': mobile
+                }
+            },
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                const doc = parse(html)
+                const data = dataFromHTML(doc)
+                expect(data.__DEVICE_TYPE__).toEqual('PHONE')
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                expect(scriptsAreSafe(doc)).toBe(true)
+            }
+        },
+        {
+            description: `rendering PWA's in "mobify-server-only" mode should not execute scripts on the client`,
+            req: {url: '/pwa/', query: {mobify_server_only: '1'}},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                doc.querySelectorAll('script').forEach((script) => {
+                    // application/json prevents execution!
+                    expect(script.getAttribute('type')).toBe('application/json')
+                })
+            }
+        },
+        {
+            description: `rendering PWA's in "__server-only" mode should not execute scripts on the client`,
+            req: {url: '/pwa/', query: {__server_only: '1'}},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                doc.querySelectorAll('script').forEach((script) => {
+                    // application/json prevents execution!
+                    expect(script.getAttribute('type')).toBe('application/json')
+                })
+            }
+        },
+        {
+            description: `rendering PWA's with legacy "mobify_pretty" mode should print stylized global state`,
+            req: {url: '/pwa/', query: {mobify_pretty: '1'}},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                const script = doc.querySelectorAll('script[id=mobify-data]')[0]
 
-        //         expect(script.innerHTML.split(/\r\n|\r|\n/).length).toBeGreaterThan(1)
-        //     }
-        // },
-        // {
-        //     description: `rendering PWA's with  "__pretty_print" mode should print stylized global state`,
-        //     req: {url: '/pwa/', query: {__pretty_print: '1'}},
-        //     assertions: (res) => {
-        //         const html = res.text
-        //         const doc = parse(html)
-        //         const include = ['<div>This is a PWA</div>']
-        //         include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
-        //         const script = doc.querySelectorAll('script[id=mobify-data]')[0]
+                expect(script.innerHTML.split(/\r\n|\r|\n/).length).toBeGreaterThan(1)
+            }
+        },
+        {
+            description: `rendering PWA's with  "__pretty_print" mode should print stylized global state`,
+            req: {url: '/pwa/', query: {__pretty_print: '1'}},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                const script = doc.querySelectorAll('script[id=mobify-data]')[0]
 
-        //         expect(script.innerHTML.split(/\r\n|\r|\n/).length).toBeGreaterThan(1)
-        //     }
-        // },
-        // {
-        //     description: `404 when no route matches`,
-        //     req: {url: '/this-should-404/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(404)
-        //     }
-        // }
-        // ,
-        // {
-        //     description: `404 when getProps method throws a 404`,
-        //     req: {url: '/404-in-get-props-error/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(404)
-        //     }
-        // },
-        // {
-        //     description: `supports react-routers redirect mechanism`,
-        //     req: {url: '/redirect/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(302)
-        //     }
-        // },
-        // {
-        //     description: `500 on unknown errors in getProps`,
-        //     req: {url: '/unknown-error/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(500)
-        //     }
-        // },
-        // {
-        //     description: `500 when string (not Error) thrown in getProps`,
-        //     req: {url: '/throw-string/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(500)
-        //     }
-        // },
-        // {
-        //     description: `5XX on known HTTP errors in getProps`,
-        //     req: {url: '/known-error/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(503)
-        //     }
-        // },
-        // {
-        //     description: `Respects HTTP status codes set in init() methods`,
-        //     req: {url: '/init-sets-status/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(418)
-        //     }
-        // },
-        // {
-        //     description: `Works if the user returns an Object of props, instead of a Promise`,
-        //     req: {url: '/get-props-returns-object/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(200)
-        //         const html = res.text
-        //         const include = ['<div>prop-value</div>']
-        //         include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
-        //     }
-        // },
+                expect(script.innerHTML.split(/\r\n|\r|\n/).length).toBeGreaterThan(1)
+            }
+        },
+        {
+            description: `404 when no route matches`,
+            req: {url: '/this-should-404/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(404)
+            }
+        }
+        ,
+        {
+            description: `404 when getProps method throws a 404`,
+            req: {url: '/404-in-get-props-error/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(404)
+            }
+        },
+        {
+            description: `supports react-routers redirect mechanism`,
+            req: {url: '/redirect/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(302)
+            }
+        },
+        {
+            description: `500 on unknown errors in getProps`,
+            req: {url: '/unknown-error/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(500)
+            }
+        },
+        {
+            description: `500 when string (not Error) thrown in getProps`,
+            req: {url: '/throw-string/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(500)
+            }
+        },
+        {
+            description: `5XX on known HTTP errors in getProps`,
+            req: {url: '/known-error/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(503)
+            }
+        },
+        {
+            description: `Respects HTTP status codes set in init() methods`,
+            req: {url: '/init-sets-status/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(418)
+            }
+        },
+        {
+            description: `Works if the user returns an Object of props, instead of a Promise`,
+            req: {url: '/get-props-returns-object/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                const include = ['<div>prop-value</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+            }
+        },
         {
             description: `Renders the error page if getProps rejects with an empty string`,
             req: {url: '/get-props-rejects-with-empty-string/'},
@@ -567,100 +567,99 @@ describe('The Node SSR Environment', () => {
                 const html = res.text
                 const doc = parse(html)
                 const data = dataFromHTML(doc)
-                console.log('DATA: ', data)
+
                 expect(data.__ERROR__.message).toEqual('Internal Server Error')
                 expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
 
                 expect(data.__ERROR__.status).toEqual(500)
             }
+        },
+        {
+            description: `Renders the error page instead if there is an error during component rendering`,
+            req: {url: '/render-throws-error/'},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const data = dataFromHTML(doc)
+
+                expect(data.__ERROR__.message).toEqual('Internal Server Error')
+                expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
+                expect(data.__ERROR__.status).toEqual(500)
+                expect(res.statusCode).toBe(500)
+            }
+        },
+        {
+            description: `Renders react-helmet tags`,
+            req: {url: '/render-helmet/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                const doc = parse(html)
+                const head = doc.querySelector('head')
+                expect(html.includes('lang="helmet-html-attribute"')).toBe(true)
+                expect(doc.querySelector('body').getAttribute('class')).toEqual(
+                    'helmet-body-attribute'
+                )
+                expect(head.querySelector(`title`).innerHTML).toEqual('Helmet title')
+                expect(head.querySelector('base').getAttribute('target')).toEqual('_blank')
+                expect(
+                    doc.querySelector('style').innerHTML.includes('background-color: blue;')
+                ).toBe(true)
+                expect(
+                    doc
+                        .querySelector('noscript')
+                        .innerHTML.includes(
+                            '<link rel="stylesheet" type="text/css" href="foo.css" />'
+                        )
+                ).toBe(true)
+                expect(doc.querySelector('noscript').innerHTML).toEqual(
+                    expect.stringContaining(
+                        '<link rel="stylesheet" type="text/css" href="foo.css" />'
+                    )
+                )
+                expect(head.querySelector('meta[name="helmet-meta-1"]')).not.toBe(null)
+                expect(head.querySelector('meta[property="helmet-meta-2"]')).not.toBe(null)
+                expect(head.querySelector('link[rel="helmet-link-1"]')).not.toBe(null)
+                expect(head.querySelector('link[rel="helmet-link-2"]')).not.toBe(null)
+                expect(head.querySelector('script[src="http://include.com/pathtojs.js"]')).not.toBe(
+                    null
+                )
+                expect(
+                    head
+                        .querySelector('script[type="application/ld+json"]')
+                        .innerHTML.includes(`"@context": "http://schema.org"`)
+                ).toBe(true)
+            }
+        },
+        {
+            description: `Frozen state is escaped preventing injection attacks`,
+            req: {url: '/xss/'},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const scriptContent = doc.querySelector('#mobify-data').innerHTML
+
+                expect(scriptContent).not.toContain('<script>')
+            }
+        },
+        {
+            description: `AppConfig errors are caught`,
+            req: {url: '/pwa/'},
+            mocks: () => {
+                jest.spyOn(AppConfig.prototype, 'render').mockImplementation(() => {
+                    throw new Error()
+                })
+            },
+            assertions: (res) => {
+                expect(res.statusCode).toBe(500)
+                const html = res.text
+
+                const shouldIncludeErrorStack = !isRemote()
+                expect(html).toContain(
+                    shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error'
+                )
+            }
         }
-        // ,
-        // {
-        //     description: `Renders the error page instead if there is an error during component rendering`,
-        //     req: {url: '/render-throws-error/'},
-        //     assertions: (res) => {
-        //         const html = res.text
-        //         const doc = parse(html)
-        //         const data = dataFromHTML(doc)
-
-        //         expect(data.__ERROR__.message).toEqual('Internal Server Error')
-        //         expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
-        //         expect(data.__ERROR__.status).toEqual(500)
-        //         expect(res.statusCode).toBe(500)
-        //     }
-        // },
-        // {
-        //     description: `Renders react-helmet tags`,
-        //     req: {url: '/render-helmet/'},
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(200)
-        //         const html = res.text
-        //         const doc = parse(html)
-        //         const head = doc.querySelector('head')
-        //         expect(html.includes('lang="helmet-html-attribute"')).toBe(true)
-        //         expect(doc.querySelector('body').getAttribute('class')).toEqual(
-        //             'helmet-body-attribute'
-        //         )
-        //         expect(head.querySelector(`title`).innerHTML).toEqual('Helmet title')
-        //         expect(head.querySelector('base').getAttribute('target')).toEqual('_blank')
-        //         expect(
-        //             doc.querySelector('style').innerHTML.includes('background-color: blue;')
-        //         ).toBe(true)
-        //         expect(
-        //             doc
-        //                 .querySelector('noscript')
-        //                 .innerHTML.includes(
-        //                     '<link rel="stylesheet" type="text/css" href="foo.css" />'
-        //                 )
-        //         ).toBe(true)
-        //         expect(doc.querySelector('noscript').innerHTML).toEqual(
-        //             expect.stringContaining(
-        //                 '<link rel="stylesheet" type="text/css" href="foo.css" />'
-        //             )
-        //         )
-        //         expect(head.querySelector('meta[name="helmet-meta-1"]')).not.toBe(null)
-        //         expect(head.querySelector('meta[property="helmet-meta-2"]')).not.toBe(null)
-        //         expect(head.querySelector('link[rel="helmet-link-1"]')).not.toBe(null)
-        //         expect(head.querySelector('link[rel="helmet-link-2"]')).not.toBe(null)
-        //         expect(head.querySelector('script[src="http://include.com/pathtojs.js"]')).not.toBe(
-        //             null
-        //         )
-        //         expect(
-        //             head
-        //                 .querySelector('script[type="application/ld+json"]')
-        //                 .innerHTML.includes(`"@context": "http://schema.org"`)
-        //         ).toBe(true)
-        //     }
-        // },
-        // {
-        //     description: `Frozen state is escaped preventing injection attacks`,
-        //     req: {url: '/xss/'},
-        //     assertions: (res) => {
-        //         const html = res.text
-        //         const doc = parse(html)
-        //         const scriptContent = doc.querySelector('#mobify-data').innerHTML
-
-        //         expect(scriptContent).not.toContain('<script>')
-        //     }
-        // },
-        // {
-        //     description: `AppConfig errors are caught`,
-        //     req: {url: '/pwa/'},
-        //     mocks: () => {
-        //         jest.spyOn(AppConfig.prototype, 'render').mockImplementation(() => {
-        //             throw new Error()
-        //         })
-        //     },
-        //     assertions: (res) => {
-        //         expect(res.statusCode).toBe(500)
-        //         const html = res.text
-
-        //         const shouldIncludeErrorStack = !isRemote()
-        //         expect(html).toContain(
-        //             shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error'
-        //         )
-        //     }
-        // }
         // ,
         // {
         //     description: `Works if the user resolves an Object with useQuery`,
@@ -686,8 +685,8 @@ describe('The Node SSR Environment', () => {
         // }
     ]
 
-    // const isRemoteValues = [true, false]
-    const isRemoteValues = [false]
+    const isRemoteValues = [true, false]
+    // const isRemoteValues = [false]
 
     isRemoteValues.forEach((isRemoteValue) => {
         // Run test cases

@@ -136,7 +136,6 @@ export const render = async (req, res, next) => {
 
     // Step 3. Bail if there is a 404.
     if (component === Throw404) {
-        console.log('BAILING')
         routeError = new errors.HTTPNotFound('Not found')
     }
 
@@ -174,9 +173,7 @@ export const render = async (req, res, next) => {
                 {}
             )
         } catch (e) {
-            debugger
-            appStateError = logAndFormatError(e)
-            console.log('ERROR GET DATA PROMISES', e, ' - ', appStateError)
+            appStateError = logAndFormatError(e || new Error())
         }
     }
 
@@ -291,9 +288,9 @@ const renderApp = async (args) => {
 
     // Return the first error encountered during the rendering pipeline.
     const error = routeError || appStateError || renderError
-    console.log('ROUTE ERROR: ', routeError)
-    console.log('APP STATE ERROR: ', appStateError)
-    console.log('RENDER ERROR: ', renderError)
+    // console.log('ROUTE ERROR: ', routeError)
+    // console.log('APP STATE ERROR: ', appStateError)
+    // console.log('RENDER ERROR: ', renderError)
 
     // Remove the stacktrace when executing remotely as to not leak any important
     // information to users about our system.
