@@ -130,15 +130,17 @@ export const render = async (req, res, next) => {
     let appState = {}
     let routerContext = {}
     let error
-    let html
+    let routeError
     let appStateError
+    let html
 
     // Step 3. Bail if there is a 404.
     if (component === Throw404) {
-        error = new errors.HTTPNotFound('Not found')
+        console.log('BAILING')
+        routeError = new errors.HTTPNotFound('Not found')
     }
 
-    if (!error) {
+    if (!routeError) {
         const AppJSX = getAppJSX(req, res, error, {
             App: WrappedApp,
             appState,
@@ -172,7 +174,9 @@ export const render = async (req, res, next) => {
                 {}
             )
         } catch (e) {
-            appStateError = e
+            debugger
+            appStateError = logAndFormatError(e)
+            console.log('ERROR GET DATA PROMISES', e, ' - ', appStateError)
         }
     }
 
@@ -184,12 +188,14 @@ export const render = async (req, res, next) => {
         App: WrappedApp,
         appState,
         appStateError,
+        routeError,
         routes,
         req,
         res,
         location,
         config
     }
+
     try {
         ;({html, routerContext, error} = await renderApp(args))
     } catch (e) {
@@ -236,7 +242,7 @@ const renderAppHtml = (req, res, error, appData) => {
 }
 
 const renderApp = async (args) => {
-    const {req, res, appStateError, App, appState, location, routes, config} = args
+    const {req, res, appStateError, routeError, App, appState, location, routes, config} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
     const routerContext = {}
@@ -284,7 +290,11 @@ const renderApp = async (args) => {
     const helmet = Helmet.renderStatic()
 
     // Return the first error encountered during the rendering pipeline.
-    const error = appStateError || renderError
+    const error = routeError || appStateError || renderError
+    console.log('ROUTE ERROR: ', routeError)
+    console.log('APP STATE ERROR: ', appStateError)
+    console.log('RENDER ERROR: ', renderError)
+
     // Remove the stacktrace when executing remotely as to not leak any important
     // information to users about our system.
     if (error && isRemote()) {
