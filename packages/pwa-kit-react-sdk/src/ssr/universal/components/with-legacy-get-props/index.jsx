@@ -38,7 +38,7 @@ const now = () => {
 export const withLegacyGetProps = (Wrapped, isPage, locals) => {
     const extraArgs = AppConfig.extraGetPropsArgs(locals)
 
-    // NOTE SURE IF THIS IS THE RIGHT PLACE TO BE DOING THIS?
+    // NOTE: NOT SURE IF THIS IS THE RIGHT PLACE TO BE DOING THIS?
     Wrapped = withLoadableResolver(Wrapped)
 
     /* istanbul ignore next */
@@ -59,13 +59,15 @@ export const withLegacyGetProps = (Wrapped, isPage, locals) => {
         }
 
         /**
+         * Enhance route components with the `withLegacyGetProps` higher order component.
          * 
-         * @param {*} routes 
-         * @param {*} isPage 
-         * @param {*} locals 
-         * @returns 
+         * @param {Object[]} routes
+         * @param {Boolean} isPage
+         * @param {Object} locals
+         * 
+         * @return {Object[]}
          */
-        static enhanceRoutes (routes = [], isPage, locals) {
+        static enhanceRoutes(routes = [], isPage, locals) {
             routes = Wrapped.enhanceRoutes ? Wrapped.enhanceRoutes(routes) : routes
 
             return routes.map(({component, ...rest}) => ({
@@ -73,47 +75,46 @@ export const withLegacyGetProps = (Wrapped, isPage, locals) => {
                 ...rest
             }))
         }
-    
+
         /**
-         * The purpose of this function is to return all the promises that are used to get
-         * data for the getProps API. This means returning the promises for the App and the
-         * Page component.
-         * 
-         * @param {*} renderContext 
-         * @returns 
+         * Returns the `getProps` promises for the matched App and Page components, this includes
+         * any promises returned by the child components `getDataPromises` implementation if one
+         * exists.
+         *
+         * @param {Object} renderContext
+         * @return {Promise<Object[]>}
          */
-        static getDataPromises (renderContext) {
+        static getDataPromises(renderContext) {
             const {App, route, match, req, res, location} = renderContext
-    
-            const dataPromise = 
-                Promise.resolve()
-                    .then(() => {
-                        const {params} = match
-                        const components = [App, route.component]
-                        const promises = components.map((c) =>
-                            c.getProps
-                                ? c.getProps({
-                                    req,
-                                    res,
-                                    params,
-                                    location
-                                })
-                                : Promise.resolve({})
-                        )
-    
-                        return Promise.all(promises)
-                    })
-                    .then(([appProps, pageProps]) => {
-                        return {
-                            [STATE_KEY]: {
-                                appProps,
-                                pageProps
-                            }
+
+            const dataPromise = Promise.resolve()
+                .then(() => {
+                    const {params} = match
+                    const components = [App, route.component]
+                    const promises = components.map((c) =>
+                        c.getProps
+                            ? c.getProps({
+                                  req,
+                                  res,
+                                  params,
+                                  location
+                              })
+                            : Promise.resolve({})
+                    )
+
+                    return Promise.all(promises)
+                })
+                .then(([appProps, pageProps]) => {
+                    return {
+                        [STATE_KEY]: {
+                            appProps,
+                            pageProps
                         }
-                    })
-            
+                    }
+                })
+
             return [
-                dataPromise, 
+                dataPromise,
                 ...(Wrapped.getDataPromises ? Wrapped.getDataPromises(renderContext) : [])
             ]
         }
@@ -403,10 +404,7 @@ export const withLegacyGetProps = (Wrapped, isPage, locals) => {
 
     hoistNonReactStatic(RouteComponent, Wrapped, excludes)
 
-    return compose(
-        withErrorHandling,
-        withRouter,
-    )(RouteComponent)
+    return compose(withErrorHandling, withRouter)(RouteComponent)
 }
 
 export default withLegacyGetProps

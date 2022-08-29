@@ -164,13 +164,16 @@ export const render = async (req, res, next) => {
             })
             const data = await Promise.all(allPromises)
 
-            appState = data.reduce((acc, appState = {}) => ({
-                ...acc,
-                ...appState
-            }), {})
+            appState = data.reduce(
+                (acc, appState = {}) => ({
+                    ...acc,
+                    ...appState
+                }),
+                {}
+            )
         } catch (e) {
             appStateError = e
-        } 
+        }
     }
 
     // Support the AppConfig freeze API.

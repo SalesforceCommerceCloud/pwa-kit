@@ -80,18 +80,21 @@ export const getRoutes = (locals) => {
 /**
  * Utility function to enhance a component with multiple higher-order components,
  * without having to nest.
- * 
- * const WrappedComponent = 
+ *
+ * const WrappedComponent =
  *       compose(
- *          withHocA, 
+ *          withHocA,
  *          withHocB,
  *          withHocc,
  *       )(Component)
- * 
- * @param  {...any} funcs 
- * @returns 
- * 
+ *
+ * @param  {...any} funcs
+ * @returns
+ *
  * @private
  */
- export const compose = (...funcs) =>
-    funcs.reduce((a, b) => (...args) => a(b(...args)), arg => arg)
+export const compose = (...funcs) =>
+    funcs.reduce(
+        (a, b) => (...args) => a(b(...args)),
+        (arg) => arg
+    )

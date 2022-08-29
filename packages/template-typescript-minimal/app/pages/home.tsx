@@ -17,7 +17,7 @@ const style = `
 body {
     background: linear-gradient(-45deg, #e73c7e, #23a6d5, #ee7752);
     background-size: 400% 400%;
-    animation: gradient 10s ease infinite;
+    // animation: gradient 10s ease infinite;
     height: 100vh;
 }
 @keyframes gradient {

@@ -51,4 +51,3 @@ jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
         })
     }
 })
-

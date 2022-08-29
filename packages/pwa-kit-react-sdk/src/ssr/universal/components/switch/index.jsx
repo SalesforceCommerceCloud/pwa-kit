@@ -32,7 +32,11 @@ const Switch = (props) => {
                                 return (
                                     <Route key={i} {...routeProps}>
                                         <UIDFork>
-                                            <Component preloadedProps={appState?.['__LEGACY_GET_PROPS__']?.pageProps} />
+                                            <Component
+                                                preloadedProps={
+                                                    appState?.['__LEGACY_GET_PROPS__']?.pageProps
+                                                }
+                                            />
                                         </UIDFork>
                                     </Route>
                                 )

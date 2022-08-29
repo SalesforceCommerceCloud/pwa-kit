@@ -18,16 +18,12 @@ const STATE_KEY = '__REACT_QUERY__'
 /**
  * This higher order component will configure your PWA-Kit application with React Query. Uses of
  * the `useQuery` hook will also work server-side.
- * 
- * @param {*} Component 
- * @returns 
+ *
+ * @param {*} Component
+ * @returns
  */
-const withReactQuery = (Component) => {
-    Component = 
-        compose(
-            withLoadableResolver,
-            withErrorHandling
-        )(Component)
+export const withReactQuery = (Component) => {
+    Component = compose(withLoadableResolver, withErrorHandling)(Component)
 
     const wrappedComponentName = Component.displayName || Component.name
 
@@ -38,11 +34,10 @@ const withReactQuery = (Component) => {
     }
 
     const queryClient = new QueryClient()
+
     const WrappedComponent = ({...passThroughProps}) => {
         const state =
-            typeof window === 'undefined'
-                ? {}
-                : window?.__PRELOADED_STATE__?.[STATE_KEY] || {}
+            typeof window === 'undefined' ? {} : window?.__PRELOADED_STATE__?.[STATE_KEY] || {}
 
         return (
             <QueryClientProvider client={queryClient}>
@@ -54,45 +49,35 @@ const withReactQuery = (Component) => {
     }
 
     // Expose statics from the wrapped component on the HOC
-    // NOTE: THIS MUST COME BEFORE WE DEFINE ANY NEW CLASS STATIC FUNCTIONS.
     hoistNonReactStatic(WrappedComponent, Component)
 
     /**
+     * Returns an array of primises. The first is a promise that resolved to the query data, the subsequest
+     * promises are those primises resolving in query data from child components that implement the 
+     * `getDataPromises` function.
      *
-     * @param {*} routes
-     * @returns
-     */
-    WrappedComponent.enhanceRoutes = (routes = []) => {
-        routes = Component.enhanceRoutes ? Component.enhanceRoutes(routes) : routes
-
-        return routes
-    }
-
-    /**
-     *  
+     * @param {Object} renderContext
      * 
-     * @param {*} renderContext
-     * @returns
+     * @return {Promise<Object[]>}
      */
     WrappedComponent.getDataPromises = (renderContext) => {
         const {AppJSX} = renderContext
 
-        const dataPromise = 
-            Promise.resolve()
-                .then(() => ssrPrepass(AppJSX)) // NOTE: ssrPrepass will be included in the vendor bundle. BAD
-                .then(() => {
-                    const queryCache = queryClient.getQueryCache()
-                    const queries = queryCache.getAll()
-                    const promises = queries
-                        .filter(({options}) => options.enabled !== false)
-                        .map((query) => query.fetch())
-                    
-                    return Promise.all(promises)
-                })
-                .then(() => ({[STATE_KEY]: dehydrate(queryClient)}))
-        
+        const dataPromise = Promise.resolve()
+            .then(() => ssrPrepass(AppJSX)) // NOTE: ssrPrepass will be included in the vendor bundle. BAD
+            .then(() => {
+                const queryCache = queryClient.getQueryCache()
+                const queries = queryCache.getAll()
+                const promises = queries
+                    .filter(({options}) => options.enabled !== false)
+                    .map((query) => query.fetch())
+
+                return Promise.all(promises)
+            })
+            .then(() => ({[STATE_KEY]: dehydrate(queryClient)}))
+
         return [
-            dataPromise, 
+            dataPromise,
             ...(Component.getDataPromises ? Component.getDataPromises(renderContext) : [])
         ]
     }

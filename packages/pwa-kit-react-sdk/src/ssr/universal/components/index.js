@@ -9,9 +9,4 @@ import withLegacyGetProps from './with-legacy-get-props'
 import withLoadableResolver from './with-loadable-resolver'
 import withErrorHandling from './with-error-handling'
 
-export {
-    withErrorHandling, 
-    withLegacyGetProps, 
-    withLoadableResolver, 
-    withReactQuery
-}
+export {withErrorHandling, withLegacyGetProps, withLoadableResolver, withReactQuery}

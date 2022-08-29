@@ -286,10 +286,12 @@ describe('withLegacyGetProps enhanceRoutes', () => {
         let mappedRoutes = Component.enhanceRoutes(routes)
         expect(mappedRoutes.length).toBe(2)
         const [first, second] = mappedRoutes
-        const expectedName = 'withErrorHandling(withRouter(withLegacyGetProps(withLoadableResolver(Component))))'
+        const expectedName =
+            'withErrorHandling(withRouter(withLegacyGetProps(withLoadableResolver(Component))))'
         expect(first.component.displayName).toBe(expectedName)
 
-        const expected404Name = 'withErrorHandling(withRouter(withLegacyGetProps(withLoadableResolver(Throw404))))'
+        const expected404Name =
+            'withErrorHandling(withRouter(withLegacyGetProps(withLoadableResolver(Throw404))))'
         expect(second.component.displayName).toBe(expected404Name)
     })
 })

@@ -10,11 +10,7 @@ interface AppConfigProps {
 }
 
 const AppConfig = (props: AppConfigProps): ReactElement => {
-    return (
-        <Fragment>
-            {props.children}
-        </Fragment>
-    )
+    return <Fragment>{props.children}</Fragment>
 }
 
 AppConfig.restore = () => {}
