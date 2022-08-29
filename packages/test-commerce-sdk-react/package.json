@@ -11,7 +11,7 @@
     "@tanstack/react-query": "^4.0.10",
     "@types/loadable__component": "^5.13.4",
     "@types/react": "^17.0.2",
-    "@types/react-router-dom": "^5.3.3",
+    "@types/react-router-dom": "^5.1.2",
     "commerce-sdk-react": "^2.3.0-dev",
     "pwa-kit-dev": "^2.3.0-dev",
     "pwa-kit-react-sdk": "^2.3.0-dev",

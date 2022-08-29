@@ -11,7 +11,7 @@ import {useCategories, useCategory, useProduct, useProducts} from './query'
 import {screen, waitFor} from '@testing-library/react'
 
 const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`})
-const Products = ({ids}: {ids: string}): ReactElement => {
+const ProductsComponent = ({ids}: {ids: string}): ReactElement => {
     const {data, isLoading, error} = useProducts({
         ids
     })
@@ -35,7 +35,7 @@ const Products = ({ids}: {ids: string}): ReactElement => {
     )
 }
 
-const Product = ({id}: {id: string}): ReactElement => {
+const ProductComponent = ({id}: {id: string}): ReactElement => {
     const {data, isLoading, error} = useProduct({
         id
     })
@@ -48,7 +48,7 @@ const Product = ({id}: {id: string}): ReactElement => {
     )
 }
 
-const Categories = ({ids}: {ids: string}): ReactElement => {
+const CategoriesComponent = ({ids}: {ids: string}): ReactElement => {
     const {data, isLoading, error} = useCategories({
         ids,
         levels: 2
@@ -69,7 +69,7 @@ const Categories = ({ids}: {ids: string}): ReactElement => {
     )
 }
 
-const Category = ({id}: {id: string}): ReactElement => {
+const CategoryComponent = ({id}: {id: string}): ReactElement => {
     const {data, isLoading, error} = useCategory({
         id
     })
@@ -89,7 +89,7 @@ const tests = [
                 name: 'returns data',
                 assertions: withMocks(async () => {
                     const ids = '25502228M,25503045M'
-                    renderWithProviders(<Products ids={ids} />)
+                    renderWithProviders(<ProductsComponent ids={ids} />)
                     const productNames = ['Dot Pattern Cardigan', 'Belted Cardigan With Studs']
 
                     expect(screen.queryByText(productNames[0])).toBeNull()
@@ -108,7 +108,7 @@ const tests = [
                     const fakeIds = [...new Array(26)]
                         .map((i) => Math.floor(Math.random() * 26))
                         .join(',')
-                    renderWithProviders(<Products ids={fakeIds} />)
+                    renderWithProviders(<ProductsComponent ids={fakeIds} />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText('error'))
@@ -125,7 +125,7 @@ const tests = [
                 name: 'returns data',
                 assertions: withMocks(async () => {
                     const id = '25502228M'
-                    renderWithProviders(<Product id={id} />)
+                    renderWithProviders(<ProductComponent id={id} />)
                     const productName = 'Belted Cardigan With Studs'
 
                     expect(screen.queryByText(productName)).toBeNull()
@@ -140,7 +140,7 @@ const tests = [
             {
                 name: 'returns error',
                 assertions: withMocks(async () => {
-                    renderWithProviders(<Product id="abc" />)
+                    renderWithProviders(<ProductComponent id="abc" />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText('error'))
@@ -157,7 +157,7 @@ const tests = [
                 name: 'returns data',
                 assertions: withMocks(async () => {
                     const catIds = ['womens-clothing', 'mens-clothing']
-                    renderWithProviders(<Categories ids={catIds.join(',')} />)
+                    renderWithProviders(<CategoriesComponent ids={catIds.join(',')} />)
 
                     expect(screen.queryByText(catIds[0])).toBeNull()
                     expect(screen.queryByText(catIds[1])).toBeNull()
@@ -175,7 +175,7 @@ const tests = [
                     const fakeIds = [...new Array(51)]
                         .map((i) => Math.floor(Math.random() * 26))
                         .join(',')
-                    renderWithProviders(<Categories ids={fakeIds} />)
+                    renderWithProviders(<CategoriesComponent ids={fakeIds} />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText('error'))
@@ -192,7 +192,7 @@ const tests = [
                 name: 'returns data',
                 assertions: withMocks(async () => {
                     const id = 'newarrivals'
-                    renderWithProviders(<Category id={id} />)
+                    renderWithProviders(<CategoryComponent id={id} />)
                     const categoryName = 'New Arrivals'
 
                     expect(screen.queryByText(categoryName)).toBeNull()
@@ -207,7 +207,7 @@ const tests = [
             {
                 name: 'returns error',
                 assertions: withMocks(async () => {
-                    renderWithProviders(<Category id="abc" />)
+                    renderWithProviders(<CategoryComponent id="abc" />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText('error'))
