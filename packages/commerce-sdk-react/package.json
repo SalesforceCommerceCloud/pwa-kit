@@ -42,6 +42,7 @@
   "private": true,
   "devDependencies": {
     "@tanstack/react-query": "^4.0.10",
+    "@tanstack/react-query-devtools": "^4.2.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.5",
     "@types/node": "^14.18.22",
