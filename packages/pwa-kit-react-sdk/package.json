@@ -40,7 +40,7 @@
   "bugs": {
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
-  "author": "dev@mobify.com",
+  "author": "cc-pwa-kit@salesforce.com",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@loadable/babel-plugin": "^5.13.2",
