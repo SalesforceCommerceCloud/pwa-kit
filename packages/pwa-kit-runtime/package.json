@@ -12,7 +12,6 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "dev@mobify.com",
-  "main": "dist/index.js",
   "files": [
     "bin",
     "LICENSE",
