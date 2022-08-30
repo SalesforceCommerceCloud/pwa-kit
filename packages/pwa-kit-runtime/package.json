@@ -13,13 +13,10 @@
   "license": "SEE LICENSE IN LICENSE",
   "author": "cc-pwa-kit@salesforce.comm",
   "files": [
-    "bin",
     "LICENSE",
     "scripts",
     "ssr",
-    "TERMS_OF_USE.md",
-    "utils",
-    "webpack"
+    "utils"
   ],
   "scripts": {
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",
