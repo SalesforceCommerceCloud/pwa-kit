@@ -417,44 +417,6 @@
       "value": "새 결제 방법 추가"
     }
   ],
-  "cart.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "이 위시리스트에 추가됨"
-    }
-  ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
@@ -585,6 +547,12 @@
     {
       "type": 0,
       "value": "주문하기"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "체크아웃하는 중에 예상치 못한 오류가 발생했습니다. "
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -955,6 +923,18 @@
       "value": "연락처 정보"
     }
   ],
+  "credit_card_fields.tool_tip.security_code": [
+    {
+      "type": 0,
+      "value": "이 3자리 코드는 카드의 후면에서 확인할 수 있습니다."
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
+    {
+      "type": 0,
+      "value": "이 4자리 코드는 카드의 전면에서 확인할 수 있습니다."
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -1293,10 +1273,54 @@
       "value": "문제가 발생했습니다. 다시 시도하십시오."
     }
   ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "개 항목"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "개 항목"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "이 위시리스트에 추가됨"
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
       "value": "항목이 위시리스트에서 제거됨"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "보기"
     }
   ],
   "header.button.assistive_msg.logo": [
@@ -1356,7 +1380,7 @@
   "home.description.here_to_help": [
     {
       "type": 0,
-      "value": "지원 담당자에게 문의하면"
+      "value": "지원 담당자에게 문의하십시오."
     }
   ],
   "home.description.here_to_help_line_2": [
@@ -1531,6 +1555,12 @@
     {
       "type": 0,
       "value": "판매"
+    }
+  ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "위에서 옵션을 모두 선택하십시오."
     }
   ],
   "locale_text.message.ar-SA": [
@@ -2167,44 +2197,6 @@
       "value": "제공 예정"
     }
   ],
-  "product_detail.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "이 위시리스트에 추가됨"
-    }
-  ],
   "product_detail.recommended_products.title.complete_set": [
     {
       "type": 0,
@@ -2249,44 +2241,6 @@
     {
       "type": 0,
       "value": "정렬 기준"
-    }
-  ],
-  "product_list.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "이 위시리스트에 추가됨"
     }
   ],
   "product_list.modal.button.clear_filters": [
@@ -2421,44 +2375,6 @@
     {
       "type": 0,
       "value": "최근 검색"
-    }
-  ],
-  "recommended_products.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "이 위시리스트에 추가됨"
     }
   ],
   "register_form.action.sign_in": [
@@ -3191,6 +3107,18 @@
     {
       "type": 0,
       "value": "새 암호"
+    }
+  ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "카트에 추가"
+    }
+  ],
+  "wishlist_primary_action.button.select_options": [
+    {
+      "type": 0,
+      "value": "옵션 선택"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [

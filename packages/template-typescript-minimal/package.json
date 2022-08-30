@@ -1,6 +1,6 @@
 {
     "name": "typescript-minimal",
-    "version": "2.2.0-dev",
+    "version": "2.3.0-dev",
     "engines": {
         "node": "^14.0.0",
         "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
@@ -10,11 +10,12 @@
         "@loadable/component": "^5.15.0",
         "@tanstack/react-query": "^4.0.10",
         "@types/react": "^17.0.2",
+        "@types/react-dom": "^17.0.2",
         "cross-env": "^5.2.0",
         "cross-fetch": "^3.1.5",
-        "pwa-kit-dev": "^2.2.0-dev",
-        "pwa-kit-react-sdk": "^2.2.0-dev",
-        "pwa-kit-runtime": "^2.2.0-dev",
+        "pwa-kit-dev": "^2.3.0-dev",
+        "pwa-kit-react-sdk": "^2.3.0-dev",
+        "pwa-kit-runtime": "^2.3.0-dev",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-helmet": "^6.1.0",
@@ -54,7 +55,7 @@
                     "path": "api"
                 },
                 {
-                    "host": "zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com",
+                    "host": "zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com",
                     "path": "ocapi"
                 },
                 {

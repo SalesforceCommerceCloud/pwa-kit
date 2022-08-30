@@ -1,9 +1,13 @@
 ## To be released
 -   Integrate `react-query`. [#693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/693)
+## v2.3.0-dev (Aug 25, 2022)
+## v2.2.0 (Aug 25, 2022)
 ## v2.1.0 (Jul 05, 2022)
 -   Remove console logs from route component. [#651](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/651)
 
 ## v2.0.0 (May 16, 2022)
+-   Drop node 12 support for [#589](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/589)
+-   Improve test coverage [#550](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/550)
 -   Remove lodash and bluebird. [#534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/534)
 -   Support Multi-site implementation using dynamic config [#469](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/469)
 -   Support functions as default exports in the applications `routes.jsx` file. [#447](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)

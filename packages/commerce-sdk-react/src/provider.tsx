@@ -20,6 +20,7 @@ import {
 
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -84,6 +85,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     return (
         <QueryClientProvider client={queryClient}>
             <CommerceApiContext.Provider value={apiClients}>{children}</CommerceApiContext.Provider>
+            <ReactQueryDevtools />
         </QueryClientProvider>
     )
 }
