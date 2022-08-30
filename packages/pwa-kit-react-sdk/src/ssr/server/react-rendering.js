@@ -18,7 +18,7 @@ import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
-import DeviceContext from '../universal/device-context'
+import {DeviceContext, PageRequestResponseContext} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -212,13 +212,15 @@ const renderAppHtml = (req, res, error, appData) => {
     const {App, appState, routes, routerContext, location, extractor, deviceType} = appData
 
     let appJSX = (
-        <Router location={location} context={routerContext}>
-            <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
-                </AppConfig>
-            </DeviceContext.Provider>
-        </Router>
+        <PageRequestResponseContext.Provider value={{req, res}}>
+            <Router location={location} context={routerContext}>
+                <DeviceContext.Provider value={{type: deviceType}}>
+                    <AppConfig locals={res.locals}>
+                        <Switch error={error} appState={appState} routes={routes} App={App} />
+                    </AppConfig>
+                </DeviceContext.Provider>
+            </Router>
+        </PageRequestResponseContext.Provider>
     )
 
     appJSX = extractor.collectChunks(appJSX)
