@@ -6,6 +6,7 @@
  */
 
 import {useContext} from 'react'
-import {PageRequestResponseContext} from '../contexts'
+import {PageRequestContext, PageResponseContext} from '../contexts'
 
-export const usePageRequestResponse = () => useContext(PageRequestResponseContext)
+export const usePageRequest = () => useContext(PageRequestContext)
+export const usePageResponse = () => useContext(PageResponseContext)
