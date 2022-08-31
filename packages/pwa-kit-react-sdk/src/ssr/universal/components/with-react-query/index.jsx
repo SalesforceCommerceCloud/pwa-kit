@@ -70,7 +70,7 @@ export const withReactQuery = (Component) => {
                 const queries = queryCache.getAll()
                 const promises = queries
                     .filter(({options}) => options.enabled !== false)
-                    .map((query) => query.fetch())
+                    .map((query) => query.fetch().catch((e) => ({error: e})))
 
                 return Promise.all(promises)
             })
