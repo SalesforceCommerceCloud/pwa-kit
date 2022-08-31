@@ -12,7 +12,9 @@ interface Props {
 }
 
 const HelloTS = ({message}: Props) => {
+    // Unlike `getProps`, React hook like this can be called anywhere in the component tree
     const pageRes = usePageResponse()
+
     if (pageRes) {
         // This inner component would override the status code that was set in the <Home> page component
         pageRes.status(201)
