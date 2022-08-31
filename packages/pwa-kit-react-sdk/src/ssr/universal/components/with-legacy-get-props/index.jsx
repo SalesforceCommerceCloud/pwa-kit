@@ -35,8 +35,9 @@ const now = () => {
  * route-config. It provides an interface, via static methods on React components,
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
-export const withLegacyGetProps = (Wrapped, isPage, locals) => {
-    const extraArgs = AppConfig.extraGetPropsArgs(locals)
+export const withLegacyGetProps = (Wrapped, isPage) => {
+    let extraArgs
+    // const extraArgs = AppConfig.extraGetPropsArgs()
 
     // NOTE: NOT SURE IF THIS IS THE RIGHT PLACE TO BE DOING THIS?
     Wrapped = withLoadableResolver(Wrapped)
@@ -198,9 +199,16 @@ export const withLegacyGetProps = (Wrapped, isPage, locals) => {
          */
         // eslint-disable-next-line
         static getProps(args) {
-            RouteComponent._latestPropsPromise = Wrapped.getComponent().then((component) =>
-                component.getProps ? component.getProps({...args, ...extraArgs}) : Promise.resolve()
-            )
+            RouteComponent._latestPropsPromise = Wrapped.getComponent().then((component) => {
+                if (!extraArgs) {
+                    extraArgs = AppConfig.extraGetPropsArgs({
+                        originalUrl: 'http://localhost:3000'
+                    })
+                }
+
+                return component.getProps ? component.getProps({...args, ...extraArgs}) : Promise.resolve()
+            })
+
             return RouteComponent._latestPropsPromise
         }
 

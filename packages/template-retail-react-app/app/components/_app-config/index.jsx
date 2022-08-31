@@ -52,7 +52,11 @@ const AppConfig = ({children, locals = {}}) => {
     )
 }
 
-AppConfig.restore = (locals = {}) => {
+AppConfig.restore = (locals = {}) => {}
+
+AppConfig.freeze = () => undefined
+
+AppConfig.extraGetPropsArgs = (locals = {}) => {
     const path =
         typeof window === 'undefined'
             ? locals.originalUrl
@@ -69,20 +73,11 @@ AppConfig.restore = (locals = {}) => {
 
     apiConfig.parameters.siteId = site.id
 
-    locals.api = new CommerceAPI({...apiConfig, locale: locale.id, currency})
-    locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
-    locals.site = site
-    locals.locale = locale.id
-}
-
-AppConfig.freeze = () => undefined
-
-AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
-        api: locals.api,
-        buildUrl: locals.buildUrl,
-        site: locals.site,
-        locale: locals.locale
+        api: new CommerceAPI({...apiConfig, locale: locale.id, currency}),
+        buildUrl: createUrlTemplate(appConfig, site.alias || site.id, locale.id),
+        site,
+        locale
     }
 }
 

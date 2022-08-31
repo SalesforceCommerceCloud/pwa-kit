@@ -49,6 +49,8 @@ import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
 
+import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components'
+
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 
@@ -267,8 +269,7 @@ App.shouldGetProps = () => {
     return typeof window === 'undefined'
 }
 
-App.getProps = async ({api, res}) => {
-    const site = resolveSiteFromUrl(res.locals.originalUrl)
+App.getProps = async ({api, res, site}) => {
     const l10nConfig = site.l10n
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -338,4 +339,4 @@ App.propTypes = {
     config: PropTypes.object
 }
 
-export default App
+export default withLegacyGetProps(App)
