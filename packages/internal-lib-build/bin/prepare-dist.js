@@ -59,7 +59,7 @@ const main = async () => {
 
     try {
         // Get a list of files from the `npm pack --dry-run` command.
-        const packageFiles = (await packlist()).filter((path) => !path.startsWith('dist'))
+        const packageFiles = (await packlist()).filter((path) => !path.startsWith('dist/'))
         // Move the required files into the `dist` folder.
         await copyFiles(packageFiles, DEST_DIR)
     } catch (e) {
