@@ -12,7 +12,7 @@ import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 type Client = ApiClients['shopperProducts']
 
 const productKeys = {
-    all: [{entity: 'product'}],
+    all: [{entity: ['product']}],
     useProducts: (arg: Record<string, unknown>) => [{...productKeys.all[0], scope: 'list', ...arg}],
     useProduct: (arg: Record<string, unknown>) => [
         {...productKeys.all[0], scope: 'detail', ...arg},
@@ -20,7 +20,7 @@ const productKeys = {
 }
 
 const categoryKeys = {
-    all: [{entity: 'category'}],
+    all: [{entity: ['category']}],
     useCategories: (arg: Record<string, unknown>) => [
         {...categoryKeys.all[0], scope: 'list', ...arg},
     ],

@@ -11,6 +11,26 @@ import {UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperBaskets']
 
+const basketKeys = {
+    all: [{entity: 'basket'}],
+    useBasket: (arg: Record<string, unknown>) => [{...basketKeys.all[0], ...arg}],
+    usePaymentMethodsForBasket: (arg: Record<string, unknown>) => [{...basketKeys.all[0], ...arg}],
+}
+// const paymentMethodKeys = {
+//     all: [{entity: ['basket', 'paymentMethod']}],
+//     usePaymentMethodsForBasket: (arg: Record<string, unknown>) => [
+//         {...paymentMethodKeys.all[0], ...arg},
+//     ],
+// }
+
+// const queryA = ['A']
+// const queryB = ['A', 'B']
+
+// // does this work??? we need to test this
+// const queryA = [entity: ['A']]
+// const queryB = [entity: ['A', 'B']]
+// invalidate(queryA)
+
 /**
  * A hook for `ShopperBaskets#getBasket`.
  * Gets a basket.
