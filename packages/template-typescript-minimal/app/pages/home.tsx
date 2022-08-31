@@ -8,6 +8,7 @@ import React, {useEffect, useState} from 'react'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
+import {usePageResponse, usePageRequest} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 interface Props {
     value: number
@@ -90,6 +91,13 @@ const Home = ({value}: Props) => {
         return () => clearInterval(interval)
     }, [counter, setCounter])
 
+    const pageRes = usePageResponse()
+    if (pageRes) {
+        pageRes.status(404)
+    }
+
+    const pageReq = usePageRequest()
+
     return (
         <div>
             <style dangerouslySetInnerHTML={{__html: style}} />
@@ -105,6 +113,8 @@ const Home = ({value}: Props) => {
                     <div className="divider"></div>
                 </div>
                 <div className="panel">
+                    {pageReq && <p>Path of the page&apos;s request: {pageReq.path}</p>}
+
                     <p style={{width: '300px'}} className="fade-in fade-in-0">
                         <b>This page is written in Typescript</b>
                         <br />

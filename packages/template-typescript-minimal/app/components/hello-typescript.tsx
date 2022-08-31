@@ -5,12 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import {usePageResponse} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 interface Props {
     message: string
 }
 
 const HelloTS = ({message}: Props) => {
+    const pageRes = usePageResponse()
+    if (pageRes) {
+        // This inner component would override the status code that was set in the <Home> page component
+        pageRes.status(201)
+
+        pageRes.set('Some-Header', 'FOOBAR')
+    }
+
     return <span>And this is a TS component (it takes a prop: &quot;{message}&quot;).</span>
 }
 
