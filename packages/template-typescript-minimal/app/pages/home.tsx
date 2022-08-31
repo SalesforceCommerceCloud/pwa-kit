@@ -113,6 +113,7 @@ const Home = ({value}: Props) => {
                     <div className="divider"></div>
                 </div>
                 <div className="panel">
+                    {/* NOTE: React would complain that this content rendered server-side does not match the one on client-side */}
                     {pageReq && <p>Path of the page&apos;s request: {pageReq.path}</p>}
 
                     <p style={{width: '300px'}} className="fade-in fade-in-0">
