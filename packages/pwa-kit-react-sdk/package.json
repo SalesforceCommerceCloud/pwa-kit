@@ -7,14 +7,11 @@
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
   "files": [
-    "bin",
     "CHANGELOG.md",
     "LICENSE",
     "scripts",
     "ssr",
-    "TERMS_OF_USE.md",
-    "utils",
-    "webpack"
+    "utils"
   ],
   "publishConfig": {
     "directory": "dist"
