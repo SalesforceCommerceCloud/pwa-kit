@@ -168,9 +168,6 @@
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "Adicionar novo método de pagamento"
   },
-  "cart.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à lista de desejos"
-  },
   "cart.info.removed_from_cart": {
     "defaultMessage": "Item removido do carrinho"
   },
@@ -215,6 +212,9 @@
   },
   "checkout.button.place_order": {
     "defaultMessage": "Fazer pedido"
+  },
+  "checkout.message.generic_error": {
+    "defaultMessage": "Ocorreu um erro inesperado durante o checkout."
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Criar conta"
@@ -299,7 +299,7 @@
     "defaultMessage": "Termos e condições"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Está é somente uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
+    "defaultMessage": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
   },
   "checkout_header.link.cart": {
     "defaultMessage": "Voltar ao carrinho"
@@ -365,7 +365,7 @@
     "defaultMessage": "Já tem uma conta? Fazer logon"
   },
   "contact_info.button.checkout_as_guest": {
-    "defaultMessage": "Checkout como convidado"
+    "defaultMessage": "Pagar como convidado"
   },
   "contact_info.button.login": {
     "defaultMessage": "Fazer logon"
@@ -378,6 +378,14 @@
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "Informações de contato"
+  },
+  "credit_card_fields.tool_tip.security_code": {
+    "defaultMessage": "Este código de 3 dígitos pode ser encontrado no verso do seu cartão.",
+    "description": "Generic credit card security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code.american_express": {
+    "defaultMessage": "Este código de 4 dígitos pode ser encontrado na frente do seu cartão.",
+    "description": "American Express security code help text"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Detalhes da conta"
@@ -538,8 +546,14 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "Ocorreu um erro. Tente novamente."
   },
+  "global.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à lista de desejos"
+  },
   "global.info.removed_from_wishlist": {
     "defaultMessage": "Item removido da lista de desejos"
+  },
+  "global.link.added_to_wishlist.view_wishlist": {
+    "defaultMessage": "Ver"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logotipo"
@@ -569,14 +583,14 @@
     "defaultMessage": "Recursos prontos para uso, para que você só precise adicionar melhorias."
   },
   "home.description.here_to_help": {
-    "defaultMessage": "Entre em contato com nossa equipe de suporte, e ela levará você"
+    "defaultMessage": "Entre em contato com nossa equipe de suporte."
   },
   "home.description.here_to_help_line_2": {
-    "defaultMessage": "ao lugar correto."
+    "defaultMessage": "Eles vão levá-lo ao lugar certo."
   },
   "home.description.shop_products": {
     "defaultMessage": "Esta seção tem conteúdo do catálogo. {docLink} sobre como substitui-lo.",
-    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos"
+    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
     "defaultMessage": "Práticas recomendadas de comércio eletrônico para a experiência de carrinho e checkout do comprador."
@@ -653,6 +667,9 @@
   "item_image.label.sale": {
     "defaultMessage": "Promoção",
     "description": "A sale badge placed on top of a product image"
+  },
+  "lCPCxk": {
+    "defaultMessage": "Selecione todas as opções acima"
   },
   "locale_text.message.ar-SA": {
     "defaultMessage": "Árabe (Arábia Saudita)"
@@ -955,9 +972,6 @@
   "product_detail.accordion.message.coming_soon": {
     "defaultMessage": "Em breve"
   },
-  "product_detail.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à lista de desejos"
-  },
   "product_detail.recommended_products.title.complete_set": {
     "defaultMessage": "Completar o conjunto"
   },
@@ -978,9 +992,6 @@
   },
   "product_list.drawer.title.sort_by": {
     "defaultMessage": "Ordenar por"
-  },
-  "product_list.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à lista de desejos"
   },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "Limpar filtros"
@@ -1044,9 +1055,6 @@
   },
   "recent_searches.heading.recent_searches": {
     "defaultMessage": "Pesquisas recentes"
-  },
-  "recommended_products.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à lista de desejos"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "Fazer logon"
@@ -1387,6 +1395,12 @@
   },
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "Nova senha"
+  },
+  "wishlist_primary_action.button.add_to_cart": {
+    "defaultMessage": "Adicionar ao carrinho"
+  },
+  "wishlist_primary_action.button.select_options": {
+    "defaultMessage": "Selecionar Opções"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) ao carrinho"

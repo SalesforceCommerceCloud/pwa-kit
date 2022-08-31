@@ -168,9 +168,6 @@
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "Neue Zahlungsmethode hinzufügen"
   },
-  "cart.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {Artikel} other {Artikel}} zur Wunschliste hinzugefügt"
-  },
   "cart.info.removed_from_cart": {
     "defaultMessage": "Artikel aus dem Warenkorb entfernt"
   },
@@ -196,7 +193,7 @@
     "defaultMessage": "Dies ist ein Geschenk."
   },
   "cart_secondary_button_group.link_learn_more": {
-    "defaultMessage": "Weitere Informationen"
+    "defaultMessage": "Mehr erfahren"
   },
   "cart_skeleton.heading.order_summary": {
     "defaultMessage": "Bestellungsübersicht"
@@ -215,6 +212,9 @@
   },
   "checkout.button.place_order": {
     "defaultMessage": "Bestellen"
+  },
+  "checkout.message.generic_error": {
+    "defaultMessage": "Es ist ein unerwarteter Fehler beim Checkout aufgetreten."
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Konto erstellen"
@@ -335,10 +335,10 @@
     "defaultMessage": "Aktion bestätigen"
   },
   "confirmation_modal.remove_cart_item.action.no": {
-    "defaultMessage": "Nein, Artikel beibehalten."
+    "defaultMessage": "Nein, Artikel beibehalten"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
-    "defaultMessage": "Ja, Artikel entfernen."
+    "defaultMessage": "Ja, Artikel entfernen"
   },
   "confirmation_modal.remove_cart_item.message.sure_to_remove": {
     "defaultMessage": "Möchten Sie diesen Artikel wirklich aus Ihrem Warenkorb löschen?"
@@ -365,7 +365,7 @@
     "defaultMessage": "Sie haben bereits ein Konto? Einloggen"
   },
   "contact_info.button.checkout_as_guest": {
-    "defaultMessage": "Kaufabwicklung als Gast"
+    "defaultMessage": "Als Gast bezahlen"
   },
   "contact_info.button.login": {
     "defaultMessage": "Einloggen"
@@ -378,6 +378,14 @@
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "Kontaktinfo"
+  },
+  "credit_card_fields.tool_tip.security_code": {
+    "defaultMessage": "Dieser 3-stellige Code befindet sich auf der Rückseite Ihrer Karte.",
+    "description": "Generic credit card security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code.american_express": {
+    "defaultMessage": "Dieser 4-stellige Code befindet sich auf der Vorderseite Ihrer Karte.",
+    "description": "American Express security code help text"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Kontodetails"
@@ -538,8 +546,14 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
   },
+  "global.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {Artikel} other {Artikel}} zur Wunschliste hinzugefügt"
+  },
   "global.info.removed_from_wishlist": {
     "defaultMessage": "Artikel aus der Wunschliste entfernt"
+  },
+  "global.link.added_to_wishlist.view_wishlist": {
+    "defaultMessage": "Anzeigen"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
@@ -569,14 +583,14 @@
     "defaultMessage": "Vorkonfigurierte Funktionalitäten, damit Sie sich voll und ganz auf das Hinzufügen von Erweiterungen konzentrieren können."
   },
   "home.description.here_to_help": {
-    "defaultMessage": "Wenden Sie sich an unser Support-Team – es leitet Sie gern"
+    "defaultMessage": "Wenden Sie sich an unser Support-Team."
   },
   "home.description.here_to_help_line_2": {
-    "defaultMessage": "an die richtige Stelle weiter."
+    "defaultMessage": "Sie werden Sie an die richtige Stelle weiterleiten."
   },
   "home.description.shop_products": {
     "defaultMessage": "Dieser Abschnitt enthält Content vom Katalog. Hier erfahren Sie, wie dieser ersetzt werden kann: {docLink}.",
-    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos"
+    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
     "defaultMessage": "E-Commerce Best Practice für den Warenkorb eines Käufers und das Checkout-Erlebnis."
@@ -653,6 +667,9 @@
   "item_image.label.sale": {
     "defaultMessage": "Sonderangebot",
     "description": "A sale badge placed on top of a product image"
+  },
+  "lCPCxk": {
+    "defaultMessage": "Bitte wählen Sie oben all Ihre Optionen aus"
   },
   "locale_text.message.ar-SA": {
     "defaultMessage": "Arabisch (Saudi-Arabien)"
@@ -955,9 +972,6 @@
   "product_detail.accordion.message.coming_soon": {
     "defaultMessage": "bald verfügbar"
   },
-  "product_detail.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {Artikel} other {Artikel}} zur Wunschliste hinzugefügt"
-  },
   "product_detail.recommended_products.title.complete_set": {
     "defaultMessage": "Set vervollständigen"
   },
@@ -978,9 +992,6 @@
   },
   "product_list.drawer.title.sort_by": {
     "defaultMessage": "Sortieren nach"
-  },
-  "product_list.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {Artikel} other {Artikel}} zur Wunschliste hinzugefügt"
   },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "Filter löschen"
@@ -1044,9 +1055,6 @@
   },
   "recent_searches.heading.recent_searches": {
     "defaultMessage": "Letzte Suchabfragen"
-  },
-  "recommended_products.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {Artikel} other {Artikel}} zur Wunschliste hinzugefügt"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "Anmelden"
@@ -1387,6 +1395,12 @@
   },
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "Neues Passwort"
+  },
+  "wishlist_primary_action.button.add_to_cart": {
+    "defaultMessage": "In den Warenkorb"
+  },
+  "wishlist_primary_action.button.select_options": {
+    "defaultMessage": "Optionen auswählen"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {Artikel} other {Artikel}} zum Warenkorb hinzugefügt"
