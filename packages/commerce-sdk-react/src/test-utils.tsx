@@ -17,7 +17,8 @@ const sampleProps = {
     shortCode: '8o7m175y',
     siteId: 'RefArchGlobal',
     locale: 'en_US',
-    currency: 'USD'
+    currency: 'USD',
+    correlationId: ''
 }
 const TestProviders = (props: {children: React.ReactNode}) => {
     return (

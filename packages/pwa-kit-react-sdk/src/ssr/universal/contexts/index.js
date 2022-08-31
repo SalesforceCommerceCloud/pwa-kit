@@ -9,5 +9,6 @@ import React from 'react'
 import DeviceContext from '../device-context'
 
 const ExpressContext = React.createContext()
+const CorrelationIdContext = React.createContext()
 
-export {DeviceContext, ExpressContext}
+export {DeviceContext, ExpressContext, CorrelationIdContext}

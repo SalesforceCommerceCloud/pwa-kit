@@ -8,7 +8,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
-import {DeviceContext, ExpressContext} from '../universal/contexts'
+import {DeviceContext, ExpressContext, CorrelationIdContext} from '../universal/contexts'
 import App from '../universal/components/_app'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
@@ -84,18 +84,20 @@ export const start = () => {
         .then(() => {
             ReactDOM.hydrate(
                 <ExpressContext.Provider value={{}}>
-                    <Router>
-                        <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                            <AppConfig locals={locals}>
-                                <Switch
-                                    error={error}
-                                    appState={window.__PRELOADED_STATE__}
-                                    routes={routes}
-                                    App={WrappedApp}
-                                />
-                            </AppConfig>
-                        </DeviceContext.Provider>
-                    </Router>
+                    <CorrelationIdContext.Provider value={'hello-jello-id-client'}>
+                        <Router>
+                            <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
+                                <AppConfig locals={locals}>
+                                    <Switch
+                                        error={error}
+                                        appState={window.__PRELOADED_STATE__}
+                                        routes={routes}
+                                        App={WrappedApp}
+                                    />
+                                </AppConfig>
+                            </DeviceContext.Provider>
+                        </Router>
+                    </CorrelationIdContext.Provider>
                 </ExpressContext.Provider>,
                 rootEl,
                 () => {

@@ -7,8 +7,12 @@
 /* istanbul ignore file */
 
 import {useContext} from 'react'
-import {ExpressContext} from '../contexts'
+import {CorrelationIdContext, ExpressContext} from '../contexts'
 
 export const useExpress = () => {
     return useContext(ExpressContext)
+}
+
+export const useCorrelationId = () => {
+    return useContext(CorrelationIdContext)
 }

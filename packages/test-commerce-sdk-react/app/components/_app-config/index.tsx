@@ -7,12 +7,16 @@
 import React, {ReactElement} from 'react'
 // @ts-ignore
 import {CommerceApiProvider} from 'commerce-sdk-react'
+import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 interface AppConfigProps {
     children: React.ReactNode
 }
 
 const AppConfig = (props: AppConfigProps): ReactElement => {
+
+    const correlationId = useCorrelationId()
+
     return (
         <CommerceApiProvider
             siteId="RefArchGlobal"
@@ -22,6 +26,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
             proxy="http://localhost:3000/mobify/proxy/api"
             locale="en-US"
             currency="USD"
+            correlationId={correlationId}
         >
             {props.children}
         </CommerceApiProvider>
