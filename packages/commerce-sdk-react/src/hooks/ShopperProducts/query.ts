@@ -11,6 +11,40 @@ import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
 
+const productKeys = {
+    // ✅ all keys are arrays with exactly one object
+    // Object query keys even make your fuzzy matching capabilities more powerful,
+    // because they have no order.
+    all: [{scope: 'products'}] as const,
+    lists: () => [{...productKeys.all[0], entity: 'list'}] as const,
+    // TODO: Add "products" parameters
+    list: (state: State, sorting: Sorting) => [{...productKeys.lists()[0], state, sorting}] as const
+
+    // all: ['todos'] as const,
+    // lists: () => [...todoKeys.all, 'list'] as const,
+    // list: (state: State, sorting: Sorting) =>
+    //     [...todoKeys.lists(), state, sorting] as const,
+    // details: () => [...todoKeys.all, 'detail'] as const,
+    // detail: (id: number) => [...todoKeys.details(), id] as const,
+}
+
+// queryFn
+const fetchTodos = async ({
+    // ✅ extract named properties from the queryKey
+    queryKey: [{state, sorting}]
+}: // 🤯 only accept keys that come from the factory
+QueryFunctionContext<ReturnType<typeof todoKeys['list']>>) => {
+    const response = await axios.get(`todos/${state}?sorting=${sorting}`)
+    return response.data
+}
+
+export const useTodos = () => {
+    const {state, sorting} = useTodoParams()
+
+    // ✅ build the key via the factory
+    return useQuery(todoKeys.list(state, sorting), fetchTodos)
+}
+
 type UseProductsParameters = NonNullable<Argument<Client['getProducts']>>['parameters']
 type UseProductsHeaders = NonNullable<Argument<Client['getProducts']>>['headers']
 type UseProductsArg = {headers?: UseProductsHeaders; rawResponse?: boolean} & UseProductsParameters
@@ -39,7 +73,9 @@ function useProducts(
     const {shopperProducts: client} = useCommerceApi()
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
+        // Query Key needs to match "options"
         ['products', arg],
+        // Don't send "options" different from the queryKey
         () => client.getProducts({parameters, headers}, rawResponse),
         options
     )

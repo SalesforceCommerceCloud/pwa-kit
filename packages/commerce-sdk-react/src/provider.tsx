@@ -20,6 +20,7 @@ import {
 
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
+import {defaultQueryClientConfig} from './config/query-client.config'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
@@ -42,7 +43,15 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
  * @returns Provider to wrap your app with
  */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
-    const {children, clientId, organizationId, shortCode, siteId, proxy, queryClientConfig} = props
+    const {
+        children,
+        clientId,
+        organizationId,
+        shortCode,
+        siteId,
+        proxy,
+        queryClientConfig = defaultQueryClientConfig
+    } = props
 
     // DEBUG: copy access token from browser
     const headers = {

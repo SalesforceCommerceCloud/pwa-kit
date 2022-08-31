@@ -13,7 +13,9 @@ export const useAsync = <T>(
     fn: () => Promise<T>,
     queryOptions?: UseQueryOptions<T, Error>
 ) => {
-    // add more logic in here
+    // React Query uses QueryFunctionContext object to inject information about
+    // the query to the queryFn.
+    // fn will receive {queryKey} as a parameter
     return useQuery<T, Error>(queryKey, fn, queryOptions)
 }
 
