@@ -43,7 +43,16 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
  * @returns Provider to wrap your app with
  */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
-    const {children, clientId, organizationId, shortCode, siteId, proxy, queryClientConfig, correlationId} = props
+    const {
+        children,
+        clientId,
+        organizationId,
+        shortCode,
+        siteId,
+        proxy,
+        queryClientConfig,
+        correlationId
+    } = props
 
     // DEBUG: copy access token from browser
     const headers = {

@@ -8,7 +8,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
-import {DeviceContext, ExpressContext, CorrelationIdContext} from '../universal/contexts'
+import {
+    DeviceContext,
+    ExpressContext,
+    CorrelationIdProvider
+} from '../universal/contexts'
 import App from '../universal/components/_app'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
@@ -84,7 +88,7 @@ export const start = () => {
         .then(() => {
             ReactDOM.hydrate(
                 <ExpressContext.Provider value={{}}>
-                    <CorrelationIdContext.Provider value={'hello-jello-id-client'}>
+                    <CorrelationIdProvider>
                         <Router>
                             <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                                 <AppConfig locals={locals}>
@@ -97,7 +101,7 @@ export const start = () => {
                                 </AppConfig>
                             </DeviceContext.Provider>
                         </Router>
-                    </CorrelationIdContext.Provider>
+                    </CorrelationIdProvider>
                 </ExpressContext.Provider>,
                 rootEl,
                 () => {

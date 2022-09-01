@@ -19,7 +19,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl, getRoutes} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
-import {CorrelationIdContext, ExpressContext} from '../universal/contexts'
+import {CorrelationIdProvider, ExpressContext} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -218,10 +218,9 @@ export const render = async (req, res, next) => {
 
 const getAppJSX = (req, res, error, appData) => {
     const {App, appState = {}, deviceType, location, routerContext, routes} = appData
-
     return (
         <ExpressContext.Provider value={{req, res}}>
-            <CorrelationIdContext.Provider value={'hello-jello-id-server'}>
+            <CorrelationIdProvider req={req}>
                 <Router location={location} context={routerContext}>
                     <DeviceContext.Provider value={{type: deviceType}}>
                         <AppConfig locals={res.locals}>
@@ -229,7 +228,7 @@ const getAppJSX = (req, res, error, appData) => {
                         </AppConfig>
                     </DeviceContext.Provider>
                 </Router>
-            </CorrelationIdContext.Provider>
+            </CorrelationIdProvider>
         </ExpressContext.Provider>
     )
 }

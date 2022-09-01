@@ -7,15 +7,14 @@
 import React, {ReactElement} from 'react'
 // @ts-ignore
 import {CommerceApiProvider} from 'commerce-sdk-react'
-import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 
 interface AppConfigProps {
     children: React.ReactNode
 }
 
 const AppConfig = (props: AppConfigProps): ReactElement => {
-
-    const correlationId = useCorrelationId()
+    const {correlationId} = useCorrelationId()
 
     return (
         <CommerceApiProvider
