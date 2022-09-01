@@ -15,7 +15,7 @@
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
   "license": "SEE LICENSE IN LICENSE",
-  "author": "dev@mobify.com",
+  "author": "cc-pwa-kit@salesforce.com",
   "bin": {
     "internal-lib-build": "./bin/internal-lib-build.js"
   },
