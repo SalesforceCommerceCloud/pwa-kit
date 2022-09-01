@@ -12,7 +12,7 @@ interface AppProps {
 }
 
 const App = (props: AppProps): ReactElement => {
-    return <Fragment>{props.children}</Fragment>
+    return <Fragment><Fragment>{JSON.stringify(props.greeting)}</Fragment><Fragment>{props.children}</Fragment></Fragment>
 }
 
 App.getProps = () => {

@@ -8,9 +8,6 @@ import React from 'react'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
-import withLoadableResolver from '../with-loadable-resolver'
-import {compose} from '../../utils'
-import {withErrorHandling} from '../../components'
 
 const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee its functionality if used elsewhere.`
 const STATE_KEY = '__REACT_QUERY__'
@@ -23,8 +20,6 @@ const STATE_KEY = '__REACT_QUERY__'
  * @returns
  */
 export const withReactQuery = (Component) => {
-    Component = compose(withLoadableResolver, withErrorHandling)(Component)
-
     const wrappedComponentName = Component.displayName || Component.name
 
     // NOTE: Is this a reliable way to determine the component type (e.g. will this work in prodution
@@ -70,7 +65,19 @@ export const withReactQuery = (Component) => {
                 const queries = queryCache.getAll()
                 const promises = queries
                     .filter(({options}) => options.enabled !== false)
-                    .map((query) => query.fetch().catch((e) => ({error: e})))
+                    .map((query) => query.fetch().catch((error) => {
+                        // NOTE: Our best attempt to create a logical return object without
+                        // getting out of hand.
+                        return {
+                            error,
+                            errorUpdatedAt: Date.now(),
+                            errorUpdateCount: 1,
+                            isError: true,
+                            isLoadingError: true,
+                            isRefetchError: false,
+                            status: 'error'
+                        }
+                    }))
 
                 return Promise.all(promises)
             })

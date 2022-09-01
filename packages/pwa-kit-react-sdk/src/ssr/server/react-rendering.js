@@ -34,7 +34,7 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
-import {withReactQuery} from '../universal/components'
+import {withErrorHandling, withLoadableResolver, withReactQuery} from '../universal/components'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -98,7 +98,12 @@ export const render = async (req, res, next) => {
     // bundle, we can probably clean up the logive for getProps somehow.
     const WrappedApp = withReactQuery(App)
     const deviceType = detectDeviceType(req)
-    let routes = getRoutes(res.locals)
+
+    // Get routes and wrap with resolver and error handlers
+    let routes = getRoutes(res.locals).map(({component, ...rest}) => ({
+        component: component ? withErrorHandling(withLoadableResolver(component)) : component,
+        ...rest
+    }))
 
     if (WrappedApp.enhanceRoutes) {
         routes = WrappedApp.enhanceRoutes(routes, true, res.locals)
@@ -288,9 +293,6 @@ const renderApp = async (args) => {
 
     // Return the first error encountered during the rendering pipeline.
     const error = routeError || appStateError || renderError
-    // console.log('ROUTE ERROR: ', routeError)
-    // console.log('APP STATE ERROR: ', appStateError)
-    // console.log('RENDER ERROR: ', renderError)
 
     // Remove the stacktrace when executing remotely as to not leak any important
     // information to users about our system.
