@@ -11,6 +11,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import {useCorrelationId} from '../../hooks'
 
 /**
  * This is a special component that can be overridden in a project. We recommend
@@ -32,9 +33,11 @@ import PropTypes from 'prop-types'
  *      <i>This property is typically used to distinguish 404 errors from other types.</i>
  */
 const Error = ({message, stack, status}) => {
+    const id = useCorrelationId()
     return (
         <div>
             <h1>Error Status: {status}</h1>
+            <div>correlation ID: ${id}</div>
             <pre>{stack}</pre>
             <pre>{message}</pre>
         </div>

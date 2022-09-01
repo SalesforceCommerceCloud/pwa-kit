@@ -22,11 +22,14 @@ const CorrelationIdProvider = ({children, req}) => {
         // if req.headers['x-amzn-requestid'] is defined, use it
         // otherwise, generate a new one
         if (req.headers['x-amzn-requestid']) {
+            console.log('remote server')
             correlationId = req.headers['x-amzn-requestid']
         } else {
+            console.log('dev server')
             correlationId = uuidv4()
         }
     } else {
+        console.log('client')
         correlationId = uuidv4()
     }
     return (
