@@ -7,6 +7,7 @@
 import React, {ReactElement} from 'react'
 // @ts-ignore
 import {CommerceApiProvider} from 'commerce-sdk-react'
+// @ts-ignore
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 
 interface AppConfigProps {
