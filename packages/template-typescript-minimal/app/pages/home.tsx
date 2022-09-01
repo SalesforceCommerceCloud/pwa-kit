@@ -8,7 +8,7 @@ import React, {useEffect, useState} from 'react'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
-import {usePageResponse, usePageRequest} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 interface Props {
     value: number
@@ -91,12 +91,10 @@ const Home = ({value}: Props) => {
         return () => clearInterval(interval)
     }, [counter, setCounter])
 
-    const pageRes = usePageResponse()
+    const {req: pageReq, res: pageRes} = useServerContext()
     if (pageRes) {
         pageRes.status(404)
     }
-
-    const pageReq = usePageRequest()
 
     return (
         <div>

@@ -8,5 +8,4 @@
 import React from 'react'
 
 export const DeviceContext = React.createContext()
-export const PageRequestContext = React.createContext()
-export const PageResponseContext = React.createContext()
+export const ServerContext = React.createContext()
