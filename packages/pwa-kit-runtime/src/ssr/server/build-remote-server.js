@@ -373,6 +373,12 @@ export const RemoteServerFactory = {
                 console.log(`Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`)
             }
 
+            // if the request has x-amzn-requestid, assign it to x-correlation-id
+            const amzRequestId = req.headers['x-amzn-requestid']
+            if (amzRequestId) {
+                req.headers['x-correlation-id'] = amzRequestId
+            }
+
             // Apply the request processor
             const requestProcessor = that._getRequestProcessor(req)
             const parsed = URL.parse(req.url)

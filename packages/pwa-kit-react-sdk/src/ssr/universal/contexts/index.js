@@ -16,15 +16,14 @@ export {CorrelationIdContext}
 const CorrelationIdContext = React.createContext()
 
 const CorrelationIdProvider = ({children, req}) => {
-    // uuid v4 format
     let correlationId
+
     if (req) {
-        // if req.headers['x-amzn-requestid'] is defined, use it
-        // otherwise, generate a new one
-        if (req.headers['x-amzn-requestid']) {
-            correlationId = req.headers['x-amzn-requestid']
+        // if the correlation is define in the header, use it, otherwise, generate one
+        if (req.headers['x-correlation-id']) {
+            correlationId = req.headers['x-correlation-id']
         } else {
-            // Note: what is the ideal way to know if
+            // generate on for local development on server side
             const id = uuidv4()
             console.log('Dev server correlation ID generated server side', id)
             correlationId = id
@@ -32,6 +31,7 @@ const CorrelationIdProvider = ({children, req}) => {
     } else {
         correlationId = uuidv4()
     }
+
     return (
         <CorrelationIdContext.Provider value={{correlationId}}>
             {children}
