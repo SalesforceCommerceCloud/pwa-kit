@@ -18,8 +18,7 @@ import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
 import {getAssetUrl, getRoutes} from '../universal/utils'
-import DeviceContext from '../universal/device-context'
-import {ExpressContext} from '../universal/contexts'
+import {DeviceContext, ServerContext} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -204,7 +203,7 @@ export const render = async (req, res, next) => {
     }
 
     try {
-        ;({html, routerContext, error} = await renderApp(args))
+        ({html, routerContext, error} = await renderApp(args))
     } catch (e) {
         // This is an unrecoverable error.
         // (errors handled by the AppErrorBoundary are considered recoverable)
@@ -230,7 +229,7 @@ const getAppJSX = (req, res, error, appData) => {
     const {App, appState = {}, deviceType, location, routerContext, routes} = appData
 
     return (
-        <ExpressContext.Provider value={{req, res}}>
+        <ServerContext.Provider value={{req, res}}>
             <Router location={location} context={routerContext}>
                 <DeviceContext.Provider value={{type: deviceType}}>
                     <AppConfig locals={res.locals}>
@@ -238,7 +237,7 @@ const getAppJSX = (req, res, error, appData) => {
                     </AppConfig>
                 </DeviceContext.Provider>
             </Router>
-        </ExpressContext.Provider>
+        </ServerContext.Provider>
     )
 }
 

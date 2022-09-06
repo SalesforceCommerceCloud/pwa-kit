@@ -8,7 +8,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
-import {DeviceContext, ExpressContext} from '../universal/contexts'
+import {DeviceContext, ServerContext} from '../universal/contexts'
 import App from '../universal/components/_app'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
@@ -83,7 +83,7 @@ export const start = () => {
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
             ReactDOM.hydrate(
-                <ExpressContext.Provider value={{}}>
+                <ServerContext.Provider value={{}}>
                     <Router>
                         <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                             <AppConfig locals={locals}>
@@ -96,7 +96,7 @@ export const start = () => {
                             </AppConfig>
                         </DeviceContext.Provider>
                     </Router>
-                </ExpressContext.Provider>,
+                </ServerContext.Provider>,
                 rootEl,
                 () => {
                     window.__HYDRATING__ = false
