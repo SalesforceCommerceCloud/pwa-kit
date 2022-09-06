@@ -462,7 +462,7 @@ export const RemoteServerFactory = {
             locals.requestStart = Date.now()
             locals.afterResponseCalled = false
             locals.responseCaching = {}
-            locals.requestId = _nextRequestId++
+            locals.requestId = req['x-correlation-id'] || _nextRequestId++
             locals.timer = new PerformanceTimer(`req${locals.requestId}`)
             locals.originalUrl = req.originalUrl
 
