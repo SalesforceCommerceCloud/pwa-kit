@@ -99,6 +99,11 @@ export const render = async (req, res, next) => {
     const WrappedApp = withReactQuery(App)
     const deviceType = detectDeviceType(req)
 
+    WrappedApp.initStaticContext({
+        req,
+        res
+    })
+
     // Get routes and wrap with resolver and error handlers
     let routes = getRoutes(res.locals).map(({component, ...rest}) => ({
         component: component ? withErrorHandling(withLoadableResolver(component)) : component,

@@ -89,6 +89,17 @@ export const withReactQuery = (Component) => {
         ]
     }
 
+    let _staticContext
+    // Should be called immediately after wrapping a component with this HOC
+    // @private
+    WrappedComponent.initStaticContext = (value) => {
+        _staticContext = value
+
+        if (Component.initStaticContext) {
+            Component.initStaticContext(value)
+        }
+    }
+
     WrappedComponent.displayName = `withReactQuery(${wrappedComponentName})`
 
     return WrappedComponent

@@ -35,7 +35,7 @@ const now = () => {
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
 // @private
- export const routeComponent = (Wrapped, isPage, locals) => {
+ export const routeComponent = (Wrapped, isPage, locals, extraGetPropsArgsFn) => {
     // NOTE: At the point in time when the API is being wrapped by `withLegacyGetProps` the __PRELOADED_STATE__ object doesn't
     // exist. Meaning we can't access it. We need to find a solution to this.
     let _preloadedProps
@@ -159,10 +159,8 @@ const now = () => {
                     return Wrapped.getComponent ? Wrapped.getComponent() : Wrapped
                 })
                 .then((component) => {
-                    if (!extraArgs) {
-                        extraArgs = AppConfig.extraGetPropsArgs({
-                            originalUrl: 'http://localhost:3000'
-                        })
+                    if (!extraArgs && extraGetPropsArgsFn) {
+                        extraArgs = extraGetPropsArgsFn()
                     }
                     
                     return component.getProps ? component.getProps({...args, ...extraArgs}) : Promise.resolve()
@@ -384,14 +382,21 @@ const now = () => {
  * route-config. It provides an interface, via static methods on React components,
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
-export const withLegacyGetProps = (Wrapped) => {
+export const withLegacyGetProps = (Wrapped, options) => {
+    let _staticContext = {}
+    
+    // Wrapped = 
+    //     compose(
+    //         routeComponent, 
+    //         withRouter
+    //     )(Wrapped, false, {}, () => {
+    //         return options.extraGetPropsArgs ? options.extraGetPropsArgs(_staticContext) : {}
+    //     }) // Sketchy
 
-    Wrapped = 
-        compose(
-            routeComponent, 
-            withRouter
-        )(Wrapped)
-
+    Wrapped = routeComponent(withRouter(Wrapped), false, {}, () => {
+        return options.extraGetPropsArgs ? options.extraGetPropsArgs(_staticContext) : {}
+    }) // Sketchy
+        
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
     
@@ -458,6 +463,16 @@ export const withLegacyGetProps = (Wrapped) => {
             dataPromise,
             ...(Wrapped.getDataPromises ? Wrapped.getDataPromises(renderContext) : [])
         ]
+    }
+
+    // Should be called immediately after wrapping a component with this HOC
+    // @private
+    WrappedComponent.initStaticContext = (value) => {
+        _staticContext = value
+
+        if (Wrapped.initStaticContext) {
+            Wrapped.initStaticContext(value)
+        }
     }
 
     const excludes = {
