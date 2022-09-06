@@ -91,10 +91,9 @@ const Home = ({value}: Props) => {
         return () => clearInterval(interval)
     }, [counter, setCounter])
 
-    const {req: pageReq, res: pageRes} = useServerContext()
-    if (pageRes) {
+    useServerContext(({res: pageRes}) => {
         pageRes.status(404)
-    }
+    })
 
     return (
         <div>
@@ -111,9 +110,6 @@ const Home = ({value}: Props) => {
                     <div className="divider"></div>
                 </div>
                 <div className="panel">
-                    {/* NOTE: React would complain that this content rendered server-side does not match the one on client-side */}
-                    {pageReq && <p>Path of the page&apos;s request: {pageReq.path}</p>}
-
                     <p style={{width: '300px'}} className="fade-in fade-in-0">
                         <b>This page is written in Typescript</b>
                         <br />

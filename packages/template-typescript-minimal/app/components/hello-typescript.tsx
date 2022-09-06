@@ -13,14 +13,12 @@ interface Props {
 
 const HelloTS = ({message}: Props) => {
     // Unlike `getProps`, React hook like this can be called anywhere in the component tree
-    const {res: pageRes} = useServerContext()
-
-    if (pageRes) {
+    useServerContext(({res: pageRes}) => {
         // This inner component would override the status code that was set in the <Home> page component
-        pageRes.status(201)
+        pageRes.status(202)
 
         pageRes.set('Some-Header', 'FOOBAR')
-    }
+    })
 
     return <span>And this is a TS component (it takes a prop: &quot;{message}&quot;).</span>
 }
