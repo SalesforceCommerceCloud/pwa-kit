@@ -15,7 +15,7 @@ const HelloTS = ({message}: Props) => {
     // Unlike `getProps`, React hook like this can be called anywhere in the component tree
     useServerContext(({res: pageRes}) => {
         // This inner component would override the status code that was set in the <Home> page component
-        pageRes.status(202)
+        // pageRes.status(202)
 
         pageRes.set('Some-Header', 'FOOBAR')
     })

@@ -91,6 +91,8 @@ const Home = ({value}: Props) => {
             // Mock network delay.
             await new Promise((resolve) => setTimeout(resolve, 80))
 
+            throw new Error('FOO')
+
             return {
                 message: 'react query works!'
             }
@@ -108,7 +110,11 @@ const Home = ({value}: Props) => {
     }, [counter, setCounter])
 
     useServerContext(({res: pageRes}) => {
-        pageRes.status(404)
+        console.log('--- query', {isLoading: query.isLoading, error: query.error, data: query.data})
+
+        if (query.error) {
+            pageRes.status(404)
+        }
     })
 
     return (
