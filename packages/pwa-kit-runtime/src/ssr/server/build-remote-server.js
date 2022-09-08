@@ -13,6 +13,7 @@ import {
     CACHE_CONTROL,
     NO_CACHE
 } from './constants'
+import {v4 as uuid} from 'uuid'
 import {
     catchAndLog,
     getHashForString,
@@ -71,8 +72,6 @@ const METRIC_DIMENSIONS = {
     Project: process.env.MOBIFY_PROPERTY_ID,
     Target: process.env.DEPLOY_TARGET
 }
-
-let _nextRequestId = 1
 
 /**
  * @private
@@ -373,12 +372,6 @@ export const RemoteServerFactory = {
                 console.log(`Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`)
             }
 
-            // if the request has x-amzn-requestid, assign it to x-correlation-id
-            const amzRequestId = req.headers['x-amzn-requestid']
-            if (amzRequestId) {
-                req.headers['x-correlation-id'] = amzRequestId
-            }
-
             // Apply the request processor
             const requestProcessor = that._getRequestProcessor(req)
             const parsed = URL.parse(req.url)
@@ -468,7 +461,8 @@ export const RemoteServerFactory = {
             locals.requestStart = Date.now()
             locals.afterResponseCalled = false
             locals.responseCaching = {}
-            locals.requestId = req['x-correlation-id'] || _nextRequestId++
+            locals.requestId = req.headers['x-amzn-requestid'] || uuid()
+
             locals.timer = new PerformanceTimer(`req${locals.requestId}`)
             locals.originalUrl = req.originalUrl
 

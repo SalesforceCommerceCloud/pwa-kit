@@ -7,7 +7,6 @@
 
 import React from 'react'
 import DeviceContext from '../device-context'
-import {v4 as uuidv4} from 'uuid'
 
 const ExpressContext = React.createContext()
 
@@ -15,23 +14,7 @@ export {CorrelationIdContext}
 
 const CorrelationIdContext = React.createContext()
 
-const CorrelationIdProvider = ({children, req}) => {
-    let correlationId
-
-    if (req) {
-        // if the correlation is define in the header, use it, otherwise, generate one
-        if (req.headers['x-correlation-id']) {
-            correlationId = req.headers['x-correlation-id']
-        } else {
-            // generate on for local development on server side
-            const id = uuidv4()
-            console.log('Dev server correlation ID generated server side', id)
-            correlationId = id
-        }
-    } else {
-        correlationId = uuidv4()
-    }
-
+const CorrelationIdProvider = ({children, correlationId}) => {
     return (
         <CorrelationIdContext.Provider value={{correlationId}}>
             {children}

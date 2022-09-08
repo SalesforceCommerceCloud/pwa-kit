@@ -220,7 +220,7 @@ const getAppJSX = (req, res, error, appData) => {
     const {App, appState = {}, deviceType, location, routerContext, routes} = appData
     return (
         <ExpressContext.Provider value={{req, res}}>
-            <CorrelationIdProvider req={req}>
+            <CorrelationIdProvider correlationId={res.locals.requestId}>
                 <Router location={location} context={routerContext}>
                     <DeviceContext.Provider value={{type: deviceType}}>
                         <AppConfig locals={res.locals}>
