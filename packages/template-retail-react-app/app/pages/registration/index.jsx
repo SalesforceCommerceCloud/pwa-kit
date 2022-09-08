@@ -13,11 +13,13 @@ import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import RegisterForm from '../../components/register'
 import useNavigation from '../../hooks/use-navigation'
+import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 const Registration = () => {
     const navigate = useNavigation()
     const customer = useCustomer()
     const form = useForm()
+    const einstein = useEinstein()
 
     const submitForm = async (data) => {
         try {
@@ -33,6 +35,11 @@ const Registration = () => {
             navigate('/account')
         }
     }, [customer])
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        einstein.sendViewPage()
+    }, [])
 
     return (
         <Box data-testid="registration-page" bg="gray.50" py={[8, 16]}>

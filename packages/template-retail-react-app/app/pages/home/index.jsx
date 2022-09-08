@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
 
@@ -33,6 +33,9 @@ import ProductScroller from '../../components/product-scroller'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from './data'
 
+//Hooks
+import useEinstein from '../../commerce-api/hooks/useEinstein'
+
 // Constants
 import {
     MAX_CACHE_AGE,
@@ -48,6 +51,12 @@ import {
  */
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
+    const einstein = useEinstein()
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        einstein.sendViewPage()
+    }, [])
 
     return (
         <Box data-testid="home-page" layerStyle="page">

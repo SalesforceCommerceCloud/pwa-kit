@@ -15,6 +15,7 @@ import {useForm} from 'react-hook-form'
 import ResetPasswordForm from '../../components/reset-password'
 import {BrandLogo} from '../../components/icons'
 import useNavigation from '../../hooks/use-navigation'
+import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 const ResetPassword = () => {
     const customer = useCustomer()
@@ -22,6 +23,7 @@ const ResetPassword = () => {
     const navigate = useNavigation()
     const [submittedEmail, setSubmittedEmail] = useState('')
     const [showSubmittedSuccess, setShowSubmittedSuccess] = useState(false)
+    const einstein = useEinstein()
 
     const submitForm = async ({email}) => {
         try {
@@ -32,6 +34,11 @@ const ResetPassword = () => {
             form.setError('global', {type: 'manual', message: error.message})
         }
     }
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        einstein.sendViewPage()
+    }, [])    
 
     return (
         <Box data-testid="reset-password-page" bg="gray.50" py={[8, 16]}>
