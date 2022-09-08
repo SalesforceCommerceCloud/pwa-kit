@@ -85,7 +85,11 @@ export const DevServerMixin = {
      * @private
      */
     _setupLogging(app) {
-        app.use(expressLogging(':method :url :status :res[content-length] - :response-time ms (:req[x-correlation-id])'))
+        app.use(
+            expressLogging(
+                ':method :url :status :res[content-length] - :response-time ms (:req[x-correlation-id])'
+            )
+        )
     },
 
     /**
