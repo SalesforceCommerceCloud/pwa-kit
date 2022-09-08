@@ -25,6 +25,7 @@ export const withErrorHandling = (Wrapped) => {
     hoistNonReactStatic(WithErrorHandling, Wrapped)
 
     WithErrorHandling.displayName = `withErrorHandling(${wrappedComponentName})`
+
     return WithErrorHandling
 }
 

@@ -12,11 +12,18 @@ interface AppProps {
 }
 
 const App = (props: AppProps): ReactElement => {
-    return <Fragment>{props.children}</Fragment>
+    return <Fragment><Fragment>{JSON.stringify(props.greeting)}</Fragment><Fragment>{props.children}</Fragment></Fragment>
 }
 
-App.getProps = () => {
+App.getProps = ({secretMessage}) => {
+    console.log(`The secret message is... "${secretMessage}"`)
     return {greeting: 'Hello from the App component.'}
 }
 
-export default withLegacyGetProps(App)
+const extraGetPropsArgs = ({req}) => {
+    return {
+        originalUrl: typeof window !== 'undefined' ? window.location.href : req.originalUrl,
+        secretMessage: 'The brown cow sleeps when the moon is full'
+    }
+}
+export default withLegacyGetProps(App, {extraGetPropsArgs})

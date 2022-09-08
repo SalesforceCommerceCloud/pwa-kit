@@ -10,7 +10,6 @@ import {withRouter} from 'react-router-dom'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import AppConfig from '../../components/_app-config'
 import {pages as pageEvents} from '../../events'
-import {withErrorHandling, withLoadableResolver} from '../../components'
 import {compose} from '../../utils'
 
 // const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee its functionality if used elsewhere.`
@@ -35,89 +34,39 @@ const now = () => {
  * route-config. It provides an interface, via static methods on React components,
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
-export const withLegacyGetProps = (Wrapped, isPage) => {
+// @private
+ export const routeComponent = (Wrapped, isPage, locals, extraGetPropsArgsFn) => {
+    // NOTE: At the point in time when the API is being wrapped by `withLegacyGetProps` the __PRELOADED_STATE__ object doesn't
+    // exist. Meaning we can't access it. We need to find a solution to this.
+    let _preloadedProps
     let extraArgs
-    // const extraArgs = AppConfig.extraGetPropsArgs()
-
-    // NOTE: NOT SURE IF THIS IS THE RIGHT PLACE TO BE DOING THIS?
-    Wrapped = withLoadableResolver(Wrapped)
 
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
+
     class RouteComponent extends React.Component {
         constructor(props, context) {
             super(props, context)
+
+            // Initialize the preloaded state from the internal "global" variable when rendering on server,
+            // and from the frozen state when rendered on the client.
+            // Ideally this logic would exist inside the `withLegacyGetProps` HOC, but because we "enhance"
+            // the routes before we get data, there is no way to pass data down to them.
+            const preloadedState = 
+                typeof window !== 'undefined' ? 
+                    window?.__PRELOADED_STATE__?.[STATE_KEY]?.[`${isPage ? 'page' : 'app'}Props`] 
+                    : _preloadedProps
+        
             this.state = {
                 childProps: {
                     // When serverside or hydrating, forward props from the frozen app state
                     // to the wrapped component.
-                    ...(isServerSide || isHydrating() ? this.props.preloadedProps : undefined),
+                    ...(isServerSide || isHydrating() ? this.props.preloadedProps || preloadedState : undefined),
                     isLoading: false
                 }
             }
 
             this._suppressUpdate = false
-        }
-
-        /**
-         * Enhance route components with the `withLegacyGetProps` higher order component.
-         *
-         * @param {Object[]} routes
-         * @param {Boolean} isPage
-         * @param {Object} locals
-         *
-         * @return {Object[]}
-         */
-        static enhanceRoutes(routes = [], isPage, locals) {
-            routes = Wrapped.enhanceRoutes ? Wrapped.enhanceRoutes(routes) : routes
-
-            return routes.map(({component, ...rest}) => ({
-                component: component ? withLegacyGetProps(component, isPage, locals) : component,
-                ...rest
-            }))
-        }
-
-        /**
-         * Returns the `getProps` promises for the matched App and Page components, this includes
-         * any promises returned by the child components `getDataPromises` implementation if one
-         * exists.
-         *
-         * @param {Object} renderContext
-         * @return {Promise<Object[]>}
-         */
-        static getDataPromises(renderContext) {
-            const {App, route, match, req, res, location} = renderContext
-
-            const dataPromise = Promise.resolve()
-                .then(() => {
-                    const {params} = match
-                    const components = [App, route.component]
-                    const promises = components.map((c) =>
-                        c.getProps
-                            ? c.getProps({
-                                  req,
-                                  res,
-                                  params,
-                                  location
-                              })
-                            : Promise.resolve({})
-                    )
-
-                    return Promise.all(promises)
-                })
-                .then(([appProps, pageProps]) => {
-                    return {
-                        [STATE_KEY]: {
-                            appProps,
-                            pageProps
-                        }
-                    }
-                })
-
-            return [
-                dataPromise,
-                ...(Wrapped.getDataPromises ? Wrapped.getDataPromises(renderContext) : [])
-            ]
         }
 
         /**
@@ -148,12 +97,18 @@ export const withLegacyGetProps = (Wrapped, isPage) => {
          * @return {Promise<Boolean>}
          */
         static async shouldGetProps(args) {
+            let component
             const defaultImpl = () => {
                 const {previousLocation, location} = args
                 return !previousLocation || previousLocation.pathname !== location.pathname
             }
-            const component = await Wrapped.getComponent()
 
+            if (Wrapped.getComponent) {
+                component = await Wrapped.getComponent()
+            } else {
+                component = Wrapped
+            }
+            
             return component.shouldGetProps ? component.shouldGetProps(args) : defaultImpl()
         }
 
@@ -199,15 +154,22 @@ export const withLegacyGetProps = (Wrapped, isPage) => {
          */
         // eslint-disable-next-line
         static getProps(args) {
-            RouteComponent._latestPropsPromise = Wrapped.getComponent().then((component) => {
-                if (!extraArgs) {
-                    extraArgs = AppConfig.extraGetPropsArgs({
-                        originalUrl: 'http://localhost:3000'
-                    })
-                }
+            RouteComponent._latestPropsPromise = Promise.resolve()
+                .then(() => {
+                    return Wrapped.getComponent ? Wrapped.getComponent() : Wrapped
+                })
+                .then((component) => {
+                    if (!extraArgs && extraGetPropsArgsFn) {
+                        extraArgs = extraGetPropsArgsFn()
+                    }
+                    
+                    return component.getProps ? component.getProps({...args, ...extraArgs}) : Promise.resolve()
+                })
+                .then((props) => {
+                    _preloadedProps = props
 
-                return component.getProps ? component.getProps({...args, ...extraArgs}) : Promise.resolve()
-            })
+                    return props
+                })
 
             return RouteComponent._latestPropsPromise
         }
@@ -386,7 +348,8 @@ export const withLegacyGetProps = (Wrapped, isPage) => {
         }
     }
 
-    RouteComponent.displayName = `withLegacyGetProps(${wrappedComponentName})`
+
+    RouteComponent.displayName = `routeComponent(${wrappedComponentName})`
 
     RouteComponent.defaultProps = {
         onGetPropsComplete: noop,
@@ -406,13 +369,122 @@ export const withLegacyGetProps = (Wrapped, isPage) => {
     const excludes = {
         shouldGetProps: true,
         getProps: true,
-        enhanceRoutes: true,
-        getDataPromises: true
+        getTemplateName: true
     }
 
     hoistNonReactStatic(RouteComponent, Wrapped, excludes)
 
-    return compose(withErrorHandling, withRouter)(RouteComponent)
+    return RouteComponent
+}
+
+/**
+ * The `routeComponent` HOC is automatically used on every component in a project's
+ * route-config. It provides an interface, via static methods on React components,
+ * that can be used to fetch data on the server and on the client, seamlessly.
+ */
+export const withLegacyGetProps = (Wrapped, options) => {
+    let _staticContext = {}
+    
+    // Wrapped = 
+    //     compose(
+    //         routeComponent, 
+    //         withRouter
+    //     )(Wrapped, false, {}, () => {
+    //         return options.extraGetPropsArgs ? options.extraGetPropsArgs(_staticContext) : {}
+    //     }) // Sketchy
+
+    Wrapped = routeComponent(withRouter(Wrapped), false, {}, () => {
+        return options.extraGetPropsArgs ? options.extraGetPropsArgs(_staticContext) : {}
+    }) // Sketchy
+        
+    /* istanbul ignore next */
+    const wrappedComponentName = Wrapped.displayName || Wrapped.name
+    
+    const WrappedComponent = ({...passThroughProps}) => {
+        return <Wrapped {...passThroughProps} />
+    }
+
+    /**
+     * Enhance route components with the `withLegacyGetProps` higher order component.
+     *
+     * @param {Object[]} routes
+     * @param {Boolean} isPage
+     * @param {Object} locals
+     *
+     * @return {Object[]}
+     */
+    WrappedComponent.enhanceRoutes = (routes = [], isPage, locals) => {
+        routes = Wrapped.enhanceRoutes ? Wrapped.enhanceRoutes(routes) : routes
+
+        return routes.map(({component, ...rest}) => ({
+            component: component ? routeComponent(withRouter(component), true, locals) : component,
+            ...rest
+        }))
+    }
+
+    /**
+     * Returns the `getProps` promises for the matched App and Page components, this includes
+     * any promises returned by the child components `getDataPromises` implementation if one
+     * exists.
+     *
+     * @param {Object} renderContext
+     * @return {Promise<Object[]>}
+     */
+    WrappedComponent.getDataPromises = (renderContext) => {
+        const {App, route, match, req, res, location} = renderContext
+
+        const dataPromise = Promise.resolve()
+            .then(() => {
+                const {params} = match
+                const components = [App, route.component]
+                const promises = components.map((c) =>
+                    c.getProps
+                        ? c.getProps({
+                              req,
+                              res,
+                              params,
+                              location
+                          })
+                        : Promise.resolve({})
+                )
+
+                return Promise.all(promises)
+            })
+            .then(([appProps, pageProps]) => {
+                return {
+                    [STATE_KEY]: {
+                        appProps,
+                        pageProps
+                    }
+                }
+            })
+
+        return [
+            dataPromise,
+            ...(Wrapped.getDataPromises ? Wrapped.getDataPromises(renderContext) : [])
+        ]
+    }
+
+    // Should be called immediately after wrapping a component with this HOC
+    // @private
+    WrappedComponent.initStaticContext = (value) => {
+        _staticContext = value
+
+        if (Wrapped.initStaticContext) {
+            Wrapped.initStaticContext(value)
+        }
+    }
+
+    const excludes = {
+        enhanceRoutes: true,
+        getDataPromises: true
+    }
+
+    hoistNonReactStatic(WrappedComponent, Wrapped, excludes)
+
+    WrappedComponent.displayName = `withLegacyGetProps(${wrappedComponentName})`
+
+    return WrappedComponent
 }
 
 export default withLegacyGetProps
