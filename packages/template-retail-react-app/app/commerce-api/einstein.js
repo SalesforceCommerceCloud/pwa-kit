@@ -91,6 +91,71 @@ class EinsteinAPI {
     }
 
     /**
+     * Tells the Einstein engine when a user views search results.
+     **/
+    async sendViewSearch(searchText, products, args) {
+        const endpoint = `/activities/${this.config.siteId}/viewSearch`
+        const method = 'POST'
+        const body = {
+            searchText,
+            products,
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user clicks on a search result.
+    **/
+    async sendClickSearch(searchText, products, args) {
+        const endpoint = `/activities/${this.config.siteId}/clickSearch`
+        const method = 'POST'
+        const body = {
+            searchText,
+            products,
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user views a category.
+    **/
+    async sendViewCategory(category, products, args) {
+        const endpoint = `/activities/${this.config.siteId}/viewCategory`
+        const method = 'POST'
+        const body = {
+            category: {
+                id
+            },
+            products,
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user clicks a product from the category page.
+     * Not meant to be used when the user clicks a category from the nav bar.
+    **/
+    async sendClickCategory(category, products, args) {
+        const endpoint = `/activities/${this.config.siteId}/clickCategory`
+        const method = 'POST'
+        const body = {
+            category: {
+                id
+            },
+            products,
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
      * Tells the Einstein engine when a user views a set of recommendations
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
@@ -126,6 +191,34 @@ class EinsteinAPI {
                 altId,
                 altIdType
             },
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user views a page.
+     * Use this only for pages where another activity does not fit. (ie. on the PDP, use viewProduct rather than this)
+     **/
+    async sendViewPage(args) {
+        const endpoint = `/activities/${this.config.siteId}/viewPage`
+        const method = 'POST'
+        const body = {
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user starts the checkout process.
+     **/
+    async sendBeginCheckout(products, args) {
+        const endpoint = `/activities/${this.config.siteId}/beginCheckout`
+        const method = 'POST'
+        const body = {
+            products: products,
             ...args
         }
 
