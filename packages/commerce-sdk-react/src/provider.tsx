@@ -57,7 +57,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     // DEBUG: copy access token from browser
     const headers = {
         authorization: '',
-        ...(correlationId && {'x-correlation-id': correlationId})
+        ...(correlationId && {'correlation-id': correlationId})
     }
 
     const config = {
