@@ -6,7 +6,7 @@
  */
 /* istanbul ignore file */
 
-import {useContext} from 'react'
+import React, {useContext} from 'react'
 import {CorrelationIdContext, ExpressContext} from '../contexts'
 
 export const useExpress = () => {
@@ -14,5 +14,9 @@ export const useExpress = () => {
 }
 
 export const useCorrelationId = () => {
-    return useContext(CorrelationIdContext)
+    const context = React.useContext(CorrelationIdContext)
+    if (context === undefined) {
+        throw new Error('useCorrelationId needs to be used within CorrelationIdProvider')
+    }
+    return context
 }

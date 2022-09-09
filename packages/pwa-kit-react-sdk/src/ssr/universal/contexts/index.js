@@ -21,12 +21,5 @@ const CorrelationIdProvider = ({children, correlationId}) => {
         </CorrelationIdContext.Provider>
     )
 }
-const useCorrelationId = () => {
-    const context = React.useContext(CorrelationIdContext)
-    if (context === undefined) {
-        throw new Error('useCorrelationId needs to be used within CorrelationIdProvider')
-    }
-    return context
-}
 
-export {useCorrelationId, CorrelationIdProvider, DeviceContext, ExpressContext}
+export {CorrelationIdProvider, DeviceContext, ExpressContext}
