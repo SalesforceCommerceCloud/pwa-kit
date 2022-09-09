@@ -9,6 +9,7 @@ import {withRouter} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import Error from '../../components/_error'
 import {HTTPError} from '../../errors'
+import {withCorrelationId} from '../with-correlation-id'
 
 export const AppErrorContext = React.createContext()
 
@@ -78,7 +79,7 @@ class AppErrorBoundary extends React.Component {
 
         return (
             <AppErrorContext.Provider value={{onGetPropsError: this.onGetPropsError}}>
-                {error ? <Error {...error} /> : children}
+                {error ? <Error {...error} correlationId={this.props.correlationId} /> : children}
             </AppErrorContext.Provider>
         )
     }
@@ -90,8 +91,9 @@ AppErrorBoundary.propTypes = {
         message: PropTypes.string.isRequired,
         status: PropTypes.number.isRequired
     }),
+    correlationId: PropTypes.string,
     history: PropTypes.object
 }
 
 export {AppErrorBoundary as AppErrorBoundaryWithoutRouter}
-export default withRouter(AppErrorBoundary)
+export default withRouter(withCorrelationId(AppErrorBoundary))

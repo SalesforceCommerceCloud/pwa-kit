@@ -26,7 +26,7 @@ import {
     CLIENT_OPTIONAL,
     REQUEST_PROCESSOR
 } from '../../configs/webpack/config-names'
-
+import crypto from 'crypto'
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
 
@@ -72,6 +72,11 @@ export const DevServerMixin = {
     /**
      * @private
      */
+    _addEventContext(app) {},
+
+    /**
+     * @private
+     */
     _setCompression(app) {
         app.use(
             compression({
@@ -81,11 +86,20 @@ export const DevServerMixin = {
         )
     },
 
+    _setRequestId(res) {
+        const locals = res.locals
+        locals.requestId = crypto.randomUUID()
+    },
+
     /**
      * @private
      */
     _setupLogging(app) {
-        app.use(expressLogging('dev'))
+        app.use(
+            expressLogging(
+                '(:req[correlation-id]) :method :url :status :response-time ms - :res[content-length]'
+            )
+        )
     },
 
     /**

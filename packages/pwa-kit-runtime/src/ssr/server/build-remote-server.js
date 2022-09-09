@@ -40,6 +40,7 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import awsServerlessExpress from 'aws-serverless-express'
+import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -71,8 +72,6 @@ const METRIC_DIMENSIONS = {
     Project: process.env.MOBIFY_PROPERTY_ID,
     Target: process.env.DEPLOY_TARGET
 }
-
-let _nextRequestId = 1
 
 /**
  * @private
@@ -232,7 +231,7 @@ export const RemoteServerFactory = {
         // Do this first – we want compression applied to
         // everything when it's enabled at all.
         this._setCompression(app)
-
+        this._addEventContext(app)
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
@@ -327,6 +326,14 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line no-unused-vars
     _addSDKInternalHandlers(app) {},
+
+    /**
+     * @private
+     * Get the event object Lambda receives from API Gateway
+     */
+    _addEventContext(app) {
+        app.use(awsServerlessExpressMiddleware.eventContext())
+    },
 
     /**
      * @private
@@ -462,9 +469,10 @@ export const RemoteServerFactory = {
             locals.requestStart = Date.now()
             locals.afterResponseCalled = false
             locals.responseCaching = {}
-            locals.requestId = _nextRequestId++
+
             locals.timer = new PerformanceTimer(`req${locals.requestId}`)
             locals.originalUrl = req.originalUrl
+            that._setRequestId(res, req)
 
             // Track this response
             req.app._requestMonitor._responseStarted(res)
@@ -539,6 +547,12 @@ export const RemoteServerFactory = {
         }
 
         app.use(ssrRequestProcessorMiddleware)
+    },
+
+    _setRequestId(res, req) {
+        const requestContext = req.apiGateway.event.requestContext
+        const locals = res.locals
+        locals.requestId = requestContext.requestId
     },
 
     /**
