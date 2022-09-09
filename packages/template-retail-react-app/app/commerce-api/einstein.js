@@ -214,11 +214,12 @@ class EinsteinAPI {
     /**
      * Tells the Einstein engine when a user starts the checkout process.
      **/
-    async sendBeginCheckout(products, args) {
+    async sendBeginCheckout(products, subtotal, args) {
         const endpoint = `/activities/${this.config.siteId}/beginCheckout`
         const method = 'POST'
         const body = {
             products: products,
+            amount: subtotal,
             ...args
         }
 

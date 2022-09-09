@@ -8,6 +8,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import useBasket from '../../../commerce-api/hooks/useBasket'
 import useCustomer from '../../../commerce-api/hooks/useCustomer'
+import useEinstein from '../../../commerce-api/hooks/useEinstein'
 import {useCommerceAPI} from '../../../commerce-api/contexts'
 import {getPaymentInstrumentCardType} from '../../../utils/cc-utils'
 import {isMatchingAddress} from '../../../utils/utils'
@@ -21,6 +22,7 @@ export const CheckoutProvider = ({children}) => {
     const customer = useCustomer()
     const basket = useBasket()
     const {formatMessage} = useIntl()
+    const einstein = useEinstein()
 
     const [state, setState] = useState({
         // @TODO: use contants to represent checkout steps like const CHECKOUT_STEP_2_SHIPPING = 2
@@ -84,6 +86,24 @@ export const CheckoutProvider = ({children}) => {
             mergeState({step: 4})
         }
     }, [customer, basket])
+
+    /**************** Einstein ****************/
+    // Run this when checkout begins and when a user logs in during checkout
+    // TODO: This fires twice when an already logged in customer goes to checkout
+    useEffect(() => {
+        if (basket) {
+            const products = basket.productItems?.map((product) => {
+                const {productId, sku = '', price = '', quantity = ''} = product
+                return {
+                    id: productId,
+                    sku,
+                    price,
+                    quantity
+                }
+            })
+            einstein.sendBeginCheckout(products, basket.productSubTotal)
+        }
+    }, [customer]) 
 
     // We combine our state and actions into a single context object. This is much more
     // convenient than having to import and bind actions seprately. State updates will
