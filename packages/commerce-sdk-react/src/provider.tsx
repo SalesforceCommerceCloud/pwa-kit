@@ -46,12 +46,12 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {
         children,
         clientId,
+        correlationId = '',
         organizationId,
-        shortCode,
-        siteId,
         proxy,
         queryClientConfig,
-        correlationId = ''
+        siteId,
+        shortCode
     } = props
 
     // DEBUG: copy access token from browser
