@@ -13,7 +13,7 @@ import useCommerceApi from './useCommerceApi'
 import {useAsync} from './useAsync'
 import useAuth from './useAuth'
 
-const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`})
+const {withMocks} = mockHttpResponses({mode: 'lockdown', directory: `${__dirname}/mock-responses`})
 
 // NOTE: how to easily _update_ the mocked responses:
 // - Globally, via `npm run test:update-mocked-responses`
@@ -32,8 +32,8 @@ const ProductName = ({id}: {id: string}) => {
             const product = await api.shopperProducts.getProduct({
                 parameters: {id},
                 headers: {
-                    Authorization: `Bearer ${access_token}`
-                }
+                    Authorization: `Bearer ${access_token}`,
+                },
             })
             setProductName(product.name as string)
         }
@@ -43,34 +43,38 @@ const ProductName = ({id}: {id: string}) => {
     return <div>{productName}</div>
 }
 
-const ProductName2 = ({id}: {id: string}) => {
-    const api = useCommerceApi()
-    const {data, isLoading, error} = useAsync(['getProduct', {id}], async ({access_token}) =>
-        api.shopperProducts.getProduct({
-            parameters: {id},
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            }
-        })
-    )
+// const ProductName2 = ({id}: {id: string}) => {
+//     const api = useCommerceApi()
+//     const {data, isLoading, error} = useAsync(['getProduct', {id}], async ({access_token}) =>
+//         api.shopperProducts.getProduct({
+//             parameters: {id},
+//             headers: {
+//                 Authorization: `Bearer ${access_token}`,
+//             },
+//         })
+//     )
 
-    return (
-        <div>
-            {isLoading && <span>Loading...</span>}
-            {data && <span>{data.name}</span>}
-            {error && <span>error</span>}
-        </div>
-    )
-}
+//     return (
+//         <div>
+//             {isLoading && <span>Loading...</span>}
+//             {data && <span>{data.name}</span>}
+//             {error && <span>error</span>}
+//         </div>
+//     )
+// }
 
 describe('lower-level hook', () => {
     test(
-        'useCommerceApi',
+        'useCommerceApi', //     renderWithProviders(<ProductName id="25591862M" />) //     //     // This util function would automatically integrate the provider components for you //     // whose filename matches the name of the current test. // Every test that calls `withMocks` would get associated with its own recording file, // withMocks(async () => {
 
-        // Every test that calls `withMocks` would get associated with its own recording file,
-        // whose filename matches the name of the current test.
+        //     const productName = 'Stripe Walking Short'
+        //     await waitFor(() => screen.getByText(productName))
+
+        //     expect(screen.getByText(productName)).toBeInTheDocument()
+        // })
         withMocks(async () => {
-            // This util function would automatically integrate the provider components for you
+            // whose filename matches the name of the current test. // Every test that calls `withMocks` would get associated with its own recording file,
+            //     // This util function would automatically integrate the provider components for you
             renderWithProviders(<ProductName id="25591862M" />)
 
             const productName = 'Stripe Walking Short'
@@ -81,44 +85,44 @@ describe('lower-level hook', () => {
     )
 })
 
-describe('higher-level hook', () => {
-    test(
-        'useAsync happy path',
-        withMocks(async () => {
-            renderWithProviders(<ProductName2 id="25591862M" />)
-            const productName = 'Stripe Walking Short'
+// describe('higher-level hook', () => {
+//     test(
+//         'useAsync happy path',
+//         withMocks(async () => {
+//             renderWithProviders(<ProductName2 id="25591862M" />)
+//             const productName = 'Stripe Walking Short'
 
-            expect(screen.queryByText(productName)).toBeNull()
-            expect(screen.getByText('Loading...')).toBeInTheDocument()
+//             expect(screen.queryByText(productName)).toBeNull()
+//             expect(screen.getByText('Loading...')).toBeInTheDocument()
 
-            await waitFor(() => screen.getByText(productName))
+//             await waitFor(() => screen.getByText(productName))
 
-            expect(screen.getByText(productName)).toBeInTheDocument()
-            expect(screen.queryByText('Loading...')).toBeNull()
-        })
-    )
+//             expect(screen.getByText(productName)).toBeInTheDocument()
+//             expect(screen.queryByText('Loading...')).toBeNull()
+//         })
+//     )
 
-    test(
-        'useAsync error',
-        withMocks(async () => {
-            // Pass in a non-existent product id
-            renderWithProviders(<ProductName2 id="1" />)
-            expect(screen.getByText('Loading...')).toBeInTheDocument()
+//     test(
+//         'useAsync error',
+//         withMocks(async () => {
+//             // Pass in a non-existent product id
+//             renderWithProviders(<ProductName2 id="1" />)
+//             expect(screen.getByText('Loading...')).toBeInTheDocument()
 
-            await waitFor(() => screen.getByText('error'))
-            expect(screen.getByText('error')).toBeInTheDocument()
-            expect(screen.queryByText('Loading...')).toBeNull()
-        })
-    )
-})
+//             await waitFor(() => screen.getByText('error'))
+//             expect(screen.getByText('error')).toBeInTheDocument()
+//             expect(screen.queryByText('Loading...')).toBeNull()
+//         })
+//     )
+// })
 
-describe('highest-level hook', () => {
-    test(
-        'useProduct',
-        withMocks(async () => {
-            // TODO: what should get tested in a highest-level hook (like useProduct)?
-            // If we've tested the lower-level hooks (useCommerceApi, useAsync), would that be sufficient?
-            // And can we assume that the isomorphic sdk is well-tested already?
-        })
-    )
-})
+// describe('highest-level hook', () => {
+//     test(
+//         'useProduct',
+//         withMocks(async () => {
+//             // TODO: what should get tested in a highest-level hook (like useProduct)?
+//             // If we've tested the lower-level hooks (useCommerceApi, useAsync), would that be sufficient?
+//             // And can we assume that the isomorphic sdk is well-tested already?
+//         })
+//     )
+// })
