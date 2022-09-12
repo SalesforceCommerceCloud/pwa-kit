@@ -165,9 +165,6 @@ class Auth {
      * Used to validate JWT token expiration.
      */
     private isTokenExpired(token: string) {
-        if (!token) {
-            return true
-        }
         const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
@@ -231,7 +228,9 @@ class Auth {
             return this.pendingToken
         }
 
-        if (!this.isTokenExpired(this.get('access_token'))) {
+        const accessToken = this.get('access_token')
+
+        if (accessToken && !this.isTokenExpired(accessToken)) {
             this.pendingToken = Promise.resolve(this.data)
             return this.pendingToken
         }
