@@ -16,6 +16,7 @@ import {
     ShopperDiscoverySearch,
     ShopperGiftCertificates,
     ShopperSearch,
+    ShopperBasketsTypes,
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
@@ -29,6 +30,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     currency: string
     redirectURI: string
     queryClientConfig?: QueryClientConfig
+    fetchOptions?: ShopperBasketsTypes.FetchOptions
 }
 
 /**
@@ -57,6 +59,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         proxy,
         redirectURI,
         queryClientConfig,
+        fetchOptions,
     } = props
 
     const config = {
@@ -68,6 +71,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             siteId,
         },
         throwOnBadResponse: true,
+        fetchOptions,
     }
 
     const apiClients = useMemo(() => {
