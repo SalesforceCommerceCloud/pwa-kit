@@ -114,7 +114,7 @@ const DATA_MAP: AuthDataMap = {
 class Auth {
     private client: ShopperLogin<ApiClientConfigParams>
     private redirectURI: string
-    private pending: Promise<ShopperLoginTypes.TokenResponse> | undefined
+    private pendingToken: Promise<ShopperLoginTypes.TokenResponse> | undefined
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
 
     constructor(config: AuthConfig) {
@@ -202,8 +202,8 @@ class Auth {
      * @Internal
      */
     async queueRequest(fn: () => Promise<ShopperLoginTypes.TokenResponse>, isGuest: boolean) {
-        const queue = this.pending ?? Promise.resolve()
-        this.pending = queue.then(async () => {
+        const queue = this.pendingToken ?? Promise.resolve()
+        this.pendingToken = queue.then(async () => {
             const token = await fn()
             this.handleTokenResponse(token, isGuest)
 
@@ -212,7 +212,7 @@ class Auth {
             // We must always grab the data from the storage (cookie/localstorage) directly
             return this.data
         })
-        return this.pending
+        return this.pendingToken
     }
 
     /**
@@ -227,13 +227,13 @@ class Auth {
      * 3. PKCE flow
      */
     async ready() {
-        if (this.pending) {
-            return this.pending
+        if (this.pendingToken) {
+            return this.pendingToken
         }
 
         if (!this.isTokenExpired(this.get('access_token'))) {
-            this.pending = Promise.resolve(this.data)
-            return this.pending
+            this.pendingToken = Promise.resolve(this.data)
+            return this.pendingToken
         }
 
         const refreshTokenRegistered = this.get('refresh_token_registered')
