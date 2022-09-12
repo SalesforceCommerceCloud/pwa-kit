@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
+import path from 'path'
 import React, {useEffect, useState} from 'react'
 import {screen, waitFor} from '@testing-library/react'
 
@@ -13,7 +13,7 @@ import useCommerceApi from './useCommerceApi'
 import {useAsync} from './useAsync'
 import useAuth from './useAuth'
 
-const {withMocks} = mockHttpResponses({mode: 'lockdown', directory: `${__dirname}/mock-responses`})
+const {withMocks} = mockHttpResponses({directory: path.join(__dirname, `../../mock-responses`)})
 
 // NOTE: how to easily _update_ the mocked responses:
 // - Globally, via `npm run test:update-mocked-responses`
@@ -78,7 +78,6 @@ describe('lower-level hook', () => {
             renderWithProviders(<ProductName id="25591862M" />)
             const productName = 'Stripe Walking Short'
             await waitFor(() => screen.getByText(productName))
-
             expect(screen.getByText(productName)).toBeInTheDocument()
         })
     )

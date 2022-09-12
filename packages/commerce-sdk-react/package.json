@@ -32,7 +32,7 @@
     "test:watch": "npm test -- --watch",
     "test:inspect": "node --inspect-brk jest --runInBand",
     "test:no-mocked-responses": "cross-env NOCK_BACK_MODE=wild npm run test",
-    "test:update-mocked-responses": "cross-env NOCK_BACK_MODE=update node --experimental-vm-modules ../internal-lib-build/node_modules/.bin/jest --verbose --coverage=false",
+    "test:update-mocked-responses": "cross-env NOCK_BACK_MODE=update npm test",
     "typecheck": "tsc --noEmit",
     "version": "node ./scripts/version.js",
     "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\""

@@ -4,67 +4,61 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-import React from 'react'
-import {render, screen} from '@testing-library/react'
+import path from 'path'
+import React, {useState, useEffect} from 'react'
+import {screen, waitFor} from '@testing-library/react'
 import useCommerceApi from './hooks/useCommerceApi'
-import CommerceApiProvider from './provider'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {renderWithProviders, mockHttpResponses, TEST_CONFIG} from './test-utils'
+import useAuth from './hooks/useAuth'
 
-const sampleProps = {
-    proxy: 'http://localhost:3000/mobify/proxy/api',
-    clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-    organizationId: 'f_ecom_zzrf_001',
-    shortCode: '8o7m175y',
-    siteId: 'RefArchGlobal',
-    locale: 'en_US',
-    redirectURI: 'http://localhost:3000/callback',
-    currency: 'USD'
-}
-const queryClient = new QueryClient()
+const {withMocks} = mockHttpResponses({directory: path.join(__dirname, `../mock-responses`)})
 
-const SampleProvider = (props: {children: React.ReactNode}) => {
-    return (
-        <QueryClientProvider client={queryClient}>
-            <CommerceApiProvider {...sampleProps}>{props.children}</CommerceApiProvider>
-        </QueryClientProvider>
-    )
-}
+test(
+    'useCommerceApi returns a set of api clients',
+    withMocks(async () => {
+        const Component = () => {
+            const api = useCommerceApi()
+            const auth = useAuth()
+            const [isAuthReady, setIsAuthReady] = useState(false)
+            useEffect(() => {
+                const waitForAuth = async () => {
+                    await auth.ready()
+                    setIsAuthReady(true)
+                }
+                waitForAuth()
+            }, [])
+            return (
+                <>
+                    <p>{api?.shopperSearch && 'success'}</p>
+                    <p>{isAuthReady && 'ready'}</p>
+                </>
+            )
+        }
+        renderWithProviders(<Component />)
+        await waitFor(() => screen.getByText('success') && screen.getByText('ready'))
+        expect(screen.getByText('success')).toBeInTheDocument()
+    })
+)
 
-test('useCommerceApi returns a set of api clients', () => {
-    const Component = () => {
-        const api = useCommerceApi()
-        return <div>{api?.shopperSearch && 'success'}</div>
-    }
-    render(
-        <SampleProvider>
-            <Component />
-        </SampleProvider>
-    )
+test(
+    'props are used properly when initializing api clients',
+    withMocks(async () => {
+        const Component = () => {
+            const api = useCommerceApi()
+            return (
+                <ul>
+                    <li>{api?.shopperSearch?.clientConfig?.parameters?.clientId}</li>
+                    <li>{api?.shopperSearch?.clientConfig?.parameters?.siteId}</li>
+                    <li>{api?.shopperSearch?.clientConfig?.parameters?.shortCode}</li>
+                    <li>{api?.shopperSearch?.clientConfig?.parameters?.organizationId}</li>
+                </ul>
+            )
+        }
+        renderWithProviders(<Component />)
 
-    expect(screen.getByText('success')).toBeInTheDocument()
-})
-
-test('props are used properly when initializing api clients', () => {
-    const Component = () => {
-        const api = useCommerceApi()
-        return (
-            <ul>
-                <li>{api?.shopperSearch?.clientConfig?.parameters?.clientId}</li>
-                <li>{api?.shopperSearch?.clientConfig?.parameters?.siteId}</li>
-                <li>{api?.shopperSearch?.clientConfig?.parameters?.shortCode}</li>
-                <li>{api?.shopperSearch?.clientConfig?.parameters?.organizationId}</li>
-            </ul>
-        )
-    }
-    render(
-        <SampleProvider>
-            <Component />
-        </SampleProvider>
-    )
-
-    expect(screen.getByText(sampleProps.clientId)).toBeInTheDocument()
-    expect(screen.getByText(sampleProps.siteId)).toBeInTheDocument()
-    expect(screen.getByText(sampleProps.shortCode)).toBeInTheDocument()
-    expect(screen.getByText(sampleProps.organizationId)).toBeInTheDocument()
-})
+        expect(screen.getByText(TEST_CONFIG.clientId)).toBeInTheDocument()
+        expect(screen.getByText(TEST_CONFIG.siteId)).toBeInTheDocument()
+        expect(screen.getByText(TEST_CONFIG.shortCode)).toBeInTheDocument()
+        expect(screen.getByText(TEST_CONFIG.organizationId)).toBeInTheDocument()
+    })
+)
