@@ -230,17 +230,32 @@ const getAppJSX = (req, res, error, appData) => {
     const {App, appState = {}, deviceType, location, routerContext, routes} = appData
     return (
         <ExpressContext.Provider value={{req, res}}>
-            <CorrelationIdProvider correlationId={res.locals.requestId}>
-                <Router location={location} context={routerContext}>
+            <Router location={location} context={routerContext}>
+                <CorrelationIdProvider correlationId={res.locals.requestId}>
                     <DeviceContext.Provider value={{type: deviceType}}>
                         <AppConfig locals={res.locals}>
                             <Switch error={error} appState={appState} routes={routes} App={App} />
                         </AppConfig>
                     </DeviceContext.Provider>
-                </Router>
-            </CorrelationIdProvider>
+                </CorrelationIdProvider>
+            </Router>
         </ExpressContext.Provider>
     )
+    // return (
+    //     <ExpressContext.Provider value={{req, res}}>
+    //         <Router
+    //             location={location}
+    //             context={routerContext}
+    //             correlationId={res.locals.requestId}
+    //         >
+    //             <DeviceContext.Provider value={{type: deviceType}}>
+    //                 <AppConfig locals={res.locals}>
+    //                     <Switch error={error} appState={appState} routes={routes} App={App} />
+    //                 </AppConfig>
+    //             </DeviceContext.Provider>
+    //         </Router>
+    //     </ExpressContext.Provider>
+    // )
 }
 
 const renderAppHtml = (req, res, error, appData) => {

@@ -85,8 +85,8 @@ export const start = () => {
         .then(() => {
             ReactDOM.hydrate(
                 <ExpressContext.Provider value={{}}>
-                    <CorrelationIdProvider correlationId={id}>
-                        <Router>
+                    <Router>
+                        <CorrelationIdProvider correlationId={id}>
                             <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                                 <AppConfig locals={locals}>
                                     <Switch
@@ -97,8 +97,8 @@ export const start = () => {
                                     />
                                 </AppConfig>
                             </DeviceContext.Provider>
-                        </Router>
-                    </CorrelationIdProvider>
+                        </CorrelationIdProvider>
+                    </Router>
                 </ExpressContext.Provider>,
                 rootEl,
                 () => {

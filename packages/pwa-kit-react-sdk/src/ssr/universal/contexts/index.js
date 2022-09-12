@@ -8,23 +8,30 @@
 import React from 'react'
 import DeviceContext from '../device-context'
 import {v4 as uuid} from 'uuid'
-const ExpressContext = React.createContext()
+import {withRouter} from 'react-router-dom'
 
-export {CorrelationIdContext}
+const ExpressContext = React.createContext()
 
 const CorrelationIdContext = React.createContext()
 
-const CorrelationIdProvider = ({children, correlationId}) => {
-    const [id, reset] = React.useState(correlationId)
-    const handleReset = () => {
+const CorrelationIdProvider = ({children, correlationId, location}) => {
+    const [id, setId] = React.useState(correlationId)
+    React.useEffect(() => {
         const newId = uuid()
-        reset(newId)
-    }
+        setId(newId)
+    }, [location.pathname])
     return (
-        <CorrelationIdContext.Provider value={{correlationId: id, reset: handleReset}}>
+        <CorrelationIdContext.Provider value={{correlationId: id}}>
             {children}
         </CorrelationIdContext.Provider>
     )
 }
 
-export {CorrelationIdProvider, DeviceContext, ExpressContext}
+const CorrelationIdProviderWithRouter = withRouter(CorrelationIdProvider)
+
+export {
+    CorrelationIdContext,
+    CorrelationIdProviderWithRouter as CorrelationIdProvider,
+    DeviceContext,
+    ExpressContext
+}
