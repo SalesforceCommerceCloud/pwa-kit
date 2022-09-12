@@ -9,7 +9,7 @@ import {configure} from '@testing-library/dom'
 
 // Default testing library timeout is too short for serial network calls
 configure({
-    asyncUtilTimeout: 10000,
+    asyncUtilTimeout: 10000
 })
 
 jest.setTimeout(10000)
@@ -35,5 +35,5 @@ class LocalStorageMock {
 const localStorageMock = new LocalStorageMock()
 
 Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock,
+    value: localStorageMock
 })

@@ -19,14 +19,14 @@ const sampleProps = {
     redirectURI: 'http://localhost:3000/callback',
     siteId: 'RefArchGlobal',
     locale: 'en_US',
-    currency: 'USD',
+    currency: 'USD'
 }
 const TestProviders = (props: {children: React.ReactNode}) => {
     return (
         <CommerceApiProvider
             {...sampleProps}
             queryClientConfig={{
-                defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+                defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
             }}
         >
             {props.children}
@@ -80,7 +80,7 @@ export const mockHttpResponses = (options: NockBackOptions) => {
                 return !!q['code_challenge']
             })
             .reply(303, undefined, {
-                Location: '/callback?usid=12345&code=ABCDE',
+                Location: '/callback?usid=12345&code=ABCDE'
             })
             .get('/callback?usid=12345&code=ABCDE')
             .reply(200)
@@ -98,7 +98,7 @@ export const mockHttpResponses = (options: NockBackOptions) => {
                 usid: '851fd6b0-ef19-4eac-b556-fa13827708ed',
                 customer_id: 'bcmbsVxKo0wHaRxuwVmqYYxudH',
                 enc_user_id: 'adb831a7fdd83dd1e2a309ce7591dff8',
-                idp_access_token: null,
+                idp_access_token: null
             })
     }
 
