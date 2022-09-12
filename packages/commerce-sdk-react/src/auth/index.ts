@@ -322,17 +322,23 @@ type ArgWithHeaders =
     | undefined
 
 /**
- * A ultility function to inject access token as Authorization header
- * into the commerce-sdk-isomorphic methods' first argument.
+ * A ultility function to inject access token into a headers object.
  *
  * @Internal
  */
-export const injectAccessToken = <T extends ArgWithHeaders>(arg: T, accessToken: string) => {
-    return {
-        ...arg,
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            ...arg?.headers
-        }
-    }
+export const injectAccessToken = (
+    headers:
+        | {
+              [key: string]: string
+          }
+        | undefined,
+    accessToken: string
+) => {
+    const _headers = headers
+        ? {
+              ...headers,
+              Authorization: `Bearer ${accessToken}`
+          }
+        : {Authorization: `Bearer ${accessToken}`}
+    return _headers
 }

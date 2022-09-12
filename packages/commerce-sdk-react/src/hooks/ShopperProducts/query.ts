@@ -42,8 +42,12 @@ function useProducts(
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
         ['products', arg],
-        // todo injectAccessToken
-        () => client.getProducts({parameters, headers}, rawResponse),
+        ({access_token}) => {
+            return client.getProducts(
+                {parameters, headers: injectAccessToken(headers, access_token)},
+                rawResponse
+            )
+        },
         options
     )
 }
@@ -77,8 +81,12 @@ function useProduct(
     const {shopperProducts: client} = useCommerceApi()
     return useAsync(
         ['product', arg],
-        // todo injectAccessToken
-        () => client.getProduct({parameters, headers}, rawResponse),
+        ({access_token}) => {
+            return client.getProduct(
+                {parameters, headers: injectAccessToken(headers, access_token)},
+                rawResponse
+            )
+        },
         options
     )
 }
@@ -116,7 +124,12 @@ function useCategories(
     const {shopperProducts: client} = useCommerceApi()
     return useAsync(
         ['categories', arg],
-        () => client.getCategories({parameters, headers}, rawResponse),
+        ({access_token}) => {
+            return client.getCategories(
+                {parameters, headers: injectAccessToken(headers, access_token)},
+                rawResponse
+            )
+        },
         options
     )
 }
@@ -153,8 +166,12 @@ function useCategory(
     const {shopperProducts: client} = useCommerceApi()
     return useAsync(
         ['category', arg],
-        // todo injectAccessToken
-        () => client.getCategory({parameters, headers}, rawResponse),
+        ({access_token}) => {
+            return client.getCategory(
+                {parameters, headers: injectAccessToken(headers, access_token)},
+                rawResponse
+            )
+        },
         options
     )
 }

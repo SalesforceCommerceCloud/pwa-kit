@@ -17,28 +17,28 @@ const routes = [
     {
         path: '/',
         exact: true,
-        component: Home,
+        component: Home
     },
     {
         path: '/products/:productId',
-        component: UseProduct,
+        component: UseProduct
     },
     {
         path: '/products',
-        component: UseProducts,
+        component: UseProducts
     },
     {
         path: '/categories/:categoryId',
-        component: UseCategory,
+        component: UseCategory
     },
     {
         path: '/categories',
-        component: UseCategories,
+        component: UseCategories
     },
     {
         path: '/slas-helpers',
-        component: UseShopperLoginHelper,
-    },
+        component: UseShopperLoginHelper
+    }
 ]
 
 export default routes
