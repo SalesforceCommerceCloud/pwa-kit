@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {withRouter} from 'react-router-dom'
 import {v4 as uuid} from 'uuid'
@@ -18,7 +18,7 @@ const CorrelationIdContext = React.createContext()
 
 const CorrelationIdProvider = ({children, correlationId, location}) => {
     const [id, setId] = React.useState(correlationId)
-    React.useEffect(() => {
+    useEffect(() => {
         const newId = uuid()
         setId(newId)
     }, [location.pathname])
