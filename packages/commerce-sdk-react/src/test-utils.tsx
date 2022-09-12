@@ -107,6 +107,9 @@ export const mockHttpResponses = (options: NockBackOptions) => {
     const withMocks = (testFn: () => Promise<void> | void) => {
         return async () => {
             const testName = expect.getState().currentTestName
+            if (!testName) {
+                throw new Error('You forget to name the test case!')
+            }
             const fileName = `${slugify(testName)}.json`
 
             nockBack.setMode(mode)

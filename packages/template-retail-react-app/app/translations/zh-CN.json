@@ -168,9 +168,6 @@
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "添加新付款方式"
   },
-  "cart.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
-  },
   "cart.info.removed_from_cart": {
     "defaultMessage": "从购物车中移除商品"
   },
@@ -215,6 +212,9 @@
   },
   "checkout.button.place_order": {
     "defaultMessage": "下订单"
+  },
+  "checkout.message.generic_error": {
+    "defaultMessage": "结帐期间发生意外错误。"
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "创建账户"
@@ -362,10 +362,10 @@
     "defaultMessage": "注销"
   },
   "contact_info.button.already_have_account": {
-    "defaultMessage": "已经有账户？登录"
+    "defaultMessage": "已有账户？登录"
   },
   "contact_info.button.checkout_as_guest": {
-    "defaultMessage": "以访客身份结账"
+    "defaultMessage": "以访客身份结算"
   },
   "contact_info.button.login": {
     "defaultMessage": "登录"
@@ -378,6 +378,14 @@
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "联系信息"
+  },
+  "credit_card_fields.tool_tip.security_code": {
+    "defaultMessage": "此 3 位数代码可在卡的背面找到。",
+    "description": "Generic credit card security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code.american_express": {
+    "defaultMessage": "此 4 位数代码可在卡的正面找到。",
+    "description": "American Express security code help text"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "账户详情"
@@ -538,8 +546,14 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "出现错误。重试。"
   },
+  "global.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
+  },
   "global.info.removed_from_wishlist": {
     "defaultMessage": "从愿望清单中移除商品"
+  },
+  "global.link.added_to_wishlist.view_wishlist": {
+    "defaultMessage": "查看"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "标志"
@@ -569,14 +583,14 @@
     "defaultMessage": "开箱即用的功能，让您只需专注于添加增强功能。"
   },
   "home.description.here_to_help": {
-    "defaultMessage": "联系我们的支持人员，他们将为您"
+    "defaultMessage": "联系我们的支持人员。"
   },
   "home.description.here_to_help_line_2": {
-    "defaultMessage": "提供适当指导。"
+    "defaultMessage": "他们将为您提供适当指导。"
   },
   "home.description.shop_products": {
     "defaultMessage": "本节包含目录中的内容。{docLink}（关于如何进行更换）",
-    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos"
+    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
     "defaultMessage": "购物者购物车和结账体验的电子商务最佳实践。"
@@ -653,6 +667,9 @@
   "item_image.label.sale": {
     "defaultMessage": "销售",
     "description": "A sale badge placed on top of a product image"
+  },
+  "lCPCxk": {
+    "defaultMessage": "请在上面选择所有选项"
   },
   "locale_text.message.ar-SA": {
     "defaultMessage": "阿拉伯语（沙特阿拉伯）"
@@ -955,9 +972,6 @@
   "product_detail.accordion.message.coming_soon": {
     "defaultMessage": "即将到货"
   },
-  "product_detail.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
-  },
   "product_detail.recommended_products.title.complete_set": {
     "defaultMessage": "Complete the Set（完成组合）"
   },
@@ -978,9 +992,6 @@
   },
   "product_list.drawer.title.sort_by": {
     "defaultMessage": "排序标准"
-  },
-  "product_list.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
   },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "清除筛选器"
@@ -1045,9 +1056,6 @@
   "recent_searches.heading.recent_searches": {
     "defaultMessage": "最近搜索"
   },
-  "recommended_products.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
-  },
   "register_form.action.sign_in": {
     "defaultMessage": "登录"
   },
@@ -1058,7 +1066,7 @@
     "defaultMessage": "开始使用！"
   },
   "register_form.message.agree_to_policy_terms": {
-    "defaultMessage": "创建账户即表明您同意 Salesforce <policy>隐私政策</policy>以及<terms>条款与条件</terms>"
+    "defaultMessage": "隐私创建账户即表明您同意 Salesforce <policy>隐私政策</policy>和<terms>条款与条件</terms>"
   },
   "register_form.message.already_have_account": {
     "defaultMessage": "已有账户？"
@@ -1387,6 +1395,12 @@
   },
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "新密码"
+  },
+  "wishlist_primary_action.button.add_to_cart": {
+    "defaultMessage": "添加到购物车"
+  },
+  "wishlist_primary_action.button.select_options": {
+    "defaultMessage": "选择选项"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至购物车"

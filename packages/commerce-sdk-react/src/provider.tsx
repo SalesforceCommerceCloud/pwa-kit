@@ -15,11 +15,12 @@ import {
     ShopperPromotions,
     ShopperDiscoverySearch,
     ShopperGiftCertificates,
-    ShopperSearch
+    ShopperSearch,
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -55,7 +56,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         proxy,
         redirectURI,
-        queryClientConfig
+        queryClientConfig,
     } = props
 
     const config = {
@@ -64,9 +65,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientId,
             organizationId,
             shortCode,
-            siteId
+            siteId,
         },
-        throwOnBadResponse: true
+        throwOnBadResponse: true,
     }
 
     const [apiClients, setApiClients] = useState<ApiClients>({
@@ -79,7 +80,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shopperOrders: new ShopperOrders(config),
         shopperProducts: new ShopperProducts(config),
         shopperPromotions: new ShopperPromotions(config),
-        shopperSearch: new ShopperSearch(config)
+        shopperSearch: new ShopperSearch(config),
     })
 
     useEffect(() => {
@@ -93,7 +94,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperOrders: new ShopperOrders(config),
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
-            shopperSearch: new ShopperSearch(config)
+            shopperSearch: new ShopperSearch(config),
         }
         setApiClients(newApiClients)
     }, [clientId, organizationId, shortCode, siteId, proxy])
@@ -105,7 +106,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shortCode,
             siteId,
             proxy,
-            redirectURI
+            redirectURI,
         })
         newAuth.ready()
 
@@ -122,6 +123,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             <CommerceApiContext.Provider value={apiClients}>
                 <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
             </CommerceApiContext.Provider>
+            <ReactQueryDevtools />
         </QueryClientProvider>
     )
 }

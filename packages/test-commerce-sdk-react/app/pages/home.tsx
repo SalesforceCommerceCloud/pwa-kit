@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -19,11 +19,11 @@ const Home = () => {
             </p>
             <p>Happy coding.</p>
             <h2>Hooks</h2>
+            <Link to="/products">useProducts</Link>
+            <br />
+            <Link to="/categories">useCategories</Link>
             <div>
-                <Link to="/useProducts">useProducts</Link>
-            </div>
-            <div>
-                <Link to="/useShopperLoginHelper">useShopperLoginHelper</Link>
+                <Link to="/slas-helpers">useShopperLoginHelper</Link>
             </div>
         </>
     )

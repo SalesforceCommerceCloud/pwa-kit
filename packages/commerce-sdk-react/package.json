@@ -1,8 +1,8 @@
 {
   "name": "commerce-sdk-react",
-  "version": "2.2.0-dev",
+  "version": "2.3.0-dev",
   "description": "A library that provides react hooks for fetching data from Commerce Cloud",
-  "author": "dev@mobify.com",
+  "author": "cc-pwa-kit@salesforce.com",
   "license": "See license in LICENSE",
   "engines": {
     "node": "^14.0.0",
@@ -42,6 +42,7 @@
   "private": true,
   "devDependencies": {
     "@tanstack/react-query": "^4.0.10",
+    "@tanstack/react-query-devtools": "^4.2.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.5",
     "@types/js-cookie": "^3.0.2",
@@ -51,7 +52,7 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "cross-env": "^5.2.0",
-    "internal-lib-build": "^2.2.0-dev",
+    "internal-lib-build": "^2.3.0-dev",
     "jsonwebtoken": "^8.5.1",
     "nock": "^13.2.9",
     "react": "^17.0.2",

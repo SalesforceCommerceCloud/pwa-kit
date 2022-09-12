@@ -1,6 +1,6 @@
 {
   "name": "internal-lib-build",
-  "version": "2.2.0-dev",
+  "version": "2.3.0-dev",
   "engines": {
     "node": "^14.0.0",
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
@@ -15,7 +15,7 @@
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
   "license": "SEE LICENSE IN LICENSE",
-  "author": "dev@mobify.com",
+  "author": "cc-pwa-kit@salesforce.com",
   "bin": {
     "internal-lib-build": "./bin/internal-lib-build.js"
   },

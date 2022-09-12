@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-runtime",
-  "version": "2.2.0-dev",
+  "version": "2.3.0-dev",
   "description": "The PWAKit Runtime",
   "repository": {
     "type": "git",
@@ -11,16 +11,12 @@
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
   "license": "SEE LICENSE IN LICENSE",
-  "author": "dev@mobify.com",
-  "main": "dist/index.js",
+  "author": "cc-pwa-kit@salesforce.comm",
   "files": [
-    "bin",
     "LICENSE",
     "scripts",
     "ssr",
-    "TERMS_OF_USE.md",
-    "utils",
-    "webpack"
+    "utils"
   ],
   "scripts": {
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",
@@ -55,7 +51,7 @@
     "@serverless/event-mocks": "^1.1.1",
     "aws-lambda-mock-context": "^3.2.1",
     "fs-extra": "^10.1.0",
-    "internal-lib-build": "^2.2.0-dev",
+    "internal-lib-build": "^2.3.0-dev",
     "nock": "^13.1.1",
     "node-fetch": "^2.6.7",
     "s3rver": "^3.1.0",
@@ -65,7 +61,7 @@
     "watch": "1.0.1"
   },
   "peerDependencies": {
-    "pwa-kit-dev": "^2.2.0-dev"
+    "pwa-kit-dev": "^2.3.0-dev"
   },
   "peerDependenciesMeta": {
     "pwa-kit-dev": {
