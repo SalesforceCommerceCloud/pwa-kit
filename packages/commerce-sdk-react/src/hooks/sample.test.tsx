@@ -76,7 +76,6 @@ describe('lower-level hook', () => {
             // whose filename matches the name of the current test. // Every test that calls `withMocks` would get associated with its own recording file,
             //     // This util function would automatically integrate the provider components for you
             renderWithProviders(<ProductName id="25591862M" />)
-
             const productName = 'Stripe Walking Short'
             await waitFor(() => screen.getByText(productName))
 

@@ -37,8 +37,3 @@ const localStorageMock = new LocalStorageMock()
 Object.defineProperty(window, 'localStorage', {
     value: localStorageMock,
 })
-
-Object.defineProperty(window.document, 'cookie', {
-    writable: true,
-    value: '',
-})
