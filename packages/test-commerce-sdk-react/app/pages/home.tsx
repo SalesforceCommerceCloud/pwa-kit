@@ -22,9 +22,7 @@ const Home = () => {
             <Link to="/products">useProducts</Link>
             <br />
             <Link to="/categories">useCategories</Link>
-            <div>
-                <Link to="/slas-helpers">useShopperLoginHelper</Link>
-            </div>
+            <Link to="/slas-helpers">useShopperLoginHelper</Link>
         </>
     )
 }

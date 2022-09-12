@@ -13,7 +13,7 @@ import Auth from '../../auth'
 export enum ShopperLoginHelpers {
     LoginGuestUser = 'loginGuestUser',
     LoginRegisteredUserB2C = 'loginRegisteredUserB2C',
-    Logout = 'logout'
+    Logout = 'logout',
 }
 
 /**
@@ -26,7 +26,8 @@ export enum ShopperLoginHelpers {
  * - loginGuestUser
  * - logout
  */
-export function useShopperLoginHelper<Action>(
+// eslint-disable-next-line prettier/prettier
+export function useShopperLoginHelper<Action extends `${ShopperLoginHelpers}`>(
     action: Action
 ): ActionResponse<Parameters<Auth[Action]>, ShopperLoginTypes.TokenResponse> {
     const auth = useAuth()
