@@ -18,8 +18,6 @@ import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
 import {getAssetUrl, getRoutes} from '../universal/utils'
-import DeviceContext from '../universal/device-context'
-import {ExpressContext} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -28,13 +26,13 @@ import Throw404 from '../universal/components/throw-404'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import * as errors from '../universal/errors'
-import {detectDeviceType, isRemote} from 'pwa-kit-runtime/utils/ssr-server'
+import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
-import {withErrorHandling, withLoadableResolver, withReactQuery} from '../universal/components'
+import {withErrorHandling, withLoadableResolver} from '../universal/components'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -96,13 +94,8 @@ export const render = async (req, res, next) => {
     // existing api applied to the application? I need to get clarification on this.
     // NOTE: We shouldn't have to wrap the App with withLoadableResolver since it's required to be in the
     // bundle, we can probably clean up the logive for getProps somehow.
-    const WrappedApp = withReactQuery(App)
-    const deviceType = detectDeviceType(req)
-
-    WrappedApp.initStaticContext({
-        req,
-        res
-    })
+    // const WrappedApp = withReactQuery(App)
+    const WrappedApp = App.compose()
 
     // Get routes and wrap with resolver and error handlers
     let routes = getRoutes(res.locals).map(({component, ...rest}) => ({
@@ -110,8 +103,8 @@ export const render = async (req, res, next) => {
         ...rest
     }))
 
-    if (WrappedApp.enhanceRoutes) {
-        routes = WrappedApp.enhanceRoutes(routes, true, res.locals)
+    if (WrappedApp.getRoutes) {
+        routes = WrappedApp.getRoutes(routes, true, res.locals)
     }
 
     const [pathname, search] = req.originalUrl.split('?')
@@ -153,7 +146,6 @@ export const render = async (req, res, next) => {
         const AppJSX = getAppJSX(req, res, error, {
             App: WrappedApp,
             appState,
-            deviceType,
             location,
             routerContext,
             routes
@@ -162,26 +154,17 @@ export const render = async (req, res, next) => {
         try {
             // Get all the data fetching promises for the various API's attached to the App component.
             // This is the react query, and getProps enhancements.
-            const allPromises = WrappedApp.getDataPromises({
+            appState = await WrappedApp.getData({
                 App,
                 AppJSX,
                 location,
                 req,
                 res,
-                deviceType,
                 route,
                 routes,
-                match
+                match,
+                getAppJSX
             })
-            const data = await Promise.all(allPromises)
-
-            appState = data.reduce(
-                (acc, appState = {}) => ({
-                    ...acc,
-                    ...appState
-                }),
-                {}
-            )
         } catch (e) {
             appStateError = logAndFormatError(e || new Error())
         }
@@ -227,18 +210,14 @@ export const render = async (req, res, next) => {
 }
 
 const getAppJSX = (req, res, error, appData) => {
-    const {App, appState = {}, deviceType, location, routerContext, routes} = appData
+    const {App, appState = {}, location, routerContext, routes} = appData
 
     return (
-        <ExpressContext.Provider value={{req, res}}>
-            <Router location={location} context={routerContext}>
-                <DeviceContext.Provider value={{type: deviceType}}>
-                    <AppConfig locals={res.locals}>
-                        <Switch error={error} appState={appState} routes={routes} App={App} />
-                    </AppConfig>
-                </DeviceContext.Provider>
-            </Router>
-        </ExpressContext.Provider>
+        <Router location={location} context={routerContext}>
+            <AppConfig locals={res.locals}>
+                <Switch error={error} appState={appState} routes={routes} App={App} />
+            </AppConfig>
+        </Router>
     )
 }
 
@@ -250,7 +229,6 @@ const renderAppHtml = (req, res, error, appData) => {
 
 const renderApp = async (args) => {
     const {req, res, appStateError, routeError, App, appState, location, routes, config} = args
-    const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
     const routerContext = {}
     const appData = {
@@ -259,7 +237,6 @@ const renderApp = async (args) => {
         location,
         routes,
         routerContext,
-        deviceType,
         extractor
     }
 
@@ -316,7 +293,6 @@ const renderApp = async (args) => {
 
     const windowGlobals = {
         __CONFIG__: config,
-        __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some

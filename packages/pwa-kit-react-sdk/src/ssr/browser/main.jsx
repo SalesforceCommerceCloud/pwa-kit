@@ -8,12 +8,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
-import {DeviceContext, ExpressContext} from '../universal/contexts'
 import App from '../universal/components/_app'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {loadableReady} from '@loadable/component'
-import {withReactQuery} from '../universal/components'
 import {getRoutes} from '../universal/utils'
 
 /* istanbul ignore next */
@@ -66,15 +64,14 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
-    // const WrappedApp = routeComponent(App, false, locals)
-    const WrappedApp = withReactQuery(App)
+    const WrappedApp = App.compose()
 
     // NOTE: It's kinda weird how frozn state is loaded in the JSX here. Would be nice if it was
     // "added" via or in, the hoc.
     let routes = getRoutes(locals)
 
-    if (WrappedApp.enhanceRoutes) {
-        routes = WrappedApp.enhanceRoutes(routes)
+    if (WrappedApp.getRoutes) {
+        routes = WrappedApp.getRoutes(routes)
     }
 
     const error = window.__ERROR__
@@ -83,20 +80,16 @@ export const start = () => {
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
             ReactDOM.hydrate(
-                <ExpressContext.Provider value={{}}>
-                    <Router>
-                        <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                            <AppConfig locals={locals}>
-                                <Switch
-                                    error={error}
-                                    appState={window.__PRELOADED_STATE__}
-                                    routes={routes}
-                                    App={WrappedApp}
-                                />
-                            </AppConfig>
-                        </DeviceContext.Provider>
-                    </Router>
-                </ExpressContext.Provider>,
+                <Router>
+                    <AppConfig locals={locals}>
+                        <Switch
+                            error={error}
+                            appState={window.__PRELOADED_STATE__}
+                            routes={routes}
+                            App={WrappedApp}
+                        />
+                    </AppConfig>
+                </Router>,
                 rootEl,
                 () => {
                     window.__HYDRATING__ = false

@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import composeApp from './compose-app'
 import withReactQuery from './with-react-query'
 import withLegacyGetProps from './with-legacy-get-props'
 import withLoadableResolver from './with-loadable-resolver'
 import withErrorHandling from './with-error-handling'
 
-export {withErrorHandling, withLegacyGetProps, withLoadableResolver, withReactQuery}
+export {composeApp, withErrorHandling, withLegacyGetProps, withLoadableResolver, withReactQuery}

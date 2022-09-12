@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {Fragment, ReactElement, ReactNode} from 'react'
-import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components'
+import {composeApp, withLegacyGetProps, withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components'
 
 interface AppProps {
     children: ReactNode
@@ -26,4 +26,23 @@ const extraGetPropsArgs = ({req}) => {
         secretMessage: 'The brown cow sleeps when the moon is full'
     }
 }
-export default withLegacyGetProps(App, {extraGetPropsArgs})
+// export default withLegacyGetProps(App, {extraGetPropsArgs})
+
+// export default composeApp(
+//     App, 
+//     [
+//         [withLegacyGetProps, {extraGetPropsArgs}],
+//         withReactQuery
+//         withRedux, 
+//         withSuperState
+//     ]
+// )
+
+
+export default composeApp(
+    App, 
+    [
+        withLegacyGetProps,
+        withReactQuery
+    ]
+)

@@ -25,14 +25,14 @@ const Switch = (props) => {
         <UIDReset>
             <AppErrorBoundary error={error}>
                 {!error && (
-                    <App>
+                    <App appState={appState}>
                         <RouterSwitch>
                             {routes.map((route, i) => {
                                 const {component: Component, ...routeProps} = route
                                 return (
                                     <Route key={i} {...routeProps}>
                                         <UIDFork>
-                                            <Component />
+                                            <Component appState={appState} />
                                         </UIDFork>
                                     </Route>
                                 )

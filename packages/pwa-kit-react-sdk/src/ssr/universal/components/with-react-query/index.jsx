@@ -30,9 +30,14 @@ export const withReactQuery = (Component) => {
 
     const queryClient = new QueryClient()
 
+    // NOTE: The appState for the entire application will always be passed in as a prop. This
+    // include this enhancers state (the retun value from the getData static). We'll use it during
+    // rendering an hydration of the application.
     const WrappedComponent = ({...passThroughProps}) => {
         const state =
-            typeof window === 'undefined' ? {} : window?.__PRELOADED_STATE__?.[STATE_KEY] || {}
+            typeof window === 'undefined' ? 
+                (passThroughProps?.appState ? passThroughProps?.appState?.[STATE_KEY] : {}) : 
+                window?.__PRELOADED_STATE__?.[STATE_KEY] || {}
 
         return (
             <QueryClientProvider client={queryClient}>
@@ -43,9 +48,6 @@ export const withReactQuery = (Component) => {
         )
     }
 
-    // Expose statics from the wrapped component on the HOC
-    hoistNonReactStatic(WrappedComponent, Component)
-
     /**
      * Returns an array of primises. The first is a promise that resolved to the query data, the subsequest
      * promises are those primises resolving in query data from child components that implement the
@@ -55,11 +57,26 @@ export const withReactQuery = (Component) => {
      *
      * @return {Promise<Object[]>}
      */
-    WrappedComponent.getDataPromises = (renderContext) => {
-        const {AppJSX} = renderContext
+     WrappedComponent.getData = (renderContext) => {
+        // NOTE: This isn't ideal, but we need to reconstruct the appJSX because the value
+        // passed in the context isn't enhanced with react query. Need to investigate this 
+        // a little futher.
+        const {req, res, error, App, getAppJSX, 
+            appState,
+            location,
+            routerContext,
+            routes} = renderContext
+        
+        const AppJSX = getAppJSX(req, res, error, {
+            App,
+            appState,
+            location,
+            routerContext,
+            routes
+        })
 
-        const dataPromise = Promise.resolve()
-            .then(() => ssrPrepass(AppJSX)) // NOTE: ssrPrepass will be included in the vendor bundle. BAD
+        return Promise.resolve()
+            .then(() => ssrPrepass(AppJSX))
             .then(() => {
                 const queryCache = queryClient.getQueryCache()
                 const queries = queryCache.getAll()
@@ -81,26 +98,22 @@ export const withReactQuery = (Component) => {
 
                 return Promise.all(promises)
             })
-            .then(() => ({[STATE_KEY]: dehydrate(queryClient)}))
-
-        return [
-            dataPromise,
-            ...(Component.getDataPromises ? Component.getDataPromises(renderContext) : [])
-        ]
+            .then(() => (dehydrate(queryClient)))
     }
 
-    let _staticContext
-    // Should be called immediately after wrapping a component with this HOC
-    // @private
-    WrappedComponent.initStaticContext = (value) => {
-        _staticContext = value
-
-        if (Component.initStaticContext) {
-            Component.initStaticContext(value)
-        }
+    // Note: I have the option of using "excludes" or defining the statics after hoisting. Not sure if
+    // there is any other difference. Using the excludes is a little more explicit. 
+    const excludes = {
+        getRoutes: true,
+        getData: true
     }
+
+    hoistNonReactStatic(WrappedComponent, Component, excludes)
 
     WrappedComponent.displayName = `withReactQuery(${wrappedComponentName})`
+
+    // Maybe this is better written as a function? Just to be consisten with the api.
+    WrappedComponent.apiName = STATE_KEY
 
     return WrappedComponent
 }
