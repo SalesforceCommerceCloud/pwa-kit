@@ -13,6 +13,7 @@ type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
+    fetchOptions: ShopperLoginTypes.FetchOptions
 }
 
 interface JWTHeaders {
@@ -126,7 +127,8 @@ class Auth {
                 shortCode: config.shortCode,
                 siteId: config.siteId
             },
-            throwOnBadResponse: true
+            throwOnBadResponse: true,
+            fetchOptions: config.fetchOptions
         })
 
         this.redirectURI = config.redirectURI

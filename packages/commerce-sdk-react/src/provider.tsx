@@ -87,7 +87,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config)
         }
-    }, [clientId, organizationId, shortCode, siteId, proxy])
+    }, [clientId, organizationId, shortCode, siteId, proxy, fetchOptions])
 
     const auth = useMemo(() => {
         return new Auth({
@@ -96,9 +96,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shortCode,
             siteId,
             proxy,
-            redirectURI
+            redirectURI,
+            fetchOptions
         })
-    }, [clientId, organizationId, shortCode, siteId, proxy, redirectURI])
+    }, [clientId, organizationId, shortCode, siteId, proxy, redirectURI, fetchOptions])
 
     useEffect(() => {
         auth.ready()
