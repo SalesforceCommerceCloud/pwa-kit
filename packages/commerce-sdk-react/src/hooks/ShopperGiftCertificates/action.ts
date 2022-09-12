@@ -16,7 +16,7 @@ export enum ShopperGiftCertificatesActions {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-gift-certificates?meta=getGiftCertificate} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppergiftcertificates.shoppergiftcertificates-1.html#getgiftcertificate} for more information on the parameters and returned data type.
      */
-    GetGiftCertificate = 'getGiftCertificate',
+    GetGiftCertificate = 'getGiftCertificate'
 }
 
 /**

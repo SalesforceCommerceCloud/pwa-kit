@@ -64,7 +64,7 @@ export enum ShopperLoginActions {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-login?meta=introspectToken} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperlogin.shopperlogin-1.html#introspecttoken} for more information on the parameters and returned data type.
      */
-    IntrospectToken = 'introspectToken',
+    IntrospectToken = 'introspectToken'
 }
 
 /**

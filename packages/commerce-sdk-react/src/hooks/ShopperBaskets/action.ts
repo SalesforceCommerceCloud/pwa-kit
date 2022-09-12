@@ -328,7 +328,7 @@ the body are the following properties if specified:
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasket} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasket} for more information on the parameters and returned data type.
      */
-    AddTaxesForBasket = 'addTaxesForBasket',
+    AddTaxesForBasket = 'addTaxesForBasket'
 }
 
 /**
