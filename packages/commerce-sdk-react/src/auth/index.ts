@@ -69,9 +69,9 @@ class Auth {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
                 shortCode: config.shortCode,
-                siteId: config.siteId
+                siteId: config.siteId,
             },
-            throwOnBadResponse: true
+            throwOnBadResponse: true,
         })
 
         this.redirectURI = config.redirectURI
@@ -85,9 +85,8 @@ class Auth {
         return storage.get(key)
     }
 
-    private set(name: AuthDataKeys, value: string, options?: any) {
-        const key = this.DATA_MAP[name].key
-        const storage = this.DATA_MAP[name].storage
+    private set(name: AuthDataKeys, value: string, options?: unknown) {
+        const {key, storage} = this.DATA_MAP[name]
         storage.set(key, value, options)
         this.DATA_MAP[name].callback?.()
     }
@@ -101,55 +100,55 @@ class Auth {
         return {
             access_token: {
                 storage: this.localStorage,
-                key: 'access_token'
+                key: 'access_token',
             },
             customer_id: {
                 storage: this.localStorage,
-                key: 'customer_id'
+                key: 'customer_id',
             },
             usid: {
                 storage: this.localStorage,
-                key: 'usid'
+                key: 'usid',
             },
             enc_user_id: {
                 storage: this.localStorage,
-                key: 'enc_user_id'
+                key: 'enc_user_id',
             },
             expires_in: {
                 storage: this.localStorage,
-                key: 'expires_in'
+                key: 'expires_in',
             },
             id_token: {
                 storage: this.localStorage,
-                key: 'id_token'
+                key: 'id_token',
             },
             idp_access_token: {
                 storage: this.localStorage,
-                key: 'idp_access_token'
+                key: 'idp_access_token',
             },
             token_type: {
                 storage: this.localStorage,
-                key: 'token_type'
+                key: 'token_type',
             },
             refresh_token_guest: {
                 storage: this.cookieStorage,
                 key: 'cc-nx-g',
                 callback: () => {
                     this.cookieStorage.delete('cc-nx')
-                }
+                },
             },
             refresh_token_registered: {
                 storage: this.cookieStorage,
                 key: 'cc-nx',
                 callback: () => {
                     this.cookieStorage.delete('cc-nx-g')
-                }
-            }
+                },
+            },
         }
     }
 
     /**
-     * Every promise method in this class returns the same data via this method.
+     * Every method in this class that returns a `TokenResponse` constructs it via this getter.
      */
     private get data(): ShopperLoginTypes.TokenResponse {
         return {
@@ -161,7 +160,7 @@ class Auth {
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
-            usid: this.get('usid')
+            usid: this.get('usid'),
         }
     }
 
@@ -175,11 +174,7 @@ class Auth {
         const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
-        if (validTimeSeconds > tokenAgeSeconds) {
-            return false
-        }
-
-        return true
+        return validTimeSeconds <= tokenAgeSeconds
     }
 
     /**
@@ -233,13 +228,12 @@ class Auth {
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
+            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS,
         })
     }
 
     /**
-     * The ready function returns a promise indicating whether we have
-     * a valid access token.
+     * The ready function returns a promise that resolves with a valid access token.
      *
      * We use this method to block those commerce api calls that
      * requires an access token.
@@ -261,7 +255,7 @@ class Auth {
         const request = async () => {
             const res = await helpers.loginGuestUser(this.client, {
                 redirectURI,
-                ...(usid && {usid})
+                ...(usid && {usid}),
             })
             this.handleTokenResponse(res, true)
             return this.data
@@ -280,7 +274,7 @@ class Auth {
         const request = async () => {
             const res = await helpers.loginRegisteredUserB2C(this.client, credentials, {
                 redirectURI,
-                ...(usid && {usid})
+                ...(usid && {usid}),
             })
             this.handleTokenResponse(res, false)
 
@@ -299,10 +293,10 @@ class Auth {
             const redirectURI = this.redirectURI
             await helpers.logout(this.client, {
                 accessToken: this.get('access_token'),
-                refreshToken: this.get('refresh_token_registered')
+                refreshToken: this.get('refresh_token_registered'),
             })
             const res = await helpers.loginGuestUser(this.client, {
-                redirectURI
+                redirectURI,
             })
             this.handleTokenResponse(res, true)
             return this.data
@@ -337,7 +331,7 @@ export const injectAccessToken = (
     const _headers = headers
         ? {
               ...headers,
-              Authorization: `Bearer ${accessToken}`
+              Authorization: `Bearer ${accessToken}`,
           }
         : {Authorization: `Bearer ${accessToken}`}
     return _headers

@@ -13,7 +13,7 @@ import Auth from '../../auth'
 export enum ShopperLoginHelpers {
     LoginGuestUser = 'loginGuestUser',
     LoginRegisteredUserB2C = 'loginRegisteredUserB2C',
-    Logout = 'logout'
+    Logout = 'logout',
 }
 
 /**
@@ -31,16 +31,13 @@ export function useShopperLoginHelper(
 ): ActionResponse<Parameters<Auth['loginRegisteredUserB2C']>, ShopperLoginTypes.TokenResponse>
 export function useShopperLoginHelper(
     action: ShopperLoginHelpers.LoginGuestUser
-): ActionResponse<never, ShopperLoginTypes.TokenResponse>
+): ActionResponse<[], ShopperLoginTypes.TokenResponse>
 export function useShopperLoginHelper(
     action: ShopperLoginHelpers.Logout
-): ActionResponse<never, ShopperLoginTypes.TokenResponse>
+): ActionResponse<[], ShopperLoginTypes.TokenResponse>
 export function useShopperLoginHelper(
     action: ShopperLoginHelpers
-): ActionResponse<
-    Parameters<Auth['loginRegisteredUserB2C']> | never,
-    ShopperLoginTypes.TokenResponse
-> {
+): ActionResponse<Parameters<Auth['loginRegisteredUserB2C']>, ShopperLoginTypes.TokenResponse> {
     const auth = useAuth()
     if (action === ShopperLoginHelpers.LoginGuestUser) {
         return useAsyncCallback(() => auth.loginGuestUser())

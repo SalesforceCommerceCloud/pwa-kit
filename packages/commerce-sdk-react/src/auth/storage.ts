@@ -6,21 +6,26 @@
  */
 import Cookies from 'js-cookie'
 
-export abstract class BaseStorage {
-    abstract set(key: string, value: string, options?: any): void
-    abstract get(key: string): string
-    abstract delete(key: string): void
+export interface BaseStorage {
+    set(key: string, value: string, options?: unknown): void
+    get(key: string): string
+    delete(key: string): void
 }
 
-export class CookieStorage extends BaseStorage {
+/**
+ * A normalized implementation for Cookie store. It implements the BaseStorage interface
+ * which allows developers to easily switch between Cookie, LocalStorage, Memory store
+ * or a customized storage. This class is mainly used for commerce-sdk-react library
+ * to store authentication tokens.
+ */
+export class CookieStorage implements BaseStorage {
     constructor() {
-        super()
         if (typeof document === 'undefined') {
             throw new Error('CookieStorage is not avaliable on the current environment.')
         }
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
-        Cookies.set(key, value, {secure: true, ...options})
+        Cookies.set(key, value, {...options, secure: true})
     }
     get(key: string) {
         return Cookies.get(key) || ''
@@ -30,14 +35,19 @@ export class CookieStorage extends BaseStorage {
     }
 }
 
-export class LocalStorage extends BaseStorage {
+/**
+ * A normalized implementation for LocalStorage. It implements the BaseStorage interface
+ * which allows developers to easily switch between Cookie, LocalStorage, Memory store
+ * or a customized storage. This class is mainly used for commerce-sdk-react library
+ * to store authentication tokens.
+ */
+export class LocalStorage implements BaseStorage {
     constructor() {
-        super()
         if (typeof window === 'undefined') {
             throw new Error('LocalStorage is not avaliable on the current environment.')
         }
     }
-    set(key: string, value: string, options?: any) {
+    set(key: string, value: string) {
         window.localStorage.setItem(key, value)
     }
     get(key: string) {

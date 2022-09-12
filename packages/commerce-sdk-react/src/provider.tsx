@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {ReactElement, useEffect, useState, useMemo} from 'react'
+import React, {ReactElement, useMemo} from 'react'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -15,7 +15,7 @@ import {
     ShopperPromotions,
     ShopperDiscoverySearch,
     ShopperGiftCertificates,
-    ShopperSearch
+    ShopperSearch,
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
@@ -56,7 +56,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         proxy,
         redirectURI,
-        queryClientConfig
+        queryClientConfig,
     } = props
 
     const config = {
@@ -65,26 +65,13 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientId,
             organizationId,
             shortCode,
-            siteId
+            siteId,
         },
-        throwOnBadResponse: true
+        throwOnBadResponse: true,
     }
 
-    const [apiClients, setApiClients] = useState<ApiClients>({
-        shopperBaskets: new ShopperBaskets(config),
-        shopperContexts: new ShopperContexts(config),
-        shopperCustomers: new ShopperCustomers(config),
-        shopperDiscoverySearch: new ShopperDiscoverySearch(config),
-        shopperGiftCertificates: new ShopperGiftCertificates(config),
-        shopperLogin: new ShopperLogin(config),
-        shopperOrders: new ShopperOrders(config),
-        shopperProducts: new ShopperProducts(config),
-        shopperPromotions: new ShopperPromotions(config),
-        shopperSearch: new ShopperSearch(config)
-    })
-
-    useEffect(() => {
-        const newApiClients = {
+    const apiClients = useMemo(() => {
+        return {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
             shopperCustomers: new ShopperCustomers(config),
@@ -94,9 +81,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperOrders: new ShopperOrders(config),
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
-            shopperSearch: new ShopperSearch(config)
+            shopperSearch: new ShopperSearch(config),
         }
-        setApiClients(newApiClients)
     }, [clientId, organizationId, shortCode, siteId, proxy])
 
     const auth = useMemo(() => {
@@ -106,7 +92,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shortCode,
             siteId,
             proxy,
-            redirectURI
+            redirectURI,
         })
         newAuth.ready()
 
