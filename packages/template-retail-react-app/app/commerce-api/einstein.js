@@ -128,7 +128,7 @@ class EinsteinAPI {
         const method = 'POST'
         const body = {
             category: {
-                id
+                id: category.id
             },
             products,
             ...args

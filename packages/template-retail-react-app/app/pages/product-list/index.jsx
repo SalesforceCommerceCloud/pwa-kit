@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -56,6 +56,7 @@ import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import {useCategories} from '../../hooks/use-categories'
+import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Others
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
@@ -101,6 +102,7 @@ const ProductList = (props) => {
     const params = useParams()
     const {categories} = useCategories()
     const toast = useToast()
+    const einstein = useEinstein()
 
     // Get the current category from global state.
     let category = undefined
@@ -177,6 +179,34 @@ const ProductList = (props) => {
             setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
         }
     }
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        if (searchQuery && productSearchResult && productSearchResult.hits) {
+            const products = productSearchResult.hits.map((productSearchItem) => {
+                const {productId, sku = '', altId = '', altIdType = ''} = productSearchItem
+                return {
+                    id: productId,
+                    sku,
+                    altId,
+                    altIdType
+                }
+            })
+            einstein.sendViewSearch(searchQuery, products)
+        } else if (category && productSearchResult && productSearchResult.hits) {
+            // TODO: When navigating between categories, this runs twice! Once when category changes and again when the search results update
+            const products = productSearchResult.hits.map((productSearchItem) => {
+                const {productId, sku = '', altId = '', altIdType = ''} = productSearchItem
+                return {
+                    id: productId,
+                    sku,
+                    altId,
+                    altIdType
+                }
+            })
+            einstein.sendViewCategory(category, products)
+        }
+    }, [searchQuery, category, productSearchResult])
 
     /**************** Filters ****************/
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
