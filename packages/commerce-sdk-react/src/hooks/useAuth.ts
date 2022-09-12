@@ -15,7 +15,11 @@ import {AuthContext} from '../provider'
  * @internal
  */
 const useAuth = (): Auth => {
-    return React.useContext(AuthContext)
+    const context = React.useContext(AuthContext)
+    if (!context) {
+        throw new Error('Missing CommerceApiProvider. You probably forget to render the provider.')
+    }
+    return context
 }
 
 export default useAuth

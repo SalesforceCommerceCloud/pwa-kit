@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {ReactElement, useMemo} from 'react'
+import React, {ReactElement, useEffect, useMemo} from 'react'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -90,7 +90,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     }, [clientId, organizationId, shortCode, siteId, proxy])
 
     const auth = useMemo(() => {
-        const newAuth = new Auth({
+        return new Auth({
             clientId,
             organizationId,
             shortCode,
@@ -98,10 +98,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             proxy,
             redirectURI
         })
-        newAuth.ready()
-
-        return newAuth
     }, [clientId, organizationId, shortCode, siteId, proxy, redirectURI])
+
+    useEffect(() => {
+        auth.ready()
+    }, [auth])
 
     const queryClient = new QueryClient(queryClientConfig)
 
