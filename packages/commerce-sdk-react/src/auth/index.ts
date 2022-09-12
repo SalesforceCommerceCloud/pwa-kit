@@ -175,41 +175,6 @@ class Auth {
     }
 
     /**
-     * This function follows the public client auth flow to get
-     * access token for the user. Following the flow:
-     * 1. If we have valid access token - use it
-     * 2. If we have valid refresh token - refresh token flow
-     * 3. PKCE flow
-     *
-     * Only call this from the "ready" function, so "ready" can manage the pending state.
-     *
-     */
-    private async init() {
-        if (!this.isTokenExpired(this.get('access_token'))) {
-            return this.data
-        }
-
-        const refreshTokenRegistered = this.get('refresh_token_registered')
-        const refreshTokenGuest = this.get('refresh_token_guest')
-        const refreshToken = refreshTokenRegistered || refreshTokenGuest
-
-        if (refreshToken) {
-            try {
-                const res = await helpers.refreshAccessToken(this.client, {refreshToken})
-                this.handleTokenResponse(res, !!refreshTokenGuest)
-                return this.data
-            } catch {
-                // If anything bad happens during refresh token flow
-                // we continue with the PKCE guest user flow.
-            }
-        }
-        const res = await helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI})
-        this.handleTokenResponse(res, true)
-
-        return this.data
-    }
-
-    /**
      * This method stores the TokenResponse object retrived from SLAS, and
      * store the data in storage.
      */
@@ -230,16 +195,66 @@ class Auth {
     }
 
     /**
-     * The ready function returns a promise that resolves with a valid access token.
+     * This method queues the requests and handles the SLAS token response.
      *
-     * We use this method to block those commerce api calls that
-     * requires an access token.
+     * It returns the queue.
+     *
+     * @Internal
+     */
+    async queueRequest(fn: () => Promise<ShopperLoginTypes.TokenResponse>, isGuest: boolean) {
+        const queue = this.pending ?? Promise.resolve()
+        this.pending = queue.then(async () => {
+            const token = await fn()
+            this.handleTokenResponse(token, isGuest)
+
+            // Q: Why don't we just return token? Why re-construct the same object again?
+            // A: because a user could open multiple tabs and the data in memory could be out-dated
+            // We must always grab the data from the storage (cookie/localstorage) directly
+            return this.data
+        })
+        return this.pending
+    }
+
+    /**
+     * The ready function returns a promise that resolves with valid ShopperLogin
+     * token response.
+     *
+     * When this method is called for the very first time, it initializes the session
+     * by following the public client auth flow to get access token for the user.
+     * The flow:
+     * 1. If we have valid access token - use it
+     * 2. If we have valid refresh token - refresh token flow
+     * 3. PKCE flow
      */
     async ready() {
-        if (!this.pending) {
-            this.pending = this.init()
+        if (this.pending) {
+            return this.pending
         }
-        return this.pending
+
+        if (!this.isTokenExpired(this.get('access_token'))) {
+            this.pending = Promise.resolve(this.data)
+            return this.pending
+        }
+
+        const refreshTokenRegistered = this.get('refresh_token_registered')
+        const refreshTokenGuest = this.get('refresh_token_guest')
+        const refreshToken = refreshTokenRegistered || refreshTokenGuest
+
+        if (refreshToken) {
+            try {
+                return this.queueRequest(
+                    () => helpers.refreshAccessToken(this.client, {refreshToken}),
+                    !!refreshTokenGuest
+                )
+            } catch {
+                // If anything bad happens during refresh token flow
+                // we continue with the PKCE guest user flow.
+            }
+        }
+        return this.queueRequest(
+            () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
+            true
+        )
     }
 
     /**
@@ -249,16 +264,15 @@ class Auth {
     async loginGuestUser() {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
-        const request = async () => {
-            const res = await helpers.loginGuestUser(this.client, {
-                redirectURI,
-                ...(usid && {usid})
-            })
-            this.handleTokenResponse(res, true)
-            return this.data
-        }
-        this.pending = this.pending ? this.pending.then(request) : request()
-        return this.pending
+        const isGuest = true
+        return this.queueRequest(
+            () =>
+                helpers.loginGuestUser(this.client, {
+                    redirectURI,
+                    ...(usid && {usid})
+                }),
+            isGuest
+        )
     }
 
     /**
@@ -268,17 +282,15 @@ class Auth {
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
-        const request = async () => {
-            const res = await helpers.loginRegisteredUserB2C(this.client, credentials, {
-                redirectURI,
-                ...(usid && {usid})
-            })
-            this.handleTokenResponse(res, false)
-
-            return this.data
-        }
-        this.pending = this.pending ? this.pending.then(request) : request()
-        return this.pending
+        const isGuest = false
+        return this.queueRequest(
+            () =>
+                helpers.loginRegisteredUserB2C(this.client, credentials, {
+                    redirectURI,
+                    ...(usid && {usid})
+                }),
+            isGuest
+        )
     }
 
     /**
@@ -286,20 +298,14 @@ class Auth {
      *
      */
     async logout() {
-        const request = async () => {
-            const redirectURI = this.redirectURI
-            await helpers.logout(this.client, {
-                accessToken: this.get('access_token'),
-                refreshToken: this.get('refresh_token_registered')
-            })
-            const res = await helpers.loginGuestUser(this.client, {
-                redirectURI
-            })
-            this.handleTokenResponse(res, true)
-            return this.data
-        }
-        this.pending = this.pending ? this.pending.then(request) : request()
-        return this.pending
+        const isGuest = true
+        return this.queueRequest(
+            () =>
+                helpers.loginGuestUser(this.client, {
+                    redirectURI: this.redirectURI
+                }),
+            isGuest
+        )
     }
 }
 
