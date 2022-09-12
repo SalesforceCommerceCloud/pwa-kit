@@ -6,9 +6,11 @@
  */
 
 import React from 'react'
-import DeviceContext from '../device-context'
-import {v4 as uuid} from 'uuid'
+import PropTypes from 'prop-types'
 import {withRouter} from 'react-router-dom'
+import {v4 as uuid} from 'uuid'
+
+import DeviceContext from '../device-context'
 
 const ExpressContext = React.createContext()
 
@@ -25,6 +27,12 @@ const CorrelationIdProvider = ({children, correlationId, location}) => {
             {children}
         </CorrelationIdContext.Provider>
     )
+}
+
+CorrelationIdProvider.propTypes = {
+    children: PropTypes.element.isRequired,
+    correlationId: PropTypes.string,
+    location: PropTypes.object
 }
 
 const CorrelationIdProviderWithRouter = withRouter(CorrelationIdProvider)
