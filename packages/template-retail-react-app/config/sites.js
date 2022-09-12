@@ -33,23 +33,28 @@ module.exports = [
             supportedLocales: [
                 {
                     id: 'de-DE',
-                    preferredCurrency: 'EUR'
+                    preferredCurrency: 'EUR',
+                    alias: 'TestLocaleAliasDE'
                 },
                 {
                     id: 'en-GB',
-                    preferredCurrency: 'GBP'
+                    preferredCurrency: 'GBP',
+                    alias: 'TestLocaleAliasGB'
                 },
                 {
                     id: 'es-MX',
-                    preferredCurrency: 'MXN'
+                    preferredCurrency: 'MXN',
+                    alias: 'TestLocaleAliasMX'
                 },
                 {
                     id: 'fr-FR',
-                    preferredCurrency: 'EUR'
+                    preferredCurrency: 'EUR',
+                    alias: 'TestLocaleAliasFR'
                 },
                 {
                     id: 'it-IT',
-                    preferredCurrency: 'EUR'
+                    preferredCurrency: 'EUR',
+                    alias: 'TestLocaleAliasIT'
                 },
                 {
                     id: 'ja-JP',
