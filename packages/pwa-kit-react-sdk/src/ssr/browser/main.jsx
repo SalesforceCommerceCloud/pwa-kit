@@ -15,7 +15,7 @@ import Switch from '../universal/components/switch'
 import {loadableReady} from '@loadable/component'
 import {withReactQuery} from '../universal/components'
 import {getRoutes} from '../universal/utils'
-import {v4 as uuid} from "uuid";
+import {v4 as uuid} from 'uuid'
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
     return Promise.resolve().then(() => {

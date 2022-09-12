@@ -7,7 +7,7 @@
 
 import React from 'react'
 import DeviceContext from '../device-context'
-
+import {v4 as uuid} from 'uuid'
 const ExpressContext = React.createContext()
 
 export {CorrelationIdContext}
@@ -15,8 +15,13 @@ export {CorrelationIdContext}
 const CorrelationIdContext = React.createContext()
 
 const CorrelationIdProvider = ({children, correlationId}) => {
+    const [id, reset] = React.useState(correlationId)
+    const handleReset = () => {
+        const newId = uuid()
+        reset(newId)
+    }
     return (
-        <CorrelationIdContext.Provider value={{correlationId}}>
+        <CorrelationIdContext.Provider value={{correlationId: id, reset: handleReset}}>
             {children}
         </CorrelationIdContext.Provider>
     )
