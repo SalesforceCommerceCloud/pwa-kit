@@ -45,6 +45,64 @@ type AuthDataMap = Record<
     }
 >
 
+const onClient = typeof window !== 'undefined'
+const localStorage = onClient ? new LocalStorage() : new Map()
+const cookieStorage = onClient ? new CookieStorage() : new Map()
+
+/**
+ * A map of the data that this auth module stores. This maps the name of the property to
+ * the storage and the key when stored in that storage. You can also pass in a "callback"
+ * function to do extra operation after a property is set.
+ */
+const DATA_MAP: AuthDataMap = {
+    access_token: {
+        storage: localStorage,
+        key: 'access_token',
+    },
+    customer_id: {
+        storage: localStorage,
+        key: 'customer_id',
+    },
+    usid: {
+        storage: localStorage,
+        key: 'usid',
+    },
+    enc_user_id: {
+        storage: localStorage,
+        key: 'enc_user_id',
+    },
+    expires_in: {
+        storage: localStorage,
+        key: 'expires_in',
+    },
+    id_token: {
+        storage: localStorage,
+        key: 'id_token',
+    },
+    idp_access_token: {
+        storage: localStorage,
+        key: 'idp_access_token',
+    },
+    token_type: {
+        storage: localStorage,
+        key: 'token_type',
+    },
+    refresh_token_guest: {
+        storage: cookieStorage,
+        key: 'cc-nx-g',
+        callback: () => {
+            cookieStorage.delete('cc-nx')
+        },
+    },
+    refresh_token_registered: {
+        storage: cookieStorage,
+        key: 'cc-nx',
+        callback: () => {
+            cookieStorage.delete('cc-nx-g')
+        },
+    },
+}
+
 /**
  * This class is used to handle shopper authentication.
  * It is responsible for initializing shopper session, manage access
@@ -56,10 +114,7 @@ type AuthDataMap = Record<
 class Auth {
     private client: ShopperLogin<ApiClientConfigParams>
     private redirectURI: string
-    private onClient = typeof window !== 'undefined'
     private pending: Promise<ShopperLoginTypes.TokenResponse> | undefined
-    private localStorage: LocalStorage
-    private cookieStorage: CookieStorage
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
 
     constructor(config: AuthConfig) {
@@ -75,76 +130,18 @@ class Auth {
         })
 
         this.redirectURI = config.redirectURI
-        this.localStorage = this.onClient ? new LocalStorage() : new Map()
-        this.cookieStorage = this.onClient ? new CookieStorage() : new Map()
     }
 
     private get(name: AuthDataKeys) {
-        const storage = this.DATA_MAP[name].storage
-        const key = this.DATA_MAP[name].key
+        const storage = DATA_MAP[name].storage
+        const key = DATA_MAP[name].key
         return storage.get(key)
     }
 
     private set(name: AuthDataKeys, value: string, options?: unknown) {
-        const {key, storage} = this.DATA_MAP[name]
+        const {key, storage} = DATA_MAP[name]
         storage.set(key, value, options)
-        this.DATA_MAP[name].callback?.()
-    }
-
-    /**
-     * A map of the data that this auth module stores. This maps the name of the property to
-     * the storage and the key when stored in that storage. You can also pass in a "callback"
-     * function to do extra operation after a property is set.
-     */
-    private get DATA_MAP(): AuthDataMap {
-        return {
-            access_token: {
-                storage: this.localStorage,
-                key: 'access_token',
-            },
-            customer_id: {
-                storage: this.localStorage,
-                key: 'customer_id',
-            },
-            usid: {
-                storage: this.localStorage,
-                key: 'usid',
-            },
-            enc_user_id: {
-                storage: this.localStorage,
-                key: 'enc_user_id',
-            },
-            expires_in: {
-                storage: this.localStorage,
-                key: 'expires_in',
-            },
-            id_token: {
-                storage: this.localStorage,
-                key: 'id_token',
-            },
-            idp_access_token: {
-                storage: this.localStorage,
-                key: 'idp_access_token',
-            },
-            token_type: {
-                storage: this.localStorage,
-                key: 'token_type',
-            },
-            refresh_token_guest: {
-                storage: this.cookieStorage,
-                key: 'cc-nx-g',
-                callback: () => {
-                    this.cookieStorage.delete('cc-nx')
-                },
-            },
-            refresh_token_registered: {
-                storage: this.cookieStorage,
-                key: 'cc-nx',
-                callback: () => {
-                    this.cookieStorage.delete('cc-nx-g')
-                },
-            },
-        }
+        DATA_MAP[name].callback?.()
     }
 
     /**
@@ -307,13 +304,6 @@ class Auth {
 }
 
 export default Auth
-
-type ArgWithHeaders =
-    | {
-          parameters?: any
-          headers?: Record<string, string>
-      }
-    | undefined
 
 /**
  * A ultility function to inject access token into a headers object.
