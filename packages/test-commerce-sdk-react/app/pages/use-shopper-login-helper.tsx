@@ -9,7 +9,8 @@ import {ShopperLoginHelpers, useShopperLoginHelper} from 'commerce-sdk-react'
 import Json from '../components/Json'
 
 const UseShopperLoginHelper = () => {
-    const loginGuestUser = useShopperLoginHelper(ShopperLoginHelpers.LoginGuestUser)
+    // use string or enum
+    const loginGuestUser = useShopperLoginHelper('loginGuestUser')
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
     const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
 

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
-import {ActionResponse, Argument} from '../types'
+import {ActionResponse} from '../types'
 import {useAsyncCallback} from '../useAsync'
 import useAuth from '../useAuth'
 import Auth from '../../auth'
@@ -26,18 +26,9 @@ export enum ShopperLoginHelpers {
  * - loginGuestUser
  * - logout
  */
-export function useShopperLoginHelper(
-    action: ShopperLoginHelpers.LoginRegisteredUserB2C
-): ActionResponse<Parameters<Auth['loginRegisteredUserB2C']>, ShopperLoginTypes.TokenResponse>
-export function useShopperLoginHelper(
-    action: ShopperLoginHelpers.LoginGuestUser
-): ActionResponse<[], ShopperLoginTypes.TokenResponse>
-export function useShopperLoginHelper(
-    action: ShopperLoginHelpers.Logout
-): ActionResponse<[], ShopperLoginTypes.TokenResponse>
-export function useShopperLoginHelper(
-    action: ShopperLoginHelpers
-): ActionResponse<Parameters<Auth['loginRegisteredUserB2C']>, ShopperLoginTypes.TokenResponse> {
+export function useShopperLoginHelper<Action>(
+    action: Action
+): ActionResponse<Parameters<Auth[Action]>, ShopperLoginTypes.TokenResponse> {
     const auth = useAuth()
     if (action === ShopperLoginHelpers.LoginGuestUser) {
         return useAsyncCallback(() => auth.loginGuestUser())
@@ -46,9 +37,13 @@ export function useShopperLoginHelper(
         return useAsyncCallback(() => auth.logout())
     }
     if (action === ShopperLoginHelpers.LoginRegisteredUserB2C) {
-        return useAsyncCallback((credentials: Argument<Auth['loginRegisteredUserB2C']>) =>
-            auth.loginRegisteredUserB2C(credentials)
-        )
+        return useAsyncCallback((...args) => {
+            const credentials = args[0]
+            if (!credentials) {
+                throw new Error('Missing registered user credentials.')
+            }
+            return auth.loginRegisteredUserB2C(credentials)
+        })
     }
 
     throw new Error('Unknown ShopperLogin helper.')
