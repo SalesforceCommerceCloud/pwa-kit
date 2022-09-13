@@ -9,3 +9,4 @@ import React from 'react'
 
 export const DeviceContext = React.createContext()
 export const ServerContext = React.createContext()
+export const IsPrePassContext = React.createContext(false)

@@ -6,7 +6,7 @@
  */
 
 import {useContext} from 'react'
-import {ServerContext} from '../contexts'
+import {IsPrePassContext, ServerContext} from '../contexts'
 
 /**
  * Server context
@@ -29,9 +29,16 @@ import {ServerContext} from '../contexts'
  */
 export const useServerContext = (fn) => {
     const serverContext = useContext(ServerContext)
-    const isOnServer = Boolean(serverContext.req)
 
-    if (isOnServer) {
+    const isOnServer = Boolean(serverContext.req)
+    const isPrePass = useIsPrePass()
+
+    if (isOnServer && !isPrePass) {
         fn(serverContext)
     }
 }
+
+/**
+ * @private
+ */
+export const useIsPrePass = () => useContext(IsPrePassContext)

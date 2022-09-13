@@ -8,6 +8,7 @@ import React from 'react'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
+import {IsPrePassContext} from '../../contexts'
 
 const USAGE_WARNING = `This HOC can only be used on your PWA-Kit App component. We cannot guarantee its functionality if used elsewhere.`
 const STATE_KEY = '__REACT_QUERY__'
@@ -56,28 +57,36 @@ export const withReactQuery = (Component) => {
      * @return {Promise<Object[]>}
      */
     WrappedComponent.getDataPromises = (renderContext) => {
-        const {AppJSX} = renderContext
+        const {AppJSX: OriginalApp} = renderContext
+
+        renderContext.AppJSX = React.createElement(
+            IsPrePassContext.Provider,
+            {value: true},
+            OriginalApp
+        )
 
         const dataPromise = Promise.resolve()
-            .then(() => ssrPrepass(AppJSX)) // NOTE: ssrPrepass will be included in the vendor bundle. BAD
+            .then(() => ssrPrepass(renderContext.AppJSX)) // NOTE: ssrPrepass will be included in the vendor bundle. BAD
             .then(() => {
                 const queryCache = queryClient.getQueryCache()
                 const queries = queryCache.getAll()
                 const promises = queries
                     .filter(({options}) => options.enabled !== false)
-                    .map((query) => query.fetch().catch((error) => {
-                        // NOTE: Our best attempt to create a logical return object without
-                        // getting out of hand.
-                        return {
-                            error,
-                            errorUpdatedAt: Date.now(),
-                            errorUpdateCount: 1,
-                            isError: true,
-                            isLoadingError: true,
-                            isRefetchError: false,
-                            status: 'error'
-                        }
-                    }))
+                    .map((query) =>
+                        query.fetch().catch((error) => {
+                            // NOTE: Our best attempt to create a logical return object without
+                            // getting out of hand.
+                            return {
+                                error,
+                                errorUpdatedAt: Date.now(),
+                                errorUpdateCount: 1,
+                                isError: true,
+                                isLoadingError: true,
+                                isRefetchError: false,
+                                status: 'error'
+                            }
+                        })
+                    )
 
                 return Promise.all(promises)
             })

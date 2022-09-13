@@ -98,7 +98,8 @@ const Home = ({value}: Props) => {
             }
         },
         {
-            enabled: typeof window === 'undefined' // Only run on the server.
+            enabled: typeof window === 'undefined', // Only run on the server.
+            retry: false
         }
     )
 
@@ -110,10 +111,7 @@ const Home = ({value}: Props) => {
     }, [counter, setCounter])
 
     useServerContext(({res: pageRes}) => {
-        // Because the component is rendered twice on the server, this callback will also be called twice:
-        // 1. initially when the query is sent
-        // 2. and then when a response (or error) comes back
-
+        // NOTE: this log should appear only once
         console.log('--- query', {isLoading: query.isLoading, error: query.error, data: query.data})
 
         if (query.error) {
