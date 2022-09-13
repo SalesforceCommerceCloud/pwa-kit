@@ -2,7 +2,7 @@
   "name": "pwa-kit-create-app",
   "version": "2.3.0-dev",
   "description": "Salesforce's project generator tool",
-  "author": "dev@mobify.com",
+  "author": "cc-pwa-kit@salesforce.com",
   "license": "See license in LICENSE",
   "repository": {
     "type": "git",

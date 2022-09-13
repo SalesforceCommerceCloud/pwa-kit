@@ -2,7 +2,7 @@
   "name": "commerce-sdk-react",
   "version": "2.3.0-dev",
   "description": "A library that provides react hooks for fetching data from Commerce Cloud",
-  "author": "dev@mobify.com",
+  "author": "cc-pwa-kit@salesforce.com",
   "license": "See license in LICENSE",
   "engines": {
     "node": "^14.0.0",
