@@ -88,7 +88,7 @@ MultiSiteProvider.propTypes = {
     children: PropTypes.node.isRequired,
     buildUrl: PropTypes.func,
     site: PropTypes.object,
-    locale: PropTypes.string
+    locale: PropTypes.object
 }
 
 /**
