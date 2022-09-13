@@ -9,6 +9,7 @@ import {withRouter} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import Error from '../../components/_error'
 import {HTTPError} from '../../errors'
+import {withCorrelationId} from '../with-correlation-id'
 
 export const AppErrorContext = React.createContext()
 
@@ -20,6 +21,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 class AppErrorBoundary extends React.Component {
     constructor(props) {
         super(props)
+        console.log('props', props)
         this.state = {
             error: props.error
         }
@@ -48,13 +50,21 @@ class AppErrorBoundary extends React.Component {
 
     // React's client side error boundaries
     static getDerivedStateFromError(err) {
+        console.log('err', err)
         // Update state so the next render will show the fallback UI
         return {error: {message: err.toString(), stack: err.stack}}
     }
 
     onGetPropsError(err) {
+        console.log('err', err)
         if (err instanceof HTTPError) {
-            this.setState({error: {message: err.message, status: err.status, stack: err.stack}})
+            this.setState({
+                error: {
+                    message: err.message,
+                    status: err.status,
+                    stack: err.stack
+                }
+            })
         } else {
             this.setState({
                 error: {
@@ -68,6 +78,8 @@ class AppErrorBoundary extends React.Component {
 
     render() {
         const {children} = this.props
+        console.log('render===', this.props)
+        console.log('this.state', this.state)
         const error = this.state.error
             ? {
                   message: this.state.error.message,
@@ -75,10 +87,10 @@ class AppErrorBoundary extends React.Component {
                   stack: isProduction ? undefined : this.state.error.stack
               }
             : undefined
-
+        console.log('error', error)
         return (
             <AppErrorContext.Provider value={{onGetPropsError: this.onGetPropsError}}>
-                {error ? <Error {...error} /> : children}
+                {error ? <Error {...error} correlationId={this.props.correlationId} /> : children}
             </AppErrorContext.Provider>
         )
     }
@@ -94,4 +106,4 @@ AppErrorBoundary.propTypes = {
 }
 
 export {AppErrorBoundary as AppErrorBoundaryWithoutRouter}
-export default withRouter(AppErrorBoundary)
+export default withRouter(withCorrelationId(AppErrorBoundary))

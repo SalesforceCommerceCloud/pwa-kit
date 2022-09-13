@@ -24,7 +24,7 @@ const CorrelationIdProvider = ({children, correlationId}) => {
     useEffect(() => {
         const newId = uuidv4()
         setId(newId)
-        // console.log('location', location)
+        console.log('location', location)
     }, [location.pathname])
     return (
         <CorrelationIdContext.Provider value={{correlationId: id}}>

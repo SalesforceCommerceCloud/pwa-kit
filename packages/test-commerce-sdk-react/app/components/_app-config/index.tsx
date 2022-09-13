@@ -16,7 +16,7 @@ interface AppConfigProps {
 
 const AppConfig = (props: AppConfigProps): ReactElement => {
     const {correlationId} = useCorrelationId()
-
+    console.log('correlationId AppConfig', correlationId)
     return (
         <CommerceApiProvider
             siteId="RefArchGlobal"
