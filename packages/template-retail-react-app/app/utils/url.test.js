@@ -131,7 +131,7 @@ describe('getPathWithLocale', () => {
         const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
-        expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
+        expect(relativeUrl).toEqual(`/uk/fr/category/newarrivals-womens`)
     })
 
     test('getPathWithLocale uses default site for siteRef when it is no defined in the url', () => {
@@ -139,7 +139,7 @@ describe('getPathWithLocale', () => {
         const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
-        expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
+        expect(relativeUrl).toEqual(`/uk/fr/category/newarrivals-womens`)
     })
 
     test('getPathWithLocale returns expected for PLP without refine param', () => {
@@ -153,7 +153,7 @@ describe('getPathWithLocale', () => {
             location
         })
         expect(relativeUrl).toEqual(
-            `/uk/fr-FR/category/newarrivals-womens?limit=25&sort=best-matches&offset=25`
+            `/uk/fr/category/newarrivals-womens?limit=25&sort=best-matches&offset=25`
         )
     })
 
@@ -162,7 +162,7 @@ describe('getPathWithLocale', () => {
         const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
-        expect(relativeUrl).toEqual(`/uk/fr-FR/`)
+        expect(relativeUrl).toEqual(`/uk/fr/`)
     })
 
     test('getPathWithLocale returns / when both site and locale are default', () => {

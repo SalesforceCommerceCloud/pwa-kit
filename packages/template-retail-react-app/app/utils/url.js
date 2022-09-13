@@ -7,7 +7,7 @@
 
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getLocaleByReference, getParamsFromPath} from './utils'
-import {getDefaultSite, getSites, resolveSiteFromUrl} from './site-utils'
+import {getDefaultSite, getSiteByReference} from './site-utils'
 import {HOME_HREF, urlPartPositions} from '../constants'
 
 /**
@@ -158,10 +158,9 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
         })
     }
 
-    const locale = getLocaleByReference(
-        resolveSiteFromUrl(`${location.pathname}${location.search}`),
-        shortCode
-    )
+    const siteAliasOrIdRef = getSiteByReference(siteRef)
+
+    const locale = getLocaleByReference(siteAliasOrIdRef, shortCode)
 
     // rebuild the url with new locale,
     const newUrl = buildUrl(
@@ -186,11 +185,7 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
 export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
     const defaultSite = getDefaultSite()
-    const sites = getSites()
-    const siteAliasOrIdRef =
-        sites.find((site) => {
-            return site.alias === siteRef || site.id === siteRef
-        }) || defaultSite
+    const siteAliasOrIdRef = getSiteByReference(siteRef)
     const defaultLocale = getLocaleByReference(
         siteAliasOrIdRef,
         siteAliasOrIdRef.l10n.defaultLocale
