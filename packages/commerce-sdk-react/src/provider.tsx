@@ -25,6 +25,7 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
+    correlationId: string
     proxy: string
     locale: string
     currency: string
@@ -53,6 +54,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {
         children,
         clientId,
+        correlationId = '',
         organizationId,
         shortCode,
         siteId,
@@ -62,7 +64,13 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchOptions
     } = props
 
+    const headers = {
+        authorization: '',
+        ...(correlationId && {'correlation-id': correlationId})
+    }
+
     const config = {
+        headers,
         proxy,
         parameters: {
             clientId,
@@ -75,6 +83,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     }
 
     const apiClients = useMemo(() => {
+        console.log('REBUILD API CLIENTS: ', config)
         return {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
@@ -87,7 +96,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config)
         }
-    }, [clientId, organizationId, shortCode, siteId, proxy, fetchOptions])
+    }, [clientId, organizationId, shortCode, siteId, proxy, fetchOptions, correlationId])
 
     const auth = useMemo(() => {
         return new Auth({

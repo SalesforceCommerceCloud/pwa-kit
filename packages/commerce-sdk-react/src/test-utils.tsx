@@ -13,6 +13,7 @@ import CommerceApiProvider from './provider'
 
 export const TEST_CONFIG = {
     proxy: 'http://localhost:3000/mobify/proxy/api',
+    correlationId: '',
     clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
     organizationId: 'f_ecom_zzrf_001',
     shortCode: '8o7m175y',

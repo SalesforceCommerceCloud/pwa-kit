@@ -16,7 +16,6 @@ interface AppConfigProps {
 
 const AppConfig = (props: AppConfigProps): ReactElement => {
     const {correlationId} = useCorrelationId()
-    console.log('correlationId AppConfig', correlationId)
     return (
         <CommerceApiProvider
             siteId="RefArchGlobal"
@@ -29,7 +28,8 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
             currency="USD"
             correlationId={correlationId}
         >
-            {props.children}
+            <React.Fragment>Correlation Id: {correlationId}</React.Fragment>
+            <React.Fragment>{props.children}</React.Fragment>
         </CommerceApiProvider>
     )
 }

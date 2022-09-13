@@ -16,15 +16,17 @@ const ExpressContext = React.createContext()
 
 const CorrelationIdContext = React.createContext()
 
+let ignoreFirst = true
 const CorrelationIdProvider = ({children, correlationId}) => {
     // console.log('default correlationId', correlationId)
     const [id, setId] = React.useState(correlationId || uuidv4())
     const location = useLocation()
-
+    console.log('CORRELATION ID PROVIDER: ', id)
     useEffect(() => {
+        console.log('SETTING NEW CORRELATION ID')
         const newId = uuidv4()
-        setId(newId)
-        console.log('location', location)
+        !ignoreFirst && setId(newId)
+        ignoreFirst = false
     }, [location.pathname])
     return (
         <CorrelationIdContext.Provider value={{correlationId: id}}>

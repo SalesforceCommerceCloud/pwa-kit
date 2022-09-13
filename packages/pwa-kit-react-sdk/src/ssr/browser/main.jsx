@@ -82,22 +82,20 @@ export const start = () => {
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
             ReactDOM.hydrate(
-                <ExpressContext.Provider value={{}}>
-                    <Router>
-                        <CorrelationIdProvider>
-                            <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                                <AppConfig locals={locals}>
-                                    <Switch
-                                        error={error}
-                                        appState={window.__PRELOADED_STATE__}
-                                        routes={routes}
-                                        App={WrappedApp}
-                                    />
-                                </AppConfig>
-                            </DeviceContext.Provider>
-                        </CorrelationIdProvider>
-                    </Router>
-                </ExpressContext.Provider>,
+                <Router>
+                    <CorrelationIdProvider>
+                        <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
+                            <AppConfig locals={locals}>
+                                <Switch
+                                    error={error}
+                                    appState={window.__PRELOADED_STATE__}
+                                    routes={routes}
+                                    App={WrappedApp}
+                                />
+                            </AppConfig>
+                        </DeviceContext.Provider>
+                    </CorrelationIdProvider>
+                </Router>,
                 rootEl,
                 () => {
                     window.__HYDRATING__ = false

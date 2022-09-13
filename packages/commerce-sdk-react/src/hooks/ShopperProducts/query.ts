@@ -32,10 +32,13 @@ function useProducts(
     arg: UseProductsArg,
     options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ) {
+    console.log('USEPRODUCTS')
     if (!arg.ids) {
         throw new Error('ids is required for useProducts')
     }
     const {headers, rawResponse, ...parameters} = arg
+    console.log('USEPRODUCTS HEADERS: ', headers)
+
     return useAsync(
         ['products', arg],
         ({shopperProducts}) => {

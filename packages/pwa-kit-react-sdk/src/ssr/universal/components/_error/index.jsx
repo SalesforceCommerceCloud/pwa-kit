@@ -36,11 +36,13 @@ const Error = ({message, stack, status, ...rest}) => {
     console.log('message', message)
     console.log('statck', stack)
     console.log('rest', rest)
+    const correlationId = useCorrelationId()
     return (
         <div>
             <h1>Error Status: {status}</h1>
             <pre>{stack}</pre>
             <pre>{message}</pre>
+            <pre>{correlationId}</pre>
         </div>
     )
 }
