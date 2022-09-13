@@ -13,6 +13,7 @@ const UseProduct = loadable(() => import('./pages/use-shopper-product'))
 const UseCategories = loadable(() => import('./pages/use-shopper-categories'))
 const UseCategory = loadable(() => import('./pages/use-shopper-category'))
 const UseProductSearch = loadable(() => import('./pages/use-product-search'))
+const UseShopperLoginHelper = loadable(() => import('./pages/use-shopper-login-helper'))
 
 const routes = [
     {
@@ -43,6 +44,10 @@ const routes = [
     {
         path: '/search-suggestions',
         component: UseSearchSuggestions
+    },
+    {
+        path: '/slas-helpers',
+        component: UseShopperLoginHelper
     }
 ]
 

@@ -62,6 +62,7 @@ const main = () => {
 
     program
         .command('test')
+        .allowUnknownOption()
         .description('test the library')
         .action((_, {args}) => {
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')

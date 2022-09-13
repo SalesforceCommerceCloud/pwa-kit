@@ -32,6 +32,9 @@ const Home = () => {
                 <li>
                     <Link to="/search-suggestions">useSearchSuggestions</Link>
                 </li>
+                <li>
+                    <Link to="/slas-helpers">useShopperLoginHelper</Link>
+                </li>
             </ul>
         </>
     )
