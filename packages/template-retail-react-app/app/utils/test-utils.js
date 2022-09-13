@@ -83,7 +83,7 @@ export const TestProviders = ({
     initialBasket = null,
     initialCustomer = null,
     initialCategories = initialMockCategories,
-    locale = DEFAULT_LOCALE,
+    locale = {id: DEFAULT_LOCALE},
     messages = fallbackMessages,
     appConfig = appDefaultConfig,
     siteAlias = DEFAULT_SITE
@@ -132,10 +132,10 @@ export const TestProviders = ({
             return site.alias === siteAlias || site.id === appConfig['site']
         }) || getDefaultSite()
 
-    const buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale)
+    const buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.alias || locale.id)
 
     return (
-        <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+        <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
             <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
                 <CommerceAPIProvider value={api}>
                     <CategoriesProvider categories={initialCategories}>
@@ -170,7 +170,7 @@ TestProviders.propTypes = {
     initialCategories: PropTypes.element,
     initialProductLists: PropTypes.object,
     messages: PropTypes.object,
-    locale: PropTypes.string,
+    locale: PropTypes.object,
     appConfig: PropTypes.object,
     siteAlias: PropTypes.string
 }
