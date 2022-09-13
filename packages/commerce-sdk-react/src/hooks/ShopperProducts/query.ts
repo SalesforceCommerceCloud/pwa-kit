@@ -6,7 +6,6 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
-import useCommerceApi from '../useCommerceApi'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
@@ -36,11 +35,12 @@ function useProducts(
     if (!arg.ids) {
         throw new Error('ids is required for useProducts')
     }
-    const {shopperProducts: client} = useCommerceApi()
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
         ['products', arg],
-        () => client.getProducts({parameters, headers}, rawResponse),
+        ({shopperProducts}) => {
+            return shopperProducts.getProducts({parameters, headers}, rawResponse)
+        },
         options
     )
 }
@@ -71,10 +71,11 @@ function useProduct(
         throw new Error('id is required for useProduct.')
     }
     const {headers, rawResponse, ...parameters} = arg
-    const {shopperProducts: client} = useCommerceApi()
     return useAsync(
         ['product', arg],
-        () => client.getProduct({parameters, headers}, rawResponse),
+        ({shopperProducts}) => {
+            return shopperProducts.getProduct({parameters, headers}, rawResponse)
+        },
         options
     )
 }
@@ -108,11 +109,11 @@ function useCategories(
         throw new Error('ids is required for useCategories')
     }
     const {headers, rawResponse, ...parameters} = arg
-
-    const {shopperProducts: client} = useCommerceApi()
     return useAsync(
         ['categories', arg],
-        () => client.getCategories({parameters, headers}, rawResponse),
+        ({shopperProducts}) => {
+            return shopperProducts.getCategories({parameters, headers}, rawResponse)
+        },
         options
     )
 }
@@ -145,11 +146,11 @@ function useCategory(
     options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategory']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-
-    const {shopperProducts: client} = useCommerceApi()
     return useAsync(
         ['category', arg],
-        () => client.getCategory({parameters, headers}, rawResponse),
+        ({shopperProducts}) => {
+            return shopperProducts.getCategory({parameters, headers}, rawResponse)
+        },
         options
     )
 }

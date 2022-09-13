@@ -32,7 +32,7 @@
     "test:watch": "npm test -- --watch",
     "test:inspect": "node --inspect-brk jest --runInBand",
     "test:no-mocked-responses": "cross-env NOCK_BACK_MODE=wild npm run test",
-    "test:update-mocked-responses": "cross-env NOCK_BACK_MODE=update npm run test",
+    "test:update-mocked-responses": "cross-env NOCK_BACK_MODE=update npm test",
     "typecheck": "tsc --noEmit",
     "version": "node ./scripts/version.js",
     "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\""
@@ -45,11 +45,15 @@
     "@tanstack/react-query-devtools": "^4.2.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.5",
+    "@types/js-cookie": "^3.0.2",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/jwt-decode": "^3.1.0",
     "@types/node": "^14.18.22",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "cross-env": "^5.2.0",
     "internal-lib-build": "^2.3.0-dev",
+    "jsonwebtoken": "^8.5.1",
     "nock": "^13.2.9",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -62,6 +66,8 @@
     "react": "^17"
   },
   "dependencies": {
-    "commerce-sdk-isomorphic": "^1.7.0"
+    "commerce-sdk-isomorphic": "^1.7.1",
+    "js-cookie": "^3.0.1",
+    "jwt-decode": "^3.1.2"
   }
 }

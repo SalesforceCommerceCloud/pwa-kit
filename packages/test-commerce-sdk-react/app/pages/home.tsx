@@ -19,9 +19,10 @@ const Home = () => {
             </p>
             <p>Happy coding.</p>
             <h2>Hooks</h2>
-            <Link to="/products">useShopperProducts</Link>
+            <Link to="/products">useProducts</Link>
             <br />
             <Link to="/categories">useCategories</Link>
+            <Link to="/slas-helpers">useShopperLoginHelper</Link>
         </>
     )
 }
