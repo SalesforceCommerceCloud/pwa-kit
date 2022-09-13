@@ -83,7 +83,7 @@ export const getSites = () => {
 /**
  * Given a site reference, return the site object
  * @param siteRef - site reference to look for the site object
- * @returns {object | undefined} site object
+ * @returns {object | undefined} found site object or default site object
  */
 export const getSiteByReference = (siteRef) => {
     const defaultSite = getDefaultSite()

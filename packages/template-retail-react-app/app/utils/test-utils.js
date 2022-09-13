@@ -48,7 +48,7 @@ export const DEFAULT_SITE = 'global'
 import {CategoriesProvider, CurrencyProvider, MultiSiteProvider} from '../contexts'
 
 import {createUrlTemplate} from './url'
-import {getDefaultSite, getSites} from './site-utils'
+import {getSiteByReference} from './site-utils'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -126,13 +126,13 @@ export const TestProviders = ({
         onClose: () => {}
     }
 
-    const sites = getSites()
-    const site =
-        sites.find((site) => {
-            return site.alias === siteAlias || site.id === appConfig['site']
-        }) || getDefaultSite()
+    const site = getSiteByReference(siteAlias || appConfig.defaultSite)
 
-    const buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.alias || locale.id)
+    const buildUrl = createUrlTemplate(
+        appConfig,
+        site?.alias || site?.id,
+        locale.alias || locale.id
+    )
 
     return (
         <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
