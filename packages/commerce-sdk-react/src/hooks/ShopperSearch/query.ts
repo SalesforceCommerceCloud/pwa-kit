@@ -30,7 +30,7 @@ function useProductSearch(
     options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
 ): UseQueryResult<DataType<Client['productSearch']>, Error>
 function useProductSearch(
-    arg: Omit<UseProductSearchArg, 'rawResp onse'> & {rawResponse?: true},
+    arg: Omit<UseProductSearchArg, 'rawResponse'> & {rawResponse?: true},
     options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
 ): UseQueryResult<DataType<Client['productSearch']>, Error>
 function useProductSearch(
