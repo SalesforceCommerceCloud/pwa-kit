@@ -62,7 +62,6 @@
     "sinon": "^13.0.1",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2",
-    "uuid": "^9.0.0",
     "watch": "1.0.1"
   },
   "peerDependencies": {

@@ -7,8 +7,8 @@
 
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {withRouter} from 'react-router-dom'
-import {v4 as uuid} from 'uuid'
+import {useLocation} from 'react-router-dom'
+import {uuidv4} from 'pwa-kit-runtime/utils/uuidv4'
 
 import DeviceContext from '../device-context'
 
@@ -16,11 +16,15 @@ const ExpressContext = React.createContext()
 
 const CorrelationIdContext = React.createContext()
 
-const CorrelationIdProvider = ({children, correlationId, location}) => {
-    const [id, setId] = React.useState(correlationId)
+const CorrelationIdProvider = ({children, correlationId}) => {
+    // console.log('default correlationId', correlationId)
+    const [id, setId] = React.useState(correlationId || uuidv4())
+    const location = useLocation()
+
     useEffect(() => {
-        const newId = uuid()
+        const newId = uuidv4()
         setId(newId)
+        // console.log('location', location)
     }, [location.pathname])
     return (
         <CorrelationIdContext.Provider value={{correlationId: id}}>
@@ -35,11 +39,4 @@ CorrelationIdProvider.propTypes = {
     location: PropTypes.object
 }
 
-const CorrelationIdProviderWithRouter = withRouter(CorrelationIdProvider)
-
-export {
-    CorrelationIdContext,
-    CorrelationIdProviderWithRouter as CorrelationIdProvider,
-    DeviceContext,
-    ExpressContext
-}
+export {CorrelationIdContext, CorrelationIdProvider, DeviceContext, ExpressContext}

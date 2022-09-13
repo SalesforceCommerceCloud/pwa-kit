@@ -15,7 +15,6 @@ import Switch from '../universal/components/switch'
 import {loadableReady} from '@loadable/component'
 import {withReactQuery} from '../universal/components'
 import {getRoutes} from '../universal/utils'
-import {v4 as uuid} from 'uuid'
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
     return Promise.resolve().then(() => {
@@ -78,7 +77,6 @@ export const start = () => {
     }
 
     const error = window.__ERROR__
-    const id = uuid()
 
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
@@ -86,7 +84,7 @@ export const start = () => {
             ReactDOM.hydrate(
                 <ExpressContext.Provider value={{}}>
                     <Router>
-                        <CorrelationIdProvider correlationId={id}>
+                        <CorrelationIdProvider>
                             <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                                 <AppConfig locals={locals}>
                                     <Switch

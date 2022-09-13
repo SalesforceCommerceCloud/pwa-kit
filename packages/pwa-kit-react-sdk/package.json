@@ -78,8 +78,7 @@
     "replace-in-file": "^6.2.0",
     "rimraf": "2.6.1",
     "sinon": "^13.0.1",
-    "supertest": "^4.0.2",
-    "uuid": "^9.0.0"
+    "supertest": "^4.0.2"
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",
