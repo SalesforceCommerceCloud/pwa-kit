@@ -425,6 +425,13 @@ const ProductList = (props) => {
                                                   product={productSearchItem}
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
+                                                  onClick={() => {
+                                                    if (searchQuery) {
+                                                        einstein.sendClickSearch(searchQuery, productSearchItem)
+                                                    } else if (category) {
+                                                        einstein.sendClickCategory(category, productSearchItem)
+                                                    }
+                                                  }}
                                                   onFavouriteToggle={(isFavourite) => {
                                                       const action = isFavourite
                                                           ? addItemToWishlist

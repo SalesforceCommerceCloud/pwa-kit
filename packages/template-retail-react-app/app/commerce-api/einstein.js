@@ -108,12 +108,18 @@ class EinsteinAPI {
     /**
      * Tells the Einstein engine when a user clicks on a search result.
     **/
-    async sendClickSearch(searchText, products, args) {
+    async sendClickSearch(searchText, product, args) {
         const endpoint = `/activities/${this.config.siteId}/clickSearch`
         const method = 'POST'
+        const {productId, sku = '', altId = '', altIdType = ''} = product
         const body = {
             searchText,
-            products,
+            product: {
+                id: productId,
+                sku,
+                altId,
+                altIdType
+            },
             ...args
         }
 
@@ -141,14 +147,20 @@ class EinsteinAPI {
      * Tells the Einstein engine when a user clicks a product from the category page.
      * Not meant to be used when the user clicks a category from the nav bar.
     **/
-    async sendClickCategory(category, products, args) {
+    async sendClickCategory(category, product, args) {
         const endpoint = `/activities/${this.config.siteId}/clickCategory`
         const method = 'POST'
+        const {productId, sku = '', altId = '', altIdType = ''} = product
         const body = {
             category: {
-                id
+                id: category.id
             },
-            products,
+            product: {
+                id: productId,
+                sku,
+                altId,
+                altIdType
+            },
             ...args
         }
 
