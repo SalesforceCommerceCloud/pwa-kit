@@ -13,7 +13,7 @@ type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
-    fetchOptions: ShopperLoginTypes.FetchOptions
+    fetchOptions?: ShopperLoginTypes.FetchOptions
 }
 
 interface JWTHeaders {
