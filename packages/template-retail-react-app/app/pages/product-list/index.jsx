@@ -103,6 +103,7 @@ const ProductList = (props) => {
     const {categories} = useCategories()
     const toast = useToast()
     const einstein = useEinstein()
+    const previousCategoryProducts = useRef()
 
     // Get the current category from global state.
     let category = undefined
@@ -194,17 +195,23 @@ const ProductList = (props) => {
             })
             einstein.sendViewSearch(searchQuery, products)
         } else if (category && productSearchResult && productSearchResult.hits) {
-            // TODO: When navigating between categories, this runs twice! Once when category changes and again when the search results update
-            const products = productSearchResult.hits.map((productSearchItem) => {
-                const {productId, sku = '', altId = '', altIdType = ''} = productSearchItem
-                return {
-                    id: productId,
-                    sku,
-                    altId,
-                    altIdType
-                }
-            })
-            einstein.sendViewCategory(category, products)
+
+            // Categories update asynchronously from category search results. To ensure we are
+            // sending a viewCategory only after both category and search results update, we track
+            // the previous category's search results in a useRef.
+            if (previousCategoryProducts.current != productSearchResult.hits) {
+                const products = productSearchResult.hits.map((productSearchItem) => {
+                    const {productId, sku = '', altId = '', altIdType = ''} = productSearchItem
+                    return {
+                        id: productId,
+                        sku,
+                        altId,
+                        altIdType
+                    }
+                })
+                einstein.sendViewCategory(category, products)
+                previousCategoryProducts.current = productSearchResult.hits
+            }
         }
     }, [searchQuery, category, productSearchResult])
 
