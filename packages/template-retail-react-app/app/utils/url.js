@@ -7,7 +7,7 @@
 
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getLocaleByReference, getParamsFromPath} from './utils'
-import {getDefaultSite, getSites} from './site-utils'
+import {getDefaultSite, getSites, resolveSiteFromUrl} from './site-utils'
 import {HOME_HREF, urlPartPositions} from '../constants'
 
 /**
@@ -158,13 +158,18 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
         })
     }
 
+    const locale = getLocaleByReference(
+        resolveSiteFromUrl(`${location.pathname}${location.search}`),
+        shortCode
+    )
+
     // rebuild the url with new locale,
     const newUrl = buildUrl(
         `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`,
         // By default, as for home page, when the values of site and locale belongs to the default site,
         // they will be not shown in the url just
         defaultSite.alias || defaultSite.id,
-        shortCode
+        locale?.alias || locale?.id
     )
     return newUrl
 }
