@@ -5,12 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {ReactElement} from 'react'
+import path from 'path'
 import '@testing-library/jest-dom'
 import {mockHttpResponses, renderWithProviders} from '../../test-utils'
 import {useCategories, useCategory, useProduct, useProducts} from './query'
 import {screen, waitFor} from '@testing-library/react'
 
-const {withMocks} = mockHttpResponses({directory: `${__dirname}/mock-responses`})
+const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
+
 const ProductsComponent = ({ids}: {ids: string}): ReactElement => {
     const {data, isLoading, error} = useProducts({
         ids
