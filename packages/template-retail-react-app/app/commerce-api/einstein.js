@@ -37,6 +37,10 @@ class EinsteinAPI {
             console.warn('Missing `cookieId`. For optimal results this value must be defined.')
         }
 
+        // The first part of the siteId is the realm
+        body.realm = this.config.siteId.split("-")[0]
+        body.correlationId = ""
+
         return body
     }
 
@@ -213,10 +217,11 @@ class EinsteinAPI {
      * Tells the Einstein engine when a user views a page.
      * Use this only for pages where another activity does not fit. (ie. on the PDP, use viewProduct rather than this)
      **/
-    async sendViewPage(args) {
+    async sendViewPage(path, args) {
         const endpoint = `/activities/${this.config.siteId}/viewPage`
         const method = 'POST'
         const body = {
+            currentLocation: path,
             ...args
         }
 

@@ -14,12 +14,14 @@ import {useForm} from 'react-hook-form'
 import RegisterForm from '../../components/register'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
+import {useLocation} from 'react-router-dom'
 
 const Registration = () => {
     const navigate = useNavigation()
     const customer = useCustomer()
     const form = useForm()
     const einstein = useEinstein()
+    const {pathname} = useLocation()
 
     const submitForm = async (data) => {
         try {
@@ -38,7 +40,7 @@ const Registration = () => {
 
     /**************** Einstein ****************/
     useEffect(() => {
-        einstein.sendViewPage()
+        einstein.sendViewPage(pathname)
     }, [])
 
     return (

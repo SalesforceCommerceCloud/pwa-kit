@@ -99,8 +99,8 @@ const Account = () => {
     /**************** Einstein ****************/
     //TODO: Do we want this firing once when the account page is first opened or every time a user swaps between tabs (ie. order history to wishlists)
     useEffect(() => {
-        einstein.sendViewPage()
-    }, [path])
+        einstein.sendViewPage(location.pathname)
+    }, [location])
 
     return (
         <Box

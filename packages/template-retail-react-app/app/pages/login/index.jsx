@@ -54,7 +54,7 @@ const Login = () => {
 
     /**************** Einstein ****************/
     useEffect(() => {
-        einstein.sendViewPage()
+        einstein.sendViewPage(location.pathname)
     }, [])
 
     return (

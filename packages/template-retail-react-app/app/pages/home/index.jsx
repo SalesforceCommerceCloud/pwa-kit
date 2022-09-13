@@ -8,6 +8,7 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
+import {useLocation} from 'react-router-dom'
 
 // Components
 import {
@@ -52,10 +53,11 @@ import {
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
     const einstein = useEinstein()
+    const {pathname} = useLocation()
 
     /**************** Einstein ****************/
     useEffect(() => {
-        einstein.sendViewPage()
+        einstein.sendViewPage(pathname)
     }, [])
 
     return (

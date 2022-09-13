@@ -16,6 +16,7 @@ import ResetPasswordForm from '../../components/reset-password'
 import {BrandLogo} from '../../components/icons'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
+import {useLocation} from 'react-router-dom'
 
 const ResetPassword = () => {
     const customer = useCustomer()
@@ -24,6 +25,7 @@ const ResetPassword = () => {
     const [submittedEmail, setSubmittedEmail] = useState('')
     const [showSubmittedSuccess, setShowSubmittedSuccess] = useState(false)
     const einstein = useEinstein()
+    const {pathname} = useLocation()
 
     const submitForm = async ({email}) => {
         try {
@@ -37,7 +39,7 @@ const ResetPassword = () => {
 
     /**************** Einstein ****************/
     useEffect(() => {
-        einstein.sendViewPage()
+        einstein.sendViewPage(pathname)
     }, [])    
 
     return (
