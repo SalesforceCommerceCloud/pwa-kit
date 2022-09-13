@@ -37,11 +37,10 @@ function useProductSearch(
     arg: UseProductSearchArg,
     options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
 ) {
-    const {shopperSearch: client} = useCommerceApi()
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
         ['productSearch', arg],
-        () => client.productSearch({parameters, headers}, rawResponse),
+        ({shopperSearch}) => shopperSearch.productSearch({parameters, headers}, rawResponse),
         options
     )
 }
@@ -73,11 +72,10 @@ function useSearchSuggestions(
     arg: UseSearchSuggestionsArg,
     options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
 ) {
-    const {shopperSearch: client} = useCommerceApi()
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
         ['search-suggestions', arg],
-        () => client.getSearchSuggestions({parameters, headers}, rawResponse),
+        ({shopperSearch}) => shopperSearch.getSearchSuggestions({parameters, headers}, rawResponse),
         options
     )
 }

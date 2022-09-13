@@ -5,12 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-
+// @ts-ignore
 import {useSearchSuggestions} from 'commerce-sdk-react'
 import Json from '../components/Json'
-import {Link} from 'react-router-dom'
 
-const searchQuery = 'son'
+const searchQuery = 'shirt'
 const currency = 'USD'
 const locale = 'en-US'
 
@@ -36,22 +35,16 @@ function UseSearchSuggestions() {
     return (
         <>
             <h1>Search Results</h1>
+            <h3>Search term: {searchQuery}</h3>
             <ul>
-                {result?.data?.productSuggestions.products.map(
-                    (hit: {
-                        productId: string
-                        productName: string
-                        price: number
-                        currency: string
+                {result?.productSuggestions?.products?.map(
+                    ({
+                        productId,
+                        productName,
                     }) => {
                         return (
-                            <li key={hit.productId}>
-                                <p style={{fontWeight: 'bold'}}>{hit.productName}</p>
-                                <p>{hit.productId}</p>
-                                <p>
-                                    {hit.currency} | {hit.price}
-                                </p>
-                                <hr />
+                            <li key={productId}>
+                                {productName}
                             </li>
                         )
                     }

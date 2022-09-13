@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-
+// @ts-ignore
 import {useProductSearch} from 'commerce-sdk-react'
 import Json from '../components/Json'
 import {Link} from 'react-router-dom'
@@ -40,11 +40,12 @@ function UseProductSearch() {
     return (
         <>
             <h1>Search Results</h1>
+            <h3>Search term: {searchQuery}</h3>
             <div>Click on the link to go to a product page</div>
-            {result?.data?.hits.map((hit: {productId: string; productName: string}) => {
+            {result?.hits.map(({productId, productName}) => {
                 return (
-                    <div key={hit.productId}>
-                        <Link to={`/products/${hit.productId}`}>{hit.productName}</Link>
+                    <div key={productId}>
+                        <Link to={`/products/${productId}`}>{productName}</Link>
                     </div>
                 )
             })}
