@@ -28,14 +28,13 @@ export const useAsync = <T>(
         auth
             .ready()
             .then(({access_token}) => {
-                const authenticatedClients = (Object.keys(apiClients).map((client) => {
-                    ;(apiClients[client] as Client).clientConfig.headers = {
+                Object.keys(apiClients).forEach((client) => {
+                    apiClients[client].clientConfig.headers = {
                         ...apiClients[client].clientConfig.headers,
                         Authorization: `Bearer ${access_token}`
                     }
-                    return apiClients[client]
-                }) as unknown) as ApiClients
-                return authenticatedClients
+                })
+                return (apiClients as unknown) as ApiClients
             })
             .then(fn)
     return useQuery<T, Error>(queryKey, authenticatedFn, queryOptions)
