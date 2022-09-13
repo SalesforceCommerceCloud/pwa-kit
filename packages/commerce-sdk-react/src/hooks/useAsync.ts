@@ -4,19 +4,40 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {useState} from 'react'
 import useAuth from './useAuth'
-import {ActionResponse} from './types'
+import useCommerceApi from './useCommerceApi'
+import {ActionResponse, ApiClients} from './types'
 import {useQuery, UseQueryOptions} from '@tanstack/react-query'
+
+interface Client {
+    clientConfig: {
+        headers: Record<string, string>
+    }
+}
 
 export const useAsync = <T>(
     queryKey: unknown[],
-    fn: (tokenResponse: ShopperLoginTypes.TokenResponse) => Promise<T>,
+    fn: (apiClients: ApiClients) => Promise<T>,
     queryOptions?: UseQueryOptions<T, Error>
 ) => {
     const auth = useAuth()
-    const authenticatedFn = () => auth.ready().then(fn)
+    // TODO: what's a better way to handle the types?
+    const apiClients = (useCommerceApi() as unknown) as Record<string, Client>
+    const authenticatedFn = () =>
+        auth
+            .ready()
+            .then(({access_token}) => {
+                const authenticatedClients = (Object.keys(apiClients).map((client) => {
+                    ;(apiClients[client] as Client).clientConfig.headers = {
+                        ...apiClients[client].clientConfig.headers,
+                        Authorization: `Bearer ${access_token}`
+                    }
+                    return apiClients[client]
+                }) as unknown) as ApiClients
+                return authenticatedClients
+            })
+            .then(fn)
     return useQuery<T, Error>(queryKey, authenticatedFn, queryOptions)
 }
 
