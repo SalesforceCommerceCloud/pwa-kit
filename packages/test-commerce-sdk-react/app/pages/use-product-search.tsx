@@ -8,13 +8,21 @@ import React from 'react'
 
 import {useProductSearch} from 'commerce-sdk-react'
 import Json from '../components/Json'
-import { Link } from 'react-router-dom'
+import {Link} from 'react-router-dom'
 
 const searchQuery = 'shirt'
+const currency = 'USD'
+const locale = 'en-US'
 
 function UseProductSearch() {
-    const {isLoading, error, data: result} = useProductSearch({
-        q: searchQuery
+    const {
+        isLoading,
+        error,
+        data: result,
+    } = useProductSearch({
+        q: searchQuery,
+        currency,
+        locale,
     })
     if (isLoading) {
         return (
@@ -33,7 +41,7 @@ function UseProductSearch() {
         <>
             <h1>Search Results</h1>
             <div>Click on the link to go to a product page</div>
-            {result?.data?.hits.map((hit: {productId: string, productName: string}) => {
+            {result?.data?.hits.map((hit: {productId: string; productName: string}) => {
                 return (
                     <div key={hit.productId}>
                         <Link to={`/products/${hit.productId}`}>{hit.productName}</Link>

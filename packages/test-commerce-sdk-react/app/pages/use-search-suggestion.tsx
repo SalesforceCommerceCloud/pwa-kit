@@ -10,10 +10,16 @@ import {useSearchSuggestions} from 'commerce-sdk-react'
 import Json from '../components/Json'
 import {Link} from 'react-router-dom'
 
-const searchQuery = 'shirt'
+const searchQuery = 'son'
+const currency = 'USD'
+const locale = 'en-US'
 
 function UseSearchSuggestions() {
-    const {isLoading, error, data: result} = useSearchSuggestions({q: searchQuery})
+    const {
+        isLoading,
+        error,
+        data: result,
+    } = useSearchSuggestions({q: searchQuery, currency, locale})
     if (isLoading) {
         return (
             <div>

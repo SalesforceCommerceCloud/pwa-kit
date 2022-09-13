@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import loadable from '@loadable/component'
+import UseSearchSuggestions from './pages/use-search-suggestion'
 
 const Home = loadable(() => import('./pages/home'))
 const UseProducts = loadable(() => import('./pages/use-shopper-products'))
@@ -38,6 +39,10 @@ const routes = [
     {
         path: '/search',
         component: UseProductSearch
+    },
+    {
+        path: '/search-suggestions',
+        component: UseSearchSuggestions
     }
 ]
 
