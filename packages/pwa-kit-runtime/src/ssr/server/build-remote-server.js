@@ -13,7 +13,6 @@ import {
     CACHE_CONTROL,
     NO_CACHE
 } from './constants'
-import {uuidv4} from '../../utils/uuidv4'
 import {
     catchAndLog,
     getHashForString,
@@ -461,7 +460,7 @@ export const RemoteServerFactory = {
             locals.requestStart = Date.now()
             locals.afterResponseCalled = false
             locals.responseCaching = {}
-            locals.requestId = req.headers['x-amzn-requestid'] || uuidv4()
+            that._setRequestId(res)
 
             locals.timer = new PerformanceTimer(`req${locals.requestId}`)
             locals.originalUrl = req.originalUrl
@@ -539,6 +538,11 @@ export const RemoteServerFactory = {
         }
 
         app.use(ssrRequestProcessorMiddleware)
+    },
+
+    _setRequestId(res) {
+        const locals = res.locals
+        locals.requestId = req.headers['x-amzn-requestid']
     },
 
     /**

@@ -8,7 +8,7 @@
 import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
-import {uuidv4} from 'pwa-kit-runtime/utils/uuidv4'
+import {uuidv4} from '../../../utils/uuidv4.client'
 
 import DeviceContext from '../device-context'
 
@@ -17,12 +17,13 @@ const ExpressContext = React.createContext()
 const CorrelationIdContext = React.createContext()
 
 const CorrelationIdProvider = ({children, correlationId}) => {
-    const [id, setId] = React.useState(correlationId || uuidv4())
+    const [id, setId] = React.useState(correlationId)
     const location = useLocation()
 
     const isFirstRun = useRef(true)
 
     useEffect(() => {
+        // this hook only runs on client-side
         // don't run this on first render
         if (isFirstRun.current) {
             isFirstRun.current = false
