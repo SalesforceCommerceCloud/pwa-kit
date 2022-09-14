@@ -13,6 +13,7 @@ import {Link} from 'react-router-dom'
 const searchQuery = 'shirt'
 const currency = 'USD'
 const locale = 'en-US'
+const refinement = ["price=(0..50)"]
 
 function UseProductSearch() {
     const {
@@ -23,6 +24,7 @@ function UseProductSearch() {
         q: searchQuery,
         currency,
         locale,
+        refine: refinement
     })
     if (isLoading) {
         return (
@@ -40,9 +42,12 @@ function UseProductSearch() {
     return (
         <>
             <h1>Search Results</h1>
-            <h3>Search term: {searchQuery}</h3>
+            <h3 style={{margin: 0, padding: 0}}>Search term: {searchQuery}</h3>
+            <h4 style={{margin: 0, padding: 0}}>Currency: {currency}</h4>
+            <h4 style={{margin: 0, padding: 0}}>Locale: {locale}</h4>
+            <h4 style={{margin: 0, padding: 0}}>Refinements: {refinement}</h4>
             <div>Click on the link to go to a product page</div>
-            {result?.hits.map(({productId, productName}) => {
+            {result?.hits?.map(({productId, productName}) => {
                 return (
                     <div key={productId}>
                         <Link to={`/products/${productId}`}>{productName}</Link>

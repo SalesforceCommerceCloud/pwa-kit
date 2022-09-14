@@ -1,0 +1,40 @@
+[
+    {
+        "scope": "http://localhost:3000",
+        "method": "GET",
+        "path": "/mobify/proxy/api/search/shopper-search/v1/organizations/f_ecom_zzrf_001/product-search?siteId=RefArchGlobal&q=shirt&refine=price%3D%280.500%29&currency=USD&locale=en-US",
+        "body": "",
+        "status": 400,
+        "response": {
+            "title": "Malformed Price Refinement",
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/malformed-price-refinement",
+            "detail": "The price refinement '(0.500)' is malformed. Something similar to '(0..100)' was expected.",
+            "malformedPrice": "(0.500)"
+        },
+        "rawHeaders": [
+            "date",
+            "Wed, 14 Sep 2022 18:17:41 GMT",
+            "content-type",
+            "application/problem+json; charset=UTF-8",
+            "content-length",
+            "291",
+            "connection",
+            "close",
+            "cf-ray",
+            "74ab1ef1c8d35c65-IAD",
+            "strict-transport-security",
+            "max-age=31536000; includeSubdomains;",
+            "cf-cache-status",
+            "DYNAMIC",
+            "x-correlation-id",
+            "74ab1ef1c8d35c65",
+            "Vary",
+            "Accept-Encoding",
+            "server",
+            "cloudflare",
+            "x-proxy-request-url",
+            "https://kv7kzm78.api.commercecloud.salesforce.com/search/shopper-search/v1/organizations/f_ecom_zzrf_001/product-search?siteId=RefArchGlobal&q=shirt&refine=price%3D%280.500%29&currency=USD&locale=en-US"
+        ],
+        "responseIsBinary": false
+    }
+]

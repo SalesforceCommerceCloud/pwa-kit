@@ -1,0 +1,43 @@
+[
+    {
+        "scope": "http://localhost:3000",
+        "method": "GET",
+        "path": "/mobify/proxy/api/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=sh&currency=USD&locale=en-US",
+        "body": "",
+        "status": 400,
+        "response": {
+            "title": "String Constraint Violation",
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/string-constraint-violation",
+            "detail": "The string length constraint was violated by 'q'. The expected length is '(3..50)'.",
+            "parameter": "q",
+            "expected": "(3..50)"
+        },
+        "rawHeaders": [
+            "date",
+            "Wed, 14 Sep 2022 18:17:52 GMT",
+            "content-type",
+            "application/problem+json; charset=UTF-8",
+            "content-length",
+            "300",
+            "connection",
+            "close",
+            "cf-ray",
+            "74ab1f338c835962-IAD",
+            "cache-control",
+            "public, must-revalidate, max-age=60",
+            "strict-transport-security",
+            "max-age=31536000; includeSubdomains;",
+            "cf-cache-status",
+            "DYNAMIC",
+            "x-correlation-id",
+            "74ab1f338c835962",
+            "Vary",
+            "Accept-Encoding",
+            "server",
+            "cloudflare",
+            "x-proxy-request-url",
+            "https://kv7kzm78.api.commercecloud.salesforce.com/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=sh&currency=USD&locale=en-US"
+        ],
+        "responseIsBinary": false
+    }
+]
