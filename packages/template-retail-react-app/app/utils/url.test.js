@@ -131,7 +131,7 @@ describe('getPathWithLocale', () => {
         const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
-        expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
+        expect(relativeUrl).toEqual(`/uk/fr/category/newarrivals-womens`)
     })
 
     test('getPathWithLocale uses default site for siteRef when it is no defined in the url', () => {
@@ -139,7 +139,7 @@ describe('getPathWithLocale', () => {
         const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
-        expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
+        expect(relativeUrl).toEqual(`/uk/fr/category/newarrivals-womens`)
     })
 
     test('getPathWithLocale returns expected for PLP without refine param', () => {
@@ -153,7 +153,7 @@ describe('getPathWithLocale', () => {
             location
         })
         expect(relativeUrl).toEqual(
-            `/uk/fr-FR/category/newarrivals-womens?limit=25&sort=best-matches&offset=25`
+            `/uk/fr/category/newarrivals-womens?limit=25&sort=best-matches&offset=25`
         )
     })
 
@@ -162,7 +162,7 @@ describe('getPathWithLocale', () => {
         const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
-        expect(relativeUrl).toEqual(`/uk/fr-FR/`)
+        expect(relativeUrl).toEqual(`/uk/fr/`)
     })
 
     test('getPathWithLocale returns / when both site and locale are default', () => {
@@ -210,7 +210,10 @@ describe('createUrlTemplate tests', () => {
                                         showDefaults: false
                                     },
                                     site: defaultSiteMock,
-                                    locale: isDefaultLocale === 0 ? {id: 'en-GB'} : {id: 'fr-FR'}
+                                    locale:
+                                        isDefaultLocale === 0
+                                            ? {id: 'en-GB'}
+                                            : {id: 'fr-FR', alias: 'fr'}
                                 })
                             } else {
                                 cases.push({
@@ -220,7 +223,10 @@ describe('createUrlTemplate tests', () => {
                                         showDefaults: false
                                     },
                                     site: nonDefaultSiteMock,
-                                    locale: isDefaultLocale === 0 ? {id: 'en-US'} : {id: 'fr-FR'}
+                                    locale:
+                                        isDefaultLocale === 0
+                                            ? {id: 'en-US'}
+                                            : {id: 'fr-FR', alias: 'fr'}
                                 })
                             }
                         }
@@ -236,34 +242,34 @@ describe('createUrlTemplate tests', () => {
             ? [
                   `/uk/en-GB${path}`,
                   `${path}`,
-                  `/fr-FR${path}`,
+                  `/fr${path}`,
                   `/us${path}`,
-                  `/us/fr-FR${path}`,
+                  `/us/fr${path}`,
                   `/en-GB${path}?site=uk`,
                   `${path}`,
-                  `/fr-FR${path}`,
+                  `/fr${path}`,
                   `${path}?site=us`,
-                  `/fr-FR${path}?site=us`,
+                  `/fr${path}?site=us`,
                   `/en-GB${path}`,
                   `${path}`,
-                  `/fr-FR${path}`,
+                  `/fr${path}`,
                   `${path}`,
-                  `/fr-FR${path}`,
+                  `/fr${path}`,
                   `/uk${path}?locale=en-GB`,
                   `${path}`,
-                  `${path}?locale=fr-FR`,
+                  `${path}?locale=fr`,
                   `/us${path}`,
-                  `/us${path}?locale=fr-FR`,
+                  `/us${path}?locale=fr`,
                   `${path}?site=uk&locale=en-GB`,
                   `${path}`,
-                  `${path}?locale=fr-FR`,
+                  `${path}?locale=fr`,
                   `${path}?site=us`,
-                  `${path}?site=us&locale=fr-FR`,
+                  `${path}?site=us&locale=fr`,
                   `${path}?locale=en-GB`,
                   `${path}`,
-                  `${path}?locale=fr-FR`,
+                  `${path}?locale=fr`,
                   `${path}`,
-                  `${path}?locale=fr-FR`,
+                  `${path}?locale=fr`,
                   `/uk${path}`,
                   `${path}`,
                   `${path}`,
@@ -283,34 +289,34 @@ describe('createUrlTemplate tests', () => {
             : [
                   `${path}`,
                   `${path}`,
-                  `/fr-FR${path}`,
+                  `/fr${path}`,
                   `/us${path}`,
-                  `/us/fr-FR${path}`,
+                  `/us/fr${path}`,
                   `${path}`,
                   `${path}`,
-                  `/fr-FR${path}`,
+                  `/fr${path}`,
                   `${path}?site=us`,
-                  `/fr-FR${path}?site=us`,
+                  `/fr${path}?site=us`,
                   `${path}`,
                   `${path}`,
-                  `/fr-FR${path}`,
+                  `/fr${path}`,
                   `${path}`,
-                  `/fr-FR${path}`,
+                  `/fr${path}`,
                   `${path}`,
                   `${path}`,
-                  `${path}?locale=fr-FR`,
+                  `${path}?locale=fr`,
                   `/us${path}`,
-                  `/us${path}?locale=fr-FR`,
+                  `/us${path}?locale=fr`,
                   `${path}`,
                   `${path}`,
-                  `${path}?locale=fr-FR`,
+                  `${path}?locale=fr`,
                   `${path}?site=us`,
-                  `${path}?site=us&locale=fr-FR`,
+                  `${path}?site=us&locale=fr`,
                   `${path}`,
                   `${path}`,
-                  `${path}?locale=fr-FR`,
+                  `${path}?locale=fr`,
                   `${path}`,
-                  `${path}?locale=fr-FR`,
+                  `${path}?locale=fr`,
                   `${path}`,
                   `${path}`,
                   `${path}`,
@@ -330,11 +336,19 @@ describe('createUrlTemplate tests', () => {
     }
     paths.forEach((path) => {
         cases.forEach(({urlConfig, site, locale}, index) => {
-            test(`URL template path:${path}, site:${site.alias}, locale:${
-                locale.id
+            test(`URL template path:${path}, site:${site.alias}, locale.id:${locale.id}${
+                locale?.alias ? `, locale.alias:${locale.alias}` : ''
             } and urlConfig:${JSON.stringify(urlConfig)}`, () => {
-                const buildUrl = createUrlTemplate({url: urlConfig}, site.id, locale.id)
-                const resultUrl = buildUrl(path, mockConfig.app.siteAliases[site.id], locale.id)
+                const buildUrl = createUrlTemplate(
+                    {url: urlConfig},
+                    site.id,
+                    locale?.alias || locale?.id
+                )
+                const resultUrl = buildUrl(
+                    path,
+                    mockConfig.app.siteAliases[site.id],
+                    locale?.alias || locale?.id
+                )
 
                 expect(resultUrl).toEqual(expectedResults(path)[index])
             })

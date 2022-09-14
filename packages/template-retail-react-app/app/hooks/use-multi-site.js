@@ -25,7 +25,7 @@ const useMultiSite = () => {
             return originalFn(
                 path,
                 siteRef ? siteRef : site?.alias || site?.id,
-                localeRef ? localeRef : locale
+                localeRef ? localeRef : locale?.alias || locale?.id
             )
         },
         [originalFn, site, locale]
