@@ -20,6 +20,8 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
 import mockConfig from '../../../config/mocks/default'
 
+jest.mock('../../commerce-api/einstein')
+
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {

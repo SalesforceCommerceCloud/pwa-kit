@@ -21,6 +21,30 @@ class EinsteinAPI {
         return {requestId: 'test-req-id', uuid: 'test-uuid'}
     }
 
+    async sendViewSearch() {
+        return {requestId: 'test-req-id', uuid: 'test-uuid'}
+    }
+
+    async sendClickSearch() {
+        return {requestId: 'test-req-id', uuid: 'test-uuid'}
+    }
+
+    async sendViewCategory() {
+        return {requestId: 'test-req-id', uuid: 'test-uuid'}
+    }
+
+    async sendClickCategory() {
+        return {requestId: 'test-req-id', uuid: 'test-uuid'}
+    }
+
+    async sendViewPage() {
+        return {requestId: 'test-req-id', uuid: 'test-uuid'}
+    }
+
+    async sendBeginCheckout() {
+        return {requestId: 'test-req-id', uuid: 'test-uuid'}
+    }
+
     async sendViewReco() {
         return {requestId: 'test-req-id', uuid: 'test-uuid'}
     }

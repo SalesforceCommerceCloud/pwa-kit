@@ -55,7 +55,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid"}'
+                    '{"product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","correlationId":""}'
             }
         )
     })
@@ -71,7 +71,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"products":[{"id":"883360544021M","sku":"","price":155,"quantity":1}],"cookieId":"test-usid"}'
+                    '{"products":[{"id":"883360544021M","sku":"","price":155,"quantity":1}],"cookieId":"test-usid","realm":"test","correlationId":""}'
             }
         )
     })
@@ -87,7 +87,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid"}'
+                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","correlationId":""}'
             }
         )
     })
@@ -103,7 +103,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","products":{"id":"test-reco"},"cookieId":"test-usid"}'
+                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","products":{"id":"test-reco"},"cookieId":"test-usid","realm":"test","correlationId":""}'
             }
         )
     })
@@ -136,7 +136,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"cookieId":"test-usid"}'
+                body: '{"cookieId":"test-usid","realm":"test","correlationId":""}'
             }
         )
 
@@ -189,7 +189,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"cookieId":"test-usid"}'
+                body: '{"cookieId":"test-usid","realm":"test","correlationId":""}'
             }
         )
 
@@ -223,7 +223,7 @@ describe('EinsteinAPI', () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
-                }
+                },
             }
         )
     })

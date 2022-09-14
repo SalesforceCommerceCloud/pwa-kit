@@ -58,7 +58,7 @@ const Home = ({productSearchResult, isLoading}) => {
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
-    }, [])
+    }, [pathname])
 
     return (
         <Box data-testid="home-page" layerStyle="page">
