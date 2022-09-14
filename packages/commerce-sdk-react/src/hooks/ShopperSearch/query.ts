@@ -32,7 +32,7 @@ function useProductSearch(
 function useProductSearch(
     arg: Omit<UseProductSearchArg, 'rawResponse'> & {rawResponse?: true},
     options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
-): UseQueryResult<DataType<Client['productSearch']>, Error>
+): UseQueryResult<Response, Error>
 function useProductSearch(
     arg: UseProductSearchArg,
     options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
@@ -67,7 +67,7 @@ function useSearchSuggestions(
 function useSearchSuggestions(
     arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse?: true},
     options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
-): UseQueryResult<DataType<Client['getSearchSuggestions']>, Error>
+): UseQueryResult<Response, Error>
 function useSearchSuggestions(
     arg: UseSearchSuggestionsArg,
     options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>

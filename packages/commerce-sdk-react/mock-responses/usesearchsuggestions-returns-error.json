@@ -2,7 +2,7 @@
     {
         "scope": "http://localhost:3000",
         "method": "GET",
-        "path": "/mobify/proxy/api/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=sh&currency=USD&locale=en-US",
+        "path": "/mobify/proxy/api/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=sh",
         "body": "",
         "status": 400,
         "response": {
@@ -14,7 +14,7 @@
         },
         "rawHeaders": [
             "date",
-            "Wed, 14 Sep 2022 18:17:52 GMT",
+            "Wed, 14 Sep 2022 19:59:00 GMT",
             "content-type",
             "application/problem+json; charset=UTF-8",
             "content-length",
@@ -22,7 +22,7 @@
             "connection",
             "close",
             "cf-ray",
-            "74ab1f338c835962-IAD",
+            "74abb35e4ae97f7e-IAD",
             "cache-control",
             "public, must-revalidate, max-age=60",
             "strict-transport-security",
@@ -30,13 +30,13 @@
             "cf-cache-status",
             "DYNAMIC",
             "x-correlation-id",
-            "74ab1f338c835962",
+            "74abb35e4ae97f7e",
             "Vary",
             "Accept-Encoding",
             "server",
             "cloudflare",
             "x-proxy-request-url",
-            "https://kv7kzm78.api.commercecloud.salesforce.com/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=sh&currency=USD&locale=en-US"
+            "https://kv7kzm78.api.commercecloud.salesforce.com/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=sh"
         ],
         "responseIsBinary": false
     }

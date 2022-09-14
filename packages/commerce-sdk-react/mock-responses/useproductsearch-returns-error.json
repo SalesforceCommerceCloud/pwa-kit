@@ -2,7 +2,7 @@
     {
         "scope": "http://localhost:3000",
         "method": "GET",
-        "path": "/mobify/proxy/api/search/shopper-search/v1/organizations/f_ecom_zzrf_001/product-search?siteId=RefArchGlobal&q=shirt&refine=price%3D%280.500%29&currency=USD&locale=en-US",
+        "path": "/mobify/proxy/api/search/shopper-search/v1/organizations/f_ecom_zzrf_001/product-search?siteId=RefArchGlobal&q=shirt&refine=price%3D%280.500%29",
         "body": "",
         "status": 400,
         "response": {
@@ -13,7 +13,7 @@
         },
         "rawHeaders": [
             "date",
-            "Wed, 14 Sep 2022 18:17:41 GMT",
+            "Wed, 14 Sep 2022 19:59:00 GMT",
             "content-type",
             "application/problem+json; charset=UTF-8",
             "content-length",
@@ -21,19 +21,19 @@
             "connection",
             "close",
             "cf-ray",
-            "74ab1ef1c8d35c65-IAD",
+            "74abb358cff137fa-IAD",
             "strict-transport-security",
             "max-age=31536000; includeSubdomains;",
             "cf-cache-status",
             "DYNAMIC",
             "x-correlation-id",
-            "74ab1ef1c8d35c65",
+            "74abb358cff137fa",
             "Vary",
             "Accept-Encoding",
             "server",
             "cloudflare",
             "x-proxy-request-url",
-            "https://kv7kzm78.api.commercecloud.salesforce.com/search/shopper-search/v1/organizations/f_ecom_zzrf_001/product-search?siteId=RefArchGlobal&q=shirt&refine=price%3D%280.500%29&currency=USD&locale=en-US"
+            "https://kv7kzm78.api.commercecloud.salesforce.com/search/shopper-search/v1/organizations/f_ecom_zzrf_001/product-search?siteId=RefArchGlobal&q=shirt&refine=price%3D%280.500%29"
         ],
         "responseIsBinary": false
     }

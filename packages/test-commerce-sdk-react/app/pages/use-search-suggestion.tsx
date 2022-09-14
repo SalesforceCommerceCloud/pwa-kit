@@ -10,15 +10,13 @@ import {useSearchSuggestions} from 'commerce-sdk-react'
 import Json from '../components/Json'
 
 const searchQuery = 'shirt'
-const currency = 'USD'
-const locale = 'en-US'
 
 function UseSearchSuggestions() {
     const {
         isLoading,
         error,
         data: result,
-    } = useSearchSuggestions({q: searchQuery, currency, locale})
+    } = useSearchSuggestions({q: searchQuery})
     if (isLoading) {
         return (
             <div>
