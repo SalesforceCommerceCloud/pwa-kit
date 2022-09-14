@@ -31,14 +31,13 @@ import {useCorrelationId} from '../../hooks'
  *      <br/>
  *      <br/>
  *      <i>This property is typically used to distinguish 404 errors from other types.</i>
+ * @param {string} props.correlationId
  */
-const Error = ({message, stack, status, ...rest}) => {
-    console.log('message', message)
-    console.log('statck', stack)
-    console.log('rest', rest)
+const Error = ({message, stack, status, correlationId}) => {
     return (
         <div>
             <h1>Error Status: {status}</h1>
+            <div>CorrelationId: {correlationId}</div>
             <pre>{stack}</pre>
             <pre>{message}</pre>
         </div>
@@ -48,7 +47,8 @@ const Error = ({message, stack, status, ...rest}) => {
 Error.propTypes = {
     message: PropTypes.string,
     status: PropTypes.number,
-    stack: PropTypes.string
+    stack: PropTypes.string,
+    correlationId: PropTypes.string
 }
 
 export default Error

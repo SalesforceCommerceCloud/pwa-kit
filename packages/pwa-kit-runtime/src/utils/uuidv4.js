@@ -12,9 +12,7 @@
 /* istanbul ignore next */
 // eslint-disable-next-line no-undef
 if (typeof WEBPACK_TARGET !== 'undefined' && WEBPACK_TARGET === 'web') {
-    console.log('client uuid.........................')
     module.exports = require('./uuidv4.client.js')
 } else {
-    console.log('server uuid-----------------------------')
     module.exports = require('./uuidv4.server.js')
 }

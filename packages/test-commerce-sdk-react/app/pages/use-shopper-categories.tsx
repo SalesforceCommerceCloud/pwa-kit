@@ -31,7 +31,6 @@ function UseShopperCategories() {
         )
     }
     if (error) {
-        throw error
         return <h1 style={{color: 'red'}}>Something is wrong</h1>
     }
     return (
