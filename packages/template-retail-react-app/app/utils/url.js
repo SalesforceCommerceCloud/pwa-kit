@@ -186,10 +186,7 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
     const defaultSite = getDefaultSite()
     const site = getSiteByReference(siteRef)
-    const defaultLocale = getLocaleByReference(
-        site,
-        site.l10n.defaultLocale
-    )
+    const defaultLocale = getLocaleByReference(site, site.l10n.defaultLocale)
 
     const isDefaultSite =
         defaultSite.id === siteRef || (defaultSite.alias && defaultSite.alias === siteRef)
