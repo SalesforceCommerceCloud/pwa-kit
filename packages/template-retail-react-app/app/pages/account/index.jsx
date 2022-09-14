@@ -54,6 +54,11 @@ const Account = () => {
 
     const {buildUrl} = useMultiSite()
 
+    /**************** Einstein ****************/
+    useEffect(() => {
+        einstein.sendViewPage(location.pathname)
+    }, [location])
+
     const onSignoutClick = async () => {
         setShowLoading(true)
         await customer.logout()
@@ -95,12 +100,6 @@ const Account = () => {
         const path = buildUrl('/login')
         return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
     }
-
-    /**************** Einstein ****************/
-    //TODO: Do we want this firing once when the account page is first opened or every time a user swaps between tabs (ie. order history to wishlists)
-    useEffect(() => {
-        einstein.sendViewPage(location.pathname)
-    }, [location])
 
     return (
         <Box
