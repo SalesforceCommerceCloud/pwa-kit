@@ -16,7 +16,7 @@ const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../..
 const ProductSearchComponent = ({q, refine}: {q: string; refine: string[]}): ReactElement => {
     const {data, isLoading, error} = useProductSearch({
         q,
-        refine,
+        refine
     })
 
     return (
@@ -36,14 +36,13 @@ const ProductSearchComponent = ({q, refine}: {q: string; refine: string[]}): Rea
 
 const SearchSuggestionsComponent = ({q}: {q: string}): ReactElement => {
     const {data, isLoading, error} = useSearchSuggestions({
-        q,
+        q
     })
     return (
         <div>
             {isLoading && <span>Loading...</span>}
             {data && (
                 <div>
-                    {console.log("Search suggestions log", JSON.stringify(data))}
                     {data.productSuggestions?.products?.map(({productName}) => (
                         <div key={productName}>{productName}</div>
                     ))}
@@ -64,7 +63,11 @@ const tests = [
                     const q = 'shirt'
                     const refinement = ['price=(0..50)']
                     renderWithProviders(<ProductSearchComponent q={q} refine={refinement} />)
-                    const productNames = ['Paisley Shirt', 'Denim Shirt Jacket', 'Fitted Seamed Shirt']
+                    const productNames = [
+                        'Paisley Shirt',
+                        'Denim Shirt Jacket',
+                        'Fitted Seamed Shirt'
+                    ]
 
                     expect(screen.queryByText(productNames[0])).toBeNull()
                     expect(screen.queryByText(productNames[1])).toBeNull()
@@ -74,7 +77,7 @@ const tests = [
                     expect(screen.getByText(productNames[0])).toBeInTheDocument()
                     expect(screen.getByText(productNames[1])).toBeInTheDocument()
                     expect(screen.getByText(productNames[2])).toBeInTheDocument()
-                }),
+                })
             },
             {
                 name: 'returns error',
@@ -88,9 +91,9 @@ const tests = [
                     await waitFor(() => screen.getByText('error'))
                     expect(screen.getByText('error')).toBeInTheDocument()
                     expect(screen.queryByText('Loading...')).toBeNull()
-                }),
-            },
-        ],
+                })
+            }
+        ]
     },
     {
         hook: 'useSearchSuggestions',
@@ -108,25 +111,23 @@ const tests = [
                     await waitFor(() => screen.getByText(productNames[0]))
                     expect(screen.getByText(productNames[0])).toBeInTheDocument()
                     expect(screen.getByText(productNames[1])).toBeInTheDocument()
-                }),
+                })
             },
             {
                 name: 'returns error',
                 assertions: withMocks(async () => {
                     // passing query with 2 characters to trigger a 400 error (query must be 3-50 characters)
                     const q = 'sh'
-                    renderWithProviders(
-                        <SearchSuggestionsComponent q={q} />
-                    )
+                    renderWithProviders(<SearchSuggestionsComponent q={q} />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText('error'))
                     expect(screen.getByText('error')).toBeInTheDocument()
                     expect(screen.queryByText('Loading...')).toBeNull()
-                }),
-            },
-        ],
-    },
+                })
+            }
+        ]
+    }
 ]
 
 tests.forEach(({hook, cases}) => {
