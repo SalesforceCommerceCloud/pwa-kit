@@ -9,6 +9,8 @@ const base = require('internal-lib-build/configs/jest/jest.config')
 
 module.exports = {
     ...base,
+    setupFilesAfterEnv: ['./setup-jest.js'],
+    transformIgnorePatterns: [],
     coverageThreshold: {
         global: {
             branches: 0,
