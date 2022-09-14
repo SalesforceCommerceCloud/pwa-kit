@@ -195,7 +195,6 @@ const ProductList = (props) => {
             })
             einstein.sendViewSearch(searchQuery, products)
         } else if (category && productSearchResult && productSearchResult.hits) {
-
             // Categories update asynchronously from category search results. To ensure we are
             // sending a viewCategory only after both category and search results update, we track
             // the previous category's search results in a useRef.
@@ -426,11 +425,17 @@ const ProductList = (props) => {
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
                                                   onClick={() => {
-                                                    if (searchQuery) {
-                                                        einstein.sendClickSearch(searchQuery, productSearchItem)
-                                                    } else if (category) {
-                                                        einstein.sendClickCategory(category, productSearchItem)
-                                                    }
+                                                      if (searchQuery) {
+                                                          einstein.sendClickSearch(
+                                                              searchQuery,
+                                                              productSearchItem
+                                                          )
+                                                      } else if (category) {
+                                                          einstein.sendClickCategory(
+                                                              category,
+                                                              productSearchItem
+                                                          )
+                                                      }
                                                   }}
                                                   onFavouriteToggle={(isFavourite) => {
                                                       const action = isFavourite

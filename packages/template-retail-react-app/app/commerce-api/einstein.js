@@ -38,8 +38,8 @@ class EinsteinAPI {
         }
 
         // The first part of the siteId is the realm
-        body.realm = this.config.siteId.split("-")[0]
-        body.correlationId = ""
+        body.realm = this.config.siteId.split('-')[0]
+        body.correlationId = ''
 
         return body
     }
@@ -111,7 +111,7 @@ class EinsteinAPI {
 
     /**
      * Tells the Einstein engine when a user clicks on a search result.
-    **/
+     **/
     async sendClickSearch(searchText, product, args) {
         const endpoint = `/activities/${this.config.siteId}/clickSearch`
         const method = 'POST'
@@ -132,7 +132,7 @@ class EinsteinAPI {
 
     /**
      * Tells the Einstein engine when a user views a category.
-    **/
+     **/
     async sendViewCategory(category, products, args) {
         const endpoint = `/activities/${this.config.siteId}/viewCategory`
         const method = 'POST'
@@ -150,7 +150,7 @@ class EinsteinAPI {
     /**
      * Tells the Einstein engine when a user clicks a product from the category page.
      * Not meant to be used when the user clicks a category from the nav bar.
-    **/
+     **/
     async sendClickCategory(category, product, args) {
         const endpoint = `/activities/${this.config.siteId}/clickCategory`
         const method = 'POST'

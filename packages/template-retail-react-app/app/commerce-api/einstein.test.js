@@ -223,7 +223,7 @@ describe('EinsteinAPI', () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
-                },
+                }
             }
         )
     })

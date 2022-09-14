@@ -102,7 +102,7 @@ export const CheckoutProvider = ({children}) => {
             })
             einstein.sendBeginCheckout(products, basket.productSubTotal)
         }
-    }, []) 
+    }, [])
 
     // We combine our state and actions into a single context object. This is much more
     // convenient than having to import and bind actions seprately. State updates will

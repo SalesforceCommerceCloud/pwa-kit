@@ -40,7 +40,7 @@ const ResetPassword = () => {
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
-    }, [])    
+    }, [])
 
     return (
         <Box data-testid="reset-password-page" bg="gray.50" py={[8, 16]}>

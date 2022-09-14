@@ -19,22 +19,22 @@ const useEinstein = () => {
         async sendViewProduct(...args) {
             return api.einstein.sendViewProduct(...args)
         },
-        async sendViewSearch(...args)  {
+        async sendViewSearch(...args) {
             return api.einstein.sendViewSearch(...args)
         },
-        async sendClickSearch(...args)  {
+        async sendClickSearch(...args) {
             return api.einstein.sendClickSearch(...args)
         },
-        async sendViewCategory(...args)  {
+        async sendViewCategory(...args) {
             return api.einstein.sendViewCategory(...args)
         },
-        async sendClickCategory(...args)  {
+        async sendClickCategory(...args) {
             return api.einstein.sendClickCategory(...args)
         },
-        async sendViewPage(...args)  {
+        async sendViewPage(...args) {
             return api.einstein.sendViewPage(...args)
         },
-        async sendBeginCheckout(...args)  {
+        async sendBeginCheckout(...args) {
             return api.einstein.sendBeginCheckout(...args)
         },
         async sendViewReco(...args) {
