@@ -21,6 +21,7 @@ import {
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
+import {defaultQueryClientConfig} from './config/query-client.config'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
@@ -58,7 +59,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         proxy,
         redirectURI,
-        queryClientConfig,
+        queryClientConfig = defaultQueryClientConfig,
         fetchOptions
     } = props
 
