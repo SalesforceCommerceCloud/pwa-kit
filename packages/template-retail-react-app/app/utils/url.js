@@ -158,9 +158,9 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
         })
     }
 
-    const siteAliasOrIdRef = getSiteByReference(siteRef)
+    const site = getSiteByReference(siteRef)
 
-    const locale = getLocaleByReference(siteAliasOrIdRef, shortCode)
+    const locale = getLocaleByReference(site, shortCode)
 
     // rebuild the url with new locale,
     const newUrl = buildUrl(
@@ -185,11 +185,8 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
 export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
     const defaultSite = getDefaultSite()
-    const siteAliasOrIdRef = getSiteByReference(siteRef)
-    const defaultLocale = getLocaleByReference(
-        siteAliasOrIdRef,
-        siteAliasOrIdRef.l10n.defaultLocale
-    )
+    const site = getSiteByReference(siteRef)
+    const defaultLocale = getLocaleByReference(site, site.l10n.defaultLocale)
 
     const isDefaultSite =
         defaultSite.id === siteRef || (defaultSite.alias && defaultSite.alias === siteRef)
