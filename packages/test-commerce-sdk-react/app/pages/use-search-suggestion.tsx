@@ -12,11 +12,7 @@ import Json from '../components/Json'
 const searchQuery = 'shirt'
 
 function UseSearchSuggestions() {
-    const {
-        isLoading,
-        error,
-        data: result,
-    } = useSearchSuggestions({q: searchQuery})
+    const {isLoading, error, data: result} = useSearchSuggestions({q: searchQuery})
     if (isLoading) {
         return (
             <div>
@@ -35,18 +31,9 @@ function UseSearchSuggestions() {
             <h1>Search Results</h1>
             <h3>Search term: {searchQuery}</h3>
             <ul>
-                {result?.productSuggestions?.products?.map(
-                    ({
-                        productId,
-                        productName,
-                    }) => {
-                        return (
-                            <li key={productId}>
-                                {productName}
-                            </li>
-                        )
-                    }
-                )}
+                {result?.productSuggestions?.products?.map(({productId, productName}) => {
+                    return <li key={productId}>{productName}</li>
+                })}
             </ul>
             <hr />
             <div>

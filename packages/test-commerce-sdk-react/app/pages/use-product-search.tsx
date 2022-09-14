@@ -11,14 +11,10 @@ import Json from '../components/Json'
 import {Link} from 'react-router-dom'
 
 const searchQuery = 'shirt'
-const refinement = ["price=(0..50)"]
+const refinement = ['price=(0..50)']
 
 function UseProductSearch() {
-    const {
-        isLoading,
-        error,
-        data: result,
-    } = useProductSearch({
+    const {isLoading, error, data: result} = useProductSearch({
         q: searchQuery,
         refine: refinement
     })
