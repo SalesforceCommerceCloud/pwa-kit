@@ -43,6 +43,20 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
  */
 export const AuthContext = React.createContext({} as Auth)
 
+const QUERY_CLIENT_CONFIG: QueryClientConfig = {
+    defaultOptions: {
+        queries: {
+            retry: (_, error) => {
+                // @ts-ignore
+                if (error.name !== 'ResponseError') {
+                    return false
+                }
+                return true
+            }
+        }
+    }
+}
+
 /**
  * Initialize a set of Commerce API clients and make it available to all of descendant components
  *
@@ -58,6 +72,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         proxy,
         redirectURI,
+        // TODO: stop retry when there is validation error
+        // TODO: how to detect validation error? Maybe any non-ResponseError objects?
+        // And make it future proof by having a separate function/module
         queryClientConfig,
         fetchOptions
     } = props
@@ -105,7 +122,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         auth.ready()
     }, [auth])
 
-    const queryClient = new QueryClient(queryClientConfig)
+    const queryClient = new QueryClient({
+        ...QUERY_CLIENT_CONFIG,
+        ...queryClientConfig
+    })
 
     // TODO: wrap the children with:
     // - context for enabling useServerEffect hook
