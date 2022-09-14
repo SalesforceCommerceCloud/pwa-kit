@@ -27,6 +27,8 @@ let mockCategoriesResponse = mockCategories
 let mockProductListSearchResponse = mockProductSearch
 jest.useFakeTimers()
 
+jest.mock('../../commerce-api/einstein')
+
 jest.mock('../../hooks/use-wishlist')
 
 jest.mock('../../commerce-api/utils', () => {
