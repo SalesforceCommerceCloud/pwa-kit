@@ -43,17 +43,22 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
  */
 export const AuthContext = React.createContext({} as Auth)
 
+const NUM_OF_RETRIES = 3
 const QUERY_CLIENT_CONFIG: QueryClientConfig = {
     defaultOptions: {
         queries: {
-            retry: (_, error) => {
+            retry: (failureCount, error) => {
+                // See https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/blob/main/src/static/responseError.ts
                 // @ts-ignore
-                if (error.name !== 'ResponseError') {
+                const isResponseError = Boolean(error.response)
+
+                if (!isResponseError || failureCount === NUM_OF_RETRIES) {
                     return false
                 }
                 return true
             }
         }
+        // TODO: also for mutations
     }
 }
 
