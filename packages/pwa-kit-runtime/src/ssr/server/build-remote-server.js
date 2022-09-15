@@ -460,7 +460,7 @@ export const RemoteServerFactory = {
             locals.requestStart = Date.now()
             locals.afterResponseCalled = false
             locals.responseCaching = {}
-            that._setRequestId(res)
+            that._setRequestId(res, req)
 
             locals.timer = new PerformanceTimer(`req${locals.requestId}`)
             locals.originalUrl = req.originalUrl
@@ -540,7 +540,7 @@ export const RemoteServerFactory = {
         app.use(ssrRequestProcessorMiddleware)
     },
 
-    _setRequestId(res) {
+    _setRequestId(res, req) {
         const locals = res.locals
         locals.requestId = req.headers['x-amzn-requestid']
     },
