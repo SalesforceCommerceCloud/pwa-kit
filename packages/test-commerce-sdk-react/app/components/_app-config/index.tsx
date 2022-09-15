@@ -16,6 +16,10 @@ interface AppConfigProps {
 
 const AppConfig = (props: AppConfigProps): ReactElement => {
     const {correlationId} = useCorrelationId()
+    console.log('correlationId', correlationId)
+    const headers = {
+        correlationId
+    }
     return (
         <CommerceApiProvider
             siteId="RefArchGlobal"
@@ -25,7 +29,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
             proxy="http://localhost:3000/mobify/proxy/api"
             locale="en-US"
             currency="USD"
-            correlationId={correlationId}
+            headers={headers}
         >
             {props.children}
         </CommerceApiProvider>

@@ -16,12 +16,12 @@ const ExpressContext = React.createContext()
 
 const CorrelationIdContext = React.createContext()
 
-const CorrelationIdProvider = ({children, correlationId}) => {
+const CorrelationIdProvider = ({children, correlationId, onPageChange = () => {}}) => {
     const [id, setId] = React.useState(correlationId)
     const location = useLocation()
 
     const isFirstRun = useRef(true)
-
+    const regexp = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
     useEffect(() => {
         // this hook only runs on client-side
         // don't run this on first render
@@ -29,7 +29,11 @@ const CorrelationIdProvider = ({children, correlationId}) => {
             isFirstRun.current = false
             return
         }
-        const newId = uuidv4()
+        const newId = onPageChange()
+
+        if (!regexp.test(newId)) {
+            throw Error('invalid uuid')
+        }
         setId(newId)
     }, [location.pathname])
     return (

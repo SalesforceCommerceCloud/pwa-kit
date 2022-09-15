@@ -78,14 +78,16 @@ export const start = () => {
     }
 
     const error = window.__ERROR__
-    const uuid = uuidv4()
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
             ReactDOM.hydrate(
                 <ExpressContext.Provider value={{}}>
                     <Router>
-                        <CorrelationIdProvider correlationId={uuid}>
+                        <CorrelationIdProvider
+                            correlationId={uuidv4()}
+                            onPageChange={() => uuidv4()}
+                        >
                             <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                                 <AppConfig locals={locals}>
                                     <Switch

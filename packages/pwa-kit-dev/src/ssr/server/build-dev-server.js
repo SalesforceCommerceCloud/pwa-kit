@@ -26,7 +26,7 @@ import {
     CLIENT_OPTIONAL,
     REQUEST_PROCESSOR
 } from '../../configs/webpack/config-names'
-
+import crypto from 'crypto'
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
 
@@ -79,6 +79,11 @@ export const DevServerMixin = {
                 filter: shouldCompress
             })
         )
+    },
+
+    _setRequestId(res) {
+        const locals = res.locals
+        locals.requestId = crypto.randomUUID()
     },
 
     /**

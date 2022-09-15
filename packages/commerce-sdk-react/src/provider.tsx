@@ -28,7 +28,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     locale: string
     currency: string
     queryClientConfig?: QueryClientConfig
-    correlationId?: string
+    headers?: Record<string, string>
 }
 
 /**
@@ -46,19 +46,13 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {
         children,
         clientId,
-        correlationId = '',
+        headers = {},
         organizationId,
         proxy,
         queryClientConfig,
         siteId,
         shortCode
     } = props
-
-    // DEBUG: copy access token from browser
-    const headers = {
-        authorization: '',
-        ...(correlationId && {'correlation-id': correlationId})
-    }
 
     const config = {
         proxy,
