@@ -22,6 +22,7 @@ type UseProductsArg = {headers?: UseProductsHeaders; rawResponse?: boolean} & Us
  */
 function useProducts(
     arg: Omit<UseProductsArg, 'rawResponse'> & {rawResponse?: false},
+    // TODO: should error be of different type? Looks like it can be Error or ResponseError (which extends Error)
     options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ): UseQueryResult<DataType<Client['getProducts']>, Error>
 function useProducts(
@@ -32,9 +33,10 @@ function useProducts(
     arg: UseProductsArg,
     options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ) {
-    if (!arg.ids) {
-        throw new Error('ids is required for useProducts')
-    }
+    // TODO: remove this kind of guard (from this file and others)
+    // if (!arg.ids) {
+    //     throw new Error('ids is required for useProducts')
+    // }
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
         ['products', arg],
@@ -43,6 +45,35 @@ function useProducts(
         },
         options
     )
+
+    /*
+    const foo = arg || {}
+    const {headers, rawResponse, ...parameters} = foo
+    return useAsync(
+        ['products', foo],
+        async ({shopperProducts}) => {
+            let response
+            try {
+                response = await shopperProducts.getProducts({parameters, headers}, rawResponse)
+            } catch (err) {
+                console.error('--- from async fn', err)
+                throw err
+            }
+            return response
+        },
+        {
+            // NOTE: this will run after all retries are finished
+            onError: (error) => {
+                console.error('--- onError', error)
+            },
+            retry: (failureCount, error) => {
+                return error ? false : true
+            }
+        }
+        // {retry: false}
+        // options
+    )
+    */
 }
 
 type UseProductParameters = NonNullable<Argument<Client['getProduct']>>['parameters']
