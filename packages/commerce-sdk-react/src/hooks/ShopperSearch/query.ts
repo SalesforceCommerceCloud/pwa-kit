@@ -36,7 +36,7 @@ function useProductSearch(
 function useProductSearch(
     arg: UseProductSearchArg,
     options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
-) {
+): UseQueryResult<DataType<Client['productSearch']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
         ['productSearch', arg],
@@ -71,7 +71,7 @@ function useSearchSuggestions(
 function useSearchSuggestions(
     arg: UseSearchSuggestionsArg,
     options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
-) {
+): UseQueryResult<DataType<Client['getSearchSuggestions']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
         ['search-suggestions', arg],
