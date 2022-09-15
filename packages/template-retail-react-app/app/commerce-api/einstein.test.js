@@ -10,6 +10,9 @@ import {
     mockAddToCartProduct,
     mockGetZoneRecommendationsResponse,
     mockProduct,
+    mockCategory,
+    mockSearchResults,
+    mockBasket,
     mockRecommendationsResponse,
     mockRecommenderDetails
 } from './mocks/einstein-mock-data'
@@ -56,6 +59,107 @@ describe('EinsteinAPI', () => {
                 },
                 body:
                     '{"product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","correlationId":""}'
+            }
+        )
+    })
+
+    test('viewSearch sends expected api request', async () => {
+        const searchTerm = 'tie'
+        await einsteinApi.sendViewSearch(searchTerm, mockSearchResults)
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/test-path/v3/activities/test-site-id/viewSearch',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cq-client-id': 'test-id'
+                },
+                body:
+                    '{"searchText":"tie","products":[{"id":"25752986M","sku":"","altId":"","altIdType":""},{"id":"25752235M","sku":"","altId":"","altIdType":""},{"id":"25752218M","sku":"","altId":"","altIdType":""},{"id":"25752981M","sku":"","altId":"","altIdType":""}],"cookieId":"test-usid","realm":"test","correlationId":""}'
+            }
+        )
+    })
+
+    test('viewCategory sends expected api request', async () => {
+        await einsteinApi.sendViewCategory(mockCategory, mockSearchResults)
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/test-path/v3/activities/test-site-id/viewCategory',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cq-client-id': 'test-id'
+                },
+                body:
+                    '{"category":{"id":"mens-accessories-ties"},"products":[{"id":"25752986M","sku":"","altId":"","altIdType":""},{"id":"25752235M","sku":"","altId":"","altIdType":""},{"id":"25752218M","sku":"","altId":"","altIdType":""},{"id":"25752981M","sku":"","altId":"","altIdType":""}],"cookieId":"test-usid","realm":"test","correlationId":""}'
+            }
+        )
+    })
+
+    test('clickSearch sends expected api request', async () => {
+        const searchTerm = 'tie'
+        const clickedProduct = mockSearchResults.hits[0]
+        await einsteinApi.sendClickSearch(searchTerm, clickedProduct)
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/test-path/v3/activities/test-site-id/clickSearch',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cq-client-id': 'test-id'
+                },
+                body:
+                    '{"searchText":"tie","product":{"id":"25752986M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","correlationId":""}'
+            }
+        )
+    })
+
+    test('clickCategory sends expected api request', async () => {
+        const clickedProduct = mockSearchResults.hits[0]
+        await einsteinApi.sendClickCategory(mockCategory, clickedProduct)
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/test-path/v3/activities/test-site-id/clickCategory',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cq-client-id': 'test-id'
+                },
+                body:
+                    '{"category":{"id":"mens-accessories-ties"},"product":{"id":"25752986M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","correlationId":""}'
+            }
+        )
+    })
+
+    test('viewPage sends expected api request', async () => {
+        const path = '/'
+        await einsteinApi.sendViewPage(path)
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/test-path/v3/activities/test-site-id/viewPage',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cq-client-id': 'test-id'
+                },
+                body:
+                    '{"currentLocation":"/","cookieId":"test-usid","realm":"test","correlationId":""}'
+            }
+        )
+    })
+
+    test('beginCheckout sends expected api request', async () => {
+        await einsteinApi.sendBeginCheckout(mockBasket)
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/test-path/v3/activities/test-site-id/beginCheckout',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cq-client-id': 'test-id'
+                },
+                body:
+                    '{"products":[{"id":"682875719029M","sku":"","price":29.99,"quantity":1}],"amount":29.99,"cookieId":"test-usid","realm":"test","correlationId":""}'
             }
         )
     })

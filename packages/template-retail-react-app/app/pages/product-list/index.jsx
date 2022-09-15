@@ -199,16 +199,7 @@ const ProductList = (props) => {
             // sending a viewCategory only after both category and search results update, we track
             // the previous category's search results in a useRef.
             if (previousCategoryProducts.current != productSearchResult.hits) {
-                const products = productSearchResult.hits.map((productSearchItem) => {
-                    const {productId, sku = '', altId = '', altIdType = ''} = productSearchItem
-                    return {
-                        id: productId,
-                        sku,
-                        altId,
-                        altIdType
-                    }
-                })
-                einstein.sendViewCategory(category, products)
+                einstein.sendViewCategory(category, productSearchResult)
                 previousCategoryProducts.current = productSearchResult.hits
             }
         }

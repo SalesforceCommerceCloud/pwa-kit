@@ -91,16 +91,7 @@ export const CheckoutProvider = ({children}) => {
     // Run this once when checkout begins
     useEffect(() => {
         if (basket && basket.productItems) {
-            const products = basket.productItems.map((product) => {
-                const {productId, sku = '', price = '', quantity = ''} = product
-                return {
-                    id: productId,
-                    sku,
-                    price,
-                    quantity
-                }
-            })
-            einstein.sendBeginCheckout(products, basket.productSubTotal)
+            einstein.sendBeginCheckout(basket)
         }
     }, [])
 

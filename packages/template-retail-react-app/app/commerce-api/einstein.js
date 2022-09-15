@@ -97,9 +97,20 @@ class EinsteinAPI {
     /**
      * Tells the Einstein engine when a user views search results.
      **/
-    async sendViewSearch(searchText, products, args) {
+    async sendViewSearch(searchText, searchResults, args) {
         const endpoint = `/activities/${this.config.siteId}/viewSearch`
         const method = 'POST'
+
+        const products = searchResults.hits.map((product) => {
+            const {productId, sku = '', altId = '', altIdType = ''} = product
+            return {
+                id: productId,
+                sku,
+                altId,
+                altIdType
+            }
+        })
+
         const body = {
             searchText,
             products,
@@ -133,9 +144,20 @@ class EinsteinAPI {
     /**
      * Tells the Einstein engine when a user views a category.
      **/
-    async sendViewCategory(category, products, args) {
+    async sendViewCategory(category, searchResults, args) {
         const endpoint = `/activities/${this.config.siteId}/viewCategory`
         const method = 'POST'
+
+        const products = searchResults.hits.map((product) => {
+            const {productId, sku = '', altId = '', altIdType = ''} = product
+            return {
+                id: productId,
+                sku,
+                altId,
+                altIdType
+            }
+        })
+
         const body = {
             category: {
                 id: category.id
@@ -231,12 +253,22 @@ class EinsteinAPI {
     /**
      * Tells the Einstein engine when a user starts the checkout process.
      **/
-    async sendBeginCheckout(products, subtotal, args) {
+    async sendBeginCheckout(basket, args) {
         const endpoint = `/activities/${this.config.siteId}/beginCheckout`
         const method = 'POST'
+        const products = basket.productItems.map((product) => {
+            const {productId, sku = '', price = '', quantity = ''} = product
+            return {
+                id: productId,
+                sku,
+                price,
+                quantity
+            }
+        })
+        const subTotal = basket.productSubTotal
         const body = {
             products: products,
-            amount: subtotal,
+            amount: subTotal,
             ...args
         }
 
