@@ -22,6 +22,7 @@ import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+import {QUERY_CLIENT_CONFIG} from './query-client-config'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -43,26 +44,11 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
  */
 export const AuthContext = React.createContext({} as Auth)
 
-const NUM_OF_RETRIES = 3
-const QUERY_CLIENT_CONFIG: QueryClientConfig = {
-    defaultOptions: {
-        queries: {
-            retry: (failureCount, error) => {
-                // See https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/blob/main/src/static/responseError.ts
-                // @ts-ignore
-                const isResponseError = Boolean(error.response)
-
-                if (!isResponseError || failureCount === NUM_OF_RETRIES) {
-                    // stop retries
-                    return false
-                }
-                // continue retries
-                return true
-            }
-        }
-        // TODO: also for mutations
-    }
-}
+// NOTE:
+// 2 main goals of this PR:
+// - reuse error from isomorphic sdk
+// - stop retries if getting validation error
+// - (plus, I'd argue that the error to catch is any error that is not ResponseError)
 
 /**
  * Initialize a set of Commerce API clients and make it available to all of descendant components
@@ -130,6 +116,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     }, [auth])
 
     const queryClient = new QueryClient({
+        // TODO: should this be a _deep_ merge?
         ...QUERY_CLIENT_CONFIG,
         ...queryClientConfig
     })
