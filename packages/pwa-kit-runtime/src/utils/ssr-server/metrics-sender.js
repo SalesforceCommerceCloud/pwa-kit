@@ -6,7 +6,7 @@
  */
 import {isRemote, localDevLog} from './utils'
 
-const METRIC_RETRIES = 3
+const METRIC_RETRIES = 0
 
 /**
  * A class that will handle asynchronous sending of CloudWatch
