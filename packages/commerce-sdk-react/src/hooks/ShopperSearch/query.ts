@@ -61,11 +61,11 @@ type UseSearchSuggestionsArg = {
  * @returns An object describing the state of the request.
  */
 function useSearchSuggestions(
-    arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse?: false},
+    arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse: false},
     options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
 ): UseQueryResult<DataType<Client['getSearchSuggestions']>, Error>
 function useSearchSuggestions(
-    arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse?: true},
+    arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse: true},
     options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
 ): UseQueryResult<Response, Error>
 function useSearchSuggestions(
