@@ -26,7 +26,7 @@ the product search hit. The search result contains only products that are online
  * @returns An object describing the state of the request.
  */
 function useProductSearch(
-    arg: Omit<UseProductSearchArg, 'rawResponse'> & {rawResponse: false},
+    arg: Omit<UseProductSearchArg, 'rawResponse'> & {rawResponse?: false},
     options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
 ): UseQueryResult<DataType<Client['productSearch']>, Error>
 function useProductSearch(
@@ -61,7 +61,7 @@ type UseSearchSuggestionsArg = {
  * @returns An object describing the state of the request.
  */
 function useSearchSuggestions(
-    arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse: false},
+    arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse?: false},
     options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
 ): UseQueryResult<DataType<Client['getSearchSuggestions']>, Error>
 function useSearchSuggestions(
