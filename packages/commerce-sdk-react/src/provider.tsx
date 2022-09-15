@@ -53,8 +53,10 @@ const QUERY_CLIENT_CONFIG: QueryClientConfig = {
                 const isResponseError = Boolean(error.response)
 
                 if (!isResponseError || failureCount === NUM_OF_RETRIES) {
+                    // stop retries
                     return false
                 }
+                // continue retries
                 return true
             }
         }
