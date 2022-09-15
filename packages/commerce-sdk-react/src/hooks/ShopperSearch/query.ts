@@ -7,10 +7,16 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
 import useCommerceApi from '../useCommerceApi'
-import {UseQueryResult} from '@tanstack/react-query'
+import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperSearch']
 
+type UseProductSearchParameters = NonNullable<Argument<Client['productSearch']>>['parameters']
+type UseProductSearchHeaders = NonNullable<Argument<Client['productSearch']>>['headers']
+type UseProductSearchArg = {
+    headers?: UseProductSearchHeaders
+    rawResponse?: boolean
+} & UseProductSearchParameters
 /**
  * A hook for `ShopperSearch#productSearch`.
  * Provides keyword and refinement search functionality for products. Only returns the product ID, link, and name in
@@ -19,12 +25,34 @@ the product search hit. The search result contains only products that are online
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppersearch.shoppersearch-1.html#productsearch} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useProductSearch = (
-    arg: Argument<Client['productSearch']>
-): UseQueryResult<DataType<Client['productSearch']>, Error> => {
-    const {shopperSearch: client} = useCommerceApi()
-    return useAsync(['product-search', arg], () => client.productSearch(arg))
+function useProductSearch(
+    arg: Omit<UseProductSearchArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
+): UseQueryResult<DataType<Client['productSearch']>, Error>
+function useProductSearch(
+    arg: Omit<UseProductSearchArg, 'rawResponse'> & {rawResponse: true},
+    options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
+): UseQueryResult<Response, Error>
+function useProductSearch(
+    arg: UseProductSearchArg,
+    options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useAsync(
+        ['productSearch', arg],
+        ({shopperSearch}) => shopperSearch.productSearch({parameters, headers}, rawResponse),
+        options
+    )
 }
+
+type UseSearchSuggestionsParameters = NonNullable<
+    Argument<Client['getSearchSuggestions']>
+>['parameters']
+type UseSearchSuggestionsHeaders = NonNullable<Argument<Client['getSearchSuggestions']>>['headers']
+type UseSearchSuggestionsArg = {
+    headers?: UseSearchSuggestionsHeaders
+    rawResponse?: boolean
+} & UseSearchSuggestionsParameters
 /**
  * A hook for `ShopperSearch#getSearchSuggestions`.
  * Provides keyword search functionality for products, categories, and brands suggestions. Returns suggested products, suggested categories, and suggested brands for the given search phrase.
@@ -32,9 +60,24 @@ export const useProductSearch = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppersearch.shoppersearch-1.html#getsearchsuggestions} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useSearchSuggestions = (
-    arg: Argument<Client['getSearchSuggestions']>
-): UseQueryResult<DataType<Client['getSearchSuggestions']>, Error> => {
-    const {shopperSearch: client} = useCommerceApi()
-    return useAsync(['search-suggestions', arg], () => client.getSearchSuggestions(arg))
+function useSearchSuggestions(
+    arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
+): UseQueryResult<DataType<Client['getSearchSuggestions']>, Error>
+function useSearchSuggestions(
+    arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse: true},
+    options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
+): UseQueryResult<Response, Error>
+function useSearchSuggestions(
+    arg: UseSearchSuggestionsArg,
+    options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useAsync(
+        ['search-suggestions', arg],
+        ({shopperSearch}) => shopperSearch.getSearchSuggestions({parameters, headers}, rawResponse),
+        options
+    )
 }
+
+export {useProductSearch, useSearchSuggestions}
