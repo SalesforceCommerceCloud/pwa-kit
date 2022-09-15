@@ -72,52 +72,6 @@ const logAndFormatError = (err) => {
     }
 }
 
-const initAppState = async ({App, component, match, route, req, res, location}) => {
-    if (component === Throw404) {
-        // Don't init if there was no match
-        return {
-            error: new errors.HTTPNotFound('Not found'),
-            appState: {}
-        }
-    }
-
-    const {params} = match
-
-    const components = [App, route.component]
-    const promises = components.map((c) =>
-        c.getProps
-            ? c.getProps({
-                  req,
-                  res,
-                  params,
-                  location
-              })
-            : Promise.resolve({})
-    )
-    let returnVal = {}
-
-    try {
-        const [appProps, pageProps] = await Promise.all(promises)
-        const appState = {
-            appProps,
-            pageProps,
-            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
-        }
-
-        returnVal = {
-            error: undefined,
-            appState: appState
-        }
-    } catch (error) {
-        returnVal = {
-            error: error || new Error(),
-            appState: {}
-        }
-    }
-
-    return returnVal
-}
-
 /**
  * This is the main react-rendering function for SSR. It is an Express handler.
  *
@@ -132,8 +86,6 @@ export const render = async (req, res, next) => {
     // Get the application config which should have been stored at this point.
     const config = getConfig()
 
-    // AppConfig.restore *must* come before using getRoutes() or routeComponent()
-    // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
 
     const routes = getRoutes(res.locals)
@@ -162,30 +114,54 @@ export const render = async (req, res, next) => {
     const component = await route.component.getComponent()
 
     // Step 3 - Init the app state
-    const {appState, error: appStateError} = await initAppState({
-        App: WrappedApp,
-        component,
-        match,
-        route,
+    const deviceType = detectDeviceType(req)
+    const props = {
+        error: null,
+        appState: {},
+        routerContext: {},
         req,
         res,
-        location
-    })
+        App,
+        routes,
+        location,
+        deviceType
+    }
+    let appJSX = <OuterApp {...props} />
+
+    const {appState, error: appStateError} =
+        component === Throw404
+            ? {
+                  error: new errors.HTTPNotFound('Not found'),
+                  appState: {}
+              }
+            : await AppConfig.initAppState({
+                  App: WrappedApp,
+                  component,
+                  match,
+                  route,
+                  req,
+                  res,
+                  location,
+                  appJSX
+              })
+
+    appJSX = React.cloneElement(appJSX, {error: appStateError, appState})
 
     // Step 4 - Render the App
     let renderResult
-    const args = {
-        App: WrappedApp,
-        appState,
-        appStateError: appStateError && logAndFormatError(appStateError),
-        routes,
-        req,
-        res,
-        location,
-        config
-    }
     try {
-        renderResult = renderApp(args)
+        renderResult = renderApp({
+            App: WrappedApp,
+            appState,
+            appStateError: appStateError && logAndFormatError(appStateError),
+            routes,
+            req,
+            res,
+            location,
+            config,
+            appJSX,
+            deviceType
+        })
     } catch (e) {
         // This is an unrecoverable error.
         // (errors handled by the AppErrorBoundary are considered recoverable)
@@ -208,10 +184,8 @@ export const render = async (req, res, next) => {
     }
 }
 
-const renderAppHtml = (req, res, error, appData) => {
-    const {App, appState, routes, routerContext, location, extractor, deviceType} = appData
-
-    let appJSX = (
+const OuterApp = ({res, error, App, appState, routes, routerContext, location, deviceType}) => {
+    return (
         <Router location={location} context={routerContext}>
             <DeviceContext.Provider value={{type: deviceType}}>
                 <AppConfig locals={res.locals}>
@@ -220,33 +194,37 @@ const renderAppHtml = (req, res, error, appData) => {
             </DeviceContext.Provider>
         </Router>
     )
-
-    appJSX = extractor.collectChunks(appJSX)
-    return ReactDOMServer.renderToString(appJSX)
 }
 
+const renderToString = (jsx, extractor) =>
+    ReactDOMServer.renderToString(extractor.collectChunks(jsx))
+
 const renderApp = (args) => {
-    const {req, res, appStateError, App, appState, location, routes, config} = args
-    const deviceType = detectDeviceType(req)
+    const {req, res, appStateError, appJSX, appState, config, deviceType} = args
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
-    const routerContext = {}
-    const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query
     const indent = prettyPrint ? 8 : 0
 
+    let routerContext
     let appHtml
     let renderError
     // It's important that we render the App before extracting the script elements,
     // otherwise it won't return the correct chunks.
+
     try {
-        appHtml = renderAppHtml(req, res, appStateError, appData)
+        routerContext = {}
+        appHtml = renderToString(React.cloneElement(appJSX, {routerContext}), extractor)
     } catch (e) {
         // This will catch errors thrown from the app and pass the error
         // to the AppErrorBoundary component, and renders the error page.
+        routerContext = {}
         renderError = logAndFormatError(e)
-        appHtml = renderAppHtml(req, res, renderError, appData)
+        appHtml = renderToString(
+            React.cloneElement(appJSX, {routerContext, error: renderError}),
+            extractor
+        )
     }
 
     // Setting type: 'application/json' stops the browser from executing the code.

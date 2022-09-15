@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
+import {useQuery} from '@tanstack/react-query'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
@@ -90,6 +91,16 @@ const Home = ({value}: Props) => {
         return () => clearInterval(interval)
     }, [counter, setCounter])
 
+    const query = useQuery(
+        ['example-data'],
+        () =>
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve('This came from react-query')
+                }, 1000)
+            })
+    )
+
     return (
         <div>
             <style dangerouslySetInnerHTML={{__html: style}} />
@@ -107,6 +118,9 @@ const Home = ({value}: Props) => {
                 <div className="panel">
                     <p style={{width: '300px'}} className="fade-in fade-in-0">
                         <b>This page is written in Typescript</b>
+                        <br />
+                        <br />
+                        React query works if this isn't empty: &quot;{query.data}&quot;
                         <br />
                         <br />
                         Server-side getProps works if this is a valid expression: &quot;5 times 7 is{' '}
@@ -138,7 +152,7 @@ Home.getProps = async () => {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(a * b)
-            }, 50)
+            }, 1000)
         })
     }
     const value = await getData(5, 7)
