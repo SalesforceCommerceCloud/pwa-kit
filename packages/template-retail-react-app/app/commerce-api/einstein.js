@@ -38,8 +38,9 @@ class EinsteinAPI {
         }
 
         // The first part of the siteId is the realm
-        body.realm = this.config.siteId.split('-')[0]
-        body.correlationId = ''
+        if (this.config.siteId) {
+            body.realm = this.config.siteId.split('-')[0]
+        }
 
         return body
     }
