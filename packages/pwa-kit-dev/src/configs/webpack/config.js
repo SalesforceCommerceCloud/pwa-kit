@@ -77,6 +77,9 @@ const baseConfig = (target) => {
     class Builder {
         constructor() {
             this.config = {
+                watchOptions: {
+                    aggregateTimeout: 1000
+                },
                 target,
                 mode,
                 ...(target === 'node'
