@@ -21,8 +21,7 @@ const sampleProps = {
     shortCode: '8o7m175y',
     siteId: 'RefArchGlobal',
     locale: 'en_US',
-    currency: 'USD',
-    correlationId: ''
+    currency: 'USD'
 }
 const queryClient = new QueryClient()
 

@@ -15,13 +15,16 @@ import DeviceContext from '../device-context'
 const ExpressContext = React.createContext()
 
 const CorrelationIdContext = React.createContext()
+// regexp for uuid format
+const regexp = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
 
-const CorrelationIdProvider = ({children, correlationId, onPageChange = () => {}}) => {
-    const [id, setId] = React.useState(correlationId)
+const CorrelationIdProvider = ({children, correlationId, resetOnPageChange = true}) => {
+    const _correlationIdFn = correlationId === 'function' && correlationId
+    const _correlationId = correlationId !== 'function' && correlationId
+    const [id, setId] = React.useState(_correlationId || _correlationIdFn())
     const location = useLocation()
 
     const isFirstRun = useRef(true)
-    const regexp = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
     useEffect(() => {
         // this hook only runs on client-side
         // don't run this on first render
@@ -29,12 +32,18 @@ const CorrelationIdProvider = ({children, correlationId, onPageChange = () => {}
             isFirstRun.current = false
             return
         }
-        const newId = onPageChange()
-
-        if (!regexp.test(newId)) {
-            throw Error('invalid uuid')
+        if (resetOnPageChange && !_correlationIdFn) {
+            console.warn(
+                'correlationId needs to be a function returning a uuid string when resetOnPageChange is true '
+            )
         }
-        setId(newId)
+        if (resetOnPageChange && _correlationIdFn) {
+            const newId = _correlationIdFn()
+            if (!regexp.test(newId)) {
+                console.warn('An invalid uuid is returned. Please check your code.')
+            }
+            setId(newId)
+        }
     }, [location.pathname])
     return (
         <CorrelationIdContext.Provider value={{correlationId: id}}>
@@ -45,7 +54,7 @@ const CorrelationIdProvider = ({children, correlationId, onPageChange = () => {}
 
 CorrelationIdProvider.propTypes = {
     children: PropTypes.element.isRequired,
-    correlationId: PropTypes.string,
+    correlationId: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
     location: PropTypes.object
 }
 

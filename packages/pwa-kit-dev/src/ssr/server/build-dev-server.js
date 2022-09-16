@@ -72,6 +72,15 @@ export const DevServerMixin = {
     /**
      * @private
      */
+    _addEventContext(app) {
+        app.use((req, res, next) => {
+            next()
+        })
+    },
+
+    /**
+     * @private
+     */
     _setCompression(app) {
         app.use(
             compression({
