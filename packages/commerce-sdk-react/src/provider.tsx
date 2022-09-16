@@ -44,12 +44,6 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
  */
 export const AuthContext = React.createContext({} as Auth)
 
-// NOTE:
-// 2 main goals of this PR:
-// - reuse error from isomorphic sdk
-// - stop retries if getting validation error
-// - (plus, I'd argue that the error to catch is any error that is not ResponseError)
-
 /**
  * Initialize a set of Commerce API clients and make it available to all of descendant components
  *

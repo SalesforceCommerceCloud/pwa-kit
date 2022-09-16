@@ -41,35 +41,6 @@ function useProducts(
         },
         options
     )
-
-    /*
-    const foo = arg || {}
-    const {headers, rawResponse, ...parameters} = foo
-    return useAsync(
-        ['products', foo],
-        async ({shopperProducts}) => {
-            let response
-            try {
-                response = await shopperProducts.getProducts({parameters, headers}, rawResponse)
-            } catch (err) {
-                console.error('--- from async fn', err)
-                throw err
-            }
-            return response
-        },
-        {
-            // NOTE: this will run after all retries are finished
-            onError: (error) => {
-                console.error('--- onError', error)
-            },
-            retry: (failureCount, error) => {
-                return error ? false : true
-            }
-        }
-        // {retry: false}
-        // options
-    )
-    */
 }
 
 type UseProductParameters = NonNullable<Argument<Client['getProduct']>>['parameters']
