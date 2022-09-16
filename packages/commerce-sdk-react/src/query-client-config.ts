@@ -10,7 +10,7 @@ import {RetryValue} from '@tanstack/query-core/build/lib/retryer'
 
 const NUM_OF_RETRIES = 3 // same as React Query's default
 
-// NOTE: ResponseError does not seem to be exported from the isomorphic sdk lib
+// NOTE: ResponseError does not seem to be exported from the isomorphic sdk lib, so I had to mimic it here
 interface ResponseError extends Error {
     response: Response
 }
@@ -30,6 +30,7 @@ const shouldContinueRetries: RetryValue<unknown> = (failureCount, error) => {
     return shouldContinue
 }
 
+// Why use `unknown` as the generic type? Because QueryClientConfig interface already defines it as such.
 const defaultOptions: DefaultOptions<unknown> = {
     queries: {retry: shouldContinueRetries},
     mutations: {retry: shouldContinueRetries}
