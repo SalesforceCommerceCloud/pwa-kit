@@ -1,0 +1,52 @@
+[
+    {
+        "scope": "http://localhost:3000",
+        "method": "GET",
+        "path": "/mobify/proxy/api/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=shirt",
+        "body": "",
+        "status": 200,
+        "response": [
+            "1f8b0800000000000003000000ffff",
+            "e4555d6bc230147df757843cab58addafa3807630f0ea1c21ec61eb2f4ae0db489dca43211fffb68add37e329913c69e0af7dce49c9c7393ee3a84d03764d2f79220006d84929acec8ae430821541f8ae0af00e3b4fe92d5498e673d0a4520248bd2163a235487020dcdf17df67ded10b2efa6549c1908146e6bd97250400393f0d3fd6390bac723654221839e8fa0752fe3d4b47bea952c86b4fb3ec58957c1d70c419a792ee729ef9ee7db96e4774b6e2c4364ba49257c306e16ccf090cec83b8b349cd3662b2bc2dae92e36ff8cd094d616d71f6c57f13a02037e556f8e23026fc60b07369894f10d8b12a84cc6e9bcc709a99d17250d4873a3e14cb451713bd735a2f74285867811c006fe4ef435c9b69db71cbdba34fa352a3fe1f5d1e75883333c4104c9b729f1c3ddb270ed51f0549033e9db83423ddbf0317b61a6b63bb547d66041ab1dc79762a17c4049ce6ef15792dd5f50e4b8d664ea8cda14ad4220cfa130704551c3497f386a12351c8f2dc776ec36519e41b106ff3a629cbe356e11e35ad6c86d13b3644247b0bd8933ae650dc7973bf3d3ff4df1929ebd39fa1b34fff83fa381210f9765bbf69f000000ffff030073dd35ce20090000"
+        ],
+        "rawHeaders": [
+            "date",
+            "Wed, 14 Sep 2022 19:59:00 GMT",
+            "content-type",
+            "application/json; charset=UTF-8",
+            "transfer-encoding",
+            "chunked",
+            "connection",
+            "close",
+            "cf-ray",
+            "74abb35bfc18058f-IAD",
+            "cache-control",
+            "public, must-revalidate, max-age=60",
+            "strict-transport-security",
+            "max-age=31536000; includeSubdomains;",
+            "cf-cache-status",
+            "DYNAMIC",
+            "x-content-type-options",
+            "nosniff",
+            "x-correlation-id",
+            "74abb35bfc18058f",
+            "x-frame-options",
+            "SAMEORIGIN",
+            "x-ratelimit-limit",
+            "7200",
+            "x-ratelimit-remaining",
+            "7199",
+            "x-xss-protection",
+            "1; mode=block",
+            "vary",
+            "Accept-Encoding",
+            "server",
+            "cloudflare",
+            "content-encoding",
+            "gzip",
+            "x-proxy-request-url",
+            "https://kv7kzm78.api.commercecloud.salesforce.com/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=shirt"
+        ],
+        "responseIsBinary": false
+    }
+]

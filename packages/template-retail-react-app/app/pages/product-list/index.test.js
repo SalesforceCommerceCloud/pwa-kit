@@ -169,7 +169,7 @@ test('show login modal when an unauthenticated user tries to add an item to wish
 
 test('clicking a filter will change url', async () => {
     renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', locale: 'en-GB'}
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
     user.click(screen.getByText(/Beige/i))
     await waitFor(() =>
@@ -186,7 +186,7 @@ test('click on filter All should clear out all the filter in search params', asy
         'uk/en-GB/category/mens-clothing-jackets?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
     )
     renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', locale: 'en-GB'}
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
     const clearAllButton = await screen.findAllByText(/Clear All/i)
     user.click(clearAllButton[0])

@@ -5,16 +5,39 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useState} from 'react'
-import {ActionResponse} from './types'
+import useAuth from './useAuth'
+import useCommerceApi from './useCommerceApi'
+import {ActionResponse, ApiClients} from './types'
 import {useQuery, UseQueryOptions} from '@tanstack/react-query'
+
+interface Client {
+    clientConfig: {
+        headers: Record<string, string>
+    }
+}
 
 export const useAsync = <T>(
     queryKey: unknown[],
-    fn: () => Promise<T>,
+    fn: (apiClients: ApiClients) => Promise<T>,
     queryOptions?: UseQueryOptions<T, Error>
 ) => {
-    // add more logic in here
-    return useQuery<T, Error>(queryKey, fn, queryOptions)
+    const auth = useAuth()
+    // TODO: what's a better way to handle the types?
+    const apiClients = (useCommerceApi() as unknown) as Record<string, Client>
+    const authenticatedFn = () =>
+        auth
+            .ready()
+            .then(({access_token}) => {
+                Object.keys(apiClients).forEach((client) => {
+                    apiClients[client].clientConfig.headers = {
+                        ...apiClients[client].clientConfig.headers,
+                        Authorization: `Bearer ${access_token}`
+                    }
+                })
+                return (apiClients as unknown) as ApiClients
+            })
+            .then(fn)
+    return useQuery<T, Error>(queryKey, authenticatedFn, queryOptions)
 }
 
 export const useAsyncCallback = <Args extends unknown[], Ret>(
