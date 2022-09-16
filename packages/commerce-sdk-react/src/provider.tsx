@@ -65,9 +65,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         proxy,
         redirectURI,
-        // TODO: stop retry when there is validation error
-        // TODO: how to detect validation error? Maybe any non-ResponseError objects?
-        // And make it future proof by having a separate function/module
         queryClientConfig,
         fetchOptions
     } = props

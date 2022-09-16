@@ -8,7 +8,7 @@
 import {DefaultOptions, QueryClientConfig} from '@tanstack/react-query'
 import {RetryValue} from '@tanstack/query-core/build/lib/retryer'
 
-const NUM_OF_RETRIES = 3
+const NUM_OF_RETRIES = 3 // same as React Query's default
 
 // NOTE: ResponseError does not seem to be exported from the isomorphic sdk lib
 interface ResponseError extends Error {

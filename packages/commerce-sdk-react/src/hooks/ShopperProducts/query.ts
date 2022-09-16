@@ -33,10 +33,6 @@ function useProducts(
     arg: UseProductsArg,
     options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ) {
-    // TODO: remove this kind of guard (from this file and others)
-    // if (!arg.ids) {
-    //     throw new Error('ids is required for useProducts')
-    // }
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
         ['products', arg],
@@ -98,9 +94,6 @@ function useProduct(
     arg: UseProductArg,
     options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
 ): UseQueryResult<DataType<Client['getProduct']> | Response, Error> {
-    if (!arg.id) {
-        throw new Error('id is required for useProduct.')
-    }
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
         ['product', arg],
@@ -136,9 +129,6 @@ function useCategories(
     arg: UseCategoriesArg,
     options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategories']> | Response, Error> {
-    if (!arg.ids) {
-        throw new Error('ids is required for useCategories')
-    }
     const {headers, rawResponse, ...parameters} = arg
     return useAsync(
         ['categories', arg],
