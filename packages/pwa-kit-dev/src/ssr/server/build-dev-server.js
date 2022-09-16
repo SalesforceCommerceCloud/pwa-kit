@@ -72,11 +72,7 @@ export const DevServerMixin = {
     /**
      * @private
      */
-    _addEventContext(app) {
-        app.use((req, res, next) => {
-            next()
-        })
-    },
+    _addEventContext(app) {},
 
     /**
      * @private
