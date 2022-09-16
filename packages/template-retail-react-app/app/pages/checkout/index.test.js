@@ -452,7 +452,7 @@ test('Can proceed through checkout as registered customer', async () => {
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {siteAlias: 'uk', locale: 'en-GB', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}
     })
 
     // Switch to login
@@ -588,7 +588,7 @@ test('Can edit address during checkout as a registered customer', async () => {
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {siteAlias: 'uk', locale: 'en-GB'}
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
 
     // Switch to login
@@ -695,7 +695,7 @@ test('Can add address during checkout as a registered customer', async () => {
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {siteAlias: 'us', locale: 'en-US'}
+        wrapperProps: {siteAlias: 'us', locale: {id: 'en-US'}}
     })
 
     // Switch to login

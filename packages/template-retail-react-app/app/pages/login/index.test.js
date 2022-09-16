@@ -143,7 +143,7 @@ test('Allows customer to sign in to their account', async () => {
     )
     // render our test component
     renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', locale: 'en-GB', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}
     })
 
     // enter credentials and submit
@@ -166,7 +166,7 @@ test('Renders error when given incorrect log in credentials', async () => {
 
     // render our test component
     renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', locale: 'en-GB', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}
     })
 
     // enter credentials and submit
@@ -187,7 +187,7 @@ test('Renders error when given incorrect log in credentials', async () => {
 test('should navigate to sign in page when the user clicks Create Account', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', locale: 'en-GB', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}
     })
     user.click(screen.getByText(/Create Account/i))
 
@@ -198,7 +198,7 @@ test('should navigate to sign in page when the user clicks Create Account', asyn
 test('should navigate to reset password page when the user clicks Forgot Password', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', locale: 'en-GB', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}
     })
     user.click(screen.getByText(/forgot password/i))
 
