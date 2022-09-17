@@ -10,7 +10,7 @@ export class FetchStrategy extends React.Component {
             const promises = this.getInitializers().map((fn) => fn(args))
             return {
                 error: undefined,
-                appState: Object.assign({}, ...await Promise.all(promises))
+                appState: Object.assign({}, ...(await Promise.all(promises)))
             }
         } catch (error) {
             return {

@@ -14,7 +14,6 @@ import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
 
-
 const noop = () => undefined
 
 const isServerSide = typeof window === 'undefined'

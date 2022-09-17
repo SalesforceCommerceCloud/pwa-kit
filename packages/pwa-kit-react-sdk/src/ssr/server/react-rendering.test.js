@@ -16,7 +16,6 @@ import path from 'path'
 import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import {getAppConfig} from '../universal/compatibility'
 
-
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
     const defaults = {
