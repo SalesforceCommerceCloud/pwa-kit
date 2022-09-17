@@ -14,7 +14,8 @@ import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
-import AppConfig from '../universal/components/_app-config'
+import {getAppConfig} from '../universal/compatibility'
+
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -605,6 +606,7 @@ describe('The Node SSR Environment', () => {
             description: `AppConfig errors are caught`,
             req: {url: '/pwa/'},
             mocks: () => {
+                const AppConfig = getAppConfig()
                 jest.spyOn(AppConfig.prototype, 'render').mockImplementation(() => {
                     throw new Error()
                 })

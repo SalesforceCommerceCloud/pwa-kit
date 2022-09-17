@@ -10,9 +10,10 @@ import {withRouter} from 'react-router-dom'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {AppErrorContext} from '../../components/app-error-boundary'
 import Throw404 from '../../components/throw-404'
-import AppConfig from '../../components/_app-config'
+import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
+
 
 const noop = () => undefined
 
@@ -54,6 +55,7 @@ const withErrorHandling = (Wrapped) => {
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
 export const routeComponent = (Wrapped, isPage, locals) => {
+    const AppConfig = getAppConfig()
     const extraArgs = AppConfig.extraGetPropsArgs(locals)
 
     /* istanbul ignore next */

@@ -24,7 +24,7 @@ import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
 import Throw404 from '../universal/components/throw-404'
 
-import AppConfig from '../universal/components/_app-config'
+import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
@@ -83,6 +83,7 @@ const logAndFormatError = (err) => {
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
+    const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
 
@@ -185,6 +186,7 @@ export const render = async (req, res, next) => {
 }
 
 const OuterApp = ({res, error, App, appState, routes, routerContext, location, deviceType}) => {
+    const AppConfig = getAppConfig()
     return (
         <Router location={location} context={routerContext}>
             <DeviceContext.Provider value={{type: deviceType}}>

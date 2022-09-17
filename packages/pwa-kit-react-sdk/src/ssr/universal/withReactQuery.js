@@ -1,5 +1,5 @@
 import hoistNonReactStatic from 'hoist-non-react-statics'
-import {FetchStrategy} from '../_app-config/fetchStrategy'
+import {FetchStrategy} from './fetchStrategy'
 import React from 'react'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ssrPrepass from 'react-ssr-prepass'

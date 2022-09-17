@@ -1,6 +1,6 @@
 import hoistNonReactStatic from 'hoist-non-react-statics'
-import AppConfig from '../_app-config/index'
-import {FetchStrategy} from '../_app-config/fetchStrategy'
+import {getAppConfig} from './compatibility'
+import {FetchStrategy} from './fetchStrategy'
 import React from 'react'
 
 export const withLegacyGetProps = (Wrapped) => {
@@ -12,6 +12,7 @@ export const withLegacyGetProps = (Wrapped) => {
         }
 
         static async doInitAppState({App, match, route, req, res, location}) {
+            const AppConfig = getAppConfig()
             const {params} = match
 
             const components = [App, route.component]
