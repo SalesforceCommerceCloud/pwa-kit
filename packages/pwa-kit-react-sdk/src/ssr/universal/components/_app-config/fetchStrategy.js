@@ -7,13 +7,10 @@ export class FetchStrategy extends React.Component {
 
     static async initAppState(args) {
         try {
-            const initializers = this.getInitializers()
-            const promises = initializers.map((fn) => fn(args))
-            const results = await Promise.all(promises)
-            const appState = Object.assign({}, ...results)
+            const promises = this.getInitializers().map((fn) => fn(args))
             return {
                 error: undefined,
-                appState: appState
+                appState: Object.assign({}, ...await Promise.all(promises))
             }
         } catch (error) {
             return {
