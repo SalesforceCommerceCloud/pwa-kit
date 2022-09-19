@@ -122,7 +122,7 @@ export const render = async (req, res, next) => {
         routerContext: {},
         req,
         res,
-        App,
+        App: WrappedApp,
         routes,
         location,
         deviceType
