@@ -23,7 +23,10 @@ export enum ShopperDiscoverySearchActions {
 /**
  * A hook for performing mutations with the Shopper Discovery Search API.
  */
-export function useShopperDiscoverySearchMutation<Action>(action: Action) {
+export function useShopperDiscoverySearchMutation<
+    // eslint-disable-next-line prettier/prettier
+    Action extends `${ShopperDiscoverySearchActions}`
+>(action: Action) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperDiscoverySearch: client} = useCommerceApi()

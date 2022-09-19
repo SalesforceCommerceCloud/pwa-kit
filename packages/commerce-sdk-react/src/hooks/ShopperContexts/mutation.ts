@@ -35,7 +35,10 @@ export enum ShopperContextsActions {
 /**
  * A hook for performing mutations with the Shopper Contexts API.
  */
-export function useShopperContextsMutation<Action>(action: Action) {
+// eslint-disable-next-line prettier/prettier
+export function useShopperContextsMutation<Action extends `${ShopperContextsActions}`>(
+    action: Action
+) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperContexts: client} = useCommerceApi()

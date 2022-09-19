@@ -335,7 +335,10 @@ the body are the following properties if specified:
 /**
  * A hook for performing mutations with the Shopper Baskets API.
  */
-export function useShopperBasketsMutation<Action>(action: Action) {
+// eslint-disable-next-line prettier/prettier
+export function useShopperBasketsMutation<Action extends `${ShopperBasketsActions}`>(
+    action: Action
+) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperBaskets: client} = useCommerceApi()

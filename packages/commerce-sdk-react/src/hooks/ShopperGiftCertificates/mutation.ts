@@ -23,7 +23,10 @@ export enum ShopperGiftCertificatesActions {
 /**
  * A hook for performing mutations with the Shopper Gift Certificates API.
  */
-export function useShopperGiftCertificatesMutation<Action>(action: Action) {
+export function useShopperGiftCertificatesMutation<
+    // eslint-disable-next-line prettier/prettier
+    Action extends `${ShopperGiftCertificatesActions}`
+>(action: Action) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperGiftCertificates: client} = useCommerceApi()

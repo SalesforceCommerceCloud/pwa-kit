@@ -52,7 +52,8 @@ paymentCard must be specified in the request.
 /**
  * A hook for performing mutations with the Shopper Gift Certificates API.
  */
-export function useShopperOrdersMutation<Action>(action: Action) {
+// eslint-disable-next-line prettier/prettier
+export function useShopperOrdersMutation<Action extends `${ShopperOrdersActions}`>(action: Action) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperOrders: client} = useCommerceApi()

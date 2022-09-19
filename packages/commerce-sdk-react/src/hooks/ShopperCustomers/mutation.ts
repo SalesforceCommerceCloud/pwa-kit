@@ -224,7 +224,10 @@ The value of this property must be valid for the type of custom attribute define
 /**
  * A hook for performing mutations with the Shopper Customers API.
  */
-export function useShopperCustomersMutation<Action>(action: Action) {
+// eslint-disable-next-line prettier/prettier
+export function useShopperCustomersMutation<Action extends `${ShopperCustomersActions}`>(
+    action: Action
+) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperCustomers: client} = useCommerceApi()
