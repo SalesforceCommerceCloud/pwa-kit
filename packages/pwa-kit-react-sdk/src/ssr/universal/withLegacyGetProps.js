@@ -5,11 +5,17 @@ import React from 'react'
 export const withLegacyGetProps = (Wrapped) => {
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
 
+    /**
+     * @private
+     */
     class WithLegacyGetProps extends FetchStrategy {
         render() {
             return <Wrapped {...this.props} />
         }
 
+        /**
+         * @private
+         */
         static async doInitAppState({App, match, route, req, res, location}) {
             const {params} = match
 
@@ -32,8 +38,18 @@ export const withLegacyGetProps = (Wrapped) => {
             }
         }
 
+        /**
+         * @private
+         */
         static getInitializers() {
             return [WithLegacyGetProps.doInitAppState, ...(Wrapped.getInitializers?.() ?? [])]
+        }
+
+        /**
+         * @private
+         */
+        static getHOCsInUse() {
+            return [withLegacyGetProps, ...(Wrapped.getHOCsInUse?.() ?? [])]
         }
     }
 

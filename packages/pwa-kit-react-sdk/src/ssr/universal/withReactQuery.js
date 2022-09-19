@@ -10,6 +10,9 @@ const STATE_KEY = '__reactQuery'
 export const withReactQuery = (Wrapped) => {
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
 
+    /**
+     * @private
+     */
     class WithReactQuery extends FetchStrategy {
         constructor(props) {
             super(props)
@@ -32,6 +35,9 @@ export const withReactQuery = (Wrapped) => {
             )
         }
 
+        /**
+         * @private
+         */
         static async doInitAppState({res, appJSX}) {
             const queryClient = (res.locals.__queryClient = new QueryClient())
 
@@ -44,8 +50,18 @@ export const withReactQuery = (Wrapped) => {
             return {[STATE_KEY]: dehydrate(queryClient)}
         }
 
+        /**
+         * @private
+         */
         static getInitializers() {
             return [WithReactQuery.doInitAppState, ...(Wrapped.getInitializers?.() ?? [])]
+        }
+
+        /**
+         * @private
+         */
+        static getHOCsInUse() {
+            return [withReactQuery, ...(Wrapped.getHOCsInUse?.() ?? [])]
         }
     }
 

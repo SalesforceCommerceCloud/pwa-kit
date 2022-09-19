@@ -13,6 +13,7 @@ import Throw404 from '../../components/throw-404'
 import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
+import {withLegacyGetProps} from '../../withLegacyGetProps'
 
 const noop = () => undefined
 
@@ -56,6 +57,9 @@ const withErrorHandling = (Wrapped) => {
 export const routeComponent = (Wrapped, isPage, locals) => {
     const AppConfig = getAppConfig()
     const extraArgs = AppConfig.extraGetPropsArgs(locals)
+
+    const hocs = AppConfig.getHOCsInUse()
+    const getPropsEnabled = hocs.indexOf(withLegacyGetProps) >= 0
 
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
@@ -103,6 +107,9 @@ export const routeComponent = (Wrapped, isPage, locals) => {
          * @return {Promise<Boolean>}
          */
         static async shouldGetProps(args) {
+            if (!getPropsEnabled) {
+                return false
+            }
             const defaultImpl = () => {
                 const {previousLocation, location} = args
                 return !previousLocation || previousLocation.pathname !== location.pathname
@@ -154,6 +161,9 @@ export const routeComponent = (Wrapped, isPage, locals) => {
          */
         // eslint-disable-next-line
         static getProps(args) {
+            if (!getPropsEnabled) {
+                return Promise.resolve({})
+            }
             RouteComponent._latestPropsPromise = RouteComponent.getComponent().then((component) =>
                 component.getProps ? component.getProps({...args, ...extraArgs}) : Promise.resolve()
             )

@@ -1,10 +1,16 @@
 import React from 'react'
 
+/**
+ * @private
+ */
 export class FetchStrategy extends React.Component {
     render() {
         return <div />
     }
 
+    /**
+     * @private
+     */
     static async initAppState(args) {
         try {
             const promises = this.getInitializers().map((fn) => fn(args))
