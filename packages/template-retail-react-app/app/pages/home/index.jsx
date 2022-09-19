@@ -53,12 +53,12 @@ import {
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
     const einstein = useEinstein()
-    const {pathname} = useLocation()
 
     /**************** Einstein ****************/
     useEffect(() => {
-        einstein.sendViewPage(pathname)
-    }, [pathname])
+        // '/' is the home page's pathname
+        einstein.sendViewPage('/')
+    }, [])
 
     return (
         <Box data-testid="home-page" layerStyle="page">
