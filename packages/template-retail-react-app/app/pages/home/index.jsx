@@ -53,11 +53,11 @@ import {
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
     const einstein = useEinstein()
+    const {pathname} = useLocation()
 
     /**************** Einstein ****************/
     useEffect(() => {
-        // '/' is the home page's pathname
-        einstein.sendViewPage('/')
+        einstein.sendViewPage(pathname)
     }, [])
 
     return (
