@@ -6,26 +6,24 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
-import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
+import {UseQueryOptions, UseQueryResult, useQueryClient} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
 
 const productKeys = {
     all: [{entity: ['product']}],
     useProducts: (arg: Record<string, unknown>) => [{...productKeys.all[0], scope: 'list', ...arg}],
-    useProduct: (arg: Record<string, unknown>) => [
-        {...productKeys.all[0], scope: 'detail', ...arg},
-    ],
+    useProduct: (arg: Record<string, unknown>) => [{...productKeys.all[0], scope: 'detail', ...arg}]
 }
 
 const categoryKeys = {
     all: [{entity: ['category']}],
     useCategories: (arg: Record<string, unknown>) => [
-        {...categoryKeys.all[0], scope: 'list', ...arg},
+        {...categoryKeys.all[0], scope: 'list', ...arg}
     ],
     useCategory: (arg: Record<string, unknown>) => [
-        {...categoryKeys.all[0], scope: 'detail', ...arg},
-    ],
+        {...categoryKeys.all[0], scope: 'detail', ...arg}
+    ]
 }
 
 type UseProductsParameters = NonNullable<Argument<Client['getProducts']>>['parameters']
@@ -130,10 +128,21 @@ function useCategories(
         throw new Error('ids is required for useCategories')
     }
     const {headers, rawResponse, ...parameters} = arg
+    const queryClient = useQueryClient()
     return useAsync(
         categoryKeys.useCategories(arg),
-        ({shopperProducts}) => {
-            return shopperProducts.getCategories({parameters, headers}, rawResponse)
+        async ({shopperProducts}) => {
+            const result = await shopperProducts.getCategories({parameters, headers}, rawResponse)
+
+            // Use query data to seed future queries
+            // @ts-ignore
+            const categories = result?.data[0].categories
+
+            categories.forEach((category: any) => {
+                queryClient.setQueryData(categoryKeys.useCategory({id: category.id}), category)
+            })
+
+            return result
         },
         options
     )
@@ -167,10 +176,13 @@ function useCategory(
     options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategory']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const queryClient = useQueryClient()
     return useAsync(
         categoryKeys.useCategory(arg),
-        ({shopperProducts}) => {
-            return shopperProducts.getCategory({parameters, headers}, rawResponse)
+        async ({shopperProducts}) => {
+            const result = await shopperProducts.getCategory({parameters, headers}, rawResponse)
+            
+            return result
         },
         options
     )

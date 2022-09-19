@@ -14,7 +14,7 @@ type Client = ApiClients['shopperBaskets']
 const basketKeys = {
     all: [{entity: 'basket'}],
     useBasket: (arg: Record<string, unknown>) => [{...basketKeys.all[0], ...arg}],
-    usePaymentMethodsForBasket: (arg: Record<string, unknown>) => [{...basketKeys.all[0], ...arg}],
+    usePaymentMethodsForBasket: (arg: Record<string, unknown>) => [{...basketKeys.all[0], ...arg}]
 }
 // const paymentMethodKeys = {
 //     all: [{entity: ['basket', 'paymentMethod']}],

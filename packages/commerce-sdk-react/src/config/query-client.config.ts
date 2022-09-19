@@ -9,7 +9,7 @@ import {DefaultOptions, QueryClientConfig} from '@tanstack/react-query'
 const defaultOptions: DefaultOptions = {
     queries: {
         staleTime: 1000 * 20 // default 0
-    },
+    }
 }
 
 const defaultQueryClientConfig: QueryClientConfig = {defaultOptions}
