@@ -137,10 +137,15 @@ function useCategories(
             // Use query data to seed future queries
             // @ts-ignore
             const categories = result?.data[0].categories
-
-            categories.forEach((category: any) => {
-                queryClient.setQueryData(categoryKeys.useCategory({id: category.id}), category)
-            })
+            const seedCategories = (categories: any) => {
+                categories.forEach((category: any) => {
+                    queryClient.setQueryData(categoryKeys.useCategory({id: category.id}), category)
+                    if ('categories' in category) {
+                        seedCategories(category.categories)
+                    }
+                })
+            }
+            seedCategories(categories)
 
             return result
         },
@@ -180,9 +185,7 @@ function useCategory(
     return useAsync(
         categoryKeys.useCategory(arg),
         async ({shopperProducts}) => {
-            const result = await shopperProducts.getCategory({parameters, headers}, rawResponse)
-            
-            return result
+            return shopperProducts.getCategory({parameters, headers}, rawResponse)
         },
         options
     )
