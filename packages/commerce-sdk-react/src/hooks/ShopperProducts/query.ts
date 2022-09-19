@@ -52,13 +52,26 @@ function useProducts(
         throw new Error('ids is required for useProducts')
     }
     const {headers, rawResponse, ...parameters} = arg
+    const queryClient = useQueryClient()
     return useAsync(
         // Query Key needs to match "options"
         // ['products', {headers, rawResponse, ...parameters}],
         productKeys.useProducts(arg),
         // Don't send "options" different from the queryKey
-        ({shopperProducts}) => {
-            return shopperProducts.getProducts({parameters, headers}, rawResponse)
+        async ({shopperProducts}) => {
+            const result = await shopperProducts.getProducts({parameters, headers}, rawResponse)
+
+            // Use query data to seed future queries
+            // @ts-ignore
+            const products = result?.data
+            const seedProducts = (products: any) => {
+                products.forEach((product: any) => {
+                    queryClient.setQueryData(productKeys.useProduct({id: product.id}), product)
+                })
+            }
+            seedProducts(products)
+
+            return result
         },
         options
     )
