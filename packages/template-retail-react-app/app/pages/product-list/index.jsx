@@ -103,7 +103,6 @@ const ProductList = (props) => {
     const {categories} = useCategories()
     const toast = useToast()
     const einstein = useEinstein()
-    const previousCategoryProducts = useRef()
 
     // Get the current category from global state.
     let category = undefined
@@ -183,27 +182,12 @@ const ProductList = (props) => {
 
     /**************** Einstein ****************/
     useEffect(() => {
-        if (searchQuery && productSearchResult && productSearchResult.hits) {
-            const products = productSearchResult.hits.map((productSearchItem) => {
-                const {productId, sku = '', altId = '', altIdType = ''} = productSearchItem
-                return {
-                    id: productId,
-                    sku,
-                    altId,
-                    altIdType
-                }
-            })
-            einstein.sendViewSearch(searchQuery, products)
-        } else if (category && productSearchResult && productSearchResult.hits) {
-            // Categories update asynchronously from category search results. To ensure we are
-            // sending a viewCategory only after both category and search results update, we track
-            // the previous category's search results in a useRef.
-            if (previousCategoryProducts.current != productSearchResult.hits) {
-                einstein.sendViewCategory(category, productSearchResult)
-                previousCategoryProducts.current = productSearchResult.hits
-            }
+        if (searchQuery) {
+            einstein.sendViewSearch(searchQuery, productSearchResult)
+        } else {
+            einstein.sendViewCategory(category, productSearchResult)
         }
-    }, [searchQuery, category, productSearchResult])
+    }, [productSearchResult])
 
     /**************** Filters ****************/
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
