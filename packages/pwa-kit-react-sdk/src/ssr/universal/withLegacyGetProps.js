@@ -1,5 +1,4 @@
 import hoistNonReactStatic from 'hoist-non-react-statics'
-import {getAppConfig} from './compatibility'
 import {FetchStrategy} from './fetchStrategy'
 import React from 'react'
 
