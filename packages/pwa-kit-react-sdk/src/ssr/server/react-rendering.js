@@ -129,22 +129,28 @@ export const render = async (req, res, next) => {
     }
     let appJSX = <OuterApp {...props} />
 
-    const {appState, error: appStateError} =
-        component === Throw404
-            ? {
-                  error: new errors.HTTPNotFound('Not found'),
-                  appState: {}
-              }
-            : await AppConfig.initAppState({
-                  App: WrappedApp,
-                  component,
-                  match,
-                  route,
-                  req,
-                  res,
-                  location,
-                  appJSX
-              })
+    let appState, appStateError
+
+    if(component === Throw404) {
+        appState = {}
+        appStateError = new errors.HTTPNotFound('Not found')
+    } else {
+        const ret = await AppConfig.initAppState({
+            App: WrappedApp,
+            component,
+            match,
+            route,
+            req,
+            res,
+            location,
+            appJSX
+        })
+        appState = {
+            ...ret.appState,
+            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
+        }
+        appStateError = ret.error
+    }
 
     appJSX = React.cloneElement(appJSX, {error: appStateError, appState})
 

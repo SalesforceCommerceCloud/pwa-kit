@@ -12,7 +12,6 @@ export const withLegacyGetProps = (Wrapped) => {
         }
 
         static async doInitAppState({App, match, route, req, res, location}) {
-            const AppConfig = getAppConfig()
             const {params} = match
 
             const components = [App, route.component]
@@ -31,7 +30,6 @@ export const withLegacyGetProps = (Wrapped) => {
             return {
                 appProps,
                 pageProps,
-                __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
             }
         }
 
