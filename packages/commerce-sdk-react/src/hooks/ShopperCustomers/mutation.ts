@@ -218,15 +218,13 @@ The value of this property must be valid for the type of custom attribute define
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomerProductListItem} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomerproductlistitem} for more information on the parameters and returned data type.
    */
-    UpdateCustomerProductListItem = 'updateCustomerProductListItem',
+    UpdateCustomerProductListItem = 'updateCustomerProductListItem'
 }
 
 /**
  * A hook for performing mutations with the Shopper Customers API.
  */
-export function useShopperCustomersMutation<Action extends `${ShopperCustomersActions}`>(
-    action: Action
-) {
+export function useShopperCustomersMutation<Action>(action: Action) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperCustomers: client} = useCommerceApi()

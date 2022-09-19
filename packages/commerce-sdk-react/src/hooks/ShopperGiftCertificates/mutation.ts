@@ -17,15 +17,13 @@ export enum ShopperGiftCertificatesActions {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-gift-certificates?meta=getGiftCertificate} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppergiftcertificates.shoppergiftcertificates-1.html#getgiftcertificate} for more information on the parameters and returned data type.
      */
-    GetGiftCertificate = 'getGiftCertificate',
+    GetGiftCertificate = 'getGiftCertificate'
 }
 
 /**
  * A hook for performing mutations with the Shopper Gift Certificates API.
  */
-export function useShopperGiftCertificatesMutation<
-    Action extends `${ShopperGiftCertificatesActions}`
->(action: Action) {
+export function useShopperGiftCertificatesMutation<Action>(action: Action) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperGiftCertificates: client} = useCommerceApi()

@@ -46,13 +46,13 @@ paymentCard must be specified in the request.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=updatePaymentInstrumentForOrder} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#updatepaymentinstrumentfororder} for more information on the parameters and returned data type.
    */
-    UpdatePaymentInstrumentForOrder = 'updatePaymentInstrumentForOrder',
+    UpdatePaymentInstrumentForOrder = 'updatePaymentInstrumentForOrder'
 }
 
 /**
  * A hook for performing mutations with the Shopper Gift Certificates API.
  */
-export function useShopperOrdersMutation<Action extends `${ShopperOrdersActions}`>(action: Action) {
+export function useShopperOrdersMutation<Action>(action: Action) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperOrders: client} = useCommerceApi()

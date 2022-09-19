@@ -18,7 +18,7 @@ interface Client {
 
 function useAuthenticatedRequest<TData>(fn: (apiClients: ApiClients) => Promise<TData>) {
     const auth = useAuth()
-    const apiClients = useCommerceApi() as unknown as Record<string, Client>
+    const apiClients = (useCommerceApi() as unknown) as Record<string, Client>
 
     return (): Promise<TData> => {
         return auth
@@ -27,10 +27,10 @@ function useAuthenticatedRequest<TData>(fn: (apiClients: ApiClients) => Promise<
                 Object.keys(apiClients).forEach((client) => {
                     apiClients[client].clientConfig.headers = {
                         ...apiClients[client].clientConfig.headers,
-                        Authorization: `Bearer ${access_token}`,
+                        Authorization: `Bearer ${access_token}`
                     }
                 })
-                return apiClients as unknown as ApiClients
+                return (apiClients as unknown) as ApiClients
             })
             .then(fn)
     }

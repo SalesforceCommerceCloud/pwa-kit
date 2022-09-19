@@ -17,15 +17,13 @@ export enum ShopperDiscoverySearchActions {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-discovery-search?meta=retrieveResults} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperdiscoverysearch.shopperdiscoverysearch-1.html#retrieveresults} for more information on the parameters and returned data type.
      */
-    RetrieveResults = 'retrieveResults',
+    RetrieveResults = 'retrieveResults'
 }
 
 /**
  * A hook for performing mutations with the Shopper Discovery Search API.
  */
-export function useShopperDiscoverySearchMutation<
-    Action extends `${ShopperDiscoverySearchActions}`
->(action: Action) {
+export function useShopperDiscoverySearchMutation<Action>(action: Action) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperDiscoverySearch: client} = useCommerceApi()
