@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType, QueryResponse} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import useCommerceApi from '../useCommerceApi'
 import {UseQueryResult} from '@tanstack/react-query'
 
@@ -22,7 +22,7 @@ export const useBasket = (
     arg: Argument<Client['getBasket']>
 ): UseQueryResult<DataType<Client['getBasket']>, Error> => {
     const {shopperBaskets: client} = useCommerceApi()
-    return useAsync(['baskets', arg], () => client.getBasket(arg))
+    return useQuery(['baskets', arg], () => client.getBasket(arg))
 }
 /**
  * A hook for `ShopperBaskets#getPaymentMethodsForBasket`.
@@ -35,7 +35,7 @@ export const usePaymentMethodsForBasket = (
     arg: Argument<Client['getPaymentMethodsForBasket']>
 ): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']>, Error> => {
     const {shopperBaskets: client} = useCommerceApi()
-    return useAsync(['payment-methods', arg], () => client.getPaymentMethodsForBasket(arg))
+    return useQuery(['payment-methods', arg], () => client.getPaymentMethodsForBasket(arg))
 }
 /**
  * A hook for `ShopperBaskets#getPriceBooksForBasket`.
@@ -48,7 +48,7 @@ export const usePriceBooksForBasket = (
     arg: Argument<Client['getPriceBooksForBasket']>
 ): UseQueryResult<DataType<Client['getPriceBooksForBasket']>, Error> => {
     const {shopperBaskets: client} = useCommerceApi()
-    return useAsync(['price-books', arg], () => client.getPriceBooksForBasket(arg))
+    return useQuery(['price-books', arg], () => client.getPriceBooksForBasket(arg))
 }
 /**
  * A hook for `ShopperBaskets#getShippingMethodsForShipment`.
@@ -61,7 +61,7 @@ export const useShippingMethodsForShipment = (
     arg: Argument<Client['getShippingMethodsForShipment']>
 ): UseQueryResult<DataType<Client['getShippingMethodsForShipment']>, Error> => {
     const {shopperBaskets: client} = useCommerceApi()
-    return useAsync(['shipping-methods'], () => client.getShippingMethodsForShipment(arg))
+    return useQuery(['shipping-methods'], () => client.getShippingMethodsForShipment(arg))
 }
 /**
  * A hook for `ShopperBaskets#getTaxesFromBasket`.
@@ -74,5 +74,5 @@ export const useTaxesFromBasket = (
     arg: Argument<Client['getTaxesFromBasket']>
 ): UseQueryResult<DataType<Client['getTaxesFromBasket']>, Error> => {
     const {shopperBaskets: client} = useCommerceApi()
-    return useAsync(['taxes', arg], () => client.getTaxesFromBasket(arg))
+    return useQuery(['taxes', arg], () => client.getTaxesFromBasket(arg))
 }

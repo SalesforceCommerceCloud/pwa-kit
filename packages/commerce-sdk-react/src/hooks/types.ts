@@ -48,15 +48,6 @@ export type ActionResponse<Args extends unknown[], Data> = QueryResponse<Data> &
 }
 
 /**
- * Object returned by a SCAPI "action" hook.
- */
-export type ScapiActionResponse<Args extends unknown[], Data, Name extends string> = ActionResponse<
-    Args,
-    Data
-> &
-    Record<Name, ActionResponse<Args, Data>['execute']>
-
-/**
  * The first argument of a function.
  */
 export type Argument<T extends (arg: any) => unknown> = Parameters<T>[0]

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import useCommerceApi from '../useCommerceApi'
 import {UseQueryResult} from '@tanstack/react-query'
 
@@ -22,7 +22,7 @@ export const useExternalProfile = (
     arg: Argument<Client['getExternalProfile']>
 ): UseQueryResult<DataType<Client['getExternalProfile']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['external-profile', arg], () => client.getExternalProfile(arg))
+    return useQuery(['external-profile', arg], () => client.getExternalProfile(arg))
 }
 /**
  * A hook for `ShopperCustomers#getCustomer`.
@@ -35,7 +35,7 @@ export const useCustomer = (
     arg: Argument<Client['getCustomer']>
 ): UseQueryResult<DataType<Client['getCustomer']>> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['customer', arg], () => client.getCustomer(arg))
+    return useQuery(['customer', arg], () => client.getCustomer(arg))
 }
 /**
  * A hook for `ShopperCustomers#getCustomerAddress`.
@@ -48,7 +48,7 @@ export const useCustomerAddress = (
     arg: Argument<Client['getCustomerAddress']>
 ): UseQueryResult<DataType<Client['getCustomerAddress']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['address', arg], () => client.getCustomerAddress(arg))
+    return useQuery(['address', arg], () => client.getCustomerAddress(arg))
 }
 /**
  * A hook for `ShopperCustomers#getCustomerBaskets`.
@@ -61,7 +61,7 @@ export const useCustomerBaskets = (
     arg: Argument<Client['getCustomerBaskets']>
 ): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['baskets', arg], () => client.getCustomerBaskets(arg))
+    return useQuery(['baskets', arg], () => client.getCustomerBaskets(arg))
 }
 /**
  * A hook for `ShopperCustomers#getCustomerOrders`.
@@ -74,7 +74,7 @@ export const useCustomerOrders = (
     arg: Argument<Client['getCustomerOrders']>
 ): UseQueryResult<DataType<Client['getCustomerOrders']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['orders', arg], () => client.getCustomerOrders(arg))
+    return useQuery(['orders', arg], () => client.getCustomerOrders(arg))
 }
 /**
  * A hook for `ShopperCustomers#getCustomerPaymentInstrument`.
@@ -87,7 +87,7 @@ export const useCustomerPaymentInstrument = (
     arg: Argument<Client['getCustomerPaymentInstrument']>
 ): UseQueryResult<DataType<Client['getCustomerPaymentInstrument']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['payment-instrument', arg], () => client.getCustomerPaymentInstrument(arg))
+    return useQuery(['payment-instrument', arg], () => client.getCustomerPaymentInstrument(arg))
 }
 /**
  * A hook for `ShopperCustomers#getCustomerProductLists`.
@@ -100,7 +100,7 @@ export const useCustomerProductLists = (
     arg: Argument<Client['getCustomerProductLists']>
 ): UseQueryResult<DataType<Client['getCustomerProductLists']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['product-lists', arg], () => client.getCustomerProductLists(arg))
+    return useQuery(['product-lists', arg], () => client.getCustomerProductLists(arg))
 }
 /**
  * A hook for `ShopperCustomers#getCustomerProductList`.
@@ -113,7 +113,7 @@ export const useCustomerProductList = (
     arg: Argument<Client['getCustomerProductList']>
 ): UseQueryResult<DataType<Client['getCustomerProductList']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['product-list', arg], () => client.getCustomerProductList(arg))
+    return useQuery(['product-list', arg], () => client.getCustomerProductList(arg))
 }
 /**
  * A hook for `ShopperCustomers#getCustomerProductListItem`.
@@ -126,7 +126,7 @@ export const useCustomerProductListItem = (
     arg: Argument<Client['getCustomerProductListItem']>
 ): UseQueryResult<DataType<Client['getCustomerProductListItem']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['product-list-item', arg], () => client.getCustomerProductListItem(arg))
+    return useQuery(['product-list-item', arg], () => client.getCustomerProductListItem(arg))
 }
 /**
  * A hook for `ShopperCustomers#getPublicProductListsBySearchTerm`.
@@ -139,7 +139,7 @@ export const usePublicProductListsBySearchTerm = (
     arg: Argument<Client['getPublicProductListsBySearchTerm']>
 ): UseQueryResult<DataType<Client['getPublicProductListsBySearchTerm']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['product-list-by-search-term', arg], () =>
+    return useQuery(['product-list-by-search-term', arg], () =>
         client.getPublicProductListsBySearchTerm(arg)
     )
 }
@@ -154,7 +154,7 @@ export const usePublicProductList = (
     arg: Argument<Client['getPublicProductList']>
 ): UseQueryResult<DataType<Client['getPublicProductList']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['public-product-list', arg], () => client.getPublicProductList(arg))
+    return useQuery(['public-product-list', arg], () => client.getPublicProductList(arg))
 }
 /**
  * A hook for `ShopperCustomers#getProductListItem`.
@@ -167,5 +167,5 @@ export const useProductListItem = (
     arg: Argument<Client['getProductListItem']>
 ): UseQueryResult<DataType<Client['getProductListItem']>, Error> => {
     const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['product-list-item', arg], () => client.getProductListItem(arg))
+    return useQuery(['product-list-item', arg], () => client.getProductListItem(arg))
 }

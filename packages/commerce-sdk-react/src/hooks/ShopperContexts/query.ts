@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType, QueryResponse} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import useCommerceApi from '../useCommerceApi'
 import {UseQueryResult} from '@tanstack/react-query'
 
@@ -22,5 +22,5 @@ export const useShopperContext = (
     arg: Argument<Client['getShopperContext']>
 ): UseQueryResult<DataType<Client['getShopperContext']>, Error> => {
     const {shopperContexts: client} = useCommerceApi()
-    return useAsync(['shopper-context', arg], () => client.getShopperContext(arg))
+    return useQuery(['shopper-context', arg], () => client.getShopperContext(arg))
 }

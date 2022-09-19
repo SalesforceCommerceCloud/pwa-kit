@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
@@ -36,7 +36,7 @@ function useProducts(
         throw new Error('ids is required for useProducts')
     }
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['products', arg],
         ({shopperProducts}) => {
             return shopperProducts.getProducts({parameters, headers}, rawResponse)
@@ -71,7 +71,7 @@ function useProduct(
         throw new Error('id is required for useProduct.')
     }
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['product', arg],
         ({shopperProducts}) => {
             return shopperProducts.getProduct({parameters, headers}, rawResponse)
@@ -109,7 +109,7 @@ function useCategories(
         throw new Error('ids is required for useCategories')
     }
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['categories', arg],
         ({shopperProducts}) => {
             return shopperProducts.getCategories({parameters, headers}, rawResponse)
@@ -146,7 +146,7 @@ function useCategory(
     options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategory']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['category', arg],
         ({shopperProducts}) => {
             return shopperProducts.getCategory({parameters, headers}, rawResponse)

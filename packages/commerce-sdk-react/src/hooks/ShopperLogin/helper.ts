@@ -6,14 +6,14 @@
  */
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {ActionResponse} from '../types'
-import {useAsyncCallback} from '../useAsync'
+import {useMutation} from '../useMutation'
 import useAuth from '../useAuth'
 import Auth from '../../auth'
 
 export enum ShopperLoginHelpers {
     LoginGuestUser = 'loginGuestUser',
     LoginRegisteredUserB2C = 'loginRegisteredUserB2C',
-    Logout = 'logout'
+    Logout = 'logout',
 }
 
 /**
@@ -29,16 +29,17 @@ export enum ShopperLoginHelpers {
 // eslint-disable-next-line prettier/prettier
 export function useShopperLoginHelper<Action extends `${ShopperLoginHelpers}`>(
     action: Action
+    // TODO: fix type
 ): ActionResponse<Parameters<Auth[Action]>, ShopperLoginTypes.TokenResponse> {
     const auth = useAuth()
     if (action === ShopperLoginHelpers.LoginGuestUser) {
-        return useAsyncCallback(() => auth.loginGuestUser())
+        return useMutation(() => auth.loginGuestUser())
     }
     if (action === ShopperLoginHelpers.Logout) {
-        return useAsyncCallback(() => auth.logout())
+        return useMutation(() => auth.logout())
     }
     if (action === ShopperLoginHelpers.LoginRegisteredUserB2C) {
-        return useAsyncCallback((...args) => {
+        return useMutation((...args) => {
             const credentials = args[0]
             if (!credentials) {
                 throw new Error('Missing registered user credentials.')
