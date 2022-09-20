@@ -35,7 +35,8 @@ export const withReactQuery = (Wrapped) => {
          * @private
          */
         static async doInitAppState({res, appJSX}) {
-            const queryClient = res.locals.__queryClient = res.locals.__queryClient || new QueryClient()
+            const queryClient = (res.locals.__queryClient =
+                res.locals.__queryClient || new QueryClient())
 
             await ssrPrepass(appJSX)
 

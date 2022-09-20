@@ -31,8 +31,8 @@ import * as errors from '../universal/errors'
 import {detectDeviceType, isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
+import PropTypes from 'prop-types'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -202,6 +202,17 @@ const OuterApp = ({res, error, App, appState, routes, routerContext, location, d
             </DeviceContext.Provider>
         </Router>
     )
+}
+
+OuterApp.propTypes = {
+    res: PropTypes.object,
+    error: PropTypes.object,
+    App: PropTypes.elementType,
+    appState: PropTypes.object,
+    routes: PropTypes.array,
+    routerContext: PropTypes.object,
+    location: PropTypes.object,
+    deviceType: PropTypes.string
 }
 
 const renderToString = (jsx, extractor) =>
