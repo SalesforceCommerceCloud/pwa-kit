@@ -17,7 +17,7 @@ interface AppConfigProps {
 const AppConfig = (props: AppConfigProps): ReactElement => {
     const {correlationId} = useCorrelationId()
     const headers = {
-        correlationId
+        'correlation-id': correlationId
     }
     return (
         <CommerceApiProvider

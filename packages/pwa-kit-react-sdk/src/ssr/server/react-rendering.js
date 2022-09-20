@@ -214,7 +214,7 @@ const renderAppHtml = (req, res, error, appData) => {
 
     let appJSX = (
         <Router location={location} context={routerContext}>
-            <CorrelationIdProvider correlationId={res.locals.requestId}>
+            <CorrelationIdProvider correlationId={res.locals.requestId} resetOnPageChange={false}>
                 <DeviceContext.Provider value={{type: deviceType}}>
                     <AppConfig locals={res.locals}>
                         <Switch error={error} appState={appState} routes={routes} App={App} />
