@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import AppConfig from './components/_app-config'
-import {withLegacyGetProps} from './withLegacyGetProps'
+import {withLegacyGetProps} from './components/with-legacy-get-props'
 
 let _appConfig = AppConfig
 

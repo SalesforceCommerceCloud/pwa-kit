@@ -13,7 +13,7 @@ import Throw404 from '../../components/throw-404'
 import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
-import {withLegacyGetProps} from '../../withLegacyGetProps'
+import {withLegacyGetProps} from '../../components/with-legacy-get-props'
 
 const noop = () => undefined
 

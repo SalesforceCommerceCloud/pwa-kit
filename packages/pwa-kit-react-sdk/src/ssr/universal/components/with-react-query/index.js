@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import hoistNonReactStatic from 'hoist-non-react-statics'
-import {FetchStrategy} from './fetchStrategy'
+import {FetchStrategy} from '../fetch-strategy'
 import React from 'react'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ssrPrepass from 'react-ssr-prepass'

@@ -40,8 +40,8 @@ const tablet =
 
 jest.mock('../universal/compatibility', () => {
     const AppConfig = jest.requireActual('../universal/components/_app-config').default
-    const {withReactQuery} = jest.requireActual('../universal/withReactQuery')
-    const {withLegacyGetProps} = jest.requireActual('../universal/withLegacyGetProps')
+    const {withReactQuery} = jest.requireActual('../universal/components/with-react-query')
+    const {withLegacyGetProps} = jest.requireActual('../universal/components/with-legacy-get-props')
 
     const appConfig = withReactQuery(withLegacyGetProps(AppConfig))
 
