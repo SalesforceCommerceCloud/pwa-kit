@@ -10,7 +10,7 @@ import React, {useContext} from 'react'
 import {CorrelationIdContext} from '../contexts'
 
 /**
- * The CorrelationIdProvider consumption hook.
+ * A hook that consumes the correlation id context
  * @returns {object} correlation id context
  */
 export const useCorrelationId = () => {
