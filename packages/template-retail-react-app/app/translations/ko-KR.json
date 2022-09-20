@@ -299,7 +299,7 @@
     "defaultMessage": "이용 약관"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
+    "defaultMessage": "2022 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
   },
   "checkout_header.link.cart": {
     "defaultMessage": "카트로 돌아가기"
@@ -380,7 +380,7 @@
     "defaultMessage": "연락처 정보"
   },
   "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "이 3자리 코드는 카드의 후면에서 확인할 수 있습니다.",
+    "defaultMessage": "이 3자리 코드는 카드의 뒷면에서 확인할 수 있습니다.",
     "description": "Generic credit card security code help text"
   },
   "credit_card_fields.tool_tip.security_code.american_express": {
@@ -511,7 +511,7 @@
     "defaultMessage": "이용 약관"
   },
   "footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
+    "defaultMessage": "2022 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
   },
   "footer.subscribe.button.sign_up": {
     "defaultMessage": "가입하기"
@@ -589,7 +589,7 @@
     "defaultMessage": "올바른 위치로 안내해 드립니다."
   },
   "home.description.shop_products": {
-    "defaultMessage": "이 섹션에는 카탈로그의 컨텐츠가 포함되어 있습니다. 대체하는 방법을 안내하는 {docLink} 문서입니다.",
+    "defaultMessage": "이 섹션에는 카탈로그의 컨텐츠가 포함되어 있습니다. 대체하는 방법을 안내하는 {docLink}입니다.",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
@@ -623,7 +623,7 @@
     "defaultMessage": "내 계정"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service(SLAS)"
+    "defaultMessage": "Shopper Login 및 API Access Service(SLAS)"
   },
   "home.features.heading.wishlist": {
     "defaultMessage": "위시리스트"
@@ -656,7 +656,7 @@
     "defaultMessage": "문서 읽기"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "소매점용 React PWA Starter Store"
+    "defaultMessage": "리테일용 React PWA 스타터 스토어"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "프로모션"
