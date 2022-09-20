@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {FetchStrategy} from './fetchStrategy'
 import React from 'react'
@@ -28,7 +34,7 @@ export const withLegacyGetProps = (Wrapped) => {
             const [appProps, pageProps] = await Promise.all(promises)
             return {
                 appProps,
-                pageProps,
+                pageProps
             }
         }
 
