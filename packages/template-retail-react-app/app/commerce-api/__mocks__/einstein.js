@@ -45,6 +45,10 @@ class EinsteinAPI {
         return {requestId: 'test-req-id', uuid: 'test-uuid'}
     }
 
+    async sendCheckoutStep() {
+        return {requestId: 'test-req-id', uuid: 'test-uuid'}
+    }
+
     async sendViewReco() {
         return {requestId: 'test-req-id', uuid: 'test-uuid'}
     }

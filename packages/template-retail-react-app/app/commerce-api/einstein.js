@@ -277,6 +277,23 @@ class EinsteinAPI {
     }
 
     /**
+     * Tells the Einstein engine when a user reaches the given step during checkout.
+     * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
+     **/
+    async sendCheckoutStep(stepName, stepNumber, basket, args) {
+        const endpoint = `/activities/${this.config.siteId}/checkoutStep`
+        const method = 'POST'
+        const body = {
+            stepName,
+            stepNumber,
+            basketId: basket.basketId,
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
      * Tells the Einstein engine when a user adds an item to their cart.
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/

@@ -37,6 +37,9 @@ const useEinstein = () => {
         async sendBeginCheckout(...args) {
             return api.einstein.sendBeginCheckout(...args)
         },
+        async sendCheckoutStep(...args) {
+            return api.einstein.sendCheckoutStep(...args)
+        },
         async sendViewReco(...args) {
             return api.einstein.sendViewReco(...args)
         },

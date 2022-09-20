@@ -163,6 +163,24 @@ describe('EinsteinAPI', () => {
         )
     })
 
+    test('checkouStep sends expected api request', async () => {
+        const checkoutStepName = 'CheckoutStep'
+        const checkoutStep = 0
+        await einsteinApi.sendCheckoutStep(checkoutStepName, checkoutStep, mockBasket)
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/test-path/v3/activities/test-site-id/checkoutStep',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cq-client-id': 'test-id'
+                },
+                body:
+                    '{"stepName":"CheckoutStep","stepNumber":0,"basketId":"f6bbeee30fb93c2f94213f60f8","cookieId":"test-usid","realm":"test"}'
+            }
+        )
+    })
+
     test('addToCart sends expected api request', async () => {
         await einsteinApi.sendAddToCart(mockAddToCartProduct)
         expect(fetch).toHaveBeenCalledWith(

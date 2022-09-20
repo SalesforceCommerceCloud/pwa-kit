@@ -41,6 +41,10 @@ export const CheckoutProvider = ({children}) => {
         Review_Order: 4
     }
 
+    const getCheckoutStepName = (step) => {
+        return Object.keys(CheckoutSteps).find((key) => CheckoutSteps[key] === step)
+    }
+
     const mergeState = useCallback((data) => {
         // If we become unmounted during an async call that results in updating state, we
         // skip the update to avoid React errors about setting state in unmounted components.
@@ -101,6 +105,13 @@ export const CheckoutProvider = ({children}) => {
             einstein.sendBeginCheckout(basket)
         }
     }, [])
+
+    // Run this every time checkout steps change
+    useEffect(() => {
+        if (state.step != undefined) {
+            einstein.sendCheckoutStep(getCheckoutStepName(state.step), state.step, basket)
+        }
+    }, [state.step])
 
     // We combine our state and actions into a single context object. This is much more
     // convenient than having to import and bind actions seprately. State updates will
