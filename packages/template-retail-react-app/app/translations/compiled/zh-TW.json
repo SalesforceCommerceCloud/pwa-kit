@@ -200,7 +200,7 @@
   "account_order_history.label.shipped_to": [
     {
       "type": 0,
-      "value": "已出貨至："
+      "value": "出貨至："
     },
     {
       "type": 1,
@@ -1420,7 +1420,7 @@
     },
     {
       "type": 0,
-      "value": "如何取代。"
+      "value": "來瞭解如何取代。"
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1796,7 +1796,7 @@
   "locale_text.message.ko-KR": [
     {
       "type": 0,
-      "value": "韓文 (大韓民國)"
+      "value": "韓文 (韓國)"
     }
   ],
   "locale_text.message.nl-BE": [
@@ -2079,12 +2079,12 @@
   ],
   "pagination.field.num_of_pages": [
     {
-      "type": 1,
-      "value": "numOfPages"
+      "type": 0,
+      "value": "/ "
     },
     {
-      "type": 0,
-      "value": " 頁"
+      "type": 1,
+      "value": "numOfPages"
     }
   ],
   "pagination.link.next": [

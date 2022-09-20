@@ -764,7 +764,7 @@
   "checkout_footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
+      "value": "2022 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
     }
   ],
   "checkout_header.link.cart": [
@@ -926,7 +926,7 @@
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "이 3자리 코드는 카드의 후면에서 확인할 수 있습니다."
+      "value": "이 3자리 코드는 카드의 뒷면에서 확인할 수 있습니다."
     }
   ],
   "credit_card_fields.tool_tip.security_code.american_express": [
@@ -1204,7 +1204,7 @@
   "footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
+      "value": "2022 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
     }
   ],
   "footer.subscribe.button.sign_up": [
@@ -1400,7 +1400,7 @@
     },
     {
       "type": 0,
-      "value": " 문서입니다."
+      "value": "입니다."
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1466,7 +1466,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Shopper Login and API Access Service(SLAS)"
+      "value": "Shopper Login 및 API Access Service(SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1532,7 +1532,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "소매점용 React PWA Starter Store"
+      "value": "리테일용 React PWA 스타터 스토어"
     }
   ],
   "item_attributes.label.promotions": [
