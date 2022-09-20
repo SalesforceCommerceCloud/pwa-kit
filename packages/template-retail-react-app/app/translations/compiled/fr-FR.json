@@ -1096,7 +1096,7 @@
     },
     {
       "type": 0,
-      "value": ". Essayez de rechercher un produit ou "
+      "value": ". Essayez de rechercher un produit ou cliquez sur "
     },
     {
       "type": 1,
@@ -1234,7 +1234,7 @@
   "footer.subscribe.button.sign_up": [
     {
       "type": 0,
-      "value": "Inscrivez-vous"
+      "value": "S'inscrire"
     }
   ],
   "footer.subscribe.description.sign_up": [
@@ -1478,7 +1478,7 @@
   "home.features.heading.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Einstein Recommendations"
+      "value": "Recommandations Einstein"
     }
   ],
   "home.features.heading.my_account": [
@@ -1508,7 +1508,7 @@
   "home.heading.here_to_help": [
     {
       "type": 0,
-      "value": "Nous sommes là pour vous aider"
+      "value": "Nous sommes là pour vous"
     }
   ],
   "home.heading.shop_products": [
@@ -2184,7 +2184,7 @@
   "price_per_item.label.each": [
     {
       "type": 0,
-      "value": "pièce"
+      "value": " pièce"
     }
   ],
   "product_detail.accordion.button.product_detail": [
@@ -3154,7 +3154,7 @@
   "wishlist_primary_action.button.select_options": [
     {
       "type": 0,
-      "value": "Sélectionnez des options"
+      "value": "Sélectionner des options"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [

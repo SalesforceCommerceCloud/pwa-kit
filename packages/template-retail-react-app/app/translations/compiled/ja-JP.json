@@ -902,7 +902,7 @@
   "contact_info.button.already_have_account": [
     {
       "type": 0,
-      "value": "すでにアカウントをお持ちですか?ログイン"
+      "value": "すでにアカウントをお持ちですか? ログイン"
     }
   ],
   "contact_info.button.checkout_as_guest": [
@@ -1200,7 +1200,7 @@
   "footer.link.signin_create_account": [
     {
       "type": 0,
-      "value": "サインインするかアカウントを作成してください"
+      "value": "アカウントにサインインまたはアカウントを作成"
     }
   ],
   "footer.link.site_map": [
@@ -1412,7 +1412,7 @@
   "home.description.shop_products": [
     {
       "type": 0,
-      "value": "このセクションには、カタログからのコンテンツが含まれています。カタログの置き換え方法に関する"
+      "value": "このセクションにはカタログからのコンテンツが含まれています。カタログの置き換え方法に関する"
     },
     {
       "type": 1,
@@ -1504,7 +1504,7 @@
   "home.heading.here_to_help": [
     {
       "type": 0,
-      "value": "弊社にお任せください"
+      "value": "当社にお任せください"
     }
   ],
   "home.heading.shop_products": [
@@ -1552,7 +1552,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "リテール用 React PWA Starter Store"
+      "value": "リテール用 React PWA スターターストア"
     }
   ],
   "item_attributes.label.promotions": [
@@ -2448,7 +2448,7 @@
   "register_form.message.already_have_account": [
     {
       "type": 0,
-      "value": "すでにアカウントをお持ちですか?"
+      "value": "すでにアカウントをお持ちですか? "
     }
   ],
   "register_form.message.create_an_account": [

@@ -301,7 +301,7 @@
           "value": [
             {
               "type": 0,
-              "value": "artículo"
+              "value": "artículo agregado"
             }
           ]
         },
@@ -309,7 +309,7 @@
           "value": [
             {
               "type": 0,
-              "value": "artículos"
+              "value": "artículos agregados"
             }
           ]
         }
@@ -320,7 +320,7 @@
     },
     {
       "type": 0,
-      "value": " agregado(s) al carrito"
+      "value": " al carrito"
     }
   ],
   "add_to_cart_modal.label.cart_subtotal": [
@@ -1096,7 +1096,7 @@
     },
     {
       "type": 0,
-      "value": ". Intente buscar un producto o "
+      "value": ". Intente buscar un producto o haga clic en "
     },
     {
       "type": 1,
@@ -1436,7 +1436,7 @@
   "home.features.description.components": [
     {
       "type": 0,
-      "value": "Desarrollado a partir de la IU Chakra, una biblioteca de componentes de React simple, modular y accesible."
+      "value": "Desarrollado a partir de la Chakra UI, una biblioteca de componentes de React simple, modular y accesible."
     }
   ],
   "home.features.description.einstein_recommendations": [
@@ -1584,7 +1584,7 @@
   "lCPCxk": [
     {
       "type": 0,
-      "value": "Seleccine todas las opciones anteriores"
+      "value": "Seleccione todas las opciones anteriores"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -3173,7 +3173,7 @@
           "value": [
             {
               "type": 0,
-              "value": "artículo"
+              "value": "artículo agregado"
             }
           ]
         },
@@ -3181,7 +3181,7 @@
           "value": [
             {
               "type": 0,
-              "value": "artículos"
+              "value": "artículos agregados"
             }
           ]
         }
@@ -3192,7 +3192,7 @@
     },
     {
       "type": 0,
-      "value": " agregado(s) al carrito"
+      "value": " al carrito"
     }
   ],
   "wishlist_secondary_button_group.action.remove": [
