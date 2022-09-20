@@ -8,19 +8,20 @@
 import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
-import {uuidv4} from '../../../utils/uuidv4.client'
-
 import DeviceContext from '../device-context'
 
 const ExpressContext = React.createContext()
 
 const CorrelationIdContext = React.createContext()
-// regexp for uuid format
-const regexp = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
 
 const CorrelationIdProvider = ({children, correlationId, resetOnPageChange = true}) => {
-    const _correlationIdFn = correlationId === 'function' && correlationId
-    const _correlationId = correlationId !== 'function' && correlationId
+    const _correlationIdFn = typeof correlationId === 'function' && correlationId
+    const _correlationId = typeof correlationId !== 'function' && correlationId
+    if (resetOnPageChange && !_correlationIdFn) {
+        console.warn(
+            'correlationId needs to be a function returning a uuid string when resetOnPageChange is true'
+        )
+    }
     const [id, setId] = React.useState(_correlationId || _correlationIdFn())
     const location = useLocation()
 
@@ -32,19 +33,14 @@ const CorrelationIdProvider = ({children, correlationId, resetOnPageChange = tru
             isFirstRun.current = false
             return
         }
-        if (resetOnPageChange && !_correlationIdFn) {
-            console.warn(
-                'correlationId needs to be a function returning a uuid string when resetOnPageChange is true '
-            )
-        }
+
         if (resetOnPageChange && _correlationIdFn) {
+            // NOTE: the function needs to be an uuid v4.
             const newId = _correlationIdFn()
-            if (!regexp.test(newId)) {
-                console.warn('An invalid uuid is returned. Please check your code.')
-            }
             setId(newId)
         }
     }, [location.pathname])
+
     return (
         <CorrelationIdContext.Provider value={{correlationId: id}}>
             {children}

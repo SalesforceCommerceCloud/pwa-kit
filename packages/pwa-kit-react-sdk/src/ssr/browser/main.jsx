@@ -84,10 +84,7 @@ export const start = () => {
             ReactDOM.hydrate(
                 <ExpressContext.Provider value={{}}>
                     <Router>
-                        <CorrelationIdProvider
-                            correlationId={uuidv4()}
-                            onPageChange={() => uuidv4()}
-                        >
+                        <CorrelationIdProvider correlationId={() => uuidv4()}>
                             <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                                 <AppConfig locals={locals}>
                                     <Switch
