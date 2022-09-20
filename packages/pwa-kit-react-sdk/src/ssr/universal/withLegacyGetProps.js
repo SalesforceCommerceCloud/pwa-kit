@@ -9,6 +9,7 @@ import {FetchStrategy} from './fetchStrategy'
 import React from 'react'
 
 export const withLegacyGetProps = (Wrapped) => {
+    /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
 
     /**
@@ -61,7 +62,12 @@ export const withLegacyGetProps = (Wrapped) => {
 
     WithLegacyGetProps.displayName = `withLegacyGetProps(${wrappedComponentName})`
 
-    const exclude = {doInitAppState: true, getInitializers: true, initAppState: true}
+    const exclude = {
+        doInitAppState: true,
+        getInitializers: true,
+        initAppState: true,
+        getHOCsInUse: true
+    }
     hoistNonReactStatic(WithLegacyGetProps, Wrapped, exclude)
 
     return WithLegacyGetProps

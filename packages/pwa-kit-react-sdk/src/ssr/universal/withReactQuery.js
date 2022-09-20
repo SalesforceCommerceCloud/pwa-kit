@@ -14,6 +14,7 @@ const isServerSide = typeof window === 'undefined'
 const STATE_KEY = '__reactQuery'
 
 export const withReactQuery = (Wrapped) => {
+    /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
 
     /**
@@ -64,7 +65,12 @@ export const withReactQuery = (Wrapped) => {
 
     WithReactQuery.displayName = `withReactQuery(${wrappedComponentName})`
 
-    const exclude = {doInitAppState: true, getInitializers: true, initAppState: true}
+    const exclude = {
+        doInitAppState: true,
+        getInitializers: true,
+        initAppState: true,
+        getHOCsInUse: true
+    }
     hoistNonReactStatic(WithReactQuery, Wrapped, exclude)
 
     return WithReactQuery

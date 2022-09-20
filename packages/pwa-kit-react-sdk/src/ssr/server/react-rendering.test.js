@@ -14,7 +14,6 @@ import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
-import {getAppConfig} from '../universal/compatibility'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -38,6 +37,18 @@ const mobile =
     'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A543 Safari/419.3'
 const tablet =
     'Mozilla/5.0 (iPad; CPU OS 6_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B141 Safari/8536.25'
+
+jest.mock('../universal/compatibility', () => {
+    const AppConfig = jest.requireActual('../universal/components/_app-config').default
+    const {withReactQuery} = jest.requireActual('../universal/withReactQuery')
+    const {withLegacyGetProps} = jest.requireActual('../universal/withLegacyGetProps')
+
+    const appConfig = withReactQuery(withLegacyGetProps(AppConfig))
+
+    return {
+        getAppConfig: () => appConfig
+    }
+})
 
 jest.mock('../universal/routes', () => {
     const React = require('react')
@@ -314,6 +325,8 @@ jest.mock('@loadable/server', () => {
 
 describe('The Node SSR Environment', () => {
     const OLD_ENV = process.env
+
+    const {getAppConfig} = require('../universal/compatibility')
 
     beforeAll(() => {
         // These values are not allowed to be `undefined` when `isRemote` returns true. So we mock them.
@@ -607,12 +620,13 @@ describe('The Node SSR Environment', () => {
             mocks: () => {
                 const AppConfig = getAppConfig()
                 jest.spyOn(AppConfig.prototype, 'render').mockImplementation(() => {
+                    console.log('Throwing an error!!')
                     throw new Error()
                 })
             },
             assertions: (res) => {
-                expect(res.statusCode).toBe(500)
                 const html = res.text
+                expect(res.statusCode).toBe(500)
 
                 const shouldIncludeErrorStack = !isRemote()
                 expect(html).toContain(
@@ -638,6 +652,7 @@ describe('The Node SSR Environment', () => {
                 const app = RemoteServerFactory._createApp(opts())
                 app.get('/*', render)
                 if (mocks) {
+                    console.log('Doing the mocking')
                     mocks()
                 }
                 return request(app)

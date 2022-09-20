@@ -10,10 +10,6 @@ import React from 'react'
  * @private
  */
 export class FetchStrategy extends React.Component {
-    render() {
-        return <div />
-    }
-
     /**
      * @private
      */
