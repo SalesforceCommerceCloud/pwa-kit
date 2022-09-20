@@ -83,7 +83,7 @@
         },
         {
             "path": "build/vendor.js",
-            "maxSize": "280 kB"
+            "maxSize": "270 kB"
         }
     ],
     "browserslist": [
