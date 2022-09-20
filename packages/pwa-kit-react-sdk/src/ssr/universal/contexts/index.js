@@ -8,12 +8,17 @@
 import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
-import DeviceContext from '../device-context'
-
-const ExpressContext = React.createContext()
 
 const CorrelationIdContext = React.createContext()
 
+/**
+ * This provider initializes the correlation id,
+ * and will generate a new id whenever there is a location change
+ * @private
+ * @param children
+ * @param correlationId - default correlation id
+ * @param resetOnPageChange - a boolean to indicate if it needs to generate a new id when navigating to a new page
+ */
 const CorrelationIdProvider = ({children, correlationId, resetOnPageChange = true}) => {
     const _correlationIdFn = typeof correlationId === 'function' && correlationId
     const _correlationId = typeof correlationId !== 'function' && correlationId
@@ -55,4 +60,4 @@ CorrelationIdProvider.propTypes = {
     location: PropTypes.object
 }
 
-export {CorrelationIdContext, CorrelationIdProvider, DeviceContext, ExpressContext}
+export {CorrelationIdContext, CorrelationIdProvider}
