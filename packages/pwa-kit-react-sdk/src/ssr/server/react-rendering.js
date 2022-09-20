@@ -131,7 +131,7 @@ export const render = async (req, res, next) => {
 
     let appState, appStateError
 
-    if(component === Throw404) {
+    if (component === Throw404) {
         appState = {}
         appStateError = new errors.HTTPNotFound('Not found')
     } else {

@@ -120,7 +120,7 @@ const Home = ({value}: Props) => {
                         <b>This page is written in Typescript</b>
                         <br />
                         <br />
-                        React query works if this isn't empty: &quot;{query.data}&quot;
+                        React query works if this is not empty: &quot;{query.data}&quot;
                         <br />
                         <br />
                         Server-side getProps works if this is a valid expression: &quot;5 times 7 is{' '}
