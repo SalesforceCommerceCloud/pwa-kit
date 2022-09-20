@@ -20,18 +20,8 @@ export const withReactQuery = (Wrapped) => {
      * @private
      */
     class WithReactQuery extends FetchStrategy {
-        constructor(props) {
-            super(props)
-
-            // Not crazy about this, but it's *super* important that
-            // we avoid making queryClient global – it can't be shared
-            // between requests.
-            if (!isServerSide && !this.props.locals.__queryClient) {
-                this.props.locals.__queryClient = new QueryClient()
-            }
-        }
-
         render() {
+            this.props.locals.__queryClient = this.props.locals.__queryClient || new QueryClient()
             return (
                 <QueryClientProvider client={this.props.locals.__queryClient}>
                     <Hydrate state={isServerSide ? {} : window.__PRELOADED_STATE__?.[STATE_KEY]}>
@@ -45,7 +35,7 @@ export const withReactQuery = (Wrapped) => {
          * @private
          */
         static async doInitAppState({res, appJSX}) {
-            const queryClient = (res.locals.__queryClient = new QueryClient())
+            const queryClient = res.locals.__queryClient = res.locals.__queryClient || new QueryClient()
 
             await ssrPrepass(appJSX)
 
