@@ -162,8 +162,8 @@ const runGenerator = (answers, {outputDir, verbose}) => {
 
     const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
     replaceJSON(manifest, {
-        name: pkgDataWithAnswers.siteName,
-        short_name: pkgDataWithAnswers.siteName,
+        name: pkgDataWithAnswers.name,
+        short_name: pkgDataWithAnswers.name,
         start_url: '/?homescreen=1',
         icons: [
             {
