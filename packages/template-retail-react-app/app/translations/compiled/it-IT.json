@@ -152,7 +152,7 @@
   "account_order_history.button.continue_shopping": [
     {
       "type": 0,
-      "value": "Continua lo shopping"
+      "value": "Continua con lo shopping"
     }
   ],
   "account_order_history.description.once_you_place_order": [
@@ -252,7 +252,7 @@
   "account_wishlist.button.continue_shopping": [
     {
       "type": 0,
-      "value": "Continua lo shopping"
+      "value": "Continua con lo shopping"
     }
   ],
   "account_wishlist.description.continue_shopping": [
@@ -644,7 +644,7 @@
   "checkout_confirmation.label.promo_applied": [
     {
       "type": 0,
-      "value": "Promozione applicata"
+      "value": "promozione applicata"
     }
   ],
   "checkout_confirmation.label.shipping": [
@@ -668,7 +668,7 @@
   "checkout_confirmation.link.continue_shopping": [
     {
       "type": 0,
-      "value": "Continua lo shopping"
+      "value": "Continua con lo shopping"
     }
   ],
   "checkout_confirmation.link.login": [
@@ -1064,7 +1064,7 @@
   "empty_cart.link.continue_shopping": [
     {
       "type": 0,
-      "value": "Continua lo shopping"
+      "value": "Continua con lo shopping"
     }
   ],
   "empty_cart.link.sign_in": [
@@ -2030,7 +2030,7 @@
   "order_summary.label.promo_applied": [
     {
       "type": 0,
-      "value": "Promozione applicata"
+      "value": "promozione applicata"
     }
   ],
   "order_summary.label.promotions_applied": [
@@ -2958,7 +2958,7 @@
   "use_promocode.info.promo_applied": [
     {
       "type": 0,
-      "value": "Promozione applicata"
+      "value": "promozione applicata"
     }
   ],
   "use_promocode.info.promo_removed": [

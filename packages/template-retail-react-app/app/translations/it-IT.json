@@ -69,7 +69,7 @@
     "defaultMessage": "Dettagli ordine"
   },
   "account_order_history.button.continue_shopping": {
-    "defaultMessage": "Continua lo shopping"
+    "defaultMessage": "Continua con lo shopping"
   },
   "account_order_history.description.once_you_place_order": {
     "defaultMessage": "Una volta effettuato un ordine, i dettagli verranno visualizzati qui."
@@ -112,7 +112,7 @@
     "defaultMessage": "Metodi di pagamento"
   },
   "account_wishlist.button.continue_shopping": {
-    "defaultMessage": "Continua lo shopping"
+    "defaultMessage": "Continua con lo shopping"
   },
   "account_wishlist.description.continue_shopping": {
     "defaultMessage": "Continua con lo shopping e aggiungi articoli alla lista desideri."
@@ -256,7 +256,7 @@
     "defaultMessage": "Totale ordine"
   },
   "checkout_confirmation.label.promo_applied": {
-    "defaultMessage": "Promozione applicata"
+    "defaultMessage": "promozione applicata"
   },
   "checkout_confirmation.label.shipping": {
     "defaultMessage": "Spedizione"
@@ -268,7 +268,7 @@
     "defaultMessage": "Imposta"
   },
   "checkout_confirmation.link.continue_shopping": {
-    "defaultMessage": "Continua lo shopping"
+    "defaultMessage": "Continua con lo shopping"
   },
   "checkout_confirmation.link.login": {
     "defaultMessage": "Accedi qui"
@@ -445,7 +445,7 @@
     "defaultMessage": "Il tuo carrello è vuoto."
   },
   "empty_cart.link.continue_shopping": {
-    "defaultMessage": "Continua lo shopping"
+    "defaultMessage": "Continua con lo shopping"
   },
   "empty_cart.link.sign_in": {
     "defaultMessage": "Accedi"
@@ -874,7 +874,7 @@
     "defaultMessage": "Totale ordine"
   },
   "order_summary.label.promo_applied": {
-    "defaultMessage": "Promozione applicata"
+    "defaultMessage": "promozione applicata"
   },
   "order_summary.label.promotions_applied": {
     "defaultMessage": "Promozioni applicate"
@@ -1316,7 +1316,7 @@
     "defaultMessage": "Controlla il codice e riprova. È possibile che sia già stato applicato o che la promozione sia scaduta."
   },
   "use_promocode.info.promo_applied": {
-    "defaultMessage": "Promozione applicata"
+    "defaultMessage": "promozione applicata"
   },
   "use_promocode.info.promo_removed": {
     "defaultMessage": "Promozione eliminata"
