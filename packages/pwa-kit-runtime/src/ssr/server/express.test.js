@@ -35,6 +35,17 @@ import {
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
 jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
+jest.mock('aws-serverless-express/middleware', () => {
+    return {
+        eventContext: () =>
+            jest.fn((req, res, next) => {
+                req['apiGateway'] = {
+                    event: {requestContext: {requestId: '4f33eb38-957a-43ec-84b8-517847bf7873'}}
+                }
+                next()
+            })
+    }
+})
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
@@ -262,7 +273,9 @@ describe('SSRServer operation', () => {
         const route = jest.fn().mockImplementation((req, res) => {
             res.send(body)
         })
+
         const app = RemoteServerFactory._createApp(opts())
+
         app.get('/*', route)
         return request(app)
             .get('/')
