@@ -434,14 +434,6 @@ describe('SSRServer operation', () => {
 
             test(`${name} (and handle 404s correctly)`, () => {
                 const app = RemoteServerFactory._createApp(opts({buildDir: tmpDir}))
-
-                return request(app)
-                    .get(requestPath)
-                    .expect(404)
-            })
-
-            test(`${name} (and handle 404s correctly) if serverWorkerPath does not exist`, () => {
-                const app = RemoteServerFactory._createApp(opts({buildDir: tmpDir}))
                 app.get('/worker.js(.map)?', RemoteServerFactory.serveServiceWorker)
 
                 return request(app)
