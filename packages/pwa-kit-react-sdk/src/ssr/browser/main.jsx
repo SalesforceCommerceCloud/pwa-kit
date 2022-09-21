@@ -11,7 +11,7 @@ import {BrowserRouter as Router} from 'react-router-dom'
 import {CorrelationIdProvider} from '../universal/contexts'
 import DeviceContext from '../universal/device-context'
 import App from '../universal/components/_app'
-import AppConfig from '../universal/components/_app-config'
+import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
@@ -35,6 +35,7 @@ export const registerServiceWorker = (url) => {
 
 /* istanbul ignore next */
 export const start = () => {
+    const AppConfig = getAppConfig()
     const rootEl = document.getElementsByClassName('react-target')[0]
     const data = JSON.parse(document.getElementById('mobify-data').innerHTML)
 
