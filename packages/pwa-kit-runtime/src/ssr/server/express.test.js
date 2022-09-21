@@ -439,6 +439,15 @@ describe('SSRServer operation', () => {
                     .get(requestPath)
                     .expect(404)
             })
+
+            test(`${name} (and handle 404s correctly) if serverWorkerPath does not exist`, () => {
+                const app = RemoteServerFactory._createApp(opts({buildDir: tmpDir}))
+                app.get('/worker.js(.map)?', RemoteServerFactory.serveServiceWorker)
+
+                return request(app)
+                    .get(requestPath)
+                    .expect(404)
+            })
         })
     })
 
@@ -464,20 +473,6 @@ describe('SSRServer operation', () => {
                         '/mobify/bundle/development/some-bundle-path.jpg'
                     )
                 ).toBe(true)
-            })
-    })
-
-    test('should support other redirects', () => {
-        const app = RemoteServerFactory._createApp(opts())
-        const route = (req, res) => {
-            res.redirect(302, '/elsewhere')
-        }
-        app.get('/*', route)
-        return request(app)
-            .get('/some-bundle-path.jpg')
-            .then((response) => {
-                expect(response.status).toBe(302)
-                expect(response.headers['location'].endsWith('/elsewhere')).toBe(true)
             })
     })
 
