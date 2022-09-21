@@ -352,6 +352,17 @@ jest.mock('@loadable/server', () => {
     }
 })
 
+jest.mock('pwa-kit-runtime/ssr/server/build-remote-server', () => {
+    const actual = jest.requireActual('pwa-kit-runtime/ssr/server/build-remote-server')
+    return {
+        ...actual,
+        RemoteServerFactory: {
+            ...actual.RemoteServerFactory,
+            _addEventContext: jest.fn()
+        }
+    }
+})
+
 describe('The Node SSR Environment', () => {
     const OLD_ENV = process.env
 
@@ -683,7 +694,12 @@ describe('The Node SSR Environment', () => {
     ]
 
     const isRemoteValues = [true, false]
-
+    RemoteServerFactory._addEventContext.mockImplementation((_app) => {
+        _app.use((req, res, next) => {
+            req['apiGateway'] = {event: {requestContext: {requestId: 'fds'}}}
+            next()
+        })
+    })
     isRemoteValues.forEach((isRemoteValue) => {
         // Run test cases
         cases.forEach(({description, req, assertions, mocks}) => {
@@ -696,6 +712,7 @@ describe('The Node SSR Environment', () => {
 
                 const {url, headers, query} = req
                 const app = RemoteServerFactory._createApp(opts())
+
                 app.get('/*', render)
                 if (mocks) {
                     mocks()
