@@ -14,7 +14,6 @@ import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
-import AppConfig from '../universal/components/_app-config'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -39,12 +38,25 @@ const mobile =
 const tablet =
     'Mozilla/5.0 (iPad; CPU OS 6_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B141 Safari/8536.25'
 
+jest.mock('../universal/compatibility', () => {
+    const AppConfig = jest.requireActual('../universal/components/_app-config').default
+    const {withReactQuery} = jest.requireActual('../universal/components/with-react-query')
+    const {withLegacyGetProps} = jest.requireActual('../universal/components/with-legacy-get-props')
+
+    const appConfig = withReactQuery(withLegacyGetProps(AppConfig))
+
+    return {
+        getAppConfig: () => appConfig
+    }
+})
+
 jest.mock('../universal/routes', () => {
     const React = require('react')
     const PropTypes = require('prop-types')
     const errors = require('../universal/errors')
     const {Redirect} = require('react-router-dom')
     const {Helmet} = require('react-helmet')
+    const {useQuery} = require('@tanstack/react-query')
 
     // Test utility to exercise paths that work with @loadable/component.
     const fakeLoadable = (Wrapped) => {
@@ -228,6 +240,26 @@ jest.mock('../universal/routes', () => {
         }
     }
 
+    const UseQueryResolvesObject = () => {
+        const {data, isLoading} = useQuery(['use-query-resolves-object'], async () => ({
+            prop: 'prop-value'
+        }))
+        return <div>{isLoading ? 'loading' : data.prop}</div>
+    }
+
+    const DisabledUseQueryIsntResolved = () => {
+        const {data, isLoading} = useQuery(
+            ['use-query-resolves-object'],
+            async () => ({
+                prop: 'prop-value'
+            }),
+            {
+                enabled: false
+            }
+        )
+        return <div>{isLoading ? 'loading' : data.prop}</div>
+    }
+
     GetPropsReturnsObject.propTypes = {
         prop: PropTypes.node
     }
@@ -282,6 +314,14 @@ jest.mock('../universal/routes', () => {
             {
                 path: '/xss/',
                 component: XSSPage
+            },
+            {
+                path: '/use-query-resolves-object/',
+                component: UseQueryResolvesObject
+            },
+            {
+                path: '/disabled-use-query-isnt-resolved/',
+                component: DisabledUseQueryIsntResolved
             }
         ]
     }
@@ -314,6 +354,8 @@ jest.mock('@loadable/server', () => {
 
 describe('The Node SSR Environment', () => {
     const OLD_ENV = process.env
+
+    const {getAppConfig} = require('../universal/compatibility')
 
     beforeAll(() => {
         // These values are not allowed to be `undefined` when `isRemote` returns true. So we mock them.
@@ -605,18 +647,37 @@ describe('The Node SSR Environment', () => {
             description: `AppConfig errors are caught`,
             req: {url: '/pwa/'},
             mocks: () => {
+                const AppConfig = getAppConfig()
                 jest.spyOn(AppConfig.prototype, 'render').mockImplementation(() => {
                     throw new Error()
                 })
             },
             assertions: (res) => {
-                expect(res.statusCode).toBe(500)
                 const html = res.text
+                expect(res.statusCode).toBe(500)
 
                 const shouldIncludeErrorStack = !isRemote()
                 expect(html).toContain(
                     shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error'
                 )
+            }
+        },
+        {
+            description: `Works if the user resolves an Object with useQuery`,
+            req: {url: '/use-query-resolves-object/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                expect(html).toEqual(expect.stringContaining('<div>prop-value</div>'))
+            }
+        },
+        {
+            description: `Disabled useQuery queries aren't run on the server`,
+            req: {url: '/disabled-use-query-isnt-resolved/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                expect(html).toEqual(expect.stringContaining('<div>loading</div>'))
             }
         }
     ]
