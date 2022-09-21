@@ -10,8 +10,9 @@ import React, {useContext} from 'react'
 import {CorrelationIdContext} from '../contexts'
 
 /**
- * A hook that consumes the correlation id context
- * @returns {object} correlation id context
+ * Use this hook to get the correlation id value of the closest CorrelationIdProvider component. 
+ *
+ * @returns {object} The correlation id
  */
 export const useCorrelationId = () => {
     const context = React.useContext(CorrelationIdContext)
