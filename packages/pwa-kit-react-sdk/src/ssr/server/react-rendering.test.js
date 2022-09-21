@@ -649,7 +649,6 @@ describe('The Node SSR Environment', () => {
             mocks: () => {
                 const AppConfig = getAppConfig()
                 jest.spyOn(AppConfig.prototype, 'render').mockImplementation(() => {
-                    console.log('Throwing an error!!')
                     throw new Error()
                 })
             },
@@ -699,7 +698,6 @@ describe('The Node SSR Environment', () => {
                 const app = RemoteServerFactory._createApp(opts())
                 app.get('/*', render)
                 if (mocks) {
-                    console.log('Doing the mocking')
                     mocks()
                 }
                 return request(app)
