@@ -20,11 +20,12 @@ const shouldContinueRetries: RetryValue<unknown> = (failureCount, error) => {
 
     // See https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/blob/main/src/static/responseError.ts
     const isResponseError = Boolean((error as ResponseError).response)
+    const isServerError = isResponseError && (error as ResponseError).response.status >= 500
 
-    // ResponseError is more like unexpected runtime error, so we do want the retries.
+    // Server error is more like unexpected runtime error, so we do want the retries.
     // But if it's user errors.. i.e. we don't pass in the correct parameters, then we want to immediately stop the retries
 
-    if (!isResponseError || failureCount === NUM_OF_RETRIES) {
+    if (!isServerError || failureCount === NUM_OF_RETRIES) {
         shouldContinue = false
     }
     return shouldContinue
