@@ -25,9 +25,6 @@ const TestProviders = (props: {children: React.ReactNode}) => {
     return (
         <CommerceApiProvider
             {...TEST_CONFIG}
-            queryClientConfig={{
-                defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
-            }}
         >
             {props.children}
         </CommerceApiProvider>

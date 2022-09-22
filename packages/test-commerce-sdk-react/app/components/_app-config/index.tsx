@@ -7,6 +7,7 @@
 import React, {ReactElement} from 'react'
 // @ts-ignore
 import {CommerceApiProvider} from 'commerce-sdk-react'
+import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 
 interface AppConfigProps {
     children: React.ReactNode
@@ -33,4 +34,4 @@ AppConfig.restore = () => {}
 AppConfig.extraGetPropsArgs = () => {}
 AppConfig.freeze = () => {}
 
-export default AppConfig
+export default withReactQuery(AppConfig)

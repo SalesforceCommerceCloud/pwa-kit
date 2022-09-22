@@ -13,16 +13,28 @@ import ssrPrepass from 'react-ssr-prepass'
 const isServerSide = typeof window === 'undefined'
 const STATE_KEY = '__reactQuery'
 
-export const withReactQuery = (Wrapped) => {
+export const withReactQuery = (Wrapped, options = {}) => {
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
+    const queryClientConfig = 
+        options.queryClientConfig || 
+        {
+            defaultOptions: {
+                queries: {
+                    retry: !isServerSide
+                },
+                mutations: {
+                    retry: !isServerSide
+                }
+            }
+        }
 
     /**
      * @private
      */
     class WithReactQuery extends FetchStrategy {
         render() {
-            this.props.locals.__queryClient = this.props.locals.__queryClient || new QueryClient()
+            this.props.locals.__queryClient = this.props.locals.__queryClient || new QueryClient(queryClientConfig)
             return (
                 <QueryClientProvider client={this.props.locals.__queryClient}>
                     <Hydrate state={isServerSide ? {} : window.__PRELOADED_STATE__?.[STATE_KEY]}>
@@ -37,7 +49,7 @@ export const withReactQuery = (Wrapped) => {
          */
         static async doInitAppState({res, appJSX}) {
             const queryClient = (res.locals.__queryClient =
-                res.locals.__queryClient || new QueryClient())
+                res.locals.__queryClient || new QueryClient(queryClientConfig))
 
             await ssrPrepass(appJSX)
 
