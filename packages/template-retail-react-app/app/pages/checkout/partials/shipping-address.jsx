@@ -21,6 +21,7 @@ export default function ShippingAddress() {
 
     const {
         step,
+        checkoutSteps,
         selectedShippingAddress,
         setShippingAddress,
         setCheckoutStep,
@@ -42,10 +43,10 @@ export default function ShippingAddress() {
                 defaultMessage: 'Shipping Address',
                 id: 'shipping_address.title.shipping_address'
             })}
-            editing={step === 1}
+            editing={step === checkoutSteps.Shipping_Address}
             isLoading={isLoading}
             disabled={selectedShippingAddress == null}
-            onEdit={() => setCheckoutStep(1)}
+            onEdit={() => setCheckoutStep(checkoutSteps.Shipping_Address)}
         >
             <ToggleCardEdit>
                 <ShippingAddressSelection

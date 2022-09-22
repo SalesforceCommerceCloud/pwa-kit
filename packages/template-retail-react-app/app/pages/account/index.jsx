@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
@@ -38,6 +38,7 @@ import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import useMultiSite from '../../hooks/use-multi-site'
+import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 const Account = () => {
     const {path} = useRouteMatch()
@@ -49,7 +50,14 @@ const Account = () => {
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
     const [showLoading, setShowLoading] = useState(false)
 
+    const einstein = useEinstein()
+
     const {buildUrl} = useMultiSite()
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        einstein.sendViewPage(location.pathname)
+    }, [location])
 
     const onSignoutClick = async () => {
         setShowLoading(true)

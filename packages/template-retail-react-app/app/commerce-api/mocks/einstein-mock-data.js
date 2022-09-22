@@ -48,6 +48,500 @@ export const mockGetZoneRecommendationsResponse = {
     recommenderName: 'recently-viewed-products'
 }
 
+export const mockCategory = {
+    id: 'mens-accessories-ties',
+    image:
+        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dwd2ff3ec8/images/slot/sub_banners/cat-banner-mens-ties.jpg',
+    name: 'Ties',
+    pageDescription:
+        "Shop Mens's Ties for all occasions including business or casual at Commerce Cloud",
+    pageTitle: "Men's Casual and Business Ties",
+    parentCategoryId: 'mens-accessories',
+    parentCategoryTree: [
+        {
+            id: 'mens',
+            name: 'Mens'
+        },
+        {
+            id: 'mens-accessories',
+            name: 'Accessories'
+        },
+        {
+            id: 'mens-accessories-ties',
+            name: 'Ties'
+        }
+    ],
+    c_enableCompare: false,
+    c_showInMenu: true
+}
+
+export const mockSearchResults = {
+    limit: 4,
+    hits: [
+        {
+            currency: 'GBP',
+            hitType: 'master',
+            image: {
+                alt: 'Striped Silk Tie, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                title: 'Striped Silk Tie, '
+            },
+            orderable: true,
+            price: 19.19,
+            productId: '25752986M',
+            productName: 'Striped Silk Tie',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '793775370033M'
+            },
+            representedProducts: [
+                {
+                    id: '793775370033M'
+                },
+                {
+                    id: '793775362380M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Colour',
+                    values: [
+                        {
+                            name: 'Red',
+                            orderable: true,
+                            value: 'REDSI'
+                        },
+                        {
+                            name: 'Turquoise',
+                            orderable: true,
+                            value: 'TURQUSI'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'GBP',
+            hitType: 'master',
+            image: {
+                alt: 'Checked Silk Tie, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                title: 'Checked Silk Tie, '
+            },
+            orderable: true,
+            price: 19.19,
+            productId: '25752235M',
+            productName: 'Checked Silk Tie',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '682875090845M'
+            },
+            representedProducts: [
+                {
+                    id: '682875090845M'
+                },
+                {
+                    id: '682875719029M'
+                },
+                {
+                    id: '682875540326M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Colour',
+                    values: [
+                        {
+                            name: 'Cobalt',
+                            orderable: true,
+                            value: 'COBATSI'
+                        },
+                        {
+                            name: 'Navy',
+                            orderable: true,
+                            value: 'NAVYSI'
+                        },
+                        {
+                            name: 'Yellow',
+                            orderable: true,
+                            value: 'YELLOSI'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'GBP',
+            hitType: 'master',
+            image: {
+                alt: 'Solid Silk Tie, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c618527/images/large/PG.949432114S.NAVYSI.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c618527/images/large/PG.949432114S.NAVYSI.PZ.jpg',
+                title: 'Solid Silk Tie, '
+            },
+            orderable: true,
+            price: 19.19,
+            productId: '25752218M',
+            productName: 'Solid Silk Tie',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '029407331289M'
+            },
+            representedProducts: [
+                {
+                    id: '029407331289M'
+                },
+                {
+                    id: '029407331227M'
+                },
+                {
+                    id: '029407331258M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Colour',
+                    values: [
+                        {
+                            name: 'Navy',
+                            orderable: true,
+                            value: 'NAVYSI'
+                        },
+                        {
+                            name: 'Red',
+                            orderable: true,
+                            value: 'REDSI'
+                        },
+                        {
+                            name: 'Yellow',
+                            orderable: true,
+                            value: 'YELLOSI'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'GBP',
+            hitType: 'master',
+            image: {
+                alt: 'Striped Silk Tie, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4982cf11/images/large/PG.949034314S.TAUPESI.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4982cf11/images/large/PG.949034314S.TAUPESI.PZ.jpg',
+                title: 'Striped Silk Tie, '
+            },
+            orderable: true,
+            price: 19.19,
+            productId: '25752981M',
+            productName: 'Striped Silk Tie',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '793775064963M'
+            },
+            representedProducts: [
+                {
+                    id: '793775064963M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Colour',
+                    values: [
+                        {
+                            name: 'Taupe',
+                            orderable: true,
+                            value: 'TAUPESI'
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    query: '',
+    refinements: [
+        {
+            attributeId: 'cgid',
+            label: 'Category',
+            values: [
+                {
+                    hitCount: 4,
+                    label: 'New Arrivals',
+                    value: 'newarrivals'
+                },
+                {
+                    hitCount: 4,
+                    label: 'Mens',
+                    value: 'mens',
+                    values: [
+                        {
+                            hitCount: 4,
+                            label: 'Accessories',
+                            value: 'mens-accessories',
+                            values: [
+                                {
+                                    hitCount: 4,
+                                    label: 'Ties',
+                                    value: 'mens-accessories-ties'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            attributeId: 'c_refinementColor',
+            label: 'Colour',
+            values: [
+                {
+                    hitCount: 0,
+                    label: 'Beige',
+                    presentationId: 'beige',
+                    value: 'Beige'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Black',
+                    presentationId: 'black',
+                    value: 'Black'
+                },
+                {
+                    hitCount: 1,
+                    label: 'Blue',
+                    presentationId: 'blue',
+                    value: 'Blue'
+                },
+                {
+                    hitCount: 2,
+                    label: 'Navy',
+                    presentationId: 'navy',
+                    value: 'Navy'
+                },
+                {
+                    hitCount: 1,
+                    label: 'Brown',
+                    presentationId: 'brown',
+                    value: 'Brown'
+                },
+                {
+                    hitCount: 1,
+                    label: 'Green',
+                    presentationId: 'green',
+                    value: 'Green'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Grey',
+                    presentationId: 'grey',
+                    value: 'Grey'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Orange',
+                    presentationId: 'orange',
+                    value: 'Orange'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Pink',
+                    presentationId: 'pink',
+                    value: 'Pink'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Purple',
+                    presentationId: 'purple',
+                    value: 'Purple'
+                },
+                {
+                    hitCount: 2,
+                    label: 'Red',
+                    presentationId: 'red',
+                    value: 'Red'
+                },
+                {
+                    hitCount: 0,
+                    label: 'White',
+                    presentationId: 'white',
+                    value: 'White'
+                },
+                {
+                    hitCount: 2,
+                    label: 'Yellow',
+                    presentationId: 'yellow',
+                    value: 'Yellow'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Miscellaneous',
+                    presentationId: 'miscellaneous',
+                    value: 'Miscellaneous'
+                }
+            ]
+        },
+        {
+            attributeId: 'price',
+            label: 'Price',
+            values: [
+                {
+                    hitCount: 4,
+                    label: '£0 - £19.99',
+                    value: '(0..20)'
+                }
+            ]
+        },
+        {
+            attributeId: 'c_isNew',
+            label: 'New Arrival'
+        }
+    ],
+    searchPhraseSuggestions: {},
+    selectedRefinements: {
+        cgid: 'mens-accessories-ties',
+        htype: 'master'
+    },
+    sortingOptions: [
+        {
+            id: 'best-matches',
+            label: 'Best Matches'
+        },
+        {
+            id: 'price-low-to-high',
+            label: 'Price Low To High'
+        },
+        {
+            id: 'price-high-to-low',
+            label: 'Price High to Low'
+        },
+        {
+            id: 'product-name-ascending',
+            label: 'Product Name A - Z'
+        },
+        {
+            id: 'product-name-descending',
+            label: 'Product Name Z - A'
+        },
+        {
+            id: 'brand',
+            label: 'Brand'
+        },
+        {
+            id: 'most-popular',
+            label: 'Most Popular'
+        },
+        {
+            id: 'top-sellers',
+            label: 'Top Sellers'
+        }
+    ],
+    offset: 0,
+    total: 4
+}
+
+export const mockBasket = {
+    adjustedMerchandizeTotalTax: 1.5,
+    adjustedShippingTotalTax: 0.3,
+    agentBasket: false,
+    basketId: 'f6bbeee30fb93c2f94213f60f8',
+    channelType: 'storefront',
+    creationDate: '2022-09-15T19:29:10.361Z',
+    currency: 'USD',
+    customerInfo: {
+        customerId: 'bdlrFJmudIlHaRk0oYkbYYlKw3'
+    },
+    lastModified: '2022-09-15T19:31:04.677Z',
+    merchandizeTotalTax: 1.5,
+    notes: {},
+    orderTotal: 37.78,
+    productItems: [
+        {
+            adjustedTax: 1.5,
+            basePrice: 29.99,
+            bonusProductLineItem: false,
+            gift: false,
+            itemId: 'de63c61b3edeca38b2d9a67a67',
+            itemText: 'Checked Silk Tie',
+            price: 29.99,
+            priceAfterItemDiscount: 29.99,
+            priceAfterOrderDiscount: 29.99,
+            productId: '682875719029M',
+            productName: 'Checked Silk Tie',
+            quantity: 1,
+            shipmentId: 'me',
+            tax: 1.5,
+            taxBasis: 29.99,
+            taxClassId: 'standard',
+            taxRate: 0.05
+        }
+    ],
+    productSubTotal: 29.99,
+    productTotal: 29.99,
+    shipments: [
+        {
+            adjustedMerchandizeTotalTax: 1.5,
+            adjustedShippingTotalTax: 0.3,
+            gift: false,
+            merchandizeTotalTax: 1.5,
+            productSubTotal: 29.99,
+            productTotal: 29.99,
+            shipmentId: 'me',
+            shipmentTotal: 37.78,
+            shippingMethod: {
+                description: 'Order received within 7-10 business days',
+                id: '001',
+                name: 'Ground',
+                price: 5.99,
+                c_estimatedArrivalTime: '7-10 Business Days'
+            },
+            shippingStatus: 'not_shipped',
+            shippingTotal: 5.99,
+            shippingTotalTax: 0.3,
+            taxTotal: 1.8
+        }
+    ],
+    shippingItems: [
+        {
+            adjustedTax: 0.3,
+            basePrice: 5.99,
+            itemId: 'b931764832e5bd90a3c226552f',
+            itemText: 'Shipping',
+            price: 5.99,
+            priceAfterItemDiscount: 5.99,
+            shipmentId: 'me',
+            tax: 0.3,
+            taxBasis: 5.99,
+            taxClassId: 'standard',
+            taxRate: 0.05
+        }
+    ],
+    shippingTotal: 5.99,
+    shippingTotalTax: 0.3,
+    taxation: 'net',
+    taxTotal: 1.8
+}
+
 export const mockProduct = {
     currency: 'USD',
     id: '56736828M',
