@@ -26,7 +26,7 @@ import {
     CLIENT_OPTIONAL,
     REQUEST_PROCESSOR
 } from '../../configs/webpack/config-names'
-import crypto from 'crypto'
+import {randomUUID} from 'crypto'
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
 
@@ -70,9 +70,18 @@ export const DevServerMixin = {
     },
 
     /**
+     * Since dev server does not have access to apiGateway event object,
+     * here we generate an uuid and assign it to request id inside apiGateway object
      * @private
      */
-    _addEventContext(app) {},
+    _addRequestIdToReq(app) {
+        app.use((req, res, next) => {
+            req['apiGateway'] = {
+                requestId: randomUUID()
+            }
+            next()
+        })
+    },
 
     /**
      * @private
@@ -84,11 +93,6 @@ export const DevServerMixin = {
                 filter: shouldCompress
             })
         )
-    },
-
-    _setRequestId(res) {
-        const locals = res.locals
-        locals.requestId = crypto.randomUUID()
     },
 
     /**

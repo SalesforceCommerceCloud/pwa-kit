@@ -9,7 +9,10 @@
  */
 /* eslint-disable header/header */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
+import {randomUUID} from 'crypto'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
+import {addRequestIdToReqMiddleware} from 'pwa-kit-runtime/ssr/server/middleware/addRequestIdToReq'
+
 import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
@@ -358,7 +361,7 @@ jest.mock('pwa-kit-runtime/ssr/server/build-remote-server', () => {
         ...actual,
         RemoteServerFactory: {
             ...actual.RemoteServerFactory,
-            _addEventContext: jest.fn()
+            _addRequestIdToReq: jest.fn()
         }
     }
 })
@@ -694,13 +697,8 @@ describe('The Node SSR Environment', () => {
     ]
 
     const isRemoteValues = [true, false]
-    RemoteServerFactory._addEventContext.mockImplementation((_app) => {
-        _app.use((req, res, next) => {
-            req['apiGateway'] = {
-                event: {requestContext: {requestId: '96469282-311d-4522-a844-f97cf6548aa1'}}
-            }
-            next()
-        })
+    RemoteServerFactory._addRequestIdToReq.mockImplementation((_app) => {
+        _app.use(addRequestIdToReqMiddleware)
     })
     isRemoteValues.forEach((isRemoteValue) => {
         // Run test cases

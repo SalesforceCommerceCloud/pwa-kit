@@ -31,22 +31,21 @@ import {
     respondFromBundle,
     getRuntime
 } from './express'
+import {addRequestIdToReqMiddleware} from './middleware/addRequestIdToReq'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
 jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
-jest.mock('aws-serverless-express/middleware', () => {
+jest.mock('./build-remote-server', () => {
+    const actual = jest.requireActual('./build-remote-server')
     return {
-        eventContext: () =>
-            jest.fn((req, res, next) => {
-                req['apiGateway'] = {
-                    event: {requestContext: {requestId: '4f33eb38-957a-43ec-84b8-517847bf7873'}}
-                }
-                next()
-            })
+        ...actual,
+        RemoteServerFactory: {
+            ...actual.RemoteServerFactory,
+            _addRequestIdToReq: jest.fn()
+        }
     }
 })
-
 const TEST_PORT = 3444
 const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
 
@@ -180,7 +179,9 @@ describe('_createApp validates environment variables', () => {
 describe('SSRServer operation', () => {
     const savedEnvironment = Object.assign({}, process.env)
     const sandbox = sinon.createSandbox()
-
+    RemoteServerFactory._addRequestIdToReq.mockImplementation((_app) => {
+        _app.use(addRequestIdToReqMiddleware)
+    })
     afterEach(() => {
         sandbox.restore()
         nock.cleanAll()
@@ -268,14 +269,12 @@ describe('SSRServer operation', () => {
         process.env = savedEnvironment
     })
 
-    test('SSRServer renders correctly', () => {
+    test.only('SSRServer renders correctly', () => {
         const body = '<div>hello world</div>'
         const route = jest.fn().mockImplementation((req, res) => {
             res.send(body)
         })
-
         const app = RemoteServerFactory._createApp(opts())
-
         app.get('/*', route)
         return request(app)
             .get('/')

@@ -40,7 +40,6 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import awsServerlessExpress from 'aws-serverless-express'
-import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -186,6 +185,24 @@ export const RemoteServerFactory = {
     },
 
     /**
+     * Passing the requestId from apiGateway event to express request object
+     * @private
+     */
+    _addRequestIdToReq(app) {
+        app.use((req, res, next) => {
+            if (!req.headers['x-apigateway-event']) {
+                console.error('Missing x-apigateway-event')
+                next()
+                return
+            }
+            req['apiGateway'] = {
+                requestId: req.headers['x-apigateway-event'].event.requestContext.requestId
+            }
+            next()
+        })
+    },
+
+    /**
      * @private
      */
     // eslint-disable-next-line no-unused-vars
@@ -231,7 +248,8 @@ export const RemoteServerFactory = {
         // Do this first – we want compression applied to
         // everything when it's enabled at all.
         this._setCompression(app)
-        this._addEventContext(app)
+        this._addRequestIdToReq(app)
+        // this._addEventContext(app)
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
@@ -326,14 +344,6 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line no-unused-vars
     _addSDKInternalHandlers(app) {},
-
-    /**
-     * @private
-     * Get the event object Lambda receives from API Gateway
-     */
-    _addEventContext(app) {
-        app.use(awsServerlessExpressMiddleware.eventContext())
-    },
 
     /**
      * @private
@@ -472,7 +482,7 @@ export const RemoteServerFactory = {
 
             locals.timer = new PerformanceTimer(`req${locals.requestId}`)
             locals.originalUrl = req.originalUrl
-            that._setRequestId(res, req)
+            that._setRequestId(req, res)
 
             // Track this response
             req.app._requestMonitor._responseStarted(res)
@@ -549,10 +559,9 @@ export const RemoteServerFactory = {
         app.use(ssrRequestProcessorMiddleware)
     },
 
-    _setRequestId(res, req) {
-        const requestContext = req.apiGateway.event.requestContext
+    _setRequestId(req, res) {
         const locals = res.locals
-        locals.requestId = requestContext.requestId
+        locals.requestId = req.apiGateway.requestId
     },
 
     /**
