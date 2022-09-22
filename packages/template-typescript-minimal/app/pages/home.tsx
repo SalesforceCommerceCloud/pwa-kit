@@ -94,7 +94,7 @@ const Home = ({value}: Props) => {
     const query = useQuery(
         ['example-data'],
         () =>
-            new Promise((resolve) => {
+            new Promise(() => {
                 throw new Error('FOO')
 
                 // setTimeout(() => {
