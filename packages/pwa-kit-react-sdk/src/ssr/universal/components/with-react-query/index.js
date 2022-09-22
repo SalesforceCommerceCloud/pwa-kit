@@ -16,25 +16,24 @@ const STATE_KEY = '__reactQuery'
 export const withReactQuery = (Wrapped, options = {}) => {
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
-    const queryClientConfig = 
-        options.queryClientConfig || 
-        {
-            defaultOptions: {
-                queries: {
-                    retry: !isServerSide
-                },
-                mutations: {
-                    retry: !isServerSide
-                }
+    const queryClientConfig = options.queryClientConfig || {
+        defaultOptions: {
+            queries: {
+                retry: !isServerSide
+            },
+            mutations: {
+                retry: !isServerSide
             }
         }
+    }
 
     /**
      * @private
      */
     class WithReactQuery extends FetchStrategy {
         render() {
-            this.props.locals.__queryClient = this.props.locals.__queryClient || new QueryClient(queryClientConfig)
+            this.props.locals.__queryClient =
+                this.props.locals.__queryClient || new QueryClient(queryClientConfig)
             return (
                 <QueryClientProvider client={this.props.locals.__queryClient}>
                     <Hydrate state={isServerSide ? {} : window.__PRELOADED_STATE__?.[STATE_KEY]}>

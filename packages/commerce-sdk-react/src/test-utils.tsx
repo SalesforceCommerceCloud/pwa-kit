@@ -22,13 +22,7 @@ export const TEST_CONFIG = {
     currency: 'USD'
 }
 const TestProviders = (props: {children: React.ReactNode}) => {
-    return (
-        <CommerceApiProvider
-            {...TEST_CONFIG}
-        >
-            {props.children}
-        </CommerceApiProvider>
-    )
+    return <CommerceApiProvider {...TEST_CONFIG}>{props.children}</CommerceApiProvider>
 }
 
 /**
