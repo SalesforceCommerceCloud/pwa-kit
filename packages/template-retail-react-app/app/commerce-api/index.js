@@ -205,7 +205,9 @@ class CommerceAPI {
         const [fetchOptions, ...restParams] = params
         const newFetchOptions = {
             ...fetchOptions,
-            headers: {...fetchOptions.headers, Authorization: this.auth.authToken}
+            // @@@
+            // headers: {...fetchOptions.headers, Authorization: this.auth.authToken}
+            headers: {...fetchOptions.headers, 'X-Authorization': this.auth.authToken}
         }
         return [newFetchOptions, ...restParams]
     }

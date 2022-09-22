@@ -11,6 +11,7 @@ const {getRuntime} = require('pwa-kit-runtime/ssr/server/express')
 const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 const helmet = require('helmet')
+const {createProxyMiddleware} = require('http-proxy-middleware')
 
 const options = {
     // The build directory (an absolute path)
@@ -32,7 +33,86 @@ const options = {
 
 const runtime = getRuntime()
 
+// @@@
+const AUTH = {
+    username: 'storefront',
+    password: 'password'
+}
+
+function basicAuthMiddleware(req, res, next) {
+    const shouldSkipAuth =
+        req.path.startsWith('/proxy') ||
+        req.path.startsWith('/mobify') ||
+        req.path.startsWith('/callback')
+    if (shouldSkipAuth) {
+        return next()
+    }
+
+    const authorization = (req.get('authorization') || '').split(' ')[1] || ''
+    const [username, password] = Buffer.from(authorization, 'base64')
+        .toString()
+        .split(':')
+
+    const hasValidAuth = username == AUTH.username && password == AUTH.password
+    if (hasValidAuth) {
+        return next()
+    }
+
+    res.set('WWW-Authenticate', 'Basic realm="Storefront"')
+    res.status(401).send('Auth Required! :woman-gesturing-no:')
+}
+
+// Basic auth credentials are in the `authorization` header, while
+// SCAPI/OCAPI JWTs are in `x-authorization`.
+function swapAuthHeader(proxyReq, req, res) {
+    proxyReq.removeHeader('Authorization')
+
+    const authorization = proxyReq.getHeader('X-Authorization')
+    proxyReq.removeHeader('X-Authorization')
+    // Avoid OCAPI origin protection.
+    proxyReq.removeHeader('Origin')
+    if (authorization) {
+        proxyReq.setHeader('Authorization', authorization)
+    }
+}
+
+// Useful for testing!
+const proxyHTTPBin = createProxyMiddleware({
+    target: 'https://httpbin.org/anything',
+    secure: true,
+    changeOrigin: true,
+    onProxyReq: swapAuthHeader,
+    pathRewrite: {
+        '.*': ''
+    }
+})
+
+const proxySCAPI = createProxyMiddleware({
+    target: 'https://kv7kzm78.api.commercecloud.salesforce.com',
+    secure: true,
+    changeOrigin: true,
+    onProxyReq: swapAuthHeader,
+    pathRewrite: {
+        '^/proxy/scapi/': '/'
+    }
+})
+
+const proxyOCAPI = createProxyMiddleware({
+    target: 'https://zzte-053.sandbox.us02.dx.commercecloud.salesforce.com',
+    secure: true,
+    changeOrigin: true,
+    onProxyReq: swapAuthHeader,
+    pathRewrite: {
+        '^/proxy/ocapi/': '/'
+    }
+})
+
 const {handler} = runtime.createHandler(options, (app) => {
+    app.use(basicAuthMiddleware)
+    app.all('/proxy/httpbin/*', proxyHTTPBin)
+    app.all('/proxy/scapi/*', proxySCAPI)
+    app.all('/proxy/ocapi/*', proxyOCAPI)
+
     // Set HTTP security headers
     app.use(
         helmet({

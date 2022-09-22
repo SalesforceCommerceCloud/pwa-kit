@@ -305,7 +305,9 @@ class Auth {
         const authorization = `Basic ${btoa(`${credentials.email}:${credentials.password}`)}`
         const options = {
             headers: {
-                Authorization: authorization,
+                // @@@
+                // Authorization: authorization,
+                'X-Authorization': authorization,
                 'Content-Type': `application/x-www-form-urlencoded`
             },
             body: {
@@ -352,7 +354,7 @@ class Auth {
 
         const options = {
             headers: {
-                Authorization: '',
+                // Authorization: '',
                 'Content-Type': `application/x-www-form-urlencoded`
             },
             parameters: {

@@ -20,7 +20,9 @@ module.exports = {
         },
         sites,
         commerceAPI: {
-            proxyPath: `/mobify/proxy/api`,
+            // @@@
+            // proxyPath: `/mobify/proxy/api`,
+            proxyPath: `/proxy/api`,
             parameters: {
                 clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
                 organizationId: 'f_ecom_zzrf_001',

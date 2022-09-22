@@ -184,7 +184,9 @@ export const createOcapiFetch = (commerceAPIConfig) => async (
     methodName,
     body
 ) => {
-    const proxy = `/mobify/proxy/ocapi`
+    // @@@
+    // const proxy = `/mobify/proxy/ocapi`
+    const proxy = `/proxy/ocapi`
 
     // The api config will only have `ocapiHost` during testing to workaround localhost proxy
     const host = commerceAPIConfig.ocapiHost
