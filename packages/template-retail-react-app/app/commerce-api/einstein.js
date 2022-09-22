@@ -37,6 +37,11 @@ class EinsteinAPI {
             console.warn('Missing `cookieId`. For optimal results this value must be defined.')
         }
 
+        // The first part of the siteId is the realm
+        if (this.config.siteId) {
+            body.realm = this.config.siteId.split('-')[0]
+        }
+
         return body
     }
 
@@ -91,6 +96,105 @@ class EinsteinAPI {
     }
 
     /**
+     * Tells the Einstein engine when a user views search results.
+     **/
+    async sendViewSearch(searchText, searchResults, args) {
+        const endpoint = `/activities/${this.config.siteId}/viewSearch`
+        const method = 'POST'
+
+        const products = searchResults.hits.map((product) => {
+            const {productId, sku = '', altId = '', altIdType = ''} = product
+            return {
+                id: productId,
+                sku,
+                altId,
+                altIdType
+            }
+        })
+
+        const body = {
+            searchText,
+            products,
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user clicks on a search result.
+     **/
+    async sendClickSearch(searchText, product, args) {
+        const endpoint = `/activities/${this.config.siteId}/clickSearch`
+        const method = 'POST'
+        const {productId, sku = '', altId = '', altIdType = ''} = product
+        const body = {
+            searchText,
+            product: {
+                id: productId,
+                sku,
+                altId,
+                altIdType
+            },
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user views a category.
+     **/
+    async sendViewCategory(category, searchResults, args) {
+        const endpoint = `/activities/${this.config.siteId}/viewCategory`
+        const method = 'POST'
+
+        const products = searchResults.hits.map((product) => {
+            const {productId, sku = '', altId = '', altIdType = ''} = product
+            return {
+                id: productId,
+                sku,
+                altId,
+                altIdType
+            }
+        })
+
+        const body = {
+            category: {
+                id: category.id
+            },
+            products,
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user clicks a product from the category page.
+     * Not meant to be used when the user clicks a category from the nav bar.
+     **/
+    async sendClickCategory(category, product, args) {
+        const endpoint = `/activities/${this.config.siteId}/clickCategory`
+        const method = 'POST'
+        const {productId, sku = '', altId = '', altIdType = ''} = product
+        const body = {
+            category: {
+                id: category.id
+            },
+            product: {
+                id: productId,
+                sku,
+                altId,
+                altIdType
+            },
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
      * Tells the Einstein engine when a user views a set of recommendations
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
@@ -126,6 +230,63 @@ class EinsteinAPI {
                 altId,
                 altIdType
             },
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user views a page.
+     * Use this only for pages where another activity does not fit. (ie. on the PDP, use viewProduct rather than this)
+     **/
+    async sendViewPage(path, args) {
+        const endpoint = `/activities/${this.config.siteId}/viewPage`
+        const method = 'POST'
+        const body = {
+            currentLocation: path,
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user starts the checkout process.
+     **/
+    async sendBeginCheckout(basket, args) {
+        const endpoint = `/activities/${this.config.siteId}/beginCheckout`
+        const method = 'POST'
+        const products = basket.productItems.map((product) => {
+            const {productId, sku = '', price = '', quantity = ''} = product
+            return {
+                id: productId,
+                sku,
+                price,
+                quantity
+            }
+        })
+        const subTotal = basket.productSubTotal
+        const body = {
+            products: products,
+            amount: subTotal,
+            ...args
+        }
+
+        return this.einsteinFetch(endpoint, method, body)
+    }
+
+    /**
+     * Tells the Einstein engine when a user reaches the given step during checkout.
+     * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
+     **/
+    async sendCheckoutStep(stepName, stepNumber, basket, args) {
+        const endpoint = `/activities/${this.config.siteId}/checkoutStep`
+        const method = 'POST'
+        const body = {
+            stepName,
+            stepNumber,
+            basketId: basket.basketId,
             ...args
         }
 

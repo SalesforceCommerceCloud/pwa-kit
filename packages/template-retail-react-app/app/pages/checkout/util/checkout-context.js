@@ -8,6 +8,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import useBasket from '../../../commerce-api/hooks/useBasket'
 import useCustomer from '../../../commerce-api/hooks/useCustomer'
+import useEinstein from '../../../commerce-api/hooks/useEinstein'
 import {useCommerceAPI} from '../../../commerce-api/contexts'
 import {getPaymentInstrumentCardType} from '../../../utils/cc-utils'
 import {isMatchingAddress} from '../../../utils/utils'
@@ -21,9 +22,9 @@ export const CheckoutProvider = ({children}) => {
     const customer = useCustomer()
     const basket = useBasket()
     const {formatMessage} = useIntl()
+    const einstein = useEinstein()
 
     const [state, setState] = useState({
-        // @TODO: use contants to represent checkout steps like const CHECKOUT_STEP_2_SHIPPING = 2
         step: undefined,
         isGuestCheckout: false,
         shippingMethods: undefined,
@@ -31,6 +32,18 @@ export const CheckoutProvider = ({children}) => {
         globalError: undefined,
         sectionError: undefined
     })
+
+    const CheckoutSteps = {
+        Contact_Info: 0,
+        Shipping_Address: 1,
+        Shipping_Options: 2,
+        Payment: 3,
+        Review_Order: 4
+    }
+
+    const getCheckoutStepName = (step) => {
+        return Object.keys(CheckoutSteps).find((key) => CheckoutSteps[key] === step)
+    }
 
     const mergeState = useCallback((data) => {
         // If we become unmounted during an async call that results in updating state, we
@@ -65,25 +78,40 @@ export const CheckoutProvider = ({children}) => {
         // A failed condition sets the current step and returns early (order matters).
         if (customer.customerId && basket.basketId && state.step == undefined) {
             if (!basket.customerInfo?.email) {
-                mergeState({step: 0})
+                mergeState({step: CheckoutSteps.Contact_Info})
                 return
             }
             if (basket.shipments && !basket.shipments[0]?.shippingAddress) {
-                mergeState({step: 1})
+                mergeState({step: CheckoutSteps.Shipping_Address})
                 return
             }
             if (basket.shipments && !basket.shipments[0]?.shippingMethod) {
-                mergeState({step: 2})
+                mergeState({step: CheckoutSteps.Shipping_Options})
                 return
             }
             if (!basket.paymentInstruments || !basket.billingAddress) {
-                mergeState({step: 3})
+                mergeState({step: CheckoutSteps.Payment})
                 return
             }
 
-            mergeState({step: 4})
+            mergeState({step: CheckoutSteps.Review_Order})
         }
     }, [customer, basket])
+
+    /**************** Einstein ****************/
+    // Run this once when checkout begins
+    useEffect(() => {
+        if (basket && basket.productItems) {
+            einstein.sendBeginCheckout(basket)
+        }
+    }, [])
+
+    // Run this every time checkout steps change
+    useEffect(() => {
+        if (state.step != undefined) {
+            einstein.sendCheckoutStep(getCheckoutStepName(state.step), state.step, basket)
+        }
+    }, [state.step])
 
     // We combine our state and actions into a single context object. This is much more
     // convenient than having to import and bind actions seprately. State updates will
@@ -134,6 +162,10 @@ export const CheckoutProvider = ({children}) => {
                     ctx.selectedShippingAddress
                 )
                 return result
+            },
+
+            get checkoutSteps() {
+                return CheckoutSteps
             },
 
             // Local state setters
