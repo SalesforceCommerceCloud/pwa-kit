@@ -95,9 +95,11 @@ const Home = ({value}: Props) => {
         ['example-data'],
         () =>
             new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve('This came from react-query')
-                }, 1000)
+                throw new Error('FOO')
+
+                // setTimeout(() => {
+                //     resolve('This came from react-query')
+                // }, 1000)
             })
     )
 
@@ -118,6 +120,9 @@ const Home = ({value}: Props) => {
                 <div className="panel">
                     <p style={{width: '300px'}} className="fade-in fade-in-0">
                         <b>This page is written in Typescript</b>
+                        <br />
+                        <br />
+                        {query.error && `${query.error}`}
                         <br />
                         <br />
                         React query works if this is not empty: &quot;{query.data}&quot;
