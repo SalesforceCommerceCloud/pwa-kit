@@ -195,8 +195,12 @@ export const RemoteServerFactory = {
                 next()
                 return
             }
+            const apiGatewayEvent = JSON.parse(
+                decodeURIComponent(req.headers['x-apigateway-event'])
+            )
+            const {requestId} = apiGatewayEvent.requestContext
             req['apiGateway'] = {
-                requestId: req.headers['x-apigateway-event'].event.requestContext.requestId
+                requestId
             }
             next()
         })

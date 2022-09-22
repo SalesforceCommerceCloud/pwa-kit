@@ -269,7 +269,7 @@ describe('SSRServer operation', () => {
         process.env = savedEnvironment
     })
 
-    test.only('SSRServer renders correctly', () => {
+    test('SSRServer renders correctly', () => {
         const body = '<div>hello world</div>'
         const route = jest.fn().mockImplementation((req, res) => {
             res.send(body)
@@ -958,7 +958,7 @@ describe('generateCacheKey', () => {
     })
 })
 
-describe('getRuntime', () => {
+describe.only('getRuntime', () => {
     let originalEnv
     let originalEval = global.eval
 
