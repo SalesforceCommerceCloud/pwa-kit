@@ -56,6 +56,7 @@ import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import {useCategories} from '../../hooks/use-categories'
+import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Others
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
@@ -101,6 +102,7 @@ const ProductList = (props) => {
     const params = useParams()
     const {categories} = useCategories()
     const toast = useToast()
+    const einstein = useEinstein()
 
     // Get the current category from global state.
     let category = undefined
@@ -177,6 +179,15 @@ const ProductList = (props) => {
             setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
         }
     }
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        if (searchQuery) {
+            einstein.sendViewSearch(searchQuery, productSearchResult)
+        } else {
+            einstein.sendViewCategory(category, productSearchResult)
+        }
+    }, [productSearchResult])
 
     /**************** Filters ****************/
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
@@ -388,6 +399,19 @@ const ProductList = (props) => {
                                                   product={productSearchItem}
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
+                                                  onClick={() => {
+                                                      if (searchQuery) {
+                                                          einstein.sendClickSearch(
+                                                              searchQuery,
+                                                              productSearchItem
+                                                          )
+                                                      } else if (category) {
+                                                          einstein.sendClickCategory(
+                                                              category,
+                                                              productSearchItem
+                                                          )
+                                                      }
+                                                  }}
                                                   onFavouriteToggle={(isFavourite) => {
                                                       const action = isFavourite
                                                           ? addItemToWishlist

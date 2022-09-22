@@ -27,6 +27,8 @@ import mockConfig from '../../../config/mocks/default'
 
 jest.setTimeout(60000)
 
+jest.mock('../../commerce-api/einstein')
+
 // Make sure fetch is defined in test env
 Object.defineProperty(window, 'fetch', {
     value: require('cross-fetch')
