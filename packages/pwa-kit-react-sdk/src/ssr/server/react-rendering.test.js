@@ -696,7 +696,9 @@ describe('The Node SSR Environment', () => {
     const isRemoteValues = [true, false]
     RemoteServerFactory._addEventContext.mockImplementation((_app) => {
         _app.use((req, res, next) => {
-            req['apiGateway'] = {event: {requestContext: {requestId: 'fds'}}}
+            req['apiGateway'] = {
+                event: {requestContext: {requestId: '96469282-311d-4522-a844-f97cf6548aa1'}}
+            }
             next()
         })
     })
