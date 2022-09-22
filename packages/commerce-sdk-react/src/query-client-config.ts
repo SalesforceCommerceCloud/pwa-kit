@@ -33,8 +33,8 @@ const shouldContinueRetries: RetryValue<unknown> = (failureCount, error) => {
 
 // Why use `unknown` as the generic type? Because QueryClientConfig interface already defines it as such.
 const defaultOptions: DefaultOptions<unknown> = {
-    queries: {retry: shouldContinueRetries},
-    mutations: {retry: shouldContinueRetries}
+    queries: {retry: shouldContinueRetries, onError: (err) => console.error(err)},
+    mutations: {retry: shouldContinueRetries, onError: (err) => console.error(err)}
 }
 
 export const QUERY_CLIENT_CONFIG: QueryClientConfig = {defaultOptions}
