@@ -36,16 +36,7 @@ import {addRequestIdToReqMiddleware} from './middleware/addRequestIdToReq'
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
 jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
-jest.mock('./build-remote-server', () => {
-    const actual = jest.requireActual('./build-remote-server')
-    return {
-        ...actual,
-        RemoteServerFactory: {
-            ...actual.RemoteServerFactory,
-            _addRequestIdToReq: jest.fn()
-        }
-    }
-})
+
 const TEST_PORT = 3444
 const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
 
@@ -179,11 +170,10 @@ describe('_createApp validates environment variables', () => {
 describe('SSRServer operation', () => {
     const savedEnvironment = Object.assign({}, process.env)
     const sandbox = sinon.createSandbox()
-    RemoteServerFactory._addRequestIdToReq.mockImplementation((_app) => {
-        _app.use(addRequestIdToReqMiddleware)
-    })
+
     afterEach(() => {
         sandbox.restore()
+        jest.resetModules()
         nock.cleanAll()
     })
 
@@ -192,6 +182,9 @@ describe('SSRServer operation', () => {
     })
 
     beforeEach(() => {
+        RemoteServerFactory._addRequestIdToReq = jest.fn().mockImplementation((_app) => {
+            _app.use(addRequestIdToReqMiddleware)
+        })
         // Ensure the environment is clean
         process.env = {
             LISTEN_ADDRESS: '',
@@ -986,11 +979,11 @@ describe('getRuntime', () => {
     }
 
     const cases = [
-        {
-            env: {},
-            expectedRuntime: MockDevServerFactory,
-            msg: 'when running locally'
-        },
+        // {
+        //     env: {},
+        //     expectedRuntime: MockDevServerFactory,
+        //     msg: 'when running locally'
+        // },
         {
             env: {AWS_LAMBDA_FUNCTION_NAME: 'this-makes-it-remote'},
             expectedRuntime: RemoteServerFactory,
