@@ -11,7 +11,6 @@
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
 import {randomUUID} from 'crypto'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
-import {addRequestIdToReqMiddleware} from 'pwa-kit-runtime/ssr/server/middleware/addRequestIdToReq'
 
 import request from 'supertest'
 import {parse} from 'node-html-parser'
@@ -361,7 +360,7 @@ jest.mock('pwa-kit-runtime/ssr/server/build-remote-server', () => {
         ...actual,
         RemoteServerFactory: {
             ...actual.RemoteServerFactory,
-            _addRequestIdToReq: jest.fn()
+            _setRequestId: jest.fn()
         }
     }
 })
@@ -697,8 +696,11 @@ describe('The Node SSR Environment', () => {
     ]
 
     const isRemoteValues = [true, false]
-    RemoteServerFactory._addRequestIdToReq.mockImplementation((_app) => {
-        _app.use(addRequestIdToReqMiddleware)
+    RemoteServerFactory._setRequestId.mockImplementation((_app) => {
+        _app.use((req, res, next) => {
+            res.locals.requestId = randomUUID()
+            next()
+        })
     })
     isRemoteValues.forEach((isRemoteValue) => {
         // Run test cases

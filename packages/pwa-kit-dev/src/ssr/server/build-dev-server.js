@@ -71,14 +71,12 @@ export const DevServerMixin = {
 
     /**
      * Since dev server does not have access to apiGateway event object,
-     * here we generate an uuid and assign it to request id inside apiGateway object
+     * here we generate an uuid and assign it under locals
      * @private
      */
-    _addRequestIdToReq(app) {
+    _setRequestId(app) {
         app.use((req, res, next) => {
-            req['apiGateway'] = {
-                requestId: randomUUID()
-            }
+            res.locals.requestId = randomUUID()
             next()
         })
     },

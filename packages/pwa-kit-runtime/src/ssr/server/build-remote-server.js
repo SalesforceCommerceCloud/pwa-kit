@@ -185,10 +185,10 @@ export const RemoteServerFactory = {
     },
 
     /**
-     * Passing the requestId from apiGateway event to express request object
+     * Passing the requestId from apiGateway event to locals
      * @private
      */
-    _addRequestIdToReq(app) {
+    _setRequestId(app) {
         app.use((req, res, next) => {
             if (!req.headers['x-apigateway-event']) {
                 console.error('Missing x-apigateway-event')
@@ -199,9 +199,7 @@ export const RemoteServerFactory = {
                 decodeURIComponent(req.headers['x-apigateway-event'])
             )
             const {requestId} = apiGatewayEvent.requestContext
-            req['apiGateway'] = {
-                requestId
-            }
+            res.locals.requestId = requestId
             next()
         })
     },
@@ -252,7 +250,7 @@ export const RemoteServerFactory = {
         // Do this first – we want compression applied to
         // everything when it's enabled at all.
         this._setCompression(app)
-        this._addRequestIdToReq(app)
+        this._setRequestId(app)
         // this._addEventContext(app)
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
@@ -486,7 +484,6 @@ export const RemoteServerFactory = {
 
             locals.timer = new PerformanceTimer(`req${locals.requestId}`)
             locals.originalUrl = req.originalUrl
-            that._setRequestId(req, res)
 
             // Track this response
             req.app._requestMonitor._responseStarted(res)
@@ -561,11 +558,6 @@ export const RemoteServerFactory = {
         }
 
         app.use(ssrRequestProcessorMiddleware)
-    },
-
-    _setRequestId(req, res) {
-        const locals = res.locals
-        locals.requestId = req.apiGateway.requestId
     },
 
     /**

@@ -31,7 +31,7 @@ import {
     respondFromBundle,
     getRuntime
 } from './express'
-import {addRequestIdToReqMiddleware} from './middleware/addRequestIdToReq'
+import {randomUUID} from 'crypto'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -182,8 +182,11 @@ describe('SSRServer operation', () => {
     })
 
     beforeEach(() => {
-        RemoteServerFactory._addRequestIdToReq = jest.fn().mockImplementation((_app) => {
-            _app.use(addRequestIdToReqMiddleware)
+        RemoteServerFactory._setRequestId = jest.fn().mockImplementation((_app) => {
+            _app.use((req, res, next) => {
+                res.locals.requestId = randomUUID()
+                next()
+            })
         })
         // Ensure the environment is clean
         process.env = {
