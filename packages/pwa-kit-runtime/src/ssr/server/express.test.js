@@ -473,6 +473,19 @@ describe('SSRServer operation', () => {
                 expect(response.headers['location'].endsWith('/elsewhere')).toBe(true)
             })
     })
+    test('should warn about non-strict SSL ', () => {
+        const app = RemoteServerFactory._createApp(opts())
+        const route = (req, res) => {
+            res.redirect(302, '/elsewhere')
+        }
+        app.get('/*', route)
+        return request(app)
+            .get('/some-bundle-path.jpg')
+            .then((response) => {
+                expect(response.status).toBe(302)
+                expect(response.headers['location'].endsWith('/elsewhere')).toBe(true)
+            })
+    })
 
     test('should support error codes', () => {
         const app = RemoteServerFactory._createApp(opts())
@@ -979,11 +992,11 @@ describe('getRuntime', () => {
     }
 
     const cases = [
-        // {
-        //     env: {},
-        //     expectedRuntime: MockDevServerFactory,
-        //     msg: 'when running locally'
-        // },
+        {
+            env: {},
+            expectedRuntime: MockDevServerFactory,
+            msg: 'when running locally'
+        },
         {
             env: {AWS_LAMBDA_FUNCTION_NAME: 'this-makes-it-remote'},
             expectedRuntime: RemoteServerFactory,
