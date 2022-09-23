@@ -958,7 +958,7 @@ describe('generateCacheKey', () => {
     })
 })
 
-describe.only('getRuntime', () => {
+describe('getRuntime', () => {
     let originalEnv
     let originalEval = global.eval
 
