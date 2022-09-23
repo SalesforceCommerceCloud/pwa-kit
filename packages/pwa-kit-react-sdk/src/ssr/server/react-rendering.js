@@ -18,7 +18,7 @@ import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
-import DeviceContext from '../universal/device-context'
+import {DeviceContext, ServerContext} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -191,20 +191,33 @@ export const render = async (req, res, next) => {
     }
 }
 
-const OuterApp = ({res, error, App, appState, routes, routerContext, location, deviceType}) => {
+const OuterApp = ({
+    req,
+    res,
+    error,
+    App,
+    appState,
+    routes,
+    routerContext,
+    location,
+    deviceType
+}) => {
     const AppConfig = getAppConfig()
     return (
-        <Router location={location} context={routerContext}>
-            <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
-                </AppConfig>
-            </DeviceContext.Provider>
-        </Router>
+        <ServerContext.Provider value={{req, res}}>
+            <Router location={location} context={routerContext}>
+                <DeviceContext.Provider value={{type: deviceType}}>
+                    <AppConfig locals={res.locals}>
+                        <Switch error={error} appState={appState} routes={routes} App={App} />
+                    </AppConfig>
+                </DeviceContext.Provider>
+            </Router>
+        </ServerContext.Provider>
     )
 }
 
 OuterApp.propTypes = {
+    req: PropTypes.object,
     res: PropTypes.object,
     error: PropTypes.object,
     App: PropTypes.elementType,

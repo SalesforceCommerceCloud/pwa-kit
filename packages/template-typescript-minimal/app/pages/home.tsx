@@ -10,6 +10,8 @@ import {useQuery} from '@tanstack/react-query'
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
 
+import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+
 interface Props {
     value: number
 }
@@ -82,6 +84,8 @@ h1 {
 `
 
 const Home = ({value}: Props) => {
+    // TODO: why is this log only once? I thought twice.
+    console.log('--- FOO')
     const [counter, setCounter] = useState(0)
 
     useEffect(() => {
@@ -100,6 +104,13 @@ const Home = ({value}: Props) => {
                 }, 1000)
             })
     )
+
+    useServerContext(({req, res}) => {
+        console.log('--- useServerContext')
+        if (query.error) {
+            res.status(404)
+        }
+    })
 
     return (
         <div>
