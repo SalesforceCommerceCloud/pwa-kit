@@ -10,21 +10,19 @@ import React from 'react'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ssrPrepass from 'react-ssr-prepass'
 
-const isServerSide = typeof window === 'undefined'
 const STATE_KEY = '__reactQuery'
+export const SERVER_RETRY_WARNING =
+    'Running queries with defined retry values on the server can lead to lengthy response times!'
 
 export const withReactQuery = (Wrapped, options = {}) => {
+    const isServerSide = typeof window === 'undefined'
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
-    const queryClientConfig = options.queryClientConfig || {
-        defaultOptions: {
-            queries: {
-                retry: !isServerSide
-            },
-            mutations: {
-                retry: !isServerSide
-            }
-        }
+    const queryClientConfig = options.queryClientConfig || {}
+    const {retry} = queryClientConfig?.defaultOptions || {}
+
+    if (isServerSide && (retry === undefined || !!retry)) {
+        console.warn(SERVER_RETRY_WARNING)
     }
 
     /**
@@ -34,6 +32,7 @@ export const withReactQuery = (Wrapped, options = {}) => {
         render() {
             this.props.locals.__queryClient =
                 this.props.locals.__queryClient || new QueryClient(queryClientConfig)
+
             return (
                 <QueryClientProvider client={this.props.locals.__queryClient}>
                     <Hydrate state={isServerSide ? {} : window.__PRELOADED_STATE__?.[STATE_KEY]}>

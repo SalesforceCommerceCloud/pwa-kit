@@ -8,7 +8,28 @@ import {withReactQuery} from './index'
 import {shallow} from 'enzyme'
 import React from 'react'
 
+import {SERVER_RETRY_WARNING} from '.'
+
 describe('withReactQuery', function() {
+    let windowSpy
+
+    beforeEach(() => {
+        windowSpy = jest.spyOn(window, 'window', 'get')
+        jest.spyOn(console, 'warn').mockImplementation(jest.fn())
+    })
+
+    afterEach(() => {
+        console.warn.mockRestore()
+        windowSpy.mockRestore()
+    })
+
+    test('Renders correctly', () => {
+        const Wrapped = () => <p>Hello world</p>
+        const Component = withReactQuery(Wrapped)
+        const wrapper = shallow(<Component locals={{}} />)
+        expect(wrapper.html()).toContain('Hello world')
+    })
+
     test('Renders correctly', () => {
         const Wrapped = () => <p>Hello world</p>
         const Component = withReactQuery(Wrapped)
@@ -24,5 +45,23 @@ describe('withReactQuery', function() {
     test(`Has working getHOCsInUse method`, () => {
         expect(withReactQuery({}).getHOCsInUse().length).toBe(1)
         expect(withReactQuery({getHOCsInUse: () => ['xyz']}).getHOCsInUse().length).toBe(2)
+    })
+
+    test('Warns if retrying is truthy on server.', () => {
+        windowSpy.mockImplementation(() => undefined)
+        const Wrapped = () => <p>Hello world</p>
+        const Component = withReactQuery(Wrapped, {queryClientConfig: {defaultOptions: {retry: 2}}})
+
+        const wrapper = shallow(<Component locals={{}} />)
+        expect(console.warn).toHaveBeenCalledWith(SERVER_RETRY_WARNING)
+    })
+
+    test('Does not warn if retrying is falsy on server', () => {
+        windowSpy.mockImplementation(() => undefined)
+        const Wrapped = () => <p>Hello world</p>
+        const Component = withReactQuery(Wrapped, {queryClientConfig: {defaultOptions: {retry: 0}}})
+
+        const wrapper = shallow(<Component locals={{}} />)
+        expect(console.warn).not.toHaveBeenCalledWith(SERVER_RETRY_WARNING)
     })
 })

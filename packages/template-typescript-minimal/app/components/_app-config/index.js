@@ -8,4 +8,12 @@ import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/wit
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import AppConfig from 'pwa-kit-react-sdk/ssr/universal/components/_app-config'
 
-export default withReactQuery(withLegacyGetProps(AppConfig))
+const options = {
+    queryClientConfig: {
+        defaultOptions: {
+            retry: false
+        }
+    }
+}
+
+export default withReactQuery(withLegacyGetProps(AppConfig), options)
