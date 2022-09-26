@@ -457,7 +457,7 @@
     "defaultMessage": "Connectez-vous pour récupérer vos articles enregistrés ou poursuivre vos achats."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "Aucun résultat trouvé pour {category}. Essayez de rechercher un produit ou {link}."
+    "defaultMessage": "Aucun résultat trouvé pour {category}. Essayez de rechercher un produit ou cliquez sur {link}."
   },
   "empty_search_results.info.cant_find_anything_for_query": {
     "defaultMessage": "Aucun résultat trouvé pour « {searchQuery} »."
@@ -514,7 +514,7 @@
     "defaultMessage": "2021 Salesforce ou ses affiliés. Tous droits réservés. Ceci est une boutique de démonstration uniquement. Les commandes NE SERONT PAS traitées."
   },
   "footer.subscribe.button.sign_up": {
-    "defaultMessage": "Inscrivez-vous"
+    "defaultMessage": "S'inscrire"
   },
   "footer.subscribe.description.sign_up": {
     "defaultMessage": "Abonnez-vous pour rester informé des meilleures offres"
@@ -617,7 +617,7 @@
     "defaultMessage": "Composants et kit de conception"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Recommandations Einstein"
   },
   "home.features.heading.my_account": {
     "defaultMessage": "Mon compte"
@@ -632,7 +632,7 @@
     "defaultMessage": "Fonctionnalités"
   },
   "home.heading.here_to_help": {
-    "defaultMessage": "Nous sommes là pour vous aider"
+    "defaultMessage": "Nous sommes là pour vous"
   },
   "home.heading.shop_products": {
     "defaultMessage": "Acheter des produits"
@@ -954,7 +954,7 @@
     "defaultMessage": "Il s’agit d’un paiement sécurisé chiffré en SSL."
   },
   "price_per_item.label.each": {
-    "defaultMessage": "pièce",
+    "defaultMessage": " pièce",
     "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
   "product_detail.accordion.button.product_detail": {
@@ -1400,7 +1400,7 @@
     "defaultMessage": "Ajouter au panier"
   },
   "wishlist_primary_action.button.select_options": {
-    "defaultMessage": "Sélectionnez des options"
+    "defaultMessage": "Sélectionner des options"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {article ajouté} other {articles ajoutés}} au panier"

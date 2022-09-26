@@ -88,7 +88,7 @@
     "defaultMessage": "下單日期：{date}"
   },
   "account_order_history.label.shipped_to": {
-    "defaultMessage": "已出貨至：{name}"
+    "defaultMessage": "出貨至：{name}"
   },
   "account_order_history.link.view_details": {
     "defaultMessage": "檢視詳細資料"
@@ -589,7 +589,7 @@
     "defaultMessage": "讓他們為您指點迷津。"
   },
   "home.description.shop_products": {
-    "defaultMessage": "此區塊包含來自目錄的內容。{docLink}如何取代。",
+    "defaultMessage": "此區塊包含來自目錄的內容。{docLink}來瞭解如何取代。",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
@@ -777,7 +777,7 @@
     "defaultMessage": "日文 (日本)"
   },
   "locale_text.message.ko-KR": {
-    "defaultMessage": "韓文 (大韓民國)"
+    "defaultMessage": "韓文 (韓國)"
   },
   "locale_text.message.nl-BE": {
     "defaultMessage": "荷蘭文 (比利時)"
@@ -901,7 +901,7 @@
     "defaultMessage": "找不到您在尋找的頁面。"
   },
   "pagination.field.num_of_pages": {
-    "defaultMessage": "{numOfPages} 頁"
+    "defaultMessage": "/ {numOfPages}"
   },
   "pagination.link.next": {
     "defaultMessage": "下一頁"
