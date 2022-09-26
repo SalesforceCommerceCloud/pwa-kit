@@ -50,7 +50,9 @@ describe('withReactQuery', function() {
     test('Warns if retrying is truthy on server.', () => {
         windowSpy.mockImplementation(() => undefined)
         const Wrapped = () => <p>Hello world</p>
-        const Component = withReactQuery(Wrapped, {queryClientConfig: {defaultOptions: {retry: 2}}})
+        const Component = withReactQuery(Wrapped, {
+            queryClientConfig: {defaultOptions: {queries: {retry: 2}}}
+        })
 
         const wrapper = shallow(<Component locals={{}} />)
         expect(console.warn).toHaveBeenCalledWith(SERVER_RETRY_WARNING)
@@ -59,7 +61,9 @@ describe('withReactQuery', function() {
     test('Does not warn if retrying is falsy on server', () => {
         windowSpy.mockImplementation(() => undefined)
         const Wrapped = () => <p>Hello world</p>
-        const Component = withReactQuery(Wrapped, {queryClientConfig: {defaultOptions: {retry: 0}}})
+        const Component = withReactQuery(Wrapped, {
+            queryClientConfig: {defaultOptions: {queries: {retry: 0}, mutations: {retry: 0}}}
+        })
 
         const wrapper = shallow(<Component locals={{}} />)
         expect(console.warn).not.toHaveBeenCalledWith(SERVER_RETRY_WARNING)

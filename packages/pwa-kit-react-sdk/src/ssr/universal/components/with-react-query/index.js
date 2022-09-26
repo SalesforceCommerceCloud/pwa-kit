@@ -19,9 +19,16 @@ export const withReactQuery = (Wrapped, options = {}) => {
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
     const queryClientConfig = options.queryClientConfig || {}
-    const {retry} = queryClientConfig?.defaultOptions || {}
+    const {retry: queriesRetry} = queryClientConfig?.defaultOptions?.queries || {}
+    const {retry: mutationsRetry} = queryClientConfig?.defaultOptions?.mutations || {}
 
-    if (isServerSide && (retry === undefined || !!retry)) {
+    if (
+        isServerSide &&
+        (queriesRetry === undefined ||
+            !!queriesRetry ||
+            mutationsRetry === undefined ||
+            !!mutationsRetry)
+    ) {
         console.warn(SERVER_RETRY_WARNING)
     }
 
