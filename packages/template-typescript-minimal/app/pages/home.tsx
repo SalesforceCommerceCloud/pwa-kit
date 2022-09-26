@@ -84,8 +84,6 @@ h1 {
 `
 
 const Home = ({value}: Props) => {
-    // TODO: why is this log only once? I thought twice.
-    console.log('--- FOO')
     const [counter, setCounter] = useState(0)
 
     useEffect(() => {

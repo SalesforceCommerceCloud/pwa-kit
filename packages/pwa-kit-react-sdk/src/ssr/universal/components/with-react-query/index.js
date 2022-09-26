@@ -36,16 +36,12 @@ export const withReactQuery = (Wrapped) => {
         /**
          * @private
          */
-        static async doInitAppState({res, appJSX}) {
+        static async doInitAppState({res, appJSX: _appJSX}) {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient())
 
-            const withPrepassContext = React.createElement(
-                IsPrePassContext.Provider,
-                {value: true},
-                appJSX
-            )
-            await ssrPrepass(withPrepassContext)
+            const appJSX = React.createElement(IsPrePassContext.Provider, {value: true}, _appJSX)
+            await ssrPrepass(appJSX)
 
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
