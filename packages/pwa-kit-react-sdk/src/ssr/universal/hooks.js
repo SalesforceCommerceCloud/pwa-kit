@@ -13,28 +13,24 @@ import {IsPrePassContext, ServerContext} from './contexts'
  * @typedef {Object} ServerContext
  * @property {Object} req - Request object
  * @property {Object} res - Response object
+ * @property {boolean} isServerSide
  */
 
 /**
- * @callback serverCtxCallback
- * @param {ServerContext} serverContext
- */
-
-/**
- * Execute the given function within the server context of a server-rendered page
+ * Get the server context
+ * @returns {ServerContext} ServerContext object
  *
- * @param {serverCtxCallback} fn - Function will be called when the server has received the request but the response is not sent yet
  * @example
- * useServerContext(({req, res}) => { res.status(404) })
+ * const {res, isServerSide} = useServerContext()
+ * if (isServerSide && query.error) { res.status(404) }
  */
-export const useServerContext = (fn) => {
+export const useServerContext = () => {
     const serverContext = useContext(ServerContext)
-
-    const isOnServer = Boolean(serverContext.req)
     const isPrePass = useIsPrePass()
 
-    if (isOnServer && !isPrePass) {
-        fn(serverContext)
+    return {
+        ...serverContext,
+        isServerSide: Boolean(serverContext.req) && !isPrePass
     }
 }
 

@@ -105,12 +105,11 @@ const Home = ({value}: Props) => {
             })
     )
 
-    useServerContext(({req, res}) => {
+    const {res, isServerSide} = useServerContext()
+    if (isServerSide && query.data) {
         console.log('--- useServerContext')
-        if (query.error) {
-            res.status(404)
-        }
-    })
+        res.status(404)
+    }
 
     return (
         <div>
