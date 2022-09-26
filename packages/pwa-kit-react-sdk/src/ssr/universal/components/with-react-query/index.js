@@ -14,17 +14,6 @@ import {IsPrePassContext} from '../../contexts'
 const isServerSide = typeof window === 'undefined'
 const STATE_KEY = '__reactQuery'
 
-const WithPrepassContext = (Component) => {
-    const WrappedComponent = (props) => {
-        return (
-            <IsPrePassContext.Provider value={true}>
-                <Component {...props} />
-            </IsPrePassContext.Provider>
-        )
-    }
-    return WrappedComponent
-}
-
 export const withReactQuery = (Wrapped) => {
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
@@ -51,7 +40,12 @@ export const withReactQuery = (Wrapped) => {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient())
 
-            await ssrPrepass(WithPrepassContext(appJSX))
+            const withPrepassContext = React.createElement(
+                IsPrePassContext.Provider,
+                {value: true},
+                appJSX
+            )
+            await ssrPrepass(withPrepassContext)
 
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
