@@ -14,7 +14,6 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 ```
 // app/components/_app-config/index.jsx
 
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 
 const AppConfig = ({children}) => {
@@ -25,7 +24,16 @@ const AppConfig = ({children}) => {
     )
 } 
 
-export defualt withReactQuery(AppConfig)
+// Sample configuraion.
+const options = {
+    queryClientConfig: {
+        defaultOptions: {
+            retry: false
+        }
+    }
+}
+
+export defualt withReactQuery(AppConfig, options)
 ```
 
 ## Generic Integration
