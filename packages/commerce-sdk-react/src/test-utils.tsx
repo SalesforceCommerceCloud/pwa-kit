@@ -25,7 +25,11 @@ export const TEST_CONFIG = {
 const TestProviders = (props: {children: React.ReactNode}) => {
     const queryClient = new QueryClient()
 
-    return <QueryClientProvider client={queryClient}><CommerceApiProvider {...TEST_CONFIG}>{props.children}</CommerceApiProvider></QueryClientProvider>
+    return (
+        <QueryClientProvider client={queryClient}>
+            <CommerceApiProvider {...TEST_CONFIG}>{props.children}</CommerceApiProvider>
+        </QueryClientProvider>
+    )
 }
 
 /**
