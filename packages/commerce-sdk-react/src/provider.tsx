@@ -22,7 +22,6 @@ import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
-import {QUERY_CLIENT_CONFIG} from './query-client-config'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -106,11 +105,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         auth.ready()
     }, [auth])
 
-    const queryClient = new QueryClient({
-        // TODO: should this be a _deep_ merge?
-        ...QUERY_CLIENT_CONFIG,
-        ...queryClientConfig
-    })
+    const queryClient = new QueryClient(queryClientConfig)
 
     // TODO: wrap the children with:
     // - context for enabling useServerEffect hook
