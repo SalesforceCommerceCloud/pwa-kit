@@ -41,7 +41,7 @@ export const experimental = (message) => {
  * @function
  * @param {String} message A message to follow the initial general warning
  */
- export const general = (message) => {
+export const general = (message) => {
     warn('general', message)
 }
 
@@ -78,7 +78,7 @@ const warn = (type, message) => {
     const messages = {
         experimental: `You are currently using an experimental function: [${functionName}] This function may change at any time.`,
         deprecated: `You are currently using an deprecated function: [${functionName}].`,
-        general: `A warning has occured in the function: [${functionName}].`,
+        general: `A warning has occured in the function: [${functionName}].`
     }
 
     if (!shouldDisplay(functionName)) return

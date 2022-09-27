@@ -55,7 +55,9 @@ describe('withReactQuery', function() {
         })
 
         const wrapper = shallow(<Component locals={{}} />)
-        expect(console.warn).toHaveBeenCalledWith(`[PWA Kit API WARNING]: A warning has occured in the function: [withReactQuery]. ${SERVER_RETRY_WARNING}`)
+        expect(console.warn).toHaveBeenCalledWith(
+            `[PWA Kit API WARNING]: A warning has occured in the function: [withReactQuery]. ${SERVER_RETRY_WARNING}`
+        )
     })
 
     test('Does not warn if retrying is falsy on server', () => {
