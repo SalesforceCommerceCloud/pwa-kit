@@ -9,7 +9,9 @@
  */
 /* eslint-disable header/header */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
+import {randomUUID} from 'crypto'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
+
 import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
@@ -352,6 +354,17 @@ jest.mock('@loadable/server', () => {
     }
 })
 
+jest.mock('pwa-kit-runtime/ssr/server/build-remote-server', () => {
+    const actual = jest.requireActual('pwa-kit-runtime/ssr/server/build-remote-server')
+    return {
+        ...actual,
+        RemoteServerFactory: {
+            ...actual.RemoteServerFactory,
+            _setRequestId: jest.fn()
+        }
+    }
+})
+
 describe('The Node SSR Environment', () => {
     const OLD_ENV = process.env
 
@@ -683,7 +696,12 @@ describe('The Node SSR Environment', () => {
     ]
 
     const isRemoteValues = [true, false]
-
+    RemoteServerFactory._setRequestId.mockImplementation((_app) => {
+        _app.use((req, res, next) => {
+            res.locals.requestId = randomUUID()
+            next()
+        })
+    })
     isRemoteValues.forEach((isRemoteValue) => {
         // Run test cases
         cases.forEach(({description, req, assertions, mocks}) => {
@@ -696,6 +714,7 @@ describe('The Node SSR Environment', () => {
 
                 const {url, headers, query} = req
                 const app = RemoteServerFactory._createApp(opts())
+
                 app.get('/*', render)
                 if (mocks) {
                     mocks()
