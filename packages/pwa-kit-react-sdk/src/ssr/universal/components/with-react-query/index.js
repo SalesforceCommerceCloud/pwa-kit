@@ -4,15 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import hoistNonReactStatic from 'hoist-non-react-statics'
-import {FetchStrategy} from '../fetch-strategy'
 import React from 'react'
-import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
+import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {FetchStrategy} from '../fetch-strategy'
+import * as Warnings from '../../../../utils/warnings'
 
 const STATE_KEY = '__reactQuery'
 export const SERVER_RETRY_WARNING =
-    'Running queries with defined retry values on the server can lead to lengthy response times!'
+    'Use of the "retry" option may lead to degraded performance on the server.'
 
 export const withReactQuery = (Wrapped, options = {}) => {
     const isServerSide = typeof window === 'undefined'
@@ -29,7 +30,7 @@ export const withReactQuery = (Wrapped, options = {}) => {
             mutationsRetry === undefined ||
             !!mutationsRetry)
     ) {
-        console.warn(SERVER_RETRY_WARNING)
+        Warnings.general(SERVER_RETRY_WARNING)
     }
 
     /**

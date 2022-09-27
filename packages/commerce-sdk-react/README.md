@@ -24,11 +24,17 @@ const AppConfig = ({children}) => {
     )
 } 
 
-// Sample configuraion.
+// Configure React Query.
 const options = {
     queryClientConfig: {
         defaultOptions: {
-            retry: false
+            refetchOnMount: false,
+            queries: {
+                retry: false
+            },
+            mutations: {
+                retry: false
+            }
         }
     }
 }
