@@ -42,7 +42,7 @@ AppConfig.restore = () => {}
 AppConfig.extraGetPropsArgs = () => {}
 AppConfig.freeze = () => {}
 
-// Recommended settings for PWA-Kit usages.
+// Recommended settings for PWA-Kit usage.
 const options = {
     queryClientConfig: {
         defaultOptions: {
