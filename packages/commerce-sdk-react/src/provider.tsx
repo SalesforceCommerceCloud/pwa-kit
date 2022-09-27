@@ -29,6 +29,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     currency: string
     redirectURI: string
     fetchOptions?: ShopperBasketsTypes.FetchOptions
+    headers?: Record<string, string>
 }
 
 /**
@@ -51,16 +52,18 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {
         children,
         clientId,
+        headers = {},
         organizationId,
-        shortCode,
-        siteId,
         proxy,
         redirectURI,
-        fetchOptions
+        fetchOptions,
+        siteId,
+        shortCode
     } = props
 
     const config = {
         proxy,
+        headers,
         parameters: {
             clientId,
             organizationId,

@@ -31,6 +31,7 @@ import {
     respondFromBundle,
     getRuntime
 } from './express'
+import {randomUUID} from 'crypto'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -172,6 +173,7 @@ describe('SSRServer operation', () => {
 
     afterEach(() => {
         sandbox.restore()
+        jest.resetModules()
         nock.cleanAll()
     })
 
@@ -180,6 +182,12 @@ describe('SSRServer operation', () => {
     })
 
     beforeEach(() => {
+        RemoteServerFactory._setRequestId = jest.fn().mockImplementation((_app) => {
+            _app.use((req, res, next) => {
+                res.locals.requestId = randomUUID()
+                next()
+            })
+        })
         // Ensure the environment is clean
         process.env = {
             LISTEN_ADDRESS: '',
@@ -421,6 +429,7 @@ describe('SSRServer operation', () => {
 
             test(`${name} (and handle 404s correctly)`, () => {
                 const app = RemoteServerFactory._createApp(opts({buildDir: tmpDir}))
+                app.get('/worker.js(.map)?', RemoteServerFactory.serveServiceWorker)
 
                 return request(app)
                     .get(requestPath)
@@ -467,8 +476,7 @@ describe('SSRServer operation', () => {
                 expect(response.headers['location'].endsWith('/elsewhere')).toBe(true)
             })
     })
-
-    test('should support other redirects', () => {
+    test('should warn about non-strict SSL ', () => {
         const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             res.redirect(302, '/elsewhere')
