@@ -43,7 +43,7 @@
     "rimraf": "2.6.1",
     "semver": "^7.3.2",
     "set-cookie-parser": "^2.2.1",
-    "ua-parser-js": "^0.7.24",
+    "ua-parser-js": "^0.7.31",
     "whatwg-encoding": "^1.0.5"
   },
   "devDependencies": {

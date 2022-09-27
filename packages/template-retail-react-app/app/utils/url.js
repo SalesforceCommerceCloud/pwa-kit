@@ -115,7 +115,7 @@ export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`
  * @param {string} searchTerm
  * @returns {string}
  */
-export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
+export const searchUrlBuilder = (searchTerm) => '/search?q=' + encodeURIComponent(searchTerm)
 
 /**
  * Returns a relative URL for a locale short code.
