@@ -7,6 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
+import {getQueryOptions} from '../../query-options'
 
 type Client = ApiClients['shopperProducts']
 
@@ -39,7 +40,7 @@ function useProducts(
         ({shopperProducts}) => {
             return shopperProducts.getProducts({parameters, headers}, rawResponse)
         },
-        options
+        getQueryOptions<DataType<Client['getProducts']> | Response, Error>(options)
     )
 }
 
@@ -71,7 +72,7 @@ function useProduct(
         ({shopperProducts}) => {
             return shopperProducts.getProduct({parameters, headers}, rawResponse)
         },
-        options
+        getQueryOptions<DataType<Client['getProduct']> | Response, Error>(options)
     )
 }
 
@@ -106,7 +107,7 @@ function useCategories(
         ({shopperProducts}) => {
             return shopperProducts.getCategories({parameters, headers}, rawResponse)
         },
-        options
+        getQueryOptions<DataType<Client['getCategories']> | Response, Error>(options)
     )
 }
 
@@ -143,7 +144,7 @@ function useCategory(
         ({shopperProducts}) => {
             return shopperProducts.getCategory({parameters, headers}, rawResponse)
         },
-        options
+        getQueryOptions<DataType<Client['getCategory']> | Response, Error>(options)
     )
 }
 
