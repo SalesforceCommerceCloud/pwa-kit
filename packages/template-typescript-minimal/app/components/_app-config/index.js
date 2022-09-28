@@ -12,7 +12,6 @@ import AppConfig from 'pwa-kit-react-sdk/ssr/universal/components/_app-config'
 const options = {
     queryClientConfig: {
         defaultOptions: {
-            refetchOnMount: false,
             queries: {
                 retry: false
             },

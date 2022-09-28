@@ -46,7 +46,6 @@ AppConfig.freeze = () => {}
 const options = {
     queryClientConfig: {
         defaultOptions: {
-            refetchOnMount: false,
             queries: {
                 retry: false
             },
