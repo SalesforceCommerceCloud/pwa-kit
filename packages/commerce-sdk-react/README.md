@@ -44,7 +44,7 @@ export default withReactQuery(AppConfig, options)
 
 ## Generic Integration
 
-> You can use this library in any React application provided you bring your own QueryCleint and QueryClientProvider. Below is a sample integration:
+> You can use this library in any React application provided you bring your own QueryClient and QueryClientProvider. Below is a sample integration:
 
 ```
 import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
