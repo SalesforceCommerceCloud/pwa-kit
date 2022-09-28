@@ -39,7 +39,7 @@ const options = {
     }
 }
 
-export defualt withReactQuery(AppConfig, options)
+export default withReactQuery(AppConfig, options)
 ```
 
 ## Generic Integration
