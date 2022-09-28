@@ -78,7 +78,7 @@ const warn = (type, message) => {
     const messages = {
         experimental: `You are currently using an experimental function: [${functionName}] This function may change at any time.`,
         deprecated: `You are currently using an deprecated function: [${functionName}].`,
-        general: `A warning has occured in the function: [${functionName}].`
+        general: `A warning has occurred in the function: [${functionName}].`
     }
 
     if (!shouldDisplay(functionName)) return
