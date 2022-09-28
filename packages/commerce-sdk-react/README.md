@@ -48,7 +48,6 @@ export default withReactQuery(AppConfig, options)
 
 ```
 import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
-import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 
 
 const App = ({children}) => {
