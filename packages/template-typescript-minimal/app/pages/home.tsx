@@ -94,13 +94,23 @@ const Home = ({value}: Props) => {
     const query = useQuery(
         ['example-data'],
         () =>
+            // new Promise((resolve) => {
+            //     setTimeout(() => {
+            //         resolve('This came from react-query')
+            //     }, 1000)
+            // })
+
             new Promise(() => {
                 throw new Error('FOO')
-
-                // setTimeout(() => {
-                //     resolve('This came from react-query')
-                // }, 1000)
             })
+
+        // If users choose to render the error boundary page, they can pass in this useErrorBoundary option.
+        // {useErrorBoundary: true}
+
+        // If users want to handle the error in a more custom way:
+        // - First of all, check for `query.error`
+        // - They can do something with the response via the upcoming `useServerContext` hook
+        // - They can also render some message on the page.
     )
 
     return (
