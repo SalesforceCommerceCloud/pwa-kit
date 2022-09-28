@@ -19,6 +19,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
+import {CorrelationIdProvider} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -195,11 +196,13 @@ const OuterApp = ({res, error, App, appState, routes, routerContext, location, d
     const AppConfig = getAppConfig()
     return (
         <Router location={location} context={routerContext}>
-            <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
-                </AppConfig>
-            </DeviceContext.Provider>
+            <CorrelationIdProvider correlationId={res.locals.requestId} resetOnPageChange={false}>
+                <DeviceContext.Provider value={{type: deviceType}}>
+                    <AppConfig locals={res.locals}>
+                        <Switch error={error} appState={appState} routes={routes} App={App} />
+                    </AppConfig>
+                </DeviceContext.Provider>
+            </CorrelationIdProvider>
         </Router>
     )
 }
