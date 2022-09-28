@@ -63,7 +63,7 @@ const App = ({children}) => {
     )
 } 
 
-export defualt App
+export default App
 ```
 ### Useful Links:
 
