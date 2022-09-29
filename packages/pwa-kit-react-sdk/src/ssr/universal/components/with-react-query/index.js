@@ -43,7 +43,14 @@ export const withReactQuery = (Wrapped) => {
 
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
-            await Promise.all(queries.map((q) => q.fetch()))
+            await Promise.all(
+                queries.map((q) =>
+                    // If there's an error in this fetch, react-query will log the error
+                    q.fetch().catch(() => {
+                        // On our end, simply catch any error and move on to the next query
+                    })
+                )
+            )
 
             return {[STATE_KEY]: dehydrate(queryClient)}
         }
