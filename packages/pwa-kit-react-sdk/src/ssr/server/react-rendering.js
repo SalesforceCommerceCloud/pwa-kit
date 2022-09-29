@@ -18,7 +18,8 @@ import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
-import {DeviceContext, ServerContext, CorrelationIdProvider} from '../universal/contexts'
+import DeviceContext from '../universal/device-context'
+import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
