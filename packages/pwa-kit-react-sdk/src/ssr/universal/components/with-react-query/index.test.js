@@ -30,13 +30,6 @@ describe('withReactQuery', function() {
         expect(wrapper.html()).toContain('Hello world')
     })
 
-    test('Renders correctly', () => {
-        const Wrapped = () => <p>Hello world</p>
-        const Component = withReactQuery(Wrapped)
-        const wrapper = shallow(<Component locals={{}} />)
-        expect(wrapper.html()).toContain('Hello world')
-    })
-
     test(`Has working getInitializers method`, () => {
         expect(withReactQuery({}).getInitializers().length).toBe(1)
         expect(withReactQuery({getInitializers: () => ['xyz']}).getInitializers().length).toBe(2)
