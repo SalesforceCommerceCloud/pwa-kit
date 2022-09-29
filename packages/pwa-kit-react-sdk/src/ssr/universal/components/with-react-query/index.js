@@ -9,7 +9,6 @@ import {FetchStrategy} from '../fetch-strategy'
 import React from 'react'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ssrPrepass from 'react-ssr-prepass'
-import {IsPrePassContext} from '../../contexts'
 
 const isServerSide = typeof window === 'undefined'
 const STATE_KEY = '__reactQuery'
@@ -36,12 +35,13 @@ export const withReactQuery = (Wrapped) => {
         /**
          * @private
          */
-        static async doInitAppState({res, appJSX: _appJSX}) {
+        static async doInitAppState({res, appJSX}) {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient())
 
-            const appJSX = React.createElement(IsPrePassContext.Provider, {value: true}, _appJSX)
+            res.locals.isServerContextReady = false
             await ssrPrepass(appJSX)
+            delete res.locals.isServerContextReady
 
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
