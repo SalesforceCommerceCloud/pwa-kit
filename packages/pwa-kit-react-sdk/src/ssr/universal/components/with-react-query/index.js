@@ -39,9 +39,11 @@ export const withReactQuery = (Wrapped) => {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient())
 
-            res.locals.isServerContextReady = false
-            await ssrPrepass(appJSX)
-            delete res.locals.isServerContextReady
+            // Without the request object, our useServerContext hook would be able tell whether on prepass
+            const withoutReq = React.cloneElement(appJSX, {
+                req: undefined
+            })
+            await ssrPrepass(withoutReq)
 
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)

@@ -26,10 +26,9 @@ import {ServerContext} from './contexts'
  */
 export const useServerContext = () => {
     const serverContext = useContext(ServerContext)
-    const res = serverContext.res
 
     return {
         ...serverContext,
-        isServerSide: Boolean(res) && res.locals.isServerContextReady !== false
+        isServerSide: Boolean(serverContext.req)
     }
 }
