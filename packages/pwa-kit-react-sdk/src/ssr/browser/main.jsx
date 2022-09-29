@@ -8,13 +8,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
-import {DeviceContext, ServerContext} from '../universal/contexts'
+import {DeviceContext, ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
-
+import {uuidv4} from '../../utils/uuidv4.client'
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
     return Promise.resolve().then(() => {
@@ -76,16 +76,18 @@ export const start = () => {
             ReactDOM.hydrate(
                 <ServerContext.Provider value={{}}>
                     <Router>
-                        <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                            <AppConfig locals={locals}>
-                                <Switch
-                                    error={error}
-                                    appState={window.__PRELOADED_STATE__}
-                                    routes={routes}
-                                    App={WrappedApp}
-                                />
-                            </AppConfig>
-                        </DeviceContext.Provider>
+                        <CorrelationIdProvider correlationId={() => uuidv4()}>
+                            <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
+                                <AppConfig locals={locals}>
+                                    <Switch
+                                        error={error}
+                                        appState={window.__PRELOADED_STATE__}
+                                        routes={routes}
+                                        App={WrappedApp}
+                                    />
+                                </AppConfig>
+                            </DeviceContext.Provider>
+                        </CorrelationIdProvider>
                     </Router>
                 </ServerContext.Provider>,
                 rootEl,

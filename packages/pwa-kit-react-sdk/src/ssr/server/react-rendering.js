@@ -18,7 +18,7 @@ import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
-import {DeviceContext, ServerContext} from '../universal/contexts'
+import {DeviceContext, ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -206,11 +206,16 @@ const OuterApp = ({
     return (
         <ServerContext.Provider value={{req, res}}>
             <Router location={location} context={routerContext}>
-                <DeviceContext.Provider value={{type: deviceType}}>
-                    <AppConfig locals={res.locals}>
-                        <Switch error={error} appState={appState} routes={routes} App={App} />
-                    </AppConfig>
-                </DeviceContext.Provider>
+                <CorrelationIdProvider
+                    correlationId={res.locals.requestId}
+                    resetOnPageChange={false}
+                >
+                    <DeviceContext.Provider value={{type: deviceType}}>
+                        <AppConfig locals={res.locals}>
+                            <Switch error={error} appState={appState} routes={routes} App={App} />
+                        </AppConfig>
+                    </DeviceContext.Provider>
+                </CorrelationIdProvider>
             </Router>
         </ServerContext.Provider>
     )
