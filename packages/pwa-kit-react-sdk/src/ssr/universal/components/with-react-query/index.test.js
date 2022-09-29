@@ -8,7 +8,21 @@ import {withReactQuery} from './index'
 import {shallow} from 'enzyme'
 import React from 'react'
 
+import {SERVER_RETRY_WARNING} from '.'
+
 describe('withReactQuery', function() {
+    let windowSpy
+
+    beforeEach(() => {
+        windowSpy = jest.spyOn(window, 'window', 'get')
+        jest.spyOn(console, 'warn').mockImplementation(jest.fn())
+    })
+
+    afterEach(() => {
+        console.warn.mockRestore()
+        windowSpy.mockRestore()
+    })
+
     test('Renders correctly', () => {
         const Wrapped = () => <p>Hello world</p>
         const Component = withReactQuery(Wrapped)
