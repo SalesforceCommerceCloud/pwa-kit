@@ -9,29 +9,38 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {FetchStrategy} from '../fetch-strategy'
-import * as Warnings from '../../../../utils/warnings'
 
 const STATE_KEY = '__reactQuery'
-export const SERVER_RETRY_WARNING =
-    'Use of the "retry" option may lead to degraded performance on the server.'
 
+// This is where we want to set the default query client configuration that are
+// safe for execution on the server and client. If there are any other config
+// option defaults that need to be set in the future, they should be set here.
+const SAFE_QUERY_CLIENT_CONFIG = {
+    defaultOptions: {
+        queries: {
+            retry: false
+        },
+        mutations: {
+            retry: false
+        }
+    }
+}
+
+/**
+ * A HoC for adding React Query support to your application.
+ *
+ * @param {React.ReactElement} Wrapped The component to be wrapped
+ * @param {Object} options
+ * @param {Object} options.queryClientConfig The react query client configuration object to be used. By
+ * default the `retry` option will be set to false to ensure performant server rendering.
+ *
+ * @returns {React.ReactElement}
+ */
 export const withReactQuery = (Wrapped, options = {}) => {
     const isServerSide = typeof window === 'undefined'
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
-    const queryClientConfig = options.queryClientConfig || {}
-    const {retry: queriesRetry} = queryClientConfig?.defaultOptions?.queries || {}
-    const {retry: mutationsRetry} = queryClientConfig?.defaultOptions?.mutations || {}
-
-    if (
-        isServerSide &&
-        (queriesRetry === undefined ||
-            !!queriesRetry ||
-            mutationsRetry === undefined ||
-            !!mutationsRetry)
-    ) {
-        Warnings.general(SERVER_RETRY_WARNING)
-    }
+    const queryClientConfig = options.queryClientConfig || SAFE_QUERY_CLIENT_CONFIG
 
     /**
      * @private

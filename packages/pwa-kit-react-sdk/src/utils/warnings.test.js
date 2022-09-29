@@ -57,25 +57,4 @@ describe('warnings', () => {
             `[PWA Kit API WARNING]: You are currently using an experimental function: [testFunction4] This function may change at any time. `
         )
     })
-
-    test('general', () => {
-        const testFunction5 = () => {
-            general('msg')
-        }
-        testFunction5()
-        expect(console.warn.mock.calls[0][0]).toEqual(
-            `[PWA Kit API WARNING]: A warning has occured in the function: [testFunction5]. msg`
-        )
-
-        testFunction5()
-        expect(console.warn).toHaveBeenCalledTimes(1)
-
-        const testFunction6 = () => {
-            general()
-        }
-        testFunction6()
-        expect(console.warn.mock.calls[1][0]).toEqual(
-            `[PWA Kit API WARNING]: A warning has occured in the function: [testFunction6]. `
-        )
-    })
 })

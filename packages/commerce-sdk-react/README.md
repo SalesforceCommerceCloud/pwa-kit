@@ -16,6 +16,8 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 
+const isServer = typeof window !== 'undefined'
+
 const AppConfig = ({children}) => {
     return (
         <CommerceApiProvider {...commerceApiProviderProps}>
@@ -24,16 +26,17 @@ const AppConfig = ({children}) => {
     )
 } 
 
-// Configure React Query.
+// Set configuration options for react query.
+// NOTE: This configuration will be used both on the server-side and 
+// client-side.
 const options = {
     queryClientConfig: {
         defaultOptions: {
-            refetchOnMount: false,
             queries: {
-                retry: false
+                retry: !server // Only retry when on the client.
             },
             mutations: {
-                retry: false
+                retry: !server // Only retry when on the client.
             }
         }
     }

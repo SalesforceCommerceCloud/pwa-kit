@@ -46,28 +46,4 @@ describe('withReactQuery', function() {
         expect(withReactQuery({}).getHOCsInUse().length).toBe(1)
         expect(withReactQuery({getHOCsInUse: () => ['xyz']}).getHOCsInUse().length).toBe(2)
     })
-
-    test('Warns if retrying is truthy on server.', () => {
-        windowSpy.mockImplementation(() => undefined)
-        const Wrapped = () => <p>Hello world</p>
-        const Component = withReactQuery(Wrapped, {
-            queryClientConfig: {defaultOptions: {queries: {retry: 2}}}
-        })
-
-        const wrapper = shallow(<Component locals={{}} />)
-        expect(console.warn).toHaveBeenCalledWith(
-            `[PWA Kit API WARNING]: A warning has occured in the function: [withReactQuery]. ${SERVER_RETRY_WARNING}`
-        )
-    })
-
-    test('Does not warn if retrying is falsy on server', () => {
-        windowSpy.mockImplementation(() => undefined)
-        const Wrapped = () => <p>Hello world</p>
-        const Component = withReactQuery(Wrapped, {
-            queryClientConfig: {defaultOptions: {queries: {retry: 0}, mutations: {retry: 0}}}
-        })
-
-        const wrapper = shallow(<Component locals={{}} />)
-        expect(console.warn).not.toHaveBeenCalledWith(SERVER_RETRY_WARNING)
-    })
 })
