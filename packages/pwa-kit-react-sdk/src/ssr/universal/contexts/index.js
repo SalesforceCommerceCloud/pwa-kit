@@ -9,6 +9,9 @@ import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 
+const DeviceContext = React.createContext()
+const ServerContext = React.createContext()
+
 const CorrelationIdContext = React.createContext()
 
 /**
@@ -60,4 +63,4 @@ CorrelationIdProvider.propTypes = {
     location: PropTypes.object
 }
 
-export {CorrelationIdContext, CorrelationIdProvider}
+export {CorrelationIdContext, CorrelationIdProvider, DeviceContext, ServerContext}
