@@ -19,7 +19,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
-import {CorrelationIdProvider} from '../universal/contexts'
+import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -192,22 +192,38 @@ export const render = async (req, res, next) => {
     }
 }
 
-const OuterApp = ({res, error, App, appState, routes, routerContext, location, deviceType}) => {
+const OuterApp = ({
+    req,
+    res,
+    error,
+    App,
+    appState,
+    routes,
+    routerContext,
+    location,
+    deviceType
+}) => {
     const AppConfig = getAppConfig()
     return (
-        <Router location={location} context={routerContext}>
-            <CorrelationIdProvider correlationId={res.locals.requestId} resetOnPageChange={false}>
-                <DeviceContext.Provider value={{type: deviceType}}>
-                    <AppConfig locals={res.locals}>
-                        <Switch error={error} appState={appState} routes={routes} App={App} />
-                    </AppConfig>
-                </DeviceContext.Provider>
-            </CorrelationIdProvider>
-        </Router>
+        <ServerContext.Provider value={{req, res}}>
+            <Router location={location} context={routerContext}>
+                <CorrelationIdProvider
+                    correlationId={res.locals.requestId}
+                    resetOnPageChange={false}
+                >
+                    <DeviceContext.Provider value={{type: deviceType}}>
+                        <AppConfig locals={res.locals}>
+                            <Switch error={error} appState={appState} routes={routes} App={App} />
+                        </AppConfig>
+                    </DeviceContext.Provider>
+                </CorrelationIdProvider>
+            </Router>
+        </ServerContext.Provider>
     )
 }
 
 OuterApp.propTypes = {
+    req: PropTypes.object,
     res: PropTypes.object,
     error: PropTypes.object,
     App: PropTypes.elementType,

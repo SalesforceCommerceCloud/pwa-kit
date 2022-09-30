@@ -7,7 +7,7 @@
 /* istanbul ignore file */
 
 import React, {useContext} from 'react'
-import {CorrelationIdContext} from '../contexts'
+import {CorrelationIdContext, ServerContext} from '../contexts'
 
 /**
  * Use this hook to get the correlation id value of the closest CorrelationIdProvider component.
@@ -20,4 +20,29 @@ export const useCorrelationId = () => {
         throw new Error('useCorrelationId needs to be used within CorrelationIdProvider')
     }
     return context
+}
+
+/**
+ * Server context
+ * @typedef {Object} ServerContext
+ * @property {Object} req - Request object
+ * @property {Object} res - Response object
+ * @property {boolean} isServerSide
+ */
+
+/**
+ * Get the server context
+ * @returns {ServerContext} ServerContext object
+ *
+ * @example
+ * const {res, isServerSide} = useServerContext()
+ * if (isServerSide && query.error) { res.status(404) }
+ */
+export const useServerContext = () => {
+    const serverContext = useContext(ServerContext)
+
+    return {
+        ...serverContext,
+        isServerSide: Boolean(serverContext.req)
+    }
 }
