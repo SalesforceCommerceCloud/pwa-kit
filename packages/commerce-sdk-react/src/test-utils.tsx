@@ -10,6 +10,7 @@ import jwt from 'jsonwebtoken'
 import nock from 'nock'
 import React from 'react'
 import CommerceApiProvider from './provider'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 export const TEST_CONFIG = {
     proxy: 'http://localhost:3000/mobify/proxy/api',
@@ -22,15 +23,12 @@ export const TEST_CONFIG = {
     currency: 'USD'
 }
 const TestProviders = (props: {children: React.ReactNode}) => {
+    const queryClient = new QueryClient()
+
     return (
-        <CommerceApiProvider
-            {...TEST_CONFIG}
-            queryClientConfig={{
-                defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
-            }}
-        >
-            {props.children}
-        </CommerceApiProvider>
+        <QueryClientProvider client={queryClient}>
+            <CommerceApiProvider {...TEST_CONFIG}>{props.children}</CommerceApiProvider>
+        </QueryClientProvider>
     )
 }
 
