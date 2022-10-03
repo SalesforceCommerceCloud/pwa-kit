@@ -82,6 +82,20 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
                     </div>
                 )}
             />
+            <Route
+                path={createPathWithDefaults('/search')}
+                render={(props) => (
+                    <div>
+                        <div>{customer.customerId}</div>
+                        <ProductList
+                            {...props}
+                            isLoading={isLoading}
+                            searchQuery={searchQuery}
+                            productSearchResult={mockProductListSearchResponse}
+                        />
+                    </div>
+                )}
+            />
         </Switch>
     )
 }
@@ -108,7 +122,6 @@ const server = setupMockServer(
 )
 
 beforeEach(() => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
 
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
@@ -128,37 +141,44 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test('should render product list page', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 })
 
 test('should render sort option list page', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-product-list-sort')).toBeInTheDocument()
 })
 
 test('should render skeleton', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent isLoading />)
     expect(screen.getAllByTestId('sf-product-tile-skeleton').length).toEqual(25)
 })
 
 test('should render empty list page', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedEmptyPage />)
     expect(await screen.findByTestId('sf-product-empty-list-page')).toBeInTheDocument()
 })
 
 test('pagination is rendered', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
 })
 
 test('should display Selected refinements as there are some in the response', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     const countOfRefinements = await screen.findAllByText('Black')
     expect(countOfRefinements.length).toEqual(2)
 })
 
 test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     const wishlistButton = screen.getAllByLabelText('Wishlist')
     expect(wishlistButton.length).toBe(25)
@@ -168,6 +188,7 @@ test('show login modal when an unauthenticated user tries to add an item to wish
 })
 
 test('clicking a filter will change url', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
@@ -197,4 +218,15 @@ test('should display Search Results for when searching ', async () => {
     renderWithProviders(<MockedComponent />)
     window.history.pushState({}, 'ProductList', 'uk/en-GB/search?q=test')
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+})
+
+test('clicking a filter on search result will change url', async () => {
+    window.history.pushState({}, 'ProductList', 'uk/en-GB/search?q=dress')
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
+    })
+    user.click(screen.getByText(/Beige/i))
+    await waitFor(() => expect(window.location.href).toEqual(createPathWithDefaults('/search')))
+    await waitFor(() => expect(window.location.search).toEqual(
+        '?limit=25&q=dress&refine=c_refinementColor%3DBeige&sort=best-matches'))
 })
