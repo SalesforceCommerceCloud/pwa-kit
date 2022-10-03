@@ -23,7 +23,10 @@ export const TEST_CONFIG = {
     currency: 'USD'
 }
 const TestProviders = (props: {children: React.ReactNode}) => {
-    const queryClient = new QueryClient()
+    const queryClient = new QueryClient({
+        // During testing, we want things to fail immediately
+        defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
+    })
 
     return (
         <QueryClientProvider client={queryClient}>
