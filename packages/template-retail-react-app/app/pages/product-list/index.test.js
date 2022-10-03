@@ -216,17 +216,17 @@ test('click on filter All should clear out all the filter in search params', asy
 
 test('should display Search Results for when searching ', async () => {
     renderWithProviders(<MockedComponent />)
-    window.history.pushState({}, 'ProductList', 'uk/en-GB/search?q=test')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/search?q=test')
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 })
 
 test('clicking a filter on search result will change url', async () => {
-    window.history.pushState({}, 'ProductList', 'uk/en-GB/search?q=dress')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/search?q=dress')
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
     user.click(screen.getByText(/Beige/i))
-    await waitFor(() => expect(window.location.href).toEqual(createPathWithDefaults('/search')))
+    await waitFor(() => expect(window.location.pathname).toEqual(createPathWithDefaults('/search')))
     await waitFor(() => expect(window.location.search).toEqual(
         '?limit=25&q=dress&refine=c_refinementColor%3DBeige&sort=best-matches'))
 })
