@@ -13,8 +13,7 @@ const ids = '25502228M,25503045M'
 
 const UseShopperProducts = () => {
     const {isLoading, error, data: result} = useProducts({
-        // @ts-ignore
-        foo: ids
+        ids
     })
     if (isLoading) {
         return (
