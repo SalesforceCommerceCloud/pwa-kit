@@ -9,7 +9,7 @@ import {render, RenderOptions} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
 import nock from 'nock'
 import React from 'react'
-import CommerceApiProvider from './provider'
+import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 export const TEST_CONFIG = {
@@ -22,12 +22,17 @@ export const TEST_CONFIG = {
     locale: 'en_US',
     currency: 'USD'
 }
-const TestProviders = (props: {children: React.ReactNode}) => {
+const TestProviders = (props: {
+    children: React.ReactNode
+    optionalConfig?: Pick<CommerceApiProviderProps, 'headers' | 'fetchOptions'>
+}) => {
     const queryClient = new QueryClient()
-
+    const {optionalConfig} = props
     return (
         <QueryClientProvider client={queryClient}>
-            <CommerceApiProvider {...TEST_CONFIG}>{props.children}</CommerceApiProvider>
+            <CommerceApiProvider {...TEST_CONFIG} {...optionalConfig}>
+                {props.children}
+            </CommerceApiProvider>
         </QueryClientProvider>
     )
 }
@@ -35,14 +40,19 @@ const TestProviders = (props: {children: React.ReactNode}) => {
 /**
  * Render your component, which will be wrapped with all the necessary Provider components
  *
- * @param component
+ * @param children
  * @param options - additional options for testing-library's render function
+ * @param wrapperProps - additional props to pass to TestProvider component
  */
 export const renderWithProviders = (
-    component: React.ReactElement,
-    options?: Omit<RenderOptions, 'wrapper'>
+    children: React.ReactElement,
+    options?: Omit<RenderOptions, 'wrapper'>,
+    wrapperProps?: {optionalConfig?: Pick<CommerceApiProviderProps, 'headers' | 'fetchOptions'>}
 ): void => {
-    render(component, {wrapper: TestProviders, ...options})
+    render(children, {
+        wrapper: () => <TestProviders {...wrapperProps}>{children}</TestProviders>,
+        ...options
+    })
 }
 
 type NockBackOptions = {
