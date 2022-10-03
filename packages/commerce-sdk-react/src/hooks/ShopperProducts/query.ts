@@ -22,7 +22,6 @@ type UseProductsArg = {headers?: UseProductsHeaders; rawResponse?: boolean} & Us
  */
 function useProducts(
     arg: Omit<UseProductsArg, 'rawResponse'> & {rawResponse?: false},
-    // TODO: should error be of different type? Looks like it can be Error or ResponseError (which extends Error)
     options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ): UseQueryResult<DataType<Client['getProducts']>, Error>
 function useProducts(
