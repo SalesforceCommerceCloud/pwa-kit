@@ -229,7 +229,7 @@ const ProductList = (props) => {
             }
         }
 
-        if (params.categoryId) {
+        if (!searchQuery) {
             navigate(`/category/${params.categoryId}?${stringifySearchParams(searchParamsCopy)}`)
         } else {
             navigate(`/search?${stringifySearchParams(searchParamsCopy)}`)
