@@ -29,7 +29,7 @@ export enum ShopperContextsActions {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-contexts?meta=updateShopperContext} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercontexts.shoppercontexts-1.html#updateshoppercontext} for more information on the parameters and returned data type.
      */
-    UpdateShopperContext = 'updateShopperContext'
+    UpdateShopperContext = 'updateShopperContext',
 }
 
 /**
@@ -42,6 +42,7 @@ export function useShopperContextsMutation<Action extends `${ShopperContextsActi
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
     const {shopperContexts: client} = useCommerceApi()
+    // @ts-ignore
     const method = client[action] as MutationFunction<Data, Params>
     return useMutation<Data, Error, Params>(method)
 }

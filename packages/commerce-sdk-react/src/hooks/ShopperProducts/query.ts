@@ -38,7 +38,7 @@ function useProducts(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['products', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getProducts({parameters, headers}, rawResponse)
         },
         options
@@ -73,7 +73,7 @@ function useProduct(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['product', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getProduct({parameters, headers}, rawResponse)
         },
         options
@@ -111,7 +111,7 @@ function useCategories(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['categories', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getCategories({parameters, headers}, rawResponse)
         },
         options
@@ -148,7 +148,7 @@ function useCategory(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['category', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getCategory({parameters, headers}, rawResponse)
         },
         options

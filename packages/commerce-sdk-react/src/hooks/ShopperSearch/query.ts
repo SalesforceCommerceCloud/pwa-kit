@@ -40,7 +40,7 @@ function useProductSearch(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['productSearch', arg],
-        ({shopperSearch}) => shopperSearch.productSearch({parameters, headers}, rawResponse),
+        (_, {shopperSearch}) => shopperSearch.productSearch({parameters, headers}, rawResponse),
         options
     )
 }
@@ -75,7 +75,8 @@ function useSearchSuggestions(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['search-suggestions', arg],
-        ({shopperSearch}) => shopperSearch.getSearchSuggestions({parameters, headers}, rawResponse),
+        (_, {shopperSearch}) =>
+            shopperSearch.getSearchSuggestions({parameters, headers}, rawResponse),
         options
     )
 }

@@ -51,13 +51,13 @@ const tests = [
                 }
             },
             {
-                name: 'execute',
+                name: 'mutate',
                 assertions: async () => {
                     const Component = () => {
                         const loginGuestUser = useShopperLoginHelper('loginGuestUser')
                         return (
                             <>
-                                <button onClick={loginGuestUser.execute}>login</button>
+                                <button onClick={loginGuestUser.mutate}>login</button>
                                 <p>{loginGuestUser.data}</p>
                                 <p>
                                     loginGuestUser:isLoading:{loginGuestUser.isLoading.toString()}

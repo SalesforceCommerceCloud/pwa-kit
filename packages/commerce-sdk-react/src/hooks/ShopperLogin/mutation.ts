@@ -13,7 +13,7 @@ import Auth from '../../auth'
 export enum ShopperLoginHelpers {
     LoginGuestUser = 'loginGuestUser',
     LoginRegisteredUserB2C = 'loginRegisteredUserB2C',
-    Logout = 'logout'
+    Logout = 'logout',
 }
 
 /**
@@ -27,10 +27,7 @@ export enum ShopperLoginHelpers {
  * - logout
  */
 // eslint-disable-next-line prettier/prettier
-export function useShopperLoginHelper<Action extends `${ShopperLoginHelpers}`>(
-    action: Action
-    // TODO: fix type
-): ActionResponse<Parameters<Auth[Action]>, ShopperLoginTypes.TokenResponse> {
+export function useShopperLoginHelper<Action extends `${ShopperLoginHelpers}`>(action: Action) {
     const auth = useAuth()
     if (action === ShopperLoginHelpers.LoginGuestUser) {
         return useMutation(() => auth.loginGuestUser())
@@ -40,7 +37,7 @@ export function useShopperLoginHelper<Action extends `${ShopperLoginHelpers}`>(
     }
     if (action === ShopperLoginHelpers.LoginRegisteredUserB2C) {
         return useMutation((...args) => {
-            const credentials = args[0]
+            const credentials = args[0] as {username: string; password: string}
             if (!credentials) {
                 throw new Error('Missing registered user credentials.')
             }

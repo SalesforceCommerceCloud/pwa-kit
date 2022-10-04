@@ -18,7 +18,7 @@ const UseShopperLoginHelper = () => {
         <>
             <h1>LoginGuestUser</h1>
             <Json data={loginGuestUser} />
-            <button onClick={() => loginGuestUser.execute()}>loginGuestUser</button>
+            <button onClick={() => loginGuestUser.mutate()}>loginGuestUser</button>
             {loginGuestUser.error?.message && (
                 <p style={{color: 'red'}}>Error: {loginGuestUser.error?.message}</p>
             )}
@@ -27,7 +27,7 @@ const UseShopperLoginHelper = () => {
             <Json data={loginRegisteredUser} />
             <button
                 onClick={() =>
-                    loginRegisteredUser.execute({username: 'kobe@test.com', password: 'Test1234!'})
+                    loginRegisteredUser.mutate({username: 'kobe@test.com', password: 'Test1234!'})
                 }
             >
                 loginRegisteredUser
@@ -38,7 +38,7 @@ const UseShopperLoginHelper = () => {
             <hr />
             <h1>Logout</h1>
             <Json data={logout} />
-            <button onClick={() => logout.execute()}>logout</button>
+            <button onClick={() => logout.mutate()}>logout</button>
             {logout.error?.message && <p style={{color: 'red'}}>Error: {logout.error?.message}</p>}
         </>
     )

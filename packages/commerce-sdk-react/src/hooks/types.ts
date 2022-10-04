@@ -14,6 +14,7 @@ import {ShopperOrders} from 'commerce-sdk-isomorphic'
 import {ShopperProducts} from 'commerce-sdk-isomorphic'
 import {ShopperPromotions} from 'commerce-sdk-isomorphic'
 import {ShopperSearch} from 'commerce-sdk-isomorphic'
+import {QueryKey, QueryFunctionContext} from '@tanstack/react-query'
 
 export type ApiClientConfigParams = {
     clientId: string
@@ -70,3 +71,12 @@ export type MutationFunction<TData = unknown, TVariables = unknown> = (
     variables: TVariables,
     apiClients: ApiClients
 ) => Promise<TData>
+
+/**
+ * Modified version of React Query's Query Function. Added a second argument
+ * API clients.
+ */
+export type QueryFunction<TData = unknown, TQueryKey extends QueryKey = unknown[]> = (
+    context: QueryFunctionContext<TQueryKey>,
+    apiClients: ApiClients
+) => TData | Promise<TData>
