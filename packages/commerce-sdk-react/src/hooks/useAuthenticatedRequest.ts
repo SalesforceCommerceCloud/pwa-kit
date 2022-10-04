@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useMutation as useReactQueryMutataion, MutationFunction} from '@tanstack/react-query'
+import {useMutation as useReactQueryMutataion} from '@tanstack/react-query'
 import {useQuery, UseQueryOptions} from '@tanstack/react-query'
 import useAuth from './useAuth'
 import useCommerceApi from './useCommerceApi'
@@ -16,11 +16,16 @@ interface Client {
     }
 }
 
-function useAuthenticatedRequest<TData>(fn: (apiClients: ApiClients) => Promise<TData>) {
+type MutationFunction<TData = unknown, TVariables = unknown> = (
+    variables: TVariables,
+    apiClients: ApiClients
+) => Promise<TData>
+
+function useAuthenticatedRequest<TData, TVariables>(fn: MutationFunction<TData, TVariables>) {
     const auth = useAuth()
     const apiClients = (useCommerceApi() as unknown) as Record<string, Client>
 
-    return (): Promise<TData> => {
+    return (variables: TVariables) => {
         return auth
             .ready()
             .then(({access_token}) => {
@@ -32,7 +37,7 @@ function useAuthenticatedRequest<TData>(fn: (apiClients: ApiClients) => Promise<
                 })
                 return (apiClients as unknown) as ApiClients
             })
-            .then(fn)
+            .then((apiClients) => fn(variables, apiClients))
     }
 }
 

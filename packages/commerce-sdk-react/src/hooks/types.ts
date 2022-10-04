@@ -61,3 +61,12 @@ export type DataType<T extends (arg: any) => Promise<unknown>> = T extends (
 ) => Promise<Response | infer R>
     ? R
     : never
+
+/**
+ * Modified version of React Query's Mutation Function. Added a second argument
+ * API clients.
+ */
+export type MutationFunction<TData = unknown, TVariables = unknown> = (
+    variables: TVariables,
+    apiClients: ApiClients
+) => Promise<TData>

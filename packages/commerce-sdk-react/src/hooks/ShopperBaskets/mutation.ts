@@ -341,7 +341,8 @@ export function useShopperBasketsMutation<Action extends `${ShopperBasketsAction
 ) {
     type Params = NonNullable<Argument<Client[Action]>>['parameters']
     type Data = DataType<Client[Action]>
-    const {shopperBaskets: client} = useCommerceApi()
-    const method = client[action] as MutationFunction<Data, Params>
-    return useMutation<Data, Error, Params>(method)
+    return useMutation<Data, Error, Params>((params, apiClients) => {
+        const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
+        return method(params)
+    })
 }
