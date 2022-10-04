@@ -7,12 +7,20 @@
 import React, {ReactElement} from 'react'
 // @ts-ignore
 import {CommerceApiProvider} from 'commerce-sdk-react'
+// @ts-ignore
+import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+// @ts-ignore
+import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 interface AppConfigProps {
     children: React.ReactNode
 }
 
 const AppConfig = (props: AppConfigProps): ReactElement => {
+    const {correlationId} = useCorrelationId()
+    const headers = {
+        'correlation-id': correlationId
+    }
     return (
         <CommerceApiProvider
             siteId="RefArchGlobal"
@@ -23,6 +31,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
             proxy="http://localhost:3000/mobify/proxy/api"
             locale="en-US"
             currency="USD"
+            headers={headers}
         >
             {props.children}
         </CommerceApiProvider>
@@ -33,4 +42,18 @@ AppConfig.restore = () => {}
 AppConfig.extraGetPropsArgs = () => {}
 AppConfig.freeze = () => {}
 
-export default AppConfig
+// Recommended settings for PWA-Kit usage.
+const options = {
+    queryClientConfig: {
+        defaultOptions: {
+            queries: {
+                retry: false
+            },
+            mutations: {
+                retry: false
+            }
+        }
+    }
+}
+
+export default withReactQuery(AppConfig, options)

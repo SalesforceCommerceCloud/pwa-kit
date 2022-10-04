@@ -18,6 +18,7 @@ const Home = () => {
                 demostrate the feature.
             </p>
             <p>Happy coding.</p>
+
             <h2>Hooks</h2>
             <ul>
                 <li>
@@ -34,6 +35,13 @@ const Home = () => {
                 </li>
                 <li>
                     <Link to="/slas-helpers">useShopperLoginHelper</Link>
+                </li>
+            </ul>
+
+            <h2>Miscellaneous</h2>
+            <ul>
+                <li>
+                    <Link to="/query-errors">Query errors</Link>
                 </li>
             </ul>
         </>

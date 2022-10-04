@@ -130,7 +130,7 @@
     "defaultMessage": "Eliminar"
   },
   "add_to_cart_modal.info.added_to_cart": {
-    "defaultMessage": "{quantity} {quantity, plural, one {artículo} other {artículos}} agregado(s) al carrito"
+    "defaultMessage": "{quantity} {quantity, plural, one {artículo agregado} other {artículos agregados}} al carrito"
   },
   "add_to_cart_modal.label.cart_subtotal": {
     "defaultMessage": "Subtotal del carrito ({itemAccumulatedCount} artículo(s))"
@@ -457,7 +457,7 @@
     "defaultMessage": "Regístrese para recuperar sus artículos guardados o continuar comprando."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "No encontramos nada para {category}. Intente buscar un producto o {link}."
+    "defaultMessage": "No encontramos nada para {category}. Intente buscar un producto o haga clic en {link}."
   },
   "empty_search_results.info.cant_find_anything_for_query": {
     "defaultMessage": "No encontramos nada para \"{searchQuery}\"."
@@ -596,7 +596,7 @@
     "defaultMessage": "Mejores prácticas de comercio electrónico para el carrito y la experiencia de finalización de la compra (checkout) del comprador."
   },
   "home.features.description.components": {
-    "defaultMessage": "Desarrollado a partir de la IU Chakra, una biblioteca de componentes de React simple, modular y accesible."
+    "defaultMessage": "Desarrollado a partir de la Chakra UI, una biblioteca de componentes de React simple, modular y accesible."
   },
   "home.features.description.einstein_recommendations": {
     "defaultMessage": "Brinde el mejor producto o la mejor oferta a cada comprador a través de recomendaciones de productos."
@@ -669,7 +669,7 @@
     "description": "A sale badge placed on top of a product image"
   },
   "lCPCxk": {
-    "defaultMessage": "Seleccine todas las opciones anteriores"
+    "defaultMessage": "Seleccione todas las opciones anteriores"
   },
   "locale_text.message.ar-SA": {
     "defaultMessage": "Árabe (Arabia Saudí)"
@@ -1403,7 +1403,7 @@
     "defaultMessage": "Seleccionar opciones"
   },
   "wishlist_primary_action.info.added_to_cart": {
-    "defaultMessage": "{quantity} {quantity, plural, one {artículo} other {artículos}} agregado(s) al carrito"
+    "defaultMessage": "{quantity} {quantity, plural, one {artículo agregado} other {artículos agregados}} al carrito"
   },
   "wishlist_secondary_button_group.action.remove": {
     "defaultMessage": "Eliminar"

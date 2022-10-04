@@ -466,7 +466,7 @@
     "defaultMessage": "Überprüfen Sie Ihre Schreibweise und versuchen Sie es erneut oder {link}."
   },
   "empty_search_results.link.contact_us": {
-    "defaultMessage": "Kontakt"
+    "defaultMessage": "klicken Sie auf \"Kontakt\""
   },
   "empty_search_results.recommended_products.title.most_viewed": {
     "defaultMessage": "Meistgesehen"

@@ -118,6 +118,7 @@ const baseConfig = (target) => {
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
                         'babel-runtime': findInProjectThenSDK('babel-runtime'),
+                        '@tanstack/react-query': findInProjectThenSDK('@tanstack/react-query'),
                         '@loadable/component': findInProjectThenSDK('@loadable/component'),
                         '@loadable/server': findInProjectThenSDK('@loadable/server'),
                         '@loadable/webpack-plugin': findInProjectThenSDK(

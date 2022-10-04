@@ -72,8 +72,6 @@ const METRIC_DIMENSIONS = {
     Target: process.env.DEPLOY_TARGET
 }
 
-let _nextRequestId = 1
-
 /**
  * @private
  */
@@ -187,6 +185,26 @@ export const RemoteServerFactory = {
     },
 
     /**
+     * Passing the requestId from apiGateway event to locals
+     * @private
+     */
+    _setRequestId(app) {
+        app.use((req, res, next) => {
+            if (!req.headers['x-apigateway-event']) {
+                console.error('Missing x-apigateway-event')
+                next()
+                return
+            }
+            const apiGatewayEvent = JSON.parse(
+                decodeURIComponent(req.headers['x-apigateway-event'])
+            )
+            const {requestId} = apiGatewayEvent.requestContext
+            res.locals.requestId = requestId
+            next()
+        })
+    },
+
+    /**
      * @private
      */
     // eslint-disable-next-line no-unused-vars
@@ -232,7 +250,8 @@ export const RemoteServerFactory = {
         // Do this first – we want compression applied to
         // everything when it's enabled at all.
         this._setCompression(app)
-
+        this._setRequestId(app)
+        // this._addEventContext(app)
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
@@ -462,7 +481,7 @@ export const RemoteServerFactory = {
             locals.requestStart = Date.now()
             locals.afterResponseCalled = false
             locals.responseCaching = {}
-            locals.requestId = _nextRequestId++
+
             locals.timer = new PerformanceTimer(`req${locals.requestId}`)
             locals.originalUrl = req.originalUrl
 

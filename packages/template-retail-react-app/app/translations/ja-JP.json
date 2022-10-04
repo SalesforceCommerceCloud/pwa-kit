@@ -362,7 +362,7 @@
     "defaultMessage": "サインアウト"
   },
   "contact_info.button.already_have_account": {
-    "defaultMessage": "すでにアカウントをお持ちですか?ログイン"
+    "defaultMessage": "すでにアカウントをお持ちですか? ログイン"
   },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "ゲストとして注文手続きへ進む"
@@ -499,7 +499,7 @@
     "defaultMessage": "配送"
   },
   "footer.link.signin_create_account": {
-    "defaultMessage": "サインインするかアカウントを作成してください"
+    "defaultMessage": "アカウントにサインインまたはアカウントを作成"
   },
   "footer.link.site_map": {
     "defaultMessage": "サイトマップ"
@@ -589,7 +589,7 @@
     "defaultMessage": "適切な部門におつなげします。"
   },
   "home.description.shop_products": {
-    "defaultMessage": "このセクションには、カタログからのコンテンツが含まれています。カタログの置き換え方法に関する{docLink}。",
+    "defaultMessage": "このセクションにはカタログからのコンテンツが含まれています。カタログの置き換え方法に関する{docLink}。",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
@@ -632,7 +632,7 @@
     "defaultMessage": "機能"
   },
   "home.heading.here_to_help": {
-    "defaultMessage": "弊社にお任せください"
+    "defaultMessage": "当社にお任せください"
   },
   "home.heading.shop_products": {
     "defaultMessage": "ショップの商品"
@@ -656,7 +656,7 @@
     "defaultMessage": "ドキュメントを読む"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "リテール用 React PWA Starter Store"
+    "defaultMessage": "リテール用 React PWA スターターストア"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "プロモーション"
@@ -1069,7 +1069,7 @@
     "defaultMessage": "アカウントを作成した場合、Salesforce の<policy>プライバシーポリシー</policy>と<terms>使用条件</terms>にご同意いただいたものと見なされます。"
   },
   "register_form.message.already_have_account": {
-    "defaultMessage": "すでにアカウントをお持ちですか?"
+    "defaultMessage": "すでにアカウントをお持ちですか? "
   },
   "register_form.message.create_an_account": {
     "defaultMessage": "アカウントを作成すると、売れ筋商品、インスピレーション、コミュニティに最初にアクセスできます。"

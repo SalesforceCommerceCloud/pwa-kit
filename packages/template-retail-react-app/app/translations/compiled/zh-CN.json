@@ -962,7 +962,7 @@
   "drawer_menu.button.log_out": [
     {
       "type": 0,
-      "value": "登出"
+      "value": "退出"
     }
   ],
   "drawer_menu.button.my_account": [
@@ -1472,7 +1472,7 @@
   "home.features.heading.components": [
     {
       "type": 0,
-      "value": "组件和设计套件"
+      "value": "组件和 Design Kit"
     }
   ],
   "home.features.heading.einstein_recommendations": [
@@ -1556,7 +1556,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "零售 React PWA Starter Store"
+      "value": "零售 React PWA 入门商铺"
     }
   ],
   "item_attributes.label.promotions": [

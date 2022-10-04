@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Container, Stack, Text} from '@chakra-ui/react'
@@ -15,6 +15,8 @@ import {useForm} from 'react-hook-form'
 import ResetPasswordForm from '../../components/reset-password'
 import {BrandLogo} from '../../components/icons'
 import useNavigation from '../../hooks/use-navigation'
+import useEinstein from '../../commerce-api/hooks/useEinstein'
+import {useLocation} from 'react-router-dom'
 
 const ResetPassword = () => {
     const customer = useCustomer()
@@ -22,6 +24,8 @@ const ResetPassword = () => {
     const navigate = useNavigation()
     const [submittedEmail, setSubmittedEmail] = useState('')
     const [showSubmittedSuccess, setShowSubmittedSuccess] = useState(false)
+    const einstein = useEinstein()
+    const {pathname} = useLocation()
 
     const submitForm = async ({email}) => {
         try {
@@ -32,6 +36,11 @@ const ResetPassword = () => {
             form.setError('global', {type: 'manual', message: error.message})
         }
     }
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        einstein.sendViewPage(pathname)
+    }, [])
 
     return (
         <Box data-testid="reset-password-page" bg="gray.50" py={[8, 16]}>
