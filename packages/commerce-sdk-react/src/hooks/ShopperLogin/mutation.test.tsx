@@ -14,7 +14,7 @@ const mockLoginGuestUser = jest.fn().mockResolvedValue('mockLoginGuestUser')
 jest.mock('../useAuth', () => {
     return jest.fn(() => ({
         ready: () => Promise.resolve({access_token: '123'}),
-        loginGuestUser: mockLoginGuestUser,
+        loginGuestUser: mockLoginGuestUser
     }))
 })
 
@@ -27,8 +27,9 @@ const tests = [
                 assertions: async () => {
                     const Component = () => {
                         const loginGuestUser = useShopperLoginHelper('loginGuestUser')
-                        const loginRegisteredUserB2C =
-                            useShopperLoginHelper('loginRegisteredUserB2C')
+                        const loginRegisteredUserB2C = useShopperLoginHelper(
+                            'loginRegisteredUserB2C'
+                        )
                         const logout = useShopperLoginHelper('logout')
                         return (
                             <>
@@ -49,7 +50,7 @@ const tests = [
                         screen.getByText('loginRegisteredUserB2C:isLoading:false')
                     ).toBeInTheDocument()
                     expect(screen.getByText('logout:isLoading:false')).toBeInTheDocument()
-                },
+                }
             },
             {
                 name: 'mutate',
@@ -69,10 +70,10 @@ const tests = [
                     await waitFor(() => screen.getByText('mockLoginGuestUser'))
                     expect(mockLoginGuestUser).toHaveBeenCalled()
                     expect(screen.getByText('mockLoginGuestUser')).toBeInTheDocument()
-                },
-            },
-        ],
-    },
+                }
+            }
+        ]
+    }
 ]
 
 tests.forEach(({hook, cases}) => {
