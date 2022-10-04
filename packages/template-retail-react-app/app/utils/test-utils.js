@@ -21,7 +21,6 @@ import {
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
-import {app as appDefaultConfig} from '../../config/default'
 import {IntlProvider} from 'react-intl'
 import {
     mockCategories as initialMockCategories,
@@ -62,8 +61,8 @@ export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Ro
 
 export const renderWithRouterAndCommerceAPI = (node) => {
     const api = new CommerceAPI({
-        ...appDefaultConfig.commerceAPI,
-        einsteinConfig: appDefaultConfig.einsteinAPI,
+        ...mockConfig.app.commerceAPI,
+        einsteinConfig: mockConfig.app.einsteinAPI,
         proxy: undefined
     })
     return renderWithReactIntl(
@@ -85,7 +84,7 @@ export const TestProviders = ({
     initialCategories = initialMockCategories,
     locale = {id: DEFAULT_LOCALE},
     messages = fallbackMessages,
-    appConfig = appDefaultConfig,
+    appConfig = mockConfig.app,
     siteAlias = DEFAULT_SITE
 }) => {
     const mounted = useRef()
