@@ -50,6 +50,7 @@ export const renderWithProviders = (
     wrapperProps?: {optionalConfig?: Pick<CommerceApiProviderProps, 'headers' | 'fetchOptions'>}
 ): void => {
     render(children, {
+        // eslint-disable-next-line react/display-name
         wrapper: () => <TestProviders {...wrapperProps}>{children}</TestProviders>,
         ...options
     })
