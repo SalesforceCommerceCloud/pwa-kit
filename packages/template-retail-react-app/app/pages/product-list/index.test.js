@@ -210,7 +210,7 @@ test('should display Search Results for when searching ', async () => {
 
 test('clicking a filter on search result will change url', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/search?q=dress')
-    renderWithProviders(<MockedComponent />, {
+    renderWithProviders(<MockedComponent searchQuery="dress" />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
     user.click(screen.getByText(/Beige/i))
