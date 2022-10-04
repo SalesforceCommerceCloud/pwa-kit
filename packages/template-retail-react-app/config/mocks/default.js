@@ -71,7 +71,7 @@ module.exports = {
                 clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
                 organizationId: 'f_ecom_zzrf_001',
                 shortCode: '8o7m175y',
-                siteId: 'RefArchGlobal'
+                siteId: 'site-1'
             }
         },
         einsteinAPI: {
@@ -80,5 +80,41 @@ module.exports = {
             // This differs from the siteId in commerceAPIConfig for testing purposes
             siteId: 'aaij-MobileFirst'
         }
+    },
+    // This list contains server-side only libraries that you don't want to be compiled by webpack
+    externals: [],
+    // Page not found url for your app
+    pageNotFoundURL: '/page-not-found',
+    // Enables or disables building the files necessary for server-side rendering.
+    ssrEnabled: true,
+    // This list determines which files are available exclusively to the server-side rendering system
+    // and are not available through the /mobify/bundle/ path.
+    ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
+    // This list determines which files are available to the server-side rendering system
+    // and available through the /mobify/bundle/ path.
+    ssrShared: [
+        'static/ico/favicon.ico',
+        'static/robots.txt',
+        '**/*.js',
+        '**/*.js.map',
+        '**/*.json'
+    ],
+    // Additional parameters that configure Express app behavior.
+    ssrParameters: {
+        ssrFunctionNodeVersion: '14.x',
+        proxyConfigs: [
+            {
+                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                path: 'api'
+            },
+            {
+                host: 'zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com',
+                path: 'ocapi'
+            },
+            {
+                host: 'api.cquotient.com',
+                path: 'einstein'
+            }
+        ]
     }
 }

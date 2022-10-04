@@ -26,7 +26,10 @@ const TestProviders = (props: {
     children: React.ReactNode
     optionalConfig?: Pick<CommerceApiProviderProps, 'headers' | 'fetchOptions'>
 }) => {
-    const queryClient = new QueryClient()
+    const queryClient = new QueryClient({
+        // During testing, we want things to fail immediately
+        defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
+    })
     const {optionalConfig} = props
     return (
         <QueryClientProvider client={queryClient}>
