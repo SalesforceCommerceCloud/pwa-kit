@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {ReactElement, useEffect, useMemo} from 'react'
+import React, {Fragment, ReactElement, useEffect, useMemo} from 'react'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -20,7 +20,6 @@ import {
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
@@ -29,8 +28,8 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     locale: string
     currency: string
     redirectURI: string
-    queryClientConfig?: QueryClientConfig
     fetchOptions?: ShopperBasketsTypes.FetchOptions
+    headers?: Record<string, string>
 }
 
 /**
@@ -53,17 +52,18 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {
         children,
         clientId,
+        headers = {},
         organizationId,
-        shortCode,
-        siteId,
         proxy,
         redirectURI,
-        queryClientConfig,
-        fetchOptions
+        fetchOptions,
+        siteId,
+        shortCode
     } = props
 
     const config = {
         proxy,
+        headers,
         parameters: {
             clientId,
             organizationId,
@@ -105,18 +105,16 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         auth.ready()
     }, [auth])
 
-    const queryClient = new QueryClient(queryClientConfig)
-
     // TODO: wrap the children with:
     // - context for enabling useServerEffect hook
     // - context for sharing the auth object that would manage the tokens -> this will probably be for internal use only
     return (
-        <QueryClientProvider client={queryClient}>
+        <Fragment>
             <CommerceApiContext.Provider value={apiClients}>
                 <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
             </CommerceApiContext.Provider>
             <ReactQueryDevtools />
-        </QueryClientProvider>
+        </Fragment>
     )
 }
 
