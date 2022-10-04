@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 
 const CorrelationIdContext = React.createContext()
+const ServerContext = React.createContext()
 
 /**
  * This provider initializes the correlation id,
@@ -60,4 +61,4 @@ CorrelationIdProvider.propTypes = {
     location: PropTypes.object
 }
 
-export {CorrelationIdContext, CorrelationIdProvider}
+export {CorrelationIdContext, CorrelationIdProvider, ServerContext}

@@ -8,6 +8,8 @@ import React, {ReactElement} from 'react'
 // @ts-ignore
 import {CommerceApiProvider} from 'commerce-sdk-react'
 // @ts-ignore
+import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+// @ts-ignore
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 interface AppConfigProps {
@@ -40,4 +42,18 @@ AppConfig.restore = () => {}
 AppConfig.extraGetPropsArgs = () => {}
 AppConfig.freeze = () => {}
 
-export default AppConfig
+// Recommended settings for PWA-Kit usage.
+const options = {
+    queryClientConfig: {
+        defaultOptions: {
+            queries: {
+                retry: false
+            },
+            mutations: {
+                retry: false
+            }
+        }
+    }
+}
+
+export default withReactQuery(AppConfig, options)

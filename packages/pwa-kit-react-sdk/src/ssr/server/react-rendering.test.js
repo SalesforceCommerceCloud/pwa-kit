@@ -59,6 +59,7 @@ jest.mock('../universal/routes', () => {
     const {Redirect} = require('react-router-dom')
     const {Helmet} = require('react-helmet')
     const {useQuery} = require('@tanstack/react-query')
+    const {useServerContext} = require('../universal/hooks')
 
     // Test utility to exercise paths that work with @loadable/component.
     const fakeLoadable = (Wrapped) => {
@@ -262,6 +263,15 @@ jest.mock('../universal/routes', () => {
         return <div>{isLoading ? 'loading' : data.prop}</div>
     }
 
+    const GetServerContext = () => {
+        const {res, isServerSide} = useServerContext()
+        if (isServerSide) {
+            console.log('--- isServerSide')
+            res.status(404)
+        }
+        return <div />
+    }
+
     GetPropsReturnsObject.propTypes = {
         prop: PropTypes.node
     }
@@ -324,6 +334,10 @@ jest.mock('../universal/routes', () => {
             {
                 path: '/disabled-use-query-isnt-resolved/',
                 component: DisabledUseQueryIsntResolved
+            },
+            {
+                path: '/server-context',
+                component: GetServerContext
             }
         ]
     }
@@ -691,6 +705,20 @@ describe('The Node SSR Environment', () => {
                 expect(res.statusCode).toBe(200)
                 const html = res.text
                 expect(html).toEqual(expect.stringContaining('<div>loading</div>'))
+            }
+        },
+        {
+            description: 'Get the server context and set the response status to 404',
+            req: {url: '/server-context'},
+            mocks: () => {
+                jest.spyOn(console, 'log')
+            },
+            assertions: (res) => {
+                expect(res.statusCode).toBe(404)
+
+                // Expect the console.log to be called only once, even though the component
+                // is going to be rendered twice on the server (on prepass and then 2nd pass)
+                expect(console.log).toHaveBeenCalledTimes(1)
             }
         }
     ]
