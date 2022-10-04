@@ -69,21 +69,10 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
     return (
         <Switch>
             <Route
-                path={createPathWithDefaults('/category/:categoryId')}
-                render={(props) => (
-                    <div>
-                        <div>{customer.customerId}</div>
-                        <ProductList
-                            {...props}
-                            isLoading={isLoading}
-                            searchQuery={searchQuery}
-                            productSearchResult={mockProductListSearchResponse}
-                        />
-                    </div>
-                )}
-            />
-            <Route
-                path={createPathWithDefaults('/search')}
+                path={[
+                    createPathWithDefaults('/category/:categoryId'),
+                    createPathWithDefaults('/search')
+                ]}
                 render={(props) => (
                     <div>
                         <div>{customer.customerId}</div>
@@ -122,7 +111,6 @@ const server = setupMockServer(
 )
 
 beforeEach(() => {
-
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
     useWishlist.mockReturnValue({
@@ -227,6 +215,9 @@ test('clicking a filter on search result will change url', async () => {
     })
     user.click(screen.getByText(/Beige/i))
     await waitFor(() => expect(window.location.pathname).toEqual(createPathWithDefaults('/search')))
-    await waitFor(() => expect(window.location.search).toEqual(
-        '?limit=25&q=dress&refine=c_refinementColor%3DBeige&sort=best-matches'))
+    await waitFor(() =>
+        expect(window.location.search).toEqual(
+            '?limit=25&q=dress&refine=c_refinementColor%3DBeige&sort=best-matches'
+        )
+    )
 })
