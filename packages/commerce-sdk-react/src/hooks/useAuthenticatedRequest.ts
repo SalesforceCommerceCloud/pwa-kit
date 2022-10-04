@@ -19,7 +19,7 @@ function useAuthenticatedMutation<TData, TVariables = unknown>(
     fn: MutationFunction<TData, TVariables>
 ) {
     const auth = useAuth()
-    const apiClients = useCommerceApi() as unknown as Record<string, Client>
+    const apiClients = (useCommerceApi() as unknown) as Record<string, Client>
 
     return (variables: TVariables) => {
         return auth
@@ -28,10 +28,10 @@ function useAuthenticatedMutation<TData, TVariables = unknown>(
                 Object.keys(apiClients).forEach((client) => {
                     apiClients[client].clientConfig.headers = {
                         ...apiClients[client].clientConfig.headers,
-                        Authorization: `Bearer ${access_token}`,
+                        Authorization: `Bearer ${access_token}`
                     }
                 })
-                return apiClients as unknown as ApiClients
+                return (apiClients as unknown) as ApiClients
             })
             .then((apiClients) => fn(variables, apiClients))
     }
@@ -41,7 +41,7 @@ function useAuthenticatedQuery<TData, TQueryKey extends QueryKey>(
     fn: QueryFunction<TData, TQueryKey>
 ) {
     const auth = useAuth()
-    const apiClients = useCommerceApi() as unknown as Record<string, Client>
+    const apiClients = (useCommerceApi() as unknown) as Record<string, Client>
 
     return (context: QueryFunctionContext<TQueryKey>) => {
         return auth
@@ -50,10 +50,10 @@ function useAuthenticatedQuery<TData, TQueryKey extends QueryKey>(
                 Object.keys(apiClients).forEach((client) => {
                     apiClients[client].clientConfig.headers = {
                         ...apiClients[client].clientConfig.headers,
-                        Authorization: `Bearer ${access_token}`,
+                        Authorization: `Bearer ${access_token}`
                     }
                 })
-                return apiClients as unknown as ApiClients
+                return (apiClients as unknown) as ApiClients
             })
             .then((apiClients) => fn(context, apiClients))
     }
