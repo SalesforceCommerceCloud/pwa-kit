@@ -61,8 +61,8 @@ export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Ro
 
 export const renderWithRouterAndCommerceAPI = (node) => {
     const api = new CommerceAPI({
-        ...appDefaultConfig.commerceAPI,
-        einsteinConfig: appDefaultConfig.einsteinAPI,
+        ...mockConfig.app.commerceAPI,
+        einsteinConfig: mockConfig.app.einsteinAPI,
         proxy: undefined
     })
     return renderWithReactIntl(
