@@ -25,13 +25,11 @@ export const TEST_CONFIG = {
 const TestProviders = (props: {
     children: React.ReactNode
     commerceApiProvider?: Partial<CommerceApiProviderProps>
-    queryClientProvider?: Partial<QueryClientProviderProps>
 }) => {
-    const {commerceApiProvider, queryClientProvider} = props
+    const {commerceApiProvider} = props
     const queryClient = new QueryClient({
         // During testing, we want things to fail immediately
-        defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
-        ...queryClientProvider
+        defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
     })
     return (
         <QueryClientProvider client={queryClient}>
@@ -54,7 +52,6 @@ export const renderWithProviders = (
     options?: Omit<RenderOptions, 'wrapper'>,
     providerProps?: {
         commerceApiProvider?: Partial<CommerceApiProviderProps>
-        queryClientProvider?: Partial<QueryClientProviderProps>
     }
 ): void => {
     render(children, {
