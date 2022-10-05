@@ -76,13 +76,14 @@ export class MetricsSender {
                 {
                     MetricData: metrics,
                     Namespace: 'ssr'
-                }, (err) => {
+                },
+                (err) => {
                     if (err) {
                         console.warn(`Metrics: error sending data: ${err}`)
                     }
                     resolve()
                 }
-                )
+            )
         })
     }
 

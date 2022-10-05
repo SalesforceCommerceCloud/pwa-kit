@@ -17,7 +17,8 @@ import {proxyConfigs} from '../ssr-shared'
 // TODO: Clean this up or provide a way to toggle
 export const verboseProxyLogging = false
 
-export const isRemote = () => Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
+export const isRemote = () =>
+    Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
 
 export const getBundleBaseUrl = () => {
     return `/mobify/bundle/${isRemote() ? process.env.BUNDLE_ID : 'development'}/`
