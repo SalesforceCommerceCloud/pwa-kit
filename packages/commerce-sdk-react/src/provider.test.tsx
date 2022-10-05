@@ -75,7 +75,7 @@ test(
                 </ul>
             )
         }
-        const optionalConfig = {
+        const commerceApiProviderConfig = {
             headers: {'correlation-id': '373a3f80-6bbb-4157-a617-63d27fb15769'},
             fetchOptions: {
                 timeout: 50
@@ -85,10 +85,12 @@ test(
             <Component />,
             {},
             {
-                optionalConfig
+                commerceApiProvider: commerceApiProviderConfig
             }
         )
-        expect(screen.getByText(optionalConfig.headers['correlation-id'])).toBeInTheDocument()
-        expect(screen.getByText(optionalConfig.fetchOptions.timeout)).toBeInTheDocument()
+        expect(
+            screen.getByText(commerceApiProviderConfig.headers['correlation-id'])
+        ).toBeInTheDocument()
+        expect(screen.getByText(commerceApiProviderConfig.fetchOptions.timeout)).toBeInTheDocument()
     })
 )
