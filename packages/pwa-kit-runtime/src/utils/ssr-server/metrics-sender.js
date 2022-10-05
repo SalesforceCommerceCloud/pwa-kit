@@ -4,9 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {isRemote, localDevLog} from './utils'
-
-const METRIC_RETRIES = 3
+import {isRemote} from './utils'
 
 /**
  * A class that will handle asynchronous sending of CloudWatch
@@ -27,9 +25,6 @@ export class MetricsSender {
         // name/value metric, and they accumulate on this queue
         // until batched up into a putMetricData call.
         this._queue = []
-
-        // The default retry count
-        this._retries = METRIC_RETRIES
     }
 
     /**
@@ -50,9 +45,6 @@ export class MetricsSender {
     _setup() {
         /* istanbul ignore next */
         if (!this._CW && (isRemote() || MetricsSender._override)) {
-            // Load the AWS sdk. Although we do this on-demand, it's
-            // likely that a webpacked project will include the whole
-            // required module, so we require just the client that we need.
             const Cloudwatch = require('aws-sdk/clients/cloudwatch')
             this._CW = new Cloudwatch({
                 apiVersion: '2010-08-01',
@@ -80,59 +72,18 @@ export class MetricsSender {
         }
 
         return new Promise((resolve) => {
-            // The parameters for putMetricData
-            const params = {
-                MetricData: metrics,
-                Namespace: 'ssr'
-            }
-
-            // Initialize the retry count
-            let retries = this._retries
-
-            // Initialize the retry delay
-            // This delay is long enough to reduce the sending
-            // rate, but not so much that it delays completion
-            // of a response too much.
-            let retryDelay = 50 // mS
-
-            // This callback is called when the putMetricData operation
-            // is complete, or if an error occurs.
-            const callback = (err) => {
-                let retry = false
-
-                if (err) {
-                    if (err.code === 'Throttling') {
-                        // We exceeded the CloudWatch metric sending
-                        // rate. We may need to retry.
-                        retry = --retries > 0
-                        const msg = retry ? `retrying after ${retryDelay} mS` : 'not retrying'
-                        console.warn(
-                            `Metrics: ${err} when sending metric data (length ${metrics.length}): ${msg}`
-                        )
-                    } else {
-                        // Some other error
+            cw.putMetricData(
+                {
+                    MetricData: metrics,
+                    Namespace: 'ssr'
+                },
+                (err) => {
+                    if (err) {
                         console.warn(`Metrics: error sending data: ${err}`)
                     }
-                }
-
-                if (retry) {
-                    // We need to delay before we actually retry
-                    setTimeout(() => cw.putMetricData(params, callback), retryDelay)
-                    // Increase the delay for any future retry
-                    retryDelay += 25 // mS
-                } else {
-                    // Sending is done.
-                    localDevLog(
-                        `Metrics: ${err ? 'discarded' : 'completed'} sending ${
-                            metrics.length
-                        } metric(s)`
-                    )
                     resolve()
                 }
-            }
-
-            // Send the metrics
-            cw.putMetricData(params, callback)
+            )
         })
     }
 
