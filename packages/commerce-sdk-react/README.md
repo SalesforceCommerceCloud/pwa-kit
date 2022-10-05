@@ -27,6 +27,7 @@ const AppConfig = ({children}) => {
 } 
 
 // Custom retry logic
+// Ref: https://tanstack.com/query/v4/docs/guides/query-retries
 const shouldRetry = (failureCount, error) => {
     // For example: do not retry on server side, but keep retrying until max of 3 failures on the client-side
     return isServer ? false : failureCount < 3
