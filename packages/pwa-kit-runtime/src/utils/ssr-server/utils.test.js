@@ -1,6 +1,6 @@
 import * as utils from './utils'
 
-describe.each([[true], [false]])('Utils (isRemote: %p)', (isRemote) => {
+describe.each([[true], [false]])('Utils remote/local tests (isRemote: %p)', (isRemote) => {
     let originalEnv
     const bundleId = 'test-bundle-id-12345'
 
@@ -15,6 +15,7 @@ describe.each([[true], [false]])('Utils (isRemote: %p)', (isRemote) => {
 
     afterEach(() => {
         process.env = originalEnv
+        jest.restoreAllMocks()
     })
 
     test(`getBundleBaseUrl should return the correct URL`, () => {
@@ -23,7 +24,33 @@ describe.each([[true], [false]])('Utils (isRemote: %p)', (isRemote) => {
         expect(utils.getBundleBaseUrl()).toBe(expected)
     })
 
-    test(`localDevLog should log conditionally`, () => {
-        utils.localDevLog('foo')
+    describe.each([[true], [false]])('Quiet/loud tests', (quiet) => {
+        let originalQuiet
+
+        beforeEach(() => {
+            originalQuiet = utils.isQuiet()
+            utils.setQuiet(quiet)
+        })
+
+        afterEach(() => {
+            utils.setQuiet(originalQuiet)
+            jest.restoreAllMocks()
+        })
+
+        test(`localDevLog should log conditionally (quiet: ${quiet})`, () => {
+            const log = jest.spyOn(console, 'log').mockImplementation(() => {})
+            const msg = 'message'
+            utils.localDevLog(msg)
+            const expected = !isRemote && !quiet ? [[msg]] : []
+            expect(log.mock.calls).toEqual(expected)
+        })
+
+        test(`infoLog should log conditionally (quiet: ${quiet})`, () => {
+            const log = jest.spyOn(console, 'log').mockImplementation(() => {})
+            const msg = 'message'
+            utils.infoLog(msg)
+            const expected = !quiet ? [[msg]] : []
+            expect(log.mock.calls).toEqual(expected)
+        })
     })
 })
