@@ -16,8 +16,6 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 
-const isServer = typeof window === 'undefined'
-
 const AppConfig = ({children}) => {
     return (
         <CommerceApiProvider {...commerceApiProviderProps}>
@@ -26,23 +24,16 @@ const AppConfig = ({children}) => {
     )
 } 
 
-// Custom retry logic
-// Ref: https://tanstack.com/query/v4/docs/guides/query-retries
-const shouldRetry = (failureCount, error) => {
-    // For example: do not retry on server side, but keep retrying until max of 3 failures on the client-side
-    return isServer ? false : failureCount < 3
-}
-
 // Set configuration options for react query.
 // NOTE: This configuration will be used both on the server-side and client-side.
 const options = {
     queryClientConfig: {
         defaultOptions: {
             queries: {
-                retry: shouldRetry
+                retry: false
             },
             mutations: {
-                retry: shouldRetry
+                retry: false
             }
         }
     }
