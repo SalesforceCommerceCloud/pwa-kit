@@ -34,19 +34,19 @@ function useAuthenticatedClient<TData, TVariables = unknown>(
     fn: IQueryFunction<TData> | IMutationFunction<TData, TVariables>
 ) {
     const auth = useAuth()
-    const apiClients = (useCommerceApi() as unknown) as Record<string, Client>
-
+    const apiClients = useCommerceApi()
+    const keys = Object.keys(apiClients) as Array<keyof ApiClients>
     return (variables: TVariables & QueryFunctionContext<QueryKey>) => {
         return auth
             .ready()
             .then(({access_token}) => {
-                Object.keys(apiClients).forEach((client) => {
+                keys.forEach((client) => {
                     apiClients[client].clientConfig.headers = {
                         ...apiClients[client].clientConfig.headers,
                         Authorization: `Bearer ${access_token}`
                     }
                 })
-                return (apiClients as unknown) as ApiClients
+                return apiClients
             })
             .then((apiClients) => fn(variables, apiClients))
     }
