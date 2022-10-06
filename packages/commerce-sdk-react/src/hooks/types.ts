@@ -54,6 +54,11 @@ export type ActionResponse<Args extends unknown[], Data> = QueryResponse<Data> &
 export type Argument<T extends (arg: any) => unknown> = Parameters<T>[0]
 
 /**
+ * The union of all possible values.
+ */
+export type valueof<T> = T[keyof T]
+
+/**
  * The data type returned by a commerce-sdk-isomorphic method when the raw response
  * flag is not set.
  */

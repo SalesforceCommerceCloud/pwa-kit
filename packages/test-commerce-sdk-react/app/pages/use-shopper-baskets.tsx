@@ -14,7 +14,7 @@ const UseShopperBaskets = () => {
         <>
             <h1>ShopperBaskets</h1>
             <div>Click the button to create a basket</div>
-            <button onClick={() => createBasket.mutate({body: {}})}>createBasket</button>
+            <button onClick={() => createBasket.mutate({})}>createBasket</button>
             <hr />
             <div>
                 <Json data={createBasket} />

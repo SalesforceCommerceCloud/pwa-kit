@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import useAuthenticatedClient from './useAuthenticatedClient'
-import {useMutation as useReactQueryMutation, MutationKey} from '@tanstack/react-query'
+import {useMutation as useReactQueryMutation} from '@tanstack/react-query'
 import {IMutationFunction} from './types'
 
 export const useMutation = <TData = unknown, TError = unknown, TVariables = unknown>(

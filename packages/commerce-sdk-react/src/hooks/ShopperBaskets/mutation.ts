@@ -8,6 +8,7 @@ import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import useCommerceApi from '../useCommerceApi'
 import {MutationFunction} from '@tanstack/react-query'
+import {createMutationHook} from '../hookCreators'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -329,20 +330,19 @@ the body are the following properties if specified:
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasket} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasket} for more information on the parameters and returned data type.
      */
-    AddTaxesForBasket = 'addTaxesForBasket'
+    AddTaxesForBasket = 'addTaxesForBasket',
 }
 
 /**
  * A hook for performing mutations with the Shopper Baskets API.
  */
-// eslint-disable-next-line prettier/prettier
-export function useShopperBasketsMutation<Action extends `${ShopperBasketsActions}`>(
-    action: Action
-) {
-    type Params = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
-    return useMutation<Data, Error, Params>((params, apiClients) => {
-        const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
-        return method.call(apiClients['shopperBaskets'], params)
-    })
-}
+const useShopperBasketsMutation = createMutationHook<
+    `${ShopperBasketsActions}`,
+    // eslint-disable-next-line prettier/prettier
+    ApiClients['shopperBaskets']
+>('shopperBaskets')
+
+// const a = useShopperBasketsMutation('createBasket')
+// a.mutate({})
+
+export {useShopperBasketsMutation}
