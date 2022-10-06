@@ -80,11 +80,11 @@ const Header = ({
     ...props
 }) => {
     const query = useQuery(
-        ['example-data'],
+        ['example-data2121212121'],
         () =>
             new Promise((resolve) => {
                 setTimeout(() => {
-                    resolve('This came from react-query')
+                    resolve('This came from react-query header page')
                 }, 1000)
             })
     )
@@ -124,7 +124,7 @@ const Header = ({
     console.log('query.data', query.data)
     return (
         <Box {...styles.container} {...props}>
-            QUERY INSIDE HEADER {query.data}
+            QUERY INSIDE HEADER: {query.data}
             <Box {...styles.content}>
                 {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
                 <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>

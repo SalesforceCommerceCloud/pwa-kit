@@ -145,14 +145,15 @@ const App = (props) => {
         () =>
             new Promise((resolve) => {
                 setTimeout(() => {
-                    resolve('This came from react-query')
+                    resolve('This came from react-query App')
                 }, 1000)
             })
     )
 
     return (
         <Box className="sf-app" {...styles.container}>
-            Testing fhdsjk {query.data}
+            App outside of IntlProvider {query.data}
+            <br />
             <IntlProvider
                 onError={(err) => {
                     if (err.code === 'MISSING_TRANSLATION') {
@@ -171,7 +172,7 @@ const App = (props) => {
                 // - "compile-translations:pseudo"
                 defaultLocale="en-US"
             >
-                Testing fhdsjk {query.data}
+                App query inside IntlProvider {query.data}
                 <CategoriesProvider categories={allCategories}>
                     <CurrencyProvider currency={currency}>
                         <Seo>

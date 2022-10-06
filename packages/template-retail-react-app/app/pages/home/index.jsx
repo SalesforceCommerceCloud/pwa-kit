@@ -62,11 +62,11 @@ const Home = ({productSearchResult, isLoading}) => {
     }, [])
 
     const query = useQuery(
-        ['example-data'],
+        ['example-data1111'],
         () =>
             new Promise((resolve) => {
                 setTimeout(() => {
-                    resolve('This came from react-query')
+                    resolve('This came from react-query HOME PAGE')
                 }, 1000)
             })
     )
