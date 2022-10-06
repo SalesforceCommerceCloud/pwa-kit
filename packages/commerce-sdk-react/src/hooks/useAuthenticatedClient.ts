@@ -35,12 +35,12 @@ function useAuthenticatedClient<TData, TVariables = unknown>(
 ) {
     const auth = useAuth()
     const apiClients = useCommerceApi()
-    const keys = Object.keys(apiClients) as Array<keyof ApiClients>
+    const apiClientKeys = Object.keys(apiClients) as Array<keyof ApiClients>
     return (variables: TVariables & QueryFunctionContext<QueryKey>) => {
         return auth
             .ready()
             .then(({access_token}) => {
-                keys.forEach((client) => {
+                apiClientKeys.forEach((client) => {
                     apiClients[client].clientConfig.headers = {
                         ...apiClients[client].clientConfig.headers,
                         Authorization: `Bearer ${access_token}`
