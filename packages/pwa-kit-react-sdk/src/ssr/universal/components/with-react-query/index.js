@@ -18,12 +18,12 @@ const STATE_KEY = '__reactQuery'
 const SAFE_QUERY_CLIENT_CONFIG = {
     defaultOptions: {
         queries: {
-            retry: false
+            retry: false,
         },
         mutations: {
-            retry: false
-        }
-    }
+            retry: false,
+        },
+    },
 }
 
 /**
@@ -64,14 +64,17 @@ export const withReactQuery = (Wrapped) => {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient(queryClientConfig))
 
+            console.log(queryClient)
             // Without the request object, our useServerContext hook would be able tell whether on prepass
             const withoutReq = React.cloneElement(appJSX, {
-                req: undefined
+                req: undefined,
             })
             await ssrPrepass(withoutReq)
 
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
+            console.log(queries)
+            debugger
             await Promise.all(
                 queries.map((q) =>
                     // If there's an error in this fetch, react-query will log the error
@@ -105,7 +108,7 @@ export const withReactQuery = (Wrapped) => {
         doInitAppState: true,
         getInitializers: true,
         initAppState: true,
-        getHOCsInUse: true
+        getHOCsInUse: true,
     }
     hoistNonReactStatic(WithReactQuery, Wrapped, exclude)
 

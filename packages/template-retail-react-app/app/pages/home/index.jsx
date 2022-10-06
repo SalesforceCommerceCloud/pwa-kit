@@ -9,6 +9,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {useLocation} from 'react-router-dom'
+import {useQuery} from '@tanstack/react-query'
 
 // Components
 import {
@@ -60,6 +61,20 @@ const Home = ({productSearchResult, isLoading}) => {
         einstein.sendViewPage(pathname)
     }, [])
 
+    const query = useQuery(
+        ['example-data'],
+        () =>
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve('This came from react-queryss')
+                }, 1000)
+            })
+    )
+    debugger
+    console.log('query.data:', query.data)
+    console.log('query.isLoading:', query.isLoading)
+    console.log('query.error:', query.error)
+
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo
@@ -67,6 +82,8 @@ const Home = ({productSearchResult, isLoading}) => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+
+            <h1>react query: {query.data}</h1>
 
             <Hero
                 title={intl.formatMessage({
