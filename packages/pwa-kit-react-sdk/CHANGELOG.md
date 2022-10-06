@@ -1,3 +1,4 @@
+## v2.3.0-alpha.0 (Oct 06, 2022)
 ## v2.3.0-dev (Aug 25, 2022)
 -   Support `react-query` server-side data fetching. [#724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/724)
 -   Add server-safe default configuration for `queryClientConfig` option.. [#734](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/734)
