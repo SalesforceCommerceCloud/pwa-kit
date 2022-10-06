@@ -17,6 +17,7 @@ import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../../contexts'
+import {useQuery} from '@tanstack/react-query'
 
 // Local Project Components
 import Header from '../../components/header'
@@ -139,8 +140,19 @@ const App = (props) => {
         history.push(path)
     }
 
+    const query = useQuery(
+        ['example-data'],
+        () =>
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve('This came from react-query')
+                }, 1000)
+            })
+    )
+
     return (
         <Box className="sf-app" {...styles.container}>
+            Testing fhdsjk {query.data}
             <IntlProvider
                 onError={(err) => {
                     if (err.code === 'MISSING_TRANSLATION') {
@@ -159,6 +171,7 @@ const App = (props) => {
                 // - "compile-translations:pseudo"
                 defaultLocale="en-US"
             >
+                Testing fhdsjk {query.data}
                 <CategoriesProvider categories={allCategories}>
                     <CurrencyProvider currency={currency}>
                         <Seo>

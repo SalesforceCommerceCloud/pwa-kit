@@ -24,7 +24,8 @@ import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '../../utils/url'
-
+import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
+import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this
@@ -91,4 +92,4 @@ AppConfig.propTypes = {
     locals: PropTypes.object
 }
 
-export default AppConfig
+export default withReactQuery(withLegacyGetProps(AppConfig))

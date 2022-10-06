@@ -48,6 +48,7 @@ import {noop} from '../../utils/utils'
 import {navLinks, messages} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../loading-spinner'
+import {useQuery} from '@tanstack/react-query'
 
 const ENTER_KEY = 'Enter'
 
@@ -78,6 +79,15 @@ const Header = ({
     onWishlistClick = noop,
     ...props
 }) => {
+    const query = useQuery(
+        ['example-data'],
+        () =>
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve('This came from react-query')
+                }, 1000)
+            })
+    )
     const intl = useIntl()
     const basket = useBasket()
     const customer = useCustomer()
@@ -111,9 +121,10 @@ const Header = ({
             if (!hasEnterPopoverContent.current) onClose()
         }, 100)
     }
-
+    console.log('query.data', query.data)
     return (
         <Box {...styles.container} {...props}>
+            QUERY INSIDE HEADER {query.data}
             <Box {...styles.content}>
                 {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
                 <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>

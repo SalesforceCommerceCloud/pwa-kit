@@ -43,6 +43,7 @@ import {
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
     HOME_SHOP_PRODUCTS_LIMIT
 } from '../../constants'
+import {useQuery} from '@tanstack/react-query'
 
 /**
  * This is the home page for Retail React App.
@@ -60,14 +61,24 @@ const Home = ({productSearchResult, isLoading}) => {
         einstein.sendViewPage(pathname)
     }, [])
 
+    const query = useQuery(
+        ['example-data'],
+        () =>
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve('This came from react-query')
+                }, 1000)
+            })
+    )
+
     return (
         <Box data-testid="home-page" layerStyle="page">
+            HOMEPAGE REACT QUERY {query.data}
             <Seo
                 title="Home Page"
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
-
             <Hero
                 title={intl.formatMessage({
                     defaultMessage: 'The React PWA Starter Store for Retail',
@@ -95,7 +106,6 @@ const Home = ({productSearchResult, isLoading}) => {
                     </Stack>
                 }
             />
-
             <Section
                 background={'gray.50'}
                 marginX="auto"
@@ -143,7 +153,6 @@ const Home = ({productSearchResult, isLoading}) => {
                     })}
                 </SimpleGrid>
             </Section>
-
             {productSearchResult && (
                 <Section
                     padding={4}
@@ -196,7 +205,6 @@ const Home = ({productSearchResult, isLoading}) => {
                     </Stack>
                 </Section>
             )}
-
             <Section
                 padding={4}
                 paddingTop={32}
@@ -240,7 +248,6 @@ const Home = ({productSearchResult, isLoading}) => {
                     </SimpleGrid>
                 </Container>
             </Section>
-
             <Section
                 padding={4}
                 paddingTop={32}
