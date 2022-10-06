@@ -67,7 +67,7 @@ export type DataType<T extends (arg: any) => Promise<unknown>> = T extends (
  * Modified version of React Query's Mutation Function. Added a second argument
  * API clients.
  */
-export type MutationFunction<TData = unknown, TVariables = unknown> = (
+export type IMutationFunction<TData = unknown, TVariables = unknown> = (
     variables: TVariables,
     apiClients: ApiClients
 ) => Promise<TData>
@@ -76,7 +76,7 @@ export type MutationFunction<TData = unknown, TVariables = unknown> = (
  * Modified version of React Query's Query Function. Added a second argument
  * API clients.
  */
-export type QueryFunction<TData = unknown, TQueryKey extends QueryKey = unknown[]> = (
-    context: QueryFunctionContext<TQueryKey>,
+export type IQueryFunction<TData = unknown> = (
+    context: QueryFunctionContext<QueryKey>,
     apiClients: ApiClients
 ) => TData | Promise<TData>

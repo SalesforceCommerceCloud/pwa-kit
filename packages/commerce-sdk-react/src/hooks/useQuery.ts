@@ -5,14 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useQuery as useReactQuery, UseQueryOptions, QueryKey} from '@tanstack/react-query'
-import {useAuthenticatedQuery} from './useAuthenticatedRequest'
-import {QueryFunction} from './types'
+import useAuthenticatedClient from './useAuthenticatedClient'
+import {IQueryFunction} from './types'
 
 export const useQuery = <TData>(
     queryKey: QueryKey,
-    fn: QueryFunction<TData, QueryKey>,
+    fn: IQueryFunction<TData>,
     queryOptions?: UseQueryOptions<TData, Error>
 ) => {
-    const authenticatedFn = useAuthenticatedQuery(fn)
+    const authenticatedFn = useAuthenticatedClient(fn)
     return useReactQuery<TData, Error>(queryKey, authenticatedFn, queryOptions)
 }
