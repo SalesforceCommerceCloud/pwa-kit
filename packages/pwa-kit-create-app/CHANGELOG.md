@@ -1,4 +1,6 @@
-## v2.3.0-dev (Aug 25, 2022)
+## v2.3.0 (Oct 06, 2022)
+- Fix generated projects missing required fields in the `manifest.json` file. [#729](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/729)
+
 ## v2.2.0 (Aug 25, 2022)
 
 ## v2.1.0 (Jul 05, 2022)

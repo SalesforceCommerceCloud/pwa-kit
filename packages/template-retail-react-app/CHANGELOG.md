@@ -1,4 +1,10 @@
-## v2.3.0-dev (Aug 25, 2022)
+## v2.3.0 (Oct 06, 2022)
+- Fix locale `alias` by including `locale` object inside the MultiSite Context.  [#716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/716)
+- Updated translations. [#725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/725)
+- Add new Einstein API activities. [#714](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/714)
+- Fix search field to recognize `“&”` character. [#736](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/736)
+- Fix filters on search results page. [#742](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/742)
+
 ## v2.2.0 (Aug 25, 2022)
 - Update zzrf-001 url [#694](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/694)
 - Optimize Server-side performance [#667](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/667)
