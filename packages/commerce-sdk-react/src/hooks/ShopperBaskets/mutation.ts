@@ -339,10 +339,10 @@ the body are the following properties if specified:
 export function useShopperBasketsMutation<Action extends `${ShopperBasketsActions}`>(
     action: Action
 ) {
-    type Params = NonNullable<Argument<Client[Action]>>['parameters']
+    type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
     return useMutation<Data, Error, Params>((params, apiClients) => {
         const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
-        return method(params)
+        return method.call(apiClients['shopperBaskets'], params)
     })
 }

@@ -36,6 +36,9 @@ const Home = () => {
                 <li>
                     <Link to="/slas-helpers">useShopperLoginHelper</Link>
                 </li>
+                <li>
+                    <Link to="/basket">useBasket & useShopperBasketsMutation</Link>
+                </li>
             </ul>
 
             <h2>Miscellaneous</h2>
