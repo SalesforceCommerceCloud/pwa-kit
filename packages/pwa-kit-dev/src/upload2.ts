@@ -17,10 +17,11 @@ interface Credentials {
 
 
 interface CloudAPIClientOpts {
-    origin: string
     credentials: Credentials,
-    fetch: Function
+    origin?: string
+    fetch?: Function
 }
+
 
 interface StringMap {[key: string]: string;}
 
@@ -36,12 +37,11 @@ interface Bundle {
 
 
 class CloudAPIClient {
-    private opts: CloudAPIClientOpts
+    private opts: Required<CloudAPIClientOpts>
 
-    constructor(params: Partial<CloudAPIClientOpts> = {}) {
+    constructor(params: CloudAPIClientOpts) {
         this.opts = {
             origin: 'https://cloud.mobify.com',
-            credentials: null,
             fetch: _fetch,
             ...params,
         }
@@ -162,5 +162,24 @@ const glob = (patterns: string[]): MatchFn => {
             return positive && !negative
         }
         return false
+    }
+}
+
+
+const readCredentials = async (filepath?: string): Promise<Credentials> => {
+    const defaultPath = `${process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME}/.mobify`
+    filepath = filepath || defaultPath
+    try {
+        const data = JSON.parse(await readFile(filepath).toString())
+        return  {
+            username: data.username,
+            api_key: data.api_key
+        }
+    } catch {
+        throw new Error(
+            `Credentials file "${filepath}" not found.\n` +
+                'Visit https://runtime.commercecloud.com/account/settings for ' +
+                'steps on authorizing your computer to push bundles.'
+        )
     }
 }
