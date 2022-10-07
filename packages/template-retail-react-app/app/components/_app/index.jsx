@@ -149,129 +149,68 @@ const App = (props) => {
                 }, 1000)
             })
     )
+    const query1 = useQuery(
+        ['example-data4324242423432432423'],
+        () =>
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve('This came from react-query App')
+                }, 1000)
+            })
+    )
 
     return (
         <Box className="sf-app" {...styles.container}>
-            App outside of IntlProvider {query.data}
-            <br />
-            <IntlProvider
-                onError={(err) => {
-                    if (err.code === 'MISSING_TRANSLATION') {
-                        // NOTE: Remove the console error for missing translations during development,
-                        // as we knew translations would be added later.
-                        console.warn('Missing translation', err.message)
-                        return
-                    }
-                    throw err
-                }}
-                locale={targetLocale}
-                messages={messages}
-                // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
-                // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:
-                // - "extract-default-translations"
-                // - "compile-translations:pseudo"
-                defaultLocale="en-US"
-            >
-                App query inside IntlProvider {query.data}
-                <CategoriesProvider categories={allCategories}>
-                    <CurrencyProvider currency={currency}>
-                        <Seo>
-                            <meta name="theme-color" content={THEME_COLOR} />
-                            <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
-                            <link
-                                rel="apple-touch-icon"
-                                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                            />
-                            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
-
-                            {/* Urls for all localized versions of this page (including current page)
-                            For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {site.l10n?.supportedLocales.map((locale) => (
-                                <link
-                                    rel="alternate"
-                                    hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${buildUrl(location.pathname)}`}
-                                    key={locale.id}
-                                />
-                            ))}
-                            {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
-                            <link
-                                rel="alternate"
-                                hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${buildUrl(location.pathname)}`}
-                            />
-                            {/* A wider fallback for user locales that the app does not support */}
-                            <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
-                        </Seo>
-
-                        <ScrollToTop />
-
-                        <Box id="app" display="flex" flexDirection="column" flex={1}>
-                            <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-
-                            <Box {...styles.headerWrapper}>
-                                {!isCheckout ? (
-                                    <Header
-                                        onMenuClick={onOpen}
-                                        onLogoClick={onLogoClick}
-                                        onMyCartClick={onCartClick}
-                                        onMyAccountClick={onAccountClick}
-                                        onWishlistClick={onWishlistClick}
-                                    >
-                                        <HideOnDesktop>
-                                            <DrawerMenu
-                                                isOpen={isOpen}
-                                                onClose={onClose}
-                                                onLogoClick={onLogoClick}
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
-                                                locale={locale}
-                                            />
-                                        </HideOnDesktop>
-
-                                        <HideOnMobile>
-                                            <ListMenu
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
-                                                locale={locale}
-                                            />
-                                        </HideOnMobile>
-                                    </Header>
-                                ) : (
-                                    <CheckoutHeader />
-                                )}
-                            </Box>
-
-                            {!isOnline && <OfflineBanner />}
-                            <AddToCartModalProvider>
-                                <SkipNavContent
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: 1,
-                                        outline: 0
-                                    }}
-                                >
-                                    <Box
-                                        as="main"
-                                        id="app-main"
-                                        role="main"
-                                        display="flex"
-                                        flexDirection="column"
-                                        flex="1"
-                                    >
-                                        <OfflineBoundary isOnline={false}>
-                                            {children}
-                                        </OfflineBoundary>
-                                    </Box>
-                                </SkipNavContent>
-
-                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
-
-                                <AuthModal {...authModal} />
-                            </AddToCartModalProvider>
-                        </Box>
-                    </CurrencyProvider>
-                </CategoriesProvider>
-            </IntlProvider>
+            App outside of IntlProvider {query.data} <br />
+            {/*Children without any provider {children}*/}
+            {/*<br />*/}
+            {/*<hr />*/}
+            {/* Only render one of those block below, don't run both*/}
+            <CategoriesProvider categories={allCategories}>
+                <CurrencyProvider currency={currency}>
+                    <Header
+                        onMenuClick={onOpen}
+                        onLogoClick={onLogoClick}
+                        onMyCartClick={onCartClick}
+                        onMyAccountClick={onAccountClick}
+                        onWishlistClick={onWishlistClick}
+                    >
+                        <div>Header</div>
+                    </Header>
+                    {children}
+                </CurrencyProvider>
+            </CategoriesProvider>
+            {/*<hr />*/}
+            {/*<IntlProvider*/}
+            {/*    onError={(err) => {*/}
+            {/*        if (err.code === 'MISSING_TRANSLATION') {*/}
+            {/*            // NOTE: Remove the console error for missing translations during development,*/}
+            {/*            // as we knew translations would be added later.*/}
+            {/*            console.warn('Missing translation', err.message)*/}
+            {/*            return*/}
+            {/*        }*/}
+            {/*        throw err*/}
+            {/*    }}*/}
+            {/*    locale={targetLocale}*/}
+            {/*    messages={messages}*/}
+            {/*    // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.*/}
+            {/*    // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:*/}
+            {/*    // - "extract-default-translations"*/}
+            {/*    // - "compile-translations:pseudo"*/}
+            {/*    defaultLocale="en-US"*/}
+            {/*>*/}
+            {/*    App query inside IntlProvider {query1.data}*/}
+            {/*    <Header*/}
+            {/*        onMenuClick={onOpen}*/}
+            {/*        onLogoClick={onLogoClick}*/}
+            {/*        onMyCartClick={onCartClick}*/}
+            {/*        onMyAccountClick={onAccountClick}*/}
+            {/*        onWishlistClick={onWishlistClick}*/}
+            {/*    >*/}
+            {/*        <div>Header</div>*/}
+            {/*    </Header>*/}
+            {/*    <div>{children}</div>*/}
+            {/*</IntlProvider>*/}
         </Box>
     )
 }
