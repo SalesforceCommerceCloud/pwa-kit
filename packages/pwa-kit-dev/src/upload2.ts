@@ -1,12 +1,12 @@
 import path from 'path'
 import git from 'git-rev-sync'
 import archiver from 'archiver'
-import fileUtils from './file-utils'
-import {Matcher} from '../dist/utils/glob'
 import {version as SDK_VERSION} from '../package.json'
 import _fetch from 'node-fetch'
 import {URL} from 'node:url'
 import {readFile, stat} from 'fs/promises'
+import {createWriteStream} from 'fs'
+import minimatch from 'minimatch'
 
 
 
@@ -29,14 +29,14 @@ interface Bundle {
     message: string
     encoding: string
     data: string
-    ssr_parameters: any
+    ssr_parameters: object
     ssr_only: string[]
     ssr_shared: string[]
 }
 
 
 class CloudAPIClient {
-    opts: CloudAPIClientOpts
+    private opts: CloudAPIClientOpts
 
     constructor(params: Partial<CloudAPIClientOpts> = {}) {
         this.opts = {
@@ -88,7 +88,7 @@ const createBundle = async (
     ) : Promise<Bundle> => {
 
     try {
-        await stat(path)
+        await stat(buildDirectory)
     } catch (e) {
         const fullPath = path.join(process.cwd(), buildDirectory)
         throw new Error(
@@ -101,7 +101,7 @@ const createBundle = async (
     const filesInArchive = []
 
     await new Promise((resolve, reject) => {
-        const output = fileUtils.createWriteStream(destination)
+        const output = createWriteStream(destination)
         const archive = archiver('tar')
 
         archive.pipe(output)
@@ -133,9 +133,34 @@ const createBundle = async (
         encoding: 'base64',
         data,
         ssr_parameters,
-        ssr_only: filesInArchive.filter(new Matcher(ssr_only).filter),
-        ssr_shared: filesInArchive.filter(new Matcher(ssr_shared).filter),
+        ssr_only: filesInArchive.filter(glob(ssr_only)),
+        ssr_shared: filesInArchive.filter(glob(ssr_shared)),
     }
-
 }
 
+
+
+
+type MatchFn = (a: string) => boolean;
+
+const glob = (patterns: string[]): MatchFn => {
+
+    // The patterns can include negations, so matching is done against all
+    // the patterns. A match is true if a given path matches any pattern and
+    // does not match any negating patterns.
+
+    const allPatterns = (patterns || [])
+        .map((pattern) => new minimatch.Minimatch(pattern, {nocomment: true}))
+        .filter((pattern) => !pattern.empty)
+    const positivePatterns = allPatterns.filter((pattern) => !pattern.negate)
+    const negativePatterns = allPatterns.filter((pattern) => pattern.negate)
+
+    return (path: string) => {
+        if (path) {
+            const positive = positivePatterns.some((pattern) => pattern.match(path))
+            const negative = negativePatterns.some((pattern) => !pattern.match(path))
+            return positive && !negative
+        }
+        return false
+    }
+}
