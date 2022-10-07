@@ -10,17 +10,41 @@ const fse = require('fs-extra')
 const program = require('commander')
 const isEmail = require('validator/lib/isEmail')
 const {execSync: _execSync} = require('child_process')
-const scriptUtils = require('../scripts/utils')
-const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
+const chalk = require('chalk')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
+
+const upload2 = (() => {
+    try {
+        return require('../dist/utils/upload2')
+    } catch {
+        return require('../utils/upload2')
+    }
+})()
+
+
+const colors = {
+    warn: 'yellow',
+    error: 'red',
+    success: 'cyan'
+}
+
+const fancyLog = (level, msg) => {
+    const color = colors[level] || 'green'
+    const colorFn = chalk[color]
+    console.log(`${colorFn(level)}: ${msg}`)
+}
+const info = (msg) => fancyLog('info', msg)
+const success = (msg) => fancyLog('success', msg)
+const warn = (msg) => fancyLog('warn', msg)
+const error = (msg) => fancyLog('error', msg)
 
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
 }
 
-const main = () => {
+const main = async () => {
     const pkgRoot = p.join(__dirname, '..')
     process.env.CONTEXT = process.cwd()
 
@@ -57,8 +81,46 @@ const main = () => {
         ].join('\n')
     )
 
-    program
-        .command('save-credentials')
+    const credentialsLocationDisplay = () => {
+        const dir = process.platform === 'win32' ? '%USERPROFILE%' : '~'
+        return p.join(dir, '.mobify')
+    }
+
+    /**
+     * All Managed Runtime commands take common opts like --cloud-origin
+     * and --credentialsFile. These are set to be split out from the SDK
+     * commands here in the near future.
+     */
+    const managedRuntimeCommand = (name) => {
+        return program.command(name)
+            .addOption(
+                new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
+                    .default(upload2.DEFAULT_CLOUD_ORIGIN)
+                    .env('CLOUD_API_BASE')
+            )
+            .addOption(
+                new program.Option(
+                    '-c, --credentialsFile <credentialsFile>',
+                    `override the standard credentials file location "${credentialsLocationDisplay()}"`
+                )
+                    .default(undefined) // *must* default to undefined!
+                    .env('PWA_KIT_CREDENTIALS_FILE')
+            )
+            .hook('preAction', (thisCommand, actionCommand) => {
+                // The final credentialsFile path depends on both cloudOrigin and credentialsFile opts.
+                // Pre-process before passing to the command.
+                const {cloudOrigin, credentialsFile} = actionCommand.opts()
+                actionCommand.setOptionValue(
+                    'credentialsFile',
+                    upload2.getCredentialsFile(
+                        cloudOrigin,
+                        credentialsFile
+                    )
+                )
+            })
+    }
+
+    managedRuntimeCommand('save-credentials')
         .description(`save API credentials for Managed Runtime`)
         .requiredOption(
             '-u, --user <email>',
@@ -76,28 +138,19 @@ const main = () => {
             `find your API key at https://runtime.commercecloud.com/account/settings`,
             (val) => {
                 if (!(typeof val === 'string') && val.length > 0) {
-                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
+                    throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
                 } else {
                     return val
                 }
             }
         )
-        .addOption(
-            new program.Option(
-                '-c, --credentialsFile <credentialsFile>',
-                'the file where your credentials should be stored'
-            )
-                .default(scriptUtils.getCredentialsFile())
-                .env('PWA_KIT_CREDENTIALS_FILE')
-        )
-        .action(({user, key, credentialsFile}) => {
+        .action(async ({user, key, credentialsFile}) => {
             try {
                 fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
-                console.log(`Saved Managed Runtime credentials to "${credentialsFile}".`)
+                success(`Saved Managed Runtime credentials to "${chalk.cyan(credentialsFile)}".`)
             } catch (e) {
-                console.error('Failed to save credentials.')
-                console.error(e)
-                process.exit(1)
+                error('Failed to save credentials.')
+                throw e
             }
         })
 
@@ -108,7 +161,7 @@ const main = () => {
             new program.Option('--inspect', 'enable debugging with --inspect on the node process')
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
-        .action(({inspect, noHMR}) => {
+        .action(async ({inspect, noHMR}) => {
             execSync(
                 `node${inspect ? ' --inspect' : ''} ${p.join(process.cwd(), 'app', 'ssr.js')}`,
                 {
@@ -131,7 +184,7 @@ const main = () => {
                 .env('PWA_KIT_BUILD_DIR')
         )
         .description(`build your app for production`)
-        .action(({buildDirectory}) => {
+        .action(async ({buildDirectory}) => {
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
             const projectWebpack = p.join(process.cwd(), 'webpack.config.js')
             const webpackConf = fse.pathExistsSync(projectWebpack)
@@ -169,8 +222,7 @@ const main = () => {
             }
         })
 
-    program
-        .command('push')
+    managedRuntimeCommand('push')
         .description(`push a bundle to Managed Runtime`)
         .addOption(
             new program.Option(
@@ -182,9 +234,7 @@ const main = () => {
             new program.Option(
                 '-m, --message <message>',
                 'a message to include along with the uploaded bundle in Managed Runtime'
-            )
-                // The default message is loaded dynamically as part of `uploadBundle(...)`
-                .default(undefined, '<git branch>:<git commit hash>')
+            ).default(undefined, '<git branch>:<git commit hash>')
         )
         .addOption(
             new program.Option(
@@ -201,24 +251,17 @@ const main = () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .addOption(
-            new program.Option(
-                '-c, --credentialsFile <credentialsFile>',
-                'the file where your credentials are stored'
-            )
-                .default(scriptUtils.getCredentialsFile())
-                .env('PWA_KIT_CREDENTIALS_FILE')
-        )
-        .action(({buildDirectory, message, projectSlug, target, credentialsFile}) => {
+        .action(async ({buildDirectory, message, projectSlug, target, cloudOrigin, credentialsFile}) => {
             // Set the deployment target env var, this is required to ensure we
             // get the correct configuration object.
             process.env.DEPLOY_TARGET = target
+
+            const credentials = await upload2.readCredentials(credentialsFile)
 
             const mobify = getConfig() || {}
 
             if (!projectSlug) {
                 try {
-                    // Using the full path isn't strictly necessary, but results in clearer errors
                     const projectPkg = p.join(process.cwd(), 'package.json')
                     const {name} = fse.readJsonSync(projectPkg)
                     if (!name) throw new Error(`Missing "name" field in ${projectPkg}`)
@@ -230,31 +273,24 @@ const main = () => {
                 }
             }
 
-            const options = {
-                buildDirectory,
-                // Avoid setting message if it's blank, so that it doesn't override the default
-                ...(message ? {message} : undefined),
-                projectSlug,
-                target,
-                credentialsFile,
-                // Note: Cloud expects snake_case, but package.json uses camelCase.
+            const bundle = await upload2.createBundle({
+                message,
                 ssr_parameters: mobify.ssrParameters,
                 ssr_only: mobify.ssrOnly,
                 ssr_shared: mobify.ssrShared,
-                set_ssr_values: true
-            }
-
-            if (
-                !Array.isArray(options.ssr_only) ||
-                options.ssr_only.length === 0 ||
-                !Array.isArray(options.ssr_shared) ||
-                options.ssr_shared.length === 0
-            ) {
-                scriptUtils.fail('ssrEnabled is set, but no ssrOnly or ssrShared files are defined')
-            }
-            uploadBundle(options).catch((err) => {
-                console.error(err.message || err)
+                buildDirectory,
+                projectSlug
             })
+            const client = new upload2.CloudAPIClient({
+                credentials,
+                origin: cloudOrigin,
+            })
+
+            info(`Beginning upload to ${cloudOrigin}`)
+            const data = await client.push(bundle, projectSlug, target)
+            const warnings = (data.warnings || [])
+            warnings.forEach(warn)
+            success('Bundle Uploaded')
         })
 
     program
@@ -262,7 +298,7 @@ const main = () => {
         .description('lint all source files')
         .argument('<path>', 'path or glob to lint')
         .option('--fix', 'Try and fix errors (default: false)')
-        .action((path, {fix}) => {
+        .action(async (path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
             const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
             execSync(
@@ -276,7 +312,7 @@ const main = () => {
         .command('format')
         .description('automatically re-format all source files')
         .argument('<path>', 'path or glob to format')
-        .action((path) => {
+        .action(async ({path}) => {
             const prettier = p.join(require.resolve('prettier'), '..', '..', '.bin', 'prettier')
             execSync(`${prettier} --write "${path}"`)
         })
@@ -284,27 +320,33 @@ const main = () => {
     program
         .command('test')
         .description('test the project')
-        .action((_, {args}) => {
+        .action(async (_, {args}) => {
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
             execSync(
                 `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
             )
         })
 
-    program.option('-v, --version', 'show version number').action(({version}) => {
-        if (version) {
-            console.log(pkg.version)
-        } else {
-            program.help({error: true})
-        }
-    })
+    program
+        .option('-v, --version', 'show version number')
+        .action(async ({version}) => {
+            if (version) {
+                console.log(pkg.version)
+            } else {
+                program.help({error: true})
+            }
+        })
 
-    program.parse(process.argv)
+    await program.parseAsync(process.argv)
 }
 
 Promise.resolve()
-    .then(() => main())
-    .catch((err) => {
-        console.error(err.message)
-        process.exit(1)
+    .then(async () => {
+        try {
+            await main()
+        } catch (err) {
+            error(err.message || err.toString())
+            process.exit(1)
+        }
     })
+
