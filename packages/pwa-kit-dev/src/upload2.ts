@@ -3,7 +3,7 @@ import path from 'path'
 import git from 'git-rev-sync'
 import archiver from 'archiver'
 // import {version as SDK_VERSION} from '../package.json'
-import _fetch from 'node-fetch'
+// import _fetch from 'node-fetch'
 import {URL} from 'node:url'
 import {readFile, stat, mkdtemp, rmdir} from 'fs/promises'
 import {createWriteStream} from 'fs'
@@ -173,12 +173,14 @@ const readCredentials = async (filepath?: string): Promise<Credentials> => {
     const defaultPath = `${process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME}/.mobify`
     filepath = filepath || defaultPath
     try {
-        const data = JSON.parse(await readFile(filepath).toString())
+        const content = await readFile(filepath)
+        const data = JSON.parse(content.toString('utf-8'))
         return  {
             username: data.username,
             api_key: data.api_key
         }
-    } catch {
+    } catch (e) {
+        console.error(e.toString())
         throw new Error(
             `Credentials file "${filepath}" not found.\n` +
                 'Visit https://runtime.commercecloud.com/account/settings for ' +
@@ -186,3 +188,10 @@ const readCredentials = async (filepath?: string): Promise<Credentials> => {
         )
     }
 }
+
+
+const main = async () => {
+    console.log(await readCredentials())
+}
+
+main()
