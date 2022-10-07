@@ -440,7 +440,7 @@ workflows:
           matrix:
             parameters:
               template: [express-minimal-test-project, typescript-minimal-test-project]
-      - docs_build_and_deploy
+      # - docs_build_and_deploy
   nightly-build:
     triggers:
       - schedule:
