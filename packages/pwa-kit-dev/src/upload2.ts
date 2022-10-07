@@ -1,13 +1,16 @@
+import os from 'os'
 import path from 'path'
 import git from 'git-rev-sync'
 import archiver from 'archiver'
-import {version as SDK_VERSION} from '../package.json'
+// import {version as SDK_VERSION} from '../package.json'
 import _fetch from 'node-fetch'
 import {URL} from 'node:url'
-import {readFile, stat} from 'fs/promises'
+import {readFile, stat, mkdtemp, rmdir} from 'fs/promises'
 import {createWriteStream} from 'fs'
-import minimatch from 'minimatch'
+import {Minimatch} from 'minimatch'
 
+
+const SDK_VERSION = 'todo'
 
 
 interface Credentials {
@@ -77,7 +80,6 @@ class CloudAPIClient {
 }
 
 
-
 const createBundle = async (
     message: string = '',
     ssr_parameters: any,
@@ -87,55 +89,56 @@ const createBundle = async (
     projectSlug: string,
     ) : Promise<Bundle> => {
 
-    try {
-        await stat(buildDirectory)
-    } catch (e) {
-        const fullPath = path.join(process.cwd(), buildDirectory)
-        throw new Error(
-            `[Error: Build directory at path "${fullPath}" not found.]\n` +
-            'You must first run the Progressive Web SDK build process before uploading a bundle.'
-        )
-    }
-
-
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'pwa-kit-dev-'))
+    const destination = path.join(tmpDir, 'build.tar')
     const filesInArchive = []
 
-    await new Promise((resolve, reject) => {
-        const output = createWriteStream(destination)
-        const archive = archiver('tar')
+    return Promise.resolve()
+        .then(() => stat(buildDirectory))
+        .catch((e) => {
+            const fullPath = path.join(process.cwd(), buildDirectory)
+            throw new Error(
+                `[Error: Build directory at path "${fullPath}" not found.]\n` +
+                'You must first run the Progressive Web SDK build process before uploading a bundle.'
+            )
+        })
+        .then(() => new Promise((resolve, reject) => {
+            const output = createWriteStream(destination)
+            const archive = archiver('tar')
 
-        archive.pipe(output)
+            archive.pipe(output)
 
-        // See https://archiverjs.com/docs/global.html#TarEntryData
-        const newRoot = path.join(projectSlug, 'bld', '')
-        archive.directory(
-            buildDirectory,
-            '',
-            (entry) => {
-                if (entry.stats.isFile()) {
-                    filesInArchive.push(entry.name)
+            // See https://archiverjs.com/docs/global.html#TarEntryData
+            const newRoot = path.join(projectSlug, 'bld', '')
+            archive.directory(
+                buildDirectory,
+                '',
+                (entry) => {
+                    if (entry.stats.isFile()) {
+                        filesInArchive.push(entry.name)
+                    }
+                    entry.prefix = newRoot
+                    return entry
                 }
-                entry.prefix = newRoot
-                return entry
+            )
+
+            archive.on('error', reject)
+            output.on('finish', resolve)
+
+            archive.finalize()
+        }))
+        .then(() => readFile(destination).toString('base64'))
+        .then((data) => {
+            return {
+                message,
+                encoding: 'base64',
+                data,
+                ssr_parameters,
+                ssr_only: filesInArchive.filter(glob(ssr_only)),
+                ssr_shared: filesInArchive.filter(glob(ssr_shared)),
             }
-        )
-
-        archive.on('error', reject)
-        output.on('finish', resolve)
-
-        archive.finalize()
-    })
-
-    const data = await readFile(destination).toString('base64')
-
-    return {
-        message,
-        encoding: 'base64',
-        data,
-        ssr_parameters,
-        ssr_only: filesInArchive.filter(glob(ssr_only)),
-        ssr_shared: filesInArchive.filter(glob(ssr_shared)),
-    }
+        })
+        .finally(() => rmdir(tmpDir, {recursive: true}))
 }
 
 
@@ -150,7 +153,7 @@ const glob = (patterns: string[]): MatchFn => {
     // does not match any negating patterns.
 
     const allPatterns = (patterns || [])
-        .map((pattern) => new minimatch.Minimatch(pattern, {nocomment: true}))
+        .map((pattern) => new Minimatch(pattern, {nocomment: true}))
         .filter((pattern) => !pattern.empty)
     const positivePatterns = allPatterns.filter((pattern) => !pattern.negate)
     const negativePatterns = allPatterns.filter((pattern) => pattern.negate)
