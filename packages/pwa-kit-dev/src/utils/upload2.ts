@@ -8,6 +8,7 @@ import {URL} from 'node:url'
 import {readFile, stat, mkdtemp, rmdir} from 'fs/promises'
 import {createWriteStream} from 'fs'
 import {Minimatch} from 'minimatch'
+import git from 'git-rev-sync'
 
 
 const SDK_VERSION = 'todo'
@@ -79,15 +80,27 @@ export class CloudAPIClient {
     }
 }
 
+const defaultMessage = (): string => {
+    try {
+        return `${git.branch()}: ${git.short()}`
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            console.log('Please run "git init" to initialize a new Git repository.')
+        }
+        return 'PWA Kit Bundle'
+    }
+}
 
 export const createBundle = async (
-    message: string = '',
+    message: string | null | undefined = null,
     ssr_parameters: any,
     ssr_only: string[] = [],
     ssr_shared: string[] = [],
     buildDirectory: string,
     projectSlug: string,
     ) : Promise<Bundle> => {
+
+    message = message || defaultMessage()
 
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'pwa-kit-dev-'))
     const destination = path.join(tmpDir, 'build.tar')
