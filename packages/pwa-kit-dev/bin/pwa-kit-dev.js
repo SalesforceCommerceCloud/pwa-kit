@@ -15,6 +15,7 @@ const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
+
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
@@ -209,7 +210,7 @@ const main = () => {
                 .default(scriptUtils.getCredentialsFile())
                 .env('PWA_KIT_CREDENTIALS_FILE')
         )
-        .action(({buildDirectory, message, projectSlug, target, credentialsFile}) => {
+        .action(async ({buildDirectory, message, projectSlug, target, credentialsFile}) => {
             // Set the deployment target env var, this is required to ensure we
             // get the correct configuration object.
             process.env.DEPLOY_TARGET = target
@@ -218,7 +219,6 @@ const main = () => {
 
             if (!projectSlug) {
                 try {
-                    // Using the full path isn't strictly necessary, but results in clearer errors
                     const projectPkg = p.join(process.cwd(), 'package.json')
                     const {name} = fse.readJsonSync(projectPkg)
                     if (!name) throw new Error(`Missing "name" field in ${projectPkg}`)
@@ -230,31 +230,28 @@ const main = () => {
                 }
             }
 
-            const options = {
-                buildDirectory,
-                // Avoid setting message if it's blank, so that it doesn't override the default
-                ...(message ? {message} : undefined),
-                projectSlug,
-                target,
-                credentialsFile,
-                // Note: Cloud expects snake_case, but package.json uses camelCase.
-                ssr_parameters: mobify.ssrParameters,
-                ssr_only: mobify.ssrOnly,
-                ssr_shared: mobify.ssrShared,
-                set_ssr_values: true
-            }
+            const bundle = await scriptUtils.upload2.createBundle(
+                message = message || 'todo-gitSHA',
+                ssr_parameters = mobify.ssrParameters,
+                ssr_only = mobify.ssrOnly,
+                ssr_shared = mobify.ssrShared,
+                buildDirectory = buildDirectory,
+                projectSlug = projectSlug,
+            )
 
-            if (
-                !Array.isArray(options.ssr_only) ||
-                options.ssr_only.length === 0 ||
-                !Array.isArray(options.ssr_shared) ||
-                options.ssr_shared.length === 0
-            ) {
-                scriptUtils.fail('ssrEnabled is set, but no ssrOnly or ssrShared files are defined')
-            }
-            uploadBundle(options).catch((err) => {
-                console.error(err.message || err)
+            console.log('created bundle', {
+                message: bundle.message,
+                encoding: bundle.encoding,
+                data: bundle.data.slice(0, 20),
+                ssr_parameters: bundle.ssr_parameters,
+                ssr_only: bundle.ssr_only,
+                ssr_shared: bundle.ssr_shared,
             })
+
+            const credentials = await scriptUtils.upload2.readCredentials(credentialsFile)
+
+            console.log('Read credentials', credentials)
+            // const client = new scriptUtils.upload2.CloudAPIClient({credentials})
         })
 
     program

@@ -39,7 +39,7 @@ interface Bundle {
 }
 
 
-class CloudAPIClient {
+export class CloudAPIClient {
     private opts: Required<CloudAPIClientOpts>
 
     constructor(params: CloudAPIClientOpts) {
@@ -80,7 +80,7 @@ class CloudAPIClient {
 }
 
 
-const createBundle = async (
+export const createBundle = async (
     message: string = '',
     ssr_parameters: any,
     ssr_only: string[] = [],
@@ -92,6 +92,10 @@ const createBundle = async (
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'pwa-kit-dev-'))
     const destination = path.join(tmpDir, 'build.tar')
     const filesInArchive = []
+
+    if (ssr_only.length === 0 || ssr_shared.length === 0) {
+        throw new Error('no ssrOnly or ssrShared files are defined')
+    }
 
     return Promise.resolve()
         .then(() => stat(buildDirectory))
@@ -127,12 +131,13 @@ const createBundle = async (
 
             archive.finalize()
         }))
-        .then(() => readFile(destination).toString('base64'))
+        .then(() => readFile(destination))
         .then((data) => {
+            const encoding = 'base64'
             return {
                 message,
-                encoding: 'base64',
-                data,
+                encoding,
+                data: data.toString(encoding),
                 ssr_parameters,
                 ssr_only: filesInArchive.filter(glob(ssr_only)),
                 ssr_shared: filesInArchive.filter(glob(ssr_shared)),
@@ -169,7 +174,7 @@ const glob = (patterns: string[]): MatchFn => {
 }
 
 
-const readCredentials = async (filepath?: string): Promise<Credentials> => {
+export const readCredentials = async (filepath?: string): Promise<Credentials> => {
     const defaultPath = `${process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME}/.mobify`
     filepath = filepath || defaultPath
     try {
@@ -180,7 +185,6 @@ const readCredentials = async (filepath?: string): Promise<Credentials> => {
             api_key: data.api_key
         }
     } catch (e) {
-        console.error(e.toString())
         throw new Error(
             `Credentials file "${filepath}" not found.\n` +
                 'Visit https://runtime.commercecloud.com/account/settings for ' +
@@ -188,10 +192,3 @@ const readCredentials = async (filepath?: string): Promise<Credentials> => {
         )
     }
 }
-
-
-const main = async () => {
-    console.log(await readCredentials())
-}
-
-main()

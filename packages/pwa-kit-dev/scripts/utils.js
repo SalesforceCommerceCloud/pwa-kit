@@ -21,7 +21,11 @@ const SDK_VERSION = require('../package.json').version
 const DEFAULT_DOCS_URL =
     'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
 
+const upload2 = require('../dist/utils/upload2')
+
 const Utils = {}
+
+Utils.upload2 = upload2
 
 // Returns a bundle object ready to upload to the Release Console.
 Utils.buildObject = (archivePath, options) => {
