@@ -6,7 +6,6 @@ A library of React hooks for fetching data from Salesforce B2C Commerce.
 
 The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.
 
-
 ## PWA-Kit Integration
 
 > To integration this library with your PWA-Kit application you can use the `CommerceApiProvider` directly given that you use the `withReactQuery` higher order component to wrap your `AppConfig` component. Below is a snippet of how this is accomplished.
@@ -16,33 +15,15 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 
-const isServer = typeof window !== 'undefined'
-
 const AppConfig = ({children}) => {
     return (
         <CommerceApiProvider {...commerceApiProviderProps}>
             {children}
         </CommerceApiProvider>
     )
-} 
-
-// Set configuration options for react query.
-// NOTE: This configuration will be used both on the server-side and 
-// client-side.
-const options = {
-    queryClientConfig: {
-        defaultOptions: {
-            queries: {
-                retry: !server // Only retry when on the client.
-            },
-            mutations: {
-                retry: !server // Only retry when on the client.
-            }
-        }
-    }
 }
 
-export default withReactQuery(AppConfig, options)
+export default withReactQuery(AppConfig)
 ```
 
 ## Generic Integration
@@ -63,10 +44,11 @@ const App = ({children}) => {
             </CommerceApiProvider>
         </QueryClientProvider>
     )
-} 
+}
 
 export default App
 ```
+
 ### Useful Links:
 
 -   [Get Started](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html)

@@ -9,8 +9,8 @@ import {render, RenderOptions} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
 import nock from 'nock'
 import React from 'react'
-import CommerceApiProvider from './provider'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
+import {QueryClient, QueryClientProvider, QueryClientProviderProps} from '@tanstack/react-query'
 
 export const TEST_CONFIG = {
     proxy: 'http://localhost:3000/mobify/proxy/api',
@@ -22,15 +22,20 @@ export const TEST_CONFIG = {
     locale: 'en_US',
     currency: 'USD'
 }
-const TestProviders = (props: {children: React.ReactNode}) => {
+const TestProviders = (props: {
+    children: React.ReactNode
+    commerceApiProvider?: Partial<CommerceApiProviderProps>
+}) => {
+    const {commerceApiProvider} = props
     const queryClient = new QueryClient({
         // During testing, we want things to fail immediately
         defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
     })
-
     return (
         <QueryClientProvider client={queryClient}>
-            <CommerceApiProvider {...TEST_CONFIG}>{props.children}</CommerceApiProvider>
+            <CommerceApiProvider {...TEST_CONFIG} {...commerceApiProvider}>
+                {props.children}
+            </CommerceApiProvider>
         </QueryClientProvider>
     )
 }
@@ -38,14 +43,22 @@ const TestProviders = (props: {children: React.ReactNode}) => {
 /**
  * Render your component, which will be wrapped with all the necessary Provider components
  *
- * @param component
+ * @param children
  * @param options - additional options for testing-library's render function
+ * @param providerProps - additional props to pass to providers in TestProvider component
  */
 export const renderWithProviders = (
-    component: React.ReactElement,
-    options?: Omit<RenderOptions, 'wrapper'>
+    children: React.ReactElement,
+    options?: Omit<RenderOptions, 'wrapper'>,
+    providerProps?: {
+        commerceApiProvider?: Partial<CommerceApiProviderProps>
+    }
 ): void => {
-    render(component, {wrapper: TestProviders, ...options})
+    render(children, {
+        // eslint-disable-next-line react/display-name
+        wrapper: () => <TestProviders {...providerProps}>{children}</TestProviders>,
+        ...options
+    })
 }
 
 type NockBackOptions = {
