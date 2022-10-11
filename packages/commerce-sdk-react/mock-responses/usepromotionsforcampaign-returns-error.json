@@ -1,0 +1,41 @@
+[
+    {
+        "scope": "http://localhost:3000",
+        "method": "GET",
+        "path": "/mobify/proxy/api/pricing/shopper-promotions/v1/organizations/f_ecom_zzrf_001/promotions/campaigns/campaign-1,%20campaign-2?siteId=RefArchGlobal",
+        "body": "",
+        "status": 401,
+        "response": {
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized",
+            "title": "Unauthorized",
+            "detail": "Your shopper JWT is invalid and could not be used to identify the API client."
+        },
+        "rawHeaders": [
+            "date",
+            "Tue, 11 Oct 2022 22:07:02 GMT",
+            "content-length",
+            "206",
+            "connection",
+            "close",
+            "cf-ray",
+            "758ae8061b43a70e-PHX",
+            "strict-transport-security",
+            "max-age=31536000; includeSubdomains;",
+            "cf-cache-status",
+            "DYNAMIC",
+            "x-correlation-id",
+            "758ae8061b43a70e",
+            "x-ratelimit-limit",
+            "800",
+            "x-ratelimit-remaining",
+            "800",
+            "vary",
+            "Accept-Encoding",
+            "server",
+            "cloudflare",
+            "x-proxy-request-url",
+            "https://kv7kzm78.api.commercecloud.salesforce.com/pricing/shopper-promotions/v1/organizations/f_ecom_zzrf_001/promotions/campaigns/campaign-1,%20campaign-2?siteId=RefArchGlobal"
+        ],
+        "responseIsBinary": false
+    }
+]

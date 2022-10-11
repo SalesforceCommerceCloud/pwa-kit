@@ -1,0 +1,41 @@
+[
+    {
+        "scope": "http://localhost:3000",
+        "method": "GET",
+        "path": "/mobify/proxy/api/pricing/shopper-promotions/v1/organizations/f_ecom_zzrf_001/promotions?siteId=RefArchGlobal&ids=promo_18%2Cpromo_7%2Cpromo_22%2Cpromo_11%2Cpromo_9%2Cpromo_2%2Cpromo_6%2Cpromo_3%2Cpromo_5%2Cpromo_11%2Cpromo_10%2Cpromo_6%2Cpromo_24%2Cpromo_14%2Cpromo_17%2Cpromo_25%2Cpromo_10%2Cpromo_23%2Cpromo_5%2Cpromo_1%2Cpromo_13%2Cpromo_8%2Cpromo_0%2Cpromo_1%2Cpromo_24%2Cpromo_15%2Cpromo_12%2Cpromo_18%2Cpromo_14%2Cpromo_10%2Cpromo_13%2Cpromo_12%2Cpromo_8%2Cpromo_24%2Cpromo_9%2Cpromo_8%2Cpromo_13%2Cpromo_5%2Cpromo_3%2Cpromo_19%2Cpromo_19%2Cpromo_18%2Cpromo_21%2Cpromo_7%2Cpromo_4%2Cpromo_6%2Cpromo_20%2Cpromo_8%2Cpromo_7%2Cpromo_11",
+        "body": "",
+        "status": 401,
+        "response": {
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized",
+            "title": "Unauthorized",
+            "detail": "Your shopper JWT is invalid and could not be used to identify the API client."
+        },
+        "rawHeaders": [
+            "date",
+            "Tue, 11 Oct 2022 20:51:44 GMT",
+            "content-length",
+            "206",
+            "connection",
+            "close",
+            "cf-ray",
+            "758a79b81fc1a726-PHX",
+            "strict-transport-security",
+            "max-age=31536000; includeSubdomains;",
+            "cf-cache-status",
+            "DYNAMIC",
+            "x-correlation-id",
+            "758a79b81fc1a726",
+            "x-ratelimit-limit",
+            "800",
+            "x-ratelimit-remaining",
+            "800",
+            "vary",
+            "Accept-Encoding",
+            "server",
+            "cloudflare",
+            "x-proxy-request-url",
+            "https://kv7kzm78.api.commercecloud.salesforce.com/pricing/shopper-promotions/v1/organizations/f_ecom_zzrf_001/promotions?siteId=RefArchGlobal&ids=promo_18%2Cpromo_7%2Cpromo_22%2Cpromo_11%2Cpromo_9%2Cpromo_2%2Cpromo_6%2Cpromo_3%2Cpromo_5%2Cpromo_11%2Cpromo_10%2Cpromo_6%2Cpromo_24%2Cpromo_14%2Cpromo_17%2Cpromo_25%2Cpromo_10%2Cpromo_23%2Cpromo_5%2Cpromo_1%2Cpromo_13%2Cpromo_8%2Cpromo_0%2Cpromo_1%2Cpromo_24%2Cpromo_15%2Cpromo_12%2Cpromo_18%2Cpromo_14%2Cpromo_10%2Cpromo_13%2Cpromo_12%2Cpromo_8%2Cpromo_24%2Cpromo_9%2Cpromo_8%2Cpromo_13%2Cpromo_5%2Cpromo_3%2Cpromo_19%2Cpromo_19%2Cpromo_18%2Cpromo_21%2Cpromo_7%2Cpromo_4%2Cpromo_6%2Cpromo_20%2Cpromo_8%2Cpromo_7%2Cpromo_11"
+        ],
+        "responseIsBinary": false
+    }
+]
