@@ -45,9 +45,9 @@ export class CloudAPIClient {
 
     constructor(params: CloudAPIClientOpts) {
         this.opts = {
-            origin: 'https://cloud.mobify.com',
-            fetch: _fetch,
-            ...params,
+            origin: params.origin || 'https://cloud.mobify.com',
+            fetch: params.fetch || _fetch,
+            credentials: params.credentials,
         }
     }
 
@@ -66,7 +66,7 @@ export class CloudAPIClient {
         }
     }
 
-    async push(projectSlug, target='', bundle: Bundle) {
+    async push(bundle: Bundle, projectSlug: string, target?: string) {
         const base = `api/projects/${projectSlug}/builds/`
         const pathname = target ? base + `${target}/` : base
         const url = new URL(this.opts.origin)
@@ -74,11 +74,16 @@ export class CloudAPIClient {
 
         const body = Buffer.from(JSON.stringify(bundle))
         const headers = await this.getHeaders({'Content-Length': body.length.toString()})
+
         const res = await this.opts.fetch(url.toString(), {
             body,
             method: 'POST',
             headers,
         })
+        if (!res.ok) {
+            throw new Error(await res.text())
+        }
+        return res
     }
 }
 

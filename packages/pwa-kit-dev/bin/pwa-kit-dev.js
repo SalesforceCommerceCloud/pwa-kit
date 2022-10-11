@@ -239,19 +239,13 @@ const main = () => {
                 projectSlug = projectSlug,
             )
 
-            console.log('created bundle', {
-                message: bundle.message,
-                encoding: bundle.encoding,
-                data: bundle.data.slice(0, 20),
-                ssr_parameters: bundle.ssr_parameters,
-                ssr_only: bundle.ssr_only,
-                ssr_shared: bundle.ssr_shared,
-            })
-
             const credentials = await scriptUtils.upload2.readCredentials(credentialsFile)
 
-            console.log('Read credentials', credentials)
-            // const client = new scriptUtils.upload2.CloudAPIClient({credentials})
+            const client = new scriptUtils.upload2.CloudAPIClient({
+                credentials,
+                origin: process.env.CLOUD_API_BASE
+            })
+            await client.push(bundle, projectSlug, target)
         })
 
     program
