@@ -231,7 +231,7 @@ const main = () => {
             }
 
             const bundle = await scriptUtils.upload2.createBundle(
-                message = message || 'todo-gitSHA',
+                message = message,
                 ssr_parameters = mobify.ssrParameters,
                 ssr_only = mobify.ssrOnly,
                 ssr_shared = mobify.ssrShared,

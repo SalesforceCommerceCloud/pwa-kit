@@ -1,16 +1,12 @@
 import os from 'os'
 import path from 'path'
 import archiver from 'archiver'
-// import {version as SDK_VERSION} from '../package.json'
 import _fetch from 'node-fetch'
 import {URL} from 'node:url'
 import {readFile, stat, mkdtemp, rmdir} from 'fs/promises'
 import {createWriteStream} from 'fs'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
-
-
-const SDK_VERSION = 'todo'
 
 
 interface Credentials {
@@ -38,6 +34,11 @@ interface Bundle {
     ssr_shared: string[]
 }
 
+const getPkgJSON = async () => {
+    const data = await readFile(path.join(__dirname, '..', 'package.json'))
+    return JSON.parse(data.toString('utf-8'))
+}
+
 
 export class CloudAPIClient {
     private opts: Required<CloudAPIClientOpts>
@@ -56,9 +57,10 @@ export class CloudAPIClient {
         return {'Authorization': `Basic ${encoded}`}
     }
 
-    private getHeaders(extras: StringMap): StringMap {
+    private async getHeaders(extras: StringMap): Promise<StringMap> {
+        const pkg = await getPkgJSON()
         return {
-            'User-Agent': `progressive-web-sdk#${SDK_VERSION}`,
+            'User-Agent': `progressive-web-sdk#${pkg.version}`,
             ...this.getAuthHeader(),
             ...extras,
         }
@@ -71,10 +73,11 @@ export class CloudAPIClient {
         url.pathname = pathname
 
         const body = Buffer.from(JSON.stringify(bundle))
+        const headers = await this.getHeaders({'Content-Length': body.length.toString()})
         const res = await this.opts.fetch(url.toString(), {
             body,
             method: 'POST',
-            headers: this.getHeaders({'Content-Length': body.length.toString()})
+            headers,
         })
     }
 }
