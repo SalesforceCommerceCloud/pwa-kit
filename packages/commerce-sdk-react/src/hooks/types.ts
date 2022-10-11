@@ -79,4 +79,4 @@ export type IMutationFunction<TData = unknown, TVariables = unknown> = (
 export type IQueryFunction<TData = unknown> = (
     context: QueryFunctionContext<QueryKey>,
     apiClients: ApiClients
-) => TData | Promise<TData>
+) => Promise<TData>
