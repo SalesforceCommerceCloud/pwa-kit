@@ -39,10 +39,10 @@ export enum ShopperContextsActions {
 export function useShopperContextsMutation<Action extends `${ShopperContextsActions}`>(
     action: Action
 ) {
-    type Params = NonNullable<Argument<Client[Action]>>['parameters']
+    type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
-    const {shopperContexts: client} = useCommerceApi()
-    // @ts-ignore
-    const method = client[action] as MutationFunction<Data, Params>
-    return useMutation<Data, Error, Params>(method)
+    return useMutation<Data, Error, Params>((params, apiClients) => {
+        const method = apiClients['shopperContexts'][action] as MutationFunction<Data, Params>
+        return method.call(apiClients['shopperContexts'], params)
+    })
 }

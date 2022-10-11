@@ -27,9 +27,13 @@ export function useShopperGiftCertificatesMutation<
     // eslint-disable-next-line prettier/prettier
     Action extends `${ShopperGiftCertificatesActions}`
 >(action: Action) {
-    type Params = NonNullable<Argument<Client[Action]>>['parameters']
+    type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
-    const {shopperGiftCertificates: client} = useCommerceApi()
-    const method = client[action] as MutationFunction<Data, Params>
-    return useMutation<Data, Error, Params>(method)
+    return useMutation<Data, Error, Params>((params, apiClients) => {
+        const method = apiClients['shopperGiftCertificates'][action] as MutationFunction<
+            Data,
+            Params
+        >
+        return method.call(apiClients['shopperGiftCertificates'], params)
+    })
 }

@@ -54,9 +54,10 @@ paymentCard must be specified in the request.
  */
 // eslint-disable-next-line prettier/prettier
 export function useShopperOrdersMutation<Action extends `${ShopperOrdersActions}`>(action: Action) {
-    type Params = NonNullable<Argument<Client[Action]>>['parameters']
+    type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
-    const {shopperOrders: client} = useCommerceApi()
-    const method = client[action] as MutationFunction<Data, Params>
-    return useMutation<Data, Error, Params>(method)
+    return useMutation<Data, Error, Params>((params, apiClients) => {
+        const method = apiClients['shopperOrders'][action] as MutationFunction<Data, Params>
+        return method.call(apiClients['shopperOrders'], params)
+    })
 }

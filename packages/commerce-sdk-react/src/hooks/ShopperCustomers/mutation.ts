@@ -228,9 +228,10 @@ The value of this property must be valid for the type of custom attribute define
 export function useShopperCustomersMutation<Action extends `${ShopperCustomersActions}`>(
     action: Action
 ) {
-    type Params = NonNullable<Argument<Client[Action]>>['parameters']
+    type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
-    const {shopperCustomers: client} = useCommerceApi()
-    const method = client[action] as MutationFunction<Data, Params>
-    return useMutation<Data, Error, Params>(method)
+    return useMutation<Data, Error, Params>((params, apiClients) => {
+        const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
+        return method.call(apiClients['shopperCustomers'], params)
+    })
 }
