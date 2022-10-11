@@ -6,7 +6,6 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
-import useCommerceApi from '../useCommerceApi'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperPromotions']
@@ -27,7 +26,7 @@ type UsePromotionsArg = {
 function usePromotions(
     arg: Omit<UsePromotionsArg, 'rawResponse'> & {rawResponse?: false},
     options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>
-): UseQueryResult<DataType<Client['getPromotions']> | Response, Error>
+): UseQueryResult<DataType<Client['getPromotions']>, Error>
 function usePromotions(
     arg: Omit<UsePromotionsArg, 'rawResponse'> & {rawResponse?: true},
     options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>

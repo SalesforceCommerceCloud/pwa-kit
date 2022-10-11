@@ -7,15 +7,14 @@
 
 import React from 'react'
 import {usePromotions} from 'commerce-sdk-react'
-import {Link, useParams} from 'react-router-dom'
 import Json from '../components/Json'
 
 function UsePromotions() {
-    const {data, isLoading, error} = usePromotions({ids: '10offsuits'})
+    const {data: result, isLoading, error} = usePromotions({ids: '10offsuits,50%offorder'})
     if (isLoading) {
         return (
             <div>
-                <h1>usePromotions page</h1>
+                <h1>Promotions</h1>
                 <h2 style={{background: 'aqua'}}>Loading...</h2>
             </div>
         )
@@ -25,10 +24,18 @@ function UsePromotions() {
     }
     return (
         <>
-            <h1>useProducts page</h1>
+            <h1>Promotions:</h1>
+            {result?.data?.map(({id, name}) => {
+                return (
+                    <div key={id} style={{marginBottom: '10px'}}>
+                        <div>Name: {name}</div>
+                        <div>id: {id}</div>
+                    </div>
+                )
+            })}
             <hr />
             <h3>Returning data</h3>
-            <Json data={{isLoading, error, data}} />
+            <Json data={{isLoading, error, result}} />
         </>
     )
 }
