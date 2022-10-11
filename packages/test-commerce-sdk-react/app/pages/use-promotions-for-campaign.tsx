@@ -7,7 +7,6 @@
 
 import React from 'react'
 import {usePromotionsForCampaign} from 'commerce-sdk-react'
-import {Link} from 'react-router-dom'
 import Json from '../components/Json'
 
 const UsePromotionsForCampaign = () => {
