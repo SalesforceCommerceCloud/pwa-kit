@@ -5,16 +5,19 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
-import {ActionResponse} from '../types'
-import {useAsyncCallback} from '../useAsync'
+import {Argument} from '../types'
+import {useMutation} from '../useMutation'
 import useAuth from '../useAuth'
 import Auth from '../../auth'
+import {UseMutationResult} from '@tanstack/react-query'
 
-export enum ShopperLoginHelpers {
-    LoginGuestUser = 'loginGuestUser',
-    LoginRegisteredUserB2C = 'loginRegisteredUserB2C',
-    Logout = 'logout'
-}
+export const ShopperLoginHelpers = {
+    LoginGuestUser: 'loginGuestUser',
+    LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
+    Logout: 'logout'
+} as const
+
+type ShopperLoginHelpersType = typeof ShopperLoginHelpers[keyof typeof ShopperLoginHelpers]
 
 /**
  * A hook for Public Client Shopper Login OAuth helpers.
@@ -26,20 +29,22 @@ export enum ShopperLoginHelpers {
  * - loginGuestUser
  * - logout
  */
-// eslint-disable-next-line prettier/prettier
-export function useShopperLoginHelper<Action extends `${ShopperLoginHelpers}`>(
+export function useShopperLoginHelper<Action extends ShopperLoginHelpersType>(
     action: Action
-): ActionResponse<Parameters<Auth[Action]>, ShopperLoginTypes.TokenResponse> {
+): UseMutationResult<
+    ShopperLoginTypes.TokenResponse,
+    Error,
+    void | Argument<Auth['loginRegisteredUserB2C']>
+> {
     const auth = useAuth()
     if (action === ShopperLoginHelpers.LoginGuestUser) {
-        return useAsyncCallback(() => auth.loginGuestUser())
+        return useMutation(() => auth.loginGuestUser())
     }
     if (action === ShopperLoginHelpers.Logout) {
-        return useAsyncCallback(() => auth.logout())
+        return useMutation(() => auth.logout())
     }
     if (action === ShopperLoginHelpers.LoginRegisteredUserB2C) {
-        return useAsyncCallback((...args) => {
-            const credentials = args[0]
+        return useMutation((credentials) => {
             if (!credentials) {
                 throw new Error('Missing registered user credentials.')
             }

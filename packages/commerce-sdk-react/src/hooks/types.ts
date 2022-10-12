@@ -14,6 +14,7 @@ import {ShopperOrders} from 'commerce-sdk-isomorphic'
 import {ShopperProducts} from 'commerce-sdk-isomorphic'
 import {ShopperPromotions} from 'commerce-sdk-isomorphic'
 import {ShopperSearch} from 'commerce-sdk-isomorphic'
+import {QueryKey, QueryFunctionContext} from '@tanstack/react-query'
 
 export type ApiClientConfigParams = {
     clientId: string
@@ -36,27 +37,6 @@ export interface ApiClients {
 }
 
 /**
- * Object returned by a "query" hook.
- */
-export type QueryResponse<T> = {isLoading: boolean; error?: Error; data?: T}
-
-/**
- * Object returned by an "action" hook.
- */
-export type ActionResponse<Args extends unknown[], Data> = QueryResponse<Data> & {
-    execute: (...args: Args) => void
-}
-
-/**
- * Object returned by a SCAPI "action" hook.
- */
-export type ScapiActionResponse<Args extends unknown[], Data, Name extends string> = ActionResponse<
-    Args,
-    Data
-> &
-    Record<Name, ActionResponse<Args, Data>['execute']>
-
-/**
  * The first argument of a function.
  */
 export type Argument<T extends (arg: any) => unknown> = Parameters<T>[0]
@@ -70,3 +50,21 @@ export type DataType<T extends (arg: any) => Promise<unknown>> = T extends (
 ) => Promise<Response | infer R>
     ? R
     : never
+
+/**
+ * Modified version of React Query's Mutation Function. Added a second argument
+ * API clients.
+ */
+export type IMutationFunction<TData = unknown, TVariables = unknown> = (
+    variables: TVariables,
+    apiClients: ApiClients
+) => Promise<TData>
+
+/**
+ * Modified version of React Query's Query Function. Added a second argument
+ * API clients.
+ */
+export type IQueryFunction<TData = unknown> = (
+    context: QueryFunctionContext<QueryKey>,
+    apiClients: ApiClients
+) => Promise<TData>
