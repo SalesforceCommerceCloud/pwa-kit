@@ -14,6 +14,7 @@ const UseCategories = loadable(() => import('./pages/use-shopper-categories'))
 const UseCategory = loadable(() => import('./pages/use-shopper-category'))
 const UseProductSearch = loadable(() => import('./pages/use-product-search'))
 const UseCustomer = loadable(() => import('./pages/use-shopper-customer'))
+const UseCustomerAddress = loadable(() => import('./pages/use-shopper-customer-address'))
 const UseShopperLoginHelper = loadable(() => import('./pages/use-shopper-login-helper'))
 const QueryErrors = loadable(() => import('./pages/query-errors'))
 
@@ -50,6 +51,10 @@ const routes = [
     {
         path: '/customer',
         component: UseCustomer
+    },
+    {
+        path: '/customer-address',
+        component: UseCustomerAddress
     },
     {
         path: '/slas-helpers',

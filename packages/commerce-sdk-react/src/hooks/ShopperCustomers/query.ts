@@ -14,12 +14,6 @@ import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperCustomers']
 
-type UseCustomerParameters = NonNullable<Argument<Client['getCustomer']>>['parameters']
-type UseCustomerHeaders = NonNullable<Argument<Client['getCustomer']>>['headers']
-type UseCustomerArg = {
-    headers?: UseCustomerHeaders
-    rawResponse?: boolean
-} & UseCustomerParameters
 /**
  * A hook for `ShopperCustomers#getExternalProfile`.
  * Gets the new external profile for a customer.This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
@@ -33,6 +27,10 @@ function useExternalProfile(
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['external-profile', arg], () => client.getExternalProfile(arg))
 }
+
+type UseCustomerParameters = NonNullable<Argument<Client['getCustomer']>>['parameters']
+type UseCustomerHeaders = NonNullable<Argument<Client['getCustomer']>>['headers']
+type UseCustomerArg = {headers?: UseCustomerHeaders; rawResponse?: boolean} & UseCustomerParameters
 /**
  * A hook for `ShopperCustomers#getCustomer`.
  * Gets a customer with all existing addresses and payment instruments associated with the requested customer.
@@ -61,6 +59,15 @@ function useCustomer(
         options
     )
 }
+
+type UseCustomerAddressParameters = NonNullable<
+    Argument<Client['getCustomerAddress']>
+>['parameters']
+type UseCustomerAddressHeaders = NonNullable<Argument<Client['getCustomerAddress']>>['headers']
+type UseCustomerAddressArg = {
+    headers?: UseCustomerAddressHeaders
+    rawResponse?: boolean
+} & UseCustomerAddressParameters
 /**
  * A hook for `ShopperCustomers#getCustomerAddress`.
  * Retrieves a customer's address by address name.
@@ -69,10 +76,25 @@ function useCustomer(
  * @returns An object describing the state of the request.
  */
 function useCustomerAddress(
-    arg: Argument<Client['getCustomerAddress']>
-): UseQueryResult<DataType<Client['getCustomerAddress']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['address', arg], () => client.getCustomerAddress(arg))
+    arg: Omit<UseCustomerAddressArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomerAddress']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerAddress']>, Error>
+function useCustomerAddress(
+    arg: Omit<UseCustomerAddressArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomerAddress']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerAddress']>, Error>
+function useCustomerAddress(
+    arg: UseCustomerAddressArg,
+    options?: UseQueryOptions<DataType<Client['getCustomerAddress']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useAsync(
+        ['address', arg],
+        ({shopperCustomers}) => {
+            return shopperCustomers.getCustomerAddress({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
 /**
  * A hook for `ShopperCustomers#getCustomerBaskets`.
