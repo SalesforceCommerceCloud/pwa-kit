@@ -28,7 +28,7 @@ function usePromotions(
     options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>
 ): UseQueryResult<DataType<Client['getPromotions']>, Error>
 function usePromotions(
-    arg: Omit<UsePromotionsArg, 'rawResponse'> & {rawResponse?: true},
+    arg: Omit<UsePromotionsArg, 'rawResponse'> & {rawResponse: true},
     options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>
 ): UseQueryResult<Response, Error>
 function usePromotions(

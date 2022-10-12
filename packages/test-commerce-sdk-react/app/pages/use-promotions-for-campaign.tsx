@@ -32,7 +32,7 @@ const UsePromotionsForCampaign = () => {
     return (
         <>
             <h1>Promotions for a Campaign</h1>
-            {result?.data.map(({id, name}) => {
+            {result?.data?.map(({id, name}) => {
                 return (
                     <div key={id} style={{marginBottom: '10px'}}>
                         <div>Name: {name}</div>
