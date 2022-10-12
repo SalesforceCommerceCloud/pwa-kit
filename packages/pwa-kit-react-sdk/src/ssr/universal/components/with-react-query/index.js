@@ -84,7 +84,8 @@ export const withReactQuery = (Wrapped) => {
                 )
             )
 
-            return {[STATE_KEY]: dehydrate(queryClient)}
+            // TODO: why queries with errors still run during hydration?
+            return {[STATE_KEY]: dehydrate(queryClient, {shouldDehydrateQuery: () => true})}
         }
 
         /**
