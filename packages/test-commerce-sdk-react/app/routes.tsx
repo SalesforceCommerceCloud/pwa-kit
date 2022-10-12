@@ -15,6 +15,7 @@ const UseCategory = loadable(() => import('./pages/use-shopper-category'))
 const UseProductSearch = loadable(() => import('./pages/use-product-search'))
 const UseShopperLoginHelper = loadable(() => import('./pages/use-shopper-login-helper'))
 const QueryErrors = loadable(() => import('./pages/query-errors'))
+const UseOrder = loadable(() => import('./pages/use-shopper-order'))
 
 const routes = [
     {
@@ -53,6 +54,10 @@ const routes = [
     {
         path: '/query-errors',
         component: QueryErrors
+    },
+    {
+        path: '/orders/:orderNo',
+        component: UseOrder
     }
 ]
 

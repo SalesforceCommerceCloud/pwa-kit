@@ -7,6 +7,8 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 
+const orderNo = '00028010'
+
 const Home = () => {
     return (
         <>
@@ -35,6 +37,9 @@ const Home = () => {
                 </li>
                 <li>
                     <Link to="/slas-helpers">useShopperLoginHelper</Link>
+                </li>
+                <li>
+                    <Link to={`/orders/${orderNo}`}>useShopperOrder</Link>
                 </li>
             </ul>
 
