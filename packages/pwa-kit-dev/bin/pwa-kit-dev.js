@@ -201,16 +201,10 @@ const main = () => {
             process.env.DEPLOY_TARGET = target
 
             const globalOpts = program.opts()
-            console.log(globalOpts)
 
             const origin = globalOpts.cloudOrigin
             const credentialsFile = scriptUtils.upload2.getCredentialsFile(origin, globalOpts.credentialsFile)
-
             const credentials = await scriptUtils.upload2.readCredentials(credentialsFile)
-            console.log(credentialsFile)
-            console.log(credentials)
-            process.exit(1)
-
 
             const mobify = getConfig() || {}
 

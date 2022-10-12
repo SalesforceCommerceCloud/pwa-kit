@@ -9,6 +9,8 @@ import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 
 export const defaultCloudOrigin = 'https://cloud.mobify.com'
+export const DEFAULT_DOCS_URL =
+    'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
 
 
 interface Credentials {
@@ -68,6 +70,27 @@ export class CloudAPIClient {
         }
     }
 
+    private async throwForStatus(res) {
+        if (res.statusCode < 400) {
+            return
+        }
+
+        let error
+        try {
+            error = await res.json()
+        } catch (err) {
+            error = {}  // Cloud doesn't always return JSON
+        }
+
+        throw new Error(
+            [
+                `HTTP ${res.statusCode}`,
+                error.message || res.body,
+                `For more information visit ${error.docs_url || DEFAULT_DOCS_URL}$`
+            ].join('\n')
+        )
+    }
+
     async push(bundle: Bundle, projectSlug: string, target?: string) {
         const base = `api/projects/${projectSlug}/builds/`
         const pathname = target ? base + `${target}/` : base
@@ -82,9 +105,7 @@ export class CloudAPIClient {
             method: 'POST',
             headers,
         })
-        if (!res.ok) {
-            throw new Error(await res.text())
-        }
+        await this.throwForStatus(res)
         return res
     }
 }
