@@ -25,7 +25,7 @@ export enum ShopperGiftCertificatesMutations {
  */
 export function useShopperGiftCertificatesMutation<
     // eslint-disable-next-line prettier/prettier
-    Action extends `${ShopperGiftCertificatesActions}`
+    Action extends `${ShopperGiftCertificatesMutations}`
 >(action: Action) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
