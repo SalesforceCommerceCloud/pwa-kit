@@ -53,7 +53,7 @@ function useCustomer(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['customer', arg],
-        ({shopperCustomers}) => {
+        (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomer({parameters, headers}, rawResponse)
         },
         options
@@ -90,7 +90,7 @@ function useCustomerAddress(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['address', arg],
-        ({shopperCustomers}) => {
+        (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerAddress({parameters, headers}, rawResponse)
         },
         options
@@ -138,7 +138,7 @@ function useCustomerOrders(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['orders', arg],
-        ({shopperCustomers}) => {
+        (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerOrders({parameters, headers}, rawResponse)
         },
         options
