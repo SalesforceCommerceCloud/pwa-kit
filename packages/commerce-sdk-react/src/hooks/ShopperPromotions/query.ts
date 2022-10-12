@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperPromotions']
@@ -36,7 +36,7 @@ function usePromotions(
     options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>
 ): UseQueryResult<DataType<Client['getPromotions']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['promotions', arg],
         ({shopperPromotions}) => {
             return shopperPromotions.getPromotions({parameters, headers}, rawResponse)
@@ -79,7 +79,7 @@ function usePromotionsForCampaign(
     options?: UseQueryOptions<DataType<Client['getPromotionsForCampaign']> | Response, Error>
 ): UseQueryResult<DataType<Client['getPromotionsForCampaign']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['promotions-for-campaign', arg],
         ({shopperPromotions}) =>
             shopperPromotions.getPromotionsForCampaign({parameters, headers}, rawResponse),
