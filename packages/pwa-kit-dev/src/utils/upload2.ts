@@ -2,7 +2,7 @@ import os from 'os'
 import path from 'path'
 import archiver from 'archiver'
 import _fetch from 'node-fetch'
-import {URL} from 'node:url'
+import {URL} from 'url'
 import {readFile, stat, mkdtemp, rmdir} from 'fs/promises'
 import {createWriteStream} from 'fs'
 import {Minimatch} from 'minimatch'
@@ -194,7 +194,7 @@ export const createBundle = async (
 
 type MatchFn = (a: string) => boolean;
 
-const glob = (patterns: string[]): MatchFn => {
+export const glob = (patterns?: string[]): MatchFn => {
 
     // The patterns can include negations, so matching is done against all
     // the patterns. A match is true if a given path matches any pattern and
