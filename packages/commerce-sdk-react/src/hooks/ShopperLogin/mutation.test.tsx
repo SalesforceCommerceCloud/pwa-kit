@@ -59,7 +59,7 @@ const tests = [
                         const loginGuestUser = useShopperLoginHelper('loginGuestUser')
                         return (
                             <>
-                                <button onClick={loginGuestUser.mutate}>login</button>
+                                <button onClick={() => loginGuestUser.mutate()}>login</button>
                                 <p>{loginGuestUser.data}</p>
                             </>
                         )
