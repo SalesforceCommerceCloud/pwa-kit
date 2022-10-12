@@ -225,7 +225,7 @@ export const glob = (patterns?: string[]): MatchFn => {
     }
 }
 
-export const findHomeDir = () => process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
+export const findHomeDir = (platform: string = process.platform) => platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
 
 export const getCredentialsFile = (cloudOrigin: string, credentialsFile?: string, doFindHomeDir: () => string = findHomeDir): string => {
     if (credentialsFile) {

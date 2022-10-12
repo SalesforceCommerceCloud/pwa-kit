@@ -14,13 +14,16 @@ import path from 'path'
 import os from 'os'
 
 describe('upload2', () => {
+    const originalEnv = process.env
     let tmpDir
 
     beforeEach(async () => {
+        process.env = {...originalEnv}
         tmpDir = await mkdtemp(path.join(os.tmpdir(), 'upload2-tests'))
     })
 
     afterEach(async () => {
+        process.env = originalEnv
         tmpDir && (await rmdir(tmpDir, {recursive: true}))
     })
 
@@ -147,6 +150,16 @@ describe('upload2', () => {
         )
     })
 
+    test('findHomeDir', () => {
+        process.env.USERPROFILE = '/path/to/fake-user-profile-dir/'
+        process.env.HOME = '/path/to/fake-home-dir/'
+        const forCurrentMachine =
+            process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
+        expect(upload2.findHomeDir('win32')).toEqual(process.env.USERPROFILE)
+        expect(upload2.findHomeDir('anything-else')).toEqual(process.env.HOME)
+        expect(upload2.findHomeDir()).toEqual(forCurrentMachine)
+    })
+
     describe('readCredentials', () => {
         test('should work', async () => {
             const creds = {username: 'alice', api_key: 'xyz'}
@@ -213,9 +226,35 @@ describe('upload2', () => {
     })
 
     describe('pushBundle', () => {
-        test.each([[{statusCode: 200}], [{statusCode: 401}]])(
+        test.each([
+            [
+                {
+                    projectSlug: 'project-slug',
+                    targetSlug: undefined,
+                    expectedURL: 'https://cloud.mobify.com/api/projects/project-slug/builds/',
+                    statusCode: 200
+                }
+            ],
+            [
+                {
+                    projectSlug: 'project-slug',
+                    targetSlug: 'target-slug',
+                    expectedURL:
+                        'https://cloud.mobify.com/api/projects/project-slug/builds/target-slug/',
+                    statusCode: 200
+                }
+            ],
+            [
+                {
+                    projectSlug: 'project-slug',
+                    targetSlug: undefined,
+                    expectedURL: 'https://cloud.mobify.com/api/projects/project-slug/builds/',
+                    statusCode: 401
+                }
+            ]
+        ])(
             'should push a built bundle and handle status codes (%p)',
-            async ({statusCode}) => {
+            async ({projectSlug, targetSlug, expectedURL, statusCode}) => {
                 const message = 'message'
                 const bundle = await upload2.createBundle({
                     message,
@@ -223,7 +262,7 @@ describe('upload2', () => {
                     ssr_only: ['*.js'],
                     ssr_shared: ['**/*.*'],
                     buildDirectory: path.join(__dirname, 'test-fixtures', 'minimal-built-app'),
-                    projectSlug: 'slug'
+                    projectSlug
                 })
 
                 const username = 'user123'
@@ -235,7 +274,7 @@ describe('upload2', () => {
 
                 const client = new upload2.CloudAPIClient({credentials, fetch: fetchMock})
 
-                const fn = async () => await client.push(bundle, 'project-slug')
+                const fn = async () => await client.push(bundle, projectSlug, targetSlug)
 
                 if (statusCode === 200) {
                     expect(await fn()).toBe(responseMock)
@@ -248,7 +287,7 @@ describe('upload2', () => {
                 const url = fetchMock.mock.calls[0][0]
                 const opts = fetchMock.mock.calls[0][1]
 
-                expect(url).toEqual('https://cloud.mobify.com/api/projects/project-slug/builds/')
+                expect(url).toEqual(expectedURL)
                 expect(opts.body).toEqual(expect.anything(Buffer))
                 expect(opts.method).toEqual('POST')
                 expect(opts.headers['Authorization']).toMatch(new RegExp('^Basic '))
