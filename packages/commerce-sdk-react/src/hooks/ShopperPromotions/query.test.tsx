@@ -39,7 +39,6 @@ const PromotionsForCampaignComponent = ({campaignId}: {campaignId: string}): Rea
     const {data, isLoading, error} = usePromotionsForCampaign({
         campaignId
     })
-
     return (
         <div>
             {isLoading && <span>Loading...</span>}
@@ -79,9 +78,10 @@ const tests = [
             {
                 name: 'returns error',
                 assertions: withMocks(async () => {
-                    // limit of id is 25, generating 26 random ids here to get an 400 error from server
-                    const fakeIds = [...new Array(50)]
-                        .map((i) => `promo_${Math.floor(Math.random() * 26)}`)
+                    // Maximum characters is 256, generating 51 ids here will exceed that limit
+                    // and cause the server to return an error
+                    const fakeIds = [...new Array(51)]
+                        .map((i) => `promo_${Math.floor(Math.random() * 50)}`)
                         .join(',')
                     renderWithProviders(<PromotionsComponent ids={fakeIds} />)
 
@@ -121,10 +121,11 @@ const tests = [
             {
                 name: 'returns error',
                 assertions: withMocks(async () => {
-                    // passing invalid string should cause the server to return an error
-                    renderWithProviders(
-                        <PromotionsForCampaignComponent campaignId="campaign-1, campaign-2" />
-                    )
+                    // passing invalid string exceeded 356 char should cause the server to return an error
+                    const invalidId = [...new Array(51)]
+                        .map((i) => `promo_${Math.floor(Math.random() * 50)}`)
+                        .join('_')
+                    renderWithProviders(<PromotionsForCampaignComponent campaignId={invalidId} />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText('error'))
@@ -138,6 +139,9 @@ const tests = [
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {
+        afterEach(() => {
+            jest.resetAllMocks()
+        })
         cases.forEach(({name, assertions}) => {
             test(name, assertions)
         })

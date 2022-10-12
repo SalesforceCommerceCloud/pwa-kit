@@ -38,7 +38,7 @@ function usePromotions(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['promotions', arg],
-        ({shopperPromotions}) => {
+        (_, {shopperPromotions}) => {
             return shopperPromotions.getPromotions({parameters, headers}, rawResponse)
         },
         options
@@ -81,7 +81,7 @@ function usePromotionsForCampaign(
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['promotions-for-campaign', arg],
-        ({shopperPromotions}) =>
+        (_, {shopperPromotions}) =>
             shopperPromotions.getPromotionsForCampaign({parameters, headers}, rawResponse),
         options
     )
