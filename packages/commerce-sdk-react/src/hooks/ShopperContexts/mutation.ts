@@ -11,7 +11,7 @@ import {MutationFunction} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperContexts']
 
-export enum ShopperContextsActions {
+export enum ShopperContextsMutations {
     /**
      * Creates the shopper's context based on shopperJWT.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-contexts?meta=createShopperContext} for more information about the API endpoint.
@@ -36,7 +36,7 @@ export enum ShopperContextsActions {
  * A hook for performing mutations with the Shopper Contexts API.
  */
 // eslint-disable-next-line prettier/prettier
-export function useShopperContextsMutation<Action extends `${ShopperContextsActions}`>(
+export function useShopperContextsMutation<Action extends `${ShopperContextsMutations}`>(
     action: Action
 ) {
     type Params = Argument<Client[Action]>

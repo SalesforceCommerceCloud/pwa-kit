@@ -11,7 +11,7 @@ import {MutationFunction} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperGiftCertificates']
 
-export enum ShopperGiftCertificatesActions {
+export enum ShopperGiftCertificatesMutations {
     /**
      * Action to retrieve an existing gift certificate.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-gift-certificates?meta=getGiftCertificate} for more information about the API endpoint.

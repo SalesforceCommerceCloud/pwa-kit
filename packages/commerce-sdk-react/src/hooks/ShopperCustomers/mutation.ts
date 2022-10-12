@@ -11,7 +11,7 @@ import {MutationFunction} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperCustomers']
 
-export enum ShopperCustomersActions {
+export enum ShopperCustomersMutations {
     /**
      * Registers a new customer. The mandatory data are the credentials, profile last name, and email. This requires a JSON Web Token (JWT) which needs to be obtained using the POST /customers/auth API with type \"guest\".
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=registerCustomer} for more information about the API endpoint.
@@ -225,7 +225,7 @@ The value of this property must be valid for the type of custom attribute define
  * A hook for performing mutations with the Shopper Customers API.
  */
 // eslint-disable-next-line prettier/prettier
-export function useShopperCustomersMutation<Action extends `${ShopperCustomersActions}`>(
+export function useShopperCustomersMutation<Action extends `${ShopperCustomersMutations}`>(
     action: Action
 ) {
     type Params = Argument<Client[Action]>

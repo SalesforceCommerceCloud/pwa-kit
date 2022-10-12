@@ -11,7 +11,7 @@ import {MutationFunction} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperBaskets']
 
-export enum ShopperBasketsActions {
+export enum ShopperBasketsMutations {
     /**
    * Creates a new basket.
 
@@ -336,7 +336,7 @@ the body are the following properties if specified:
  * A hook for performing mutations with the Shopper Baskets API.
  */
 // eslint-disable-next-line prettier/prettier
-export function useShopperBasketsMutation<Action extends `${ShopperBasketsActions}`>(
+export function useShopperBasketsMutation<Action extends `${ShopperBasketsMutations}`>(
     action: Action
 ) {
     type Params = Argument<Client[Action]>

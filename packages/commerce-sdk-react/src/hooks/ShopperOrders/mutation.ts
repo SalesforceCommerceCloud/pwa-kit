@@ -11,7 +11,7 @@ import {MutationFunction} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperOrders']
 
-export enum ShopperOrdersActions {
+export enum ShopperOrdersMutations {
     /**
      * Submits an order based on a prepared basket. The only considered value from the request body is basketId.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=createOrder} for more information about the API endpoint.
@@ -53,7 +53,9 @@ paymentCard must be specified in the request.
  * A hook for performing mutations with the Shopper Gift Certificates API.
  */
 // eslint-disable-next-line prettier/prettier
-export function useShopperOrdersMutation<Action extends `${ShopperOrdersActions}`>(action: Action) {
+export function useShopperOrdersMutation<Action extends `${ShopperOrdersMutations}`>(
+    action: Action
+) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
     return useMutation<Data, Error, Params>((params, apiClients) => {

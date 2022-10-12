@@ -11,7 +11,7 @@ import {MutationFunction} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperDiscoverySearch']
 
-export enum ShopperDiscoverySearchActions {
+export enum ShopperDiscoverySearchMutations {
     /**
      * This method retrieves search results for a Channel.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-discovery-search?meta=retrieveResults} for more information about the API endpoint.
@@ -25,7 +25,7 @@ export enum ShopperDiscoverySearchActions {
  */
 export function useShopperDiscoverySearchMutation<
     // eslint-disable-next-line prettier/prettier
-    Action extends `${ShopperDiscoverySearchActions}`
+    Action extends `${ShopperDiscoverySearchMutations}`
 >(action: Action) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
