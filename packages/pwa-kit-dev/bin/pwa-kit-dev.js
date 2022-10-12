@@ -12,7 +12,22 @@ const isEmail = require('validator/lib/isEmail')
 const {execSync: _execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
 const pkg = require('../package.json')
+const chalk = require('chalk')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
+
+const colors = {
+    warn: 'yellow',
+    error: 'red',
+    success: 'blue',
+}
+
+const fancyLog = (level, msg) => {
+    const color = colors[level] || 'green'
+    const colorFn = chalk[color]
+    console.log(`${colorFn(level.toUpperCase())}: ${msg}`)
+}
+const info = (msg) => fancyLog('info', msg)
+const success = (msg) => fancyLog('success', msg)
 
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
@@ -230,12 +245,19 @@ const main = () => {
                 buildDirectory,
                 projectSlug
             })
-
             const client = new scriptUtils.upload2.CloudAPIClient({
                 credentials,
                 origin
             })
-            await client.push(bundle, projectSlug, target)
+
+            info(`Beginning upload to ${origin}`)
+            const data = await client.push(bundle, projectSlug, target)
+            success('Bundle Uploaded!')
+
+            const cliMessages = data['cli_messages']
+            if (cliMessages) {
+                cliMessages.forEach(({level, message}) => fancyLog(level, message))
+            }
         })
 
     program

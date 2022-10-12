@@ -269,7 +269,8 @@ describe('upload2', () => {
                 const api_key = '123'
                 const credentials = {username, api_key}
 
-                const responseMock = {statusCode}
+                const reponseBodyMock = {anything: 'anything'}
+                const responseMock = {statusCode, json: () => Promise.resolve(reponseBodyMock)}
                 const fetchMock = jest.fn(async () => responseMock)
 
                 const client = new upload2.CloudAPIClient({credentials, fetch: fetchMock})
@@ -277,7 +278,7 @@ describe('upload2', () => {
                 const fn = async () => await client.push(bundle, projectSlug, targetSlug)
 
                 if (statusCode === 200) {
-                    expect(await fn()).toBe(responseMock)
+                    expect(await fn()).toBe(reponseBodyMock)
                 } else {
                     await expect(fn).rejects.toThrow('For more information visit')
                 }

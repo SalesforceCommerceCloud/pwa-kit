@@ -106,7 +106,7 @@ export class CloudAPIClient {
             headers,
         })
         await this.throwForStatus(res)
-        return res
+        return await res.json()
     }
 }
 
