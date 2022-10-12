@@ -228,7 +228,7 @@ const main = () => {
                 ssr_only: mobify.ssrOnly,
                 ssr_shared: mobify.ssrShared,
                 buildDirectory,
-                projectSlug,
+                projectSlug
             })
 
             const client = new scriptUtils.upload2.CloudAPIClient({
