@@ -38,8 +38,8 @@ interface Bundle {
     ssr_shared: string[]
 }
 
-const getPkgJSON = async () => {
-    const data = await readFile(path.join(__dirname, '..', 'package.json'))
+export const getPkgJSON = async () => {
+    const data = await readFile(path.join(__dirname, '..', '..', 'package.json'))
     return JSON.parse(data.toString('utf-8'))
 }
 
@@ -216,11 +216,11 @@ export const glob = (patterns?: string[]): MatchFn => {
     }
 }
 
-export const getCredentialsFile = (cloudOrigin: string, credentialsFile?: string): string => {
+export const getCredentialsFile = (cloudOrigin: string, credentialsFile?: string, platform: string = process.platform): string => {
     if (credentialsFile) {
         return credentialsFile
     } else {
-        const dir = process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
+        const dir = platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
         const url = new URL(cloudOrigin)
         const host = url.host
         const suffix = (host === 'cloud.mobify.com') ? '' : `--${host}`
