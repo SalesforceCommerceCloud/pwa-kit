@@ -776,7 +776,7 @@
   "checkout_footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce ou ses affiliés. Tous droits réservés. Ceci est une boutique de démonstration uniquement. Les commandes NE SERONT PAS traitées."
+      "value": "Salesforce ou ses affiliés. Tous droits réservés. Ceci est une boutique de démonstration uniquement. Les commandes NE SERONT PAS traitées."
     }
   ],
   "checkout_header.link.cart": [

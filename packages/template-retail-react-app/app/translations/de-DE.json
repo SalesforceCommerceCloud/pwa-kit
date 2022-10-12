@@ -299,7 +299,7 @@
     "defaultMessage": "Allgemeine Geschäftsbedingungen"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce oder dessen Geschäftspartner. Alle Rechte vorbehalten. Dies ist lediglich ein Geschäft zu Demonstrationszwecken. Aufgegebene Bestellungen WERDEN NICHT bearbeitet."
+    "defaultMessage": "Salesforce oder dessen Geschäftspartner. Alle Rechte vorbehalten. Dies ist lediglich ein Geschäft zu Demonstrationszwecken. Aufgegebene Bestellungen WERDEN NICHT bearbeitet."
   },
   "checkout_header.link.cart": {
     "defaultMessage": "Zurück zum Warenkorb"

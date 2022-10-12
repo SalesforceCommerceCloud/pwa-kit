@@ -58,7 +58,7 @@ const CheckoutFooter = ({...otherProps}) => {
 
                     <Box {...styles.bottomHalf}>
                         <Text {...styles.copyright}>
-                            &copy;{' '}{new Date().getFullYear()}{' '}
+                            &copy; {new Date().getFullYear()}{' '}
                             {intl.formatMessage({
                                 id: 'checkout_footer.message.copyright',
                                 defaultMessage:
@@ -133,4 +133,3 @@ const CreditCardIcons = (props) => {
         </HStack>
     )
 }
-
