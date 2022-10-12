@@ -109,6 +109,13 @@ function useCustomerBaskets(
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['baskets', arg], () => client.getCustomerBaskets(arg))
 }
+
+type UseCustomerOrdersParameters = NonNullable<Argument<Client['getCustomerOrders']>>['parameters']
+type UseCustomerOrdersHeaders = NonNullable<Argument<Client['getCustomerOrders']>>['headers']
+type UseCustomerOrdersArg = {
+    headers?: UseCustomerOrdersHeaders
+    rawResponse?: boolean
+} & UseCustomerOrdersParameters
 /**
  * A hook for `ShopperCustomers#getCustomerOrders`.
  * Returns a pageable list of all customer's orders. The default page size is 10.
@@ -117,11 +124,27 @@ function useCustomerBaskets(
  * @returns An object describing the state of the request.
  */
 function useCustomerOrders(
-    arg: Argument<Client['getCustomerOrders']>
-): UseQueryResult<DataType<Client['getCustomerOrders']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['orders', arg], () => client.getCustomerOrders(arg))
+    arg: Omit<UseCustomerOrdersArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomerOrders']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerOrders']>, Error>
+function useCustomerOrders(
+    arg: Omit<UseCustomerOrdersArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomerOrders']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerOrders']>, Error>
+function useCustomerOrders(
+    arg: UseCustomerOrdersArg,
+    options?: UseQueryOptions<DataType<Client['getCustomerOrders']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useAsync(
+        ['orders', arg],
+        ({shopperCustomers}) => {
+            return shopperCustomers.getCustomerOrders({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
+
 /**
  * A hook for `ShopperCustomers#getCustomerPaymentInstrument`.
  * Retrieves a customer's payment instrument by its ID.
