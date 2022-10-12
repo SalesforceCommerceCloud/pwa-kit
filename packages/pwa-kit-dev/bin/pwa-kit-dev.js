@@ -18,7 +18,7 @@ const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 const colors = {
     warn: 'yellow',
     error: 'red',
-    success: 'blue',
+    success: 'blue'
 }
 
 const fancyLog = (level, msg) => {
@@ -254,10 +254,8 @@ const main = () => {
             const data = await client.push(bundle, projectSlug, target)
             success('Bundle Uploaded!')
 
-            const cliMessages = data['cli_messages']
-            if (cliMessages) {
-                cliMessages.forEach(({level, message}) => fancyLog(level, message))
-            }
+            const cliMessages = data['cli_messages'] || []
+            cliMessages.forEach(({level, message}) => fancyLog(level, message))
         })
 
     program
