@@ -14,7 +14,6 @@ const scriptUtils = require('../scripts/utils')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
-
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
@@ -177,8 +176,7 @@ const main = () => {
             new program.Option(
                 '-m, --message <message>',
                 'a message to include along with the uploaded bundle in Managed Runtime'
-            )
-                .default(undefined, '<git branch>:<git commit hash>')
+            ).default(undefined, '<git branch>:<git commit hash>')
         )
         .addOption(
             new program.Option(
@@ -203,7 +201,10 @@ const main = () => {
             const globalOpts = program.opts()
 
             const origin = globalOpts.cloudOrigin
-            const credentialsFile = scriptUtils.upload2.getCredentialsFile(origin, globalOpts.credentialsFile)
+            const credentialsFile = scriptUtils.upload2.getCredentialsFile(
+                origin,
+                globalOpts.credentialsFile
+            )
             const credentials = await scriptUtils.upload2.readCredentials(credentialsFile)
 
             const mobify = getConfig() || {}
@@ -221,18 +222,18 @@ const main = () => {
                 }
             }
 
-            const bundle = await scriptUtils.upload2.createBundle(
-                message = message,
-                ssr_parameters = mobify.ssrParameters,
-                ssr_only = mobify.ssrOnly,
-                ssr_shared = mobify.ssrShared,
-                buildDirectory = buildDirectory,
-                projectSlug = projectSlug,
-            )
+            const bundle = await scriptUtils.upload2.createBundle({
+                message,
+                ssr_parameters: mobify.ssrParameters,
+                ssr_only: mobify.ssrOnly,
+                ssr_shared: mobify.ssrShared,
+                buildDirectory,
+                projectSlug,
+            })
 
             const client = new scriptUtils.upload2.CloudAPIClient({
                 credentials,
-                origin,
+                origin
             })
             await client.push(bundle, projectSlug, target)
         })
@@ -283,12 +284,9 @@ const main = () => {
     })
 
     program.addOption(
-        new program.Option(
-            '--cloud-origin <origin>',
-            'the API origin to connect to'
-        )
-        .default(scriptUtils.upload2.defaultCloudOrigin)
-        .env('CLOUD_API_BASE')
+        new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
+            .default(scriptUtils.upload2.defaultCloudOrigin)
+            .env('CLOUD_API_BASE')
     )
 
     const credentialsLocationDisplay = () => {
@@ -301,10 +299,9 @@ const main = () => {
             '-c, --credentialsFile <credentialsFile>',
             `override the standard credentials file location "${credentialsLocationDisplay()}"`
         )
-        .default(undefined) // *must* default to undefined!
-        .env('PWA_KIT_CREDENTIALS_FILE')
+            .default(undefined) // *must* default to undefined!
+            .env('PWA_KIT_CREDENTIALS_FILE')
     )
-
 
     program.parse(process.argv)
 }

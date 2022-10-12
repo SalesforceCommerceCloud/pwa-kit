@@ -5,13 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {mkdtemp, rmdir, writeFile} from "fs/promises";
+import {mkdtemp, rmdir, writeFile} from 'fs/promises'
 
 const pkg = require('../../package.json')
 import * as upload2 from './upload2'
 import assert from 'assert'
-import path from "path";
-import os from "os";
+import path from 'path'
+import os from 'os'
 
 describe('upload2', () => {
     let tmpDir
@@ -21,7 +21,7 @@ describe('upload2', () => {
     })
 
     afterEach(async () => {
-        tmpDir && await rmdir(tmpDir, {recursive: true})
+        tmpDir && (await rmdir(tmpDir, {recursive: true}))
     })
 
     test('glob() with no patterns matches nothing', () => {
@@ -30,7 +30,6 @@ describe('upload2', () => {
         expect(matcher('a.js')).toBe(false)
         expect(matcher()).toBe(false)
     })
-
 
     describe('glob() filters correctly', () => {
         const patterns = ['ssr.js', '**/*.jpg', '!**/no.jpg', 'abc.{js,jsx}']
@@ -54,7 +53,13 @@ describe('upload2', () => {
         )
 
         // Paths we expect not to match
-        const expectNotToMatch = ['ssrxjs', 'subdirectory/ssr.js', 'no.jpg', 'static/no.jpg', 'abc.jsz']
+        const expectNotToMatch = [
+            'ssrxjs',
+            'subdirectory/ssr.js',
+            'no.jpg',
+            'static/no.jpg',
+            'abc.jsz'
+        ]
 
         expectNotToMatch.forEach((path) =>
             test(`Expect path "${path}" to NOT match`, () => {
@@ -79,7 +84,7 @@ describe('upload2', () => {
         const username = 'user123'
         const api_key = '123'
         const encoded = Buffer.from(`${username}:${api_key}`, 'binary').toString('base64')
-        const expectedAuthHeader = {'Authorization': `Basic ${encoded}`}
+        const expectedAuthHeader = {Authorization: `Basic ${encoded}`}
 
         test('getAuthHeader', async () => {
             const client = new upload2.CloudAPIClient({credentials: {username, api_key}})
@@ -92,7 +97,7 @@ describe('upload2', () => {
             expect(await client.getHeaders(extra)).toEqual({
                 'User-Agent': `progressive-web-sdk#${pkg.version}`,
                 ...expectedAuthHeader,
-                ...extra,
+                ...extra
             })
         })
     })
@@ -109,25 +114,40 @@ describe('upload2', () => {
         })
 
         test('works outside of a git repo ', async () => {
-            const mockGit = {branch: () => {throw {code: 'ENOENT'}}, short: () => 'short'}
+            const mockGit = {
+                branch: () => {
+                    throw {code: 'ENOENT'}
+                },
+                short: () => 'short'
+            }
             expect(upload2.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
         })
 
         test('works with any other error ', async () => {
-            const mockGit = {branch: () => {throw new Error()}, short: () => 'short'}
+            const mockGit = {
+                branch: () => {
+                    throw new Error()
+                },
+                short: () => 'short'
+            }
             expect(upload2.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
         })
     })
 
     test('getCredentialsFile', async () => {
         const findHomeDir = () => '/my-fake-home/'
-        expect(upload2.getCredentialsFile('https://example.com', '/path/to/.mobify', undefined)).toBe('/path/to/.mobify')
-        expect(upload2.getCredentialsFile('https://example.com', undefined, findHomeDir)).toBe(`${findHomeDir()}.mobify--example.com`)
-        expect(upload2.getCredentialsFile('https://cloud.mobify.com', undefined, findHomeDir)).toBe(`${findHomeDir()}.mobify`)
+        expect(
+            upload2.getCredentialsFile('https://example.com', '/path/to/.mobify', undefined)
+        ).toBe('/path/to/.mobify')
+        expect(upload2.getCredentialsFile('https://example.com', undefined, findHomeDir)).toBe(
+            `${findHomeDir()}.mobify--example.com`
+        )
+        expect(upload2.getCredentialsFile('https://cloud.mobify.com', undefined, findHomeDir)).toBe(
+            `${findHomeDir()}.mobify`
+        )
     })
 
     describe('readCredentials', () => {
-
         test('should work', async () => {
             const creds = {username: 'alice', api_key: 'xyz'}
             const thePath = path.join(tmpDir, '.mobify.test')
@@ -143,25 +163,31 @@ describe('upload2', () => {
 
     describe('createBundle', () => {
         test('should throw if ssr_only and ssr_shared is empty', async () => {
-            await expect(async () => await upload2.createBundle({
-                message: null,
-                ssr_parameters: {},
-                ssr_only: [],
-                ssr_shared: [],
-                buildDirectory: tmpDir,
-                projectSlug: 'slug',
-            })).rejects.toThrow('no ssrOnly or ssrShared files are defined')
+            await expect(
+                async () =>
+                    await upload2.createBundle({
+                        message: null,
+                        ssr_parameters: {},
+                        ssr_only: [],
+                        ssr_shared: [],
+                        buildDirectory: tmpDir,
+                        projectSlug: 'slug'
+                    })
+            ).rejects.toThrow('no ssrOnly or ssrShared files are defined')
         })
 
         test('should throw buildDir does not exist', async () => {
-            await expect(async () => await upload2.createBundle({
-                message: null,
-                ssr_parameters: {},
-                ssr_only: ['*.js'],
-                ssr_shared: ['*.js'],
-                buildDirectory: path.join(tmpDir, 'does-not-exist'),
-                projectSlug: 'slug',
-            })).rejects.toThrow('Error: Build directory at path')
+            await expect(
+                async () =>
+                    await upload2.createBundle({
+                        message: null,
+                        ssr_parameters: {},
+                        ssr_only: ['*.js'],
+                        ssr_shared: ['*.js'],
+                        buildDirectory: path.join(tmpDir, 'does-not-exist'),
+                        projectSlug: 'slug'
+                    })
+            ).rejects.toThrow('Error: Build directory at path')
         })
 
         test('should archive a bundle', async () => {
@@ -172,14 +198,14 @@ describe('upload2', () => {
                 ssr_only: ['*.js'],
                 ssr_shared: ['**/*.*'],
                 buildDirectory: path.join(__dirname, 'test-fixtures', 'minimal-built-app'),
-                projectSlug: 'slug',
+                projectSlug: 'slug'
             })
 
             expect(bundle.message).toEqual(message)
             expect(bundle.encoding).toEqual('base64')
             expect(bundle.ssr_parameters).toEqual({})
             expect(bundle.ssr_only).toEqual(['ssr.js'])
-            expect(bundle.ssr_shared).toEqual(["ssr.js", "static/favicon.ico"])
+            expect(bundle.ssr_shared).toEqual(['ssr.js', 'static/favicon.ico'])
 
             // De-code and re-encode gives the same result, to show that it *is* b64 encoded
             expect(Buffer.from(bundle.data, 'base64').toString('base64')).toEqual(bundle.data)
