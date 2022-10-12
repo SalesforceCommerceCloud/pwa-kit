@@ -6,7 +6,6 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
-import useCommerceApi from '../useCommerceApi'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperSearch']

@@ -6,7 +6,6 @@
  */
 import {ApiClients, DataType, Argument} from '../types'
 import {useMutation} from '../useMutation'
-import useCommerceApi from '../useCommerceApi'
 import {MutationFunction} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperOrders']

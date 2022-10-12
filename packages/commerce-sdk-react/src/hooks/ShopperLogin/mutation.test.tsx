@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {useShopperLoginHelper} from './helper'
-import {render, fireEvent, waitFor, screen} from '@testing-library/react'
-import {mockHttpResponses, renderWithProviders} from '../../test-utils'
+import {fireEvent, waitFor, screen} from '@testing-library/react'
+import {renderWithProviders} from '../../test-utils'
 
 const mockLoginGuestUser = jest.fn().mockResolvedValue('mockLoginGuestUser')
 

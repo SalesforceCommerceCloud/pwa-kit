@@ -37,18 +37,6 @@ export interface ApiClients {
 }
 
 /**
- * Object returned by a "query" hook.
- */
-export type QueryResponse<T> = {isLoading: boolean; error?: Error; data?: T}
-
-/**
- * Object returned by an "action" hook.
- */
-export type ActionResponse<Args extends unknown[], Data> = QueryResponse<Data> & {
-    execute: (...args: Args) => void
-}
-
-/**
  * The first argument of a function.
  */
 export type Argument<T extends (arg: any) => unknown> = Parameters<T>[0]
