@@ -11,7 +11,6 @@ const program = require('commander')
 const isEmail = require('validator/lib/isEmail')
 const {execSync: _execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
-const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
@@ -83,15 +82,10 @@ const main = () => {
                 }
             }
         )
-        .addOption(
-            new program.Option(
-                '-c, --credentialsFile <credentialsFile>',
-                'the file where your credentials should be stored'
-            )
-                .default(scriptUtils.getCredentialsFile())
-                .env('PWA_KIT_CREDENTIALS_FILE')
-        )
-        .action(({user, key, credentialsFile}) => {
+        .action(({user, key}) => {
+            const globalOpts = program.opts()
+            const {credentialsFile} = globalOpts
+
             try {
                 fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
                 console.log(`Saved Managed Runtime credentials to "${credentialsFile}".`)
@@ -184,7 +178,6 @@ const main = () => {
                 '-m, --message <message>',
                 'a message to include along with the uploaded bundle in Managed Runtime'
             )
-                // The default message is loaded dynamically as part of `uploadBundle(...)`
                 .default(undefined, '<git branch>:<git commit hash>')
         )
         .addOption(
@@ -202,18 +195,22 @@ const main = () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .addOption(
-            new program.Option(
-                '-c, --credentialsFile <credentialsFile>',
-                'the file where your credentials are stored'
-            )
-                .default(scriptUtils.getCredentialsFile())
-                .env('PWA_KIT_CREDENTIALS_FILE')
-        )
-        .action(async ({buildDirectory, message, projectSlug, target, credentialsFile}) => {
+        .action(async ({buildDirectory, message, projectSlug, target}) => {
             // Set the deployment target env var, this is required to ensure we
             // get the correct configuration object.
             process.env.DEPLOY_TARGET = target
+
+            const globalOpts = program.opts()
+            console.log(globalOpts)
+
+            const origin = globalOpts.cloudOrigin
+            const credentialsFile = scriptUtils.upload2.getCredentialsFile(origin, globalOpts.credentialsFile)
+
+            const credentials = await scriptUtils.upload2.readCredentials(credentialsFile)
+            console.log(credentialsFile)
+            console.log(credentials)
+            process.exit(1)
+
 
             const mobify = getConfig() || {}
 
@@ -239,11 +236,9 @@ const main = () => {
                 projectSlug = projectSlug,
             )
 
-            const credentials = await scriptUtils.upload2.readCredentials(credentialsFile)
-
             const client = new scriptUtils.upload2.CloudAPIClient({
                 credentials,
-                origin: process.env.CLOUD_API_BASE
+                origin,
             })
             await client.push(bundle, projectSlug, target)
         })
@@ -267,7 +262,10 @@ const main = () => {
         .command('format')
         .description('automatically re-format all source files')
         .argument('<path>', 'path or glob to format')
-        .action((path) => {
+        .action((...args) => {
+            console.log(program.opts())
+            process.exit(1)
+
             const prettier = p.join(require.resolve('prettier'), '..', '..', '.bin', 'prettier')
             execSync(`${prettier} --write "${path}"`)
         })
@@ -289,6 +287,30 @@ const main = () => {
             program.help({error: true})
         }
     })
+
+    program.addOption(
+        new program.Option(
+            '--cloud-origin <origin>',
+            'the API origin to connect to'
+        )
+        .default(scriptUtils.upload2.defaultCloudOrigin)
+        .env('CLOUD_API_BASE')
+    )
+
+    const credentialsLocationDisplay = () => {
+        const dir = process.platform === 'win32' ? '%USERPROFILE%' : '~'
+        return p.join(dir, '.mobify')
+    }
+
+    program.addOption(
+        new program.Option(
+            '-c, --credentialsFile <credentialsFile>',
+            `override the standard credentials file location "${credentialsLocationDisplay()}"`
+        )
+        .default(undefined) // *must* default to undefined!
+        .env('PWA_KIT_CREDENTIALS_FILE')
+    )
+
 
     program.parse(process.argv)
 }

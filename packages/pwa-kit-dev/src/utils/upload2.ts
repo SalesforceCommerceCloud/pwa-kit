@@ -8,6 +8,8 @@ import {createWriteStream} from 'fs'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 
+export const defaultCloudOrigin = 'https://cloud.mobify.com'
+
 
 interface Credentials {
     username: string
@@ -45,7 +47,7 @@ export class CloudAPIClient {
 
     constructor(params: CloudAPIClientOpts) {
         this.opts = {
-            origin: params.origin || 'https://cloud.mobify.com',
+            origin: params.origin || defaultCloudOrigin,
             fetch: params.fetch || _fetch,
             credentials: params.credentials,
         }
@@ -193,10 +195,20 @@ const glob = (patterns: string[]): MatchFn => {
     }
 }
 
+export const getCredentialsFile = (cloudOrigin: string, credentialsFile?: string): string => {
+    if (credentialsFile) {
+        return credentialsFile
+    } else {
+        const dir = process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
+        const url = new URL(cloudOrigin)
+        const host = url.host
+        const suffix = (host === 'cloud.mobify.com') ? '' : `--${host}`
+        return path.join(dir, `.mobify${suffix}`)
+    }
+}
 
-export const readCredentials = async (filepath?: string): Promise<Credentials> => {
-    const defaultPath = `${process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME}/.mobify`
-    filepath = filepath || defaultPath
+
+export const readCredentials = async (filepath: string): Promise<Credentials> => {
     try {
         const content = await readFile(filepath)
         const data = JSON.parse(content.toString('utf-8'))
