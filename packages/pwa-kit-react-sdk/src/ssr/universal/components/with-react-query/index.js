@@ -18,7 +18,10 @@ const STATE_KEY = '__reactQuery'
 const SAFE_QUERY_CLIENT_CONFIG = {
     defaultOptions: {
         queries: {
-            retry: false
+            retry: false,
+            // TODO: is this really the right place?
+            // Ref: usage of staleTime for SSR - https://tanstack.com/query/v4/docs/guides/ssr#staleness-is-measured-from-when-the-query-was-fetched-on-the-server
+            staleTime: 5 * 1000
         },
         mutations: {
             retry: false
