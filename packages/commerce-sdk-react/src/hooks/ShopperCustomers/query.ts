@@ -6,11 +6,20 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useAsync} from '../useAsync'
+
+// TODO: Remove
 import useCommerceApi from '../useCommerceApi'
-import {UseQueryResult} from '@tanstack/react-query'
+
+import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperCustomers']
 
+type UseCustomerParameters = NonNullable<Argument<Client['getCustomer']>>['parameters']
+type UseCustomerHeaders = NonNullable<Argument<Client['getCustomer']>>['headers']
+type UseCustomerArg = {
+    headers?: UseCustomerHeaders
+    rawResponse?: boolean
+} & UseCustomerParameters
 /**
  * A hook for `ShopperCustomers#getExternalProfile`.
  * Gets the new external profile for a customer.This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
@@ -18,9 +27,9 @@ type Client = ApiClients['shopperCustomers']
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getexternalprofile} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useExternalProfile = (
+function useExternalProfile(
     arg: Argument<Client['getExternalProfile']>
-): UseQueryResult<DataType<Client['getExternalProfile']>, Error> => {
+): UseQueryResult<DataType<Client['getExternalProfile']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['external-profile', arg], () => client.getExternalProfile(arg))
 }
@@ -31,11 +40,26 @@ export const useExternalProfile = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomer} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomer = (
-    arg: Argument<Client['getCustomer']>
-): UseQueryResult<DataType<Client['getCustomer']>> => {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useAsync(['customer', arg], () => client.getCustomer(arg))
+function useCustomer(
+    arg: Omit<UseCustomerArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomer']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomer']>, Error>
+function useCustomer(
+    arg: Omit<UseCustomerArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomer']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomer']>, Error>
+function useCustomer(
+    arg: UseCustomerArg,
+    options?: UseQueryOptions<DataType<Client['getCustomer']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomer']>, Error> {
+    const {headers, rawResponse, ...parameters} = arg
+    return useAsync(
+        ['customer', arg],
+        ({shopperCustomers}) => {
+            return shopperCustomers.getCustomer({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
 /**
  * A hook for `ShopperCustomers#getCustomerAddress`.
@@ -44,9 +68,9 @@ export const useCustomer = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomeraddress} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerAddress = (
+function useCustomerAddress(
     arg: Argument<Client['getCustomerAddress']>
-): UseQueryResult<DataType<Client['getCustomerAddress']>, Error> => {
+): UseQueryResult<DataType<Client['getCustomerAddress']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['address', arg], () => client.getCustomerAddress(arg))
 }
@@ -57,9 +81,9 @@ export const useCustomerAddress = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerbaskets} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerBaskets = (
+function useCustomerBaskets(
     arg: Argument<Client['getCustomerBaskets']>
-): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error> => {
+): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['baskets', arg], () => client.getCustomerBaskets(arg))
 }
@@ -70,9 +94,9 @@ export const useCustomerBaskets = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerorders} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerOrders = (
+function useCustomerOrders(
     arg: Argument<Client['getCustomerOrders']>
-): UseQueryResult<DataType<Client['getCustomerOrders']>, Error> => {
+): UseQueryResult<DataType<Client['getCustomerOrders']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['orders', arg], () => client.getCustomerOrders(arg))
 }
@@ -83,9 +107,9 @@ export const useCustomerOrders = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerpaymentinstrument} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerPaymentInstrument = (
+function useCustomerPaymentInstrument(
     arg: Argument<Client['getCustomerPaymentInstrument']>
-): UseQueryResult<DataType<Client['getCustomerPaymentInstrument']>, Error> => {
+): UseQueryResult<DataType<Client['getCustomerPaymentInstrument']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['payment-instrument', arg], () => client.getCustomerPaymentInstrument(arg))
 }
@@ -96,9 +120,9 @@ export const useCustomerPaymentInstrument = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlists} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerProductLists = (
+function useCustomerProductLists(
     arg: Argument<Client['getCustomerProductLists']>
-): UseQueryResult<DataType<Client['getCustomerProductLists']>, Error> => {
+): UseQueryResult<DataType<Client['getCustomerProductLists']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['product-lists', arg], () => client.getCustomerProductLists(arg))
 }
@@ -109,9 +133,9 @@ export const useCustomerProductLists = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlist} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerProductList = (
+function useCustomerProductList(
     arg: Argument<Client['getCustomerProductList']>
-): UseQueryResult<DataType<Client['getCustomerProductList']>, Error> => {
+): UseQueryResult<DataType<Client['getCustomerProductList']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['product-list', arg], () => client.getCustomerProductList(arg))
 }
@@ -122,9 +146,9 @@ export const useCustomerProductList = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlistitem} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerProductListItem = (
+function useCustomerProductListItem(
     arg: Argument<Client['getCustomerProductListItem']>
-): UseQueryResult<DataType<Client['getCustomerProductListItem']>, Error> => {
+): UseQueryResult<DataType<Client['getCustomerProductListItem']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['product-list-item', arg], () => client.getCustomerProductListItem(arg))
 }
@@ -135,9 +159,9 @@ export const useCustomerProductListItem = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getpublicproductlistsbysearchterm} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const usePublicProductListsBySearchTerm = (
+function usePublicProductListsBySearchTerm(
     arg: Argument<Client['getPublicProductListsBySearchTerm']>
-): UseQueryResult<DataType<Client['getPublicProductListsBySearchTerm']>, Error> => {
+): UseQueryResult<DataType<Client['getPublicProductListsBySearchTerm']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['product-list-by-search-term', arg], () =>
         client.getPublicProductListsBySearchTerm(arg)
@@ -150,9 +174,9 @@ export const usePublicProductListsBySearchTerm = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getpublicproductlist} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const usePublicProductList = (
+function usePublicProductList(
     arg: Argument<Client['getPublicProductList']>
-): UseQueryResult<DataType<Client['getPublicProductList']>, Error> => {
+): UseQueryResult<DataType<Client['getPublicProductList']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['public-product-list', arg], () => client.getPublicProductList(arg))
 }
@@ -163,9 +187,24 @@ export const usePublicProductList = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getproductlistitem} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useProductListItem = (
+function useProductListItem(
     arg: Argument<Client['getProductListItem']>
-): UseQueryResult<DataType<Client['getProductListItem']>, Error> => {
+): UseQueryResult<DataType<Client['getProductListItem']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useAsync(['product-list-item', arg], () => client.getProductListItem(arg))
+}
+
+export {
+    useExternalProfile,
+    useCustomer,
+    useCustomerAddress,
+    useCustomerBaskets,
+    useCustomerOrders,
+    useCustomerPaymentInstrument,
+    useCustomerProductLists,
+    useCustomerProductList,
+    useCustomerProductListItem,
+    usePublicProductListsBySearchTerm,
+    usePublicProductList,
+    useProductListItem
 }
