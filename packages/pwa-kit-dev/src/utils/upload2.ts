@@ -110,9 +110,9 @@ export class CloudAPIClient {
     }
 }
 
-const defaultMessage = (): string => {
+export const defaultMessage = (gitInstance: git = git): string => {
     try {
-        return `${git.branch()}: ${git.short()}`
+        return `${gitInstance.branch()}: ${gitInstance.short()}`
     } catch (err) {
         if (err.code === 'ENOENT') {
             console.log('Please run "git init" to initialize a new Git repository.')
@@ -121,14 +121,23 @@ const defaultMessage = (): string => {
     }
 }
 
-export const createBundle = async (
-    message: string | null | undefined = null,
-    ssr_parameters: any,
-    ssr_only: string[] = [],
-    ssr_shared: string[] = [],
-    buildDirectory: string,
-    projectSlug: string,
-    ) : Promise<Bundle> => {
+interface CreateBundleArgs {
+    message: string | null | undefined
+    ssr_parameters: any
+    ssr_only: string[]
+    ssr_shared: string[]
+    buildDirectory: string
+    projectSlug: string
+}
+
+export const createBundle = async ({
+        message,
+        ssr_parameters,
+        ssr_only,
+        ssr_shared,
+        buildDirectory,
+        projectSlug,
+    }: CreateBundleArgs) : Promise<Bundle> => {
 
     message = message || defaultMessage()
 
@@ -216,15 +225,16 @@ export const glob = (patterns?: string[]): MatchFn => {
     }
 }
 
-export const getCredentialsFile = (cloudOrigin: string, credentialsFile?: string, platform: string = process.platform): string => {
+export const findHomeDir = () => process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
+
+export const getCredentialsFile = (cloudOrigin: string, credentialsFile?: string, doFindHomeDir: () => string = findHomeDir): string => {
     if (credentialsFile) {
         return credentialsFile
     } else {
-        const dir = platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
         const url = new URL(cloudOrigin)
         const host = url.host
         const suffix = (host === 'cloud.mobify.com') ? '' : `--${host}`
-        return path.join(dir, `.mobify${suffix}`)
+        return path.join(doFindHomeDir(), `.mobify${suffix}`)
     }
 }
 
