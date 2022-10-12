@@ -211,4 +211,50 @@ describe('upload2', () => {
             expect(Buffer.from(bundle.data, 'base64').toString('base64')).toEqual(bundle.data)
         })
     })
+
+    describe('pushBundle', () => {
+        test.each([[{statusCode: 200}], [{statusCode: 401}]])(
+            'should push a built bundle and handle status codes (%p)',
+            async ({statusCode}) => {
+                const message = 'message'
+                const bundle = await upload2.createBundle({
+                    message,
+                    ssr_parameters: {},
+                    ssr_only: ['*.js'],
+                    ssr_shared: ['**/*.*'],
+                    buildDirectory: path.join(__dirname, 'test-fixtures', 'minimal-built-app'),
+                    projectSlug: 'slug'
+                })
+
+                const username = 'user123'
+                const api_key = '123'
+                const credentials = {username, api_key}
+
+                const responseMock = {statusCode}
+                const fetchMock = jest.fn(async () => responseMock)
+
+                const client = new upload2.CloudAPIClient({credentials, fetch: fetchMock})
+
+                const fn = async () => await client.push(bundle, 'project-slug')
+
+                if (statusCode === 200) {
+                    expect(await fn()).toBe(responseMock)
+                } else {
+                    await expect(fn).rejects.toThrow('For more information visit')
+                }
+
+                expect(fetchMock.mock.calls.length).toBe(1)
+
+                const url = fetchMock.mock.calls[0][0]
+                const opts = fetchMock.mock.calls[0][1]
+
+                expect(url).toEqual('https://cloud.mobify.com/api/projects/project-slug/builds/')
+                expect(opts.body).toEqual(expect.anything(Buffer))
+                expect(opts.method).toEqual('POST')
+                expect(opts.headers['Authorization']).toMatch(new RegExp('^Basic '))
+                expect(opts.headers['Content-Length']).toEqual(opts.body.length.toString())
+                expect(opts.headers['User-Agent']).toEqual(`progressive-web-sdk#${pkg.version}`)
+            }
+        )
+    })
 })

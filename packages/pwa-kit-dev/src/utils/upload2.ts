@@ -86,7 +86,7 @@ export class CloudAPIClient {
             [
                 `HTTP ${res.statusCode}`,
                 error.message || res.body,
-                `For more information visit ${error.docs_url || DEFAULT_DOCS_URL}$`
+                `For more information visit ${error.docs_url || DEFAULT_DOCS_URL}`
             ].join('\n')
         )
     }
