@@ -232,7 +232,7 @@ describe('upload2', () => {
                     projectSlug: 'project-slug',
                     targetSlug: undefined,
                     expectedURL: 'https://cloud.mobify.com/api/projects/project-slug/builds/',
-                    statusCode: 200
+                    status: 200
                 }
             ],
             [
@@ -241,7 +241,7 @@ describe('upload2', () => {
                     targetSlug: 'target-slug',
                     expectedURL:
                         'https://cloud.mobify.com/api/projects/project-slug/builds/target-slug/',
-                    statusCode: 200
+                    status: 200
                 }
             ],
             [
@@ -249,7 +249,7 @@ describe('upload2', () => {
                     projectSlug: 'project-slug',
                     targetSlug: undefined,
                     expectedURL: 'https://cloud.mobify.com/api/projects/project-slug/builds/',
-                    statusCode: 401
+                    status: 401
                 }
             ]
         ])(
@@ -270,14 +270,14 @@ describe('upload2', () => {
                 const credentials = {username, api_key}
 
                 const reponseBodyMock = {anything: 'anything'}
-                const responseMock = {statusCode, json: () => Promise.resolve(reponseBodyMock)}
+                const responseMock = {status, json: () => Promise.resolve(reponseBodyMock)}
                 const fetchMock = jest.fn(async () => responseMock)
 
                 const client = new upload2.CloudAPIClient({credentials, fetch: fetchMock})
 
                 const fn = async () => await client.push(bundle, projectSlug, targetSlug)
 
-                if (statusCode === 200) {
+                if (status === 200) {
                     expect(await fn()).toBe(reponseBodyMock)
                 } else {
                     await expect(fn).rejects.toThrow('For more information visit')

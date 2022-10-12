@@ -18,7 +18,7 @@ const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 const colors = {
     warn: 'yellow',
     error: 'red',
-    success: 'blue'
+    success: 'cyan'
 }
 
 const fancyLog = (level, msg) => {

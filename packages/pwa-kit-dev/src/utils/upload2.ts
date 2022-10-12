@@ -71,7 +71,7 @@ export class CloudAPIClient {
     }
 
     private async throwForStatus(res) {
-        if (res.statusCode < 400) {
+        if (res.status < 400) {
             return
         }
 
@@ -84,7 +84,7 @@ export class CloudAPIClient {
 
         throw new Error(
             [
-                `HTTP ${res.statusCode}`,
+                `HTTP ${res.status}`,
                 error.message || res.body,
                 `For more information visit ${error.docs_url || DEFAULT_DOCS_URL}`
             ].join('\n')
