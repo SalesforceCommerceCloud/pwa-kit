@@ -225,7 +225,6 @@ type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeo
 /**
  * A hook for performing mutations with the Shopper Customers API.
  */
-// eslint-disable-next-line prettier/prettier
 export function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
     action: Action
 ) {
