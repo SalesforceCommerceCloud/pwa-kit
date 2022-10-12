@@ -10,21 +10,22 @@ import {MutationFunction} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperGiftCertificates']
 
-export enum ShopperGiftCertificatesMutations {
+export const ShopperGiftCertificatesMutations = {
     /**
      * Action to retrieve an existing gift certificate.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-gift-certificates?meta=getGiftCertificate} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppergiftcertificates.shoppergiftcertificates-1.html#getgiftcertificate} for more information on the parameters and returned data type.
      */
-    GetGiftCertificate = 'getGiftCertificate'
-}
+    GetGiftCertificate: 'getGiftCertificate'
+} as const
+
+type ShopperGiftCertificatesMutationType = typeof ShopperGiftCertificatesMutations[keyof typeof ShopperGiftCertificatesMutations]
 
 /**
  * A hook for performing mutations with the Shopper Gift Certificates API.
  */
 export function useShopperGiftCertificatesMutation<
-    // eslint-disable-next-line prettier/prettier
-    Action extends `${ShopperGiftCertificatesMutations}`
+    Action extends ShopperGiftCertificatesMutationType
 >(action: Action) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>

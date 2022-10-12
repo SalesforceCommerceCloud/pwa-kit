@@ -11,11 +11,13 @@ import useAuth from '../useAuth'
 import Auth from '../../auth'
 import {UseMutationResult} from '@tanstack/react-query'
 
-export enum ShopperLoginHelpers {
-    LoginGuestUser = 'loginGuestUser',
-    LoginRegisteredUserB2C = 'loginRegisteredUserB2C',
-    Logout = 'logout'
-}
+export const ShopperLoginHelpers = {
+    LoginGuestUser: 'loginGuestUser',
+    LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
+    Logout: 'logout'
+} as const
+
+type ShopperLoginHelpersType = typeof ShopperLoginHelpers[keyof typeof ShopperLoginHelpers]
 
 /**
  * A hook for Public Client Shopper Login OAuth helpers.
@@ -27,8 +29,7 @@ export enum ShopperLoginHelpers {
  * - loginGuestUser
  * - logout
  */
-// eslint-disable-next-line prettier/prettier
-export function useShopperLoginHelper<Action extends `${ShopperLoginHelpers}`>(
+export function useShopperLoginHelper<Action extends ShopperLoginHelpersType>(
     action: Action
 ): UseMutationResult<
     ShopperLoginTypes.TokenResponse,
