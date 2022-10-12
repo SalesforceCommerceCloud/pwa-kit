@@ -4,19 +4,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, DataType, ScapiActionResponse} from '../types'
-import {useAsyncCallback} from '../useAsync'
-import useCommerceApi from '../useCommerceApi'
+import {ApiClients, DataType, Argument} from '../types'
+import {useMutation} from '../useMutation'
+import {MutationFunction} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperCustomers']
 
-export enum ShopperCustomersActions {
+export const ShopperCustomersMutations = {
     /**
      * Registers a new customer. The mandatory data are the credentials, profile last name, and email. This requires a JSON Web Token (JWT) which needs to be obtained using the POST /customers/auth API with type \"guest\".
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=registerCustomer} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#registercustomer} for more information on the parameters and returned data type.
      */
-    RegisterCustomer = 'registerCustomer',
+    RegisterCustomer: 'registerCustomer',
     /**
    * **DEPRECATION NOTICE**
 
@@ -28,7 +28,7 @@ Log the user out.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=invalidateCustomerAuth} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#invalidatecustomerauth} for more information on the parameters and returned data type.
    */
-    InvalidateCustomerAuth = 'invalidateCustomerAuth',
+    InvalidateCustomerAuth: 'invalidateCustomerAuth',
     /**
    * **DEPRECATION NOTICE**
 
@@ -84,7 +84,7 @@ mechanism.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=authorizeCustomer} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#authorizecustomer} for more information on the parameters and returned data type.
    */
-    AuthorizeCustomer = 'authorizeCustomer',
+    AuthorizeCustomer: 'authorizeCustomer',
     /**
    * **DEPRECATION NOTICE**
 
@@ -97,85 +97,85 @@ clientId, returns a customer object in the response body and the JWT generated a
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=authorizeTrustedSystem} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#authorizetrustedsystem} for more information on the parameters and returned data type.
    */
-    AuthorizeTrustedSystem = 'authorizeTrustedSystem',
+    AuthorizeTrustedSystem: 'authorizeTrustedSystem',
     /**
      * Reset customer password, after obtaining a reset token. This is the second step in the reset customer password flow, where a customer password is reset by providing the new credentials along with a reset token. This call should be preceded by a call to the /create-reset-token endpoint.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=resetPassword} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#resetpassword} for more information on the parameters and returned data type.
      */
-    ResetPassword = 'resetPassword',
+    ResetPassword: 'resetPassword',
     /**
      * Get reset password token. This is the first step in the reset customer password flow, where a password reset token is requested for future use to reset a customer password. This call should be followed by a call to the /reset endpoint.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getResetPasswordToken} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getresetpasswordtoken} for more information on the parameters and returned data type.
      */
-    GetResetPasswordToken = 'getResetPasswordToken',
+    GetResetPasswordToken: 'getResetPasswordToken',
     /**
      * Registers a new external profile for a customer. This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=registerExternalProfile} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#registerexternalprofile} for more information on the parameters and returned data type.
      */
-    RegisterExternalProfile = 'registerExternalProfile',
+    RegisterExternalProfile: 'registerExternalProfile',
     /**
      * Updates a customer.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomer} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomer} for more information on the parameters and returned data type.
      */
-    UpdateCustomer = 'updateCustomer',
+    UpdateCustomer: 'updateCustomer',
     /**
      * Creates a new address with the given name for the given customer.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=createCustomerAddress} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#createcustomeraddress} for more information on the parameters and returned data type.
      */
-    CreateCustomerAddress = 'createCustomerAddress',
+    CreateCustomerAddress: 'createCustomerAddress',
     /**
      * Deletes a customer's address by address name.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=removeCustomerAddress} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#removecustomeraddress} for more information on the parameters and returned data type.
      */
-    RemoveCustomerAddress = 'removeCustomerAddress',
+    RemoveCustomerAddress: 'removeCustomerAddress',
     /**
      * Updates a customer's address by address name.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomerAddress} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomeraddress} for more information on the parameters and returned data type.
      */
-    UpdateCustomerAddress = 'updateCustomerAddress',
+    UpdateCustomerAddress: 'updateCustomerAddress',
     /**
      * Updates the customer's password.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomerPassword} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomerpassword} for more information on the parameters and returned data type.
      */
-    UpdateCustomerPassword = 'updateCustomerPassword',
+    UpdateCustomerPassword: 'updateCustomerPassword',
     /**
      * Adds a payment instrument to the customer information.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=createCustomerPaymentInstrument} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#createcustomerpaymentinstrument} for more information on the parameters and returned data type.
      */
-    CreateCustomerPaymentInstrument = 'createCustomerPaymentInstrument',
+    CreateCustomerPaymentInstrument: 'createCustomerPaymentInstrument',
     /**
      * Deletes a customer's payment instrument.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=deleteCustomerPaymentInstrument} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#deletecustomerpaymentinstrument} for more information on the parameters and returned data type.
      */
-    DeleteCustomerPaymentInstrument = 'deleteCustomerPaymentInstrument',
+    DeleteCustomerPaymentInstrument: 'deleteCustomerPaymentInstrument',
     /**
      * Creates a customer product list.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=createCustomerProductList} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#createcustomerproductlist} for more information on the parameters and returned data type.
      */
-    CreateCustomerProductList = 'createCustomerProductList',
+    CreateCustomerProductList: 'createCustomerProductList',
     /**
      * Deletes a customer product list.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=deleteCustomerProductList} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#deletecustomerproductlist} for more information on the parameters and returned data type.
      */
-    DeleteCustomerProductList = 'deleteCustomerProductList',
+    DeleteCustomerProductList: 'deleteCustomerProductList',
     /**
      * Changes a product list. Changeable properties are the name, description, and if the list is public.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomerProductList} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomerproductlist} for more information on the parameters and returned data type.
      */
-    UpdateCustomerProductList = 'updateCustomerProductList',
+    UpdateCustomerProductList: 'updateCustomerProductList',
     /**
    * Adds an item to the customer's product list. Considered values from the request body are:
 
@@ -196,13 +196,13 @@ type of custom attribute defined for ProductListItem.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=createCustomerProductListItem} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#createcustomerproductlistitem} for more information on the parameters and returned data type.
    */
-    CreateCustomerProductListItem = 'createCustomerProductListItem',
+    CreateCustomerProductListItem: 'createCustomerProductListItem',
     /**
      * Removes an item from a customer product list.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=deleteCustomerProductListItem} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#deletecustomerproductlistitem} for more information on the parameters and returned data type.
      */
-    DeleteCustomerProductListItem = 'deleteCustomerProductListItem',
+    DeleteCustomerProductListItem: 'deleteCustomerProductListItem',
     /**
    * Updates an item of a customer's product list.
 Considered values from the request body are:
@@ -217,36 +217,21 @@ The value of this property must be valid for the type of custom attribute define
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomerProductListItem} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomerproductlistitem} for more information on the parameters and returned data type.
    */
-    UpdateCustomerProductListItem = 'updateCustomerProductListItem'
-}
+    UpdateCustomerProductListItem: 'updateCustomerProductListItem'
+} as const
+
+type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
 /**
- * A hook for performing actions with the Shopper Customers API.
+ * A hook for performing mutations with the Shopper Customers API.
  */
-// TODO: Why does prettier not like "extends `${Actions}`"?
-// eslint-disable-next-line prettier/prettier
-export function useShopperCustomersAction<Action extends `${ShopperCustomersActions}`>(
+export function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
     action: Action
-): ScapiActionResponse<Parameters<Client[Action]>, DataType<Client[Action]>, Action> {
-    type Args = Parameters<Client[Action]>
+) {
+    type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
-    // Directly calling `client[action](arg)` doesn't work, because the methods don't fully
-    // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
-    // confident, though, that it is safe, because it seems like we're mostly re-defining what we
-    // already have.
-    // In addition to the assertion required to get this to work, I have also simplified the
-    // overloaded SDK method to a single signature that just returns the data type. This makes it
-    // easier to work with when passing to other mapped types.
-    function assertMethod(fn: unknown): asserts fn is (args: Args) => Promise<Data> {
-        if (typeof fn !== 'function') throw new Error(`Unknown action: ${action}`)
-    }
-    const {shopperCustomers: client} = useCommerceApi()
-    const method = client[action]
-    assertMethod(method)
-
-    const hook = useAsyncCallback((...args: Args) => method.call(client, args))
-    // TypeScript loses information when using a computed property name - it assumes `string`, but
-    // we know it's `Action`. This type assertion just restores that lost information.
-    const namedAction = {[action]: hook.execute} as Record<Action, typeof hook.execute>
-    return {...hook, ...namedAction}
+    return useMutation<Data, Error, Params>((params, apiClients) => {
+        const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
+        return method.call(apiClients['shopperCustomers'], params)
+    })
 }

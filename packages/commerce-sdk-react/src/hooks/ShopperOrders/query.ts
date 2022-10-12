@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import useCommerceApi from '../useCommerceApi'
 import {UseQueryResult} from '@tanstack/react-query'
 
@@ -22,7 +22,7 @@ export const useOrder = (
     arg: Argument<Client['getOrder']>
 ): UseQueryResult<DataType<Client['getOrder']>, Error> => {
     const {shopperOrders: client} = useCommerceApi()
-    return useAsync([], () => client.getOrder(arg))
+    return useQuery([], () => client.getOrder(arg))
 }
 /**
  * A hook for `ShopperOrders#getPaymentMethodsForOrder`.
@@ -35,7 +35,7 @@ export const usePaymentMethodsForOrder = (
     arg: Argument<Client['getPaymentMethodsForOrder']>
 ): UseQueryResult<DataType<Client['getPaymentMethodsForOrder']>, Error> => {
     const {shopperOrders: client} = useCommerceApi()
-    return useAsync([], () => client.getPaymentMethodsForOrder(arg))
+    return useQuery([], () => client.getPaymentMethodsForOrder(arg))
 }
 /**
  * A hook for `ShopperOrders#getTaxesFromOrder`.
@@ -50,5 +50,5 @@ export const useTaxesFromOrder = (
     arg: Argument<Client['getTaxesFromOrder']>
 ): UseQueryResult<DataType<Client['getTaxesFromOrder']>, Error> => {
     const {shopperOrders: client} = useCommerceApi()
-    return useAsync([], () => client.getTaxesFromOrder(arg))
+    return useQuery([], () => client.getTaxesFromOrder(arg))
 }

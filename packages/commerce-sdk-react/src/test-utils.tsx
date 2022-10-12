@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken'
 import nock from 'nock'
 import React from 'react'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
-import {QueryClient, QueryClientProvider, QueryClientProviderProps} from '@tanstack/react-query'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 export const TEST_CONFIG = {
     proxy: 'http://localhost:3000/mobify/proxy/api',
