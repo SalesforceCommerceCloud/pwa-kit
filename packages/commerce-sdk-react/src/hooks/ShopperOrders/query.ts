@@ -47,8 +47,12 @@ function useOrder(
     )
 }
 
-type UsePaymentMethodsParameters = NonNullable<Argument<Client['getPaymentMethodsForOrder']>>['parameters']
-type UsePaymentMethodsHeaders = NonNullable<Argument<Client['getPaymentMethodsForOrder']>>['headers']
+type UsePaymentMethodsParameters = NonNullable<
+    Argument<Client['getPaymentMethodsForOrder']>
+>['parameters']
+type UsePaymentMethodsHeaders = NonNullable<
+    Argument<Client['getPaymentMethodsForOrder']>
+>['headers']
 type UsePaymentMethodsArg = {
     headers?: UsePaymentMethodsHeaders
     rawResponse?: boolean

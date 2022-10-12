@@ -4,19 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
 import React from 'react'
-import {useOrder} from 'commerce-sdk-react'
-import {Link, useParams} from 'react-router-dom'
+import {usePaymentMethodsForOrder} from 'commerce-sdk-react'
 import Json from '../components/Json'
+import {useParams} from 'react-router-dom'
 
-function UseShopperOrder() {
+function UsePaymentMethods() {
     const {orderNo}: {orderNo: string} = useParams()
-    const {data, isLoading, error} = useOrder({orderNo: orderNo})
+    const {data, isLoading, error} = usePaymentMethodsForOrder({orderNo: orderNo})
     if (isLoading) {
         return (
             <div>
-                <h1>useOrder page</h1>
+                <h1>usePaymentMethods page</h1>
                 <h2 style={{background: 'aqua'}}>Loading...</h2>
             </div>
         )
@@ -26,10 +25,10 @@ function UseShopperOrder() {
     }
     return (
         <>
-            <h1>Order Information</h1>
+            <h1>Payment Methods</h1>
             <h3>Order #: {orderNo}</h3>
-            <div>Click on the link to go to the payment methods page</div>
-            <Link to={`/orders/${orderNo}/payment-methods`}>Payment Methods for {orderNo}</Link>
+            <h2>{data?.name}</h2>
+
             <hr />
             <div>
                 <div>Returning Data</div>
@@ -39,6 +38,6 @@ function UseShopperOrder() {
     )
 }
 
-UseShopperOrder.getTemplateName = () => 'UseShopperOrder'
+UsePaymentMethods.getTemplateName = () => 'UsePaymentMethods'
 
-export default UseShopperOrder
+export default UsePaymentMethods

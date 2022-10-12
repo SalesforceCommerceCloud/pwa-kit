@@ -8,9 +8,7 @@ import React, {ReactElement} from 'react'
 import path from 'path'
 import '@testing-library/jest-dom'
 import {mockHttpResponses, renderWithProviders} from '../../test-utils'
-import {
-    useOrder, 
-    usePaymentMethodsForOrder} from './query'
+import {useOrder, usePaymentMethodsForOrder} from './query'
 import {screen, waitFor} from '@testing-library/react'
 
 const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
@@ -29,7 +27,13 @@ const OrderComponent = ({orderNo, locale}: {orderNo: string; locale: string}): R
     )
 }
 
-const PaymentMethodsComponent = ({orderNo, locale}: {orderNo: string; locale: string}): ReactElement => {
+const PaymentMethodsComponent = ({
+    orderNo,
+    locale
+}: {
+    orderNo: string
+    locale: string
+}): ReactElement => {
     const {data, isLoading, error} = usePaymentMethodsForOrder({
         orderNo,
         locale
