@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {Link, useParams} from 'react-router-dom'
+import {Link} from 'react-router-dom'
 import Json from '../components/Json'
 import {ShopperLoginHelpers, useShopperLoginHelper} from 'commerce-sdk-react'
 const orderNos = ['00014202', '00014103']
@@ -33,8 +33,8 @@ function ShopperOrderLogin() {
             <hr />
             <h1>Account Orders</h1>
             <div>Click on the link to go to an order page</div>
-            {orderNos.map(orderNo => (
-                <div>
+            {orderNos.map((orderNo) => (
+                <div key={orderNo}>
                     <Link to={`/orders/${orderNo}`}>{orderNo}</Link>
                 </div>
             ))}
