@@ -18,6 +18,7 @@ const UseShopperBaskets = loadable(() => import('./pages/use-shopper-baskets'))
 const QueryErrors = loadable(() => import('./pages/query-errors'))
 const UseOrder = loadable(() => import('./pages/use-shopper-order'))
 const UsePaymentMethods = loadable(() => import('./pages/use-payment-methods'))
+const ShopperOrderLogin = loadable(() => import('./pages/shopper-order-login'))
 
 const routes = [
     {
@@ -66,8 +67,12 @@ const routes = [
         component: UsePaymentMethods
     },
     {
-        path: '/orders',
+        path: '/orders/:orderNo',
         component: UseOrder
+    },
+    {
+        path: '/orders',
+        component: ShopperOrderLogin
     }
 ]
 
