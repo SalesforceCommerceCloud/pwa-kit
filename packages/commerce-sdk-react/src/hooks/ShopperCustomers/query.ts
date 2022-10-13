@@ -7,7 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
 
-// TODO: Remove
+// TODO: Remove once phase2 is completed and all hooks are implemented
 import useCommerceApi from '../useCommerceApi'
 
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
@@ -89,7 +89,7 @@ function useCustomerAddress(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        [{entity: 'customer', scope:'address'}, arg],
+        [{entity: 'customer', scope: 'address'}, arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerAddress({parameters, headers}, rawResponse)
         },
@@ -97,7 +97,9 @@ function useCustomerAddress(
     )
 }
 
-type UseCustomerBasketsParameters = NonNullable<Argument<Client['getCustomerBaskets']>>['parameters']
+type UseCustomerBasketsParameters = NonNullable<
+    Argument<Client['getCustomerBaskets']>
+>['parameters']
 type UseCustomerBasketsHeaders = NonNullable<Argument<Client['getCustomerBaskets']>>['headers']
 type UseCustomerBasketsArg = {
     headers?: UseCustomerBasketsHeaders
@@ -124,7 +126,7 @@ function useCustomerBaskets(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        [{entity: 'customer', scope:'baskets'}, arg],
+        [{entity: 'customer', scope: 'baskets'}, arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerBaskets({parameters, headers}, rawResponse)
         },
@@ -159,7 +161,7 @@ function useCustomerOrders(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        [{entity: 'customer', scope:'orders'}, arg],
+        [{entity: 'customer', scope: 'orders'}, arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerOrders({parameters, headers}, rawResponse)
         },
@@ -193,6 +195,17 @@ function useCustomerProductLists(
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['product-lists', arg], () => client.getCustomerProductLists(arg))
 }
+
+type UseCustomerProductListParameters = NonNullable<
+    Argument<Client['getCustomerProductList']>
+>['parameters']
+type UseCustomerProductListHeaders = NonNullable<
+    Argument<Client['getCustomerProductList']>
+>['headers']
+type UseCustomerProductListArg = {
+    headers?: UseCustomerProductListHeaders
+    rawResponse?: boolean
+} & UseCustomerProductListParameters
 /**
  * A hook for `ShopperCustomers#getCustomerProductList`.
  * Returns a customer product list of the given customer and the items in the list.
@@ -201,11 +214,27 @@ function useCustomerProductLists(
  * @returns An object describing the state of the request.
  */
 function useCustomerProductList(
-    arg: Argument<Client['getCustomerProductList']>
-): UseQueryResult<DataType<Client['getCustomerProductList']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['product-list', arg], () => client.getCustomerProductList(arg))
+    arg: Omit<UseCustomerProductListArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomerProductList']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerProductList']>, Error>
+function useCustomerProductList(
+    arg: Omit<UseCustomerProductListArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomerProductList']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerProductList']>, Error>
+function useCustomerProductList(
+    arg: UseCustomerProductListArg,
+    options?: UseQueryOptions<DataType<Client['getCustomerProductList']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        [{entity: 'customer', scope: 'product-list'}, arg],
+        (_, {shopperCustomers}) => {
+            return shopperCustomers.getCustomerProductList({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
+
 /**
  * A hook for `ShopperCustomers#getCustomerProductListItem`.
  * Returns an item of a customer product list and the actual product details like image, availability and price.

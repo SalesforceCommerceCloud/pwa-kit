@@ -8,8 +8,10 @@ import React from 'react'
 import {
     ShopperLoginHelpers,
     useCustomer,
-    useCustomerAddress, useCustomerBaskets,
+    useCustomerAddress,
+    useCustomerBaskets,
     useCustomerOrders,
+    useCustomerProductList,
     useShopperLoginHelper
 } from 'commerce-sdk-react'
 import Json from '../components/Json'
@@ -17,6 +19,7 @@ import {useQueryClient} from '@tanstack/react-query'
 
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
 const ADDRESS_NAME = 'TestAddress'
+const LIST_ID = '987ae461a7c6c5fd17006fc774'
 
 const renderHookResponse = (hookName: string, {data, isLoading, error}: any) => {
     if (isLoading) {
@@ -67,6 +70,10 @@ function UseCustomer() {
         {
             name: 'useCustomerBaskets',
             hook: useCustomerBaskets({customerId: CUSTOMER_ID})
+        },
+        {
+            name: 'useCustomerProductList',
+            hook: useCustomerProductList({customerId: CUSTOMER_ID, listId: LIST_ID})
         }
     )
 
