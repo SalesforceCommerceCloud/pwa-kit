@@ -299,7 +299,7 @@
     "defaultMessage": "使用条件"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce またはその系列会社。All Rights Reserved. これはデモのみを目的とするストアです。注文を確定しても処理されません。"
+    "defaultMessage": "Salesforce またはその系列会社。All Rights Reserved. これはデモのみを目的とするストアです。注文を確定しても処理されません。"
   },
   "checkout_header.link.cart": {
     "defaultMessage": "買い物カゴに戻る"
