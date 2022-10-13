@@ -57,12 +57,12 @@ const routes = [
         component: QueryErrors
     },
     {
-        path: '/orders/:orderNo',
-        component: UseOrder
-    },
-    {
         path: '/orders/:orderNo/payment-methods',
         component: UsePaymentMethods
+    },
+    {
+        path: '/orders',
+        component: UseOrder
     }
 ]
 

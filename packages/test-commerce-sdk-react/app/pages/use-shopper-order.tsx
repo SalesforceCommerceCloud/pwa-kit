@@ -29,7 +29,7 @@ function UseShopperOrder() {
             <h1>Order Information</h1>
             <h3>Order #: {orderNo}</h3>
             <div>Click on the link to go to the payment methods page</div>
-            <Link to={`/orders/${orderNo}/payment-methods`}>Payment Methods for {orderNo}</Link>
+            <Link to={`/orders/${orderNo}/payment-methods`}>Payment Methods</Link>
             <hr />
             <div>
                 <div>Returning Data</div>
