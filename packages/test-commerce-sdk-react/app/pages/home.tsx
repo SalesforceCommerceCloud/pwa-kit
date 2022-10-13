@@ -15,7 +15,7 @@ const Home = () => {
             <p>Feel free to use this playground to develop commerce-sdk-react.</p>
             <p>
                 If you are adding new features to the package, please add a new page on this app to
-                demostrate the feature.
+                demonstrate the feature.
             </p>
             <p>Happy coding.</p>
 
@@ -32,6 +32,12 @@ const Home = () => {
                 </li>
                 <li>
                     <Link to="/search-suggestions">useSearchSuggestions</Link>
+                </li>
+                <li>
+                    <Link to="/use-promotions">usePromotions</Link>
+                </li>
+                <li>
+                    <Link to="/use-promotions-for-campaign">usePromotionsForCampaign</Link>
                 </li>
                 <li>
                     <Link to="/slas-helpers">useShopperLoginHelper</Link>
