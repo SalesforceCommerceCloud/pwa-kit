@@ -299,7 +299,7 @@
     "defaultMessage": "이용 약관"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2022 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
+    "defaultMessage": "Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
   },
   "checkout_header.link.cart": {
     "defaultMessage": "카트로 돌아가기"

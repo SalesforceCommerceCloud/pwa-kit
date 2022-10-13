@@ -299,7 +299,7 @@
     "defaultMessage": "條款與條件"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
+    "defaultMessage": "Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
   },
   "checkout_header.link.cart": {
     "defaultMessage": "返回購物車"
