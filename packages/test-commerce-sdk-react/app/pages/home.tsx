@@ -34,7 +34,7 @@ const Home = () => {
                     <Link to="/search-suggestions">useSearchSuggestions</Link>
                 </li>
                 <li>
-                    <Link to="/customer">useCustomer</Link>
+                    <Link to="/customer">ShopperCustomers hooks</Link>
                 </li>
                 <li>
                     <Link to="/slas-helpers">useShopperLoginHelper</Link>

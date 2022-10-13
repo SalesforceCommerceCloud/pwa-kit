@@ -49,9 +49,8 @@ const renderHookResponse = (hookName: string, {data, isLoading, error}: any) => 
 
 function UseCustomer() {
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-    const useCustomerHooks = []
     const queryClient = useQueryClient()
-    useCustomerHooks.push(
+    const useCustomerHooks = [
         {
             name: 'useCustomer',
             hook: useCustomer({customerId: CUSTOMER_ID})
@@ -75,7 +74,7 @@ function UseCustomer() {
             name: 'useCustomerProductList',
             hook: useCustomerProductList({customerId: CUSTOMER_ID, listId: LIST_ID})
         }
-    )
+    ]
 
     return (
         <>
