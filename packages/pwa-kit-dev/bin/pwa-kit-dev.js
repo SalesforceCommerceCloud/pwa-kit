@@ -10,10 +10,18 @@ const fse = require('fs-extra')
 const program = require('commander')
 const isEmail = require('validator/lib/isEmail')
 const {execSync: _execSync} = require('child_process')
-const scriptUtils = require('../scripts/utils')
 const pkg = require('../package.json')
 const chalk = require('chalk')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
+
+const upload2 = (() => {
+    try {
+        return require('../dist/utils/upload2')
+    } catch {
+        return require('../utils/upload2')
+    }
+})()
+
 
 const colors = {
     warn: 'yellow',
@@ -72,8 +80,46 @@ const main = () => {
         ].join('\n')
     )
 
-    program
-        .command('save-credentials')
+    const credentialsLocationDisplay = () => {
+        const dir = process.platform === 'win32' ? '%USERPROFILE%' : '~'
+        return p.join(dir, '.mobify')
+    }
+
+    /**
+     * All Managed Runtime commands take common opts like --cloud-origin
+     * and --credentialsFile. These are set to be split out from the SDK
+     * commands here in the near future.
+     */
+    const managedRuntimeCommand = (name) => {
+        return program.command(name)
+            .addOption(
+                new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
+                    .default(upload2.defaultCloudOrigin)
+                    .env('CLOUD_API_BASE')
+            )
+            .addOption(
+                new program.Option(
+                    '-c, --credentialsFile <credentialsFile>',
+                    `override the standard credentials file location "${credentialsLocationDisplay()}"`
+                )
+                    .default(undefined) // *must* default to undefined!
+                    .env('PWA_KIT_CREDENTIALS_FILE')
+            )
+            .hook('preAction', (thisCommand, actionCommand) => {
+                // The final credentialsFile path depends on both cloudOrigin and credentialsFile opts.
+                // Pre-process before passing to the command.
+                const {cloudOrigin, credentialsFile} = actionCommand.opts()
+                actionCommand.setOptionValue(
+                    'credentialsFile',
+                    upload2.getCredentialsFile(
+                        cloudOrigin,
+                        credentialsFile
+                    )
+                )
+            })
+    }
+
+    managedRuntimeCommand('save-credentials')
         .description(`save API credentials for Managed Runtime`)
         .requiredOption(
             '-u, --user <email>',
@@ -97,10 +143,7 @@ const main = () => {
                 }
             }
         )
-        .action(({user, key}) => {
-            const globalOpts = program.opts()
-            const {credentialsFile} = globalOpts
-
+        .action(({user, key, credentialsFile}) => {
             try {
                 fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
                 console.log(`Saved Managed Runtime credentials to "${credentialsFile}".`)
@@ -179,8 +222,7 @@ const main = () => {
             }
         })
 
-    program
-        .command('push')
+    managedRuntimeCommand('push')
         .description(`push a bundle to Managed Runtime`)
         .addOption(
             new program.Option(
@@ -209,19 +251,12 @@ const main = () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .action(async ({buildDirectory, message, projectSlug, target}) => {
+        .action(async ({buildDirectory, message, projectSlug, target, cloudOrigin, credentialsFile}) => {
             // Set the deployment target env var, this is required to ensure we
             // get the correct configuration object.
             process.env.DEPLOY_TARGET = target
 
-            const globalOpts = program.opts()
-
-            const origin = globalOpts.cloudOrigin
-            const credentialsFile = scriptUtils.upload2.getCredentialsFile(
-                origin,
-                globalOpts.credentialsFile
-            )
-            const credentials = await scriptUtils.upload2.readCredentials(credentialsFile)
+            const credentials = await upload2.readCredentials(credentialsFile)
 
             const mobify = getConfig() || {}
 
@@ -238,7 +273,7 @@ const main = () => {
                 }
             }
 
-            const bundle = await scriptUtils.upload2.createBundle({
+            const bundle = await upload2.createBundle({
                 message,
                 ssr_parameters: mobify.ssrParameters,
                 ssr_only: mobify.ssrOnly,
@@ -246,12 +281,12 @@ const main = () => {
                 buildDirectory,
                 projectSlug
             })
-            const client = new scriptUtils.upload2.CloudAPIClient({
+            const client = new upload2.CloudAPIClient({
                 credentials,
-                origin
+                origin: cloudOrigin,
             })
 
-            info(`Beginning upload to ${origin}`)
+            info(`Beginning upload to ${cloudOrigin}`)
             const data = await client.push(bundle, projectSlug, target)
             const warnings = (data.warnings || [])
             warnings.forEach(warn)
@@ -302,26 +337,6 @@ const main = () => {
             program.help({error: true})
         }
     })
-
-    program.addOption(
-        new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
-            .default(scriptUtils.upload2.defaultCloudOrigin)
-            .env('CLOUD_API_BASE')
-    )
-
-    const credentialsLocationDisplay = () => {
-        const dir = process.platform === 'win32' ? '%USERPROFILE%' : '~'
-        return p.join(dir, '.mobify')
-    }
-
-    program.addOption(
-        new program.Option(
-            '-c, --credentialsFile <credentialsFile>',
-            `override the standard credentials file location "${credentialsLocationDisplay()}"`
-        )
-            .default(undefined) // *must* default to undefined!
-            .env('PWA_KIT_CREDENTIALS_FILE')
-    )
 
     program.parse(process.argv)
 }
