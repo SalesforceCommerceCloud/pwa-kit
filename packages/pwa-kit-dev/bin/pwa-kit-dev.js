@@ -24,10 +24,11 @@ const colors = {
 const fancyLog = (level, msg) => {
     const color = colors[level] || 'green'
     const colorFn = chalk[color]
-    console.log(`${colorFn(level.toUpperCase())}: ${msg}`)
+    console.log(`${colorFn(level)}: ${msg}`)
 }
 const info = (msg) => fancyLog('info', msg)
 const success = (msg) => fancyLog('success', msg)
+const warn = (msg) => fancyLog('warn', msg)
 
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
@@ -252,10 +253,9 @@ const main = () => {
 
             info(`Beginning upload to ${origin}`)
             const data = await client.push(bundle, projectSlug, target)
-            success('Bundle Uploaded!')
-
-            const cliMessages = data['cli_messages'] || []
-            cliMessages.forEach(({level, message}) => fancyLog(level, message))
+            const warnings = (data.warnings || [])
+            warnings.forEach(warn)
+            success('Bundle Uploaded')
         })
 
     program
