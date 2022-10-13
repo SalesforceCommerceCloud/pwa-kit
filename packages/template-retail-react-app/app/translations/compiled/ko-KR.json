@@ -1204,7 +1204,7 @@
   "footer.message.copyright": [
     {
       "type": 0,
-      "value": "2022 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
+      "value": "Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
     }
   ],
   "footer.subscribe.button.sign_up": [

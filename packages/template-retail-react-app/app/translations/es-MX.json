@@ -511,7 +511,7 @@
     "defaultMessage": "Términos y condiciones"
   },
   "footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce o sus afiliados. Todos los derechos reservados. Esta es solo una tienda de demostración. Los pedidos realizados NO se procesarán."
+    "defaultMessage": "Salesforce o sus afiliados. Todos los derechos reservados. Esta es solo una tienda de demostración. Los pedidos realizados NO se procesarán."
   },
   "footer.subscribe.button.sign_up": {
     "defaultMessage": "Registrarse"

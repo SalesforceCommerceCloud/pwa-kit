@@ -511,7 +511,7 @@
     "defaultMessage": "Conditions générales"
   },
   "footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce ou ses affiliés. Tous droits réservés. Ceci est une boutique de démonstration uniquement. Les commandes NE SERONT PAS traitées."
+    "defaultMessage": "Salesforce ou ses affiliés. Tous droits réservés. Ceci est une boutique de démonstration uniquement. Les commandes NE SERONT PAS traitées."
   },
   "footer.subscribe.button.sign_up": {
     "defaultMessage": "S'inscrire"

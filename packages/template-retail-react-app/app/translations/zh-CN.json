@@ -511,7 +511,7 @@
     "defaultMessage": "条款与条件"
   },
   "footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce 或其附属公司。保留所有权利。此仅为示范商店。所下订单不会被处理。"
+    "defaultMessage": "Salesforce 或其附属公司。保留所有权利。此仅为示范商店。所下订单不会被处理。"
   },
   "footer.subscribe.button.sign_up": {
     "defaultMessage": "注册"
