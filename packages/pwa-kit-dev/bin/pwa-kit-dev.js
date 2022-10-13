@@ -37,13 +37,14 @@ const fancyLog = (level, msg) => {
 const info = (msg) => fancyLog('info', msg)
 const success = (msg) => fancyLog('success', msg)
 const warn = (msg) => fancyLog('warn', msg)
+const error = (msg) => fancyLog('error', msg)
 
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
 }
 
-const main = () => {
+const main = async () => {
     const pkgRoot = p.join(__dirname, '..')
     process.env.CONTEXT = process.cwd()
 
@@ -143,14 +144,13 @@ const main = () => {
                 }
             }
         )
-        .action(({user, key, credentialsFile}) => {
+        .action(async ({user, key, credentialsFile}) => {
             try {
                 fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
-                console.log(`Saved Managed Runtime credentials to "${credentialsFile}".`)
+                success(`Saved Managed Runtime credentials to "${chalk.cyan(credentialsFile)}".`)
             } catch (e) {
-                console.error('Failed to save credentials.')
-                console.error(e)
-                process.exit(1)
+                error('Failed to save credentials.')
+                throw e
             }
         })
 
@@ -161,7 +161,7 @@ const main = () => {
             new program.Option('--inspect', 'enable debugging with --inspect on the node process')
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
-        .action(({inspect, noHMR}) => {
+        .action(async ({inspect, noHMR}) => {
             execSync(
                 `node${inspect ? ' --inspect' : ''} ${p.join(process.cwd(), 'app', 'ssr.js')}`,
                 {
@@ -184,7 +184,7 @@ const main = () => {
                 .env('PWA_KIT_BUILD_DIR')
         )
         .description(`build your app for production`)
-        .action(({buildDirectory}) => {
+        .action(async ({buildDirectory}) => {
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
             const projectWebpack = p.join(process.cwd(), 'webpack.config.js')
             const webpackConf = fse.pathExistsSync(projectWebpack)
@@ -298,7 +298,7 @@ const main = () => {
         .description('lint all source files')
         .argument('<path>', 'path or glob to lint')
         .option('--fix', 'Try and fix errors (default: false)')
-        .action((path, {fix}) => {
+        .action(async (path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
             const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
             execSync(
@@ -312,10 +312,7 @@ const main = () => {
         .command('format')
         .description('automatically re-format all source files')
         .argument('<path>', 'path or glob to format')
-        .action((...args) => {
-            console.log(program.opts())
-            process.exit(1)
-
+        .action(async ({path}) => {
             const prettier = p.join(require.resolve('prettier'), '..', '..', '.bin', 'prettier')
             execSync(`${prettier} --write "${path}"`)
         })
@@ -323,27 +320,33 @@ const main = () => {
     program
         .command('test')
         .description('test the project')
-        .action((_, {args}) => {
+        .action(async (_, {args}) => {
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
             execSync(
                 `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
             )
         })
 
-    program.option('-v, --version', 'show version number').action(({version}) => {
-        if (version) {
-            console.log(pkg.version)
-        } else {
-            program.help({error: true})
-        }
-    })
+    program
+        .option('-v, --version', 'show version number')
+        .action(async ({version}) => {
+            if (version) {
+                console.log(pkg.version)
+            } else {
+                program.help({error: true})
+            }
+        })
 
-    program.parse(process.argv)
+    await program.parseAsync(process.argv)
 }
 
 Promise.resolve()
-    .then(() => main())
-    .catch((err) => {
-        console.error(err.message)
-        process.exit(1)
+    .then(async () => {
+        try {
+            await main()
+        } catch (err) {
+            error(err.message || err.toString())
+            process.exit(1)
+        }
     })
+
