@@ -52,7 +52,7 @@ function useCustomer(
 ): UseQueryResult<DataType<Client['getCustomer']>, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['customer', arg],
+        [{entity: 'customer'}, arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomer({parameters, headers}, rawResponse)
         },
@@ -89,7 +89,7 @@ function useCustomerAddress(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['address', arg],
+        [{entity: 'customer', scope:'address'}, arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerAddress({parameters, headers}, rawResponse)
         },
@@ -137,7 +137,7 @@ function useCustomerOrders(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['orders', arg],
+        [{entity: 'customer', scope:'orders'}, arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerOrders({parameters, headers}, rawResponse)
         },
