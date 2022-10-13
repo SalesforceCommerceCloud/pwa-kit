@@ -511,7 +511,7 @@
     "defaultMessage": "Allgemeine Geschäftsbedingungen"
   },
   "footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce oder dessen Geschäftspartner. Alle Rechte vorbehalten. Dies ist lediglich ein Geschäft zu Demonstrationszwecken. Aufgegebene Bestellungen WERDEN NICHT bearbeitet."
+    "defaultMessage": "Salesforce oder dessen Geschäftspartner. Alle Rechte vorbehalten. Dies ist lediglich ein Geschäft zu Demonstrationszwecken. Aufgegebene Bestellungen WERDEN NICHT bearbeitet."
   },
   "footer.subscribe.button.sign_up": {
     "defaultMessage": "Registrieren"
