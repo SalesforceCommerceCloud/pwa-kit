@@ -8,7 +8,7 @@ import {createWriteStream} from 'fs'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 
-export const defaultCloudOrigin = 'https://cloud.mobify.com'
+export const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
 export const DEFAULT_DOCS_URL =
     'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
 
@@ -49,7 +49,7 @@ export class CloudAPIClient {
 
     constructor(params: CloudAPIClientOpts) {
         this.opts = {
-            origin: params.origin || defaultCloudOrigin,
+            origin: params.origin || DEFAULT_CLOUD_ORIGIN,
             fetch: params.fetch || _fetch,
             credentials: params.credentials,
         }

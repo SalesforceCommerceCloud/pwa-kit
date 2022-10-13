@@ -94,7 +94,7 @@ const main = () => {
         return program.command(name)
             .addOption(
                 new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
-                    .default(upload2.defaultCloudOrigin)
+                    .default(upload2.DEFAULT_CLOUD_ORIGIN)
                     .env('CLOUD_API_BASE')
             )
             .addOption(
