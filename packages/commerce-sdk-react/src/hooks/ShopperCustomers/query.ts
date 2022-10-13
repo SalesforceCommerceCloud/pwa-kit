@@ -96,6 +96,13 @@ function useCustomerAddress(
         options
     )
 }
+
+type UseCustomerBasketsParameters = NonNullable<Argument<Client['getCustomerBaskets']>>['parameters']
+type UseCustomerBasketsHeaders = NonNullable<Argument<Client['getCustomerBaskets']>>['headers']
+type UseCustomerBasketsArg = {
+    headers?: UseCustomerBasketsHeaders
+    rawResponse?: boolean
+} & UseCustomerBasketsParameters
 /**
  * A hook for `ShopperCustomers#getCustomerBaskets`.
  * Gets the baskets of a customer.
@@ -104,10 +111,25 @@ function useCustomerAddress(
  * @returns An object describing the state of the request.
  */
 function useCustomerBaskets(
-    arg: Argument<Client['getCustomerBaskets']>
-): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['baskets', arg], () => client.getCustomerBaskets(arg))
+    arg: Omit<UseCustomerBasketsArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomerBaskets']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error>
+function useCustomerBaskets(
+    arg: Omit<UseCustomerBasketsArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomerBaskets']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error>
+function useCustomerBaskets(
+    arg: UseCustomerBasketsArg,
+    options?: UseQueryOptions<DataType<Client['getCustomerBaskets']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        [{entity: 'customer', scope:'baskets'}, arg],
+        (_, {shopperCustomers}) => {
+            return shopperCustomers.getCustomerBaskets({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
 
 type UseCustomerOrdersParameters = NonNullable<Argument<Client['getCustomerOrders']>>['parameters']

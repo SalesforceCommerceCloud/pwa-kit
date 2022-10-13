@@ -8,7 +8,7 @@ import React from 'react'
 import {
     ShopperLoginHelpers,
     useCustomer,
-    useCustomerAddress,
+    useCustomerAddress, useCustomerBaskets,
     useCustomerOrders,
     useShopperLoginHelper
 } from 'commerce-sdk-react'
@@ -63,6 +63,10 @@ function UseCustomer() {
         {
             name: 'useCustomerOrders',
             hook: useCustomerOrders({customerId: CUSTOMER_ID})
+        },
+        {
+            name: 'useCustomerBaskets',
+            hook: useCustomerBaskets({customerId: CUSTOMER_ID})
         }
     )
 
