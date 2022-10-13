@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import useCommerceApi from '../useCommerceApi'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
@@ -38,9 +38,9 @@ function useOrder(
     options?: UseQueryOptions<DataType<Client['getOrder']> | Response, Error>
 ): UseQueryResult<DataType<Client['getOrder']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['order', arg],
-        ({shopperOrders}) => {
+        (_, {shopperOrders}) => {
             return shopperOrders.getOrder({parameters, headers}, rawResponse)
         },
         options
@@ -78,14 +78,15 @@ function usePaymentMethodsForOrder(
     options?: UseQueryOptions<DataType<Client['getPaymentMethodsForOrder']> | Response, Error>
 ): UseQueryResult<DataType<Client['getPaymentMethodsForOrder']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['paymentMethods', arg],
-        ({shopperOrders}) => {
+        (_, {shopperOrders}) => {
             return shopperOrders.getPaymentMethodsForOrder({parameters, headers}, rawResponse)
         },
         options
     )
 }
+
 /**
  * A hook for `ShopperOrders#getTaxesFromOrder`.
  * This method gives you the external taxation data of the order transferred from the basket during
@@ -99,7 +100,7 @@ export const useTaxesFromOrder = (
     arg: Argument<Client['getTaxesFromOrder']>
 ): UseQueryResult<DataType<Client['getTaxesFromOrder']>, Error> => {
     const {shopperOrders: client} = useCommerceApi()
-    return useAsync([], () => client.getTaxesFromOrder(arg))
+    return useQuery([], () => client.getTaxesFromOrder(arg))
 }
 
 export {useOrder, usePaymentMethodsForOrder}

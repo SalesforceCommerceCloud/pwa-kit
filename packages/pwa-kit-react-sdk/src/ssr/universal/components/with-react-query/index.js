@@ -30,17 +30,15 @@ const SAFE_QUERY_CLIENT_CONFIG = {
  * A HoC for adding React Query support to your application.
  *
  * @param {React.ReactElement} Wrapped The component to be wrapped
- * @param {Object} options
- * @param {Object} options.queryClientConfig The react query client configuration object to be used. By
- * default the `retry` option will be set to false to ensure performant server rendering.
- *
  * @returns {React.ReactElement}
  */
-export const withReactQuery = (Wrapped, options = {}) => {
+export const withReactQuery = (Wrapped) => {
     const isServerSide = typeof window === 'undefined'
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
-    const queryClientConfig = options.queryClientConfig || SAFE_QUERY_CLIENT_CONFIG
+
+    // @TODO: allow user to configure react query
+    const queryClientConfig = SAFE_QUERY_CLIENT_CONFIG
 
     /**
      * @private

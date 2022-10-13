@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import useCommerceApi from '../useCommerceApi'
 import {UseQueryResult} from '@tanstack/react-query'
 
@@ -22,7 +22,7 @@ export const usePromotions = (
     arg: Argument<Client['getPromotions']>
 ): UseQueryResult<DataType<Client['getPromotions']>, Error> => {
     const {shopperPromotions: client} = useCommerceApi()
-    return useAsync(['promotions', arg], () => client.getPromotions(arg))
+    return useQuery(['promotions', arg], () => client.getPromotions(arg))
 }
 /**
  * A hook for `ShopperPromotions#getPromotionsForCampaign`.
@@ -39,5 +39,5 @@ export const usePromotionsForCampaign = (
     arg: Argument<Client['getPromotionsForCampaign']>
 ): UseQueryResult<DataType<Client['getPromotionsForCampaign']>, Error> => {
     const {shopperPromotions: client} = useCommerceApi()
-    return useAsync(['promotions-for-campaign', arg], () => client.getPromotionsForCampaign(arg))
+    return useQuery(['promotions-for-campaign', arg], () => client.getPromotionsForCampaign(arg))
 }

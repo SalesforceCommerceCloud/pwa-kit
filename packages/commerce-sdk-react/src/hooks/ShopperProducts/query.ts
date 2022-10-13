@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
@@ -33,9 +33,9 @@ function useProducts(
     options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ) {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['products', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getProducts({parameters, headers}, rawResponse)
         },
         options
@@ -65,9 +65,9 @@ function useProduct(
     options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
 ): UseQueryResult<DataType<Client['getProduct']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['product', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getProduct({parameters, headers}, rawResponse)
         },
         options
@@ -100,9 +100,9 @@ function useCategories(
     options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategories']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['categories', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getCategories({parameters, headers}, rawResponse)
         },
         options
@@ -137,9 +137,9 @@ function useCategory(
     options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategory']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['category', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getCategory({parameters, headers}, rawResponse)
         },
         options

@@ -37,7 +37,10 @@ const Home = () => {
                     <Link to="/slas-helpers">useShopperLoginHelper</Link>
                 </li>
                 <li>
-                    <Link to={`/orders`}>useShopperOrder</Link>
+                    <Link to="/basket">useBasket & useShopperBasketsMutation</Link>
+                </li>
+                <li>
+                    <Link to="/orders">useShopperOrder</Link>
                 </li>
             </ul>
 
