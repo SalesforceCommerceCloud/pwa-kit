@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-// @ts-ignore
-import {useSearchSuggestions} from 'commerce-sdk-react'
+import {useSearcjSuggestions} from 'commerce-sdk-react'
 import Json from '../components/Json'
 
 const searchQuery = 'shirt'

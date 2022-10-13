@@ -1,0 +1,41 @@
+[
+    {
+        "scope": "http://localhost:3000",
+        "method": "GET",
+        "path": "/mobify/proxy/api/checkout/shopper-baskets/v1/organizations/f_ecom_zzrf_001/baskets/123/taxes?siteId=RefArchGlobal",
+        "body": "",
+        "status": 401,
+        "response": {
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized",
+            "title": "Unauthorized",
+            "detail": "Your access-token is invalid and could not be used to identify the API client."
+        },
+        "rawHeaders": [
+            "date",
+            "Thu, 13 Oct 2022 15:35:47 GMT",
+            "content-length",
+            "207",
+            "connection",
+            "close",
+            "cf-ray",
+            "759925a69d61c436-EWR",
+            "strict-transport-security",
+            "max-age=31536000; includeSubdomains;",
+            "cf-cache-status",
+            "DYNAMIC",
+            "x-correlation-id",
+            "759925a69d61c436",
+            "x-ratelimit-limit",
+            "60000",
+            "x-ratelimit-remaining",
+            "59995",
+            "vary",
+            "Accept-Encoding",
+            "server",
+            "cloudflare",
+            "x-proxy-request-url",
+            "https://kv7kzm78.api.commercecloud.salesforce.com/checkout/shopper-baskets/v1/organizations/f_ecom_zzrf_001/baskets/123/taxes?siteId=RefArchGlobal"
+        ],
+        "responseIsBinary": false
+    }
+]
