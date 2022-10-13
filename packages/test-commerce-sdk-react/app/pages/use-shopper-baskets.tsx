@@ -5,48 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import { Link } from 'react-router-dom'
-import Json from '../components/Json'
-import {useBasket} from 'commerce-sdk-react'
+import {UseBasket} from '../components/use-shopper-baskets/use-basket'
+import {UsePaymentMethodsForBasket} from '../components/use-shopper-baskets/use-payment-method-for-basket'
+import { UseShippingMethodsForShipment } from '../components/use-shopper-baskets/use-shipping-methods-for-shipment'
+import { UseTaxesFromBasket } from '../components/use-shopper-baskets/use-taxes-from-basket'
 
 function UseShopperBaskets() {
-    const {
-        isLoading,
-        error,
-        data: result,
-    } = useBasket({basketId: '123'})
-
-    if (isLoading) {
-        return (
-            <div>
-                <h1>Basket</h1>
-                <h2 style={{background: 'aqua'}}>Loading...</h2>
-            </div>
-        )
-    }
-
-    if (error) {
-        return <h1 style={{color: 'red'}}>Something is wrong</h1>
-    }
-
     return (
         <>
-            <h1>Basket</h1>
-            {result?.productItems?.map(({productId, productName}) => {
-                return (
-                    <div key={productId}>
-                        <Link to={`/products/${productId}`}>{productName}</Link>
-                    </div>
-                )
-            })}
-            <p>
-                Total: {result?.productTotal} {result?.currency}
-            </p>
+            <UseBasket basketId="123" />
             <hr />
-            <div>
-                <div>Returning data</div>
-                <Json data={{isLoading, error, result}} />
-            </div>
+            <UsePaymentMethodsForBasket basketId="123" />
+            <hr />
+            <UseShippingMethodsForShipment basketId='123' shipmentId='ship123' />
+            <hr />
+            <UseTaxesFromBasket basketId='123' />
         </>
     )
 }
