@@ -299,7 +299,7 @@
     "defaultMessage": "Termos e condições"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
+    "defaultMessage": "Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
   },
   "checkout_header.link.cart": {
     "defaultMessage": "Voltar ao carrinho"
@@ -511,7 +511,7 @@
     "defaultMessage": "Termos e condições"
   },
   "footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
+    "defaultMessage": "Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
   },
   "footer.subscribe.button.sign_up": {
     "defaultMessage": "Cadastro"
