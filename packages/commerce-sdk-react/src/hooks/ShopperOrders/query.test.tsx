@@ -13,8 +13,7 @@ import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {useOrder} from './query'
 
 const {withMocks} = mockHttpResponses({
-    directory: path.join(__dirname, '../../../mock-responses'),
-    mode: 'update'
+    directory: path.join(__dirname, '../../../mock-responses')
 })
 
 const OrderComponent = ({orderNo}: {orderNo: string}): ReactElement => {
