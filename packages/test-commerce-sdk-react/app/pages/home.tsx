@@ -40,7 +40,7 @@ const Home = () => {
                     <Link to="/use-promotions-for-campaign">usePromotionsForCampaign</Link>
                 </li>
                 <li>
-                    <Link to="/customer">ShopperCustomers hooks</Link>
+                    <Link to="/customer">useCustomer & useShopperCustomersMutation</Link>
                 </li>
                 <li>
                     <Link to="/slas-helpers">useShopperLoginHelper</Link>
