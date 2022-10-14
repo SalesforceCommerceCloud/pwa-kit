@@ -55,6 +55,7 @@ export const withReactQuery = (Wrapped) => {
                     ...queryClientConfig.defaultOptions,
                     queries: {
                         ...queryClientConfig.defaultOptions?.queries,
+                        // Temporarily setting this option
                         refetchOnMount: false
                     }
                 }
@@ -98,8 +99,7 @@ export const withReactQuery = (Wrapped) => {
                 )
             )
 
-            // TODO: why queries with errors still run during hydration?
-            return {[STATE_KEY]: dehydrate(queryClient, {shouldDehydrateQuery: () => true})}
+            return {[STATE_KEY]: dehydrate(queryClient)}
         }
 
         /**
