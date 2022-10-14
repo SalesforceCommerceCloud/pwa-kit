@@ -12,6 +12,7 @@ import {
     useCustomerBaskets,
     useCustomerOrders,
     useCustomerProductList,
+    useShopperCustomersMutation,
     useShopperLoginHelper
 } from 'commerce-sdk-react'
 import Json from '../components/Json'
@@ -20,12 +21,17 @@ import {useQueryClient} from '@tanstack/react-query'
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
 const ADDRESS_NAME = 'TestAddress'
 const LIST_ID = '987ae461a7c6c5fd17006fc774'
+const ITEM_ID = '500cebac3fe6e8aa67e22dca1a'
+const PRODUCT_ID = '25518823M'
+const RANDOM_STR = Math.random()
+    .toString(36)
+    .slice(2, 7)
 
-const renderHookResponse = (hookName: string, {data, isLoading, error}: any) => {
+const renderQueryHooks = (name: string, {data, isLoading, error}: any) => {
     if (isLoading) {
         return (
-            <div key={hookName}>
-                <h1 id={hookName}>{hookName}</h1>
+            <div key={name}>
+                <h1 id={name}>{name}</h1>
                 <hr />
                 <h2 style={{background: 'aqua'}}>Loading...</h2>
             </div>
@@ -37,9 +43,9 @@ const renderHookResponse = (hookName: string, {data, isLoading, error}: any) => 
     }
 
     return (
-        <div key={hookName}>
-            <h1 id={hookName}>{hookName}</h1>
-            <h2>{data?.name}</h2>
+        <div key={name}>
+            <h2 id={name}>{name}</h2>
+            <h3>{data?.name}</h3>
             <hr />
             <h3>Returning data</h3>
             <Json data={{isLoading, error, data}} />
@@ -47,10 +53,126 @@ const renderHookResponse = (hookName: string, {data, isLoading, error}: any) => 
     )
 }
 
+const renderMutationHooks = ({name, hook, body, parameters}: any) => {
+    return (
+        <div key={name}>
+            <h2 id={name}>{name}</h2>
+            <button
+                onClick={() =>
+                    hook.mutate({
+                        body,
+                        parameters
+                    })
+                }
+            >
+                {name}
+            </button>
+
+            {hook.error?.message && <p style={{color: 'red'}}>Error: {hook.error?.message}</p>}
+            <hr />
+            <div>
+                <Json data={hook} />
+            </div>
+        </div>
+    )
+}
+
 function UseCustomer() {
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
     const queryClient = useQueryClient()
-    const useCustomerHooks = [
+    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const mutationHooks = [
+        // {
+        //     action: 'registerCustomer',
+        //     body: {
+        //         customer: {
+        //             login: 'jsmith111@test111.com',
+        //             email: 'jsmith111@test111.com',
+        //             first_name: 'John111',
+        //             last_name: 'Smith111'
+        //         },
+        //         password: 'Abcd!12345'
+        //     },
+        //     parameters: {}
+        // },
+        {
+            action: 'updateCustomer',
+            body: {firstName: `Kobe${RANDOM_STR}`},
+            parameters: {customerId: CUSTOMER_ID}
+        },
+        {
+            action: 'updateCustomerPassword',
+            body: {currentPassword: 'Test12345!', password: 'Test1234!'},
+            parameters: {customerId: CUSTOMER_ID}
+        },
+        // {
+        //     action: 'getResetPasswordToken',
+        //     body: {login: 'kobe@test.com'},
+        //     parameters: {}
+        // },
+        {
+            action: 'createCustomerAddress',
+            body: {addressId: `TestAddress${RANDOM_STR}`, countryCode: 'CA', lastName: 'Murphy'},
+            parameters: {customerId: CUSTOMER_ID}
+        },
+        {
+            action: 'updateCustomerAddress',
+            body: {addressId: 'TestAddress', countryCode: 'US', lastName: `Murphy${RANDOM_STR}`},
+            parameters: {customerId: CUSTOMER_ID, addressName: ADDRESS_NAME}
+        },
+        {
+            action: 'removeCustomerAddress',
+            body: {},
+            parameters: {customerId: CUSTOMER_ID, addressName: `TestAddress${RANDOM_STR}`}
+        },
+        {
+            action: 'createCustomerProductList',
+            body: {type: 'wish_list'},
+            parameters: {customerId: CUSTOMER_ID}
+        },
+        {
+            action: 'createCustomerProductListItem',
+            body: {priority: 2, public: true, quantity: 3, type: 'product', productId: PRODUCT_ID},
+            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID}
+        },
+        {
+            action: 'updateCustomerProductListItem',
+            body: {priority: 2, public: true, quantity: 3},
+            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
+        },
+        {
+            action: 'createCustomerPaymentInstrument',
+            body: {
+                bankRoutingNumber: 'AB1234',
+                giftCertificateCode: 'gift-code',
+                paymentCard: {
+                    number: '4454852652415965',
+                    validFromMonth: 12,
+                    expirationYear: 2030,
+                    expirationMonth: 12,
+                    cardType: 'Visa',
+                    holder: 'John Smith',
+                    issueNumber: '92743928',
+                    validFromYear: 22
+                },
+                paymentMethodId: 'Credit Card'
+            },
+            parameters: {customerId: CUSTOMER_ID}
+        },
+        {
+            action: 'deleteCustomerPaymentInstrument',
+            body: {},
+            parameters: {customerId: CUSTOMER_ID, paymentInstrumentId: '812ad603d00ae6cdf0f80803ad'}
+        }
+    ].map(({action, body, parameters}) => {
+        return {
+            name: action,
+            hook: useShopperCustomersMutation(action),
+            body,
+            parameters
+        }
+    })
+
+    const queryHooks = [
         {
             name: 'useCustomer',
             hook: useCustomer({customerId: CUSTOMER_ID})
@@ -99,9 +221,20 @@ function UseCustomer() {
                     )}
                 </>
             ) : (
-                useCustomerHooks.map(({name, hook}) => {
-                    return renderHookResponse(name, {...hook})
-                })
+                <>
+                    <div>
+                        <h1>Mutation hooks</h1>
+                        {mutationHooks.map((mutation) => {
+                            return renderMutationHooks({...mutation})
+                        })}
+                    </div>
+                    <div>
+                        <h1>Query hooks</h1>
+                        {queryHooks.map(({name, hook}) => {
+                            return renderQueryHooks(name, {...hook})
+                        })}
+                    </div>
+                </>
             )}
         </>
     )
