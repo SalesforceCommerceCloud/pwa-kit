@@ -7,7 +7,13 @@
 import React, {useEffect} from 'react'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
-import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {
+    dehydrate,
+    Hydrate,
+    QueryClient,
+    QueryClientProvider,
+    useQueryClient
+} from '@tanstack/react-query'
 import {FetchStrategy} from '../fetch-strategy'
 
 const STATE_KEY = '__reactQuery'
@@ -68,7 +74,6 @@ export const withReactQuery = (Wrapped) => {
                         <Wrapped {...this.props} />
                     </Hydrate>
                     <ResetDefaultOptionsAfterHydration
-                        queryClient={this.props.locals.__queryClient}
                         defaultOptions={queryClientConfig.defaultOptions}
                     />
                 </QueryClientProvider>
@@ -130,7 +135,9 @@ export const withReactQuery = (Wrapped) => {
     return WithReactQuery
 }
 
-const ResetDefaultOptionsAfterHydration = ({queryClient, defaultOptions}) => {
+const ResetDefaultOptionsAfterHydration = ({defaultOptions}) => {
+    const queryClient = useQueryClient()
+
     useEffect(() => {
         if (!isServerSide) {
             queryClient.setDefaultOptions(defaultOptions)
