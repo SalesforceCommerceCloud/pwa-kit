@@ -4,47 +4,46 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {ReactElement, useEffect} from 'react'
+import React, {ReactElement} from 'react'
 import path from 'path'
 import '@testing-library/jest-dom'
 import {mockHttpResponses, renderWithProviders} from '../../test-utils'
-import {useOrder, usePaymentMethodsForOrder} from './query'
-import {useShopperLoginHelper} from '../ShopperLogin/helper'
 import {screen, waitFor} from '@testing-library/react'
+import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
+import {useOrder} from './query'
 
-const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
+const {withMocks} = mockHttpResponses({
+    directory: path.join(__dirname, '../../../mock-responses'),
+    mode: 'update'
+})
 
 const OrderComponent = ({orderNo}: {orderNo: string}): ReactElement => {
-    const {data, isLoading, error} = useOrder({orderNo})
-    const loginRegisteredUser = useShopperLoginHelper(
-        'loginRegisteredUserB2C'
-    )
-    useEffect(() => {
-        loginRegisteredUser.mutate({username: 'alex@test.com', password: 'Test1234#'})}, [])
-    return (
-        <div>
-            {isLoading && <span>Loading...</span>}
-            {data && <div>{data.name}</div>}
-            {error && <span>error</span>}
-            {loginRegisteredUser && (<p>Email: {loginRegisteredUser.variables?.username}</p>)}
-        </div>
-    )
-}
+    // log into register account before fetching any order information when the component is mounted
+    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    React.useEffect(() => {
+        loginRegisteredUser.mutate({username: 'alex@test.com', password: 'Test1234#'})
+    }, [])
 
-const PaymentMethodsComponent = ({orderNo}: {orderNo: string}): ReactElement => {
-    const {data, isLoading, error} = usePaymentMethodsForOrder({orderNo})
-    const loginRegisteredUser = useShopperLoginHelper(
-        'loginRegisteredUserB2C'
+    const {data, isLoading, error} = useOrder(
+        {
+            orderNo
+        },
+        {
+            // wait until the access_token is back before fetching order
+            enabled: !!loginRegisteredUser?.data?.access_token
+        }
     )
-    useEffect(() => {
-        loginRegisteredUser.mutate({username: 'alex@test.com', password: 'Test1234#'})}, [])
     return (
-        <div>
-            {isLoading && <span>Loading...</span>}
-            {data && <div>{data.name}</div>}
-            {error && <span>error</span>}
-            {loginRegisteredUser && (<p>Email: {loginRegisteredUser.variables?.username}</p>)}
-        </div>
+        <>
+            <h1>Order Information</h1>
+            {loginRegisteredUser.isLoading ? (
+                <span>Logging in...</span>
+            ) : (
+                <div>Logged in as {loginRegisteredUser?.variables?.username}</div>
+            )}
+            {isLoading && <div>Loading...</div>}
+            {data && <div>{data.customerName}</div>}
+        </>
     )
 }
 
@@ -53,68 +52,25 @@ const tests = [
         hook: 'useOrder',
         cases: [
             {
-                name: 'returns order data',
+                name: 'returns data',
                 assertions: withMocks(async () => {
-                    const orderNo = '00014103'
+                    const orderNo = '00014202'
                     renderWithProviders(<OrderComponent orderNo={orderNo} />)
-                    const orderItems = ['Ruffle Front Cardigan', 'Porcelain Straight Leg Pant', '2 Button Front Jacket']
-                    const orderTotal = 229.11
-                    
+                    const orderItems = [
+                        'Ruffle Front Cardigan',
+                        'Porcelain Straight Leg Pant',
+                        '2 Button Front Jacket'
+                    ]
+                    // const orderTotal = 229.11
+
                     expect(screen.queryByText(orderItems[0])).toBeNull()
                     expect(screen.queryByText(orderItems[1])).toBeNull()
                     expect(screen.queryByText(orderItems[2])).toBeNull()
-                    expect(screen.getByText('Loading...')).toBeInTheDocument()
-                    await waitFor(() => screen.getByText('alex@test.com'))
-                    expect(screen.getByText(orderItems[0])).toBeInTheDocument()
-                    expect(screen.getByText(orderItems[1])).toBeInTheDocument()
-                    expect(screen.getByText(orderItems[2])).toBeInTheDocument()
-                    expect(screen.getByText(orderTotal)).toBeInTheDocument()
-                })
-            },
-            {
-                name: 'returns error',
-                assertions: withMocks(async () => {
-                    renderWithProviders(<OrderComponent orderNo='abcdef' />)
+                    await waitFor(() => screen.getByText(/alex@test.com/))
+                    expect(screen.queryByText(/alex@test.com/)).toBeInTheDocument()
+                    await waitFor(() => screen.getByText(/Alex V/))
 
-                    expect(screen.getByText('Loading...')).toBeInTheDocument()
-                    await waitFor(() => screen.getByText('error'))
-                    expect(screen.getByText('error')).toBeInTheDocument()
-                    expect(screen.queryByText('Loading...')).toBeNull()
-                })
-            }
-        ]
-    },
-    {
-        hook: 'usePaymentMethodsForOrder',
-        cases: [
-            {
-                name: 'returns payment methods data',
-                assertions: withMocks(async () => {
-                    const orderNo = '00014103'
-                    renderWithProviders(<PaymentMethodsComponent orderNo={orderNo} />)
-                    const paymentMethods = ['GIFT_CERTIFICATE', 'CREDIT_CARD', 'PayPal', 'BML']
-
-                    expect(screen.queryByText(paymentMethods[0])).toBeNull()
-                    expect(screen.queryByText(paymentMethods[1])).toBeNull()
-                    expect(screen.queryByText(paymentMethods[2])).toBeNull()
-                    expect(screen.queryByText(paymentMethods[3])).toBeNull()
-                    expect(screen.getByText('Loading...')).toBeInTheDocument()
-                    await waitFor(() => screen.getByText('alex@test.com'))
-                    expect(screen.getByText(paymentMethods[0])).toBeInTheDocument()
-                    expect(screen.getByText(paymentMethods[1])).toBeInTheDocument()
-                    expect(screen.getByText(paymentMethods[2])).toBeInTheDocument()
-                    expect(screen.getByText(paymentMethods[3])).toBeInTheDocument()
-                })
-            },
-            {
-                name: 'returns error',
-                assertions: withMocks(async () => {
-                    renderWithProviders(<PaymentMethodsComponent orderNo='abcdef' />)
-
-                    expect(screen.getByText('Loading...')).toBeInTheDocument()
-                    await waitFor(() => screen.getByText('error'))
-                    expect(screen.getByText('error')).toBeInTheDocument()
-                    expect(screen.queryByText('Loading...')).toBeNull()
+                    expect(screen.queryByText(/Alex V/)).toBeInTheDocument()
                 })
             }
         ]

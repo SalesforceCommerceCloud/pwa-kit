@@ -27,7 +27,7 @@ const UseShopperLoginHelper = () => {
             <Json data={loginRegisteredUser} />
             <button
                 onClick={() =>
-                    loginRegisteredUser.mutate({username: 'kobe@test.com', password: 'Test1234!'})
+                    loginRegisteredUser.mutate({username: 'alex@test.com', password: 'Test1234#'})
                 }
             >
                 loginRegisteredUser
