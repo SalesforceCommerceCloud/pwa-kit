@@ -62,3 +62,6 @@ export default App
 -   [Routing](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html)
 -   [Phased Headless Rollouts](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/phased-headless-rollouts.html)
 -   [Launch Your Storefront](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/launching-your-storefront.html)
+
+## Support Policy
+Customers on existing support contracts are entitled to bug fixes and updates to previous SDK versions, for a period of 24 months from the time of a given version’s General Availability release.
