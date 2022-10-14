@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useEffect} from 'react'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
@@ -18,16 +18,15 @@ const STATE_KEY = '__reactQuery'
 const SAFE_QUERY_CLIENT_CONFIG = {
     defaultOptions: {
         queries: {
-            retry: false,
-            // TODO: is this really the right place?
-            // Ref: usage of staleTime for SSR - https://tanstack.com/query/v4/docs/guides/ssr#staleness-is-measured-from-when-the-query-was-fetched-on-the-server
-            staleTime: 5 * 1000
+            retry: false
         },
         mutations: {
             retry: false
         }
     }
 }
+
+const isServerSide = typeof window === 'undefined'
 
 /**
  * A HoC for adding React Query support to your application.
@@ -36,7 +35,6 @@ const SAFE_QUERY_CLIENT_CONFIG = {
  * @returns {React.ReactElement}
  */
 export const withReactQuery = (Wrapped) => {
-    const isServerSide = typeof window === 'undefined'
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
 
@@ -51,11 +49,27 @@ export const withReactQuery = (Wrapped) => {
             this.props.locals.__queryClient =
                 this.props.locals.__queryClient || new QueryClient(queryClientConfig)
 
+            if (!isServerSide) {
+                // Stop queries during hydration because they've run already on server side
+                const withRefetchOnMountDisabled = {
+                    ...queryClientConfig.defaultOptions,
+                    queries: {
+                        ...queryClientConfig.defaultOptions?.queries,
+                        refetchOnMount: false
+                    }
+                }
+                this.props.locals.__queryClient.setDefaultOptions(withRefetchOnMountDisabled)
+            }
+
             return (
                 <QueryClientProvider client={this.props.locals.__queryClient}>
                     <Hydrate state={isServerSide ? {} : window.__PRELOADED_STATE__?.[STATE_KEY]}>
                         <Wrapped {...this.props} />
                     </Hydrate>
+                    <ResetDefaultOptionsAfterHydration
+                        queryClient={this.props.locals.__queryClient}
+                        defaultOptions={queryClientConfig.defaultOptions}
+                    />
                 </QueryClientProvider>
             )
         }
@@ -114,4 +128,14 @@ export const withReactQuery = (Wrapped) => {
     hoistNonReactStatic(WithReactQuery, Wrapped, exclude)
 
     return WithReactQuery
+}
+
+const ResetDefaultOptionsAfterHydration = ({queryClient, defaultOptions}) => {
+    useEffect(() => {
+        if (!isServerSide) {
+            queryClient.setDefaultOptions(defaultOptions)
+        }
+    }, [])
+
+    return null
 }
