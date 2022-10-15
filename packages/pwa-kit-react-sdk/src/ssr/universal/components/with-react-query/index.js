@@ -136,12 +136,13 @@ export const withReactQuery = (Wrapped) => {
 }
 
 const ResetDefaultOptionsAfterHydration = ({defaultOptions}) => {
-    const queryClient = useQueryClient()
+    if (isServerSide) {
+        return null
+    }
 
+    const queryClient = useQueryClient()
     useEffect(() => {
-        if (!isServerSide) {
-            queryClient.setDefaultOptions(defaultOptions)
-        }
+        queryClient.setDefaultOptions(defaultOptions)
     }, [])
 
     return null
