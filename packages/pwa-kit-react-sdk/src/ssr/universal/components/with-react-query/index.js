@@ -55,18 +55,17 @@ export const withReactQuery = (Wrapped) => {
             this.props.locals.__queryClient =
                 this.props.locals.__queryClient || new QueryClient(queryClientConfig)
 
-            if (!isServerSide) {
-                // Stop queries during hydration because they've run already on server side
-                const withRefetchOnMountDisabled = {
-                    ...queryClientConfig.defaultOptions,
-                    queries: {
-                        ...queryClientConfig.defaultOptions?.queries,
-                        // Temporarily setting this option
-                        refetchOnMount: false
-                    }
+            const optionsForSSRAndHydration = {
+                ...queryClientConfig.defaultOptions,
+                queries: {
+                    ...queryClientConfig.defaultOptions?.queries,
+                    // Stop queries during hydration because they've run already on server side
+                    ...(!isServerSide ? {refetchOnMount: false} : {}),
+                    // On server side, make sure query with error does not attempt to fetch again on mount
+                    ...(isServerSide ? {retryOnMount: false} : {})
                 }
-                this.props.locals.__queryClient.setDefaultOptions(withRefetchOnMountDisabled)
             }
+            this.props.locals.__queryClient.setDefaultOptions(optionsForSSRAndHydration)
 
             return (
                 <QueryClientProvider client={this.props.locals.__queryClient}>
