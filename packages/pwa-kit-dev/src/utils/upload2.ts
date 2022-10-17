@@ -155,7 +155,7 @@ export const createBundle = async ({
             const fullPath = path.join(process.cwd(), buildDirectory)
             throw new Error(
                 `[Error: Build directory at path "${fullPath}" not found.]\n` +
-                'You must first run the Progressive Web SDK build process before uploading a bundle.'
+                'Run `pwa-kit-dev build` first!'
             )
         })
         .then(() => new Promise((resolve, reject) => {
