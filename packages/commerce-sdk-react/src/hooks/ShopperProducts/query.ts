@@ -31,7 +31,7 @@ function useProducts(
 function useProducts(
     arg: UseProductsArg,
     options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
-) {
+): UseQueryResult<DataType<Client['getProducts']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
         ['products', arg],
