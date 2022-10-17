@@ -118,7 +118,7 @@ const tests = [
     },
     {
         hook: 'usePaymentMethodsForOrder',
-        cases:  [
+        cases: [
             {
                 name: 'returns data',
                 assertions: withMocks(async () => {
@@ -130,7 +130,6 @@ const tests = [
 
                     await waitFor(() => screen.getByText('PayPal'))
                     expect(screen.getByText('PayPal')).toBeInTheDocument()
-
                 })
             },
             {
@@ -153,6 +152,9 @@ const tests = [
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {
+        afterEach(() => {
+            jest.clearAllMocks()
+        })
         cases.forEach(({name, assertions}) => {
             test(name, assertions)
         })
