@@ -62,6 +62,7 @@ export const withReactQuery = (Wrapped) => {
                     // Stop queries during hydration because they've run already on server side
                     ...(!isServerSide ? {refetchOnMount: false} : {}),
                     // On server side, make sure query with error does not attempt to fetch again on mount
+                    // NOTE: `retryOnMount` and `retry` options are different. They seem to work independently.
                     ...(isServerSide ? {retryOnMount: false} : {})
                 }
             }
