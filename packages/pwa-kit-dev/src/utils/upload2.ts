@@ -64,7 +64,7 @@ export class CloudAPIClient {
     private async getHeaders(extras: StringMap): Promise<StringMap> {
         const pkg = await getPkgJSON()
         return {
-            'User-Agent': `progressive-web-sdk#${pkg.version}`,
+            'User-Agent': `${pkg.name}@${pkg.version}`,
             ...this.getAuthHeader(),
             ...extras,
         }
