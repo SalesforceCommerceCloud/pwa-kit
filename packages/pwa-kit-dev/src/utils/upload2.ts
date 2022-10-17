@@ -115,7 +115,7 @@ export const defaultMessage = (gitInstance: git = git): string => {
         return `${gitInstance.branch()}: ${gitInstance.short()}`
     } catch (err) {
         if (err.code === 'ENOENT') {
-            console.log('Please run "git init" to initialize a new Git repository.')
+            console.log('Using default bundle message as no message was provided and not in a Git repo.')
         }
         return 'PWA Kit Bundle'
     }
