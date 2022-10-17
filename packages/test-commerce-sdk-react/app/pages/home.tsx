@@ -40,7 +40,7 @@ const Home = () => {
                     <Link to="/basket">useBasket & useShopperBasketsMutation</Link>
                 </li>
                 <li>
-                    <Link to="/orders">useShopperOrders</Link>
+                    <Link to="/orders">useShopperOrders & useShopperOrdersMutation</Link>
                 </li>
             </ul>
 
