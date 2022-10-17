@@ -30,9 +30,9 @@ module.exports = {
         },
         einsteinAPI: {
             proxyPath: `/mobify/proxy/einstein`,
-            einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            einsteinId: 'd27fafa6-8622-400d-97a4-ddf0794943a2',
             // This differs from the siteId in commerceAPIConfig for testing purposes
-            siteId: 'aaij-MobileFirst'
+            siteId: 'bjnl-RefArch'
         }
     },
     externals: [],
@@ -58,7 +58,7 @@ module.exports = {
                 path: 'ocapi'
             },
             {
-                host: 'api.cquotient.com',
+                host: 'staging.ai.salesforce.com',
                 path: 'einstein'
             }
         ]
