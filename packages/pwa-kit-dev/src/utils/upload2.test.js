@@ -138,7 +138,7 @@ describe('upload2', () => {
     })
 
     test('getCredentialsFile', async () => {
-        const findHomeDir = () => '/my-fake-home/'
+        const findHomeDir = () => path.resolve('my-fake-home') + path.sep
         expect(
             upload2.getCredentialsFile('https://example.com', '/path/to/.mobify', undefined)
         ).toBe('/path/to/.mobify')
