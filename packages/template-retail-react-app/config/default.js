@@ -30,9 +30,9 @@ module.exports = {
         },
         einsteinAPI: {
             host: 'https://api.cquotient.com',
-            einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            einsteinId: 'd27fafa6-8622-400d-97a4-ddf0794943a2',
             // This differs from the siteId in commerceAPIConfig for testing purposes
-            siteId: 'aaij-MobileFirst',
+            siteId: 'bjnl-RefArch',
             isProduction: false
         }
     },
@@ -57,6 +57,10 @@ module.exports = {
             {
                 host: 'production-functional38-qa222.demandware.net',
                 path: 'ocapi'
+            },
+            {
+                host: 'api.cquotient.com',
+                path: 'einstein'
             }
         ]
     }
