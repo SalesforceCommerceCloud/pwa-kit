@@ -22,7 +22,6 @@ const upload2 = (() => {
     }
 })()
 
-
 const colors = {
     warn: 'yellow',
     error: 'red',
@@ -92,7 +91,8 @@ const main = async () => {
      * commands here in the near future.
      */
     const managedRuntimeCommand = (name) => {
-        return program.command(name)
+        return program
+            .command(name)
             .addOption(
                 new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
                     .default(upload2.DEFAULT_CLOUD_ORIGIN)
@@ -112,10 +112,7 @@ const main = async () => {
                 const {cloudOrigin, credentialsFile} = actionCommand.opts()
                 actionCommand.setOptionValue(
                     'credentialsFile',
-                    upload2.getCredentialsFile(
-                        cloudOrigin,
-                        credentialsFile
-                    )
+                    upload2.getCredentialsFile(cloudOrigin, credentialsFile)
                 )
             })
     }
@@ -251,47 +248,56 @@ const main = async () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .action(async ({buildDirectory, message, projectSlug, target, cloudOrigin, credentialsFile}) => {
-            // Set the deployment target env var, this is required to ensure we
-            // get the correct configuration object.
-            process.env.DEPLOY_TARGET = target
-
-            const credentials = await upload2.readCredentials(credentialsFile)
-
-            const mobify = getConfig() || {}
-
-            if (!projectSlug) {
-                try {
-                    const projectPkg = p.join(process.cwd(), 'package.json')
-                    const {name} = fse.readJsonSync(projectPkg)
-                    if (!name) throw new Error(`Missing "name" field in ${projectPkg}`)
-                    projectSlug = name
-                } catch (err) {
-                    throw new Error(
-                        `Could not detect project slug from "name" field in package.json: ${err.message}`
-                    )
-                }
-            }
-
-            const bundle = await upload2.createBundle({
-                message,
-                ssr_parameters: mobify.ssrParameters,
-                ssr_only: mobify.ssrOnly,
-                ssr_shared: mobify.ssrShared,
+        .action(
+            async ({
                 buildDirectory,
-                projectSlug
-            })
-            const client = new upload2.CloudAPIClient({
-                credentials,
-                origin: cloudOrigin,
-            })
+                message,
+                projectSlug,
+                target,
+                cloudOrigin,
+                credentialsFile
+            }) => {
+                // Set the deployment target env var, this is required to ensure we
+                // get the correct configuration object.
+                process.env.DEPLOY_TARGET = target
 
-            info(`Beginning upload to ${cloudOrigin}`)
-            const data = await client.push(bundle, projectSlug, target)
-            const warnings = (data.warnings || [])
-            warnings.forEach(warn)
-            success('Bundle Uploaded')
-        })
+                const credentials = await upload2.readCredentials(credentialsFile)
+
+                const mobify = getConfig() || {}
+
+                if (!projectSlug) {
+                    try {
+                        const projectPkg = p.join(process.cwd(), 'package.json')
+                        const {name} = fse.readJsonSync(projectPkg)
+                        if (!name) throw new Error(`Missing "name" field in ${projectPkg}`)
+                        projectSlug = name
+                    } catch (err) {
+                        throw new Error(
+                            `Could not detect project slug from "name" field in package.json: ${err.message}`
+                        )
+                    }
+                }
+
+                const bundle = await upload2.createBundle({
+                    message,
+                    ssr_parameters: mobify.ssrParameters,
+                    ssr_only: mobify.ssrOnly,
+                    ssr_shared: mobify.ssrShared,
+                    buildDirectory,
+                    projectSlug
+                })
+                const client = new upload2.CloudAPIClient({
+                    credentials,
+                    origin: cloudOrigin
+                })
+
+                info(`Beginning upload to ${cloudOrigin}`)
+                const data = await client.push(bundle, projectSlug, target)
+                const warnings = data.warnings || []
+                warnings.forEach(warn)
+                success('Bundle Uploaded')
+            }
+        )
 
     program
         .command('lint')
@@ -327,26 +333,22 @@ const main = async () => {
             )
         })
 
-    program
-        .option('-v, --version', 'show version number')
-        .action(async ({version}) => {
-            if (version) {
-                console.log(pkg.version)
-            } else {
-                program.help({error: true})
-            }
-        })
+    program.option('-v, --version', 'show version number').action(async ({version}) => {
+        if (version) {
+            console.log(pkg.version)
+        } else {
+            program.help({error: true})
+        }
+    })
 
     await program.parseAsync(process.argv)
 }
 
-Promise.resolve()
-    .then(async () => {
-        try {
-            await main()
-        } catch (err) {
-            error(err.message || err.toString())
-            process.exit(1)
-        }
-    })
-
+Promise.resolve().then(async () => {
+    try {
+        await main()
+    } catch (err) {
+        error(err.message || err.toString())
+        process.exit(1)
+    }
+})

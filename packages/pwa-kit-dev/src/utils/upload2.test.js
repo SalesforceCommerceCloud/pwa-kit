@@ -254,7 +254,7 @@ describe('upload2', () => {
             ]
         ])(
             'should push a built bundle and handle status codes (%p)',
-            async ({projectSlug, targetSlug, expectedURL, statusCode}) => {
+            async ({projectSlug, targetSlug, expectedURL, status}) => {
                 const message = 'message'
                 const bundle = await upload2.createBundle({
                     message,
@@ -293,7 +293,7 @@ describe('upload2', () => {
                 expect(opts.method).toEqual('POST')
                 expect(opts.headers['Authorization']).toMatch(new RegExp('^Basic '))
                 expect(opts.headers['Content-Length']).toEqual(opts.body.length.toString())
-                expect(opts.headers['User-Agent']).toEqual(`progressive-web-sdk#${pkg.version}`)
+                expect(opts.headers['User-Agent']).toEqual(`${pkg.name}@${pkg.version}`)
             }
         )
     })
