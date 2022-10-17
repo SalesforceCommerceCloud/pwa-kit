@@ -98,7 +98,7 @@ describe('upload2', () => {
             const client = new upload2.CloudAPIClient({credentials: {username, api_key}})
             const extra = {extraHeader: 'xyz'}
             expect(await client.getHeaders(extra)).toEqual({
-                'User-Agent': `progressive-web-sdk#${pkg.version}`,
+                'User-Agent': `${pkg.name}@${pkg.version}`,
                 ...expectedAuthHeader,
                 ...extra
             })
