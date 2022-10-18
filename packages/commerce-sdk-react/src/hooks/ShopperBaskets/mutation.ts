@@ -6,7 +6,7 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction} from '@tanstack/react-query'
+import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -328,10 +328,11 @@ the body are the following properties if specified:
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasket} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasket} for more information on the parameters and returned data type.
      */
-    AddTaxesForBasket: 'addTaxesForBasket'
+    AddTaxesForBasket: 'addTaxesForBasket',
 } as const
 
-type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
+type ShopperBasketMutationType =
+    typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
 /**
  * A hook for performing mutations with the Shopper Baskets API.
@@ -341,8 +342,31 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
 ) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
-    return useMutation<Data, Error, Params>((params, apiClients) => {
-        const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
-        return method.call(apiClients['shopperBaskets'], params)
-    })
+    const queryClient = useQueryClient()
+    return useMutation<Data, Error, Params>(
+        (params, apiClients) => {
+            const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
+            return method.call(apiClients['shopperBaskets'], params)
+        },
+        {
+            onSuccess: (data, params) => {
+                if (action === 'createBasket') {
+                    if ('customerInfo' in data && data.customerInfo?.customerId) {
+                        queryClient.invalidateQueries([
+                            'customer',
+                            data.customerInfo?.customerId,
+                            'baskets',
+                        ])
+                        queryClient.setQueryData(['basket', data.basketId], data)
+                    }
+                }
+
+                // @ts-ignore some action doesn't have basketId as parameter, like createBasket
+                if (params?.parameters?.basketId) {
+                    // @ts-ignore
+                    queryClient.invalidateQueries(['basket', params?.parameters?.basketId])
+                }
+            },
+        }
+    )
 }

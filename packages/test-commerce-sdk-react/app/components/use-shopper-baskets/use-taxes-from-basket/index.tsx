@@ -21,19 +21,10 @@ export const UseTaxesFromBasket = ({basketId}: {basketId: string}): ReactElement
     return (
         <>
             {data && (
-                <>
-                    <p>taxes:</p>
-                    <ul>
-                        {Object.keys(data?.taxes).map((taxItemId) => (
-                            <li>{taxItemId}</li>
-                        ))}
-                    </ul>
-                    <hr />
-                    <div>
-                        <div>Returning data</div>
-                        <Json data={{isLoading, error, data}} />
-                    </div>
-                </>
+                <div>
+                    <h2>useTaxesFromBasket</h2>
+                    <Json data={{isLoading, error, data}} />
+                </div>
             )}
         </>
     )

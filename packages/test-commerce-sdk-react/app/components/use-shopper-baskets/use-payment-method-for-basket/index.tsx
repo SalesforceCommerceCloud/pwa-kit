@@ -2,8 +2,12 @@ import React, {ReactElement} from 'react'
 import Json from '../../Json'
 import {usePaymentMethodsForBasket} from 'commerce-sdk-react'
 
-export const UsePaymentMethodsForBasket = ({basketId}: {basketId: string}): ReactElement => {
+export const UsePaymentMethodsForBasket = ({basketId}: {basketId: string}): ReactElement | null => {
     const {isLoading, error, data} = usePaymentMethodsForBasket({basketId}, {enabled: !!basketId})
+
+    if (!basketId) {
+        return null
+    }
 
     if (isLoading) {
         return (
@@ -22,20 +26,8 @@ export const UsePaymentMethodsForBasket = ({basketId}: {basketId: string}): Reac
         <>
             {data && (
                 <>
-                    <p>payment methods:</p>
-                    <ul>
-                        {data?.applicablePaymentMethods?.map((paymentMethod) => (
-                            <li>
-                                {paymentMethod.id} | {paymentMethod.name} |{' '}
-                                {paymentMethod.description}
-                            </li>
-                        ))}
-                    </ul>
-                    <hr />
-                    <div>
-                        <div>Returning data</div>
-                        <Json data={{isLoading, error, data}} />
-                    </div>
+                    <h2>usePaymentMethodsForBasket</h2>
+                    <Json data={{isLoading, error, data}} />
                 </>
             )}
         </>

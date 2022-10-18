@@ -2,8 +2,12 @@ import React, {ReactElement} from 'react'
 import Json from '../../Json'
 import {useBasket} from 'commerce-sdk-react'
 
-export const UseBasket = ({basketId}: {basketId: string}): ReactElement => {
+export const UseBasket = ({basketId}: {basketId: string}): ReactElement | null => {
     const {isLoading, error, data} = useBasket({basketId}, {enabled: !!basketId})
+
+    if (!basketId) {
+        return null
+    }
 
     if (isLoading) {
         return (
@@ -22,19 +26,8 @@ export const UseBasket = ({basketId}: {basketId: string}): ReactElement => {
         <>
             {data && (
                 <>
-                    <div>customerId: {data?.customerInfo?.customerId}</div>
-                    <p>currency: {data?.currency}</p>
-                    <p>product total: {data?.productTotal}</p>
-                    <ul>
-                        {data?.productItems?.map((productItem) => (
-                            <li>{productItem.itemText}</li>
-                        ))}
-                    </ul>
-                    <hr />
-                    <div>
-                        <div>Returning data</div>
-                        <Json data={{isLoading, error, data}} />
-                    </div>
+                    <h2>useBasket</h2>
+                    <Json data={{isLoading, error, data}} />
                 </>
             )}
         </>

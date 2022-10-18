@@ -37,7 +37,7 @@ function useBasket(
 ): UseQueryResult<DataType<Client['getBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['baskets', arg],
+        ['basket', parameters.basketId, arg],
         (_, {shopperBaskets}) => shopperBaskets.getBasket({parameters, headers}, rawResponse),
         options
     )
@@ -74,7 +74,7 @@ function usePaymentMethodsForBasket(
 ): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['payment-methods', arg],
+        ['basket', parameters.basketId, 'payment-method', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getPaymentMethodsForBasket({parameters, headers}, rawResponse),
         options
@@ -112,7 +112,7 @@ function usePriceBooksForBasket(
 ): UseQueryResult<DataType<Client['getPriceBooksForBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['price-books', arg],
+        ['basket', parameters.basketId, 'price-books', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getPriceBooksForBasket({parameters, headers}, rawResponse),
         options
@@ -150,7 +150,7 @@ function useShippingMethodsForShipment(
 ): UseQueryResult<DataType<Client['getShippingMethodsForShipment']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['shipping-methods'],
+        ['basket', parameters.basketId, 'shipping-methods', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getShippingMethodsForShipment({parameters, headers}, rawResponse),
         options
@@ -186,7 +186,7 @@ function useTaxesFromBasket(
 ): UseQueryResult<DataType<Client['getTaxesFromBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['taxes', arg],
+        ['basket', parameters.basketId, 'taxes', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getTaxesFromBasket({parameters, headers}, rawResponse),
         options
