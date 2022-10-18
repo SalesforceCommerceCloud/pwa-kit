@@ -6,7 +6,7 @@
  */
 import React, {ReactElement, useEffect} from 'react'
 import path from 'path'
-import {mockHttpResponses, renderWithProviders} from '../../test-utils'
+import {mockHttpResponses, renderWithProviders, withRegisteredUser} from '../../test-utils'
 import {
     useCustomer,
     useCustomerAddress,
@@ -22,21 +22,13 @@ const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../..
 
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
 const CUSTOMER_EMAIL = 'kobe@test.com'
-
-const CustomerComponent = ({customerId}: {customerId: string}): ReactElement => {
-    const queryClient = useQueryClient()
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-
-    useEffect(() => {
-        // TODO: Before each clear React Query cache
-        queryClient.removeQueries([{entity: 'customer'}])
-
-        loginRegisteredUser.mutate({
-            username: 'kobe@test.com',
-            password: 'Test1234!'
-        })
-    }, [])
-
+const CustomerComponent = ({
+    customerId,
+    loginRegisteredUser
+}: {
+    customerId: string
+    loginRegisteredUser: any
+}): React.ReactElement => {
     const {data, isLoading, error} = useCustomer(
         {customerId},
         {
@@ -61,7 +53,8 @@ const tests = [
             {
                 name: 'returns data',
                 assertions: withMocks(async () => {
-                    renderWithProviders(<CustomerComponent customerId={CUSTOMER_ID} />)
+                    const Component = withRegisteredUser(CustomerComponent)
+                    renderWithProviders(<Component customerId={CUSTOMER_ID} />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText(CUSTOMER_EMAIL))
@@ -72,7 +65,9 @@ const tests = [
             {
                 name: 'returns error',
                 assertions: withMocks(async () => {
-                    renderWithProviders(<CustomerComponent customerId={'WRONG_CUSTOMER_ID'} />)
+                    const Component = withRegisteredUser(CustomerComponent)
+
+                    renderWithProviders(<Component customerId={'WRONG_CUSTOMER_ID'} />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText('error'))
