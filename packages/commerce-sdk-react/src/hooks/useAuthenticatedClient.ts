@@ -8,7 +8,7 @@ import {
     QueryFunctionContext,
     QueryKey,
     QueryFunction,
-    MutationFunction
+    MutationFunction,
 } from '@tanstack/react-query'
 import useAuth from './useAuth'
 import useCommerceApi from './useCommerceApi'
@@ -43,7 +43,7 @@ function useAuthenticatedClient<TData, TVariables = unknown>(
                 apiClientKeys.forEach((client) => {
                     apiClients[client].clientConfig.headers = {
                         ...apiClients[client].clientConfig.headers,
-                        Authorization: `Bearer ${access_token}`
+                        Authorization: `Bearer ${access_token}`,
                     }
                 })
                 return apiClients

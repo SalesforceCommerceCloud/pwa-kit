@@ -59,54 +59,54 @@ const cookieStorage = onClient ? new CookieStorage() : new Map()
 const DATA_MAP: AuthDataMap = {
     access_token: {
         storage: localStorage,
-        key: 'access_token'
+        key: 'access_token',
     },
     customer_id: {
         storage: localStorage,
-        key: 'customer_id'
+        key: 'customer_id',
     },
     usid: {
         storage: localStorage,
-        key: 'usid'
+        key: 'usid',
     },
     enc_user_id: {
         storage: localStorage,
-        key: 'enc_user_id'
+        key: 'enc_user_id',
     },
     expires_in: {
         storage: localStorage,
-        key: 'expires_in'
+        key: 'expires_in',
     },
     id_token: {
         storage: localStorage,
-        key: 'id_token'
+        key: 'id_token',
     },
     idp_access_token: {
         storage: localStorage,
-        key: 'idp_access_token'
+        key: 'idp_access_token',
     },
     token_type: {
         storage: localStorage,
-        key: 'token_type'
+        key: 'token_type',
     },
     refresh_token_guest: {
         storage: cookieStorage,
         key: 'cc-nx-g',
         callback: () => {
             cookieStorage.delete('cc-nx')
-        }
+        },
     },
     refresh_token_registered: {
         storage: cookieStorage,
         key: 'cc-nx',
         callback: () => {
             cookieStorage.delete('cc-nx-g')
-        }
+        },
     },
     site_id: {
         storage: cookieStorage,
-        key: 'cc-site-id'
-    }
+        key: 'cc-site-id',
+    },
 }
 
 /**
@@ -130,16 +130,17 @@ class Auth {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
                 shortCode: config.shortCode,
-                siteId: config.siteId
+                siteId: config.siteId,
             },
             throwOnBadResponse: true,
-            fetchOptions: config.fetchOptions
+            fetchOptions: config.fetchOptions,
         })
 
         if (this.get('site_id') && this.get('site_id') !== config.siteId) {
             // if site is switched, remove all existing auth data in storage
             // and the next auth.ready() call with restart the auth flow
             this.clearStorage()
+            this.pendingToken = undefined
         }
 
         if (!this.get('site_id')) {
@@ -181,7 +182,7 @@ class Auth {
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
-            usid: this.get('usid')
+            usid: this.get('usid'),
         }
     }
 
@@ -211,7 +212,7 @@ class Auth {
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
+            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS,
         })
     }
 
@@ -292,7 +293,7 @@ class Auth {
             () =>
                 helpers.loginGuestUser(this.client, {
                     redirectURI,
-                    ...(usid && {usid})
+                    ...(usid && {usid}),
                 }),
             isGuest
         )
@@ -310,7 +311,7 @@ class Auth {
             () =>
                 helpers.loginRegisteredUserB2C(this.client, credentials, {
                     redirectURI,
-                    ...(usid && {usid})
+                    ...(usid && {usid}),
                 }),
             isGuest
         )
@@ -325,7 +326,7 @@ class Auth {
         return this.queueRequest(
             () =>
                 helpers.loginGuestUser(this.client, {
-                    redirectURI: this.redirectURI
+                    redirectURI: this.redirectURI,
                 }),
             isGuest
         )
@@ -350,7 +351,7 @@ export const injectAccessToken = (
     const _headers = headers
         ? {
               ...headers,
-              Authorization: `Bearer ${accessToken}`
+              Authorization: `Bearer ${accessToken}`,
           }
         : {Authorization: `Bearer ${accessToken}`}
     return _headers

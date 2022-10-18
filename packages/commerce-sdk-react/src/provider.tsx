@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {Fragment, ReactElement, useEffect, useMemo} from 'react'
+import React, {ReactElement, useEffect, useMemo} from 'react'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -16,7 +16,7 @@ import {
     ShopperDiscoverySearch,
     ShopperGiftCertificates,
     ShopperSearch,
-    ShopperBasketsTypes
+    ShopperBasketsTypes,
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
@@ -40,6 +40,11 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
 /**
  * @internal
  */
+export const ConfigContext = React.createContext({} as Omit<CommerceApiProviderProps, 'children'>)
+
+/**
+ * @internal
+ */
 export const AuthContext = React.createContext({} as Auth)
 
 /**
@@ -58,7 +63,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         redirectURI,
         fetchOptions,
         siteId,
-        shortCode
+        shortCode,
+        locale,
+        currency,
     } = props
 
     const config = {
@@ -68,12 +75,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientId,
             organizationId,
             shortCode,
-            siteId
+            siteId,
         },
         throwOnBadResponse: true,
-        fetchOptions
+        fetchOptions,
     }
-
     const apiClients = useMemo(() => {
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -85,7 +91,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperOrders: new ShopperOrders(config),
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
-            shopperSearch: new ShopperSearch(config)
+            shopperSearch: new ShopperSearch(config),
         }
     }, [clientId, organizationId, shortCode, siteId, proxy, fetchOptions])
 
@@ -97,7 +103,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             siteId,
             proxy,
             redirectURI,
-            fetchOptions
+            fetchOptions,
         })
     }, [clientId, organizationId, shortCode, siteId, proxy, redirectURI, fetchOptions])
 
@@ -105,16 +111,26 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         auth.ready()
     }, [auth])
 
-    // TODO: wrap the children with:
-    // - context for enabling useServerEffect hook
-    // - context for sharing the auth object that would manage the tokens -> this will probably be for internal use only
     return (
-        <Fragment>
+        <ConfigContext.Provider
+            value={{
+                clientId,
+                headers,
+                organizationId,
+                proxy,
+                redirectURI,
+                fetchOptions,
+                siteId,
+                shortCode,
+                locale,
+                currency,
+            }}
+        >
             <CommerceApiContext.Provider value={apiClients}>
                 <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
             </CommerceApiContext.Provider>
             <ReactQueryDevtools />
-        </Fragment>
+        </ConfigContext.Provider>
     )
 }
 

@@ -19,7 +19,7 @@ interface AppConfigProps {
 const AppConfig = (props: AppConfigProps): ReactElement => {
     const {correlationId} = useCorrelationId()
     const headers = {
-        'correlation-id': correlationId
+        'correlation-id': correlationId,
     }
     const defaultSiteId = 'RefArchGlobal'
     const [siteId, setSiteId] = useState(defaultSiteId)
