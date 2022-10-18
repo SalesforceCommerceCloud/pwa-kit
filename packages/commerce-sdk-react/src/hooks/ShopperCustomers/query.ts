@@ -24,10 +24,6 @@ export const useExternalProfile = (
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['external-profile', arg], () => client.getExternalProfile(arg))
 }
-
-type UseCustomerParameters = NonNullable<Argument<Client['getCustomer']>>['parameters']
-type UseCustomerHeaders = NonNullable<Argument<Client['getCustomer']>>['headers']
-type UseCustomerArg = {headers?: UseCustomerHeaders; rawResponse?: boolean} & UseCustomerParameters
 /**
  * A hook for `ShopperCustomers#getCustomer`.
  * Gets a customer with all existing addresses and payment instruments associated with the requested customer.
@@ -35,27 +31,11 @@ type UseCustomerArg = {headers?: UseCustomerHeaders; rawResponse?: boolean} & Us
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomer} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export function useCustomer(
-    arg: Omit<UseCustomerArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getCustomer']> | Response, Error>
-): UseQueryResult<DataType<Client['getCustomer']>, Error>
-export function useCustomer(
-    arg: Omit<UseCustomerArg, 'rawResponse'> & {rawResponse?: true},
-    options?: UseQueryOptions<DataType<Client['getCustomer']> | Response, Error>
-): UseQueryResult<DataType<Client['getCustomer']>, Error>
-export function useCustomer(
-    arg: UseCustomerArg,
-    options?: UseQueryOptions<DataType<Client['getCustomer']> | Response, Error>
-): UseQueryResult<DataType<Client['getCustomer']>, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    return useQuery(
-        [{entity: 'customer'}, arg],
-        (_, {shopperCustomers}) => {
-            return shopperCustomers.getCustomer({parameters, headers}, rawResponse)
-        },
-        options
-    )
-}
+export const useCustomer = (
+    arg: Argument<Client['getCustomer']>
+): UseQueryResult<DataType<Client['getCustomer']>> => {
+    const {shopperCustomers: client} = useCommerceApi()
+    return useQuery(['customer', arg], () => client.getCustomer(arg))
 /**
  * A hook for `ShopperCustomers#getCustomerAddress`.
  * Retrieves a customer's address by address name.
