@@ -19,11 +19,14 @@ interface AppConfigProps {
 const AppConfig = (props: AppConfigProps): ReactElement => {
     const {correlationId} = useCorrelationId()
     const headers = {
-        'correlation-id': correlationId,
+        'correlation-id': correlationId
     }
     const defaultSiteId = 'RefArchGlobal'
+    const defaultLocale = 'en-US'
     const [siteId, setSiteId] = useState(defaultSiteId)
+    const [locale, setLocale] = useState(defaultLocale)
     const anotherSite = siteId === defaultSiteId ? 'RefArch' : defaultSiteId
+    const anotherLocale = locale === defaultLocale ? 'en-CA' : defaultLocale
     return (
         <CommerceApiProvider
             siteId={siteId}
@@ -32,12 +35,20 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
             organizationId="f_ecom_zzrf_001"
             redirectURI="http://localhost:3000/callback"
             proxy="http://localhost:3000/mobify/proxy/api"
-            locale="en-US"
+            locale={locale}
             currency="USD"
             headers={headers}
         >
             {props.children}
-            <div style={{position: 'fixed', right: 0, bottom: 0, margin: '8px'}}>
+            <div
+                style={{
+                    backgroundColor: '#ebebeb',
+                    position: 'fixed',
+                    right: 0,
+                    bottom: 0,
+                    margin: '8px'
+                }}
+            >
                 <h3>Site: {siteId}</h3>
                 <button
                     onClick={() => {
@@ -45,6 +56,13 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
                     }}
                 >
                     Switch to {anotherSite}
+                </button>
+                <button
+                    onClick={() => {
+                        setLocale(anotherLocale)
+                    }}
+                >
+                    Switch to {anotherLocale}
                 </button>
             </div>
         </CommerceApiProvider>

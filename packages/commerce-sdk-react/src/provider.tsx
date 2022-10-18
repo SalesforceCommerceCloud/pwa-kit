@@ -16,7 +16,7 @@ import {
     ShopperDiscoverySearch,
     ShopperGiftCertificates,
     ShopperSearch,
-    ShopperBasketsTypes,
+    ShopperBasketsTypes
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
@@ -65,7 +65,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         shortCode,
         locale,
-        currency,
+        currency
     } = props
 
     const config = {
@@ -75,10 +75,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientId,
             organizationId,
             shortCode,
-            siteId,
+            siteId
         },
         throwOnBadResponse: true,
-        fetchOptions,
+        fetchOptions
     }
     const apiClients = useMemo(() => {
         return {
@@ -91,7 +91,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperOrders: new ShopperOrders(config),
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
-            shopperSearch: new ShopperSearch(config),
+            shopperSearch: new ShopperSearch(config)
         }
     }, [clientId, organizationId, shortCode, siteId, proxy, fetchOptions])
 
@@ -103,7 +103,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             siteId,
             proxy,
             redirectURI,
-            fetchOptions,
+            fetchOptions
         })
     }, [clientId, organizationId, shortCode, siteId, proxy, redirectURI, fetchOptions])
 
@@ -123,7 +123,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 siteId,
                 shortCode,
                 locale,
-                currency,
+                currency
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>

@@ -75,7 +75,6 @@ function useProduct(
     return useQuery(
         ['product', arg],
         (_, {shopperProducts}) => {
-            console.log('getproduct')
             return shopperProducts.getProduct({parameters, headers}, rawResponse)
         },
         options
