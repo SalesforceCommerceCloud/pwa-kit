@@ -16,7 +16,7 @@ function UseShopperBaskets() {
     const updateBasket = useShopperBasketsMutation('updateBasket')
 
     const hasBasket = baskets.data?.total !== 0
-    const basketId = hasBasket ? baskets.data?.baskets![0].basketId! : ''
+    const basketId = baskets.data?.baskets ? baskets.data?.baskets[0].basketId : ''
 
     return (
         <>
@@ -26,9 +26,9 @@ function UseShopperBaskets() {
                     <button onClick={() => createBasket.mutate({body: {}})}>create basket</button>
                 </>
             )}
-            <UseBasket basketId={basketId} />
+            {basketId && <UseBasket basketId={basketId} />}
             <hr />
-            <UsePaymentMethodsForBasket basketId={basketId} />
+            {basketId && <UsePaymentMethodsForBasket basketId={basketId} />}
             <hr />
             {basketId && (
                 <>

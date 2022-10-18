@@ -100,7 +100,7 @@ export function useCustomerBaskets(
     const {headers, rawResponse, ...parameters} = arg
     const queryKey = ['/customers', parameters.customerId, '/baskets', arg]
     const defaultOptions = {
-        enabled: !!parameters.customerId,
+        enabled: !!parameters.customerId
     }
     return useQuery(
         queryKey,

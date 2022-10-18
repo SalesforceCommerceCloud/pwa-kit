@@ -8,7 +8,12 @@ import React, {ReactElement} from 'react'
 import path from 'path'
 import '@testing-library/jest-dom'
 import {mockHttpResponses, renderWithProviders} from '../../test-utils'
-import {useBasket, usePaymentMethodsForBasket, useShippingMethodsForShipment, useTaxesFromBasket} from './query'
+import {
+    useBasket,
+    usePaymentMethodsForBasket,
+    useShippingMethodsForShipment,
+    useTaxesFromBasket
+} from './query'
 import {screen, waitFor} from '@testing-library/react'
 
 const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
@@ -42,7 +47,7 @@ const PaymentMethodsForBasketComponent = ({basketId}: {basketId: string}): React
                     <p>payment methods:</p>
                     <ul>
                         {data?.applicablePaymentMethods?.map((paymentMethod) => (
-                            <li>{paymentMethod.id}</li>
+                            <li key={paymentMethod.id}>{paymentMethod.id}</li>
                         ))}
                     </ul>
                 </>
@@ -54,7 +59,7 @@ const PaymentMethodsForBasketComponent = ({basketId}: {basketId: string}): React
 
 const ShippingMethodsForShipmentComponent = ({
     basketId,
-    shipmentId,
+    shipmentId
 }: {
     basketId: string
     shipmentId: string
@@ -68,8 +73,8 @@ const ShippingMethodsForShipmentComponent = ({
                 <>
                     <p>shipping methods:</p>
                     <ul>
-                        {data?.applicableShippingMethods?.map((shippingMethod) => (
-                            <li>{shippingMethod.name}</li>
+                        {data?.applicableShippingMethods?.map((shippingMethod, i) => (
+                            <li key={i}>{shippingMethod.name}</li>
                         ))}
                     </ul>
                 </>
@@ -90,7 +95,7 @@ const TaxesFromBasketComponent = ({basketId}: {basketId: string}): ReactElement 
                     <p>taxes:</p>
                     <ul>
                         {Object.keys(data?.taxes).map((taxItemId) => (
-                            <li>{taxItemId}</li>
+                            <li key={taxItemId}>{taxItemId}</li>
                         ))}
                     </ul>
                 </>
@@ -118,7 +123,7 @@ const tests = [
                     expect(screen.getByText('customerId: ' + customerId)).toBeInTheDocument()
                     expect(screen.getByText('product total: ' + productTotal)).toBeInTheDocument()
                     expect(screen.getByText('currency: ' + currency)).toBeInTheDocument()
-                }),
+                })
             },
             {
                 name: 'returns error if basket not found',
@@ -130,9 +135,9 @@ const tests = [
                     await waitFor(() => screen.getByText('error'))
                     expect(screen.getByText('error')).toBeInTheDocument()
                     expect(screen.queryByText('Loading...')).toBeNull()
-                }),
-            },
-        ],
+                })
+            }
+        ]
     },
     {
         hook: 'usePaymentMethodsForBasket',
@@ -149,7 +154,7 @@ const tests = [
                     expect(screen.getByText(paymentMethodIds[0])).toBeInTheDocument()
                     expect(screen.getByText(paymentMethodIds[1])).toBeInTheDocument()
                     expect(screen.getByText(paymentMethodIds[2])).toBeInTheDocument()
-                }),
+                })
             },
             {
                 name: 'returns error if basket not found',
@@ -161,9 +166,9 @@ const tests = [
                     await waitFor(() => screen.getByText('error'))
                     expect(screen.getByText('error')).toBeInTheDocument()
                     expect(screen.queryByText('Loading...')).toBeNull()
-                }),
-            },
-        ],
+                })
+            }
+        ]
     },
     {
         hook: 'useShippingMethodsForShipment',
@@ -186,7 +191,7 @@ const tests = [
                     expect(screen.getByText(shipmentMethods[0])).toBeInTheDocument()
                     expect(screen.getByText(shipmentMethods[1])).toBeInTheDocument()
                     expect(screen.getByText(shipmentMethods[2])).toBeInTheDocument()
-                }),
+                })
             },
             {
                 name: 'returns error if basket not found',
@@ -204,9 +209,9 @@ const tests = [
                     await waitFor(() => screen.getByText('error'))
                     expect(screen.getByText('error')).toBeInTheDocument()
                     expect(screen.queryByText('Loading...')).toBeNull()
-                }),
-            },
-        ],
+                })
+            }
+        ]
     },
     {
         hook: 'useTaxesFromBasket',
@@ -215,37 +220,29 @@ const tests = [
                 name: 'returns taxes from basket',
                 assertions: withMocks(async () => {
                     const basketId = '123'
-                    renderWithProviders(
-                        <TaxesFromBasketComponent
-                            basketId={basketId}
-                        />
-                    )
+                    renderWithProviders(<TaxesFromBasketComponent basketId={basketId} />)
                     const taxItemIds = ['abc123', 'xyz456']
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText(taxItemIds[0]))
                     expect(screen.getByText(taxItemIds[0])).toBeInTheDocument()
                     expect(screen.getByText(taxItemIds[1])).toBeInTheDocument()
-                }),
+                })
             },
             {
                 name: 'returns error if basket not found',
                 assertions: withMocks(async () => {
                     const basketId = '123'
-                    renderWithProviders(
-                        <TaxesFromBasketComponent
-                            basketId={basketId}
-                        />
-                    )
+                    renderWithProviders(<TaxesFromBasketComponent basketId={basketId} />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText('error'))
                     expect(screen.getByText('error')).toBeInTheDocument()
                     expect(screen.queryByText('Loading...')).toBeNull()
-                }),
-            },
-        ],
-    },
+                })
+            }
+        ]
+    }
 ]
 
 tests.forEach(({hook, cases}) => {

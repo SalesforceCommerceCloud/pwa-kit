@@ -328,11 +328,10 @@ the body are the following properties if specified:
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasket} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasket} for more information on the parameters and returned data type.
      */
-    AddTaxesForBasket: 'addTaxesForBasket',
+    AddTaxesForBasket: 'addTaxesForBasket'
 } as const
 
-type ShopperBasketMutationType =
-    typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
+type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
 /**
  * A hook for performing mutations with the Shopper Baskets API.
@@ -359,7 +358,7 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
                         queryClient.invalidateQueries([
                             '/customers',
                             data.customerInfo?.customerId,
-                            '/baskets',
+                            '/baskets'
                         ])
                         queryClient.setQueryData(['/baskets', data.basketId], data)
                     }
@@ -371,7 +370,7 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
                     // invalidate all cache entries that are related to the basket
                     queryClient.invalidateQueries(['/baskets', params?.parameters?.basketId])
                 }
-            },
+            }
         }
     )
 }

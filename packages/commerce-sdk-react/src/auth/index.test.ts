@@ -17,7 +17,7 @@ import jwt from 'jsonwebtoken'
 
 jest.mock('./storage', () => {
     return {
-        CookieStorage: jest.fn(function () {
+        CookieStorage: jest.fn(function() {
             const map = new Map()
             return {
                 set(key: string, value: string) {
@@ -28,10 +28,10 @@ jest.mock('./storage', () => {
                 },
                 delete(key: string) {
                     map.delete(key)
-                },
+                }
             }
         }),
-        LocalStorage: jest.fn(function () {
+        LocalStorage: jest.fn(function() {
             const map = new Map()
             return {
                 set(key: string, value: string) {
@@ -39,9 +39,9 @@ jest.mock('./storage', () => {
                 },
                 get(key: string) {
                     return map.get(key)
-                },
+                }
             }
-        }),
+        })
     }
 })
 
@@ -59,8 +59,8 @@ jest.mock('commerce-sdk-isomorphic', () => {
             refreshAccessToken: mockRefreshAccessToken,
             loginGuestUser: mockLoginGuestUser,
             loginRegisteredUserB2C: mockLoginRegisteredUserB2C,
-            logout: mockLogout,
-        },
+            logout: mockLogout
+        }
     }
 })
 
@@ -75,7 +75,7 @@ const config = {
     shortCode: 'shortCode',
     siteId: 'siteId',
     proxy: 'proxy',
-    redirectURI: 'redirectURI',
+    redirectURI: 'redirectURI'
 }
 
 describe('Auth', () => {
@@ -123,7 +123,7 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid',
+            usid: 'usid'
         }
         const {refresh_token_guest, ...result} = {...sample, refresh_token: 'refresh_token_guest'}
 
@@ -167,7 +167,7 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid',
+            usid: 'usid'
         }
         // @ts-expect-error private method
         auth.pendingToken = Promise.resolve(data)
@@ -186,7 +186,7 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid',
+            usid: 'usid'
         }
         const {refresh_token_guest, ...result} = {...data, refresh_token: 'refresh_token_guest'}
 
@@ -209,7 +209,7 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid',
+            usid: 'usid'
         }
         const {refresh_token_guest, ...result} = {...data, refresh_token: 'refresh_token_guest'}
 

@@ -37,7 +37,7 @@ function useBasket(
 ): UseQueryResult<DataType<Client['getBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     const defaultOptions = {
-        enabled: !!parameters.basketId,
+        enabled: !!parameters.basketId
     }
     return useQuery(
         ['/baskets', parameters.basketId, arg],
@@ -77,7 +77,7 @@ function usePaymentMethodsForBasket(
 ): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     const defaultOptions = {
-        enabled: !!parameters.basketId,
+        enabled: !!parameters.basketId
     }
     return useQuery(
         ['/baskets', parameters.basketId, '/payment-methods', arg],
@@ -118,7 +118,7 @@ function usePriceBooksForBasket(
 ): UseQueryResult<DataType<Client['getPriceBooksForBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     const defaultOptions = {
-        enabled: !!parameters.basketId,
+        enabled: !!parameters.basketId
     }
     return useQuery(
         ['/baskets', parameters.basketId, '/price-books', arg],
@@ -159,7 +159,7 @@ function useShippingMethodsForShipment(
 ): UseQueryResult<DataType<Client['getShippingMethodsForShipment']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     const defaultOptions = {
-        enabled: !!parameters.basketId && !!parameters.shipmentId,
+        enabled: !!parameters.basketId && !!parameters.shipmentId
     }
     return useQuery(
         [
@@ -168,7 +168,7 @@ function useShippingMethodsForShipment(
             '/shipments',
             parameters.shipmentId,
             '/shipping-methods',
-            arg,
+            arg
         ],
         (_, {shopperBaskets}) =>
             shopperBaskets.getShippingMethodsForShipment({parameters, headers}, rawResponse),
@@ -205,7 +205,7 @@ function useTaxesFromBasket(
 ): UseQueryResult<DataType<Client['getTaxesFromBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     const defaultOptions = {
-        enabled: !!parameters.basketId,
+        enabled: !!parameters.basketId
     }
     return useQuery(
         ['/baskets', parameters.basketId, '/taxes', arg],
@@ -220,5 +220,5 @@ export {
     usePaymentMethodsForBasket,
     usePriceBooksForBasket,
     useShippingMethodsForShipment,
-    useTaxesFromBasket,
+    useTaxesFromBasket
 }
