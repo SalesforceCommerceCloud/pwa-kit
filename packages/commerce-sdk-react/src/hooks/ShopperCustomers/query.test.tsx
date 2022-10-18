@@ -7,16 +7,8 @@
 import React, {ReactElement, useEffect} from 'react'
 import path from 'path'
 import {mockHttpResponses, renderWithProviders, withRegisteredUser} from '../../test-utils'
-import {
-    useCustomer,
-    useCustomerAddress,
-    useCustomerBaskets,
-    useCustomerOrders,
-    useCustomerProductList
-} from './query'
+import {useCustomer} from './query'
 import {screen, waitFor} from '@testing-library/react'
-import {useQueryClient} from '@tanstack/react-query'
-import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 
 const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
 
@@ -28,7 +20,7 @@ const CustomerComponent = ({
 }: {
     customerId: string
     loginRegisteredUser: any
-}): React.ReactElement => {
+}): ReactElement => {
     const {data, isLoading, error} = useCustomer(
         {customerId},
         {
