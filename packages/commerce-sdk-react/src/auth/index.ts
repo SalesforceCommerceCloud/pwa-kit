@@ -104,9 +104,8 @@ const DATA_MAP: AuthDataMap = {
         }
     },
     site_id: {
-        // do we need this be a cookie to support plugin_slas?
-        storage: localStorage,
-        key: 'site_id'
+        storage: cookieStorage,
+        key: 'cc-site-id'
     }
 }
 
@@ -164,9 +163,8 @@ class Auth {
 
     private clearStorage() {
         Object.keys(DATA_MAP).forEach((key) => {
-            DATA_MAP[key as keyof typeof DATA_MAP].storage.delete(
-                DATA_MAP[key as keyof typeof DATA_MAP].key
-            )
+            type Key = keyof AuthDataMap
+            DATA_MAP[key as Key].storage.delete(DATA_MAP[key as Key].key)
         })
     }
 
