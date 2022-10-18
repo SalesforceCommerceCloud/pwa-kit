@@ -37,7 +37,7 @@ function useBasket(
 ): UseQueryResult<DataType<Client['getBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['basket', parameters.basketId, arg],
+        ['/baskets', parameters.basketId, arg],
         (_, {shopperBaskets}) => shopperBaskets.getBasket({parameters, headers}, rawResponse),
         options
     )
@@ -74,7 +74,7 @@ function usePaymentMethodsForBasket(
 ): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['basket', parameters.basketId, 'payment-method', arg],
+        ['/baskets', parameters.basketId, '/payment-methods', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getPaymentMethodsForBasket({parameters, headers}, rawResponse),
         options
@@ -112,7 +112,7 @@ function usePriceBooksForBasket(
 ): UseQueryResult<DataType<Client['getPriceBooksForBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['basket', parameters.basketId, 'price-books', arg],
+        ['/baskets', parameters.basketId, '/price-books', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getPriceBooksForBasket({parameters, headers}, rawResponse),
         options
@@ -150,7 +150,14 @@ function useShippingMethodsForShipment(
 ): UseQueryResult<DataType<Client['getShippingMethodsForShipment']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['basket', parameters.basketId, 'shipping-methods', arg],
+        [
+            '/baskets',
+            parameters.basketId,
+            '/shipments',
+            parameters.shipmentId,
+            '/shipping-methods',
+            arg,
+        ],
         (_, {shopperBaskets}) =>
             shopperBaskets.getShippingMethodsForShipment({parameters, headers}, rawResponse),
         options
@@ -186,7 +193,7 @@ function useTaxesFromBasket(
 ): UseQueryResult<DataType<Client['getTaxesFromBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['basket', parameters.basketId, 'taxes', arg],
+        ['/baskets', parameters.basketId, '/taxes', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getTaxesFromBasket({parameters, headers}, rawResponse),
         options

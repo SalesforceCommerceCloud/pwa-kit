@@ -353,18 +353,18 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
                 if (action === 'createBasket') {
                     if ('customerInfo' in data && data.customerInfo?.customerId) {
                         queryClient.invalidateQueries([
-                            'customer',
+                            '/customers',
                             data.customerInfo?.customerId,
-                            'baskets',
+                            '/baskets',
                         ])
-                        queryClient.setQueryData(['basket', data.basketId], data)
+                        queryClient.setQueryData(['/baskets', data.basketId], data)
                     }
                 }
 
                 // @ts-ignore some action doesn't have basketId as parameter, like createBasket
                 if (params?.parameters?.basketId) {
                     // @ts-ignore
-                    queryClient.invalidateQueries(['basket', params?.parameters?.basketId])
+                    queryClient.invalidateQueries(['/baskets', params?.parameters?.basketId])
                 }
             },
         }

@@ -5,16 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useCustomerBaskets, useShopperBasketsMutation} from 'commerce-sdk-react'
+import {useCustomerBaskets, useShopperBasketsMutation, useCustomerId} from 'commerce-sdk-react'
 import {UseBasket} from '../components/use-shopper-baskets/use-basket'
 import {UsePaymentMethodsForBasket} from '../components/use-shopper-baskets/use-payment-method-for-basket'
-import {UseShippingMethodsForShipment} from '../components/use-shopper-baskets/use-shipping-methods-for-shipment'
-import {UseTaxesFromBasket} from '../components/use-shopper-baskets/use-taxes-from-basket'
-
-// TODO: need a mechanism to get current customer id
-const customerId = 'ablbkWleoXwKgRwuoZwWYYmrw3'
 
 function UseShopperBaskets() {
+    const customerId = useCustomerId() || ''
     const baskets = useCustomerBaskets({customerId})
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
@@ -54,8 +50,6 @@ function UseShopperBaskets() {
                     <hr />
                 </>
             )}
-
-            {/* <UseTaxesFromBasket basketId={basketId} /> */}
         </>
     )
 }
