@@ -144,7 +144,9 @@ class Auth {
         }
 
         if (!this.get('site_id')) {
-            this.set('site_id', config.siteId)
+            this.set('site_id', config.siteId, {
+                expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
+            })
         }
 
         this.redirectURI = config.redirectURI
