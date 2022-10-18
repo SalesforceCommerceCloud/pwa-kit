@@ -37,6 +37,7 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'token_type'
     | 'usid'
+    | 'site_id'
 type AuthDataMap = Record<
     AuthDataKeys,
     {
@@ -101,6 +102,11 @@ const DATA_MAP: AuthDataMap = {
         callback: () => {
             cookieStorage.delete('cc-nx-g')
         }
+    },
+    site_id: {
+        // do we need this be a cookie to support plugin_slas?
+        storage: localStorage,
+        key: 'site_id'
     }
 }
 
@@ -131,6 +137,16 @@ class Auth {
             fetchOptions: config.fetchOptions
         })
 
+        if (this.get('site_id') && this.get('site_id') !== config.siteId) {
+            // if site is switched, remove all existing auth data in storage
+            // and restart the auth flow
+            this.clearStorage()
+        }
+
+        if (!this.get('site_id')) {
+            this.set('site_id', config.siteId)
+        }
+
         this.redirectURI = config.redirectURI
     }
 
@@ -144,6 +160,14 @@ class Auth {
         const {key, storage} = DATA_MAP[name]
         storage.set(key, value, options)
         DATA_MAP[name].callback?.()
+    }
+
+    private clearStorage() {
+        Object.keys(DATA_MAP).forEach((key) => {
+            DATA_MAP[key as keyof typeof DATA_MAP].storage.delete(
+                DATA_MAP[key as keyof typeof DATA_MAP].key
+            )
+        })
     }
 
     /**
