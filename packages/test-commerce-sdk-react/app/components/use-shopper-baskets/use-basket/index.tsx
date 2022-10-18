@@ -3,7 +3,7 @@ import Json from '../../Json'
 import {useBasket} from 'commerce-sdk-react'
 
 export const UseBasket = ({basketId}: {basketId: string}): ReactElement => {
-    const {isLoading, error, data} = useBasket({basketId})
+    const {isLoading, error, data} = useBasket({basketId}, {enabled: !!basketId})
 
     if (isLoading) {
         return (
@@ -26,7 +26,9 @@ export const UseBasket = ({basketId}: {basketId: string}): ReactElement => {
                     <p>currency: {data?.currency}</p>
                     <p>product total: {data?.productTotal}</p>
                     <ul>
-                        {data?.productItems?.map((productItem) => <li>{productItem.itemText}</li>) }
+                        {data?.productItems?.map((productItem) => (
+                            <li>{productItem.itemText}</li>
+                        ))}
                     </ul>
                     <hr />
                     <div>

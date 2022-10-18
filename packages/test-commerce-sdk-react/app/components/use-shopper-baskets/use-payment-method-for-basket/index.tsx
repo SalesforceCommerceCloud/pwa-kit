@@ -3,7 +3,7 @@ import Json from '../../Json'
 import {usePaymentMethodsForBasket} from 'commerce-sdk-react'
 
 export const UsePaymentMethodsForBasket = ({basketId}: {basketId: string}): ReactElement => {
-    const {isLoading, error, data} = usePaymentMethodsForBasket({basketId})
+    const {isLoading, error, data} = usePaymentMethodsForBasket({basketId}, {enabled: !!basketId})
 
     if (isLoading) {
         return (
@@ -25,7 +25,10 @@ export const UsePaymentMethodsForBasket = ({basketId}: {basketId: string}): Reac
                     <p>payment methods:</p>
                     <ul>
                         {data?.applicablePaymentMethods?.map((paymentMethod) => (
-                            <li>{paymentMethod.id} | {paymentMethod.name} | {paymentMethod.description}</li>
+                            <li>
+                                {paymentMethod.id} | {paymentMethod.name} |{' '}
+                                {paymentMethod.description}
+                            </li>
                         ))}
                     </ul>
                     <hr />

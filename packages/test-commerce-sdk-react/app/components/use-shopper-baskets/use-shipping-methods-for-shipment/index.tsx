@@ -9,7 +9,10 @@ export const UseShippingMethodsForShipment = ({
     basketId: string
     shipmentId: string
 }): ReactElement => {
-    const {isLoading, error, data} = useShippingMethodsForShipment({basketId, shipmentId})
+    const {isLoading, error, data} = useShippingMethodsForShipment(
+        {basketId, shipmentId},
+        {enabled: !!basketId}
+    )
 
     if (isLoading) {
         return (

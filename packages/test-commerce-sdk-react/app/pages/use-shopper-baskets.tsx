@@ -7,8 +7,11 @@
 import React from 'react'
 import {UseBasket} from '../components/use-shopper-baskets/use-basket'
 import {UsePaymentMethodsForBasket} from '../components/use-shopper-baskets/use-payment-method-for-basket'
-import { UseShippingMethodsForShipment } from '../components/use-shopper-baskets/use-shipping-methods-for-shipment'
-import { UseTaxesFromBasket } from '../components/use-shopper-baskets/use-taxes-from-basket'
+import {UseShippingMethodsForShipment} from '../components/use-shopper-baskets/use-shipping-methods-for-shipment'
+import {UseTaxesFromBasket} from '../components/use-shopper-baskets/use-taxes-from-basket'
+
+// TODO: to be replaced by useCustomer
+const customerId = 'abmbgWkKdGxbsRxuhKlWYYkbEY'
 
 function UseShopperBaskets() {
     return (
@@ -17,9 +20,9 @@ function UseShopperBaskets() {
             <hr />
             <UsePaymentMethodsForBasket basketId="123" />
             <hr />
-            <UseShippingMethodsForShipment basketId='123' shipmentId='ship123' />
+            {/* <UseShippingMethodsForShipment basketId='123' shipmentId='ship123' /> */}
             <hr />
-            <UseTaxesFromBasket basketId='123' />
+            <UseTaxesFromBasket basketId="123" />
         </>
     )
 }

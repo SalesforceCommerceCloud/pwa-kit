@@ -3,7 +3,7 @@ import Json from '../../Json'
 import {useTaxesFromBasket} from 'commerce-sdk-react'
 
 export const UseTaxesFromBasket = ({basketId}: {basketId: string}): ReactElement => {
-    const {isLoading, error, data} = useTaxesFromBasket({basketId})
+    const {isLoading, error, data} = useTaxesFromBasket({basketId}, {enabled: !!basketId})
 
     if (isLoading) {
         return (
