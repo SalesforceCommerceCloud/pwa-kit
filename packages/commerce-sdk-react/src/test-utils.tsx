@@ -12,7 +12,6 @@ import React, {useEffect} from 'react'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 import {QueryClient, QueryClientProvider, useQueryClient} from '@tanstack/react-query'
 import {ShopperLoginHelpers, useShopperLoginHelper} from './hooks'
-import exp from 'constants'
 
 export const TEST_CONFIG = {
     proxy: 'http://localhost:3000/mobify/proxy/api',
@@ -42,7 +41,7 @@ const TestProviders = (props: {
     )
 }
 interface Props {
-    comp: React.ElementType // 👈️ type it as React.ElementType
+    comp: React.ElementType
 }
 
 // TODO: fix the type
