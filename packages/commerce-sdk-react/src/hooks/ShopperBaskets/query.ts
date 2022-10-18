@@ -36,10 +36,13 @@ function useBasket(
     options?: UseQueryOptions<DataType<Client['getBasket']> | Response, Error>
 ): UseQueryResult<DataType<Client['getBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const defaultOptions = {
+        enabled: !!parameters.basketId,
+    }
     return useQuery(
         ['/baskets', parameters.basketId, arg],
         (_, {shopperBaskets}) => shopperBaskets.getBasket({parameters, headers}, rawResponse),
-        options
+        {...defaultOptions, ...options}
     )
 }
 
@@ -73,11 +76,14 @@ function usePaymentMethodsForBasket(
     options?: UseQueryOptions<DataType<Client['getPaymentMethodsForBasket']> | Response, Error>
 ): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const defaultOptions = {
+        enabled: !!parameters.basketId,
+    }
     return useQuery(
         ['/baskets', parameters.basketId, '/payment-methods', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getPaymentMethodsForBasket({parameters, headers}, rawResponse),
-        options
+        {...defaultOptions, ...options}
     )
 }
 
@@ -111,11 +117,14 @@ function usePriceBooksForBasket(
     options?: UseQueryOptions<DataType<Client['getPriceBooksForBasket']> | Response, Error>
 ): UseQueryResult<DataType<Client['getPriceBooksForBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const defaultOptions = {
+        enabled: !!parameters.basketId,
+    }
     return useQuery(
         ['/baskets', parameters.basketId, '/price-books', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getPriceBooksForBasket({parameters, headers}, rawResponse),
-        options
+        {...defaultOptions, ...options}
     )
 }
 
@@ -149,6 +158,9 @@ function useShippingMethodsForShipment(
     options?: UseQueryOptions<DataType<Client['getShippingMethodsForShipment']> | Response, Error>
 ): UseQueryResult<DataType<Client['getShippingMethodsForShipment']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const defaultOptions = {
+        enabled: !!parameters.basketId && !!parameters.shipmentId,
+    }
     return useQuery(
         [
             '/baskets',
@@ -160,7 +172,7 @@ function useShippingMethodsForShipment(
         ],
         (_, {shopperBaskets}) =>
             shopperBaskets.getShippingMethodsForShipment({parameters, headers}, rawResponse),
-        options
+        {...defaultOptions, ...options}
     )
 }
 
@@ -192,11 +204,14 @@ function useTaxesFromBasket(
     options?: UseQueryOptions<DataType<Client['getTaxesFromBasket']> | Response, Error>
 ): UseQueryResult<DataType<Client['getTaxesFromBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const defaultOptions = {
+        enabled: !!parameters.basketId,
+    }
     return useQuery(
         ['/baskets', parameters.basketId, '/taxes', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getTaxesFromBasket({parameters, headers}, rawResponse),
-        options
+        {...defaultOptions, ...options}
     )
 }
 

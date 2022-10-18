@@ -350,7 +350,11 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
         },
         {
             onSuccess: (data, params) => {
-                if (action === 'createBasket') {
+                if (
+                    action === 'createBasket' ||
+                    action === 'transferBasket' ||
+                    action === 'mergeBasket'
+                ) {
                     if ('customerInfo' in data && data.customerInfo?.customerId) {
                         queryClient.invalidateQueries([
                             '/customers',
@@ -364,6 +368,7 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
                 // @ts-ignore some action doesn't have basketId as parameter, like createBasket
                 if (params?.parameters?.basketId) {
                     // @ts-ignore
+                    // invalidate all cache entries that are related to the basket
                     queryClient.invalidateQueries(['/baskets', params?.parameters?.basketId])
                 }
             },

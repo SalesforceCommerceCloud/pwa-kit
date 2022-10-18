@@ -98,7 +98,10 @@ export function useCustomerBaskets(
 ) {
     const queryClient = useQueryClient()
     const {headers, rawResponse, ...parameters} = arg
-    const queryKey = ['customer', parameters.customerId, 'baskets', arg]
+    const queryKey = ['/customers', parameters.customerId, '/baskets', arg]
+    const defaultOptions = {
+        enabled: !!parameters.customerId,
+    }
     return useQuery(
         queryKey,
         async (_, {shopperCustomers}) => {
@@ -111,13 +114,13 @@ export function useCustomerBaskets(
             // Pre-populate the basket cache.
             if (baskets && 'baskets' in baskets && baskets.baskets) {
                 baskets.baskets.forEach((basket) => {
-                    queryClient.setQueryData(['basket', basket.basketId], basket)
+                    queryClient.setQueryData(['/baskets', basket.basketId], basket)
                 })
             }
 
             return baskets
         },
-        options
+        {...defaultOptions, ...options}
     )
 }
 /**
