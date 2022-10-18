@@ -64,4 +64,5 @@ export default App
 -   [Launch Your Storefront](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/launching-your-storefront.html)
 
 ## Support Policy
-Customers on existing support contracts are entitled to bug fixes and updates to previous SDK versions, for a period of 24 months from the time of a given version’s General Availability release.
+Customers on existing support contracts are entitled to bug fixes and updates to the latest versions of each major SDK versions,
+for a period of 24 months from the time of a given version’s General Availability release.
