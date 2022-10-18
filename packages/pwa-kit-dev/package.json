@@ -85,7 +85,7 @@
     "jest-expect-message": "1.0.0",
     "jest-fetch-mock": "^2.1.2",
     "mime-types": "2.1.32",
-    "minimatch": "3.0.4",
+    "minimatch": "3.0.5",
     "morgan": "1.9.1",
     "open": "^8.4.0",
     "prettier": "^1.18.2",
