@@ -15,7 +15,6 @@ import {
 } from 'commerce-sdk-react'
 const orderNos = ['00014202', '00014103']
 const ORDER_NO = '00014103'
-const PAYMENT_ID = '1aad877d58e7db0ffc1e44dd12'
 const BANK_ROUTING = '123456'
 
 const renderMutationHooks = ({name, hook, body, parameters}: any) => {
@@ -56,18 +55,19 @@ function UseShopperOrders() {
         // },
         {
             action: 'createPaymentInstrumentForOrder',
-            body: {amount: 700, paymentMethodId: 'CREDIT_CARD', bankRoutingNumber: BANK_ROUTING},
+            body: {amount: 700, paymentMethodId: 'GIFT_CERTIFICATE', bankRoutingNumber: BANK_ROUTING},
             parameters: {orderNo: ORDER_NO}
         },
         {
-            action: 'removePaymentInstrumentForOrder',
+            //need to input a valid paymentInstrumentId from order details
+            action: 'removePaymentInstrumentFromOrder',
             body: {},
-            parameters: {orderNo: ORDER_NO, paymentInstrumentId: PAYMENT_ID}
+            parameters: {orderNo: ORDER_NO, paymentInstrumentId: ''}
         },
         {
             action: 'updatePaymentInstrumentForOrder',
-            body: {bankRoutingNumber: BANK_ROUTING},
-            parameters: {orderNo: ORDER_NO, paymentInstrumentId: PAYMENT_ID}
+            body: {bankRoutingNumber: BANK_ROUTING, paymentMethodId: 'PayPal'},
+            parameters: {orderNo: ORDER_NO, paymentInstrumentId: '5db799461deeaccf700ea4f125'}
         }
     ].map(({action, body, parameters}) => {
         return {

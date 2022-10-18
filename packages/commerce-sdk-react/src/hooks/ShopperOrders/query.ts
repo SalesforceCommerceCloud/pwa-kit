@@ -87,6 +87,17 @@ function usePaymentMethodsForOrder(
     )
 }
 
+type UseTaxesParameters = NonNullable<
+    Argument<Client['getTaxesFromOrder']>
+>['parameters']
+type UseTaxesHeaders = NonNullable<
+    Argument<Client['getTaxesFromOrder']>
+>['headers']
+type UseTaxesArg = {
+    headers?: UseTaxesHeaders
+    rawResponse?: boolean
+} & UseTaxesParameters
+
 /**
  * A hook for `ShopperOrders#getTaxesFromOrder`.
  * This method gives you the external taxation data of the order transferred from the basket during
@@ -96,11 +107,26 @@ for more information.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#gettaxesfromorder} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useTaxesFromOrder = (
-    arg: Argument<Client['getTaxesFromOrder']>
-): UseQueryResult<DataType<Client['getTaxesFromOrder']>, Error> => {
-    const {shopperOrders: client} = useCommerceApi()
-    return useQuery([], () => client.getTaxesFromOrder(arg))
+function useTaxesFromOrder(
+    arg: Omit<UseTaxesArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getTaxesFromOrder']> | Response, Error>
+): UseQueryResult<DataType<Client['getTaxesFromOrder']>, Error>
+function useTaxesFromOrder(
+    arg: Omit<UseTaxesArg, 'rawResponse'> & {rawResponse: true},
+    options?: UseQueryOptions<DataType<Client['getTaxesFromOrder']> | Response, Error>
+): UseQueryResult<Response, Error>
+function useTaxesFromOrder(
+    arg: UseTaxesArg,
+    options?: UseQueryOptions<DataType<Client['getTaxesFromOrder']> | Response, Error>
+): UseQueryResult<DataType<Client['getTaxesFromOrder']> | Response, Error> {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        ['taxes', arg],
+        (_, {shopperOrders}) => {
+            return shopperOrders.getTaxesFromOrder({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
 
-export {useOrder, usePaymentMethodsForOrder}
+export {useOrder, usePaymentMethodsForOrder, useTaxesFromOrder}
