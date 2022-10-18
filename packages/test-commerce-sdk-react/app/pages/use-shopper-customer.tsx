@@ -27,7 +27,7 @@ const RANDOM_STR = Math.random()
     .toString(36)
     .slice(2, 7)
 
-const renderQueryHooks = (name: string, {data, isLoading, error}: any) => {
+const renderQueryHook = (name: string, {data, isLoading, error}: any) => {
     if (isLoading) {
         return (
             <div key={name}>
@@ -53,7 +53,7 @@ const renderQueryHooks = (name: string, {data, isLoading, error}: any) => {
     )
 }
 
-const renderMutationHooks = ({name, hook, body, parameters}: any) => {
+const renderMutationHook = ({name, hook, body, parameters}: any) => {
     return (
         <div key={name}>
             <h2 id={name}>{name}</h2>
@@ -225,13 +225,13 @@ function UseCustomer() {
                     <div>
                         <h1>Mutation hooks</h1>
                         {mutationHooks.map((mutation) => {
-                            return renderMutationHooks({...mutation})
+                            return renderMutationHook({...mutation})
                         })}
                     </div>
                     <div>
                         <h1>Query hooks</h1>
                         {queryHooks.map(({name, hook}) => {
-                            return renderQueryHooks(name, {...hook})
+                            return renderQueryHook(name, {...hook})
                         })}
                     </div>
                 </>
