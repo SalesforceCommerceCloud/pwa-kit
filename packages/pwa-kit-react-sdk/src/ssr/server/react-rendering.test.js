@@ -9,7 +9,9 @@
  */
 /* eslint-disable header/header */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
+import {randomUUID} from 'crypto'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
+
 import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
@@ -57,6 +59,7 @@ jest.mock('../universal/routes', () => {
     const {Redirect} = require('react-router-dom')
     const {Helmet} = require('react-helmet')
     const {useQuery} = require('@tanstack/react-query')
+    const {useServerContext} = require('../universal/hooks')
 
     // Test utility to exercise paths that work with @loadable/component.
     const fakeLoadable = (Wrapped) => {
@@ -260,6 +263,15 @@ jest.mock('../universal/routes', () => {
         return <div>{isLoading ? 'loading' : data.prop}</div>
     }
 
+    const GetServerContext = () => {
+        const {res, isServerSide} = useServerContext()
+        if (isServerSide) {
+            console.log('--- isServerSide')
+            res.status(404)
+        }
+        return <div />
+    }
+
     GetPropsReturnsObject.propTypes = {
         prop: PropTypes.node
     }
@@ -322,6 +334,10 @@ jest.mock('../universal/routes', () => {
             {
                 path: '/disabled-use-query-isnt-resolved/',
                 component: DisabledUseQueryIsntResolved
+            },
+            {
+                path: '/server-context',
+                component: GetServerContext
             }
         ]
     }
@@ -348,6 +364,17 @@ jest.mock('@loadable/server', () => {
                 collectChunks: jest.fn().mockImplementation((x) => x),
                 getScriptElements: jest.fn().mockReturnValue([])
             }
+        }
+    }
+})
+
+jest.mock('pwa-kit-runtime/ssr/server/build-remote-server', () => {
+    const actual = jest.requireActual('pwa-kit-runtime/ssr/server/build-remote-server')
+    return {
+        ...actual,
+        RemoteServerFactory: {
+            ...actual.RemoteServerFactory,
+            _setRequestId: jest.fn()
         }
     }
 })
@@ -679,11 +706,30 @@ describe('The Node SSR Environment', () => {
                 const html = res.text
                 expect(html).toEqual(expect.stringContaining('<div>loading</div>'))
             }
+        },
+        {
+            description: 'Get the server context and set the response status to 404',
+            req: {url: '/server-context'},
+            mocks: () => {
+                jest.spyOn(console, 'log')
+            },
+            assertions: (res) => {
+                expect(res.statusCode).toBe(404)
+
+                // Expect the console.log to be called only once, even though the component
+                // is going to be rendered twice on the server (on prepass and then 2nd pass)
+                expect(console.log).toHaveBeenCalledTimes(1)
+            }
         }
     ]
 
     const isRemoteValues = [true, false]
-
+    RemoteServerFactory._setRequestId.mockImplementation((_app) => {
+        _app.use((req, res, next) => {
+            res.locals.requestId = randomUUID()
+            next()
+        })
+    })
     isRemoteValues.forEach((isRemoteValue) => {
         // Run test cases
         cases.forEach(({description, req, assertions, mocks}) => {
@@ -696,6 +742,7 @@ describe('The Node SSR Environment', () => {
 
                 const {url, headers, query} = req
                 const app = RemoteServerFactory._createApp(opts())
+
                 app.get('/*', render)
                 if (mocks) {
                     mocks()

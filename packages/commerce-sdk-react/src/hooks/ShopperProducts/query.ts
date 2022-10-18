@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
@@ -31,14 +31,11 @@ function useProducts(
 function useProducts(
     arg: UseProductsArg,
     options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
-) {
-    if (!arg.ids) {
-        throw new Error('ids is required for useProducts')
-    }
+): UseQueryResult<DataType<Client['getProducts']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['products', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getProducts({parameters, headers}, rawResponse)
         },
         options
@@ -67,13 +64,10 @@ function useProduct(
     arg: UseProductArg,
     options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
 ): UseQueryResult<DataType<Client['getProduct']> | Response, Error> {
-    if (!arg.id) {
-        throw new Error('id is required for useProduct.')
-    }
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['product', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getProduct({parameters, headers}, rawResponse)
         },
         options
@@ -105,13 +99,10 @@ function useCategories(
     arg: UseCategoriesArg,
     options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategories']> | Response, Error> {
-    if (!arg.ids) {
-        throw new Error('ids is required for useCategories')
-    }
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['categories', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getCategories({parameters, headers}, rawResponse)
         },
         options
@@ -146,9 +137,9 @@ function useCategory(
     options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategory']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['category', arg],
-        ({shopperProducts}) => {
+        (_, {shopperProducts}) => {
             return shopperProducts.getCategory({parameters, headers}, rawResponse)
         },
         options

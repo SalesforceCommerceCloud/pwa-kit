@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, Argument, DataType} from '../types'
-import {useAsync} from '../useAsync'
+import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperBaskets']
@@ -36,9 +36,9 @@ function useBasket(
     options?: UseQueryOptions<DataType<Client['getBasket']> | Response, Error>
 ): UseQueryResult<DataType<Client['getBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['baskets', arg],
-        ({shopperBaskets}) => shopperBaskets.getBasket({parameters, headers}, rawResponse),
+        (_, {shopperBaskets}) => shopperBaskets.getBasket({parameters, headers}, rawResponse),
         options
     )
 }
@@ -73,9 +73,9 @@ function usePaymentMethodsForBasket(
     options?: UseQueryOptions<DataType<Client['getPaymentMethodsForBasket']> | Response, Error>
 ): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['payment-methods', arg],
-        ({shopperBaskets}) =>
+        (_, {shopperBaskets}) =>
             shopperBaskets.getPaymentMethodsForBasket({parameters, headers}, rawResponse),
         options
     )
@@ -111,9 +111,9 @@ function usePriceBooksForBasket(
     options?: UseQueryOptions<DataType<Client['getPriceBooksForBasket']> | Response, Error>
 ): UseQueryResult<DataType<Client['getPriceBooksForBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['price-books', arg],
-        ({shopperBaskets}) =>
+        (_, {shopperBaskets}) =>
             shopperBaskets.getPriceBooksForBasket({parameters, headers}, rawResponse),
         options
     )
@@ -149,9 +149,9 @@ function useShippingMethodsForShipment(
     options?: UseQueryOptions<DataType<Client['getShippingMethodsForShipment']> | Response, Error>
 ): UseQueryResult<DataType<Client['getShippingMethodsForShipment']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['shipping-methods'],
-        ({shopperBaskets}) =>
+        (_, {shopperBaskets}) =>
             shopperBaskets.getShippingMethodsForShipment({parameters, headers}, rawResponse),
         options
     )
@@ -185,11 +185,18 @@ function useTaxesFromBasket(
     options?: UseQueryOptions<DataType<Client['getTaxesFromBasket']> | Response, Error>
 ): UseQueryResult<DataType<Client['getTaxesFromBasket']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    return useAsync(
+    return useQuery(
         ['taxes', arg],
-        ({shopperBaskets}) => shopperBaskets.getTaxesFromBasket({parameters, headers}, rawResponse),
+        (_, {shopperBaskets}) =>
+            shopperBaskets.getTaxesFromBasket({parameters, headers}, rawResponse),
         options
     )
 }
 
-export {useBasket, usePaymentMethodsForBasket, usePriceBooksForBasket, useShippingMethodsForShipment, useTaxesFromBasket}
+export {
+    useBasket,
+    usePaymentMethodsForBasket,
+    usePriceBooksForBasket,
+    useShippingMethodsForShipment,
+    useTaxesFromBasket,
+}

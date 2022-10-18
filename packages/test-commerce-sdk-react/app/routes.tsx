@@ -12,48 +12,63 @@ const UseProduct = loadable(() => import('./pages/use-shopper-product'))
 const UseCategories = loadable(() => import('./pages/use-shopper-categories'))
 const UseCategory = loadable(() => import('./pages/use-shopper-category'))
 const UseProductSearch = loadable(() => import('./pages/use-product-search'))
+const UsePromotions = loadable(() => import('./pages/use-promotions'))
+const UsePromotionsForCampaign = loadable(() => import('./pages/use-promotions-for-campaign'))
 const UseShopperLoginHelper = loadable(() => import('./pages/use-shopper-login-helper'))
 const UseSearchSuggestions = loadable(() => import('./pages/use-search-suggestions'))
 const UseShopperBaskets = loadable(() => import('./pages/use-shopper-baskets'))
+const QueryErrors = loadable(() => import('./pages/query-errors'))
 
 const routes = [
     {
         path: '/',
         exact: true,
-        component: Home
+        component: Home,
     },
     {
         path: '/products/:productId',
-        component: UseProduct
+        component: UseProduct,
     },
     {
         path: '/products',
-        component: UseProducts
+        component: UseProducts,
     },
     {
         path: '/categories/:categoryId',
-        component: UseCategory
+        component: UseCategory,
     },
     {
         path: '/categories',
-        component: UseCategories
+        component: UseCategories,
     },
     {
         path: '/search',
-        component: UseProductSearch
+        component: UseProductSearch,
     },
     {
         path: '/search-suggestions',
-        component: UseSearchSuggestions
+        component: UseSearchSuggestions,
+    },
+    {
+        path: '/use-promotions',
+        component: UsePromotions,
+    },
+    {
+        path: '/use-promotions-for-campaign',
+        component: UsePromotionsForCampaign,
     },
     {
         path: '/slas-helpers',
-        component: UseShopperLoginHelper
+        component: UseShopperLoginHelper,
     },
     {
         path: '/basket',
-        component: UseShopperBaskets
-    }
+        component: UseShopperBaskets,
+    },
+    {
+        path: '/query-errors',
+        component: QueryErrors,
+    },
 ]
 
 export default routes

@@ -26,7 +26,7 @@ import {
     CLIENT_OPTIONAL,
     REQUEST_PROCESSOR
 } from '../../configs/webpack/config-names'
-
+import {randomUUID} from 'crypto'
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
 
@@ -70,6 +70,18 @@ export const DevServerMixin = {
     },
 
     /**
+     * Since dev server does not have access to apiGateway event object,
+     * here we generate an uuid and assign it under locals
+     * @private
+     */
+    _setRequestId(app) {
+        app.use((req, res, next) => {
+            res.locals.requestId = randomUUID()
+            next()
+        })
+    },
+
+    /**
      * @private
      */
     _setCompression(app) {
@@ -85,7 +97,11 @@ export const DevServerMixin = {
      * @private
      */
     _setupLogging(app) {
-        app.use(expressLogging('dev'))
+        app.use(
+            expressLogging(
+                '(:req[correlation-id]) :method :url :status :response-time ms - :res[content-length]'
+            )
+        )
     },
 
     /**

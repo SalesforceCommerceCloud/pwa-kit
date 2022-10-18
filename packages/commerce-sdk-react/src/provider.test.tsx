@@ -62,3 +62,35 @@ test(
         expect(screen.getByText(TEST_CONFIG.organizationId)).toBeInTheDocument()
     })
 )
+
+test(
+    'api clients optional config are passed properly',
+    withMocks(async () => {
+        const Component = () => {
+            const api = useCommerceApi()
+            return (
+                <ul>
+                    <li>{api?.shopperSearch?.clientConfig?.headers?.['correlation-id']}</li>
+                    <li>{api?.shopperSearch?.clientConfig?.fetchOptions?.timeout}</li>
+                </ul>
+            )
+        }
+        const commerceApiProviderConfig = {
+            headers: {'correlation-id': '373a3f80-6bbb-4157-a617-63d27fb15769'},
+            fetchOptions: {
+                timeout: 50
+            }
+        }
+        renderWithProviders(
+            <Component />,
+            {},
+            {
+                commerceApiProvider: commerceApiProviderConfig
+            }
+        )
+        expect(
+            screen.getByText(commerceApiProviderConfig.headers['correlation-id'])
+        ).toBeInTheDocument()
+        expect(screen.getByText(commerceApiProviderConfig.fetchOptions.timeout)).toBeInTheDocument()
+    })
+)
