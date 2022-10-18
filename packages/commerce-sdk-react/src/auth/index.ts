@@ -139,7 +139,7 @@ class Auth {
 
         if (this.get('site_id') && this.get('site_id') !== config.siteId) {
             // if site is switched, remove all existing auth data in storage
-            // and restart the auth flow
+            // and the next auth.ready() call with restart the auth flow
             this.clearStorage()
         }
 
