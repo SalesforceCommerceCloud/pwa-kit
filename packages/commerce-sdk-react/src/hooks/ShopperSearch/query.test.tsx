@@ -24,8 +24,8 @@ const ProductSearchComponent = ({q, refine}: {q: string; refine: string[]}): Rea
             {isLoading && <span>Loading...</span>}
             {data && (
                 <div>
-                    {data.hits?.map(({productName}) => (
-                        <div key={productName}>{productName}</div>
+                    {data.hits?.map(({productName, i}) => (
+                        <div key={i}>{productName}</div>
                     ))}
                 </div>
             )}
@@ -43,8 +43,8 @@ const SearchSuggestionsComponent = ({q}: {q: string}): ReactElement => {
             {isLoading && <span>Loading...</span>}
             {data && (
                 <div>
-                    {data.productSuggestions?.products?.map(({productName}) => (
-                        <div key={productName}>{productName}</div>
+                    {data.productSuggestions?.products?.map(({productName, i}) => (
+                        <div key={i}>{productName}</div>
                     ))}
                 </div>
             )}
@@ -63,20 +63,14 @@ const tests = [
                     const q = 'shirt'
                     const refinement = ['price=(0..50)']
                     renderWithProviders(<ProductSearchComponent q={q} refine={refinement} />)
-                    const productNames = [
-                        'Paisley Shirt',
-                        'Denim Shirt Jacket',
-                        'Fitted Seamed Shirt'
-                    ]
+                    const productNames = ['Striped Shirt', 'Paisley Shirt']
 
                     expect(screen.queryByText(productNames[0])).toBeNull()
                     expect(screen.queryByText(productNames[1])).toBeNull()
-                    expect(screen.queryByText(productNames[2])).toBeNull()
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText(productNames[0]))
                     expect(screen.getByText(productNames[0])).toBeInTheDocument()
                     expect(screen.getByText(productNames[1])).toBeInTheDocument()
-                    expect(screen.getByText(productNames[2])).toBeInTheDocument()
                 })
             },
             {
