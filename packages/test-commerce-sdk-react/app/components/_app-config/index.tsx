@@ -42,4 +42,18 @@ AppConfig.restore = () => {}
 AppConfig.extraGetPropsArgs = () => {}
 AppConfig.freeze = () => {}
 
-export default withReactQuery(AppConfig)
+// Recommended settings for PWA-Kit usage.
+const options = {
+    queryClientConfig: {
+        defaultOptions: {
+            queries: {
+                retry: false
+            },
+            mutations: {
+                retry: false
+            }
+        }
+    }
+}
+
+export default withReactQuery(AppConfig, options)
