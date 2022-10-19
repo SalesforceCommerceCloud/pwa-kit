@@ -75,8 +75,22 @@ const ShopperOrdersMutationComponent = () => {
                 >
                     Update Payment
                 </button>
-                <p>{updatePaymentInstrument.data?.customerName}</p>
                 <p>UpdatePayment:isSuccess:{updatePaymentInstrument.isSuccess.toString()}</p>
+            </div>
+            <div>
+                <button
+                    onClick={() => {
+                        removePaymentInstrument.mutate({
+                            parameters: {
+                                orderNo: ORDER_NO,
+                                paymentInstrumentId: '5db799461deeaccf700ea4f125'
+                            }
+                        })
+                    }}
+                >
+                    Remove Payment
+                </button>
+                <p>RemovePayment:isSuccess:{removePaymentInstrument.isSuccess.toString()}</p>
             </div>
         </>
     )
@@ -99,27 +113,42 @@ const tests = [
                     expect(screen.getByText('CreatePayment:isSuccess:true')).toBeInTheDocument()
                     expect(screen.getByText(/Alex V/)).toBeInTheDocument()
                 }, PAYMENT_EXPECTED_RETURN)
-            }
+            },
             // {
             //     name: 'update payment mutate',
             //     assertions: withMocks(async () => {
             //         renderWithProviders(<ShopperOrdersMutationComponent />)
             //         await waitFor(() => screen.getByText(/alex@test.com/))
             //         expect(screen.queryByText(/alex@test.com/)).toBeInTheDocument()
-
+            //         //first create the payment
+            //         const createButton = screen.getByText('Create Payment')
+            //         fireEvent.click(createButton)
+            //         await waitFor(() => screen.getByText('CreatePayment:isSuccess:true'))
+            //         //then update
             //         const button = screen.getByText('Update Payment')
             //         fireEvent.click(button)
             //         await waitFor(() => screen.getByText('UpdatePayment:isSuccess:true'))
             //         // expect(screen.getByText('UpdatePayment:isSuccess:true')).toBeInTheDocument()
-            //         // expect(screen.getByText(/Alex V/)).toBeInTheDocument()
             //     }, PAYMENT_EXPECTED_RETURN),
             // },
-            // {
-            //     name: 'remove payment mutate',
-            //     assertions: async () => {
-            //         renderWithProviders(<ShopperOrdersMutationComponent />)
-            //     }
-            // }
+            {
+                name: 'remove payment mutate',
+                assertions: withMocks(async () => {
+                    renderWithProviders(<ShopperOrdersMutationComponent />)
+                    await waitFor(() => screen.getByText(/alex@test.com/))
+                    expect(screen.queryByText(/alex@test.com/)).toBeInTheDocument()
+
+                    //first create the payment
+                    const createButton = screen.getByText('Create Payment')
+                    fireEvent.click(createButton)
+                    await waitFor(() => screen.getByText('CreatePayment:isSuccess:true'))
+                    //then remove
+                    const removeButton = screen.getByText('Remove Payment')
+                    fireEvent.click(removeButton)
+                    await waitFor(() => screen.getByText('RemovePayment:isSuccess:true'))
+                    expect(screen.getByText('RemovePayment:isSuccess:true')).toBeInTheDocument()
+                }, PAYMENT_EXPECTED_RETURN),
+            },
         ]
     }
 ]
