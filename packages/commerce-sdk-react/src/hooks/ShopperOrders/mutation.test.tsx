@@ -16,7 +16,6 @@ const {withMocks} = mockHttpResponses({
     directory: path.join(__dirname, '../../../mock-responses')
 })
 
-
 const ShopperOrdersMutationComponent = () => {
     // log into register account before fetching any order information when the component is mounted
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
@@ -25,25 +24,36 @@ const ShopperOrdersMutationComponent = () => {
     }, [])
     const ORDER_NO = '00014103'
 
-    const createPaymentInstrument = useShopperOrdersMutation(ShopperOrdersMutations.CreatePaymentInstrumentForOrder)
-    const updatePaymentInstrument = useShopperOrdersMutation(ShopperOrdersMutations.UpdatePaymentInstrumentForOrder)
-    const removePaymentInstrument = useShopperOrdersMutation(ShopperOrdersMutations.RemovePaymentInstrumentFromOrder)
+    const createPaymentInstrument = useShopperOrdersMutation(
+        ShopperOrdersMutations.CreatePaymentInstrumentForOrder
+    )
+    const updatePaymentInstrument = useShopperOrdersMutation(
+        ShopperOrdersMutations.UpdatePaymentInstrumentForOrder
+    )
+    const removePaymentInstrument = useShopperOrdersMutation(
+        ShopperOrdersMutations.RemovePaymentInstrumentFromOrder
+    )
 
     return (
         <>
             <div>
-                <button onClick={() => createPaymentInstrument.mutate({orderNo: ORDER_NO})}>Create Payment</button>
+                <button
+                    onClick={() => {
+                        createPaymentInstrument.mutate({
+                            parameters: {orderNo: ORDER_NO},
+                            body: {
+                                amount: 700,
+                                paymentMethodId: 'GIFT_CERTIFICATE',
+                                bankRoutingNumber: '123456'
+                            }
+                        })
+                    }}
+                >
+                    Create Payment
+                </button>
                 <p>{createPaymentInstrument.data}</p>
                 <p>CreatePayment:isSuccess:{createPaymentInstrument.isSuccess.toString()}</p>
             </div>
-        {/* <div>
-        <button onClick={() => updatePaymentInstrument.mutate({orderNo: ORDER_NO, paymentInstrumentId: PAYMENT_ID})}>Update Payment</button>
-            <p>{updatePaymentInstrument.data}</p>
-        </div>
-        <div>
-        <button onClick={() => removePaymentInstrument.mutate({orderNo: ORDER_NO, paymentInstrumentId: PAYMENT_ID})}>Remove Payment</button>
-            <p>{removePaymentInstrument.data}</p>
-        </div> */}
         </>
     )
 }
@@ -59,7 +69,7 @@ const tests = [
                     const button = screen.getByText('Create Payment')
                     fireEvent.click(button)
                 })
-            },
+            }
             // {
             //     name: 'update payment mutate',
             //     assertions: async () => {
