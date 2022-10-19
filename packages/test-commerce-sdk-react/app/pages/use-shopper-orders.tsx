@@ -55,19 +55,23 @@ function UseShopperOrders() {
         // },
         {
             action: 'createPaymentInstrumentForOrder',
-            body: {amount: 700, paymentMethodId: 'GIFT_CERTIFICATE', bankRoutingNumber: BANK_ROUTING},
+            body: {
+                amount: 700,
+                paymentMethodId: 'GIFT_CERTIFICATE',
+                bankRoutingNumber: BANK_ROUTING
+            },
             parameters: {orderNo: ORDER_NO}
         },
         {
             //need to input a valid paymentInstrumentId from order details
             action: 'removePaymentInstrumentFromOrder',
             body: {},
-            parameters: {orderNo: ORDER_NO, paymentInstrumentId: ''}
+            parameters: {orderNo: ORDER_NO, paymentInstrumentId: '2c79dabce39a7eba4a45725fc9'}
         },
         {
             action: 'updatePaymentInstrumentForOrder',
-            body: {bankRoutingNumber: BANK_ROUTING, paymentMethodId: 'PayPal'},
-            parameters: {orderNo: ORDER_NO, paymentInstrumentId: '5db799461deeaccf700ea4f125'}
+            body: {bankRoutingNumber: '000000'},
+            parameters: {orderNo: ORDER_NO, paymentInstrumentId: '7a7cb6bb69e94fa6fcc35e6281'}
         }
     ].map(({action, body, parameters}) => {
         return {

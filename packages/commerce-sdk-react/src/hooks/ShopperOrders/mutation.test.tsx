@@ -7,7 +7,7 @@
 import React, {ReactElement} from 'react'
 import path from 'path'
 import '@testing-library/jest-dom'
-import {mockHttpResponses, renderWithProviders} from '../../test-utils'
+import {mockHttpResponses, renderWithProviders, PAYMENT_EXPECTED_RETURN} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {useShopperOrdersMutation, ShopperOrdersMutations} from './mutation'
@@ -36,6 +36,11 @@ const ShopperOrdersMutationComponent = () => {
 
     return (
         <>
+            {loginRegisteredUser.isLoading ? (
+                <span>Logging in...</span>
+            ) : (
+                <div>Logged in as {loginRegisteredUser?.variables?.username}</div>
+            )}
             <div>
                 <button
                     onClick={() => {
@@ -51,8 +56,27 @@ const ShopperOrdersMutationComponent = () => {
                 >
                     Create Payment
                 </button>
-                <p>{createPaymentInstrument.data}</p>
+                <p>{createPaymentInstrument.data?.customerName}</p>
                 <p>CreatePayment:isSuccess:{createPaymentInstrument.isSuccess.toString()}</p>
+            </div>
+            <div>
+                <button
+                    onClick={() => {
+                        updatePaymentInstrument.mutate({
+                            parameters: {
+                                orderNo: ORDER_NO,
+                                paymentInstrumentId: '5db799461deeaccf700ea4f125'
+                            },
+                            body: {
+                                bankRoutingNumber: '000000'
+                            }
+                        })
+                    }}
+                >
+                    Update Payment
+                </button>
+                <p>{updatePaymentInstrument.data?.customerName}</p>
+                <p>UpdatePayment:isSuccess:{updatePaymentInstrument.isSuccess.toString()}</p>
             </div>
         </>
     )
@@ -66,15 +90,29 @@ const tests = [
                 name: 'create payment mutate',
                 assertions: withMocks(async () => {
                     renderWithProviders(<ShopperOrdersMutationComponent />)
+                    await waitFor(() => screen.getByText(/alex@test.com/))
+                    expect(screen.queryByText(/alex@test.com/)).toBeInTheDocument()
+
                     const button = screen.getByText('Create Payment')
                     fireEvent.click(button)
-                })
+                    await waitFor(() => screen.getByText('CreatePayment:isSuccess:true'))
+                    expect(screen.getByText('CreatePayment:isSuccess:true')).toBeInTheDocument()
+                    expect(screen.getByText(/Alex V/)).toBeInTheDocument()
+                }, PAYMENT_EXPECTED_RETURN)
             }
             // {
             //     name: 'update payment mutate',
-            //     assertions: async () => {
+            //     assertions: withMocks(async () => {
             //         renderWithProviders(<ShopperOrdersMutationComponent />)
-            //     }
+            //         await waitFor(() => screen.getByText(/alex@test.com/))
+            //         expect(screen.queryByText(/alex@test.com/)).toBeInTheDocument()
+
+            //         const button = screen.getByText('Update Payment')
+            //         fireEvent.click(button)
+            //         await waitFor(() => screen.getByText('UpdatePayment:isSuccess:true'))
+            //         // expect(screen.getByText('UpdatePayment:isSuccess:true')).toBeInTheDocument()
+            //         // expect(screen.getByText(/Alex V/)).toBeInTheDocument()
+            //     }, PAYMENT_EXPECTED_RETURN),
             // },
             // {
             //     name: 'remove payment mutate',

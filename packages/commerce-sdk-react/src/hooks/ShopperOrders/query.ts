@@ -87,12 +87,8 @@ function usePaymentMethodsForOrder(
     )
 }
 
-type UseTaxesParameters = NonNullable<
-    Argument<Client['getTaxesFromOrder']>
->['parameters']
-type UseTaxesHeaders = NonNullable<
-    Argument<Client['getTaxesFromOrder']>
->['headers']
+type UseTaxesParameters = NonNullable<Argument<Client['getTaxesFromOrder']>>['parameters']
+type UseTaxesHeaders = NonNullable<Argument<Client['getTaxesFromOrder']>>['headers']
 type UseTaxesArg = {
     headers?: UseTaxesHeaders
     rawResponse?: boolean

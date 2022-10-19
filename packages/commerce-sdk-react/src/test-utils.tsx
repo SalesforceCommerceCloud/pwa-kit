@@ -11,6 +11,7 @@ import nock from 'nock'
 import React from 'react'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {url} from 'inspector'
 
 export const TEST_CONFIG = {
     proxy: 'http://localhost:3000/mobify/proxy/api',
@@ -64,6 +65,22 @@ export const renderWithProviders = (
 type NockBackOptions = {
     directory: string
     mode?: nock.BackMode
+}
+
+export const PAYMENT_EXPECTED_RETURN = {
+    customerName: 'Alex V',
+    exportStatus: 'not_exported',
+    orderNo: '00014103',
+    orderToken: 'D08foBs-EGXwPwVxuax-KZu5YA9vbL6lVg86Mx_6joY',
+    orderTotal: 229.11,
+    paymentInstruments: [
+        {
+            amount: 700,
+            bankRoutingNumber: '123456',
+            paymentInstrumentId: '5db799461deeaccf700ea4f125',
+            paymentMethodId: 'GIFT_CERTIFICATE'
+        }
+    ]
 }
 
 /**
@@ -130,7 +147,16 @@ export const mockHttpResponses = (options: NockBackOptions) => {
             })
     }
 
-    const withMocks = (testFn: () => Promise<void> | void) => {
+    const mockMutationCalls = (body: any) => {
+        nock('http://localhost:3000')
+            .persist()
+            .post((uri) => {
+                return uri.includes('/payment-instruments')
+            })
+            .reply(200, body)
+    }
+
+    const withMocks = (testFn: () => Promise<void> | void, expectedPaymentReturn?: any) => {
         return async () => {
             const testName = expect.getState().currentTestName
             if (!testName) {
@@ -141,6 +167,7 @@ export const mockHttpResponses = (options: NockBackOptions) => {
             nockBack.setMode(mode)
             const {nockDone} = await nockBack(fileName)
             mockAuthCalls()
+            mockMutationCalls(expectedPaymentReturn)
             await testFn()
             nockDone()
             // Make sure nock do not interfere with other tests that do not call `withMocks`
