@@ -8,10 +8,9 @@
 import {render, RenderOptions} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
 import nock from 'nock'
-import React, {useEffect} from 'react'
+import React from 'react'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
-import {QueryClient, QueryClientProvider, useQueryClient} from '@tanstack/react-query'
-import {ShopperLoginHelpers, useShopperLoginHelper} from './hooks'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 export const TEST_CONFIG = {
     proxy: 'http://localhost:3000/mobify/proxy/api',
@@ -39,27 +38,6 @@ const TestProviders = (props: {
             </CommerceApiProvider>
         </QueryClientProvider>
     )
-}
-interface Props {
-    comp: React.ElementType
-}
-
-// TODO: fix the type
-export const withRegisteredUser = (Component: React.ComponentType<Props>) => (props) => {
-    const queryClient = useQueryClient()
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-    useEffect(() => {
-        // TODO: Before each clear React Query cache
-        queryClient.removeQueries([{entity: 'customer'}])
-
-        // how to check it a user is already registered here before logging them in
-        loginRegisteredUser.mutate({
-            username: 'kobe@test.com',
-            password: 'Test1234!'
-        })
-    }, [])
-
-    return <Component {...props} loginRegisteredUser={loginRegisteredUser} />
 }
 
 /**
