@@ -10,7 +10,7 @@ import '@testing-library/jest-dom'
 import {mockHttpResponses, renderWithProviders} from '../../test-utils'
 import {useProductSearch, useSearchSuggestions} from './query'
 import {screen, waitFor} from '@testing-library/react'
-import nock from "nock";
+import nock from 'nock'
 
 const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
 
@@ -133,9 +133,6 @@ const tests = [
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {
-        afterAll(() => {
-            nock.restore()
-        })
         cases.forEach(({name, assertions}) => {
             test(name, assertions)
         })

@@ -86,6 +86,7 @@ export const mockHttpResponses = (options: NockBackOptions) => {
     nockBack.fixtures = options.directory
 
     const mockAuthCalls = () => {
+        nock.restore()
         nock('http://localhost:3000')
             .persist()
             .get((uri) => {

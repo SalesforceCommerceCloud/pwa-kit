@@ -8,7 +8,7 @@ import React from 'react'
 import {useShopperLoginHelper} from './helper'
 import {fireEvent, waitFor, screen} from '@testing-library/react'
 import {renderWithProviders} from '../../test-utils'
-import nock from "nock";
+import nock from 'nock'
 
 const mockLoginGuestUser = jest.fn().mockResolvedValue('mockLoginGuestUser')
 
@@ -79,11 +79,11 @@ const tests = [
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {
-        afterAll(() => {
-            nock.restore()
-        })
         afterEach(() => {
             mockLoginGuestUser.mockClear()
+        })
+        beforeAll(() => {
+            nock.restore()
         })
 
         cases.forEach(({name, assertions}) => {
