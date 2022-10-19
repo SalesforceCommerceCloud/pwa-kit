@@ -11,6 +11,7 @@ import {mockHttpResponses, renderWithProviders} from '../../test-utils'
 import {screen, waitFor} from '@testing-library/react'
 import {usePromotions, usePromotionsForCampaign} from './query'
 import path from 'path'
+import nock from "nock";
 
 const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
 
@@ -139,6 +140,9 @@ const tests = [
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {
+        afterAll(() => {
+            nock.restore()
+        })
         afterEach(() => {
             jest.resetAllMocks()
         })
