@@ -6,7 +6,7 @@
  */
 import React, {ReactElement} from 'react'
 import path from 'path'
-import {mockHttpResponses, renderWithProviders} from '../../test-utils'
+import {mockHttpResponses, renderWithProviders, withRegisteredUser} from '../../test-utils'
 import {
     useCustomer,
     useCustomerAddress,
@@ -25,18 +25,13 @@ const CUSTOMER_EMAIL = 'kobe@test.com'
 const ADDRESS_NAME = 'TestAddress'
 const LIST_ID = '987ae461a7c6c5fd17006fc774'
 
-const CustomerComponent = ({customerId}: {customerId: string}): ReactElement => {
-    const queryClient = useQueryClient()
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-
-    React.useEffect(() => {
-        queryClient.invalidateQueries([{entity: 'customer'}])
-        loginRegisteredUser.mutate({
-            username: 'kobe@test.com',
-            password: 'Test1234!'
-        })
-    }, [])
-
+const CustomerComponent = ({
+    customerId,
+    loginRegisteredUser
+}: {
+    customerId: string
+    loginRegisteredUser: any
+}): ReactElement => {
     const {data, isLoading, error} = useCustomer(
         {customerId},
         {
@@ -189,7 +184,8 @@ const tests = [
             {
                 name: 'returns data',
                 assertions: withMocks(async () => {
-                    renderWithProviders(<CustomerComponent customerId={CUSTOMER_ID} />)
+                    const Component = withRegisteredUser(CustomerComponent)
+                    renderWithProviders(<Component customerId={CUSTOMER_ID} />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText(CUSTOMER_EMAIL))
@@ -199,7 +195,8 @@ const tests = [
             {
                 name: 'returns error',
                 assertions: withMocks(async () => {
-                    renderWithProviders(<CustomerComponent customerId={'WRONG_CUSTOMER_ID'} />)
+                    const Component = withRegisteredUser(CustomerComponent)
+                    renderWithProviders(<Component customerId={'WRONG_CUSTOMER_ID'} />)
 
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
                     await waitFor(() => screen.getByText('error'))
