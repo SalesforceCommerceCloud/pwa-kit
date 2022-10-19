@@ -147,8 +147,8 @@ const tests = [
                     fireEvent.click(removeButton)
                     await waitFor(() => screen.getByText('RemovePayment:isSuccess:true'))
                     expect(screen.getByText('RemovePayment:isSuccess:true')).toBeInTheDocument()
-                }, PAYMENT_EXPECTED_RETURN),
-            },
+                }, PAYMENT_EXPECTED_RETURN)
+            }
         ]
     }
 ]
