@@ -83,14 +83,6 @@ const main = () => {
                 }
             }
         )
-        .addOption(
-            new program.Option(
-                '-c, --credentialsFile <credentialsFile>',
-                'the file where your credentials should be stored'
-            )
-                .default(scriptUtils.getCredentialsFile())
-                .env('PWA_KIT_CREDENTIALS_FILE')
-        )
         .action(({user, key, credentialsFile}) => {
             try {
                 fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
@@ -202,22 +194,14 @@ const main = () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .addOption(
-            new program.Option(
-                '-c, --credentialsFile <credentialsFile>',
-                'the file where your credentials are stored'
-            )
-                .default(scriptUtils.getCredentialsFile())
-                .env('PWA_KIT_CREDENTIALS_FILE')
-        )
         .action((_, opts) => {
             let {
                 buildDirectory,
                 message,
                 projectSlug,
                 target,
-                credentialsFile,
-                cloudApiBase
+                cloudApiBase,
+                credentialsFile
             } = opts.optsWithGlobals()
             // Set the deployment target env var, this is required to ensure we
             // get the correct configuration object.
@@ -305,7 +289,7 @@ const main = () => {
         .command('logs')
         .description(`tail environment logs`)
         // TODO: add a --tail flag and make -p optional. get the default from package.json
-        .requiredOption('-p, --project <project_slug>', 'the project slug', (val) => {
+        .option('-p, --project <project_slug>', 'the project slug', (val) => {
             if (!(typeof val === 'string') && val.length > 0) {
                 throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
             } else {
@@ -320,22 +304,21 @@ const main = () => {
             }
         })
         .action(async (_, opts) => {
-            const {project, environment, cloudApiBase} = opts.optsWithGlobals()
-            let settings
+            const {project, environment, cloudApiBase, credentialsFile} = opts.optsWithGlobals()
+            let credentials
             try {
-                const settingsPath = scriptUtils.getSettingsPath()
-                settings = fse.readJsonSync(settingsPath)
+                credentials = fse.readJsonSync(credentialsFile)
             } catch (e) {
                 scriptUtils.fail(`Error reading settings: ${e}`)
             }
 
-            const token = await scriptUtils.createToken(project, environment, cloudApiBase, settings.api_key)
+            const token = await scriptUtils.createToken(project, environment, cloudApiBase, credentials.api_key)
             const url = new URL(cloudApiBase.replace('cloud', 'logs'))
             url.protocol = 'wss'
             const searchParams = {
                 project,
                 environment,
-                user: settings.username,
+                user: credentials.username,
                 access_token: token
             }
             for (const [key, value] of Object.entries(searchParams)) {
@@ -349,6 +332,8 @@ const main = () => {
             })
         })
 
+    // Global options
+
     program.option('-v, --version', 'show version number').action(({version}) => {
         if (version) {
             console.log(pkg.version)
@@ -357,7 +342,6 @@ const main = () => {
         }
     })
 
-    // Global option, accessible on all commands.
     program.addOption(
         new program.Option(
             '--cloud-api-base <url>',
@@ -365,6 +349,15 @@ const main = () => {
         )
             .default('https://cloud.mobify.com')
             .env('CLOUD_API_BASE')
+    )
+
+    program.addOption(
+        new program.Option(
+            '-c, --credentialsFile <credentialsFile>',
+            'the file where your credentials are stored'
+        )
+            .default(scriptUtils.getCredentialsFile())
+            .env('PWA_KIT_CREDENTIALS_FILE')
     )
 
     program.parse(process.argv)
