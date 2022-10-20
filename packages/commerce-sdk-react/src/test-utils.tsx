@@ -19,7 +19,7 @@ export const TEST_CONFIG = {
     shortCode: '8o7m175y',
     redirectURI: 'http://localhost:3000/callback',
     siteId: 'RefArchGlobal',
-    locale: 'en_US',
+    locale: 'en-US',
     currency: 'USD'
 }
 const TestProviders = (props: {
