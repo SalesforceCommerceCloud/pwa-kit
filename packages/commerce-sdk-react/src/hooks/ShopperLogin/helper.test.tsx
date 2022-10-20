@@ -6,12 +6,14 @@
  */
 import React from 'react'
 import {useShopperLoginHelper} from './helper'
-import {render, fireEvent, waitFor, screen} from '@testing-library/react'
+import {fireEvent, waitFor, screen} from '@testing-library/react'
+import {renderWithProviders} from '../../test-utils'
 
 const mockLoginGuestUser = jest.fn().mockResolvedValue('mockLoginGuestUser')
 
 jest.mock('../useAuth', () => {
     return jest.fn(() => ({
+        ready: () => Promise.resolve({access_token: '123'}),
         loginGuestUser: mockLoginGuestUser
     }))
 })
@@ -42,7 +44,7 @@ const tests = [
                             </>
                         )
                     }
-                    render(<Component />)
+                    renderWithProviders(<Component />)
                     expect(screen.getByText('loginGuestUser:isLoading:false')).toBeInTheDocument()
                     expect(
                         screen.getByText('loginRegisteredUserB2C:isLoading:false')
@@ -51,31 +53,23 @@ const tests = [
                 }
             },
             {
-                name: 'execute',
+                name: 'mutate',
                 assertions: async () => {
                     const Component = () => {
                         const loginGuestUser = useShopperLoginHelper('loginGuestUser')
                         return (
                             <>
-                                <button onClick={loginGuestUser.execute}>login</button>
+                                <button onClick={() => loginGuestUser.mutate()}>login</button>
                                 <p>{loginGuestUser.data}</p>
-                                <p>
-                                    loginGuestUser:isLoading:{loginGuestUser.isLoading.toString()}
-                                </p>
                             </>
                         )
                     }
-                    render(<Component />)
+                    renderWithProviders(<Component />)
                     const button = screen.getByText('login')
                     fireEvent.click(button)
-                    expect(mockLoginGuestUser).toHaveBeenCalled()
-
-                    expect(screen.getByText('loginGuestUser:isLoading:true')).toBeInTheDocument()
-
-                    // mock resolved
                     await waitFor(() => screen.getByText('mockLoginGuestUser'))
+                    expect(mockLoginGuestUser).toHaveBeenCalled()
                     expect(screen.getByText('mockLoginGuestUser')).toBeInTheDocument()
-                    expect(screen.getByText('loginGuestUser:isLoading:false')).toBeInTheDocument()
                 }
             }
         ]

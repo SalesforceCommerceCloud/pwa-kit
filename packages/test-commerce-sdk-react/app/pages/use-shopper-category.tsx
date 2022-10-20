@@ -6,7 +6,6 @@
  */
 
 import React from 'react'
-// @ts-ignore
 import {useCategory} from 'commerce-sdk-react'
 import {Link, useParams} from 'react-router-dom'
 import Json from '../components/Json'

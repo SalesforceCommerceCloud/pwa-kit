@@ -5,10 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// @ts-ignore
-import {useCategories} from 'commerce-sdk-react'
-
 import React from 'react'
+import {useCategories} from 'commerce-sdk-react'
 import Json from '../components/Json'
 import {Link} from 'react-router-dom'
 import {flatten} from '../utils/utils'

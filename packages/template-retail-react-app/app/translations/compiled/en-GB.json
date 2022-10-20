@@ -808,7 +808,7 @@
   "checkout_footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+      "value": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
     }
   ],
   "checkout_header.link.cart": [
@@ -1260,7 +1260,7 @@
   "footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+      "value": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
     }
   ],
   "footer.subscribe.button.sign_up": [
