@@ -2,7 +2,7 @@
     {
         "scope": "http://localhost:3000",
         "method": "GET",
-        "path": "/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/categories?ids=20%2C21%2C20%2C7%2C5%2C10%2C20%2C9%2C18%2C16%2C24%2C15%2C4%2C21%2C13%2C1%2C11%2C16%2C2%2C7%2C4%2C10%2C15%2C14%2C13%2C1%2C5%2C5%2C7%2C4%2C11%2C14%2C10%2C8%2C19%2C23%2C4%2C5%2C2%2C9%2C16%2C13%2C0%2C10%2C19%2C21%2C16%2C14%2C5%2C5%2C12&levels=2&locale=en-US&siteId=RefArchGlobal",
+        "path": "/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/categories?ids=2%2C25%2C11%2C0%2C4%2C19%2C24%2C7%2C14%2C25%2C5%2C13%2C7%2C24%2C22%2C17%2C21%2C17%2C12%2C5%2C21%2C23%2C17%2C14%2C2%2C14%2C20%2C17%2C25%2C8%2C19%2C8%2C22%2C21%2C17%2C10%2C24%2C18%2C7%2C4%2C23%2C12%2C6%2C21%2C17%2C21%2C12%2C7%2C9%2C7%2C21&levels=2&locale=en-US&siteId=RefArchGlobal",
         "body": "",
         "status": 400,
         "response": {
@@ -12,7 +12,7 @@
         },
         "rawHeaders": [
             "date",
-            "Thu, 20 Oct 2022 19:36:21 GMT",
+            "Thu, 20 Oct 2022 19:51:20 GMT",
             "content-type",
             "application/problem+json; charset=UTF-8",
             "content-length",
@@ -26,11 +26,11 @@
             "cdn-loop",
             "cloudflare; subreqs=1",
             "x-real-ip",
-            "162.158.142.225",
+            "162.158.142.224",
             "x-forwarded-proto",
             "https",
             "cf-ray",
-            "75d433ae6a5aa6fa-PHX",
+            "75d449a10a94a6ee-PHX",
             "accept-encoding",
             "gzip",
             "accept",
@@ -52,9 +52,9 @@
             "true-client-ip",
             "13.110.54.15",
             "x-correlation-id",
-            "75d433ae6a5aa6fa",
+            "75d449a10a94a6ee",
             "x-forwarded-for",
-            "13.110.54.15, 162.158.142.225",
+            "13.110.54.15, 162.158.142.224",
             "x-forwarded-host",
             "kv7kzm78.api.commercecloud.salesforce.com",
             "x-forwarded-proto-real",
@@ -74,7 +74,7 @@
             "server",
             "cloudflare",
             "x-proxy-request-url",
-            "https://kv7kzm78.api.commercecloud.salesforce.com/product/shopper-products/v1/organizations/f_ecom_zzrf_001/categories?ids=20%2C21%2C20%2C7%2C5%2C10%2C20%2C9%2C18%2C16%2C24%2C15%2C4%2C21%2C13%2C1%2C11%2C16%2C2%2C7%2C4%2C10%2C15%2C14%2C13%2C1%2C5%2C5%2C7%2C4%2C11%2C14%2C10%2C8%2C19%2C23%2C4%2C5%2C2%2C9%2C16%2C13%2C0%2C10%2C19%2C21%2C16%2C14%2C5%2C5%2C12&levels=2&locale=en-US&siteId=RefArchGlobal"
+            "https://kv7kzm78.api.commercecloud.salesforce.com/product/shopper-products/v1/organizations/f_ecom_zzrf_001/categories?ids=2%2C25%2C11%2C0%2C4%2C19%2C24%2C7%2C14%2C25%2C5%2C13%2C7%2C24%2C22%2C17%2C21%2C17%2C12%2C5%2C21%2C23%2C17%2C14%2C2%2C14%2C20%2C17%2C25%2C8%2C19%2C8%2C22%2C21%2C17%2C10%2C24%2C18%2C7%2C4%2C23%2C12%2C6%2C21%2C17%2C21%2C12%2C7%2C9%2C7%2C21&levels=2&locale=en-US&siteId=RefArchGlobal"
         ],
         "responseIsBinary": false
     }
