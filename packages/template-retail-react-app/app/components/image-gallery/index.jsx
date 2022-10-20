@@ -138,7 +138,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
                             borderWidth={`${selected ? '1px' : 0}`}
                         >
                             <AspectRatio ratio={1}>
-                                <Img alt={image.alt} src={image.disBaseLink} />
+                                <Img alt={image.alt} src={image.disBaseLink || image.link} />
                             </AspectRatio>
                         </ListItem>
                     )

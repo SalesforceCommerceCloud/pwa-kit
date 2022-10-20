@@ -88,7 +88,7 @@
     "defaultMessage": "下單日期：{date}"
   },
   "account_order_history.label.shipped_to": {
-    "defaultMessage": "已出貨至：{name}"
+    "defaultMessage": "出貨至：{name}"
   },
   "account_order_history.link.view_details": {
     "defaultMessage": "檢視詳細資料"
@@ -168,9 +168,6 @@
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "新增付款方式"
   },
-  "cart.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
-  },
   "cart.info.removed_from_cart": {
     "defaultMessage": "已從購物車移除商品"
   },
@@ -196,7 +193,7 @@
     "defaultMessage": "這是禮物。"
   },
   "cart_secondary_button_group.link_learn_more": {
-    "defaultMessage": "進一步瞭解"
+    "defaultMessage": "瞭解更多"
   },
   "cart_skeleton.heading.order_summary": {
     "defaultMessage": "訂單摘要"
@@ -215,6 +212,9 @@
   },
   "checkout.button.place_order": {
     "defaultMessage": "送出訂單"
+  },
+  "checkout.message.generic_error": {
+    "defaultMessage": "結帳時發生意外錯誤。"
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "建立帳戶"
@@ -299,7 +299,7 @@
     "defaultMessage": "條款與條件"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
+    "defaultMessage": "Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
   },
   "checkout_header.link.cart": {
     "defaultMessage": "返回購物車"
@@ -380,8 +380,12 @@
     "defaultMessage": "聯絡資訊"
   },
   "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "此 {length} 位數代碼可在您卡片的{side}找到。",
-    "description": "Credit card security code help text"
+    "defaultMessage": "此 3 位數代碼可在您卡片的背面找到。",
+    "description": "Generic credit card security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code.american_express": {
+    "defaultMessage": "此 4 位數代碼可在您卡片的正面找到。",
+    "description": "American Express security code help text"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "帳戶詳細資料"
@@ -507,7 +511,7 @@
     "defaultMessage": "條款與條件"
   },
   "footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
+    "defaultMessage": "Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
   },
   "footer.subscribe.button.sign_up": {
     "defaultMessage": "註冊"
@@ -541,6 +545,15 @@
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "發生錯誤。請再試一次。"
+  },
+  "global.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
+  },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "已從願望清單移除商品"
+  },
+  "global.link.added_to_wishlist.view_wishlist": {
+    "defaultMessage": "檢視"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "標誌"
@@ -576,8 +589,8 @@
     "defaultMessage": "讓他們為您指點迷津。"
   },
   "home.description.shop_products": {
-    "defaultMessage": "此區塊包含來自目錄的內容。{docLink}如何取代。",
-    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos"
+    "defaultMessage": "此區塊包含來自目錄的內容。{docLink}來瞭解如何取代。",
+    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
     "defaultMessage": "為購物者提供購物車和結帳體驗的電子商務最佳做法。"
@@ -586,7 +599,7 @@
     "defaultMessage": "以簡單、模組化、無障礙設計的 React 元件庫 Chakra UI 打造而成。"
   },
   "home.features.description.einstein_recommendations": {
-    "defaultMessage": "透過產品推薦，向每位購物者傳遞下一個最佳產品或優惠 (next best product or offer)。"
+    "defaultMessage": "透過產品推薦，向每位購物者傳遞下一個最佳產品或優惠。"
   },
   "home.features.description.my_account": {
     "defaultMessage": "購物者可管理帳戶資訊，例如個人資料、地址、付款和訂單。"
@@ -604,13 +617,13 @@
     "defaultMessage": "元件與設計套件"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Einstein 推薦"
   },
   "home.features.heading.my_account": {
     "defaultMessage": "我的帳戶"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service"
+    "defaultMessage": "Shopper Login and API Access Service (SLAS)"
   },
   "home.features.heading.wishlist": {
     "defaultMessage": "願望清單"
@@ -643,7 +656,7 @@
     "defaultMessage": "閱讀文件"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "React PWA 範例零售商店"
+    "defaultMessage": "零售型 React PWA Starter Store"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "促銷"
@@ -654,6 +667,9 @@
   "item_image.label.sale": {
     "defaultMessage": "特價",
     "description": "A sale badge placed on top of a product image"
+  },
+  "lCPCxk": {
+    "defaultMessage": "請在上方選擇所有選項"
   },
   "locale_text.message.ar-SA": {
     "defaultMessage": "阿拉伯文 (沙烏地阿拉伯)"
@@ -761,7 +777,7 @@
     "defaultMessage": "日文 (日本)"
   },
   "locale_text.message.ko-KR": {
-    "defaultMessage": "韓文 (大韓民國)"
+    "defaultMessage": "韓文 (韓國)"
   },
   "locale_text.message.nl-BE": {
     "defaultMessage": "荷蘭文 (比利時)"
@@ -885,7 +901,7 @@
     "defaultMessage": "找不到您在尋找的頁面。"
   },
   "pagination.field.num_of_pages": {
-    "defaultMessage": "{numOfPages} 頁"
+    "defaultMessage": "/ {numOfPages}"
   },
   "pagination.link.next": {
     "defaultMessage": "下一頁"
@@ -915,7 +931,7 @@
     "description": "Password requirement"
   },
   "password_requirements.error.one_special_character": {
-    "defaultMessage": "1 個特殊字元 (例如：, S ! % #)",
+    "defaultMessage": "1 個特殊字元 (例如：, $ ! % #)",
     "description": "Password requirement"
   },
   "password_requirements.error.one_uppercase_letter": {
@@ -956,9 +972,6 @@
   "product_detail.accordion.message.coming_soon": {
     "defaultMessage": "即將推出"
   },
-  "product_detail.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
-  },
   "product_detail.recommended_products.title.complete_set": {
     "defaultMessage": "完成組合"
   },
@@ -979,12 +992,6 @@
   },
   "product_list.drawer.title.sort_by": {
     "defaultMessage": "排序方式"
-  },
-  "product_list.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
-  },
-  "product_list.info.removed_from_wishlist": {
-    "defaultMessage": "已從願望清單移除商品"
   },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "清除篩選條件"
@@ -1048,12 +1055,6 @@
   },
   "recent_searches.heading.recent_searches": {
     "defaultMessage": "最近搜尋"
-  },
-  "recommended_products.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
-  },
-  "recommended_products.info.removed_from_wishlist": {
-    "defaultMessage": "已從願望清單移除商品"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "登入"
@@ -1394,6 +1395,12 @@
   },
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "新密碼"
+  },
+  "wishlist_primary_action.button.add_to_cart": {
+    "defaultMessage": "新增至購物車"
+  },
+  "wishlist_primary_action.button.select_options": {
+    "defaultMessage": "選擇選項"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至購物車"

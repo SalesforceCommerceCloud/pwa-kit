@@ -29,7 +29,7 @@ const mockData = {
                                     disBaseLink:
                                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2bf7e719/images/large/PG.10251589.JJ3WDXX.PZ.jpg',
                                     link:
-                                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2bf7e719/images/large/PG.10251589.JJ3WDXX.PZ.jpg',
+                                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2bf7e719/images/large/PG.10251589.JJ3WDXX.PZ.jpg',
                                     title: 'Drape Neck Dress., '
                                 },
                                 {
@@ -37,7 +37,7 @@ const mockData = {
                                     disBaseLink:
                                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3bdcd88e/images/large/PG.10251589.JJ3WDXX.BZ.jpg',
                                     link:
-                                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3bdcd88e/images/large/PG.10251589.JJ3WDXX.BZ.jpg',
+                                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3bdcd88e/images/large/PG.10251589.JJ3WDXX.BZ.jpg',
                                     title: 'Drape Neck Dress., '
                                 }
                             ],
@@ -50,7 +50,7 @@ const mockData = {
                                     disBaseLink:
                                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw06ea3ef5/images/medium/PG.10251589.JJ3WDXX.PZ.jpg',
                                     link:
-                                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw06ea3ef5/images/medium/PG.10251589.JJ3WDXX.PZ.jpg',
+                                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw06ea3ef5/images/medium/PG.10251589.JJ3WDXX.PZ.jpg',
                                     title: 'Drape Neck Dress., '
                                 },
                                 {
@@ -58,7 +58,7 @@ const mockData = {
                                     disBaseLink:
                                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9e791206/images/medium/PG.10251589.JJ3WDXX.BZ.jpg',
                                     link:
-                                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9e791206/images/medium/PG.10251589.JJ3WDXX.BZ.jpg',
+                                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9e791206/images/medium/PG.10251589.JJ3WDXX.BZ.jpg',
                                     title: 'Drape Neck Dress., '
                                 }
                             ],
@@ -71,7 +71,7 @@ const mockData = {
                                     disBaseLink:
                                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw70771d1e/images/small/PG.10251589.JJ3WDXX.PZ.jpg',
                                     link:
-                                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw70771d1e/images/small/PG.10251589.JJ3WDXX.PZ.jpg',
+                                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw70771d1e/images/small/PG.10251589.JJ3WDXX.PZ.jpg',
                                     title: 'Drape Neck Dress., '
                                 },
                                 {
@@ -79,7 +79,7 @@ const mockData = {
                                     disBaseLink:
                                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6c634209/images/small/PG.10251589.JJ3WDXX.BZ.jpg',
                                     link:
-                                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6c634209/images/small/PG.10251589.JJ3WDXX.BZ.jpg',
+                                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6c634209/images/small/PG.10251589.JJ3WDXX.BZ.jpg',
                                     title: 'Drape Neck Dress., '
                                 }
                             ],

@@ -22,6 +22,7 @@ const Payment = () => {
 
     const {
         step,
+        checkoutSteps,
         setCheckoutStep,
         selectedShippingAddress,
         selectedBillingAddress,
@@ -48,13 +49,13 @@ const Payment = () => {
         <ToggleCard
             id="step-3"
             title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
-            editing={step === 3}
+            editing={step === checkoutSteps.Payment}
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
                 billingAddressForm.formState.isSubmitting
             }
             disabled={selectedPayment == null}
-            onEdit={() => setCheckoutStep(3)}
+            onEdit={() => setCheckoutStep(checkoutSteps.Payment)}
         >
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>

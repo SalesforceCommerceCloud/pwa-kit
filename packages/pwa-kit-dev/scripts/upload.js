@@ -24,7 +24,7 @@ const upload = (options) => {
         return Buffer.from(buildJSON)
     })
 
-    const credentialsPromise = Utils.readCredentials(options.settingsFile)
+    const credentialsPromise = Utils.readCredentials(options.credentialsFile)
 
     return Promise.all([dataBufferPromise, credentialsPromise])
         .then((values) => {
@@ -61,7 +61,7 @@ const uploadBundle = (opts) => {
 
     const defaults = {
         buildDirectory: 'build',
-        settingsFile: Utils.getSettingsPath(),
+        credentialsFile: Utils.getCredentialsFile(),
         target: '',
         message: Utils.setDefaultMessage()
     }

@@ -425,44 +425,6 @@
       "value": "Ajouter un nouveau mode de paiement"
     }
   ],
-  "cart.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "article ajouté"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "articles ajoutés"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " à la liste de souhaits"
-    }
-  ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
@@ -514,13 +476,13 @@
   "cart_secondary_button_group.link_learn_more": [
     {
       "type": 0,
-      "value": "Envie d'en savoir plus ?"
+      "value": "En savoir plus"
     }
   ],
   "cart_skeleton.heading.order_summary": [
     {
       "type": 0,
-      "value": "Résumé de commande"
+      "value": "Résumé de la commande"
     }
   ],
   "cart_skeleton.title.cart": [
@@ -595,6 +557,12 @@
       "value": "Passer commande"
     }
   ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "Une erreur inattendue s'est produite durant le checkout."
+    }
+  ],
   "checkout_confirmation.button.create_account": [
     {
       "type": 0,
@@ -628,7 +596,7 @@
   "checkout_confirmation.heading.order_summary": [
     {
       "type": 0,
-      "value": "Résumé de commande"
+      "value": "Résumé de la commande"
     }
   ],
   "checkout_confirmation.heading.payment_details": [
@@ -808,7 +776,7 @@
   "checkout_footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce ou ses affiliés. Tous droits réservés. Ceci est une boutique de démonstration uniquement. Les commandes NE SERONT PAS traitées."
+      "value": "Salesforce ou ses affiliés. Tous droits réservés. Ceci est une boutique de démonstration uniquement. Les commandes NE SERONT PAS traitées."
     }
   ],
   "checkout_header.link.cart": [
@@ -934,13 +902,13 @@
   "contact_info.button.already_have_account": [
     {
       "type": 0,
-      "value": "Vous avez déjà un compte ? Connexion"
+      "value": "Vous avez déjà un compte ? Se connecter"
     }
   ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
-      "value": "Régler en tant qu’invité"
+      "value": "Régler en tant qu'invité"
     }
   ],
   "contact_info.button.login": [
@@ -970,23 +938,13 @@
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "Ce code à "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
+      "value": "Ce code à 3 chiffres se trouve au dos de votre carte."
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
     {
       "type": 0,
-      "value": " chiffres se trouve au "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " de votre carte."
+      "value": "Ce code à 4 chiffres se trouve sur le devant de votre carte."
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1040,7 +998,7 @@
   "drawer_menu.link.customer_support.contact_us": [
     {
       "type": 0,
-      "value": "Contactez-nous"
+      "value": "Nous contacter"
     }
   ],
   "drawer_menu.link.customer_support.shipping_and_returns": [
@@ -1138,7 +1096,7 @@
     },
     {
       "type": 0,
-      "value": ". Essayez de rechercher un produit ou "
+      "value": ". Essayez de rechercher un produit ou cliquez sur "
     },
     {
       "type": 1,
@@ -1180,7 +1138,7 @@
   "empty_search_results.link.contact_us": [
     {
       "type": 0,
-      "value": "Contactez-nous"
+      "value": "Nous contacter"
     }
   ],
   "empty_search_results.recommended_products.title.most_viewed": [
@@ -1222,7 +1180,7 @@
   "footer.link.contact_us": [
     {
       "type": 0,
-      "value": "Contactez-nous"
+      "value": "Nous contacter"
     }
   ],
   "footer.link.order_status": [
@@ -1270,13 +1228,13 @@
   "footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce ou ses affiliés. Tous droits réservés. Ceci est une boutique de démonstration uniquement. Les commandes NE SERONT PAS traitées."
+      "value": "Salesforce ou ses affiliés. Tous droits réservés. Ceci est une boutique de démonstration uniquement. Les commandes NE SERONT PAS traitées."
     }
   ],
   "footer.subscribe.button.sign_up": [
     {
       "type": 0,
-      "value": "Inscrivez-vous"
+      "value": "S'inscrire"
     }
   ],
   "footer.subscribe.description.sign_up": [
@@ -1339,6 +1297,56 @@
       "value": "Un problème est survenu Veuillez réessayer."
     }
   ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "article ajouté"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "articles ajoutés"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " à la liste de souhaits"
+    }
+  ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Article supprimé de la liste de souhaits"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "Afficher"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -1396,13 +1404,13 @@
   "home.description.here_to_help": [
     {
       "type": 0,
-      "value": "Contactez notre équipe de support, qui vous amènera"
+      "value": "Contactez notre équipe de support."
     }
   ],
   "home.description.here_to_help_line_2": [
     {
       "type": 0,
-      "value": "au bon endroit."
+      "value": "Elle vous amènera au bon endroit."
     }
   ],
   "home.description.shop_products": [
@@ -1470,7 +1478,7 @@
   "home.features.heading.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Einstein Recommendations"
+      "value": "Recommandations Einstein"
     }
   ],
   "home.features.heading.my_account": [
@@ -1500,7 +1508,7 @@
   "home.heading.here_to_help": [
     {
       "type": 0,
-      "value": "Nous sommes là pour vous aider"
+      "value": "Nous sommes là pour vous"
     }
   ],
   "home.heading.shop_products": [
@@ -1512,7 +1520,7 @@
   "home.hero_features.link.design_kit": [
     {
       "type": 0,
-      "value": "Créer avec le kit de conception Figma PWA"
+      "value": "Créer avec le Figma PWA Design Kit"
     }
   ],
   "home.hero_features.link.on_github": [
@@ -1530,7 +1538,7 @@
   "home.link.contact_us": [
     {
       "type": 0,
-      "value": "Contactez-nous"
+      "value": "Nous contacter"
     }
   ],
   "home.link.get_started": [
@@ -1548,7 +1556,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "La boutique de démarrage React PWA pour le retail"
+      "value": "React PWA Starter Store pour le retail"
     }
   ],
   "item_attributes.label.promotions": [
@@ -1571,6 +1579,12 @@
     {
       "type": 0,
       "value": "Vente"
+    }
+  ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "Sélectionnez toutes vos options ci-dessus"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -1992,7 +2006,7 @@
   "order_summary.heading.order_summary": [
     {
       "type": 0,
-      "value": "Résumé de commande"
+      "value": "Résumé de la commande"
     }
   ],
   "order_summary.label.estimated_total": [
@@ -2170,7 +2184,7 @@
   "price_per_item.label.each": [
     {
       "type": 0,
-      "value": "pièce"
+      "value": " pièce"
     }
   ],
   "product_detail.accordion.button.product_detail": [
@@ -2188,7 +2202,7 @@
   "product_detail.accordion.button.reviews": [
     {
       "type": 0,
-      "value": "Vérification"
+      "value": "Avis"
     }
   ],
   "product_detail.accordion.button.size_fit": [
@@ -2201,44 +2215,6 @@
     {
       "type": 0,
       "value": "Bientôt disponibles"
-    }
-  ],
-  "product_detail.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "article ajouté"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "articles ajoutés"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " à la liste de souhaits"
     }
   ],
   "product_detail.recommended_products.title.complete_set": [
@@ -2285,50 +2261,6 @@
     {
       "type": 0,
       "value": "Trier par"
-    }
-  ],
-  "product_list.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "article ajouté"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "articles ajoutés"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " à la liste de souhaits"
-    }
-  ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Article supprimé de la liste de souhaits"
     }
   ],
   "product_list.modal.button.clear_filters": [
@@ -2467,50 +2399,6 @@
     {
       "type": 0,
       "value": "Recherche récentes"
-    }
-  ],
-  "recommended_products.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "article ajouté"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "articles ajoutés"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " à la liste de souhaits"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Article supprimé de la liste de souhaits"
     }
   ],
   "register_form.action.sign_in": [
@@ -2880,7 +2768,7 @@
   "use_address_fields.label.preferred": [
     {
       "type": 0,
-      "value": "Définir comme valeur par défaut"
+      "value": "Définir comme adresse par défaut"
     }
   ],
   "use_address_fields.label.province": [
@@ -3255,6 +3143,18 @@
     {
       "type": 0,
       "value": "Nouveau mot de passe"
+    }
+  ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "Ajouter au panier"
+    }
+  ],
+  "wishlist_primary_action.button.select_options": [
+    {
+      "type": 0,
+      "value": "Sélectionner des options"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [

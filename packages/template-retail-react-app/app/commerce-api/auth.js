@@ -190,31 +190,6 @@ class Auth {
     }
 
     /**
-     * Make a post request to the OCAPI /session endpoint to bridge the session.
-     *
-     * The HTTP response contains a set-cookie header which sets the dwsid session cookie.
-     * This cookie is used on SFRA site and it shoppers to navigate between SFRA site and
-     * this PWA site seamlessly, this is often used to enable hybrid deployment.
-     *
-     * (Note: this method is client side only, b/c MRT doesn't support set-cookie header right now)
-     *
-     * @returns {Promise}
-     */
-    createOCAPISession() {
-        return fetch(
-            `${getAppOrigin()}/mobify/proxy/ocapi/s/${
-                this._config.parameters.siteId
-            }/dw/shop/v21_3/sessions`,
-            {
-                method: 'POST',
-                headers: {
-                    Authorization: this.authToken
-                }
-            }
-        )
-    }
-
-    /**
      * Authorizes the customer as a registered or guest user.
      * @param {CustomerCredentials} [credentials]
      * @returns {Promise}
@@ -235,21 +210,15 @@ class Auth {
             } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
             }
-            return this[authorizationMethod](credentials)
-                .catch((error) => {
-                    const retryErrors = [INVALID_TOKEN, EXPIRED_TOKEN]
-                    if (retries === 0 && retryErrors.includes(error.message)) {
-                        retries = 1 // we only retry once
-                        this._clearAuth()
-                        return startLoginFlow()
-                    }
-                    throw error
-                })
-                .then((result) => {
-                    // Uncomment the following line for phased launch
-                    // this._onClient && this.createOCAPISession()
-                    return result
-                })
+            return this[authorizationMethod](credentials).catch((error) => {
+                const retryErrors = [INVALID_TOKEN, EXPIRED_TOKEN]
+                if (retries === 0 && retryErrors.includes(error.message)) {
+                    retries = 1 // we only retry once
+                    this._clearAuth()
+                    return startLoginFlow()
+                }
+                throw error
+            })
         }
 
         this._pendingLogin = startLoginFlow().finally(() => {

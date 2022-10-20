@@ -417,44 +417,6 @@
       "value": "새 결제 방법 추가"
     }
   ],
-  "cart.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "이 위시리스트에 추가됨"
-    }
-  ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
@@ -500,7 +462,7 @@
   "cart_secondary_button_group.label.this_is_gift": [
     {
       "type": 0,
-      "value": "선물입니다."
+      "value": "선물로 구매"
     }
   ],
   "cart_secondary_button_group.link_learn_more": [
@@ -585,6 +547,12 @@
     {
       "type": 0,
       "value": "주문하기"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "체크아웃하는 중에 예상치 못한 오류가 발생했습니다. "
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -796,7 +764,7 @@
   "checkout_footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
+      "value": "Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
     }
   ],
   "checkout_header.link.cart": [
@@ -958,23 +926,13 @@
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "이 "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
+      "value": "이 3자리 코드는 카드의 뒷면에서 확인할 수 있습니다."
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
     {
       "type": 0,
-      "value": "자리 코드는 카드의 "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": "에서 확인할 수 있습니다."
+      "value": "이 4자리 코드는 카드의 전면에서 확인할 수 있습니다."
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1246,7 +1204,7 @@
   "footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
+      "value": "Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
     }
   ],
   "footer.subscribe.button.sign_up": [
@@ -1315,6 +1273,56 @@
       "value": "문제가 발생했습니다. 다시 시도하십시오."
     }
   ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "개 항목"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "개 항목"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "이 위시리스트에 추가됨"
+    }
+  ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "항목이 위시리스트에서 제거됨"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "보기"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -1372,7 +1380,7 @@
   "home.description.here_to_help": [
     {
       "type": 0,
-      "value": "지원 담당자에게 문의하면"
+      "value": "지원 담당자에게 문의하십시오."
     }
   ],
   "home.description.here_to_help_line_2": [
@@ -1392,7 +1400,7 @@
     },
     {
       "type": 0,
-      "value": " 문서입니다."
+      "value": "입니다."
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1446,7 +1454,7 @@
   "home.features.heading.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Einstein Recommendations"
+      "value": "Einstein 제품 추천"
     }
   ],
   "home.features.heading.my_account": [
@@ -1458,7 +1466,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Shopper Login and API Access Service"
+      "value": "Shopper Login 및 API Access Service(SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1488,7 +1496,7 @@
   "home.hero_features.link.design_kit": [
     {
       "type": 0,
-      "value": "Figma PWA 디자인 키트를 사용하여 생성"
+      "value": "Figma PWA Design Kit를 사용하여 생성"
     }
   ],
   "home.hero_features.link.on_github": [
@@ -1524,7 +1532,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "소매점용 React PWA 스타터 매장"
+      "value": "리테일용 React PWA 스타터 스토어"
     }
   ],
   "item_attributes.label.promotions": [
@@ -1547,6 +1555,12 @@
     {
       "type": 0,
       "value": "판매"
+    }
+  ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "위에서 옵션을 모두 선택하십시오."
     }
   ],
   "locale_text.message.ar-SA": [
@@ -2183,44 +2197,6 @@
       "value": "제공 예정"
     }
   ],
-  "product_detail.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "이 위시리스트에 추가됨"
-    }
-  ],
   "product_detail.recommended_products.title.complete_set": [
     {
       "type": 0,
@@ -2265,50 +2241,6 @@
     {
       "type": 0,
       "value": "정렬 기준"
-    }
-  ],
-  "product_list.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "이 위시리스트에 추가됨"
-    }
-  ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "항목이 위시리스트에서 제거됨"
     }
   ],
   "product_list.modal.button.clear_filters": [
@@ -2443,50 +2375,6 @@
     {
       "type": 0,
       "value": "최근 검색"
-    }
-  ],
-  "recommended_products.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "개 항목"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "이 위시리스트에 추가됨"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "항목이 위시리스트에서 제거됨"
     }
   ],
   "register_form.action.sign_in": [
@@ -3219,6 +3107,18 @@
     {
       "type": 0,
       "value": "새 암호"
+    }
+  ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "카트에 추가"
+    }
+  ],
+  "wishlist_primary_action.button.select_options": [
+    {
+      "type": 0,
+      "value": "옵션 선택"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [

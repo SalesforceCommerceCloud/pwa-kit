@@ -1,25 +1,28 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 /* eslint-env jest */
-/* eslint max-nested-callbacks:0 */
-
 import fse from 'fs-extra'
+import https from 'https'
+import nock from 'nock'
+import os from 'os'
+import path from 'path'
+import sinon from 'sinon'
+import superagent from 'superagent'
+import request from 'supertest'
+
 import {PersistentCache} from '../../utils/ssr-cache'
-import {CachedResponse} from '../../utils/ssr-server'
+import {CachedResponse, getHashForString} from '../../utils/ssr-server'
+// We need to mock isRemote in some tests, so we need to import it directly from
+// the file it was defined in, because of the way jest works.
+import * as ssrServerUtils from '../../utils/ssr-server/utils'
+import {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} from './build-remote-server'
 import {X_MOBIFY_QUERYSTRING} from './constants'
-
-// Mock static assets (require path is relative to the 'ssr' directory)
-const mockStaticAssets = {}
-jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
-
-// We use require() for the ssr-server since we have to mock a module
-// that it needs.
-const {
+import {
     RESOLVED_PROMISE,
     generateCacheKey,
     getResponseFromCache,
@@ -27,19 +30,12 @@ const {
     cacheResponseWhenDone,
     respondFromBundle,
     getRuntime
-} = require('./express')
-const {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} = require('./build-remote-server')
-const ssrServerUtils = require('../../utils/ssr-server')
-const {getHashForString} = ssrServerUtils
-const fs = require('fs')
-const https = require('https')
-const nock = require('nock')
-const sinon = require('sinon')
-const path = require('path')
-const os = require('os')
-const rimraf = require('rimraf')
-const request = require('supertest')
-const superagent = require('superagent')
+} from './express'
+import {randomUUID} from 'crypto'
+
+// Mock static assets (require path is relative to the 'ssr' directory)
+const mockStaticAssets = {}
+jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
@@ -97,7 +93,7 @@ const opts = (overrides = {}) => {
     }
 }
 
-const mkdtempSync = () => fs.mkdtempSync(path.resolve(os.tmpdir(), 'ssr-server-tests-'))
+const mkdtempSync = () => fse.mkdtempSync(path.resolve(os.tmpdir(), 'ssr-server-tests-'))
 
 beforeAll(() => {
     // The SSR app applies patches on creation. Those patches are specific to an
@@ -177,6 +173,7 @@ describe('SSRServer operation', () => {
 
     afterEach(() => {
         sandbox.restore()
+        jest.resetModules()
         nock.cleanAll()
     })
 
@@ -185,6 +182,12 @@ describe('SSRServer operation', () => {
     })
 
     beforeEach(() => {
+        RemoteServerFactory._setRequestId = jest.fn().mockImplementation((_app) => {
+            _app.use((req, res, next) => {
+                res.locals.requestId = randomUUID()
+                next()
+            })
+        })
         // Ensure the environment is clean
         process.env = {
             LISTEN_ADDRESS: '',
@@ -389,7 +392,7 @@ describe('SSRServer operation', () => {
         })
 
         afterEach(() => {
-            rimraf.sync(tmpDir)
+            fse.removeSync(tmpDir)
         })
 
         const cases = [
@@ -426,6 +429,7 @@ describe('SSRServer operation', () => {
 
             test(`${name} (and handle 404s correctly)`, () => {
                 const app = RemoteServerFactory._createApp(opts({buildDir: tmpDir}))
+                app.get('/worker.js(.map)?', RemoteServerFactory.serveServiceWorker)
 
                 return request(app)
                     .get(requestPath)
@@ -472,8 +476,7 @@ describe('SSRServer operation', () => {
                 expect(response.headers['location'].endsWith('/elsewhere')).toBe(true)
             })
     })
-
-    test('should support other redirects', () => {
+    test('should warn about non-strict SSL ', () => {
         const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             res.redirect(302, '/elsewhere')
@@ -561,7 +564,7 @@ describe('SSRServer operation', () => {
             .parse(superagent.parse.image)
             .expect(200)
             .then((res) => {
-                const iconData = fs.readFileSync(faviconPath)
+                const iconData = fse.readFileSync(faviconPath)
                 expect(res.body).toEqual(iconData)
             })
     })
@@ -624,7 +627,7 @@ describe('SSRServer persistent caching', () => {
             case 'image':
                 res.status(status)
                 res.setHeader('content-type', 'image/png')
-                res.send(fs.readFileSync(path.join(testFixtures, 'mobify.png')))
+                res.send(fse.readFileSync(path.join(testFixtures, 'mobify.png')))
                 break
 
             case 'html':

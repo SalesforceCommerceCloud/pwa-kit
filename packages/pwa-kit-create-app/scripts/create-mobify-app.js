@@ -161,9 +161,10 @@ const runGenerator = (answers, {outputDir, verbose}) => {
     writeJson(pkgJsonPath, pkgDataWithAnswers)
 
     const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
+    const siteName = pkgDataWithAnswers.name
     replaceJSON(manifest, {
-        name: pkgDataWithAnswers.siteName,
-        short_name: pkgDataWithAnswers.siteName,
+        name: siteName,
+        short_name: siteName,
         start_url: '/?homescreen=1',
         icons: [
             {
@@ -270,7 +271,7 @@ const retailReactAppPrompts = () => {
         },
         {
             name: 'clientId',
-            message: 'What is your SLAS API Client ID in Account Manager?',
+            message: 'What is your SLAS Client ID?',
             validate: validClientId
         },
         {
@@ -320,7 +321,7 @@ const buildAnswers = ({
 const testProjectAnswers = () => {
     const config = {
         projectName: 'retail-react-app',
-        instanceUrl: 'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
+        instanceUrl: 'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com',
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
         siteId: 'RefArch',
         organizationId: 'f_ecom_zzrf_001',

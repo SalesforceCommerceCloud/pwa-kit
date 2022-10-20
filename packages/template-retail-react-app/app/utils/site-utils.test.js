@@ -124,6 +124,7 @@ describe('getDefaultSite', function() {
             id: 'site-2',
             l10n: {
                 defaultLocale: 'en-US',
+                defaultCurrency: 'USD',
                 supportedLocales: [
                     {
                         id: 'en-US',
@@ -152,6 +153,7 @@ describe('getSites', function() {
                 alias: 'uk',
                 l10n: {
                     defaultLocale: 'en-GB',
+                    defaultCurrency: 'GBP',
                     supportedLocales: [
                         {
                             id: 'en-GB',
@@ -174,6 +176,7 @@ describe('getSites', function() {
                 alias: 'us',
                 l10n: {
                     defaultLocale: 'en-US',
+                    defaultCurrency: 'USD',
                     supportedLocales: [
                         {
                             id: 'en-US',

@@ -6,10 +6,7 @@
  */
 import {useCallback} from 'react'
 import {useHistory} from 'react-router'
-import {useIntl} from 'react-intl'
-import {buildPathWithUrlConfig} from '../utils/url'
-import useSite from './use-site'
-import {getLocaleByReference} from '../utils/utils'
+import useMultiSite from './use-multi-site'
 
 /**
  * A convenience hook for programmatic navigation uses history's `push` or `replace`. The proper locale
@@ -19,8 +16,8 @@ import {getLocaleByReference} from '../utils/utils'
 const useNavigation = () => {
     const history = useHistory()
 
-    const {locale: localeShortCode} = useIntl()
-    const site = useSite()
+    const {site, locale: localeShortCode, buildUrl} = useMultiSite()
+
     return useCallback(
         /**
          *
@@ -29,12 +26,7 @@ const useNavigation = () => {
          * @param  {...any} args - additional args passed to `.push` or `.replace`
          */
         (path, action = 'push', ...args) => {
-            const locale = getLocaleByReference(site, localeShortCode)
-
-            const updatedHref = buildPathWithUrlConfig(path, {
-                locale: locale.alias || locale.id,
-                site: site.alias || site.id
-            })
+            const updatedHref = buildUrl(path)
             history[action](path === '/' ? '/' : updatedHref, ...args)
         },
         [localeShortCode, site]

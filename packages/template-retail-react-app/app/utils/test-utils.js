@@ -21,7 +21,6 @@ import {
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
-import {app as appConfig} from '../../config/default'
 import {IntlProvider} from 'react-intl'
 import {
     mockCategories as initialMockCategories,
@@ -43,9 +42,12 @@ export const SUPPORTED_LOCALES = [
         preferredCurrency: 'EUR'
     }
 ]
+export const DEFAULT_SITE = 'global'
 // Contexts
-import {CategoriesProvider, CurrencyProvider} from '../contexts'
-import {buildPathWithUrlConfig} from './url'
+import {CategoriesProvider, CurrencyProvider, MultiSiteProvider} from '../contexts'
+
+import {createUrlTemplate} from './url'
+import {getSiteByReference} from './site-utils'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -59,8 +61,8 @@ export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Ro
 
 export const renderWithRouterAndCommerceAPI = (node) => {
     const api = new CommerceAPI({
-        ...appConfig.commerceAPI,
-        einsteinConfig: appConfig.einsteinAPI,
+        ...mockConfig.app.commerceAPI,
+        einsteinConfig: mockConfig.app.einsteinAPI,
         proxy: undefined
     })
     return renderWithReactIntl(
@@ -80,8 +82,10 @@ export const TestProviders = ({
     initialBasket = null,
     initialCustomer = null,
     initialCategories = initialMockCategories,
-    locale = DEFAULT_LOCALE,
-    messages = fallbackMessages
+    locale = {id: DEFAULT_LOCALE},
+    messages = fallbackMessages,
+    appConfig = mockConfig.app,
+    siteAlias = DEFAULT_SITE
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -96,7 +100,7 @@ export const TestProviders = ({
     const proxy = undefined
 
     // @TODO: make this dynamic (getting from package.json during CI tests fails, so hardcoding for now)
-    const ocapiHost = 'zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com'
+    const ocapiHost = 'zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com'
 
     const api = new CommerceAPI({
         ...appConfig.commerceAPI,
@@ -121,27 +125,39 @@ export const TestProviders = ({
         onClose: () => {}
     }
 
+    const site = getSiteByReference(siteAlias || appConfig.defaultSite)
+
+    const buildUrl = createUrlTemplate(
+        appConfig,
+        site?.alias || site?.id,
+        locale.alias || locale.id
+    )
+
     return (
-        <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-            <CommerceAPIProvider value={api}>
-                <CategoriesProvider categories={initialCategories}>
-                    <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                        <CustomerProvider value={{customer, setCustomer}}>
-                            <BasketProvider value={{basket, setBasket}}>
-                                <CustomerProductListsProvider>
-                                    <Router>
-                                        <ChakraProvider theme={theme}>
-                                            <AddToCartModalContext.Provider value={addToCartModal}>
-                                                {children}
-                                            </AddToCartModalContext.Provider>
-                                        </ChakraProvider>
-                                    </Router>
-                                </CustomerProductListsProvider>
-                            </BasketProvider>
-                        </CustomerProvider>
-                    </CurrencyProvider>
-                </CategoriesProvider>
-            </CommerceAPIProvider>
+        <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+            <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
+                <CommerceAPIProvider value={api}>
+                    <CategoriesProvider categories={initialCategories}>
+                        <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                            <CustomerProvider value={{customer, setCustomer}}>
+                                <BasketProvider value={{basket, setBasket}}>
+                                    <CustomerProductListsProvider>
+                                        <Router>
+                                            <ChakraProvider theme={theme}>
+                                                <AddToCartModalContext.Provider
+                                                    value={addToCartModal}
+                                                >
+                                                    {children}
+                                                </AddToCartModalContext.Provider>
+                                            </ChakraProvider>
+                                        </Router>
+                                    </CustomerProductListsProvider>
+                                </BasketProvider>
+                            </CustomerProvider>
+                        </CurrencyProvider>
+                    </CategoriesProvider>
+                </CommerceAPIProvider>
+            </MultiSiteProvider>
         </IntlProvider>
     )
 }
@@ -153,7 +169,9 @@ TestProviders.propTypes = {
     initialCategories: PropTypes.element,
     initialProductLists: PropTypes.object,
     messages: PropTypes.object,
-    locale: PropTypes.string
+    locale: PropTypes.object,
+    appConfig: PropTypes.object,
+    siteAlias: PropTypes.string
 }
 
 /**
@@ -185,10 +203,9 @@ export const createPathWithDefaults = (path) => {
     const siteAlias = app.siteAliases[defaultSite.id]
     const defaultLocale = defaultSite.l10n.defaultLocale
 
-    const updatedPath = buildPathWithUrlConfig(path, {
-        site: siteAlias || defaultSite.id,
-        locale: defaultLocale
-    })
+    const buildUrl = createUrlTemplate(app, siteAlias || defaultSite, defaultLocale)
+
+    const updatedPath = buildUrl(path, siteAlias || defaultSite.id, defaultLocale)
     return updatedPath
 }
 

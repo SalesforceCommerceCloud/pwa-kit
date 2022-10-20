@@ -11,8 +11,11 @@ import {renderWithProviders} from '../../utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
+import mockConfig from '../../../config/mocks/default'
 
 jest.setTimeout(60000)
+
+jest.mock('../../commerce-api/einstein')
 
 const mockRegisteredCustomer = {
     authType: 'registered',
@@ -147,7 +150,9 @@ test('Allows customer to create an account', async () => {
     })
 
     // render our test component
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
 
     // fill out form and submit
     const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
