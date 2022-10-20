@@ -780,7 +780,7 @@
   "checkout_footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
+      "value": "Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
     }
   ],
   "checkout_header.link.cart": [
@@ -1232,7 +1232,7 @@
   "footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
+      "value": "Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
     }
   ],
   "footer.subscribe.button.sign_up": [

@@ -6,11 +6,16 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
-import useCommerceApi from '../useCommerceApi'
-import {UseQueryResult} from '@tanstack/react-query'
+import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperPromotions']
 
+type UsePromotionsParameters = NonNullable<Argument<Client['getPromotions']>>['parameters']
+type UsePromotionsHeaders = NonNullable<Argument<Client['getPromotions']>>['headers']
+type UsePromotionsArg = {
+    headers?: UsePromotionsHeaders
+    rawResponse?: boolean
+} & UsePromotionsParameters
 /**
  * A hook for `ShopperPromotions#getPromotions`.
  * Returns an array of enabled promotions for a list of specified IDs. In the request URL, you can specify up to 50 IDs. If you specify an ID that contains either parentheses or the separator characters, you must URL encode these characters. Each request returns only enabled promotions as the server does not consider promotion qualifiers or schedules.
@@ -18,12 +23,38 @@ type Client = ApiClients['shopperPromotions']
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperpromotions.shopperpromotions-1.html#getpromotions} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const usePromotions = (
-    arg: Argument<Client['getPromotions']>
-): UseQueryResult<DataType<Client['getPromotions']>, Error> => {
-    const {shopperPromotions: client} = useCommerceApi()
-    return useQuery(['promotions', arg], () => client.getPromotions(arg))
+function usePromotions(
+    arg: Omit<UsePromotionsArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>
+): UseQueryResult<DataType<Client['getPromotions']>, Error>
+function usePromotions(
+    arg: Omit<UsePromotionsArg, 'rawResponse'> & {rawResponse: true},
+    options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>
+): UseQueryResult<Response, Error>
+function usePromotions(
+    arg: UsePromotionsArg,
+    options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>
+): UseQueryResult<DataType<Client['getPromotions']> | Response, Error> {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        ['promotions', arg],
+        (_, {shopperPromotions}) => {
+            return shopperPromotions.getPromotions({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
+
+type UsePromotionsForCampaignParameters = NonNullable<
+    Argument<Client['getPromotionsForCampaign']>
+>['parameters']
+type UsePromotionsForCampaignHeaders = NonNullable<
+    Argument<Client['getPromotionsForCampaign']>
+>['headers']
+type UsePromotionsForCampaignArg = {
+    headers?: UsePromotionsForCampaignHeaders
+    rawResponse?: boolean
+} & UsePromotionsForCampaignParameters
 /**
  * A hook for `ShopperPromotions#getPromotionsForCampaign`.
  * Handles get promotion by filter criteria. Returns an array of enabled promotions matching the specified filter
@@ -35,9 +66,25 @@ promotions, since the server does not consider promotion qualifiers or schedules
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperpromotions.shopperpromotions-1.html#getpromotionsforcampaign} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const usePromotionsForCampaign = (
-    arg: Argument<Client['getPromotionsForCampaign']>
-): UseQueryResult<DataType<Client['getPromotionsForCampaign']>, Error> => {
-    const {shopperPromotions: client} = useCommerceApi()
-    return useQuery(['promotions-for-campaign', arg], () => client.getPromotionsForCampaign(arg))
+function usePromotionsForCampaign(
+    arg: Omit<UsePromotionsForCampaignArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getPromotionsForCampaign']> | Response, Error>
+): UseQueryResult<DataType<Client['getPromotionsForCampaign']>, Error>
+function usePromotionsForCampaign(
+    arg: Omit<UsePromotionsForCampaignArg, 'rawResponse'> & {rawResponse: true},
+    options?: UseQueryOptions<DataType<Client['getPromotionsForCampaign']> | Response, Error>
+): UseQueryResult<Response, Error>
+function usePromotionsForCampaign(
+    arg: UsePromotionsForCampaignArg,
+    options?: UseQueryOptions<DataType<Client['getPromotionsForCampaign']> | Response, Error>
+): UseQueryResult<DataType<Client['getPromotionsForCampaign']> | Response, Error> {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        ['promotions-for-campaign', arg],
+        (_, {shopperPromotions}) =>
+            shopperPromotions.getPromotionsForCampaign({parameters, headers}, rawResponse),
+        options
+    )
 }
+
+export {usePromotions, usePromotionsForCampaign}
