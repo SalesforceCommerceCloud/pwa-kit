@@ -37,6 +37,7 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'token_type'
     | 'usid'
+    | 'site_id'
 type AuthDataMap = Record<
     AuthDataKeys,
     {
@@ -101,6 +102,10 @@ const DATA_MAP: AuthDataMap = {
         callback: () => {
             cookieStorage.delete('cc-nx-g')
         }
+    },
+    site_id: {
+        storage: cookieStorage,
+        key: 'cc-site-id'
     }
 }
 
@@ -131,6 +136,19 @@ class Auth {
             fetchOptions: config.fetchOptions
         })
 
+        if (this.get('site_id') && this.get('site_id') !== config.siteId) {
+            // if site is switched, remove all existing auth data in storage
+            // and the next auth.ready() call with restart the auth flow
+            this.clearStorage()
+            this.pendingToken = undefined
+        }
+
+        if (!this.get('site_id')) {
+            this.set('site_id', config.siteId, {
+                expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
+            })
+        }
+
         this.redirectURI = config.redirectURI
     }
 
@@ -144,6 +162,13 @@ class Auth {
         const {key, storage} = DATA_MAP[name]
         storage.set(key, value, options)
         DATA_MAP[name].callback?.()
+    }
+
+    private clearStorage() {
+        Object.keys(DATA_MAP).forEach((key) => {
+            type Key = keyof AuthDataMap
+            DATA_MAP[key as Key].storage.delete(DATA_MAP[key as Key].key)
+        })
     }
 
     /**

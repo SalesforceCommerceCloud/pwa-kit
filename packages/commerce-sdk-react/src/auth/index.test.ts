@@ -39,6 +39,9 @@ jest.mock('./storage', () => {
                 },
                 get(key: string) {
                     return map.get(key)
+                },
+                delete(key: string) {
+                    map.delete(key)
                 }
             }
         })
@@ -148,6 +151,19 @@ describe('Auth', () => {
         expect(auth.isTokenExpired(JWTExpired)).toBe(true)
         // @ts-expect-error private method
         expect(() => auth.isTokenExpired()).toThrow()
+    })
+    test('site switch clears auth storage', () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token', '123')
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', '456')
+        const switchSiteConfig = {...config, siteId: 'another site'}
+        const newAuth = new Auth(switchSiteConfig)
+        // @ts-expect-error private method
+        expect(newAuth.get('access_token')).not.toBe('123')
+        // @ts-expect-error private method
+        expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
     test('isTokenExpired', () => {
         const auth = new Auth(config)

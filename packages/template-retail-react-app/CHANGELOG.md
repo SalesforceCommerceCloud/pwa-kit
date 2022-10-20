@@ -1,4 +1,5 @@
 ## v2.3.0-dev (Aug 25, 2022)
+- Ensure that a valid target locale is use if none is provided [#788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/788)
 ## v2.2.0 (Aug 25, 2022)
 - Update zzrf-001 url [#694](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/694)
 - Optimize Server-side performance [#667](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/667)
