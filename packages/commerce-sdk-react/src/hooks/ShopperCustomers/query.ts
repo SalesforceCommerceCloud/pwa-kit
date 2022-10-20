@@ -7,7 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
 import useCommerceApi from '../useCommerceApi'
-import {QueryClient, useQueryClient, UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
+import {UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperCustomers']
 
@@ -36,6 +36,7 @@ export const useCustomer = (
 ): UseQueryResult<DataType<Client['getCustomer']>> => {
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['customer', arg], () => client.getCustomer(arg))
+}
 /**
  * A hook for `ShopperCustomers#getCustomerAddress`.
  * Retrieves a customer's address by address name.
@@ -49,14 +50,6 @@ export const useCustomerAddress = (
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['address', arg], () => client.getCustomerAddress(arg))
 }
-type UseCustomerBasketsParameters = NonNullable<
-    Argument<Client['getCustomerBaskets']>
->['parameters']
-type UseCustomerBasketsHeaders = NonNullable<Argument<Client['getCustomerBaskets']>>['headers']
-type UseCustomerBasketsArg = {
-    headers?: UseCustomerBasketsHeaders
-    rawResponse?: boolean
-} & UseCustomerBasketsParameters
 /**
  * A hook for `ShopperCustomers#getCustomerBaskets`.
  * Gets the baskets of a customer.
@@ -64,44 +57,11 @@ type UseCustomerBasketsArg = {
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerbaskets} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export function useCustomerBaskets(
-    arg: Omit<UseCustomerBasketsArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getCustomerBaskets']> | Response, Error>
-): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error>
-export function useCustomerBaskets(
-    arg: Omit<UseCustomerBasketsArg, 'rawResponse'> & {rawResponse?: true},
-    options?: UseQueryOptions<DataType<Client['getCustomerBaskets']> | Response, Error>
-): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error>
-export function useCustomerBaskets(
-    arg: UseCustomerBasketsArg,
-    options?: UseQueryOptions<DataType<Client['getCustomerBaskets']> | Response, Error>
-) {
-    const queryClient = useQueryClient()
-    const {headers, rawResponse, ...parameters} = arg
-    const queryKey = ['/customers', parameters.customerId, '/baskets', arg]
-    const defaultOptions = {
-        enabled: !!parameters.customerId
-    }
-    return useQuery(
-        queryKey,
-        async (_, {shopperCustomers}) => {
-            const baskets = await shopperCustomers.getCustomerBaskets(
-                {parameters, headers},
-                rawResponse
-            )
-
-            // This is a performance optimization.
-            // Pre-populate the basket cache.
-            if (baskets && 'baskets' in baskets && baskets.baskets) {
-                baskets.baskets.forEach((basket) => {
-                    queryClient.setQueryData(['/baskets', basket.basketId], basket)
-                })
-            }
-
-            return baskets
-        },
-        {...defaultOptions, ...options}
-    )
+export const useCustomerBaskets = (
+    arg: Argument<Client['getCustomerBaskets']>
+): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error> => {
+    const {shopperCustomers: client} = useCommerceApi()
+    return useQuery(['baskets', arg], () => client.getCustomerBaskets(arg))
 }
 /**
  * A hook for `ShopperCustomers#getCustomerOrders`.
