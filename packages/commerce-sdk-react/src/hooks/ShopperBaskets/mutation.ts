@@ -6,7 +6,7 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction} from '@tanstack/react-query'
+import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -341,8 +341,36 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
 ) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
-    return useMutation<Data, Error, Params>((params, apiClients) => {
-        const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
-        return method.call(apiClients['shopperBaskets'], params)
-    })
+    const queryClient = useQueryClient()
+    return useMutation<Data, Error, Params>(
+        (params, apiClients) => {
+            const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
+            return method.call(apiClients['shopperBaskets'], params)
+        },
+        {
+            onSuccess: (data, params) => {
+                if (
+                    action === 'createBasket' ||
+                    action === 'transferBasket' ||
+                    action === 'mergeBasket'
+                ) {
+                    if ('customerInfo' in data && data.customerInfo?.customerId) {
+                        queryClient.invalidateQueries([
+                            '/customers',
+                            data.customerInfo?.customerId,
+                            '/baskets'
+                        ])
+                        queryClient.setQueryData(['/baskets', data.basketId], data)
+                    }
+                }
+
+                // @ts-ignore some action doesn't have basketId as parameter, like createBasket
+                if (params?.parameters?.basketId) {
+                    // @ts-ignore
+                    // invalidate all cache entries that are related to the basket
+                    queryClient.invalidateQueries(['/baskets', params?.parameters?.basketId])
+                }
+            }
+        }
+    )
 }

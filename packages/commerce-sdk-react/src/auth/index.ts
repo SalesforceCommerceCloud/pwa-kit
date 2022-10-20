@@ -152,7 +152,7 @@ class Auth {
         this.redirectURI = config.redirectURI
     }
 
-    private get(name: AuthDataKeys) {
+    get(name: AuthDataKeys) {
         const storage = DATA_MAP[name].storage
         const key = DATA_MAP[name].key
         return storage.get(key)
