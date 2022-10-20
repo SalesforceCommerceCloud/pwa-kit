@@ -97,11 +97,23 @@ export const mockHttpResponses = (options: NockBackOptions) => {
             .reply(303, undefined, {
                 Location: '/callback?usid=12345&code=ABCDE'
             })
-
         nock('http://localhost:3000')
             .get((uri) => {
                 return uri.includes('/callback')
             })
+            .reply(200)
+        nock('http://localhost:3000')
+            .persist()
+            .post((uri) => {
+                return uri.includes('/oauth2/login')
+            })
+            .reply(303, undefined, {
+                Location:
+                    '/callback?usid=851fd6b0-ef19-4eac-b556-fa13827708ed&state=1665780553940&scope=openid%20offline_access&code=bh7WZtgxdfdC_Jyy71gl9lFbV9di21S9brt2h-lZj-w'
+            })
+            .get(
+                '/callback?usid=851fd6b0-ef19-4eac-b556-fa13827708ed&state=1665780553940&scope=openid%20offline_access&code=bh7WZtgxdfdC_Jyy71gl9lFbV9di21S9brt2h-lZj-w'
+            )
             .reply(200)
         nock('http://localhost:3000')
             .persist()
