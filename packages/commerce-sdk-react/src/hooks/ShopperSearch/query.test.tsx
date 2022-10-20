@@ -24,7 +24,7 @@ const ProductSearchComponent = ({q, refine}: {q: string; refine: string[]}): Rea
             {isLoading && <span>Loading...</span>}
             {data && (
                 <div>
-                    {data.hits?.map(({productName, i}) => (
+                    {data.hits?.map(({productName}, i) => (
                         <div key={i}>{productName}</div>
                     ))}
                 </div>
@@ -43,7 +43,7 @@ const SearchSuggestionsComponent = ({q}: {q: string}): ReactElement => {
             {isLoading && <span>Loading...</span>}
             {data && (
                 <div>
-                    {data.productSuggestions?.products?.map(({productName, i}) => (
+                    {data.productSuggestions?.products?.map(({productName}, i) => (
                         <div key={i}>{productName}</div>
                     ))}
                 </div>
@@ -61,7 +61,7 @@ const tests = [
                 name: 'returns data',
                 assertions: withMocks(async () => {
                     const q = 'shirt'
-                    const refinement = ['price=(0..50)']
+                    const refinement = ['price=(0...50)']
                     renderWithProviders(<ProductSearchComponent q={q} refine={refinement} />)
                     const productNames = ['Striped Shirt', 'Paisley Shirt']
 
