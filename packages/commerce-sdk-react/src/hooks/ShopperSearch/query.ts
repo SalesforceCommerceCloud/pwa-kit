@@ -38,9 +38,9 @@ function useProductSearch(
     options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
 ): UseQueryResult<DataType<Client['productSearch']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    // const {locale, currency} = useConfig()
-    // parameters.locale = parameters.locale || locale
-    // parameters.currency = parameters.currency || currency
+    const {locale, currency} = useConfig()
+    parameters.locale = parameters.locale || locale
+    parameters.currency = parameters.currency || currency
     return useQuery(
         ['productSearch', arg],
         (_, {shopperSearch}) => shopperSearch.productSearch({parameters, headers}, rawResponse),
