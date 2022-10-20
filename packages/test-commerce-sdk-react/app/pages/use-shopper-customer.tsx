@@ -23,9 +23,7 @@ const ADDRESS_NAME = 'TestAddress'
 const LIST_ID = '987ae461a7c6c5fd17006fc774'
 const ITEM_ID = '500cebac3fe6e8aa67e22dca1a'
 const PRODUCT_ID = '25518823M'
-const RANDOM_STR = Math.random()
-    .toString(36)
-    .slice(2, 7)
+const RANDOM_STR = Math.random().toString(36).slice(2, 7)
 
 const renderQueryHook = (name: string, {data, isLoading, error}: any) => {
     if (isLoading) {
@@ -80,20 +78,24 @@ const renderMutationHook = ({name, hook, body, parameters}: any) => {
 function UseCustomer() {
     const queryClient = useQueryClient()
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const loginGuestUser = useShopperLoginHelper('loginGuestUser')
+
+    const guestUserMutationHooks = [// TODO: Register the current guest user to a registered user
+        {
+            action: 'registerCustomer',
+            body: {
+                customer: {
+                    login: `jsmith${RANDOM_STR}@test.com`,
+                    email: `jsmith${RANDOM_STR}@test.com`,
+                    first_name: `John${RANDOM_STR}`,
+                    last_name: `Smith${RANDOM_STR}`
+                },
+                password: 'Abcd!12345'
+            },
+            parameters: {}
+        }]
+
     const mutationHooks = [
-        // {
-        //     action: 'registerCustomer',
-        //     body: {
-        //         customer: {
-        //             login: 'jsmith111@test111.com',
-        //             email: 'jsmith111@test111.com',
-        //             first_name: 'John111',
-        //             last_name: 'Smith111'
-        //         },
-        //         password: 'Abcd!12345'
-        //     },
-        //     parameters: {}
-        // },
         {
             action: 'updateCustomer',
             body: {firstName: `Kobe${RANDOM_STR}`},
@@ -104,6 +106,7 @@ function UseCustomer() {
             body: {currentPassword: 'Test12345!', password: 'Test1234!'},
             parameters: {customerId: CUSTOMER_ID}
         },
+        // TODO: {"type":"https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized","title":"Unauthorized","detail":"Your access-token is invalid and could not be used to identify the API client."}
         // {
         //     action: 'getResetPasswordToken',
         //     body: {login: 'kobe@test.com'},
@@ -223,15 +226,15 @@ function UseCustomer() {
             ) : (
                 <>
                     <div>
-                        <h1>Mutation hooks</h1>
-                        {mutationHooks.map((mutation) => {
-                            return renderMutationHook({...mutation})
-                        })}
-                    </div>
-                    <div>
                         <h1>Query hooks</h1>
                         {queryHooks.map(({name, hook}) => {
                             return renderQueryHook(name, {...hook})
+                        })}
+                    </div>
+                    <div>
+                        <h1>Mutation hooks</h1>
+                        {mutationHooks.map((mutation) => {
+                            return renderMutationHook({...mutation})
                         })}
                     </div>
                 </>
