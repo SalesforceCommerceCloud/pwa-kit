@@ -37,7 +37,7 @@ class LocalStorageMock {
 const localStorageMock = new LocalStorageMock()
 
 Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock
+    value: localStorageMock,
 })
 
 global.beforeEach(() => {
