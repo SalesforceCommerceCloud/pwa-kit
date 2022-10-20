@@ -19,6 +19,9 @@ const UsePromotionsForCampaign = loadable(() => import('./pages/use-promotions-f
 const UseShopperLoginHelper = loadable(() => import('./pages/use-shopper-login-helper'))
 const UseShopperBaskets = loadable(() => import('./pages/use-shopper-baskets'))
 const QueryErrors = loadable(() => import('./pages/query-errors'))
+const UseGetOrder = loadable(() => import('./pages/use-shopper-get-order'))
+const UsePaymentMethods = loadable(() => import('./pages/use-payment-methods'))
+const UseShopperOrders = loadable(() => import('./pages/use-shopper-orders'))
 
 const routes = [
     {
@@ -73,6 +76,18 @@ const routes = [
     {
         path: '/query-errors',
         component: QueryErrors
+    },
+    {
+        path: '/orders/:orderNo/payment-methods',
+        component: UsePaymentMethods
+    },
+    {
+        path: '/orders/:orderNo',
+        component: UseGetOrder
+    },
+    {
+        path: '/orders',
+        component: UseShopperOrders
     }
 ]
 
