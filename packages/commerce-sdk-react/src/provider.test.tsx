@@ -13,6 +13,12 @@ import useAuth from './hooks/useAuth'
 
 const {withMocks} = mockHttpResponses({directory: path.join(__dirname, `../mock-responses`)})
 
+jest.mock('./hooks/useAuth', () => {
+    return jest.fn(() => ({
+        ready: () => Promise.resolve({access_token: '123'})
+    }))
+})
+
 test(
     'useCommerceApi returns a set of api clients',
     withMocks(async () => {
