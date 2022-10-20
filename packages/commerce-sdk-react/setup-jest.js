@@ -6,7 +6,6 @@
  */
 import '@testing-library/jest-dom'
 import {configure} from '@testing-library/dom'
-import {networkInterfaces} from 'os'
 import nock from 'nock'
 
 // Default testing library timeout is too short for serial network calls
