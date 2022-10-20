@@ -80,25 +80,25 @@ const renderMutationHook = ({name, hook, body, parameters}: any) => {
 function UseCustomer() {
     const queryClient = useQueryClient()
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-    const loginGuestUser = useShopperLoginHelper('loginGuestUser')
 
-    // TODO: Implement the flow: Login as a guest user and then registered that user.
+    // TODO: Implement the flow - Login as a guest user and then registered that user.
     //  Currently Login as a guest doesn't work in packages/test-commerce-sdk-react/app/pages/use-shopper-login-helper.tsx
-    const guestUserMutationHooks = [
-        {
-            action: 'registerCustomer',
-            body: {
-                customer: {
-                    login: `jsmith${RANDOM_STR}@test.com`,
-                    email: `jsmith${RANDOM_STR}@test.com`,
-                    first_name: `John${RANDOM_STR}`,
-                    last_name: `Smith${RANDOM_STR}`
-                },
-                password: 'Abcd!12345'
-            },
-            parameters: {}
-        }
-    ]
+    // const loginGuestUser = useShopperLoginHelper('loginGuestUser')
+    // const guestUserMutationHooks = [
+    //     {
+    //         action: 'registerCustomer',
+    //         body: {
+    //             customer: {
+    //                 login: `jsmith${RANDOM_STR}@test.com`,
+    //                 email: `jsmith${RANDOM_STR}@test.com`,
+    //                 first_name: `John${RANDOM_STR}`,
+    //                 last_name: `Smith${RANDOM_STR}`
+    //             },
+    //             password: 'Abcd!12345'
+    //         },
+    //         parameters: {}
+    //     }
+    // ]
 
     const mutationHooks = [
         {
