@@ -67,22 +67,6 @@ type NockBackOptions = {
     mode?: nock.BackMode
 }
 
-export const PAYMENT_EXPECTED_RETURN = {
-    customerName: 'Alex V',
-    exportStatus: 'not_exported',
-    orderNo: '00014103',
-    orderToken: 'D08foBs-EGXwPwVxuax-KZu5YA9vbL6lVg86Mx_6joY',
-    orderTotal: 229.11,
-    paymentInstruments: [
-        {
-            amount: 700,
-            bankRoutingNumber: '123456',
-            paymentInstrumentId: '5db799461deeaccf700ea4f125',
-            paymentMethodId: 'GIFT_CERTIFICATE'
-        }
-    ]
-}
-
 /**
  * Enable recording and mocking of the http responses
  *
@@ -147,16 +131,7 @@ export const mockHttpResponses = (options: NockBackOptions) => {
             })
     }
 
-    const mockMutationCalls = (body: any) => {
-        nock('http://localhost:3000')
-            .persist()
-            .post((uri) => {
-                return uri.includes('/payment-instruments')
-            })
-            .reply(200, body)
-    }
-
-    const withMocks = (testFn: () => Promise<void> | void, expectedPaymentReturn?: any) => {
+    const withMocks = (testFn: () => Promise<void> | void) => {
         return async () => {
             const testName = expect.getState().currentTestName
             if (!testName) {
@@ -167,7 +142,6 @@ export const mockHttpResponses = (options: NockBackOptions) => {
             nockBack.setMode(mode)
             const {nockDone} = await nockBack(fileName)
             mockAuthCalls()
-            mockMutationCalls(expectedPaymentReturn)
             await testFn()
             nockDone()
             // Make sure nock do not interfere with other tests that do not call `withMocks`
