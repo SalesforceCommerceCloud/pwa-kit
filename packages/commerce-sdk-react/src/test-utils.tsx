@@ -11,6 +11,7 @@ import nock from 'nock'
 import React from 'react'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {url} from 'inspector'
 
 export const TEST_CONFIG = {
     proxy: 'http://localhost:3000/mobify/proxy/api',
@@ -99,7 +100,19 @@ export const mockHttpResponses = (options: NockBackOptions) => {
             })
             .get('/callback?usid=12345&code=ABCDE')
             .reply(200)
-
+        nock('http://localhost:3000')
+            .persist()
+            .post((uri) => {
+                return uri.includes('/oauth2/login')
+            })
+            .reply(303, undefined, {
+                Location:
+                    '/callback?usid=851fd6b0-ef19-4eac-b556-fa13827708ed&state=1665780553940&scope=openid%20offline_access&code=bh7WZtgxdfdC_Jyy71gl9lFbV9di21S9brt2h-lZj-w'
+            })
+            .get(
+                '/callback?usid=851fd6b0-ef19-4eac-b556-fa13827708ed&state=1665780553940&scope=openid%20offline_access&code=bh7WZtgxdfdC_Jyy71gl9lFbV9di21S9brt2h-lZj-w'
+            )
+            .reply(200)
         nock('http://localhost:3000')
             .persist()
             .post((uri) => {
