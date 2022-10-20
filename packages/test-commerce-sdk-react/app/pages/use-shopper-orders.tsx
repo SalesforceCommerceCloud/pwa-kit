@@ -14,8 +14,6 @@ import {
     ShopperLoginHelpers
 } from 'commerce-sdk-react'
 const orderNos = ['00014202', '00014103']
-const ORDER_NO = '00014103'
-const BANK_ROUTING = '123456'
 
 const renderMutationHooks = ({name, hook, body, parameters}: any) => {
     return (
