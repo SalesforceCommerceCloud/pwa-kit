@@ -20,7 +20,7 @@ export const TEST_CONFIG = {
     redirectURI: 'http://localhost:3000/callback',
     siteId: 'RefArchGlobal',
     locale: 'en-US',
-    currency: 'USD'
+    currency: 'USD',
 }
 const TestProviders = (props: {
     children: React.ReactNode
@@ -29,7 +29,7 @@ const TestProviders = (props: {
     const {commerceApiProvider} = props
     const queryClient = new QueryClient({
         // During testing, we want things to fail immediately
-        defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
+        defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
     })
     return (
         <QueryClientProvider client={queryClient}>
@@ -57,7 +57,7 @@ export const renderWithProviders = (
     render(children, {
         // eslint-disable-next-line react/display-name
         wrapper: () => <TestProviders {...providerProps}>{children}</TestProviders>,
-        ...options
+        ...options,
     })
 }
 
@@ -95,9 +95,13 @@ export const mockHttpResponses = (options: NockBackOptions) => {
                 return !!q['code_challenge']
             })
             .reply(303, undefined, {
-                Location: '/callback?usid=12345&code=ABCDE'
+                Location: '/callback?usid=12345&code=ABCDE',
             })
-            .get('/callback?usid=12345&code=ABCDE')
+
+        nock('http://localhost:3000')
+            .get((uri) => {
+                return uri.includes('/callback')
+            })
             .reply(200)
 
         nock('http://localhost:3000')
@@ -114,7 +118,7 @@ export const mockHttpResponses = (options: NockBackOptions) => {
                 usid: '851fd6b0-ef19-4eac-b556-fa13827708ed',
                 customer_id: 'bcmbsVxKo0wHaRxuwVmqYYxudH',
                 enc_user_id: 'adb831a7fdd83dd1e2a309ce7591dff8',
-                idp_access_token: null
+                idp_access_token: null,
             })
     }
 
