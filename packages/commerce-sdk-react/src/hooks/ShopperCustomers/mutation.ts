@@ -239,19 +239,6 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         {
             onSuccess: (data, params) => {
                 // TODO: Fine grain invalidation of '/customers'
-                // if (
-                //     action === 'createBasket' ||
-                //     action === 'transferBasket' ||
-                //     action === 'mergeBasket'
-                // ) {
-                //     if ('customerId' in data && data) {
-                //         queryClient.invalidateQueries([
-                //             '/customers',
-                //             data.customerInfo?.customerId
-                //         ])
-                //         queryClient.setQueryData(['/customers'], data)
-                //     }
-                // }
 
                 // @ts-ignore some action doesn't have customerId as parameter
                 if (params?.parameters?.customerId) {
