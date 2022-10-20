@@ -2,7 +2,7 @@
     {
         "scope": "http://localhost:3000",
         "method": "GET",
-        "path": "/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/categories?ids=5%2C18%2C4%2C19%2C23%2C13%2C22%2C6%2C0%2C17%2C11%2C10%2C23%2C1%2C10%2C3%2C17%2C21%2C25%2C19%2C17%2C22%2C10%2C20%2C11%2C9%2C19%2C12%2C15%2C18%2C14%2C12%2C21%2C15%2C25%2C5%2C20%2C6%2C20%2C14%2C1%2C4%2C20%2C15%2C22%2C5%2C12%2C19%2C11%2C20%2C20&levels=2&locale=en-US&siteId=RefArchGlobal",
+        "path": "/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/categories?ids=3%2C24%2C23%2C0%2C12%2C8%2C21%2C8%2C15%2C16%2C17%2C14%2C15%2C8%2C12%2C18%2C25%2C5%2C12%2C9%2C23%2C25%2C6%2C22%2C19%2C12%2C14%2C9%2C6%2C12%2C14%2C13%2C6%2C15%2C14%2C15%2C2%2C23%2C9%2C10%2C4%2C6%2C19%2C13%2C23%2C3%2C23%2C1%2C9%2C23%2C13&levels=2&locale=en-US&siteId=RefArchGlobal",
         "body": "",
         "status": 400,
         "response": {
@@ -12,7 +12,7 @@
         },
         "rawHeaders": [
             "date",
-            "Thu, 20 Oct 2022 18:55:18 GMT",
+            "Thu, 20 Oct 2022 19:19:49 GMT",
             "content-type",
             "application/problem+json; charset=UTF-8",
             "content-length",
@@ -20,17 +20,17 @@
             "connection",
             "close",
             "host",
-            "lb003-mprd-use1.cloudhub.commercecloud.salesforce.com",
+            "lb002-mprd-use1.cloudhub.commercecloud.salesforce.com",
             "cf-ew-via",
             "15",
             "cdn-loop",
             "cloudflare; subreqs=1",
             "x-real-ip",
-            "162.158.142.186",
+            "162.158.142.150",
             "x-forwarded-proto",
             "https",
             "cf-ray",
-            "75d3f78b7dbea702-PHX",
+            "75d41b743b07a700-PHX",
             "accept-encoding",
             "gzip",
             "accept",
@@ -52,9 +52,9 @@
             "true-client-ip",
             "13.110.54.15",
             "x-correlation-id",
-            "75d3f78b7dbea702",
+            "75d41b743b07a700",
             "x-forwarded-for",
-            "13.110.54.15, 162.158.142.186",
+            "13.110.54.15, 162.158.142.150",
             "x-forwarded-host",
             "kv7kzm78.api.commercecloud.salesforce.com",
             "x-forwarded-proto-real",
@@ -74,7 +74,7 @@
             "server",
             "cloudflare",
             "x-proxy-request-url",
-            "https://kv7kzm78.api.commercecloud.salesforce.com/product/shopper-products/v1/organizations/f_ecom_zzrf_001/categories?ids=5%2C18%2C4%2C19%2C23%2C13%2C22%2C6%2C0%2C17%2C11%2C10%2C23%2C1%2C10%2C3%2C17%2C21%2C25%2C19%2C17%2C22%2C10%2C20%2C11%2C9%2C19%2C12%2C15%2C18%2C14%2C12%2C21%2C15%2C25%2C5%2C20%2C6%2C20%2C14%2C1%2C4%2C20%2C15%2C22%2C5%2C12%2C19%2C11%2C20%2C20&levels=2&locale=en-US&siteId=RefArchGlobal"
+            "https://kv7kzm78.api.commercecloud.salesforce.com/product/shopper-products/v1/organizations/f_ecom_zzrf_001/categories?ids=3%2C24%2C23%2C0%2C12%2C8%2C21%2C8%2C15%2C16%2C17%2C14%2C15%2C8%2C12%2C18%2C25%2C5%2C12%2C9%2C23%2C25%2C6%2C22%2C19%2C12%2C14%2C9%2C6%2C12%2C14%2C13%2C6%2C15%2C14%2C15%2C2%2C23%2C9%2C10%2C4%2C6%2C19%2C13%2C23%2C3%2C23%2C1%2C9%2C23%2C13&levels=2&locale=en-US&siteId=RefArchGlobal"
         ],
         "responseIsBinary": false
     }
