@@ -118,6 +118,8 @@ const CustomerOrdersComponent = ({customerId}: {customerId: string}): ReactEleme
     )
 }
 
+//TODO: Create a basket for the register user before testing if the basket exist
+// Baskets are created in PR not merged yet https://github.com/SalesforceCommerceCloud/pwa-kit/pull/768
 const CustomerBasketsComponent = ({customerId}: {customerId: string}): ReactElement => {
     const queryClient = useQueryClient()
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
@@ -272,6 +274,8 @@ const tests = [
             }
         ]
     },
+    //TODO: Create a basket for the register user before testing if the basket exist
+    // Baskets are created in PR not merged yet https://github.com/SalesforceCommerceCloud/pwa-kit/pull/768
     {
         hook: 'useCustomerBaskets',
         cases: [
