@@ -6,8 +6,11 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
+
+// TODO: Remove once phase2 is completed and all hooks are implemented
 import useCommerceApi from '../useCommerceApi'
-import {UseQueryResult} from '@tanstack/react-query'
+
+import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperCustomers']
 
@@ -18,12 +21,16 @@ type Client = ApiClients['shopperCustomers']
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getexternalprofile} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useExternalProfile = (
+function useExternalProfile(
     arg: Argument<Client['getExternalProfile']>
-): UseQueryResult<DataType<Client['getExternalProfile']>, Error> => {
+): UseQueryResult<DataType<Client['getExternalProfile']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['external-profile', arg], () => client.getExternalProfile(arg))
 }
+
+type UseCustomerParameters = NonNullable<Argument<Client['getCustomer']>>['parameters']
+type UseCustomerHeaders = NonNullable<Argument<Client['getCustomer']>>['headers']
+type UseCustomerArg = {headers?: UseCustomerHeaders; rawResponse?: boolean} & UseCustomerParameters
 /**
  * A hook for `ShopperCustomers#getCustomer`.
  * Gets a customer with all existing addresses and payment instruments associated with the requested customer.
@@ -31,12 +38,36 @@ export const useExternalProfile = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomer} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomer = (
-    arg: Argument<Client['getCustomer']>
-): UseQueryResult<DataType<Client['getCustomer']>> => {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['customer', arg], () => client.getCustomer(arg))
+function useCustomer(
+    arg: Omit<UseCustomerArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomer']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomer']>, Error>
+function useCustomer(
+    arg: Omit<UseCustomerArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomer']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomer']>, Error>
+function useCustomer(
+    arg: UseCustomerArg,
+    options?: UseQueryOptions<DataType<Client['getCustomer']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomer']>, Error> {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        ['/customers', parameters.customerId, arg],
+        (_, {shopperCustomers}) => {
+            return shopperCustomers.getCustomer({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
+
+type UseCustomerAddressParameters = NonNullable<
+    Argument<Client['getCustomerAddress']>
+>['parameters']
+type UseCustomerAddressHeaders = NonNullable<Argument<Client['getCustomerAddress']>>['headers']
+type UseCustomerAddressArg = {
+    headers?: UseCustomerAddressHeaders
+    rawResponse?: boolean
+} & UseCustomerAddressParameters
 /**
  * A hook for `ShopperCustomers#getCustomerAddress`.
  * Retrieves a customer's address by address name.
@@ -44,12 +75,36 @@ export const useCustomer = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomeraddress} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerAddress = (
-    arg: Argument<Client['getCustomerAddress']>
-): UseQueryResult<DataType<Client['getCustomerAddress']>, Error> => {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['address', arg], () => client.getCustomerAddress(arg))
+function useCustomerAddress(
+    arg: Omit<UseCustomerAddressArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomerAddress']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerAddress']>, Error>
+function useCustomerAddress(
+    arg: Omit<UseCustomerAddressArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomerAddress']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerAddress']>, Error>
+function useCustomerAddress(
+    arg: UseCustomerAddressArg,
+    options?: UseQueryOptions<DataType<Client['getCustomerAddress']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        ['/customers', parameters.customerId, '/addresses', arg],
+        (_, {shopperCustomers}) => {
+            return shopperCustomers.getCustomerAddress({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
+
+type UseCustomerBasketsParameters = NonNullable<
+    Argument<Client['getCustomerBaskets']>
+>['parameters']
+type UseCustomerBasketsHeaders = NonNullable<Argument<Client['getCustomerBaskets']>>['headers']
+type UseCustomerBasketsArg = {
+    headers?: UseCustomerBasketsHeaders
+    rawResponse?: boolean
+} & UseCustomerBasketsParameters
 /**
  * A hook for `ShopperCustomers#getCustomerBaskets`.
  * Gets the baskets of a customer.
@@ -57,12 +112,34 @@ export const useCustomerAddress = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerbaskets} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerBaskets = (
-    arg: Argument<Client['getCustomerBaskets']>
-): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error> => {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['baskets', arg], () => client.getCustomerBaskets(arg))
+function useCustomerBaskets(
+    arg: Omit<UseCustomerBasketsArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomerBaskets']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error>
+function useCustomerBaskets(
+    arg: Omit<UseCustomerBasketsArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomerBaskets']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerBaskets']>, Error>
+function useCustomerBaskets(
+    arg: UseCustomerBasketsArg,
+    options?: UseQueryOptions<DataType<Client['getCustomerBaskets']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        ['/customers', parameters.customerId, '/baskets', arg],
+        (_, {shopperCustomers}) => {
+            return shopperCustomers.getCustomerBaskets({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
+
+type UseCustomerOrdersParameters = NonNullable<Argument<Client['getCustomerOrders']>>['parameters']
+type UseCustomerOrdersHeaders = NonNullable<Argument<Client['getCustomerOrders']>>['headers']
+type UseCustomerOrdersArg = {
+    headers?: UseCustomerOrdersHeaders
+    rawResponse?: boolean
+} & UseCustomerOrdersParameters
 /**
  * A hook for `ShopperCustomers#getCustomerOrders`.
  * Returns a pageable list of all customer's orders. The default page size is 10.
@@ -70,12 +147,28 @@ export const useCustomerBaskets = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerorders} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerOrders = (
-    arg: Argument<Client['getCustomerOrders']>
-): UseQueryResult<DataType<Client['getCustomerOrders']>, Error> => {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['orders', arg], () => client.getCustomerOrders(arg))
+function useCustomerOrders(
+    arg: Omit<UseCustomerOrdersArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomerOrders']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerOrders']>, Error>
+function useCustomerOrders(
+    arg: Omit<UseCustomerOrdersArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomerOrders']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerOrders']>, Error>
+function useCustomerOrders(
+    arg: UseCustomerOrdersArg,
+    options?: UseQueryOptions<DataType<Client['getCustomerOrders']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        ['/customers', parameters.customerId, '/orders', arg],
+        (_, {shopperCustomers}) => {
+            return shopperCustomers.getCustomerOrders({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
+
 /**
  * A hook for `ShopperCustomers#getCustomerPaymentInstrument`.
  * Retrieves a customer's payment instrument by its ID.
@@ -83,9 +176,9 @@ export const useCustomerOrders = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerpaymentinstrument} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerPaymentInstrument = (
+function useCustomerPaymentInstrument(
     arg: Argument<Client['getCustomerPaymentInstrument']>
-): UseQueryResult<DataType<Client['getCustomerPaymentInstrument']>, Error> => {
+): UseQueryResult<DataType<Client['getCustomerPaymentInstrument']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['payment-instrument', arg], () => client.getCustomerPaymentInstrument(arg))
 }
@@ -96,12 +189,23 @@ export const useCustomerPaymentInstrument = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlists} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerProductLists = (
+function useCustomerProductLists(
     arg: Argument<Client['getCustomerProductLists']>
-): UseQueryResult<DataType<Client['getCustomerProductLists']>, Error> => {
+): UseQueryResult<DataType<Client['getCustomerProductLists']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['product-lists', arg], () => client.getCustomerProductLists(arg))
 }
+
+type UseCustomerProductListParameters = NonNullable<
+    Argument<Client['getCustomerProductList']>
+>['parameters']
+type UseCustomerProductListHeaders = NonNullable<
+    Argument<Client['getCustomerProductList']>
+>['headers']
+type UseCustomerProductListArg = {
+    headers?: UseCustomerProductListHeaders
+    rawResponse?: boolean
+} & UseCustomerProductListParameters
 /**
  * A hook for `ShopperCustomers#getCustomerProductList`.
  * Returns a customer product list of the given customer and the items in the list.
@@ -109,12 +213,28 @@ export const useCustomerProductLists = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlist} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerProductList = (
-    arg: Argument<Client['getCustomerProductList']>
-): UseQueryResult<DataType<Client['getCustomerProductList']>, Error> => {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['product-list', arg], () => client.getCustomerProductList(arg))
+function useCustomerProductList(
+    arg: Omit<UseCustomerProductListArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomerProductList']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerProductList']>, Error>
+function useCustomerProductList(
+    arg: Omit<UseCustomerProductListArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomerProductList']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerProductList']>, Error>
+function useCustomerProductList(
+    arg: UseCustomerProductListArg,
+    options?: UseQueryOptions<DataType<Client['getCustomerProductList']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        ['/customers', parameters.customerId, '/product-list', arg],
+        (_, {shopperCustomers}) => {
+            return shopperCustomers.getCustomerProductList({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
+
 /**
  * A hook for `ShopperCustomers#getCustomerProductListItem`.
  * Returns an item of a customer product list and the actual product details like image, availability and price.
@@ -122,9 +242,9 @@ export const useCustomerProductList = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlistitem} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useCustomerProductListItem = (
+function useCustomerProductListItem(
     arg: Argument<Client['getCustomerProductListItem']>
-): UseQueryResult<DataType<Client['getCustomerProductListItem']>, Error> => {
+): UseQueryResult<DataType<Client['getCustomerProductListItem']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['product-list-item', arg], () => client.getCustomerProductListItem(arg))
 }
@@ -135,9 +255,9 @@ export const useCustomerProductListItem = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getpublicproductlistsbysearchterm} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const usePublicProductListsBySearchTerm = (
+function usePublicProductListsBySearchTerm(
     arg: Argument<Client['getPublicProductListsBySearchTerm']>
-): UseQueryResult<DataType<Client['getPublicProductListsBySearchTerm']>, Error> => {
+): UseQueryResult<DataType<Client['getPublicProductListsBySearchTerm']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['product-list-by-search-term', arg], () =>
         client.getPublicProductListsBySearchTerm(arg)
@@ -150,9 +270,9 @@ export const usePublicProductListsBySearchTerm = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getpublicproductlist} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const usePublicProductList = (
+function usePublicProductList(
     arg: Argument<Client['getPublicProductList']>
-): UseQueryResult<DataType<Client['getPublicProductList']>, Error> => {
+): UseQueryResult<DataType<Client['getPublicProductList']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['public-product-list', arg], () => client.getPublicProductList(arg))
 }
@@ -163,9 +283,24 @@ export const usePublicProductList = (
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getproductlistitem} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useProductListItem = (
+function useProductListItem(
     arg: Argument<Client['getProductListItem']>
-): UseQueryResult<DataType<Client['getProductListItem']>, Error> => {
+): UseQueryResult<DataType<Client['getProductListItem']>, Error> {
     const {shopperCustomers: client} = useCommerceApi()
     return useQuery(['product-list-item', arg], () => client.getProductListItem(arg))
+}
+
+export {
+    useExternalProfile,
+    useCustomer,
+    useCustomerAddress,
+    useCustomerBaskets,
+    useCustomerOrders,
+    useCustomerPaymentInstrument,
+    useCustomerProductLists,
+    useCustomerProductList,
+    useCustomerProductListItem,
+    usePublicProductListsBySearchTerm,
+    usePublicProductList,
+    useProductListItem
 }

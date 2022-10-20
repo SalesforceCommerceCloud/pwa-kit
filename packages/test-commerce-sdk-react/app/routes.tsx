@@ -12,12 +12,16 @@ const UseProduct = loadable(() => import('./pages/use-shopper-product'))
 const UseCategories = loadable(() => import('./pages/use-shopper-categories'))
 const UseCategory = loadable(() => import('./pages/use-shopper-category'))
 const UseProductSearch = loadable(() => import('./pages/use-product-search'))
+const UseCustomer = loadable(() => import('./pages/use-shopper-customer'))
 const UsePromotions = loadable(() => import('./pages/use-promotions'))
 const UsePromotionsForCampaign = loadable(() => import('./pages/use-promotions-for-campaign'))
 const UseShopperLoginHelper = loadable(() => import('./pages/use-shopper-login-helper'))
 const UseSearchSuggestions = loadable(() => import('./pages/use-search-suggestions'))
 const UseShopperBaskets = loadable(() => import('./pages/use-shopper-baskets'))
 const QueryErrors = loadable(() => import('./pages/query-errors'))
+const UseGetOrder = loadable(() => import('./pages/use-shopper-get-order'))
+const UsePaymentMethods = loadable(() => import('./pages/use-payment-methods'))
+const UseShopperOrders = loadable(() => import('./pages/use-shopper-orders'))
 
 const routes = [
     {
@@ -58,6 +62,10 @@ const routes = [
         component: UsePromotionsForCampaign
     },
     {
+        path: '/customer',
+        component: UseCustomer
+    },
+    {
         path: '/slas-helpers',
         component: UseShopperLoginHelper
     },
@@ -68,6 +76,18 @@ const routes = [
     {
         path: '/query-errors',
         component: QueryErrors
+    },
+    {
+        path: '/orders/:orderNo/payment-methods',
+        component: UsePaymentMethods
+    },
+    {
+        path: '/orders/:orderNo',
+        component: UseGetOrder
+    },
+    {
+        path: '/orders',
+        component: UseShopperOrders
     }
 ]
 
