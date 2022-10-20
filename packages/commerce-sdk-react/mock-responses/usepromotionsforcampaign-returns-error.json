@@ -2,37 +2,37 @@
     {
         "scope": "http://localhost:3000",
         "method": "GET",
-        "path": "/mobify/proxy/api/pricing/shopper-promotions/v1/organizations/f_ecom_zzrf_001/promotions/campaigns/promo_22_promo_43_promo_10_promo_42_promo_16_promo_0_promo_20_promo_19_promo_12_promo_0_promo_40_promo_41_promo_19_promo_20_promo_7_promo_38_promo_27_promo_18_promo_2_promo_15_promo_3_promo_30_promo_1_promo_10_promo_3_promo_12_promo_15_promo_31_promo_35_promo_31_promo_24_promo_4_promo_47_promo_44_promo_47_promo_4_promo_15_promo_31_promo_27_promo_42_promo_0_promo_41_promo_46_promo_8_promo_0_promo_38_promo_21_promo_26_promo_12_promo_23_promo_39?siteId=RefArchGlobal",
+        "path": "/mobify/proxy/api/pricing/shopper-promotions/v1/organizations/f_ecom_zzrf_001/promotions/campaigns/promo_16_promo_10_promo_2_promo_32_promo_2_promo_4_promo_47_promo_40_promo_38_promo_17_promo_29_promo_19_promo_48_promo_42_promo_27_promo_23_promo_11_promo_31_promo_8_promo_2_promo_17_promo_49_promo_15_promo_2_promo_29_promo_39_promo_27_promo_10_promo_13_promo_23_promo_23_promo_38_promo_38_promo_39_promo_43_promo_30_promo_49_promo_25_promo_33_promo_25_promo_11_promo_46_promo_41_promo_39_promo_47_promo_6_promo_1_promo_15_promo_48_promo_33_promo_38?siteId=RefArchGlobal",
         "body": "",
         "status": 400,
         "response": {
             "title": "Bad Request",
             "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/invalid-uri-parameter",
-            "detail": "Invalid value 'promo_22_promo_43_promo_10_promo_42_promo_16_promo_0_promo_20_promo_19_promo_12_promo_0_promo_40_promo_41_promo_19_promo_20_promo_7_promo_38_promo_27_promo_18_promo_2_promo_15_promo_3_promo_30_promo_1_promo_10_promo_3_promo_12_promo_15_promo_31_promo_35_promo_31_promo_24_promo_4_promo_47_promo_44_promo_47_promo_4_promo_15_promo_31_promo_27_promo_42_promo_0_promo_41_promo_46_promo_8_promo_0_promo_38_promo_21_promo_26_promo_12_promo_23_promo_39' for uri parameter campaignId. expected maxLength: 256, actual: 446"
+            "detail": "Invalid value 'promo_16_promo_10_promo_2_promo_32_promo_2_promo_4_promo_47_promo_40_promo_38_promo_17_promo_29_promo_19_promo_48_promo_42_promo_27_promo_23_promo_11_promo_31_promo_8_promo_2_promo_17_promo_49_promo_15_promo_2_promo_29_promo_39_promo_27_promo_10_promo_13_promo_23_promo_23_promo_38_promo_38_promo_39_promo_43_promo_30_promo_49_promo_25_promo_33_promo_25_promo_11_promo_46_promo_41_promo_39_promo_47_promo_6_promo_1_promo_15_promo_48_promo_33_promo_38' for uri parameter campaignId. expected maxLength: 256, actual: 450"
         },
         "rawHeaders": [
             "date",
-            "Thu, 20 Oct 2022 16:54:15 GMT",
+            "Thu, 20 Oct 2022 17:33:48 GMT",
             "content-type",
             "application/problem+json; charset=UTF-8",
             "content-length",
-            "679",
+            "683",
             "connection",
             "close",
             "cf-ray",
-            "75d3463b4e44a6eb-PHX",
+            "75d3802c1fd6a70c-PHX",
             "strict-transport-security",
             "max-age=31536000; includeSubdomains;",
             "cf-cache-status",
             "DYNAMIC",
             "x-correlation-id",
-            "75d3463b4e44a6eb",
+            "75d3802c1fd6a70c",
             "Vary",
             "Accept-Encoding",
             "server",
             "cloudflare",
             "x-proxy-request-url",
-            "https://kv7kzm78.api.commercecloud.salesforce.com/pricing/shopper-promotions/v1/organizations/f_ecom_zzrf_001/promotions/campaigns/promo_22_promo_43_promo_10_promo_42_promo_16_promo_0_promo_20_promo_19_promo_12_promo_0_promo_40_promo_41_promo_19_promo_20_promo_7_promo_38_promo_27_promo_18_promo_2_promo_15_promo_3_promo_30_promo_1_promo_10_promo_3_promo_12_promo_15_promo_31_promo_35_promo_31_promo_24_promo_4_promo_47_promo_44_promo_47_promo_4_promo_15_promo_31_promo_27_promo_42_promo_0_promo_41_promo_46_promo_8_promo_0_promo_38_promo_21_promo_26_promo_12_promo_23_promo_39?siteId=RefArchGlobal"
+            "https://kv7kzm78.api.commercecloud.salesforce.com/pricing/shopper-promotions/v1/organizations/f_ecom_zzrf_001/promotions/campaigns/promo_16_promo_10_promo_2_promo_32_promo_2_promo_4_promo_47_promo_40_promo_38_promo_17_promo_29_promo_19_promo_48_promo_42_promo_27_promo_23_promo_11_promo_31_promo_8_promo_2_promo_17_promo_49_promo_15_promo_2_promo_29_promo_39_promo_27_promo_10_promo_13_promo_23_promo_23_promo_38_promo_38_promo_39_promo_43_promo_30_promo_49_promo_25_promo_33_promo_25_promo_11_promo_46_promo_41_promo_39_promo_47_promo_6_promo_1_promo_15_promo_48_promo_33_promo_38?siteId=RefArchGlobal"
         ],
         "responseIsBinary": false
     }
