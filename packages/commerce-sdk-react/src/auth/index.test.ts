@@ -156,9 +156,7 @@ describe('Auth', () => {
         auth.set('refresh_token_guest', '456')
         const switchSiteConfig = {...config, siteId: 'another site'}
         const newAuth = new Auth(switchSiteConfig)
-        // @ts-expect-error private method
         expect(newAuth.get('access_token')).not.toBe('123')
-        // @ts-expect-error private method
         expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
     test('isTokenExpired', () => {
