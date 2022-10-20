@@ -97,9 +97,7 @@ describe('Auth', () => {
         auth.set('refresh_token_guest', refreshToken)
         // @ts-expect-error private method
         auth.set('access_token', accessToken)
-        // @ts-expect-error private method
         expect(auth.get('refresh_token_guest')).toBe(refreshToken)
-        // @ts-expect-error private method
         expect(auth.get('access_token')).toBe(accessToken)
     })
     test('set registered refresh token will clear guest refresh token, vise versa', () => {
@@ -111,11 +109,9 @@ describe('Auth', () => {
         auth.set('refresh_token_guest', refreshTokenGuest)
         // @ts-expect-error private method
         auth.set('refresh_token_registered', refreshTokenRegistered)
-        // @ts-expect-error private method
         expect(auth.get('refresh_token_guest')).toBe(undefined)
         // @ts-expect-error private method
         auth.set('refresh_token_guest', refreshTokenGuest)
-        // @ts-expect-error private method
         expect(auth.get('refresh_token_registered')).toBe(undefined)
     })
     test('this.data returns the storage value', () => {
@@ -160,9 +156,7 @@ describe('Auth', () => {
         auth.set('refresh_token_guest', '456')
         const switchSiteConfig = {...config, siteId: 'another site'}
         const newAuth = new Auth(switchSiteConfig)
-        // @ts-expect-error private method
         expect(newAuth.get('access_token')).not.toBe('123')
-        // @ts-expect-error private method
         expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
     test('isTokenExpired', () => {
