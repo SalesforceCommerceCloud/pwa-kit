@@ -46,11 +46,11 @@ function UseShopperOrders() {
         loginRegisteredUser.mutate({username: 'alex@test.com', password: 'Test1234#'})
     }, [])
     const mutationHooks = [
-        // {
-        //     action: 'createOrder',
-        //     body: {basketId: 'xxx'},
-        //     parameters: {}
-        // },
+        {
+            action: 'createOrder',
+            body: {basketId: '8140cd55ffa151713f0d88df1d'},
+            parameters: {}
+        }
     ].map(({action, body, parameters}) => {
         return {
             name: action,
