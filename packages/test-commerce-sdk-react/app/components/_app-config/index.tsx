@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {ReactElement} from 'react'
+import React, {useState, ReactElement} from 'react'
 // @ts-ignore
 import {CommerceApiProvider} from 'commerce-sdk-react'
 // @ts-ignore
@@ -21,19 +21,50 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     const headers = {
         'correlation-id': correlationId
     }
+    const defaultSiteId = 'RefArchGlobal'
+    const defaultLocale = 'en-US'
+    const [siteId, setSiteId] = useState(defaultSiteId)
+    const [locale, setLocale] = useState(defaultLocale)
+    const anotherSite = siteId === defaultSiteId ? 'RefArch' : defaultSiteId
+    const anotherLocale = locale === defaultLocale ? 'en-CA' : defaultLocale
     return (
         <CommerceApiProvider
-            siteId="RefArchGlobal"
+            siteId={siteId}
             shortCode="8o7m175y"
             clientId="c9c45bfd-0ed3-4aa2-9971-40f88962b836"
             organizationId="f_ecom_zzrf_001"
             redirectURI="http://localhost:3000/callback"
             proxy="http://localhost:3000/mobify/proxy/api"
-            locale="en-US"
+            locale={locale}
             currency="USD"
             headers={headers}
         >
             {props.children}
+            <div
+                style={{
+                    backgroundColor: '#ebebeb',
+                    position: 'fixed',
+                    right: 0,
+                    bottom: 0,
+                    margin: '8px'
+                }}
+            >
+                <h3>Site: {siteId}</h3>
+                <button
+                    onClick={() => {
+                        setSiteId(anotherSite)
+                    }}
+                >
+                    Switch to {anotherSite}
+                </button>
+                <button
+                    onClick={() => {
+                        setLocale(anotherLocale)
+                    }}
+                >
+                    Switch to {anotherLocale}
+                </button>
+            </div>
         </CommerceApiProvider>
     )
 }

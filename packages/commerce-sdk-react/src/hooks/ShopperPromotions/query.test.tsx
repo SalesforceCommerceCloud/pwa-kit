@@ -26,8 +26,8 @@ const PromotionsComponent = ({ids}: {ids: string}): ReactElement => {
             {data && <div>Total: {data.total}</div>}
             {data && (
                 <div>
-                    {data.data?.map(({name}) => (
-                        <div key={name}>{name}</div>
+                    {data.data?.map(({name}, i) => (
+                        <div key={i}>{name}</div>
                     ))}
                 </div>
             )}
@@ -46,8 +46,8 @@ const PromotionsForCampaignComponent = ({campaignId}: {campaignId: string}): Rea
             {data && <div>Total: {data.total}</div>}
             {data && (
                 <div>
-                    {data.data?.map(({name}) => (
-                        <div key={name}>{name}</div>
+                    {data.data?.map(({name}, i) => (
+                        <div key={i}>{name}</div>
                     ))}
                 </div>
             )}

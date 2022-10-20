@@ -2,16 +2,16 @@
     {
         "scope": "http://localhost:3000",
         "method": "GET",
-        "path": "/mobify/proxy/api/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=shirt",
+        "path": "/mobify/proxy/api/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=shirt&currency=USD&locale=en-US",
         "body": "",
         "status": 200,
         "response": [
             "1f8b0800000000000003000000ffff",
-            "e4555d6bc230147df757843cab58addafa3807630f0ea1c21ec61eb2f4ae0db489dca43211fffb68add37e329913c69e0af7dce49c9c7393ee3a84d03764d2f79220006d84929acec8ae430821541f8ae0af00e3b4fe92d5498e673d0a4520248bd2163a235487020dcdf17df67ded10b2efa6549c1908146e6bd97250400393f0d3fd6390bac723654221839e8fa0752fe3d4b47bea952c86b4fb3ec58957c1d70c419a792ee729ef9ee7db96e4774b6e2c4364ba49257c306e16ccf090cec83b8b349cd3662b2bc2dae92e36ff8cd094d616d71f6c57f13a02037e556f8e23026fc60b07369894f10d8b12a84cc6e9bcc709a99d17250d4873a3e14cb451713bd735a2f74285867811c006fe4ef435c9b69db71cbdba34fa352a3fe1f5d1e75883333c4104c9b729f1c3ddb270ed51f0549033e9db83423ddbf0317b61a6b63bb547d66041ab1dc79762a17c4049ce6ef15792dd5f50e4b8d664ea8cda14ad4220cfa130704551c3497f386a12351c8f2dc776ec36519e41b106ff3a629cbe356e11e35ad6c86d13b3644247b0bd8933ae650dc7973bf3d3ff4df1929ebd39fa1b34fff83fa381210f9765bbf69f000000ffff030073dd35ce20090000"
+            "c493316f83301085ff4a743389204003acc9d22155245275a83ab8e60a96c0466753358af8ef15815202a91a3543473fdbdf3ddff31de195984ce22a4d511ba1a486e808ba5d62b2472a3444cf475024522159de281081ce0419a85f6a0b3833982a3a8c189d2cb0bd2f1288a040a9e73c572613329d27845acf4f240d1648562044b069d459fca5968c509a7557e3a13db3ee1050bf58df66771931dd95c30fc6cd96199e41f4c6728d1694a7ed718533c22fcfb5c0f407b82aca1c0d263d9f2b22e4436568c2508516bcb3bcc261fb4e0d54d2a03437655069a38a5b0825a9a4e263139dda3db92242c90f10c163bc69b221c11122c7f517b6dd23ee9ba4575eb8f25cc7de42af77d96d558224678310a0b67e867bf6220ccfd94bdf77022ff0a6ecd8902831b906eb5ec2868ee38653ec8e099de3e1cf6e43c759fab7b8bdd8e12074ee56813be5ee339c3d65c2e07993af1995f697f693a2a737ff67443432e2d96ee4eb130000ffff03005520f7eabd040000"
         ],
         "rawHeaders": [
             "date",
-            "Wed, 14 Sep 2022 19:59:00 GMT",
+            "Thu, 20 Oct 2022 17:36:39 GMT",
             "content-type",
             "application/json; charset=UTF-8",
             "transfer-encoding",
@@ -19,9 +19,9 @@
             "connection",
             "close",
             "cf-ray",
-            "74abb35bfc18058f-IAD",
+            "75d38457f9f31b23-PHX",
             "cache-control",
-            "public, must-revalidate, max-age=60",
+            "max-age=60",
             "strict-transport-security",
             "max-age=31536000; includeSubdomains;",
             "cf-cache-status",
@@ -29,13 +29,13 @@
             "x-content-type-options",
             "nosniff",
             "x-correlation-id",
-            "74abb35bfc18058f",
+            "75d38457f9f31b23",
             "x-frame-options",
             "SAMEORIGIN",
             "x-ratelimit-limit",
             "7200",
             "x-ratelimit-remaining",
-            "7199",
+            "7200",
             "x-xss-protection",
             "1; mode=block",
             "vary",
@@ -45,7 +45,7 @@
             "content-encoding",
             "gzip",
             "x-proxy-request-url",
-            "https://kv7kzm78.api.commercecloud.salesforce.com/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=shirt"
+            "https://kv7kzm78.api.commercecloud.salesforce.com/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=shirt&currency=USD&locale=en-US"
         ],
         "responseIsBinary": false
     }
