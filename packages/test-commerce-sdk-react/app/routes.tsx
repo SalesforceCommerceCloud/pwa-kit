@@ -13,6 +13,7 @@ const UseProduct = loadable(() => import('./pages/use-shopper-product'))
 const UseCategories = loadable(() => import('./pages/use-shopper-categories'))
 const UseCategory = loadable(() => import('./pages/use-shopper-category'))
 const UseProductSearch = loadable(() => import('./pages/use-product-search'))
+const UseCustomer = loadable(() => import('./pages/use-shopper-customer'))
 const UsePromotions = loadable(() => import('./pages/use-promotions'))
 const UsePromotionsForCampaign = loadable(() => import('./pages/use-promotions-for-campaign'))
 const UseShopperLoginHelper = loadable(() => import('./pages/use-shopper-login-helper'))
@@ -59,6 +60,10 @@ const routes = [
     {
         path: '/use-promotions-for-campaign',
         component: UsePromotionsForCampaign
+    },
+    {
+        path: '/customer',
+        component: UseCustomer
     },
     {
         path: '/slas-helpers',
