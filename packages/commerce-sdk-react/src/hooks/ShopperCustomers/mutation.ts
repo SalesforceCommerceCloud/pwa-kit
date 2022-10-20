@@ -6,7 +6,7 @@
  */
 import {ApiClients, DataType, Argument} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction} from '@tanstack/react-query'
+import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperCustomers']
 
@@ -230,6 +230,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
 ) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
+    const queryClient = useQueryClient()
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
