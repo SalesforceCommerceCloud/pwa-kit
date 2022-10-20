@@ -11,7 +11,6 @@ const WebSocket = require('ws')
 const program = require('commander')
 const isEmail = require('validator/lib/isEmail')
 const {execSync: _execSync} = require('child_process')
-const request = require('request')
 const scriptUtils = require('../scripts/utils')
 const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
@@ -287,7 +286,8 @@ const main = () => {
 
     program
         .command('logs')
-        .description(`display logs for an environment`)
+        .description(`tail environment logs`)
+        // TODO: add a --tail flag and make -p optional. get the default from package.json
         .requiredOption('-p, --project <project_slug>', 'the project slug', (val) => {
             if (!(typeof val === 'string') && val.length > 0) {
                 throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
@@ -302,43 +302,34 @@ const main = () => {
                 return val
             }
         })
-        .action((_, opts) => {
+        .action(async (_, opts) => {
             const {project, environment, cloudApiBase} = opts.optsWithGlobals()
+            let settings
             try {
                 const settingsPath = scriptUtils.getSettingsPath()
-                const auth = fse.readJsonSync(settingsPath)
-                const options = {
-                    url: new URL(
-                        `/api/projects/${project}/target/${environment}/`,
-                        cloudApiBase
-                    ).toString(),
-                    method: 'GET',
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${auth.api_key}`
-                    }
-                }
-
-                request(options, function(err, res, body) {
-                    const data = JSON.parse(body)
-                    const endpoint =
-                        data['current_deploy']['external_publish_details']['LogTailEndpoint']
-                    const wss = new WebSocket(endpoint)
-                    wss.on('message', (message) => {
-                        JSON.parse(message).forEach((logLine) => {
-                            console.log(
-                                `${new Date(logLine.timestamp).toLocaleString()}> ${
-                                    logLine.message
-                                }`.trim()
-                            )
-                        })
-                    })
-                })
+                settings = fse.readJsonSync(settingsPath)
             } catch (e) {
-                console.error('Failed to read credentials.')
-                console.error(e)
-                process.exit(1)
+                scriptUtils.fail(`Error reading settings: ${e}`)
             }
+
+            const token = await scriptUtils.createToken(project, environment, cloudApiBase, settings.api_key)
+            const url = new URL(cloudApiBase.replace('cloud', 'logs'))
+            url.protocol = 'wss'
+            const searchParams = {
+                project,
+                environment,
+                user: settings.username,
+                access_token: token
+            }
+            for (const [key, value] of Object.entries(searchParams)) {
+                url.searchParams.set(key, value)
+            }
+
+            const wss = new WebSocket(url)
+            wss.on('message', (message) => {
+                const log = JSON.parse(message)
+                console.log(`${new Date(log.timestamp).toISOString()} ${log.message}`.trim())
+            })
         })
 
     program.option('-v, --version', 'show version number').action(({version}) => {

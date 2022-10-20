@@ -17,6 +17,8 @@ const fileUtils = require('./file-utils')
 
 const Matcher = require('../dist/utils/glob').Matcher
 
+const request = require('request')
+
 const SDK_VERSION = require('../package.json').version
 const DEFAULT_DOCS_URL =
     'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
@@ -212,6 +214,28 @@ Utils.readCredentials = (filepath) => {
             /* istanbul ignore next */ (e) =>
                 Utils.fail(`Error parsing "${filepath}".\n` + `[${e}]`)
         )
+}
+
+Utils.createToken = (project, environment, cloudApiBase, apiKey) => {
+    const options = {
+        url: new URL(
+            `/api/projects/${project}/target/${environment}/jwt/`,
+            cloudApiBase
+        ).toString(),
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${apiKey}`
+        }
+    }
+    return new Promise(resolve => {
+        request(options, (error, response, body) => {
+            if (error || (error = Utils.errorForStatus(response))) {
+                Utils.fail(error.message)
+            }
+            resolve(JSON.parse(body).token)
+        })
+    })
 }
 
 Utils.setDefaultMessage = () => {
