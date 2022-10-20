@@ -23,7 +23,9 @@ const ADDRESS_NAME = 'TestAddress'
 const LIST_ID = '987ae461a7c6c5fd17006fc774'
 const ITEM_ID = '500cebac3fe6e8aa67e22dca1a'
 const PRODUCT_ID = '25518823M'
-const RANDOM_STR = Math.random().toString(36).slice(2, 7)
+const RANDOM_STR = Math.random()
+    .toString(36)
+    .slice(2, 7)
 
 const renderQueryHook = (name: string, {data, isLoading, error}: any) => {
     if (isLoading) {
@@ -80,7 +82,9 @@ function UseCustomer() {
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
     const loginGuestUser = useShopperLoginHelper('loginGuestUser')
 
-    const guestUserMutationHooks = [// TODO: Register the current guest user to a registered user
+    // TODO: Implement the flow: Login as a guest user and then registered that user.
+    //  Currently Login as a guest doesn't work in packages/test-commerce-sdk-react/app/pages/use-shopper-login-helper.tsx
+    const guestUserMutationHooks = [
         {
             action: 'registerCustomer',
             body: {
@@ -93,7 +97,8 @@ function UseCustomer() {
                 password: 'Abcd!12345'
             },
             parameters: {}
-        }]
+        }
+    ]
 
     const mutationHooks = [
         {
@@ -106,7 +111,8 @@ function UseCustomer() {
             body: {currentPassword: 'Test12345!', password: 'Test1234!'},
             parameters: {customerId: CUSTOMER_ID}
         },
-        // TODO: {"type":"https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized","title":"Unauthorized","detail":"Your access-token is invalid and could not be used to identify the API client."}
+        // TODO: Not working. Potentially related to the issue scoping tokens
+        //  {"type":"https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized","title":"Unauthorized","detail":"Your access-token is invalid and could not be used to identify the API client."}
         // {
         //     action: 'getResetPasswordToken',
         //     body: {login: 'kobe@test.com'},

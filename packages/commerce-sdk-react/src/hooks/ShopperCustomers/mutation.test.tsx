@@ -4,16 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {ReactElement} from 'react'
+import React from 'react'
 import path from 'path'
 import {mockHttpResponses, renderWithProviders} from '../../test-utils'
-import {
-    useCustomer,
-    useCustomerAddress,
-    useCustomerOrders,
-    useCustomerBaskets,
-    useCustomerProductList
-} from './query'
+import {useCustomer} from './query'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {useQueryClient} from '@tanstack/react-query'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
@@ -83,14 +77,11 @@ const tests = [
                             name: /update customer/i
                         })
                     )
-
                     const button = screen.getByRole('button', {
                         name: /update customer/i
                     })
                     fireEvent.click(button)
-
                     await waitFor(() => screen.getByText(/email/i))
-                    screen.debug(undefined, Infinity)
                     expect(screen.getByText(/email/i)).toBeInTheDocument()
                 })
             }

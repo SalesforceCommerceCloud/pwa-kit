@@ -52,7 +52,7 @@ function useCustomer(
 ): UseQueryResult<DataType<Client['getCustomer']>, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        [{entity: 'customer'}, arg],
+        ['/customers', parameters.customerId, arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomer({parameters, headers}, rawResponse)
         },
@@ -89,7 +89,7 @@ function useCustomerAddress(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        [{entity: 'customer', scope: 'address'}, arg],
+        ['/customers', parameters.customerId, '/addresses', arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerAddress({parameters, headers}, rawResponse)
         },
@@ -126,7 +126,7 @@ function useCustomerBaskets(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        [{entity: 'customer', scope: 'baskets'}, arg],
+        ['/customers', parameters.customerId, '/baskets', arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerBaskets({parameters, headers}, rawResponse)
         },
@@ -161,7 +161,7 @@ function useCustomerOrders(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        [{entity: 'customer', scope: 'orders'}, arg],
+        ['/customers', parameters.customerId, '/orders', arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerOrders({parameters, headers}, rawResponse)
         },
@@ -227,7 +227,7 @@ function useCustomerProductList(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        [{entity: 'customer', scope: 'product-list'}, arg],
+        ['/customers', parameters.customerId, '/product-list', arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerProductList({parameters, headers}, rawResponse)
         },
