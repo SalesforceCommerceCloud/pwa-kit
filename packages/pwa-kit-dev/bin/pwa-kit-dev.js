@@ -5,11 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+const chalk = require('chalk')
 const p = require('path')
 const fse = require('fs-extra')
 const WebSocket = require('ws')
 const program = require('commander')
-const isEmail = require('validator/lib/isEmail')
+const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
 const uploadBundle = require('../scripts/upload.js')
@@ -65,7 +66,7 @@ const main = () => {
             '-u, --user <email>',
             'the e-mail address you used to register with Managed Runtime',
             (val) => {
-                if (!isEmail(val)) {
+                if (!validator.isEmail(val)) {
                     throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
                 } else {
                     return val
@@ -297,7 +298,7 @@ const main = () => {
             try {
                 credentials = fse.readJsonSync(credentialsFile)
             } catch (e) {
-                scriptUtils.fail(`Error reading settings: ${e}`)
+                scriptUtils.fail(`Error reading credentials: ${e}`)
             }
 
             const token = await scriptUtils.createToken(project, environment, cloudApiBase, credentials.api_key)
@@ -310,10 +311,32 @@ const main = () => {
                 access_token: token
             })
 
+            const uuidPattern = /(?<short>[a-f\d]{8})-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/
             const socket = new WebSocket(url)
-            socket.on('message', (message) => {
-                const log = JSON.parse(message)
-                console.log(`${new Date(log.timestamp).toISOString()} ${log.message}`.trim())
+
+            socket.on('message', (event) => {
+                const log = JSON.parse(event)
+                const timestamp = new Date(log.timestamp).toISOString()
+                let message = log.message.trim().split('\t')
+                let shortRequestId
+
+                if (
+                    message.length >= 4
+                    && validator.isISO8601(message[0])
+                    && validator.isUUID(message[1])
+                    && validator.isAlpha(message[2])
+                ) {
+                    message.shift()
+                    shortRequestId = message.shift().split('-')[0]
+                    message = message.shift() + ' ' + message.join('\t')
+                } else {
+                    message = message.join('\t')
+                    if (match = uuidPattern.exec(message)) {
+                        shortRequestId = match.groups.short
+                    }
+                }
+
+                console.log(chalk.cyan(timestamp), chalk.green(shortRequestId), message)
             })
         })
 
