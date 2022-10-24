@@ -73,12 +73,17 @@ AppConfig.restore = () => {}
 AppConfig.extraGetPropsArgs = () => {}
 AppConfig.freeze = () => {}
 
-// Recommended settings for PWA-Kit usage.
+const isServerSide = typeof window === 'undefined'
+// Recommended settings for PWA-Kit usages.
 const options = {
     queryClientConfig: {
         defaultOptions: {
             queries: {
-                retry: false
+                retry: false,
+                // Avoid double requests during hydration
+                staleTime: 5 * 1000,
+                // So that the final value for the `isLoading` state is correct, whenever a query has an error in SSR.
+                ...(isServerSide ? {retryOnMount: false} : {})
             },
             mutations: {
                 retry: false
