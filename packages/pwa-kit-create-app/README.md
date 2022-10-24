@@ -41,5 +41,4 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 
 
 ## Support Policy
-Customers on existing support contracts are entitled to bug fixes and updates to the latest version of each major SDK version,
-for a period of 24 months from the time of a given version’s General Availability release.
+Security patches are provided for 24 months after the general availability of each major version of the SDK (1.0, 2.0, and so on).
