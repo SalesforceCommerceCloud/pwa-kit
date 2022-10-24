@@ -311,14 +311,12 @@ const main = () => {
                 access_token: token
             })
 
-            const uuidPattern = /(?<short>[a-f\d]{8})-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/
             const socket = new WebSocket(url)
-
             socket.on('message', (event) => {
                 const log = JSON.parse(event)
                 const timestamp = new Date(log.timestamp).toISOString()
                 let message = log.message.trim().split('\t')
-                let shortRequestId
+                let requestId, shortRequestId
 
                 if (
                     message.length >= 4
@@ -326,17 +324,21 @@ const main = () => {
                     && validator.isUUID(message[1])
                     && validator.isAlpha(message[2])
                 ) {
+                    // An application log
                     message.shift()
-                    shortRequestId = message.shift().split('-')[0]
+                    requestId = message.shift()
                     message = message.shift() + ' ' + message.join('\t')
                 } else {
+                    // A default log
                     message = message.join('\t')
-                    if (match = uuidPattern.exec(message)) {
-                        shortRequestId = match.groups.short
-                    }
                 }
 
-                console.log(chalk.cyan(timestamp), chalk.green(shortRequestId), message)
+                const uuidPattern = /(?<short>[a-f\d]{8})-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/
+                if (match = uuidPattern.exec(requestId || message)) {
+                    shortRequestId = match.groups.short
+                }
+
+                console.log(chalk.green(timestamp), chalk.cyan(shortRequestId), message)
             })
         })
 
