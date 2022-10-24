@@ -14,12 +14,6 @@ import useAuth from './useAuth'
 import useCommerceApi from './useCommerceApi'
 import {ApiClients, IQueryFunction, IMutationFunction} from './types'
 
-interface Client {
-    clientConfig: {
-        headers: Record<string, string>
-    }
-}
-
 /**
  * This is a private method. It is a react hook that wraps queries / mutations with
  * authenticated API clients.
