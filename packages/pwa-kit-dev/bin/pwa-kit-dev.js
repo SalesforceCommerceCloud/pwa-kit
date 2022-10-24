@@ -289,20 +289,8 @@ const main = () => {
         .command('logs')
         .description(`tail environment logs`)
         // TODO: add a --tail flag and make -p optional. get the default from package.json
-        .option('-p, --project <project_slug>', 'the project slug', (val) => {
-            if (!(typeof val === 'string') && val.length > 0) {
-                throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
-            } else {
-                return val
-            }
-        })
-        .requiredOption('-e, --environment <environment_slug>', 'the environment slug', (val) => {
-            if (!(typeof val === 'string') && val.length > 0) {
-                throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
-            } else {
-                return val
-            }
-        })
+        .option('-p, --project <projectSlug>', 'the project slug')
+        .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
         .action(async (_, opts) => {
             const {project, environment, cloudApiBase, credentialsFile} = opts.optsWithGlobals()
             let credentials
@@ -315,18 +303,15 @@ const main = () => {
             const token = await scriptUtils.createToken(project, environment, cloudApiBase, credentials.api_key)
             const url = new URL(cloudApiBase.replace('cloud', 'logs'))
             url.protocol = 'wss'
-            const searchParams = {
+            url.search = new URLSearchParams({
                 project,
                 environment,
                 user: credentials.username,
                 access_token: token
-            }
-            for (const [key, value] of Object.entries(searchParams)) {
-                url.searchParams.set(key, value)
-            }
+            })
 
-            const wss = new WebSocket(url)
-            wss.on('message', (message) => {
+            const socket = new WebSocket(url)
+            socket.on('message', (message) => {
                 const log = JSON.parse(message)
                 console.log(`${new Date(log.timestamp).toISOString()} ${log.message}`.trim())
             })

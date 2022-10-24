@@ -233,9 +233,11 @@ Utils.createToken = (project, environment, cloudApiBase, apiKey) => {
             if (error || (error = Utils.errorForStatus(response))) {
                 Utils.fail(error.message)
             }
-            resolve(JSON.parse(body).token)
+            resolve(body)
         })
     })
+        .then(body => JSON.parse(body).token)
+        .catch(e => Utils.fail(e))
 }
 
 Utils.setDefaultMessage = () => {
