@@ -216,11 +216,11 @@ Utils.readCredentials = (filepath) => {
         )
 }
 
-Utils.createToken = (project, environment, cloudApiBase, apiKey) => {
+Utils.createToken = (project, environment, cloudOrigin, apiKey) => {
     const options = {
         url: new URL(
             `/api/projects/${project}/target/${environment}/jwt/`,
-            cloudApiBase
+            cloudOrigin
         ).toString(),
         method: 'POST',
         headers: {

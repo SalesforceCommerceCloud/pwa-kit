@@ -65,8 +65,50 @@ const main = () => {
         ].join('\n')
     )
 
-    program
-        .command('save-credentials')
+    /**
+     * All Managed Runtime commands take common opts like --cloud-origin
+     * and --credentialsFile. These are set to be split out from the SDK
+     * commands here in the near future.
+     */
+     const managedRuntimeCommand = (name) => {
+        return program
+            .command(name)
+            .addOption(
+                new program.Option(
+                    '--cloud-origin <origin>',
+                    'the API origin to connect to'
+                )
+                    .default('https://cloud.mobify.com')
+                    .env('CLOUD_API_BASE')
+                    .argParser(val => {
+                        try {
+                            const url = new URL(val)
+                            const labels = url.host.split('.')
+                            if (
+                                labels.length !== 3
+                                || !labels[0].startsWith('cloud')
+                                || !labels[1].startsWith('mobify')
+                                || labels[2] !== 'com'
+                            ) {
+                                throw new Error
+                            }
+                        } catch {
+                            throw new program.InvalidArgumentError(`'${val}' is not a valid Cloud origin`)
+                        }
+                        return val
+                    })
+            )
+            .addOption(
+                new program.Option(
+                    '-c, --credentialsFile <credentialsFile>',
+                    'override the standard credentials file location'
+                )
+                    .default(scriptUtils.getCredentialsFile())
+                    .env('PWA_KIT_CREDENTIALS_FILE')
+            )
+    }
+
+    managedRuntimeCommand('save-credentials')
         .description(`save API credentials for Managed Runtime`)
         .requiredOption(
             '-u, --user <email>',
@@ -169,8 +211,7 @@ const main = () => {
             }
         })
 
-    program
-        .command('push')
+    managedRuntimeCommand('push')
         .description(`push a bundle to Managed Runtime`)
         .addOption(
             new program.Option(
@@ -207,7 +248,7 @@ const main = () => {
                 message,
                 projectSlug,
                 target,
-                cloudApiBase,
+                cloudOrigin,
                 credentialsFile
             } = opts.optsWithGlobals()
             // Set the deployment target env var, this is required to ensure we
@@ -241,7 +282,7 @@ const main = () => {
                 ssr_only: mobify.ssrOnly,
                 ssr_shared: mobify.ssrShared,
                 set_ssr_values: true,
-                origin: cloudApiBase
+                origin: cloudOrigin
             }
 
             if (
@@ -292,14 +333,13 @@ const main = () => {
             )
         })
 
-    program
-        .command('logs')
+    managedRuntimeCommand('logs')
         .description(`tail environment logs`)
         // TODO: add a --tail flag and make -p optional. get the default from package.json
         .option('-p, --project <projectSlug>', 'the project slug')
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
         .action(async (_, opts) => {
-            const {project, environment, cloudApiBase, credentialsFile} = opts.optsWithGlobals()
+            const {project, environment, cloudOrigin, credentialsFile} = opts.optsWithGlobals()
             let credentials
             try {
                 credentials = fse.readJsonSync(credentialsFile)
@@ -307,8 +347,8 @@ const main = () => {
                 scriptUtils.fail(`Error reading credentials: ${e}`)
             }
 
-            const token = await scriptUtils.createToken(project, environment, cloudApiBase, credentials.api_key)
-            const url = new URL(cloudApiBase.replace('cloud', 'logs'))
+            const token = await scriptUtils.createToken(project, environment, cloudOrigin, credentials.api_key)
+            const url = new URL(cloudOrigin.replace('cloud', 'logs'))
             url.protocol = 'wss'
             url.search = new URLSearchParams({
                 project,
@@ -321,22 +361,22 @@ const main = () => {
             socket.on('message', (event) => {
                 const log = JSON.parse(event)
                 const timestamp = new Date(log.timestamp).toISOString()
-                let message = log.message.trim().split('\t')
-                let requestId, shortRequestId
+                const parts = log.message.trim().split('\t')
+                let message, requestId, shortRequestId
 
                 if (
-                    message.length >= 4
-                    && validator.isISO8601(message[0])
-                    && validator.isUUID(message[1])
-                    && validator.isAlpha(message[2])
+                    parts.length >= 4
+                    && validator.isISO8601(parts[0])
+                    && validator.isUUID(parts[1])
+                    && validator.isAlpha(parts[2])
                 ) {
                     // An application log
-                    message.shift()
-                    requestId = message.shift()
-                    message = message.shift() + ' ' + message.join('\t')
+                    parts.shift()
+                    requestId = parts.shift()
+                    message = parts.shift() + ' ' + parts.join('\t')
                 } else {
                     // A platform log
-                    message = message.join('\t')
+                    message = parts.join('\t')
                 }
 
                 const uuidPattern = /(?<short>[a-f\d]{8})-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/
@@ -362,41 +402,6 @@ const main = () => {
             program.help({error: true})
         }
     })
-
-    program.addOption(
-        new program.Option(
-            '--cloud-api-base <url>',
-            'Pass a URL for the Cloud API (eg. for testing)'
-        )
-            .default('https://cloud.mobify.com')
-            .env('CLOUD_API_BASE')
-            .argParser(val => {
-                try {
-                    const url = new URL(val)
-                    const labels = url.host.split('.')
-                    if (
-                        labels.length !== 3
-                        || !labels[0].startsWith('cloud')
-                        || !labels[1].startsWith('mobify')
-                        || labels[2] !== 'com'
-                    ) {
-                        throw new Error
-                    }
-                } catch {
-                    throw new program.InvalidArgumentError(`'${val}' is not a valid Cloud URL`)
-                }
-                return val
-            })
-    )
-
-    program.addOption(
-        new program.Option(
-            '-c, --credentialsFile <credentialsFile>',
-            'the file where your credentials are stored'
-        )
-            .default(scriptUtils.getCredentialsFile())
-            .env('PWA_KIT_CREDENTIALS_FILE')
-    )
 
     program.parse(process.argv)
 }
