@@ -40,7 +40,5 @@ export const useCorrelationId = () => {
 export const useServerContext = () => {
     const serverContext = useContext(ServerContext)
 
-    return {
-        ...serverContext
-    }
+    return serverContext
 }
