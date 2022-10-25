@@ -6,7 +6,7 @@
  */
 import {ApiClients, DataType, Argument} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction} from '@tanstack/react-query'
+import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperCustomers']
 
@@ -69,11 +69,11 @@ finally the signature section records the token signature.
 
 A token is created and returned to the client whenever a registered
 customer logs in (type \"credentials\") or a guest customer requests it (type
-\"guest\"). The token is returned in the response header as 
+\"guest\"). The token is returned in the response header as
 Authorization: Bearer --token--
 
-The client has to include the token in the request header as 
-Authorization: Bearer --token-- 
+The client has to include the token in the request header as
+Authorization: Bearer --token--
 in any follow-up request. The server declines any follow-up requests
 without a token or which cannot be verified based on the token signature
 or expiration time. A token nearing its expiration time should be
@@ -92,7 +92,7 @@ To enhance the security and availability of Salesforce services, this endpoint i
 
 ---
 
-Obtain the JSON Web Token (JWT) for registered customers whose credentials are stored using a third party system. Accepts loginId and 
+Obtain the JSON Web Token (JWT) for registered customers whose credentials are stored using a third party system. Accepts loginId and
 clientId, returns a customer object in the response body and the JWT generated against the clientId in the response header.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=authorizeTrustedSystem} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#authorizetrustedsystem} for more information on the parameters and returned data type.
@@ -210,7 +210,7 @@ Considered values from the request body are:
 priority: This is the priority of the customer's product list item.
 public: This is the flag whether the customer's product list item is public.
 quantity: This is the quantity of
-the customer's product list item. Used for product item type only. 
+the customer's product list item. Used for product item type only.
 custom properties in the form c_\<CUSTOM_NAME\>: The custom property
 must correspond to a custom attribute (\<CUSTOM_NAME\>) defined for ProductListItem.
 The value of this property must be valid for the type of custom attribute defined for ProductListItem.
@@ -230,8 +230,23 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
 ) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
-    return useMutation<Data, Error, Params>((params, apiClients) => {
-        const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
-        return method.call(apiClients['shopperCustomers'], params)
-    })
+    const queryClient = useQueryClient()
+    return useMutation<Data, Error, Params>(
+        (params, apiClients) => {
+            const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
+            return method.call(apiClients['shopperCustomers'], params)
+        },
+        {
+            onSuccess: (data, params) => {
+                // TODO: Fine grain invalidation of '/customers'
+
+                // @ts-ignore some action doesn't have customerId as parameter
+                if (params?.parameters?.customerId) {
+                    // @ts-ignore
+                    // invalidate all cache entries that are related to the customer
+                    queryClient.invalidateQueries(['/customers', params?.parameters?.customerId])
+                }
+            }
+        }
+    )
 }

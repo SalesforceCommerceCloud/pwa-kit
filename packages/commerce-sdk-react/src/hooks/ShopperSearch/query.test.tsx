@@ -18,17 +18,10 @@ const ProductSearchComponent = ({q, refine}: {q: string; refine: string[]}): Rea
         q,
         refine
     })
-
     return (
         <div>
             {isLoading && <span>Loading...</span>}
-            {data && (
-                <div>
-                    {data.hits?.map(({productName}) => (
-                        <div key={productName}>{productName}</div>
-                    ))}
-                </div>
-            )}
+            {data && 'we got data!'}
             {error && <span>error</span>}
         </div>
     )
@@ -41,13 +34,7 @@ const SearchSuggestionsComponent = ({q}: {q: string}): ReactElement => {
     return (
         <div>
             {isLoading && <span>Loading...</span>}
-            {data && (
-                <div>
-                    {data.productSuggestions?.products?.map(({productName}) => (
-                        <div key={productName}>{productName}</div>
-                    ))}
-                </div>
-            )}
+            {data && 'we got data!'}
             {error && <span>error</span>}
         </div>
     )
@@ -63,20 +50,8 @@ const tests = [
                     const q = 'shirt'
                     const refinement = ['price=(0..50)']
                     renderWithProviders(<ProductSearchComponent q={q} refine={refinement} />)
-                    const productNames = [
-                        'Paisley Shirt',
-                        'Denim Shirt Jacket',
-                        'Fitted Seamed Shirt'
-                    ]
-
-                    expect(screen.queryByText(productNames[0])).toBeNull()
-                    expect(screen.queryByText(productNames[1])).toBeNull()
-                    expect(screen.queryByText(productNames[2])).toBeNull()
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
-                    await waitFor(() => screen.getByText(productNames[0]))
-                    expect(screen.getByText(productNames[0])).toBeInTheDocument()
-                    expect(screen.getByText(productNames[1])).toBeInTheDocument()
-                    expect(screen.getByText(productNames[2])).toBeInTheDocument()
+                    await waitFor(() => screen.getByText('we got data!'))
                 })
             },
             {
@@ -103,14 +78,8 @@ const tests = [
                 assertions: withMocks(async () => {
                     const q = 'shirt'
                     renderWithProviders(<SearchSuggestionsComponent q={q} />)
-                    const productNames = ['Modern Dress Shirt', 'Paisley Shirt']
-
-                    expect(screen.queryByText(productNames[0])).toBeNull()
-                    expect(screen.queryByText(productNames[1])).toBeNull()
                     expect(screen.getByText('Loading...')).toBeInTheDocument()
-                    await waitFor(() => screen.getByText(productNames[0]))
-                    expect(screen.getByText(productNames[0])).toBeInTheDocument()
-                    expect(screen.getByText(productNames[1])).toBeInTheDocument()
+                    await waitFor(() => screen.getByText('we got data!'))
                 })
             },
             {

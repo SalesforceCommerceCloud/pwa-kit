@@ -27,8 +27,8 @@ const ProductsComponent = ({ids}: {ids: string}): ReactElement => {
             )}
             {data && (
                 <div>
-                    {data.data?.map(({name}) => (
-                        <div key={name}>{name}</div>
+                    {data.data?.map(({name}, i) => (
+                        <div key={i}>{name}</div>
                     ))}
                 </div>
             )}
