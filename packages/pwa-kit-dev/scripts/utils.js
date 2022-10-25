@@ -9,6 +9,7 @@
 'use strict'
 
 const path = require('path')
+const fse = require('fs-extra')
 const git = require('git-rev-sync')
 
 const archiver = require('archiver')
@@ -216,22 +217,34 @@ Utils.readCredentials = (filepath) => {
         )
 }
 
-Utils.createToken = (project, environment, cloudOrigin, apiKey) => {
-    const options = {
-        url: new URL(
-            `/api/projects/${project}/target/${environment}/jwt/`,
-            cloudOrigin
-        ).toString(),
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${apiKey}`
-        }
+Utils.readPackageJson = (keyName) => {
+    try {
+        // Using the full path isn't strictly necessary, but results in clearer errors
+        const packageJson = path.join(process.cwd(), 'package.json')
+        const key = fse.readJsonSync(packageJson)[keyName]
+        if (key) return key
+        throw new Error(`${packageJson} does not contain key ${keyName}`)
+    } catch (err) {
+        Utils.fail(`Error reading package.json: ${err.message}`)
     }
+}
+
+Utils.createToken = (project, environment, cloudOrigin, apiKey) => {
     return new Promise(resolve => {
+        const options = {
+            url: new URL(
+                `/api/projects/${project}/target/${environment}/jwt/`,
+                cloudOrigin
+            ).toString(),
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${apiKey}`
+            }
+        }
         request(options, (error, response, body) => {
             if (error || (error = Utils.errorForStatus(response))) {
-                Utils.fail(error.message)
+                Utils.fail(`${cloudOrigin} returned ${error.message}`)
             }
             resolve(body)
         })

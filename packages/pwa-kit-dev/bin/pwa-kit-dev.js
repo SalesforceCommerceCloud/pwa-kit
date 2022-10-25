@@ -257,17 +257,7 @@ const main = () => {
             const mobify = getConfig() || {}
 
             if (!projectSlug) {
-                try {
-                    // Using the full path isn't strictly necessary, but results in clearer errors
-                    const projectPkg = p.join(process.cwd(), 'package.json')
-                    const {name} = fse.readJsonSync(projectPkg)
-                    if (!name) throw new Error(`Missing "name" field in ${projectPkg}`)
-                    projectSlug = name
-                } catch (err) {
-                    throw new Error(
-                        `Could not detect project slug from "name" field in package.json: ${err.message}`
-                    )
-                }
+                projectSlug = scriptUtils.readPackageJson('name')
             }
 
             const options = {
@@ -335,16 +325,26 @@ const main = () => {
 
     managedRuntimeCommand('logs')
         .description(`tail environment logs`)
-        // TODO: add a --tail flag and make -p optional. get the default from package.json
-        .option('-p, --project <projectSlug>', 'the project slug')
+        .addOption(
+            new program.Option(
+                '-p, --project <projectSlug>',
+                'the project slug'
+            )
+                .default(undefined, "the 'name' key from package.json")
+        )
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
         .action(async (_, opts) => {
-            const {project, environment, cloudOrigin, credentialsFile} = opts.optsWithGlobals()
+            let {project, environment, cloudOrigin, credentialsFile} = opts.optsWithGlobals()
+
             let credentials
             try {
                 credentials = fse.readJsonSync(credentialsFile)
             } catch (e) {
                 scriptUtils.fail(`Error reading credentials: ${e}`)
+            }
+
+            if (!project) {
+                project = scriptUtils.readPackageJson('name')
             }
 
             const token = await scriptUtils.createToken(project, environment, cloudOrigin, credentials.api_key)
