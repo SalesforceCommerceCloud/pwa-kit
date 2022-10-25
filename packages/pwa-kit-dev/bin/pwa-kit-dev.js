@@ -345,9 +345,9 @@ const main = () => {
                 }
 
                 const logLevelPattern = /^([A-Z]+)/
-                message = message.replace(logLevelPattern, match => {
-                    return chalk[colors[match.toLowerCase()] || 'cyan'](match.padEnd(6))
-                })
+                message = message.replace(logLevelPattern, match => (
+                    chalk[colors[match.toLowerCase()] || 'cyan'](match.padEnd(6))
+                ))
 
                 console.log(chalk.green(timestamp), chalk.cyan(shortRequestId), message)
             })
@@ -370,6 +370,17 @@ const main = () => {
         )
             .default('https://cloud.mobify.com')
             .env('CLOUD_API_BASE')
+            .argParser(val => {
+                try {
+                    const url = new URL(val)
+                    if (!/cloud[-\w]*.mobify[-\w]*.com/.test(url.host)) {
+                        throw new Error
+                    }
+                } catch {
+                    throw new program.InvalidArgumentError(`'${val}' is not a valid Cloud URL`)
+                }
+                return val
+            })
     )
 
     program.addOption(
