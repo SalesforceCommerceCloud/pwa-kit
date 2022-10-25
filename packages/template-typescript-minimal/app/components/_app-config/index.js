@@ -8,6 +8,8 @@ import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/wit
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import AppConfig from 'pwa-kit-react-sdk/ssr/universal/components/_app-config'
 
+const isServerSide = typeof window === 'undefined'
+
 // Recommended settings for PWA-Kit usages.
 // NOTE: they will be applied on both server and client side.
 const options = {
@@ -16,7 +18,7 @@ const options = {
             queries: {
                 retry: false,
                 staleTime: 2 * 1000,
-                retryOnMount: false
+                ...(isServerSide ? {retryOnMount: false} : {})
             },
             mutations: {
                 retry: false
