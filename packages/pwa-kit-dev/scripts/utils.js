@@ -222,10 +222,10 @@ Utils.readPackageJson = (keyName) => {
         // Using the full path isn't strictly necessary, but results in clearer errors
         const packageJson = path.join(process.cwd(), 'package.json')
         const key = fse.readJsonSync(packageJson)[keyName]
-        if (key) return key
-        throw new Error(`${packageJson} does not contain key ${keyName}`)
-    } catch (err) {
-        Utils.fail(`Error reading package.json: ${err.message}`)
+        if (!key) Utils.fail(`Error reading ${packageJson}: key '${keyName}' is missing`)
+        return key
+    } catch (e) {
+        Utils.fail(e)
     }
 }
 
