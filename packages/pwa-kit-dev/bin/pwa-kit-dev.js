@@ -17,6 +17,12 @@ const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
+const colors = {
+    info: 'blue',
+    warn: 'yellow',
+    error: 'red'
+}
+
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
@@ -329,7 +335,7 @@ const main = () => {
                     requestId = message.shift()
                     message = message.shift() + ' ' + message.join('\t')
                 } else {
-                    // A default log
+                    // A platform log
                     message = message.join('\t')
                 }
 
@@ -337,6 +343,11 @@ const main = () => {
                 if (match = uuidPattern.exec(requestId || message)) {
                     shortRequestId = match.groups.short
                 }
+
+                const logLevelPattern = /^([A-Z]+)/
+                message = message.replace(logLevelPattern, match => {
+                    return chalk[colors[match.toLowerCase()] || 'blue'](match)
+                })
 
                 console.log(chalk.green(timestamp), chalk.cyan(shortRequestId), message)
             })
