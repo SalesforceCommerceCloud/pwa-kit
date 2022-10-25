@@ -18,7 +18,7 @@ const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
 const colors = {
-    info: 'blue',
+    info: 'cyan',
     warn: 'yellow',
     error: 'red'
 }
@@ -346,7 +346,7 @@ const main = () => {
 
                 const logLevelPattern = /^([A-Z]+)/
                 message = message.replace(logLevelPattern, match => {
-                    return chalk[colors[match.toLowerCase()] || 'blue'](match)
+                    return chalk[colors[match.toLowerCase()] || 'cyan'](match.padEnd(6))
                 })
 
                 console.log(chalk.green(timestamp), chalk.cyan(shortRequestId), message)
