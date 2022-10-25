@@ -373,7 +373,13 @@ const main = () => {
             .argParser(val => {
                 try {
                     const url = new URL(val)
-                    if (!/cloud[-\w]*.mobify[-\w]*.com/.test(url.host)) {
+                    const labels = url.host.split('.')
+                    if (
+                        labels.length !== 3
+                        || !labels[0].startsWith('cloud')
+                        || !labels[1].startsWith('mobify')
+                        || labels[2] !== 'com'
+                    ) {
                         throw new Error
                     }
                 } catch {
