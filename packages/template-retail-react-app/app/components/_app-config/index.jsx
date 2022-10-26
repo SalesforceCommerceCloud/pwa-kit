@@ -48,10 +48,7 @@ const AppConfig = ({children, locals = {}}) => {
         'correlation-id': correlationId
     }
 
-    // TODO: is this an expensive call?
-    const {
-        app: {commerceAPI: commerceApiConfig}
-    } = getConfig()
+    const commerceApiConfig = locals.appConfig.commerceAPI
 
     const appOrigin = getAppOrigin()
 
@@ -103,6 +100,7 @@ AppConfig.restore = (locals = {}) => {
     locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
     locals.site = site
     locals.locale = locale
+    locals.appConfig = appConfig
 }
 
 AppConfig.freeze = () => undefined
