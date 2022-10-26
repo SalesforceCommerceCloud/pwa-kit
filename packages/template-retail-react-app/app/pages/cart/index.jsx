@@ -37,12 +37,14 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST
 } from '../../constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from './partials/cart-secondary-button-group'
-
+// import {useBasket as useBasketHook} from '../../hooks/useBasket'
 // Utilities
 import debounce from 'lodash/debounce'
+import {useCustomerBaskets, useCustomerId, useProducts} from 'commerce-sdk-react'
 
 const Cart = () => {
     const basket = useBasket()
+    console.log('basket', basket)
     const customer = useCustomer()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
@@ -58,6 +60,21 @@ const Cart = () => {
             status: 'error'
         })
     }
+    /*****************************************Commerce react HOOKS************************/
+    // NOTE: we can directly called two hooks to get baskets or we can have a custom hooks to keep the code DRY
+    // see ../../hooks/useBasket
+    // get the basket, fetch product details
+    const customerId = useCustomerId() || ''
+    const baskets = useCustomerBaskets({customerId}, {enabled: !!customerId})
+    // if id is not defined use the first basket in the list
+    const basketFromHook = baskets?.data?.baskets?.[0]
+    const productIds = basketFromHook?.productItems?.map((i) => i.productId).join(',')
+    const {data: productDetails} = useProducts(
+        {ids: productIds, allImage: true},
+        {enabled: basket?.productItems}
+    )
+
+    /***********************/
 
     /**************** Wishlist ****************/
     const wishlist = useWishlist()
@@ -97,11 +114,11 @@ const Cart = () => {
         }
     }, [basket.basketId])
 
-    if (!basket?.basketId) {
+    if (!basketFromHook?.basketId) {
         return <CartSkeleton />
     }
 
-    if (!basket?.productItems) {
+    if (!basketFromHook?.productItems) {
         return <EmptyCart isRegistered={customer.isRegistered} />
     }
 
@@ -234,7 +251,7 @@ const Cart = () => {
                         >
                             <GridItem>
                                 <Stack spacing={4}>
-                                    {basket.productItems.map((product, idx) => (
+                                    {basketFromHook.productItems.map((product, idx) => (
                                         <ProductItem
                                             key={product.productId}
                                             index={idx}
@@ -250,8 +267,8 @@ const Cart = () => {
                                             }
                                             product={{
                                                 ...product,
-                                                ...(basket._productItemsDetail &&
-                                                    basket._productItemsDetail[product.productId]),
+                                                ...(basketFromHook &&
+                                                    basketFromHook[product.productId]),
                                                 price: product.price,
                                                 quantity: localQuantity[product.itemId]
                                                     ? localQuantity[product.itemId]

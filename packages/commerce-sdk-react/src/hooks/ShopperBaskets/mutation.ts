@@ -352,7 +352,8 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
                 if (
                     action === 'createBasket' ||
                     action === 'transferBasket' ||
-                    action === 'mergeBasket'
+                    action === 'mergeBasket' ||
+                    action === 'addItemToBasket'
                 ) {
                     if ('customerInfo' in data && data.customerInfo?.customerId) {
                         queryClient.invalidateQueries([

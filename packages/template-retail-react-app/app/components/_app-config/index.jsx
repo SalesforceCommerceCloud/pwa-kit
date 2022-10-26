@@ -10,12 +10,12 @@ import {ChakraProvider} from '@chakra-ui/react'
 
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
-
+import {CommerceApiProvider} from 'commerce-sdk-react'
 import theme from '../../theme'
 import CommerceAPI from '../../commerce-api'
 import {
     BasketProvider,
-    CommerceAPIProvider,
+    CommerceAPIProvider as _CommerceAPIProvider,
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
@@ -24,6 +24,22 @@ import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '../../utils/url'
+import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
+import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+
+const options = {
+    queryClientConfig: {
+        defaultOptions: {
+            queries: {
+                retry: false,
+                refetchOnWindowFocus: false
+            },
+            mutations: {
+                retry: false
+            }
+        }
+    }
+}
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -36,18 +52,28 @@ import {createUrlTemplate} from '../../utils/url'
 const AppConfig = ({children, locals = {}}) => {
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
-
     return (
         <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-            <CommerceAPIProvider value={locals.api}>
-                <CustomerProvider value={{customer, setCustomer}}>
-                    <BasketProvider value={{basket, setBasket}}>
-                        <CustomerProductListsProvider>
-                            <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                        </CustomerProductListsProvider>
-                    </BasketProvider>
-                </CustomerProvider>
-            </CommerceAPIProvider>
+            <_CommerceAPIProvider value={locals.api}>
+                <CommerceApiProvider
+                    siteId={locals.site?.id}
+                    shortCode="8o7m175y"
+                    clientId="c9c45bfd-0ed3-4aa2-9971-40f88962b836"
+                    organizationId="f_ecom_zzrf_001"
+                    redirectURI="http://localhost:3000/callback"
+                    proxy="http://localhost:3000/mobify/proxy/api"
+                    locale={locals.locale.id}
+                    currency="USD"
+                >
+                    <CustomerProvider value={{customer, setCustomer}}>
+                        <BasketProvider value={{basket, setBasket}}>
+                            <CustomerProductListsProvider>
+                                <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                            </CustomerProductListsProvider>
+                        </BasketProvider>
+                    </CustomerProvider>
+                </CommerceApiProvider>
+            </_CommerceAPIProvider>
         </MultiSiteProvider>
     )
 }
@@ -91,4 +117,4 @@ AppConfig.propTypes = {
     locals: PropTypes.object
 }
 
-export default AppConfig
+export default withReactQuery(withLegacyGetProps(AppConfig), options)

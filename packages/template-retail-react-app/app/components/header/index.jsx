@@ -48,7 +48,8 @@ import {noop} from '../../utils/utils'
 import {navLinks, messages} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../loading-spinner'
-
+import {useCustomerBaskets, useCustomerId} from 'commerce-sdk-react'
+import {useBasket as useBasketHook} from '../../hooks/useBasket'
 const ENTER_KEY = 'Enter'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
@@ -79,7 +80,7 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
-    const basket = useBasket()
+    // const basket = useBasket()
     const customer = useCustomer()
     const navigate = useNavigation()
 
@@ -92,6 +93,12 @@ const Header = ({
     const hasEnterPopoverContent = useRef()
 
     const styles = useMultiStyleConfig('Header')
+
+    //***************************React commerce hooks******************//
+    // const customerId = useCustomerId() || ''
+    // const baskets = useCustomerBaskets({customerId}, {enabled: !!customerId})
+    const {totalItems} = useBasketHook()
+    //*************************************************************//
 
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -257,11 +264,7 @@ const Header = ({
                         icon={
                             <>
                                 <BasketIcon />
-                                {basket?.loaded && (
-                                    <Badge variant="notification">
-                                        {basket.itemAccumulatedCount}
-                                    </Badge>
-                                )}
+                                {totalItems && <Badge variant="notification">{totalItems}</Badge>}
                             </>
                         }
                         variant="unstyled"
