@@ -29,6 +29,7 @@ import {CommerceApiProvider} from 'commerce-sdk-react'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -52,18 +53,19 @@ const AppConfig = ({children, locals = {}}) => {
         app: {commerceAPI: commerceApiConfig}
     } = getConfig()
 
-    // TODO: do not hardcode 'localhost:3000'
+    const appOrigin = getAppOrigin()
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
             clientId={commerceApiConfig.parameters.clientId}
             organizationId={commerceApiConfig.parameters.organizationId}
             siteId={locals.site?.id}
-            headers={headers}
-            redirectURI="http://localhost:3000/callback"
-            proxy={`http://localhost:3000${commerceApiConfig.proxyPath}`}
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
+            redirectURI={`${appOrigin}/callback`}
+            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
+            headers={headers}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <_CommerceAPIProvider value={locals.api}>
