@@ -20,6 +20,8 @@ describe('uuidv4', () => {
 
     test('returns correct format', () => {
         global.crypto = {
+            // we mock the module because crypto.getRandomValues
+            // is not available on node v14 (came out in node v15)
             getRandomValues: () => [123],
         }
 
