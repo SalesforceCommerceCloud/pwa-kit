@@ -253,7 +253,20 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
 
                         // @ts-ignore
                         queryClient.setQueriesData(
-                            ['/customers', params?.parameters?.customerId, {customerId: params?.parameters?.customerId}],
+                            {
+                                predicate: (query) => {
+                                    console.log('### 1. updateCustomer setQueriesData')
+                                    console.log('query:', query)
+                                    // @ts-ignore
+                                    const result =
+                                        query.queryKey[0] === '/customers' &&
+                                        query.queryKey[1] === params?.parameters?.customerId &&
+                                        Object.values(query.queryKey[2]).includes(params?.parameters?.customerId)
+
+                                    console.log('result:', result)
+                                    return result
+                                },
+                            },
                             data
                         )
                     }
@@ -268,7 +281,15 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
 
                         // @ts-ignore
                         queryClient.setQueryData(
-                            ['/customers', params?.parameters?.customerId, '/addresses', {addressName: params?.parameters?.addressName, customerId: params?.parameters?.customerId}],
+                            [
+                                '/customers',
+                                params?.parameters?.customerId,
+                                '/addresses',
+                                {
+                                    addressName: params?.parameters?.addressName,
+                                    customerId: params?.parameters?.customerId
+                                }
+                            ],
                             data
                         )
                     }
@@ -292,24 +313,23 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                 if (action === 'updateCustomer') {
                     // @ts-ignore some action doesn't have customerId as parameter
                     if (params?.parameters?.customerId) {
-                        // invalidate all cache entries that are related to the customer
                         // @ts-ignore
-                        queryClient.invalidateQueries([
-                            '/customers',
-                            params?.parameters?.customerId,
-                            '/payment-instruments'
-                        ])
-                        // @ts-ignore
-                        queryClient.invalidateQueries([
-                            '/customers',
-                            params?.parameters?.customerId,
-                            '/addresses'
-                        ])
-                        // @ts-ignore
-                        queryClient.invalidateQueries([
-                            '/customers',
-                            '/external-profile'
-                        ])
+                        // invalidate cache entries that contain Customer type related data
+                        queryClient.invalidateQueries({
+                            predicate: (query) => {
+                                console.log('### 2. updateCustomer invalidateQueries')
+                                console.log('query:', query)
+                                const result =
+                                    (query.queryKey[0] === '/customers' &&
+                                        query.queryKey[1] === params?.parameters?.customerId &&
+                                        (query.queryKey[2] === '/payment-instruments' ||
+                                            query.queryKey[2]==='/addresses')) ||
+                                    (query.queryKey[0] === '/customers' &&
+                                        query.queryKey[1] === '/external-profile')
+                                console.log('result:', result)
+                                return result
+                            }
+                        })
                     }
                 }
 
@@ -329,7 +349,6 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                             params?.parameters?.customerId,
                             '/addresses'
                         ])
-
                     }
                 }
             }
