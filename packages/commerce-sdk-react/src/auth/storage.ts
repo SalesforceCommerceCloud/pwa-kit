@@ -53,7 +53,7 @@ export class LocalStorage implements BaseStorage {
         const event = new StorageEvent('storage', {
             key: key,
             oldValue: oldValue,
-            newValue: value,
+            newValue: value
         })
         window.dispatchEvent(event)
     }
@@ -66,7 +66,7 @@ export class LocalStorage implements BaseStorage {
         const event = new StorageEvent('storage', {
             key: key,
             oldValue: oldValue,
-            newValue: null,
+            newValue: null
         })
         window.dispatchEvent(event)
     }
