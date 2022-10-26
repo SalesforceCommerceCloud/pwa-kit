@@ -26,14 +26,14 @@ import Cookies from 'js-cookie'
  * @typedef {Object} Customer
  */
 
-const usidStorageKey = 'usid'
-const cidStorageKey = 'cid'
-const encUserIdStorageKey = 'enc-user-id'
-const tokenStorageKey = 'token'
-const refreshTokenRegisteredStorageKey = 'cc-nx'
-const refreshTokenGuestStorageKey = 'cc-nx-g'
-const oidStorageKey = 'oid'
-const dwSessionIdKey = 'dwsid'
+const usidStorageKey = '_usid'
+const cidStorageKey = '_cid'
+const encUserIdStorageKey = '_enc-user-id'
+const tokenStorageKey = '_token'
+const refreshTokenRegisteredStorageKey = '_cc-nx'
+const refreshTokenGuestStorageKey = '_cc-nx-g'
+const oidStorageKey = '_oid'
+const dwSessionIdKey = '_dwsid'
 const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridge.
 
 const EXPIRED_TOKEN = 'EXPIRED_TOKEN'
