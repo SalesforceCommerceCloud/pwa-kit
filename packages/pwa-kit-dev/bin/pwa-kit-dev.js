@@ -357,39 +357,40 @@ const main = () => {
                 access_token: token
             })
 
-            const socket = new WebSocket(url)
-            socket.on('message', (event) => {
-                const log = JSON.parse(event)
-                const timestamp = new Date(log.timestamp).toISOString()
-                const parts = log.message.trim().split('\t')
-                let message, requestId, shortRequestId
+            const ws = new WebSocket(url)
+            ws.on('message', (event) => {
+                JSON.parse(event).forEach(log => {
+                    const timestamp = new Date(log.timestamp).toISOString()
+                    const parts = log.message.trim().split('\t')
+                    let message, requestId, shortRequestId
 
-                if (
-                    parts.length >= 4
-                    && validator.isISO8601(parts[0])
-                    && validator.isUUID(parts[1])
-                    && validator.isAlpha(parts[2])
-                ) {
-                    // An application log
-                    parts.shift()
-                    requestId = parts.shift()
-                    message = parts.shift() + ' ' + parts.join('\t')
-                } else {
-                    // A platform log
-                    message = parts.join('\t')
-                }
+                    if (
+                        parts.length >= 4
+                        && validator.isISO8601(parts[0])
+                        && validator.isUUID(parts[1])
+                        && validator.isAlpha(parts[2])
+                    ) {
+                        // An application log
+                        parts.shift()
+                        requestId = parts.shift()
+                        message = parts.shift() + ' ' + parts.join('\t')
+                    } else {
+                        // A platform log
+                        message = parts.join('\t')
+                    }
 
-                const uuidPattern = /(?<short>[a-f\d]{8})-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/
-                if (match = uuidPattern.exec(requestId || message)) {
-                    shortRequestId = match.groups.short
-                }
+                    const uuidPattern = /(?<short>[a-f\d]{8})-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/
+                    if (match = uuidPattern.exec(requestId || message)) {
+                        shortRequestId = match.groups.short
+                    }
 
-                const logLevelPattern = /^([A-Z]+)/
-                message = message.replace(logLevelPattern, match => (
-                    chalk[colors[match.toLowerCase()] || 'cyan'](match.padEnd(6))
-                ))
+                    const logLevelPattern = /^([A-Z]+)/
+                    message = message.replace(logLevelPattern, match => (
+                        chalk[colors[match.toLowerCase()] || 'cyan'](match.padEnd(6))
+                    ))
 
-                console.log(chalk.green(timestamp), chalk.cyan(shortRequestId), message)
+                    console.log(chalk.green(timestamp), chalk.cyan(shortRequestId), message)
+                })
             })
         })
 
