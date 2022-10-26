@@ -22,7 +22,7 @@ describe('uuidv4', () => {
         global.crypto = {
             // we mock the module because crypto.getRandomValues
             // is not available on node v14 (came out in node v15)
-            getRandomValues: () => [123],
+            getRandomValues: () => [123]
         }
 
         expect(uuidv4()).toBe('abbbbbbb-abbb-4bbb-bbbb-abbbbbbbbbbb')
