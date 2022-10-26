@@ -43,18 +43,21 @@ import {
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
     HOME_SHOP_PRODUCTS_LIMIT
 } from '../../constants'
-
+import {useProductSearch} from 'commerce-sdk-react'
 /**
  * This is the home page for Retail React App.
  * The page is created for demonstration purposes.
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = ({productSearchResult, isLoading}) => {
+const Home = () => {
     const intl = useIntl()
     const einstein = useEinstein()
     const {pathname} = useLocation()
-
+    const {data: productSearchResult, isLoading} = useProductSearch({
+        refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+        limit: HOME_SHOP_PRODUCTS_LIMIT
+    })
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
@@ -285,22 +288,25 @@ const Home = ({productSearchResult, isLoading}) => {
 
 Home.getTemplateName = () => 'home'
 
-Home.shouldGetProps = ({previousLocation, location}) =>
-    !previousLocation || previousLocation.pathname !== location.pathname
+// Home.shouldGetProps = ({previousLocation, location}) =>
+//     !previousLocation || previousLocation.pathname !== location.pathname
 
-Home.getProps = async ({res, api}) => {
+Home.getProps = async ({
+    res
+    // api
+}) => {
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
 
-    const productSearchResult = await api.shopperSearch.productSearch({
-        parameters: {
-            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
-            limit: HOME_SHOP_PRODUCTS_LIMIT
-        }
-    })
-
-    return {productSearchResult}
+    // const productSearchResult = await api.shopperSearch.productSearch({
+    //     parameters: {
+    //         refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+    //         limit: HOME_SHOP_PRODUCTS_LIMIT
+    //     }
+    // })
+    //
+    // return {productSearchResult}
 }
 
 Home.propTypes = {

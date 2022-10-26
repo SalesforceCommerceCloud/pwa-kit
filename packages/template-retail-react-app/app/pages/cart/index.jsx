@@ -61,7 +61,8 @@ const Cart = () => {
         })
     }
     /*****************************************Commerce react HOOKS************************/
-    // NOTE: we can directly called two hooks to get baskets or we can have a custom hooks to keep the code DRY
+    // NOTE: we can directly called two hooks to get baskets
+    // or we can have a custom hooks to keep the code DRY
     // see ../../hooks/useBasket
     // get the basket, fetch product details
     const customerId = useCustomerId() || ''
@@ -267,8 +268,8 @@ const Cart = () => {
                                             }
                                             product={{
                                                 ...product,
-                                                ...(basketFromHook &&
-                                                    basketFromHook[product.productId]),
+                                                ...(productDetails &&
+                                                    productDetails[product.productId]),
                                                 price: product.price,
                                                 quantity: localQuantity[product.itemId]
                                                     ? localQuantity[product.itemId]

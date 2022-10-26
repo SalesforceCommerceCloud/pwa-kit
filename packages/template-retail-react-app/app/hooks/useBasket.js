@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
 import {useCustomerBaskets, useCustomerId} from 'commerce-sdk-react'
 
 // This is a simple hook that combined the logic of useCustomerId and useCustomerBaskets to keep the code DRY

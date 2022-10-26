@@ -28,7 +28,6 @@ import {
     useMediaQuery
 } from '@chakra-ui/react'
 
-import useBasket from '../../commerce-api/hooks/useBasket'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 import Link from '../link'
@@ -48,7 +47,6 @@ import {noop} from '../../utils/utils'
 import {navLinks, messages} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../loading-spinner'
-import {useCustomerBaskets, useCustomerId} from 'commerce-sdk-react'
 import {useBasket as useBasketHook} from '../../hooks/useBasket'
 const ENTER_KEY = 'Enter'
 

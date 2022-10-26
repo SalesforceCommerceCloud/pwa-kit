@@ -23,7 +23,7 @@ import {
 } from '@chakra-ui/react'
 
 // Hooks
-import useBasket from '../../commerce-api/hooks/useBasket'
+// import useBasket from '../../commerce-api/hooks/useBasket'
 import {useVariant} from '../../hooks'
 import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
@@ -34,28 +34,22 @@ import RecommendedProducts from '../../components/recommended-products'
 import ProductView from '../../partials/product-view'
 
 // Others/Utils
-import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
+// import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // constant
 import {
     API_ERROR_MESSAGE,
-    MAX_CACHE_AGE,
+    // MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST
 } from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useParams, useLocation} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {
-    useCategory,
-    useCustomerBaskets,
-    useCustomerId,
-    useProduct,
-    useShopperBasketsMutation
-} from 'commerce-sdk-react'
+import {useCategory, useProduct, useShopperBasketsMutation} from 'commerce-sdk-react'
 import {useBasket as useBasketHook} from '../../hooks/useBasket'
 
-const ProductDetail = ({}) => {
+const ProductDetail = () => {
     const {formatMessage} = useIntl()
     // const basket = useBasket()
     const history = useHistory()
@@ -67,8 +61,6 @@ const ProductDetail = ({}) => {
     //===================== Commerce react hooks==========================//
     // **************Basket******************** //
     const {baskets, hasBasket} = useBasketHook()
-    console.log('PDP baskets.data?.total', baskets.data?.total)
-    console.log('PDP baskets.data', baskets)
     const createBasket = useShopperBasketsMutation('createBasket')
     const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
 
@@ -81,7 +73,7 @@ const ProductDetail = ({}) => {
         allImages: true
     })
     // only fetch category on master product
-    const {data: category, isLoading: isCategoryLoading, error: categoryError} = useCategory(
+    const {data: category, error: categoryError} = useCategory(
         {id: product?.primaryCategoryId, levels: 1},
         {enabled: !!product?.primaryCategoryId}
     )
@@ -111,7 +103,6 @@ const ProductDetail = ({}) => {
         const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
             pid: variant?.productId
         })
-        debugger
         history.replace(updatedUrl)
     }, [variant?.productId])
 
@@ -160,7 +151,7 @@ const ProductDetail = ({}) => {
             // The basket accepts an array of `ProductItems`, so lets create a single
             // item array to add to the basket.
 
-            if (!basket.hasBasket) {
+            if (!hasBasket) {
                 createBasket.mutate({body: {}})
             }
 
@@ -311,42 +302,42 @@ const ProductDetail = ({}) => {
                     <Box display={['none', 'none', 'none', 'block']} flex={4}></Box>
                 </Stack>
                 Product Recommendations
-                {/*<Stack spacing={16}>*/}
-                {/*    <RecommendedProducts*/}
-                {/*        title={*/}
-                {/*            <FormattedMessage*/}
-                {/*                defaultMessage="Complete the Set"*/}
-                {/*                id="product_detail.recommended_products.title.complete_set"*/}
-                {/*            />*/}
-                {/*        }*/}
-                {/*        recommender={'complete-the-set'}*/}
-                {/*        products={product && [product.id]}*/}
-                {/*        mx={{base: -4, md: -8, lg: 0}}*/}
-                {/*        shouldFetch={() => product?.id}*/}
-                {/*    />*/}
-                {/*    <RecommendedProducts*/}
-                {/*        title={*/}
-                {/*            <FormattedMessage*/}
-                {/*                defaultMessage="You might also like"*/}
-                {/*                id="product_detail.recommended_products.title.might_also_like"*/}
-                {/*            />*/}
-                {/*        }*/}
-                {/*        recommender={'pdp-similar-items'}*/}
-                {/*        products={product && [product.id]}*/}
-                {/*        mx={{base: -4, md: -8, lg: 0}}*/}
-                {/*        shouldFetch={() => product?.id}*/}
-                {/*    />*/}
-                {/*    <RecommendedProducts*/}
-                {/*        title={*/}
-                {/*            <FormattedMessage*/}
-                {/*                defaultMessage="Recently Viewed"*/}
-                {/*                id="product_detail.recommended_products.title.recently_viewed"*/}
-                {/*            />*/}
-                {/*        }*/}
-                {/*        recommender={'viewed-recently-einstein'}*/}
-                {/*        mx={{base: -4, md: -8, lg: 0}}*/}
-                {/*    />*/}
-                {/*</Stack>*/}
+                <Stack spacing={16}>
+                    <RecommendedProducts
+                        title={
+                            <FormattedMessage
+                                defaultMessage="Complete the Set"
+                                id="product_detail.recommended_products.title.complete_set"
+                            />
+                        }
+                        recommender={'complete-the-set'}
+                        products={product && [product.id]}
+                        mx={{base: -4, md: -8, lg: 0}}
+                        shouldFetch={() => product?.id}
+                    />
+                    <RecommendedProducts
+                        title={
+                            <FormattedMessage
+                                defaultMessage="You might also like"
+                                id="product_detail.recommended_products.title.might_also_like"
+                            />
+                        }
+                        recommender={'pdp-similar-items'}
+                        products={product && [product.id]}
+                        mx={{base: -4, md: -8, lg: 0}}
+                        shouldFetch={() => product?.id}
+                    />
+                    <RecommendedProducts
+                        title={
+                            <FormattedMessage
+                                defaultMessage="Recently Viewed"
+                                id="product_detail.recommended_products.title.recently_viewed"
+                            />
+                        }
+                        recommender={'viewed-recently-einstein'}
+                        mx={{base: -4, md: -8, lg: 0}}
+                    />
+                </Stack>
             </Stack>
         </Box>
     )
