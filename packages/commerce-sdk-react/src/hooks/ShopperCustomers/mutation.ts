@@ -238,13 +238,99 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
-                // TODO: Fine grain invalidation of '/customers'
+                console.log('action:', action)
+                console.log('data:', data)
+                console.log('params:', params)
 
-                // @ts-ignore some action doesn't have customerId as parameter
-                if (params?.parameters?.customerId) {
+                //TODO: 1. Update Cache query keys
+
+                if (action === 'updateCustomer') {
                     // @ts-ignore
-                    // invalidate all cache entries that are related to the customer
-                    queryClient.invalidateQueries(['/customers', params?.parameters?.customerId])
+                    if (params?.parameters?.customerId) {
+                        // Update core data inside query cache for the ShopperCustomer query
+
+                        //TODO: Question1: include arg in queryKey??
+
+                        // @ts-ignore
+                        queryClient.setQueriesData(
+                            ['/customers', params?.parameters?.customerId, {customerId: params?.parameters?.customerId}],
+                            data
+                        )
+                    }
+                }
+
+                if (action === 'updateCustomerAddress') {
+                    // @ts-ignore
+                    if (params?.parameters?.customerId) {
+                        // Update core data inside query cache for the ShopperCustomer query
+
+                        //TODO: Question1: include arg in queryKey??
+
+                        // @ts-ignore
+                        queryClient.setQueryData(
+                            ['/customers', params?.parameters?.customerId, '/addresses', {addressName: params?.parameters?.addressName, customerId: params?.parameters?.customerId}],
+                            data
+                        )
+                    }
+                }
+
+                // if (params?.parameters?.customerId) {
+                //
+                //     switch (action) {
+                //         case 'updateCustomer':
+                //             queryClient.setQueryData(
+                //                 ['/customers', params?.parameters?.customerId],
+                //                 data
+                //             )
+                //             break;
+                //     }
+                //
+                // }
+
+                // TODO: 2. Invalidation Cache query keys
+
+                if (action === 'updateCustomer') {
+                    // @ts-ignore some action doesn't have customerId as parameter
+                    if (params?.parameters?.customerId) {
+                        // invalidate all cache entries that are related to the customer
+                        // @ts-ignore
+                        queryClient.invalidateQueries([
+                            '/customers',
+                            params?.parameters?.customerId,
+                            '/payment-instruments'
+                        ])
+                        // @ts-ignore
+                        queryClient.invalidateQueries([
+                            '/customers',
+                            params?.parameters?.customerId,
+                            '/addresses'
+                        ])
+                        // @ts-ignore
+                        queryClient.invalidateQueries([
+                            '/customers',
+                            '/external-profile'
+                        ])
+                    }
+                }
+
+                if (action === 'updateCustomerAddress') {
+                    // @ts-ignore some action doesn't have customerId as parameter
+                    if (params?.parameters?.customerId) {
+                        // invalidate all cache entries that are related to the customer
+                        // @ts-ignore
+                        queryClient.invalidateQueries([
+                            '/customers',
+                            params?.parameters?.customerId,
+                            '/payment-instruments'
+                        ])
+                        // @ts-ignore
+                        queryClient.invalidateQueries([
+                            '/customers',
+                            params?.parameters?.customerId,
+                            '/addresses'
+                        ])
+
+                    }
                 }
             }
         }
