@@ -262,7 +262,9 @@ const Header = ({
                         icon={
                             <>
                                 <BasketIcon />
-                                {totalItems && <Badge variant="notification">{totalItems}</Badge>}
+                                {totalItems ? (
+                                    <Badge variant="notification">{totalItems.toString()}</Badge>
+                                ) : null}
                             </>
                         }
                         variant="unstyled"
