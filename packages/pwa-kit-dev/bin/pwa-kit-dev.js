@@ -70,30 +70,29 @@ const main = () => {
      * and --credentialsFile. These are set to be split out from the SDK
      * commands here in the near future.
      */
-     const managedRuntimeCommand = (name) => {
+    const managedRuntimeCommand = (name) => {
         return program
             .command(name)
             .addOption(
-                new program.Option(
-                    '--cloud-origin <origin>',
-                    'the API origin to connect to'
-                )
+                new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
                     .default('https://cloud.mobify.com')
                     .env('CLOUD_API_BASE')
-                    .argParser(val => {
+                    .argParser((val) => {
                         try {
                             const url = new URL(val)
                             const labels = url.host.split('.')
                             if (
-                                labels.length !== 3
-                                || !labels[0].startsWith('cloud')
-                                || !labels[1].startsWith('mobify')
-                                || labels[2] !== 'com'
+                                labels.length !== 3 ||
+                                !labels[0].startsWith('cloud') ||
+                                !labels[1].startsWith('mobify') ||
+                                labels[2] !== 'com'
                             ) {
-                                throw new Error
+                                throw new Error()
                             }
                         } catch {
-                            throw new program.InvalidArgumentError(`'${val}' is not a valid Cloud origin`)
+                            throw new program.InvalidArgumentError(
+                                `'${val}' is not a valid Cloud origin`
+                            )
                         }
                         return val
                     })
@@ -326,11 +325,10 @@ const main = () => {
     managedRuntimeCommand('logs')
         .description(`tail environment logs`)
         .addOption(
-            new program.Option(
-                '-p, --project <projectSlug>',
-                'the project slug'
+            new program.Option('-p, --project <projectSlug>', 'the project slug').default(
+                undefined,
+                "the 'name' key from package.json"
             )
-                .default(undefined, "the 'name' key from package.json")
         )
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
         .action(async (_, opts) => {
@@ -347,7 +345,12 @@ const main = () => {
                 scriptUtils.fail(`Error reading credentials: ${e}`)
             }
 
-            const token = await scriptUtils.createToken(project, environment, cloudOrigin, credentials.api_key)
+            const token = await scriptUtils.createToken(
+                project,
+                environment,
+                cloudOrigin,
+                credentials.api_key
+            )
             const url = new URL(cloudOrigin.replace('cloud', 'logs'))
             url.protocol = 'wss'
             url.search = new URLSearchParams({
@@ -361,28 +364,28 @@ const main = () => {
             let heartbeat
 
             ws.on('open', () => {
-                // Send a heartbeat periodically to keep the connection open.
+                // Send a heartbeat periodically to bypass idle timeout.
                 heartbeat = setTimeout(() => ws.ping(), 5 * 60 * 1000)
             })
 
-            ws.on('close', code => {
+            ws.on('close', (code) => {
                 console.log('Connection closed by server with code', code)
                 clearInterval(heartbeat)
             })
 
-            ws.on('error', error => scriptUtils.fail(`Error tailing logs: ${error.message}`))
+            ws.on('error', (error) => scriptUtils.fail(`Error tailing logs: ${error.message}`))
 
-            ws.on('message', data => {
-                JSON.parse(data).forEach(log => {
+            ws.on('message', (data) => {
+                JSON.parse(data).forEach((log) => {
                     const timestamp = new Date(log.timestamp).toISOString()
                     const parts = log.message.trim().split('\t')
                     let message, requestId, shortRequestId
 
                     if (
-                        parts.length > 3
-                        && validator.isISO8601(parts[0])
-                        && validator.isUUID(parts[1])
-                        && validator.isAlpha(parts[2])
+                        parts.length > 3 &&
+                        validator.isISO8601(parts[0]) &&
+                        validator.isUUID(parts[1]) &&
+                        validator.isAlpha(parts[2])
                     ) {
                         // An application log
                         parts.shift()
@@ -394,14 +397,15 @@ const main = () => {
                     }
 
                     const uuidPattern = /(?<short>[a-f\d]{8})-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/
-                    if (match = uuidPattern.exec(requestId || message)) {
+                    const match = uuidPattern.exec(requestId || message)
+                    if (match) {
                         shortRequestId = match.groups.short
                     }
 
                     const logLevelPattern = /^([A-Z]+)/
-                    message = message.replace(logLevelPattern, match => (
+                    message = message.replace(logLevelPattern, (match) =>
                         chalk[colors[match.toLowerCase()] || 'cyan'](match.padEnd(6))
-                    ))
+                    )
 
                     console.log(chalk.green(timestamp), chalk.cyan(shortRequestId), message)
                 })

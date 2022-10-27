@@ -230,7 +230,7 @@ Utils.readPackageJson = (keyName) => {
 }
 
 Utils.createToken = (project, environment, cloudOrigin, apiKey) => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         const options = {
             url: new URL(
                 `/api/projects/${project}/target/${environment}/jwt/`,
@@ -249,8 +249,8 @@ Utils.createToken = (project, environment, cloudOrigin, apiKey) => {
             resolve(body)
         })
     })
-        .then(body => JSON.parse(body).token)
-        .catch(e => Utils.fail(e))
+        .then((body) => JSON.parse(body).token)
+        .catch((e) => Utils.fail(e))
 }
 
 Utils.setDefaultMessage = () => {

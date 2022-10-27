@@ -53,7 +53,7 @@ const uploadBundle = (opts) => {
     if (isEmptyOptions(opts)) {
         Utils.fail('[Error: You must provide a Mobify Cloud project slug to upload a bundle.]')
     }
-    if (!opts.hasOwnProperty('origin')) {
+    if (!Object.prototype.hasOwnProperty.call(opts, 'origin')) {
         Utils.fail(
             '[Error: Missing key "origin" in uploadBundle(opts) - you must specify an origin for the Cloud API.]'
         )
