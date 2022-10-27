@@ -225,7 +225,6 @@ type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeo
 const isObject = (item) => typeof item === 'object' && !Array.isArray(item) && item !== null
 
 const updateCache = (queryClient, action, queryKeysMatrix, data) => {
-
     const isMatchingKey = (cacheQuery, queryKey) => {
         return queryKey.every((item, index) => {
             return isObject(item)
@@ -234,7 +233,7 @@ const updateCache = (queryClient, action, queryKeysMatrix, data) => {
         })
     }
     // STEP 1. Update data inside query cache for the matching queryKeys
-    queryKeysMatrix[action]?.update.map((queryKey) => {
+    queryKeysMatrix[action]?.update?.map((queryKey) => {
         queryClient.setQueriesData(
             {
                 predicate: (cacheQuery) => isMatchingKey(cacheQuery, queryKey)
@@ -244,13 +243,12 @@ const updateCache = (queryClient, action, queryKeysMatrix, data) => {
     })
 
     // STEP 2. Invalidate cache entries with the matching queryKeys
-    queryKeysMatrix[action]?.invalidate.map((queryKey) => {
+    queryKeysMatrix[action]?.invalidate?.map((queryKey) => {
         queryClient.invalidateQueries({
             predicate: (cacheQuery) => isMatchingKey(cacheQuery, queryKey)
         })
     })
 }
-
 
 /**
  * A hook for performing mutations with the Shopper Customers API.
@@ -268,6 +266,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
+                // @ts-ignore
                 const queryKeysMatrix = {
                     updateCustomer: {
                         update: [
@@ -299,11 +298,62 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 {arg: params?.parameters?.customerId}
                             ]
                         ]
+                    },
+                    // TODO: Create should set a new entry when no match. I was doing that in the init commit..
+                    createCustomerAddress: {
+                        update: [
+                            [
+                                '/customers',
+                                params?.parameters?.customerId,
+                                {arg: params?.parameters?.customerId}
+                            ]
+                        ],
+                        invalidate: [
+                            [
+                                '/customers',
+                                params?.parameters?.customerId,
+                                '/addresses',
+                                {arg: params?.parameters?.addressName}
+                            ]
+                        ]
+                    },
+                    removeCustomerAddress: {
+                        invalidate: [
+                            [
+                                '/customers',
+                                params?.parameters?.customerId,
+                                '/addresses',
+                                {arg: params?.parameters?.addressName}
+                            ],
+                            [
+                                '/customers',
+                                params?.parameters?.customerId,
+                                {arg: params?.parameters?.customerId}
+                            ]
+                        ]
+                    },
+                    updateCustomerProductListItem: {
+                        update: [
+                            [
+                                '/customers',
+                                params?.parameters?.customerId,
+                                '/product-list',
+                                params?.parameters?.listId,
+                                {arg: params?.parameters?.itemId}
+                            ]
+                        ],
+                        invalidate: [
+                            [
+                                '/customers',
+                                params?.parameters?.customerId,
+                                '/product-list',
+                                {arg: params?.parameters?.listId}
+                            ]
+                        ]
                     }
                 }
 
                 updateCache(queryClient, action, queryKeysMatrix, data)
-
             }
         }
     )
