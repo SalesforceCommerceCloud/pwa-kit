@@ -1,6 +1,6 @@
 {
   "name": "commerce-sdk-react",
-  "version": "2.3.0-alpha.1",
+  "version": "2.3.0-alpha.2",
   "description": "A library that provides react hooks for fetching data from Commerce Cloud",
   "author": "cc-pwa-kit@salesforce.com",
   "license": "See license in LICENSE",
@@ -32,7 +32,7 @@
     "test:watch": "npm test -- --watch",
     "test:inspect": "node --inspect-brk jest --runInBand",
     "test:no-mocked-responses": "cross-env NOCK_BACK_MODE=wild npm run test",
-    "test:update-mocked-responses": "cross-env NOCK_BACK_MODE=update npm test",
+    "test:update-mocked-responses": "cross-env NOCK_BACK_MODE=update internal-lib-build test",
     "typecheck": "tsc --noEmit",
     "version": "node ./scripts/version.js",
     "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\""
@@ -52,7 +52,7 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "cross-env": "^5.2.0",
-    "internal-lib-build": "^2.3.0-alpha.1",
+    "internal-lib-build": "^2.3.0-alpha.2",
     "jsonwebtoken": "^8.5.1",
     "nock": "^13.2.9",
     "react": "^17.0.2",
