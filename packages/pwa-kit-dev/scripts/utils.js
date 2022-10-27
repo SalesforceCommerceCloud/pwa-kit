@@ -230,18 +230,15 @@ Utils.readPackageJson = (keyName) => {
 }
 
 Utils.createToken = (project, environment, cloudOrigin, apiKey) => {
+    const options = {
+        url: new URL(`/api/projects/${project}/target/${environment}/jwt/`, cloudOrigin).toString(),
+        method: 'POST',
+        headers: Utils.getRequestHeaders({
+            Accept: 'application/json',
+            Authorization: `Bearer ${apiKey}`
+        })
+    }
     return new Promise((resolve) => {
-        const options = {
-            url: new URL(
-                `/api/projects/${project}/target/${environment}/jwt/`,
-                cloudOrigin
-            ).toString(),
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                Authorization: `Bearer ${apiKey}`
-            }
-        }
         request(options, (error, response, body) => {
             if (error || (error = Utils.errorForStatus(response))) {
                 Utils.fail(`${cloudOrigin} returned ${error.message}`)

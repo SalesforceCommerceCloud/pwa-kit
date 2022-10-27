@@ -16,6 +16,9 @@ const pkg = require('../package.json')
 jest.mock('git-rev-sync')
 const git = require('git-rev-sync')
 
+jest.mock('request')
+const request = require('request')
+
 let realFail
 beforeEach(() => {
     realFail = Utils.fail
@@ -54,6 +57,43 @@ test('errorForStatus returns false for 2xx and 3xx statuses', () => {
 test('errorForStatus returns an Error for 4xx and 5xx statuses', () => {
     ;[400, 401, 403, 404, 500, 503].forEach((statusCode) => {
         expect(Utils.errorForStatus({statusCode})).toBeInstanceOf(Error)
+    })
+})
+
+describe('createToken', () => {
+    test('makes request and returns token', async () => {
+        const data = {token: 'abcd'}
+        request.mockClear()
+        request.mockImplementation((_, callback) => {
+            callback(null, {}, JSON.stringify(data))
+        })
+
+        const mockGetHeaders = jest.fn((headers) => headers)
+        Utils.getRequestHeaders = mockGetHeaders
+
+        const args = {
+            project: 'pwa-kit',
+            environment: 'dev',
+            cloudOrigin: 'https://test.mobify.com',
+            apiKey: 'key'
+        }
+        expect(await Utils.createToken(...Object.values(args))).toEqual(data.token)
+        expect(request).toBeCalled()
+        expect(mockGetHeaders).toBeCalled()
+
+        const options = request.mock.calls[0][0]
+        expect(options.url).toBe(
+            `${args.cloudOrigin}/api/projects/${args.project}/target/${args.environment}/jwt/`
+        )
+        expect(options.method).toBe('POST')
+        expect(options.headers).toStrictEqual({
+            Accept: 'application/json',
+            Authorization: `Bearer ${args.apiKey}`
+        })
+    })
+
+    test('exits with error after unsuccessful request', () => {
+        console.log('todo')
     })
 })
 
