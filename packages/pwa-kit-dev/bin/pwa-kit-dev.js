@@ -365,7 +365,7 @@ const main = () => {
 
             ws.on('open', () => {
                 // Send a heartbeat periodically to bypass idle timeout.
-                heartbeat = setTimeout(() => ws.ping(), 5 * 60 * 1000)
+                heartbeat = setInterval(() => ws.ping(), 5 * 60 * 1000)
             })
 
             ws.on('close', (code) => {
