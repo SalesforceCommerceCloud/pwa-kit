@@ -28,6 +28,8 @@ import {
     useMediaQuery
 } from '@chakra-ui/react'
 
+import {useProduct} from 'commerce-sdk-react'
+
 import useBasket from '../../commerce-api/hooks/useBasket'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
@@ -111,6 +113,9 @@ const Header = ({
             if (!hasEnterPopoverContent.current) onClose()
         }, 100)
     }
+
+    // DEBUG
+    useProduct({id: 'efg'})
 
     return (
         <Box {...styles.container} {...props}>
