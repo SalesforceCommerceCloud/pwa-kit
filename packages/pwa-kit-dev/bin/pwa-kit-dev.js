@@ -336,15 +336,15 @@ const main = () => {
         .action(async (_, opts) => {
             let {project, environment, cloudOrigin, credentialsFile} = opts.optsWithGlobals()
 
+            if (!project) {
+                project = scriptUtils.readPackageJson('name')
+            }
+
             let credentials
             try {
                 credentials = fse.readJsonSync(credentialsFile)
             } catch (e) {
                 scriptUtils.fail(`Error reading credentials: ${e}`)
-            }
-
-            if (!project) {
-                project = scriptUtils.readPackageJson('name')
             }
 
             const token = await scriptUtils.createToken(project, environment, cloudOrigin, credentials.api_key)
@@ -358,8 +358,20 @@ const main = () => {
             })
 
             const ws = new WebSocket(url)
-            ws.on('close', code => console.log('Connection closed by server with code', code))
+            let heartbeat
+
+            ws.on('open', () => {
+                // Send a heartbeat periodically to keep the connection open.
+                heartbeat = setTimeout(() => ws.ping(), 5 * 60 * 1000)
+            })
+
+            ws.on('close', code => {
+                console.log('Connection closed by server with code', code)
+                clearInterval(heartbeat)
+            })
+
             ws.on('error', error => scriptUtils.fail(`Error tailing logs: ${error.message}`))
+
             ws.on('message', data => {
                 JSON.parse(data).forEach(log => {
                     const timestamp = new Date(log.timestamp).toISOString()
