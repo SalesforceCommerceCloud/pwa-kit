@@ -49,10 +49,10 @@ issue, and expiration time),
 finally the signature section records the token signature.</p>
 <p>A token is created and returned to the client whenever a registered
 customer logs in (type &quot;credentials&quot;) or a guest customer requests it (type
-&quot;guest&quot;). The token is returned in the response header as 
+&quot;guest&quot;). The token is returned in the response header as
 Authorization: Bearer --token--</p>
-<p>The client has to include the token in the request header as 
-Authorization: Bearer --token-- 
+<p>The client has to include the token in the request header as
+Authorization: Bearer --token--
 in any follow-up request. The server declines any follow-up requests
 without a token or which cannot be verified based on the token signature
 or expiration time. A token nearing its expiration time should be
@@ -70,7 +70,7 @@ mechanism.</p>
 <div class="tsd-comment tsd-typography"><p><strong>DEPRECATION NOTICE</strong></p>
 <p>To enhance the security and availability of Salesforce services, this endpoint is now <em><strong>deprecated</strong></em>, and <em><strong>we plan to remove it in mid-2022</strong></em>. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the <a href="https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice">Shopper Login and API Access Service</a> (SLAS) because they meet our rigorous standards for security and availability.</p>
 <hr>
-<p>Obtain the JSON Web Token (JWT) for registered customers whose credentials are stored using a third party system. Accepts loginId and 
+<p>Obtain the JSON Web Token (JWT) for registered customers whose credentials are stored using a third party system. Accepts loginId and
 clientId, returns a customer object in the response body and the JWT generated against the clientId in the response header.</p>
 
 <h3>See</h3><ul>
@@ -255,7 +255,7 @@ Considered values from the request body are:</p>
 <p>priority: This is the priority of the customer&#39;s product list item.
 public: This is the flag whether the customer&#39;s product list item is public.
 quantity: This is the quantity of
-the customer&#39;s product list item. Used for product item type only. 
+the customer&#39;s product list item. Used for product item type only.
 custom properties in the form c_&lt;CUSTOM_NAME&gt;: The custom property
 must correspond to a custom attribute (&lt;CUSTOM_NAME&gt;) defined for ProductListItem.
 The value of this property must be valid for the type of custom attribute defined for ProductListItem.</p>
@@ -266,7 +266,7 @@ The value of this property must be valid for the type of custom attribute define
 </ul>
 </div></li></ul></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/3f633446/packages/commerce-sdk-react/src/hooks/ShopperCustomers/mutation.ts#L13">src/hooks/ShopperCustomers/mutation.ts:13</a></li></ul></aside></div>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/3afe451a/packages/commerce-sdk-react/src/hooks/ShopperCustomers/mutation.ts#L13">src/hooks/ShopperCustomers/mutation.ts:13</a></li></ul></aside></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -311,6 +311,7 @@ The value of this property must be valid for the type of custom attribute define
 <li class="tsd-kind-function"><a href="../functions/useCustomer.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>use<wbr/>Customer</a></li>
 <li class="tsd-kind-function"><a href="../functions/useCustomerAddress.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>use<wbr/>Customer<wbr/>Address</a></li>
 <li class="tsd-kind-function"><a href="../functions/useCustomerBaskets.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>use<wbr/>Customer<wbr/>Baskets</a></li>
+<li class="tsd-kind-function"><a href="../functions/useCustomerId.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>use<wbr/>Customer<wbr/>Id</a></li>
 <li class="tsd-kind-function"><a href="../functions/useCustomerOrders.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>use<wbr/>Customer<wbr/>Orders</a></li>
 <li class="tsd-kind-function"><a href="../functions/useCustomerPaymentInstrument.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>use<wbr/>Customer<wbr/>Payment<wbr/>Instrument</a></li>
 <li class="tsd-kind-function"><a href="../functions/useCustomerProductList.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>use<wbr/>Customer<wbr/>Product<wbr/>List</a></li>
