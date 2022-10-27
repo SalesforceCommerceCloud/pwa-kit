@@ -1,4 +1,4 @@
-## v2.3.0 (Oct 06, 2022)
+## v2.3.0 (Oct 27, 2022)
 -   Minimize "Module not found" error during webpack rebuild, whenever a package dependency is being updated/built [#722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/722)
 
 ## v2.2.0 (Aug 25, 2022)
