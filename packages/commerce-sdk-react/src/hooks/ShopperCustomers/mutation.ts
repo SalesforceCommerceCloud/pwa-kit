@@ -222,6 +222,25 @@ The value of this property must be valid for the type of custom attribute define
 
 type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
+const isObject = (item) => typeof item === 'object' && !Array.isArray(item) && item !== null
+
+const updateCache = (queryClient, action, invalidationMatrix) => {
+
+    // invalidate cache entries with a matching queryKey
+    invalidationMatrix[action]?.invalidateQueryKeys.map((queryKey) => {
+
+        queryClient.invalidateQueries({
+            predicate: (query) => {
+                return queryKey.every((item, index) => {
+                    return isObject(item)
+                        ? Object.values(query.queryKey[index]).includes(item.arg)
+                        : item === query.queryKey[index]
+                })
+            }
+        })
+    })
+}
+
 /**
  * A hook for performing mutations with the Shopper Customers API.
  */
@@ -238,119 +257,88 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
-                console.log('action:', action)
-                console.log('data:', data)
-                console.log('params:', params)
 
-                //TODO: 1. Update Cache query keys
-
-                if (action === 'updateCustomer') {
-                    // @ts-ignore
-                    if (params?.parameters?.customerId) {
-                        // Update core data inside query cache for the ShopperCustomer query
-
-                        //TODO: Question1: include arg in queryKey??
-
-                        // @ts-ignore
-                        queryClient.setQueriesData(
-                            {
-                                predicate: (query) => {
-                                    console.log('### 1. updateCustomer setQueriesData')
-                                    console.log('query:', query)
-                                    // @ts-ignore
-                                    const result =
-                                        query.queryKey[0] === '/customers' &&
-                                        query.queryKey[1] === params?.parameters?.customerId &&
-                                        Object.values(query.queryKey[2]).includes(params?.parameters?.customerId)
-
-                                    console.log('result:', result)
-                                    return result
-                                },
-                            },
-                            data
-                        )
-                    }
-                }
-
-                if (action === 'updateCustomerAddress') {
-                    // @ts-ignore
-                    if (params?.parameters?.customerId) {
-                        // Update core data inside query cache for the ShopperCustomer query
-
-                        //TODO: Question1: include arg in queryKey??
-
-                        // @ts-ignore
-                        queryClient.setQueryData(
+                const invalidationMatrix = {
+                    updateCustomer: {
+                        updateQueryKeys: [
+                            '/customers',
+                            params?.parameters?.customerId,
+                            {arg: params?.parameters?.customerId}
+                        ],
+                        invalidateQueryKeys: [
+                            ['/customers', params?.parameters?.customerId, '/payment-instruments'],
+                            ['/customers', params?.parameters?.customerId, '/addresses'],
+                            ['/customers', '/external-profile']
+                        ]
+                    },
+                    updateCustomerAddress: {
+                        updateQueryKeys: [
+                            '/customers',
+                            params?.parameters?.customerId,
+                            '/addresses',
+                            {arg: params?.parameters?.addressName}
+                        ],
+                        invalidateQueryKeys: [
                             [
                                 '/customers',
                                 params?.parameters?.customerId,
                                 '/addresses',
-                                {
-                                    addressName: params?.parameters?.addressName,
-                                    customerId: params?.parameters?.customerId
-                                }
+                                {arg: params?.parameters?.addressName}
                             ],
-                            data
-                        )
+                            [
+                                '/customers',
+                                params?.parameters?.customerId,
+                                {arg: params?.parameters?.customerId}
+                            ]
+                        ]
                     }
                 }
 
-                // if (params?.parameters?.customerId) {
+                updateCache(queryClient, action, invalidationMatrix)
+
+                // //TODO: #1 Update data inside query cache for the ShopperCustomer query keys.
+                // if (action === 'updateCustomer') {
                 //
-                //     switch (action) {
-                //         case 'updateCustomer':
-                //             queryClient.setQueryData(
-                //                 ['/customers', params?.parameters?.customerId],
-                //                 data
-                //             )
-                //             break;
+                //     if (params?.parameters?.customerId) {
+                //         //TODO: Question: Do we want include `arg` in the queryKey??
+                //
+                //         queryClient.setQueriesData(
+                //             {
+                //                 predicate: (query) => {
+                //                     // @ts-ignore
+                //                     const result =
+                //                         query.queryKey[0] === '/customers' &&
+                //                         query.queryKey[1] === params?.parameters?.customerId &&
+                //                         Object.values(query.queryKey[2]).includes(
+                //                             params?.parameters?.customerId
+                //                         )
+                //                     return result
+                //                 }
+                //             },
+                //             data
+                //         )
                 //     }
-                //
                 // }
-
-                // TODO: 2. Invalidation Cache query keys
-
-                if (action === 'updateCustomer') {
-                    // @ts-ignore some action doesn't have customerId as parameter
-                    if (params?.parameters?.customerId) {
-                        // @ts-ignore
-                        // invalidate cache entries that contain Customer type related data
-                        queryClient.invalidateQueries({
-                            predicate: (query) => {
-                                console.log('### 2. updateCustomer invalidateQueries')
-                                console.log('query:', query)
-                                const result =
-                                    (query.queryKey[0] === '/customers' &&
-                                        query.queryKey[1] === params?.parameters?.customerId &&
-                                        (query.queryKey[2] === '/payment-instruments' ||
-                                            query.queryKey[2]==='/addresses')) ||
-                                    (query.queryKey[0] === '/customers' &&
-                                        query.queryKey[1] === '/external-profile')
-                                console.log('result:', result)
-                                return result
-                            }
-                        })
-                    }
-                }
-
-                if (action === 'updateCustomerAddress') {
-                    // @ts-ignore some action doesn't have customerId as parameter
-                    if (params?.parameters?.customerId) {
-                        // invalidate all cache entries that are related to the customer
-                        // @ts-ignore
-                        queryClient.invalidateQueries([
-                            '/customers',
-                            params?.parameters?.customerId,
-                            '/payment-instruments'
-                        ])
-                        // @ts-ignore
-                        queryClient.invalidateQueries([
-                            '/customers',
-                            params?.parameters?.customerId,
-                            '/addresses'
-                        ])
-                    }
-                }
+                //
+                // // TODO: #2 Invalidate data inside query cache for the ShopperCustomer query keys.
+                // if (action === 'updateCustomer') {
+                //     if (params?.parameters?.customerId) {
+                //         // @ts-ignore
+                //         // invalidate cache entries containing Customer type related data
+                //         queryClient.invalidateQueries({
+                //             predicate: (query) => {
+                //                 const result =
+                //                     (query.queryKey[0] === '/customers' &&
+                //                         query.queryKey[1] === params?.parameters?.customerId &&
+                //                         (query.queryKey[2] === '/payment-instruments' ||
+                //                             query.queryKey[2] === '/addresses')) ||
+                //                     (query.queryKey[0] === '/customers' &&
+                //                         query.queryKey[1] === '/external-profile')
+                //                 return result
+                //             }
+                //         })
+                //     }
+                // }
             }
         }
     )
