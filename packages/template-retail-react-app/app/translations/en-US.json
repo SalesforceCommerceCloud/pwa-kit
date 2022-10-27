@@ -299,7 +299,7 @@
     "defaultMessage": "Terms & Conditions"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+    "defaultMessage": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
   },
   "checkout_header.link.cart": {
     "defaultMessage": "Back to cart"
@@ -511,7 +511,7 @@
     "defaultMessage": "Terms & Conditions"
   },
   "footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+    "defaultMessage": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
   },
   "footer.subscribe.button.sign_up": {
     "defaultMessage": "Sign Up"

@@ -4,6 +4,7 @@
 - Add new Einstein API activities. [#714](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/714)
 - Fix search field to recognize `“&”` character. [#736](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/736)
 - Fix filters on search results page. [#742](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/742)
+- Ensure that a valid target locale is use if none is provided [#788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/788)
 
 ## v2.2.0 (Aug 25, 2022)
 - Update zzrf-001 url [#694](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/694)
