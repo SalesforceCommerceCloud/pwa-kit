@@ -369,11 +369,14 @@ const main = () => {
             })
 
             ws.on('close', (code) => {
-                console.log('Connection closed by server with code', code)
                 clearInterval(heartbeat)
+                console.log('Connection closed with code', code)
             })
 
-            ws.on('error', (error) => scriptUtils.fail(`Error tailing logs: ${error.message}`))
+            ws.on('error', (error) => {
+                clearInterval(heartbeat)
+                scriptUtils.fail(`Error tailing logs: ${error.message}`)
+            })
 
             ws.on('message', (data) => {
                 JSON.parse(data).forEach((log) => {
