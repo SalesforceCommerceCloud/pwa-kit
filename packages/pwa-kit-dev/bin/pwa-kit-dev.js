@@ -358,14 +358,16 @@ const main = () => {
             })
 
             const ws = new WebSocket(url)
-            ws.on('message', (event) => {
-                JSON.parse(event).forEach(log => {
+            ws.on('close', code => console.log('Connection closed by server with code', code))
+            ws.on('error', error => scriptUtils.fail(`Error tailing logs: ${error.message}`))
+            ws.on('message', data => {
+                JSON.parse(data).forEach(log => {
                     const timestamp = new Date(log.timestamp).toISOString()
                     const parts = log.message.trim().split('\t')
                     let message, requestId, shortRequestId
 
                     if (
-                        parts.length >= 4
+                        parts.length > 3
                         && validator.isISO8601(parts[0])
                         && validator.isUUID(parts[1])
                         && validator.isAlpha(parts[2])
