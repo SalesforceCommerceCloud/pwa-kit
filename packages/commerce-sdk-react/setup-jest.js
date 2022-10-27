@@ -39,6 +39,9 @@ Object.defineProperty(window, 'localStorage', {
     value: localStorageMock
 })
 
-global.beforeEach(() => {
+global.afterEach(() => {
+    nock.cleanAll()
+})
+global.afterAll(() => {
     nock.restore()
 })

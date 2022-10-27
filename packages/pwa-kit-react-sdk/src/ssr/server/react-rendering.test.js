@@ -264,8 +264,8 @@ jest.mock('../universal/routes', () => {
     }
 
     const GetServerContext = () => {
-        const {res, isServerSide} = useServerContext()
-        if (isServerSide) {
+        const {res} = useServerContext()
+        if (res) {
             console.log('--- isServerSide')
             res.status(404)
         }
@@ -716,9 +716,8 @@ describe('The Node SSR Environment', () => {
             assertions: (res) => {
                 expect(res.statusCode).toBe(404)
 
-                // Expect the console.log to be called only once, even though the component
-                // is going to be rendered twice on the server (on prepass and then 2nd pass)
-                expect(console.log).toHaveBeenCalledTimes(1)
+                // Because of the prepass step we'll expect that this method is called twice.
+                expect(console.log).toHaveBeenCalledTimes(2)
             }
         }
     ]

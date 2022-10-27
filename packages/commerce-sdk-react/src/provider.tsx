@@ -93,7 +93,15 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config)
         }
-    }, [clientId, organizationId, shortCode, siteId, proxy, fetchOptions])
+    }, [
+        clientId,
+        organizationId,
+        shortCode,
+        siteId,
+        proxy,
+        fetchOptions,
+        headers?.['correlation-id']
+    ])
 
     const auth = useMemo(() => {
         return new Auth({
