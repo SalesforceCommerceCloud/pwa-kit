@@ -224,22 +224,33 @@ type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeo
 
 const isObject = (item) => typeof item === 'object' && !Array.isArray(item) && item !== null
 
-const updateCache = (queryClient, action, invalidationMatrix) => {
+const updateCache = (queryClient, action, queryKeysMatrix, data) => {
 
-    // invalidate cache entries with a matching queryKey
-    invalidationMatrix[action]?.invalidateQueryKeys.map((queryKey) => {
+    const isMatchingKey = (cacheQuery, queryKey) => {
+        return queryKey.every((item, index) => {
+            return isObject(item)
+                ? Object.values(cacheQuery.queryKey[index]).includes(item.arg)
+                : item === cacheQuery.queryKey[index]
+        })
+    }
+    // STEP 1. Update data inside query cache for the matching queryKeys
+    queryKeysMatrix[action]?.update.map((queryKey) => {
+        queryClient.setQueriesData(
+            {
+                predicate: (cacheQuery) => isMatchingKey(cacheQuery, queryKey)
+            },
+            data
+        )
+    })
 
+    // STEP 2. Invalidate cache entries with the matching queryKeys
+    queryKeysMatrix[action]?.invalidate.map((queryKey) => {
         queryClient.invalidateQueries({
-            predicate: (query) => {
-                return queryKey.every((item, index) => {
-                    return isObject(item)
-                        ? Object.values(query.queryKey[index]).includes(item.arg)
-                        : item === query.queryKey[index]
-                })
-            }
+            predicate: (cacheQuery) => isMatchingKey(cacheQuery, queryKey)
         })
     })
 }
+
 
 /**
  * A hook for performing mutations with the Shopper Customers API.
@@ -257,34 +268,31 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
-
-                const invalidationMatrix = {
+                const queryKeysMatrix = {
                     updateCustomer: {
-                        updateQueryKeys: [
-                            '/customers',
-                            params?.parameters?.customerId,
-                            {arg: params?.parameters?.customerId}
+                        update: [
+                            [
+                                '/customers',
+                                params?.parameters?.customerId,
+                                {arg: params?.parameters?.customerId}
+                            ]
                         ],
-                        invalidateQueryKeys: [
+                        invalidate: [
                             ['/customers', params?.parameters?.customerId, '/payment-instruments'],
                             ['/customers', params?.parameters?.customerId, '/addresses'],
                             ['/customers', '/external-profile']
                         ]
                     },
                     updateCustomerAddress: {
-                        updateQueryKeys: [
-                            '/customers',
-                            params?.parameters?.customerId,
-                            '/addresses',
-                            {arg: params?.parameters?.addressName}
-                        ],
-                        invalidateQueryKeys: [
+                        update: [
                             [
                                 '/customers',
                                 params?.parameters?.customerId,
                                 '/addresses',
                                 {arg: params?.parameters?.addressName}
-                            ],
+                            ]
+                        ],
+                        invalidate: [
                             [
                                 '/customers',
                                 params?.parameters?.customerId,
@@ -294,51 +302,8 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                     }
                 }
 
-                updateCache(queryClient, action, invalidationMatrix)
+                updateCache(queryClient, action, queryKeysMatrix, data)
 
-                // //TODO: #1 Update data inside query cache for the ShopperCustomer query keys.
-                // if (action === 'updateCustomer') {
-                //
-                //     if (params?.parameters?.customerId) {
-                //         //TODO: Question: Do we want include `arg` in the queryKey??
-                //
-                //         queryClient.setQueriesData(
-                //             {
-                //                 predicate: (query) => {
-                //                     // @ts-ignore
-                //                     const result =
-                //                         query.queryKey[0] === '/customers' &&
-                //                         query.queryKey[1] === params?.parameters?.customerId &&
-                //                         Object.values(query.queryKey[2]).includes(
-                //                             params?.parameters?.customerId
-                //                         )
-                //                     return result
-                //                 }
-                //             },
-                //             data
-                //         )
-                //     }
-                // }
-                //
-                // // TODO: #2 Invalidate data inside query cache for the ShopperCustomer query keys.
-                // if (action === 'updateCustomer') {
-                //     if (params?.parameters?.customerId) {
-                //         // @ts-ignore
-                //         // invalidate cache entries containing Customer type related data
-                //         queryClient.invalidateQueries({
-                //             predicate: (query) => {
-                //                 const result =
-                //                     (query.queryKey[0] === '/customers' &&
-                //                         query.queryKey[1] === params?.parameters?.customerId &&
-                //                         (query.queryKey[2] === '/payment-instruments' ||
-                //                             query.queryKey[2] === '/addresses')) ||
-                //                     (query.queryKey[0] === '/customers' &&
-                //                         query.queryKey[1] === '/external-profile')
-                //                 return result
-                //             }
-                //         })
-                //     }
-                // }
             }
         }
     )
