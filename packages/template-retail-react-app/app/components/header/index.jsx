@@ -28,8 +28,6 @@ import {
     useMediaQuery
 } from '@chakra-ui/react'
 
-import {useProduct} from 'commerce-sdk-react'
-
 import useBasket from '../../commerce-api/hooks/useBasket'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
