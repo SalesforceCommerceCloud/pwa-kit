@@ -389,14 +389,15 @@ jobs:
 
               snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
             fi
-      - run:
-          name: Send metrics to Datadog
-          environment:
-          command: |
-            # Add a dogrc so we can submit metrics to datadog
-            printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
+      # TODO: un-comment this block
+      # - run:
+      #     name: Send metrics to Datadog
+      #     environment:
+      #     command: |
+      #       # Add a dogrc so we can submit metrics to datadog
+      #       printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
 
-            dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
+      #       dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
       - run:
           name: Push Bundle
           command: |
