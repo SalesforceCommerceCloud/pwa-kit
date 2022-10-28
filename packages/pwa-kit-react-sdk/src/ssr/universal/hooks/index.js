@@ -27,7 +27,6 @@ export const useCorrelationId = () => {
  * @typedef {Object} ServerContext
  * @property {Object} req - Request object
  * @property {Object} res - Response object
- * @property {boolean} isServerSide
  */
 
 /**
@@ -35,14 +34,11 @@ export const useCorrelationId = () => {
  * @returns {ServerContext} ServerContext object
  *
  * @example
- * const {res, isServerSide} = useServerContext()
- * if (isServerSide && query.error) { res.status(404) }
+ * const {res} = useServerContext()
+ * if (res && query.error) { res.status(404) }
  */
 export const useServerContext = () => {
     const serverContext = useContext(ServerContext)
 
-    return {
-        ...serverContext,
-        isServerSide: Boolean(serverContext.req)
-    }
+    return serverContext
 }

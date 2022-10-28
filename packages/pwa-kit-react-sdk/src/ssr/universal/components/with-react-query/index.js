@@ -12,20 +12,6 @@ import {FetchStrategy} from '../fetch-strategy'
 
 const STATE_KEY = '__reactQuery'
 
-// This is where we want to set the default query client configuration that are
-// safe for execution on the server and client. If there are any other config
-// option defaults that need to be set in the future, they should be set here.
-const SAFE_QUERY_CLIENT_CONFIG = {
-    defaultOptions: {
-        queries: {
-            retry: false
-        },
-        mutations: {
-            retry: false
-        }
-    }
-}
-
 /**
  * A HoC for adding React Query support to your application.
  *
@@ -40,7 +26,7 @@ export const withReactQuery = (Wrapped, options = {}) => {
     const isServerSide = typeof window === 'undefined'
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
-    const queryClientConfig = options.queryClientConfig || SAFE_QUERY_CLIENT_CONFIG
+    const queryClientConfig = options.queryClientConfig
 
     /**
      * @private
@@ -66,11 +52,8 @@ export const withReactQuery = (Wrapped, options = {}) => {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient(queryClientConfig))
 
-            // Without the request object, our useServerContext hook would be able tell whether on prepass
-            const withoutReq = React.cloneElement(appJSX, {
-                req: undefined
-            })
-            await ssrPrepass(withoutReq)
+            // Use `ssrPrepass` to collect all uses of `useQuery`.
+            await ssrPrepass(appJSX)
 
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
