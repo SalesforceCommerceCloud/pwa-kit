@@ -105,7 +105,7 @@ describe('createToken', () => {
 
         expect(await Utils.createToken(...Object.values(args))).toBeUndefined()
         expect(request).toBeCalled()
-        expect(Utils.fail).toBeCalled()
+        expect(mockFail).toBeCalled()
 
         const errorMessage = Utils.fail.mock.calls[0][0]
         expect(errorMessage.includes(`${args.cloudOrigin} returned HTTP ${error.statusCode}`)).toBeTruthy()
