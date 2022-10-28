@@ -383,7 +383,7 @@ const main = () => {
                 JSON.parse(data).forEach((log) => {
                     const timestamp = new Date(log.timestamp).toISOString()
                     const parts = log.message.trim().split('\t')
-                    let message, requestId, shortRequestId
+                    let message, uuid, id
 
                     if (
                         parts.length > 3 &&
@@ -393,17 +393,17 @@ const main = () => {
                     ) {
                         // An application log
                         parts.shift()
-                        requestId = parts.shift()
+                        uuid = parts.shift()
                         message = parts.shift() + ' ' + parts.join('\t')
                     } else {
                         // A platform log
                         message = parts.join('\t')
                     }
 
-                    const uuidPattern = /(?<short>[a-f\d]{8})-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/
-                    const match = uuidPattern.exec(requestId || message)
+                    const uuidPattern = /(?<id>[a-f\d]{8})-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/
+                    const match = uuidPattern.exec(uuid || message)
                     if (match) {
-                        shortRequestId = match.groups.short
+                        id = match.groups.id
                     }
 
                     const logLevelPattern = /^([A-Z]+)/
@@ -411,7 +411,7 @@ const main = () => {
                         chalk[colors[match.toLowerCase()] || 'cyan'](match.padEnd(6))
                     )
 
-                    console.log(chalk.green(timestamp), chalk.cyan(shortRequestId), message)
+                    console.log(chalk.green(timestamp), chalk.cyan(id), message)
                 })
             })
         })

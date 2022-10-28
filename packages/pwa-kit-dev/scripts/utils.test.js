@@ -8,6 +8,7 @@
 const Utils = require('./utils')
 
 const fs = require('fs')
+const fse = require('fs-extra')
 const path = require('path')
 const os = require('os')
 const rimraf = require('rimraf')
@@ -60,8 +61,36 @@ test('errorForStatus returns an Error for 4xx and 5xx statuses', () => {
     })
 })
 
+describe('readPackageJson', () => {
+    const data = {name: 'test'}
+    let mockReadJsonSync
+    beforeAll(() => {
+        mockReadJsonSync = jest.spyOn(fse, 'readJsonSync').mockImplementation(() => data)
+    })
+
+    afterAll(() => {
+        mockReadJsonSync.mockRestore()
+    })
+
+    test('returns key value', () => {
+        const keyName = 'name'
+        expect(Utils.readPackageJson(keyName)).toBe(data[keyName])
+        expect(fse.readJsonSync).toBeCalled()
+    })
+
+    test('fails if key is missing', () => {
+        const keyName = 'fake'
+        expect(Utils.readPackageJson(keyName)).toBeUndefined()
+        expect(fse.readJsonSync).toBeCalled()
+        expect(Utils.fail).toBeCalled()
+
+        const errorMessage = Utils.fail.mock.calls[0][0]
+        expect(errorMessage.includes(`key '${keyName}' is missing`)).toBeTruthy()
+    })
+})
+
 describe('createToken', () => {
-    const args = {
+    let args = {
         project: 'pwa-kit',
         environment: 'dev',
         cloudOrigin: 'https://test.mobify.com',
@@ -71,7 +100,7 @@ describe('createToken', () => {
     test('makes request and returns token', async () => {
         const data = {token: 'abcd'}
         request.mockClear()
-        request.mockImplementation((_, callback) => {
+        request.mockImplementationOnce((_, callback) => {
             callback(null, {}, JSON.stringify(data))
         })
 
@@ -96,19 +125,18 @@ describe('createToken', () => {
     test('fails after unsuccessful request', async () => {
         const error = {statusCode: 403}
         request.mockClear()
-        request.mockImplementation((_, callback) => {
+        request.mockImplementationOnce((_, callback) => {
             callback(null, error, {})
         })
 
-        const mockFail = jest.fn()
-        Utils.fail = mockFail
-
         expect(await Utils.createToken(...Object.values(args))).toBeUndefined()
         expect(request).toBeCalled()
-        expect(mockFail).toBeCalled()
+        expect(Utils.fail).toBeCalled()
 
         const errorMessage = Utils.fail.mock.calls[0][0]
-        expect(errorMessage.includes(`${args.cloudOrigin} returned HTTP ${error.statusCode}`)).toBeTruthy()
+        expect(
+            errorMessage.includes(`${args.cloudOrigin} returned HTTP ${error.statusCode}`)
+        ).toBeTruthy()
     })
 })
 
