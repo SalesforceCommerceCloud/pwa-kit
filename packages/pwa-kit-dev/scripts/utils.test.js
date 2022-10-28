@@ -61,6 +61,13 @@ test('errorForStatus returns an Error for 4xx and 5xx statuses', () => {
 })
 
 describe('createToken', () => {
+    const args = {
+        project: 'pwa-kit',
+        environment: 'dev',
+        cloudOrigin: 'https://test.mobify.com',
+        apiKey: 'key'
+    }
+
     test('makes request and returns token', async () => {
         const data = {token: 'abcd'}
         request.mockClear()
@@ -71,12 +78,6 @@ describe('createToken', () => {
         const mockGetHeaders = jest.fn((headers) => headers)
         Utils.getRequestHeaders = mockGetHeaders
 
-        const args = {
-            project: 'pwa-kit',
-            environment: 'dev',
-            cloudOrigin: 'https://test.mobify.com',
-            apiKey: 'key'
-        }
         expect(await Utils.createToken(...Object.values(args))).toEqual(data.token)
         expect(request).toBeCalled()
         expect(mockGetHeaders).toBeCalled()
@@ -92,8 +93,22 @@ describe('createToken', () => {
         })
     })
 
-    test('exits with error after unsuccessful request', () => {
-        console.log('todo')
+    test('fails after unsuccessful request', async () => {
+        const error = {statusCode: 403}
+        request.mockClear()
+        request.mockImplementation((_, callback) => {
+            callback(null, error, {})
+        })
+
+        const mockFail = jest.fn()
+        Utils.fail = mockFail
+
+        expect(await Utils.createToken(...Object.values(args))).toBeUndefined()
+        expect(request).toBeCalled()
+        expect(Utils.fail).toBeCalled()
+
+        const errorMessage = Utils.fail.mock.calls[0][0]
+        expect(errorMessage.includes(`${args.cloudOrigin} returned HTTP ${error.statusCode}`)).toBeTruthy()
     })
 })
 
