@@ -61,9 +61,6 @@ const Home = ({productSearchResult, isLoading}) => {
         einstein.sendViewPage(pathname)
     }, [])
 
-    // DEBUG
-    useProduct({id: '25502228M'})
-
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo

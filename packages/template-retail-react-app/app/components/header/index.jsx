@@ -114,9 +114,6 @@ const Header = ({
         }, 100)
     }
 
-    // DEBUG
-    useProduct({id: 'efg'})
-
     return (
         <Box {...styles.container} {...props}>
             <Box {...styles.content}>
