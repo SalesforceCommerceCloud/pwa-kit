@@ -18,3 +18,18 @@ describe('getProxyConfigs (client-side)', () => {
         expect(utils.getProxyConfigs()).toEqual(configs)
     })
 })
+
+describe('getAssetUrl (client-side)', () => {
+    beforeEach(() => {
+        global.Progressive = {buildOrigin: 'test.com'}
+    })
+    afterEach(() => {
+        delete global.Progressive
+    })
+    test('should return build origin when path is undefined', () => {
+        expect(utils.getAssetUrl()).toEqual('test.com')
+    })
+    test('should return origin + path', () => {
+        expect(utils.getAssetUrl('/path')).toEqual('test.com/path')
+    })
+})
