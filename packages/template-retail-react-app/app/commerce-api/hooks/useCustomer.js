@@ -202,7 +202,7 @@ export default function useCustomer() {
                     }
                 }
 
-                // Send a new login request with updated password
+                // Fetch a new SLAS JWT to update the invalid one in client app state
                 const credentials = {
                     email: email,
                     password: data.password
