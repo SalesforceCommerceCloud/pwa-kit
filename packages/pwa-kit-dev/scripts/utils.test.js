@@ -74,8 +74,9 @@ describe('readPackageJson', () => {
 
     test('returns key value', () => {
         const keyName = 'name'
+        const packageJson = path.join(process.cwd(), 'package.json')
         expect(Utils.readPackageJson(keyName)).toBe(data[keyName])
-        expect(fse.readJsonSync).toBeCalled()
+        expect(fse.readJsonSync).toBeCalledWith(packageJson)
     })
 
     test('fails if key is missing', () => {
