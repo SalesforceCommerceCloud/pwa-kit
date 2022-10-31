@@ -381,37 +381,13 @@ const main = () => {
 
             ws.on('message', (data) => {
                 JSON.parse(data).forEach((log) => {
-                    const timestamp = new Date(log.timestamp).toISOString()
-                    const parts = log.message.trim().split('\t')
-                    let message, uuid, id
-
-                    if (
-                        parts.length > 3 &&
-                        validator.isISO8601(parts[0]) &&
-                        validator.isUUID(parts[1]) &&
-                        validator.isAlpha(parts[2])
-                    ) {
-                        // An application log
-                        parts.shift()
-                        uuid = parts.shift()
-                        message = parts.shift() + ' ' + parts.join('\t')
-                    } else {
-                        // A platform log
-                        message = parts.join('\t')
-                    }
-
-                    const uuidPattern = /(?<id>[a-f\d]{8})-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}/
-                    const match = uuidPattern.exec(uuid || message)
-                    if (match) {
-                        id = match.groups.id
-                    }
-
-                    const logLevelPattern = /^([A-Z]+)/
-                    message = message.replace(logLevelPattern, (match) =>
-                        chalk[colors[match.toLowerCase()] || 'cyan'](match.padEnd(6))
+                    const {id, message, timestamp, type} = scriptUtils.parseLog(log)
+                    console.log(
+                        chalk.green(timestamp.toISOString()),
+                        chalk.cyan(id),
+                        chalk[colors[type] || 'cyan'](type.toUpperCase().padEnd(6)),
+                        message
                     )
-
-                    console.log(chalk.green(timestamp), chalk.cyan(id), message)
                 })
             })
         })

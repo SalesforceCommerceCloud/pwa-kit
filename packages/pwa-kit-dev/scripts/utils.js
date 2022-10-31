@@ -11,6 +11,7 @@
 const path = require('path')
 const fse = require('fs-extra')
 const git = require('git-rev-sync')
+const validator = require('validator')
 
 const archiver = require('archiver')
 
@@ -278,6 +279,37 @@ Utils.requestErrorMessage = {
     code404:
         'Resource not found.\nPlease double check your command to make sure the option values are correct.', // wrong target name
     code500: 'Internal Server Error. Please report this to the Salesforce support team.'
+}
+
+Utils.parseLog = (log) => {
+    const parts = log.message.trim().split('\t')
+    let id, uuid, message, type
+
+    if (
+        parts.length > 3 &&
+        validator.isISO8601(parts[0]) &&
+        validator.isUUID(parts[1]) &&
+        validator.isAlpha(parts[2])
+    ) {
+        // An application log
+        parts.shift()
+        uuid = parts.shift()
+        type = parts.shift()
+    } else {
+        // A platform log
+        const words = parts[0].split(' ')
+        type = words.shift()
+        parts[0] = words.join(' ')
+    }
+    message = parts.join('\t')
+
+    const idPattern = /(?<id>[a-f\d]{8})/
+    const match = idPattern.exec(uuid || message)
+    if (match) {
+        id = match.groups.id
+    }
+
+    return {id, message, timestamp: new Date(log.timestamp), type: type.toLowerCase()}
 }
 
 module.exports = Utils
