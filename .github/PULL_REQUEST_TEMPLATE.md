@@ -6,7 +6,7 @@
 
 # GUS Ticket
 
-[W-XXXXXXXX]([htt](https://gus.lightning.force.com/lightning/r/ADM_Work__c/<gus_internal_id>/view)
+[W-XXXXXXXX](https://gus.lightning.force.com/lightning/r/ADM_Work__c/<gus_internal_id>/view)
 
 # Types of Changes
 
