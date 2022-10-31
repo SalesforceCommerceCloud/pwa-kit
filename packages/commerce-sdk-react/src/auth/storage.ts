@@ -48,12 +48,26 @@ export class LocalStorage implements BaseStorage {
         }
     }
     set(key: string, value: string) {
+        const oldValue = this.get(key)
         window.localStorage.setItem(key, value)
+        const event = new StorageEvent('storage', {
+            key: key,
+            oldValue: oldValue,
+            newValue: value
+        })
+        window.dispatchEvent(event)
     }
     get(key: string) {
         return window.localStorage.getItem(key) || ''
     }
     delete(key: string) {
+        const oldValue = this.get(key)
         window.localStorage.removeItem(key)
+        const event = new StorageEvent('storage', {
+            key: key,
+            oldValue: oldValue,
+            newValue: null
+        })
+        window.dispatchEvent(event)
     }
 }
