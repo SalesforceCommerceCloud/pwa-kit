@@ -275,7 +275,8 @@ describe('Create Bundle', () => {
 
 test('parseLog parses application and platform logs correctly', () => {
     const now = new Date()
-    const timestamp = now.getTime(), isoTimestamp = now.toISOString()
+    const timestamp = now.getTime()
+    const isoTimestamp = now.toISOString()
     const uuid = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
     const requestId = uuid.slice(0, 8)
     const cases = [
