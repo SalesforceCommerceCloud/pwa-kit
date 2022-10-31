@@ -4,6 +4,10 @@
 
 <!--- A longer summary of your changes, including: a description of the issue that you’re addressing, a list of required dependencies (if applicable), and any other relevant context. -->
 
+# GUS Ticket
+
+[W-XXXXXXXX]([htt](https://gus.lightning.force.com/lightning/r/ADM_Work__c/<gus_internal_id>/view)
+
 # Types of Changes
 
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
