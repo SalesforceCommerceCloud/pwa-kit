@@ -1,7 +1,14 @@
-## v2.3.0-dev (Aug 25, 2022)
+## v2.4.0-dev (Oct 27, 2022)
+## v2.3.0 (Oct 27, 2022)
 -   Support `react-query` server-side data fetching. [#724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/724)
--   Add server-safe default configuration for `queryClientConfig` option.. [#734](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/734)
+-   Add server-safe default configuration for `queryClientConfig` option. [#734](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/734)
+-   Add `useServerContext` hook with the `res` response object and the `isServerSide` flag. [#737](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/737)
+-   Handle `react-query` server-side errors. [#735](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/735)
+-   Fix internal build script. [#706](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/706)
+-   Add Correlation ID to SCAPI requests. [#728](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/728)
+
 ## v2.2.0 (Aug 25, 2022)
+
 ## v2.1.0 (Jul 05, 2022)
 -   Remove console logs from route component. [#651](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/651)
 

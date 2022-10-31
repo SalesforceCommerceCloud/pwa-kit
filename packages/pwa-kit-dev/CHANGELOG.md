@@ -1,5 +1,7 @@
-## v2.3.0-dev (Aug 25, 2022)
+## v2.4.0-dev (Oct 27, 2022)
+## v2.3.0 (Oct 27, 2022)
 -   Minimize "Module not found" error during webpack rebuild, whenever a package dependency is being updated/built [#722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/722)
+-   Update minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793)
 
 ## v2.2.0 (Aug 25, 2022)
 -   Added option to specify where/from the credentials can be saved/read [#647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/647)
