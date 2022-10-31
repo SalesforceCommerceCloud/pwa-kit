@@ -14,7 +14,9 @@ const isEmptyOptions = (options) => {
     return (
         typeof options === 'undefined' ||
         typeof options.projectSlug === 'undefined' ||
-        options.projectSlug.length === 0
+        options.projectSlug.length === 0 ||
+        typeof options.origin === 'undefined' ||
+        options.origin.length === 0
     )
 }
 
@@ -51,11 +53,8 @@ const upload = (options) => {
 
 const uploadBundle = (opts) => {
     if (isEmptyOptions(opts)) {
-        Utils.fail('[Error: You must provide a Mobify Cloud project slug to upload a bundle.]')
-    }
-    if (!Object.prototype.hasOwnProperty.call(opts, 'origin')) {
         Utils.fail(
-            '[Error: Missing key "origin" in uploadBundle(opts) - you must specify an origin for the Cloud API.]'
+            '[Error: You must provide a Managed Runtime project slug and Cloud origin to upload a bundle.]'
         )
     }
 

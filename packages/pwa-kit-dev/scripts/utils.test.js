@@ -94,7 +94,7 @@ describe('createToken', () => {
     let args = {
         project: 'pwa-kit',
         environment: 'dev',
-        cloudOrigin: 'https://test.mobify.com',
+        cloudOrigin: 'https://cloud-test.mobify.com',
         apiKey: 'key'
     }
 
