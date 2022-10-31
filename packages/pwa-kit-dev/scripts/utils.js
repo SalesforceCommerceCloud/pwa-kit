@@ -281,9 +281,23 @@ Utils.requestErrorMessage = {
     code500: 'Internal Server Error. Please report this to the Salesforce support team.'
 }
 
+/**
+ * @param {Object} log
+ *  {
+ *      timestamp,
+ *      message
+ *  }
+ * @returns {Object}
+ *  {
+ *      message,
+ *      requestId,
+ *      timestamp,
+ *      type
+ *  }
+ */
 Utils.parseLog = (log) => {
     const parts = log.message.trim().split('\t')
-    let id, uuid, message, type
+    let requestId, uuid, message, type
 
     if (
         parts.length > 3 &&
@@ -303,13 +317,13 @@ Utils.parseLog = (log) => {
     }
     message = parts.join('\t')
 
-    const idPattern = /(?<id>[a-f\d]{8})/
-    const match = idPattern.exec(uuid || message)
+    const requestIdPattern = /(?<id>[a-f\d]{8})/
+    const match = requestIdPattern.exec(uuid || message)
     if (match) {
-        id = match.groups.id
+        requestId = match.groups.id
     }
 
-    return {id, message, timestamp: new Date(log.timestamp), type: type.toLowerCase()}
+    return {message, requestId, timestamp: new Date(log.timestamp).toISOString(), type}
 }
 
 module.exports = Utils

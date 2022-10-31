@@ -381,11 +381,11 @@ const main = () => {
 
             ws.on('message', (data) => {
                 JSON.parse(data).forEach((log) => {
-                    const {id, message, timestamp, type} = scriptUtils.parseLog(log)
+                    const {message, requestId, timestamp, type} = scriptUtils.parseLog(log)
                     console.log(
-                        chalk.green(timestamp.toISOString()),
-                        chalk.cyan(id),
-                        chalk[colors[type] || 'cyan'](type.toUpperCase().padEnd(6)),
+                        chalk.green(timestamp),
+                        chalk.cyan(requestId),
+                        chalk[colors[type.toLowerCase()] || 'cyan'](type.padEnd(6)),
                         message
                     )
                 })

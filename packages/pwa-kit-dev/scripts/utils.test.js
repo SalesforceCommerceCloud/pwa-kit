@@ -272,3 +272,78 @@ describe('Create Bundle', () => {
         })
     })
 })
+
+test('parseLog parses application and platform logs correctly', () => {
+    const now = new Date()
+    const timestamp = now.getTime(), isoTimestamp = now.toISOString()
+    const uuid = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+    const requestId = uuid.slice(0, 8)
+    const cases = [
+        {
+            log: {
+                message: `START RequestId: ${uuid} Version: $LATEST`,
+                timestamp
+            },
+            expected: {
+                message: `RequestId: ${uuid} Version: $LATEST`,
+                requestId,
+                timestamp: isoTimestamp,
+                type: 'START'
+            }
+        },
+        {
+            log: {
+                message: `END RequestId: ${uuid}`,
+                timestamp
+            },
+            expected: {
+                message: `RequestId: ${uuid}`,
+                requestId,
+                timestamp: isoTimestamp,
+                type: 'END'
+            }
+        },
+        {
+            log: {
+                message: `REPORT RequestId: ${uuid}	Duration: 21.04 ms	Billed Duration: 22 ms	Memory Size: 2496 MB	Max Memory Used: 94 MB`,
+                timestamp
+            },
+            expected: {
+                message: `RequestId: ${uuid}	Duration: 21.04 ms	Billed Duration: 22 ms	Memory Size: 2496 MB	Max Memory Used: 94 MB`,
+                requestId,
+                timestamp: isoTimestamp,
+                type: 'REPORT'
+            }
+        },
+        {
+            log: {
+                message: `2022-10-31T22:00:00.000Z	${uuid}	INFO	Request: GET /`,
+                timestamp
+            },
+            expected: {
+                message: 'Request: GET /',
+                requestId,
+                timestamp: isoTimestamp,
+                type: 'INFO'
+            }
+        },
+        {
+            log: {
+                message: `2022-10-31T22:00:00.000Z	${uuid}	ERROR	Response status:	500`,
+                timestamp
+            },
+            expected: {
+                message: 'Response status:	500',
+                requestId,
+                timestamp: isoTimestamp,
+                type: 'ERROR'
+            }
+        }
+    ]
+    cases.forEach(({log, expected}) => {
+        const parsed = Utils.parseLog(log)
+        Object.keys(parsed).forEach((key) => {
+            expect(parsed[key]).toBe(expected[key])
+        })
+    })
+})
