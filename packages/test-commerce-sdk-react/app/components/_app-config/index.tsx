@@ -73,12 +73,17 @@ AppConfig.restore = () => {}
 AppConfig.extraGetPropsArgs = () => {}
 AppConfig.freeze = () => {}
 
-// Recommended settings for PWA-Kit usage.
+const isServerSide = typeof window === 'undefined'
+
+// Recommended settings for PWA-Kit usages.
+// NOTE: they will be applied on both server and client side.
 const options = {
     queryClientConfig: {
         defaultOptions: {
             queries: {
-                retry: false
+                retry: false,
+                staleTime: 2 * 1000,
+                ...(isServerSide ? {retryOnMount: false} : {})
             },
             mutations: {
                 retry: false
