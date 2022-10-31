@@ -10,7 +10,7 @@ import AppConfig from './index.jsx'
 
 describe('AppConfig', () => {
     test('renders', () => {
-        const {container} = render(<AppConfig />)
+        const {container} = render(<AppConfig locals={{}} />)
         expect(container).toBeDefined()
     })
 
