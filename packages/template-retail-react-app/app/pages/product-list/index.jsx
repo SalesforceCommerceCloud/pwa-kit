@@ -182,10 +182,10 @@ const ProductList = (props) => {
 
     /**************** Einstein ****************/
     useEffect(() => {
-        if (searchQuery) {
-            einstein.sendViewSearch(searchQuery, productSearchResult)
-        } else {
-            einstein.sendViewCategory(category, productSearchResult)
+        if (productSearchResult) {
+            searchQuery
+                ? einstein.sendViewSearch(searchQuery, productSearchResult)
+                : einstein.sendViewCategory(category, productSearchResult)
         }
     }, [productSearchResult])
 
