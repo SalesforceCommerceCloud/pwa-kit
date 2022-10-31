@@ -306,11 +306,11 @@ test('parseLog parses application and platform logs correctly', () => {
         },
         {
             log: {
-                message: `REPORT RequestId: ${uuid}	Duration: 21.04 ms	Billed Duration: 22 ms	Memory Size: 2496 MB	Max Memory Used: 94 MB`,
+                message: `REPORT RequestId: ${uuid}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
                 timestamp
             },
             expected: {
-                message: `RequestId: ${uuid}	Duration: 21.04 ms	Billed Duration: 22 ms	Memory Size: 2496 MB	Max Memory Used: 94 MB`,
+                message: `RequestId: ${uuid}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
                 requestId,
                 timestamp: isoTimestamp,
                 type: 'REPORT'
@@ -318,7 +318,7 @@ test('parseLog parses application and platform logs correctly', () => {
         },
         {
             log: {
-                message: `2022-10-31T22:00:00.000Z	${uuid}	INFO	Request: GET /`,
+                message: `2022-10-31T22:00:00.000Z	${uuid}	INFO\tRequest: GET /`,
                 timestamp
             },
             expected: {
@@ -330,11 +330,11 @@ test('parseLog parses application and platform logs correctly', () => {
         },
         {
             log: {
-                message: `2022-10-31T22:00:00.000Z	${uuid}	ERROR	Response status:	500`,
+                message: `2022-10-31T22:00:00.000Z	${uuid}	ERROR\tResponse status: 500\tuh oh!`,
                 timestamp
             },
             expected: {
-                message: 'Response status:	500',
+                message: 'Response status: 500\tuh oh!',
                 requestId,
                 timestamp: isoTimestamp,
                 type: 'ERROR'
