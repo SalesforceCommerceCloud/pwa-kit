@@ -61,7 +61,7 @@ const Cart = () => {
         })
     }
     /*****************************************Commerce react HOOKS************************/
-    // NOTE: we can directly called two hooks to get baskets
+    // NOTE: we can directly call two hooks to get baskets
     // or we can have a custom hooks to keep the code DRY
     // see ../../hooks/useBasket
     // get the basket, fetch product details
@@ -70,9 +70,19 @@ const Cart = () => {
     // if id is not defined use the first basket in the list
     const basketFromHook = baskets?.data?.baskets?.[0]
     const productIds = basketFromHook?.productItems?.map((i) => i.productId).join(',')
+    // fetch the products and transform it from array of products into an object
     const {data: productDetails} = useProducts(
         {ids: productIds, allImage: true},
-        {enabled: basket?.productItems}
+        {
+            enabled: basket?.productItems,
+            select: (res) => {
+                return res.data.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
     )
 
     /***********************/
