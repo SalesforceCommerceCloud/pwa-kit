@@ -277,65 +277,65 @@ test('parseLog parses application and platform logs correctly', () => {
     const now = new Date()
     const timestamp = now.getTime()
     const isoTimestamp = now.toISOString()
-    const uuid = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
-    const requestId = uuid.slice(0, 8)
+    const requestId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+    const shortRequestId = requestId.slice(0, 8)
     const cases = [
         {
             log: {
-                message: `START RequestId: ${uuid} Version: $LATEST`,
+                message: `START RequestId: ${requestId} Version: $LATEST`,
                 timestamp
             },
             expected: {
-                message: `RequestId: ${uuid} Version: $LATEST`,
-                requestId,
+                message: `RequestId: ${requestId} Version: $LATEST`,
+                shortRequestId,
                 timestamp: isoTimestamp,
                 type: 'START'
             }
         },
         {
             log: {
-                message: `END RequestId: ${uuid}`,
+                message: `END RequestId: ${requestId}`,
                 timestamp
             },
             expected: {
-                message: `RequestId: ${uuid}`,
-                requestId,
+                message: `RequestId: ${requestId}`,
+                shortRequestId,
                 timestamp: isoTimestamp,
                 type: 'END'
             }
         },
         {
             log: {
-                message: `REPORT RequestId: ${uuid}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
+                message: `REPORT RequestId: ${requestId}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
                 timestamp
             },
             expected: {
-                message: `RequestId: ${uuid}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
-                requestId,
+                message: `RequestId: ${requestId}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
+                shortRequestId,
                 timestamp: isoTimestamp,
                 type: 'REPORT'
             }
         },
         {
             log: {
-                message: `2022-10-31T22:00:00.000Z\t${uuid}\tINFO\tRequest: GET /`,
+                message: `2022-10-31T22:00:00.000Z\t${requestId}\tINFO\tRequest: GET /`,
                 timestamp
             },
             expected: {
                 message: 'Request: GET /',
-                requestId,
+                shortRequestId,
                 timestamp: isoTimestamp,
                 type: 'INFO'
             }
         },
         {
             log: {
-                message: `2022-10-31T22:00:00.000Z\t${uuid}\tERROR\tResponse status: 500\tuh oh!`,
+                message: `2022-10-31T22:00:00.000Z\t${requestId}\tERROR\tResponse status: 500\tuh oh!`,
                 timestamp
             },
             expected: {
                 message: 'Response status: 500\tuh oh!',
-                requestId,
+                shortRequestId,
                 timestamp: isoTimestamp,
                 type: 'ERROR'
             }

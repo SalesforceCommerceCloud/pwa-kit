@@ -297,7 +297,7 @@ Utils.requestErrorMessage = {
  */
 Utils.parseLog = (log) => {
     const parts = log.message.trim().split('\t')
-    let requestId, uuid, message, type
+    let requestId, shortRequestId, message, type
 
     if (
         parts.length > 3 &&
@@ -307,7 +307,7 @@ Utils.parseLog = (log) => {
     ) {
         // An application log
         parts.shift()
-        uuid = parts.shift()
+        requestId = parts.shift()
         type = parts.shift()
     } else {
         // A platform log
@@ -317,13 +317,12 @@ Utils.parseLog = (log) => {
     }
     message = parts.join('\t')
 
-    const requestIdPattern = /(?<id>[a-f\d]{8})/
-    const match = requestIdPattern.exec(uuid || message)
+    const match = /(?<id>[a-f\d]{8})/.exec(requestId || message)
     if (match) {
-        requestId = match.groups.id
+        shortRequestId = match.groups.id
     }
 
-    return {message, requestId, timestamp: new Date(log.timestamp).toISOString(), type}
+    return {message, shortRequestId, timestamp: new Date(log.timestamp).toISOString(), type}
 }
 
 module.exports = Utils

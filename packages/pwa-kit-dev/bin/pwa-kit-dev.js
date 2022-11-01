@@ -376,10 +376,10 @@ const main = () => {
 
             ws.on('message', (data) => {
                 JSON.parse(data).forEach((log) => {
-                    const {message, requestId, timestamp, type} = scriptUtils.parseLog(log)
+                    const {message, shortRequestId, timestamp, type} = scriptUtils.parseLog(log)
                     console.log(
                         chalk.green(timestamp),
-                        chalk.cyan(requestId),
+                        chalk.cyan(shortRequestId),
                         chalk[colors[type.toLowerCase()] || 'cyan'](type.padEnd(6)),
                         message
                     )
