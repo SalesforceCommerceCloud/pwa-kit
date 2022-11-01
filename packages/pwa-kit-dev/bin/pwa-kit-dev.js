@@ -224,7 +224,7 @@ const main = () => {
                 'a message to include along with the uploaded bundle in Managed Runtime'
             )
                 // The default message is loaded dynamically as part of `uploadBundle(...)`
-                .default(undefined, '<git branch>:<git commit hash>')
+                .default(null, '<git branch>:<git commit hash>')
         )
         .addOption(
             new program.Option(
@@ -233,7 +233,7 @@ const main = () => {
             )
                 // We load the slug from the package.json by default, but we don't want to do that
                 // unless we need to, so it is loaded conditionally in the action implementation
-                .default(undefined, "the 'name' key from the package.json")
+                .default(null, "the 'name' key from the package.json")
         )
         .addOption(
             new program.Option(
