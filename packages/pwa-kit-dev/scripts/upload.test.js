@@ -23,14 +23,14 @@ afterEach(() => {
     Utils.fail = realFail
 })
 
-const validOptions = {projectSlug: 'mobify-test', origin: 'https://cloud-test.mobify.com'}
+const requiredOptions = {projectSlug: 'mobify-test', origin: 'https://cloud-test.mobify.com'}
 
 test('uploadBundle fails with invalid options', () => {
     ;[
         undefined,
         {},
-        {projectSlug: '', origin: validOptions.origin},
-        {projectSlug: validOptions.projectSlug, origin: ''}
+        {projectSlug: '', origin: requiredOptions.origin},
+        {projectSlug: requiredOptions.projectSlug, origin: ''}
     ].forEach((options) => {
         try {
             uploadBundle(options)
@@ -52,7 +52,7 @@ test("calls Utils.exists to check for the bundle's existence", () => {
 
     Utils.buildObject.mockClear()
 
-    return uploadBundle(validOptions)
+    return uploadBundle(requiredOptions)
         .catch(() => true)
         .then(() => {
             expect(Utils.createBundle).toBeCalled()
@@ -67,14 +67,14 @@ test('the default options can be overwritten', async () => {
     Utils.createBundle.mockReturnValue(Promise.reject())
 
     try {
-        await uploadBundle({target: 'dev', ...validOptions})
+        await uploadBundle({target: 'dev', ...requiredOptions})
     } catch (err) {
         const outputTarget = Utils.createBundle.mock.calls[0][0].target
         expect(outputTarget).toBe('dev')
     }
 
     try {
-        await uploadBundle(validOptions)
+        await uploadBundle(requiredOptions)
     } catch (err) {
         const outputTarget = Utils.createBundle.mock.calls[1][0].target
         const defaultTargetValue = '' // see OPTION_DEFAULTS in ./upload.js
