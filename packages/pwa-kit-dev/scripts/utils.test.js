@@ -318,7 +318,7 @@ test('parseLog parses application and platform logs correctly', () => {
         },
         {
             log: {
-                message: `2022-10-31T22:00:00.000Z	${uuid}	INFO\tRequest: GET /`,
+                message: `2022-10-31T22:00:00.000Z\t${uuid}\tINFO\tRequest: GET /`,
                 timestamp
             },
             expected: {
@@ -330,7 +330,7 @@ test('parseLog parses application and platform logs correctly', () => {
         },
         {
             log: {
-                message: `2022-10-31T22:00:00.000Z	${uuid}	ERROR\tResponse status: 500\tuh oh!`,
+                message: `2022-10-31T22:00:00.000Z\t${uuid}\tERROR\tResponse status: 500\tuh oh!`,
                 timestamp
             },
             expected: {
