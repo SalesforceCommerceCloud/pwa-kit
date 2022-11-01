@@ -10,7 +10,7 @@
     "sdk-create-hash-manifest": "bin/create-hash-manifest.js"
   },
   "engines": {
-    "node": "^10.17.0 || ^12.0.0"
+    "node": "^10.17.0 || ^14.0.0"
   },
   "files": [
     "bin",
