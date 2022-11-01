@@ -125,7 +125,7 @@
     "mobify-code-style": "^2.8.5",
     "nightwatch": "^1.6.3",
     "nock": "^10.0.0",
-    "node-sass": "^4.11.0",
+    "node-sass": "^6.0.1",
     "nodemon": "1.18.10",
     "postcss-loader": "3.0.0",
     "prettier": "1.18.2",
