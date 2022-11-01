@@ -376,14 +376,14 @@ const main = () => {
 
             ws.on('message', (data) => {
                 JSON.parse(data).forEach((log) => {
-                    const {message, shortRequestId, timestamp, type} = scriptUtils.parseLog(log)
-                    const paddedType = type.padEnd(6)
+                    const {message, shortRequestId, level} = scriptUtils.parseLog(log.message)
+                    const paddedLevel = level.padEnd(6)
                     console.log(
-                        chalk.green(timestamp),
+                        chalk.green(new Date(log.timestamp).toISOString()),
                         chalk.cyan(shortRequestId),
-                        ['WARN', 'ERROR'].includes(type)
-                            ? chalk[colors[type.toLowerCase()]].bold(paddedType)
-                            : paddedType,
+                        ['WARN', 'ERROR'].includes(level)
+                            ? chalk[colors[level.toLowerCase()]].bold(paddedLevel)
+                            : paddedLevel,
                         message
                     )
                 })

@@ -282,22 +282,17 @@ Utils.requestErrorMessage = {
 }
 
 /**
- * @param {Object} log
- *  {
- *      timestamp,
- *      message
- *  }
+ * @param {string} log
  * @returns {Object}
  *  {
+ *      level,
  *      message,
- *      requestId,
- *      timestamp,
- *      type
+ *      requestId
  *  }
  */
 Utils.parseLog = (log) => {
-    const parts = log.message.trim().split('\t')
-    let requestId, shortRequestId, message, type
+    const parts = log.trim().split('\t')
+    let requestId, shortRequestId, message, level
 
     if (
         parts.length > 3 &&
@@ -308,11 +303,11 @@ Utils.parseLog = (log) => {
         // An application log
         parts.shift()
         requestId = parts.shift()
-        type = parts.shift()
+        level = parts.shift()
     } else {
         // A platform log
         const words = parts[0].split(' ')
-        type = words.shift()
+        level = words.shift()
         parts[0] = words.join(' ')
     }
     message = parts.join('\t')
@@ -322,7 +317,7 @@ Utils.parseLog = (log) => {
         shortRequestId = match.groups.id
     }
 
-    return {message, shortRequestId, timestamp: new Date(log.timestamp).toISOString(), type}
+    return {level, message, shortRequestId}
 }
 
 module.exports = Utils

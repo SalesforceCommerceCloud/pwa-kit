@@ -274,70 +274,47 @@ describe('Create Bundle', () => {
 })
 
 test('parseLog parses application and platform logs correctly', () => {
-    const now = new Date()
-    const timestamp = now.getTime()
-    const isoTimestamp = now.toISOString()
     const requestId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
     const shortRequestId = requestId.slice(0, 8)
     const cases = [
         {
-            log: {
-                message: `START RequestId: ${requestId} Version: $LATEST`,
-                timestamp
-            },
+            log: `START RequestId: ${requestId} Version: $LATEST`,
             expected: {
+                level: 'START',
                 message: `RequestId: ${requestId} Version: $LATEST`,
-                shortRequestId,
-                timestamp: isoTimestamp,
-                type: 'START'
+                shortRequestId
             }
         },
         {
-            log: {
-                message: `END RequestId: ${requestId}`,
-                timestamp
-            },
+            log: `END RequestId: ${requestId}`,
             expected: {
+                level: 'END',
                 message: `RequestId: ${requestId}`,
-                shortRequestId,
-                timestamp: isoTimestamp,
-                type: 'END'
+                shortRequestId
             }
         },
         {
-            log: {
-                message: `REPORT RequestId: ${requestId}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
-                timestamp
-            },
+            log: `REPORT RequestId: ${requestId}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
             expected: {
+                level: 'REPORT',
                 message: `RequestId: ${requestId}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
-                shortRequestId,
-                timestamp: isoTimestamp,
-                type: 'REPORT'
+                shortRequestId
             }
         },
         {
-            log: {
-                message: `2022-10-31T22:00:00.000Z\t${requestId}\tINFO\tRequest: GET /`,
-                timestamp
-            },
+            log: `2022-10-31T22:00:00.000Z\t${requestId}\tINFO\tRequest: GET /`,
             expected: {
+                level: 'INFO',
                 message: 'Request: GET /',
-                shortRequestId,
-                timestamp: isoTimestamp,
-                type: 'INFO'
+                shortRequestId
             }
         },
         {
-            log: {
-                message: `2022-10-31T22:00:00.000Z\t${requestId}\tERROR\tResponse status: 500\tuh oh!`,
-                timestamp
-            },
+            log: `2022-10-31T22:00:00.000Z\t${requestId}\tERROR\tResponse status: 500\tuh oh!`,
             expected: {
+                level: 'ERROR',
                 message: 'Response status: 500\tuh oh!',
-                shortRequestId,
-                timestamp: isoTimestamp,
-                type: 'ERROR'
+                shortRequestId
             }
         }
     ]
