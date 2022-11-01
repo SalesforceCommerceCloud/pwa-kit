@@ -306,8 +306,7 @@ const main = () => {
     program
         .command('test')
         .description('test the project')
-        .action((_, opts) => {
-            const {args} = opts
+        .action((_, {args}) => {
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
             execSync(
                 `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
