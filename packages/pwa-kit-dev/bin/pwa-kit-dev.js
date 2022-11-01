@@ -377,10 +377,13 @@ const main = () => {
             ws.on('message', (data) => {
                 JSON.parse(data).forEach((log) => {
                     const {message, shortRequestId, timestamp, type} = scriptUtils.parseLog(log)
+                    const paddedType = type.padEnd(6)
                     console.log(
                         chalk.green(timestamp),
                         chalk.cyan(shortRequestId),
-                        chalk[colors[type.toLowerCase()] || 'cyan'](type.padEnd(6)),
+                        ['WARN', 'ERROR'].includes(type)
+                            ? chalk[colors[type.toLowerCase()]].bold(paddedType)
+                            : paddedType,
                         message
                     )
                 })
