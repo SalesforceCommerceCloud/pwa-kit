@@ -241,15 +241,7 @@ const main = () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .action((_, opts) => {
-            let {
-                buildDirectory,
-                message,
-                projectSlug,
-                target,
-                cloudOrigin,
-                credentialsFile
-            } = opts.optsWithGlobals()
+        .action(({buildDirectory, message, projectSlug, target, cloudOrigin, credentialsFile}) => {
             // Set the deployment target env var, this is required to ensure we
             // get the correct configuration object.
             process.env.DEPLOY_TARGET = target
@@ -323,16 +315,19 @@ const main = () => {
         })
 
     managedRuntimeCommand('logs')
-        .description(`tail environment logs`)
+        .description(`display environment logs (without --tail, displays this help text and exits)`)
         .addOption(
             new program.Option('-p, --project <projectSlug>', 'the project slug').default(
-                undefined,
+                null,
                 "the 'name' key from package.json"
             )
         )
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
-        .action(async (_, opts) => {
-            let {project, environment, cloudOrigin, credentialsFile} = opts.optsWithGlobals()
+        .option('-t, --tail', 'continuously stream logs')
+        .action(async ({project, environment, tail, cloudOrigin, credentialsFile}, command) => {
+            if (!tail) {
+                command.help()
+            }
 
             if (!project) {
                 project = scriptUtils.readPackageJson('name')

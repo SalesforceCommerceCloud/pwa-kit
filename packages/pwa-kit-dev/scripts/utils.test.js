@@ -108,7 +108,7 @@ describe('createToken', () => {
         const mockGetHeaders = jest.fn((headers) => headers)
         Utils.getRequestHeaders = mockGetHeaders
 
-        expect(await Utils.createToken(...Object.values(args))).toEqual(data.token)
+        expect(await Utils.createToken(...Object.values(args))).toBe(data.token)
         expect(request).toBeCalled()
         expect(mockGetHeaders).toBeCalled()
 
