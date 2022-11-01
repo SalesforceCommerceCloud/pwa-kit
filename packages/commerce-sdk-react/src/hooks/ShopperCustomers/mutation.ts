@@ -222,30 +222,31 @@ The value of this property must be valid for the type of custom attribute define
 
 type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
-const isObject = (item) => typeof item === 'object' && !Array.isArray(item) && item !== null
+const isObject = (item: null) => typeof item === 'object' && !Array.isArray(item) && item !== null
 
+// @ts-ignore
 const updateCache = (queryClient, action, queryKeysMatrix, data) => {
-    const isMatchingKey = (cacheQuery, queryKey) => {
-        return queryKey.every((item, index) => {
-            return isObject(item)
-                ? Object.values(cacheQuery.queryKey[index]).includes(item.arg)
+    const isMatchingKey = (cacheQuery: {queryKey: {[x: string]: any}}, queryKey: any[]) =>
+        queryKey.every((item, index) =>
+            isObject(item) && isObject(cacheQuery.queryKey[index])
+                ? Object.entries(cacheQuery.queryKey[index])
+                      .sort()
+                      .toString() ===
+                  Object.entries(item)
+                      .sort()
+                      .toString()
                 : item === cacheQuery.queryKey[index]
-        })
-    }
-    // STEP 1. Update data inside query cache for the matching queryKeys
-    queryKeysMatrix[action]?.update?.map((queryKey) => {
-        queryClient.setQueriesData(
-            {
-                predicate: (cacheQuery) => isMatchingKey(cacheQuery, queryKey)
-            },
-            data
         )
+
+    // STEP 1. Update data inside query cache for the matching queryKeys
+    queryKeysMatrix[action]?.update?.map((queryKey: any) => {
+        queryClient.setQueryData(queryKey, data)
     })
 
     // STEP 2. Invalidate cache entries with the matching queryKeys
-    queryKeysMatrix[action]?.invalidate?.map((queryKey) => {
+    queryKeysMatrix[action]?.invalidate?.map((queryKey: any) => {
         queryClient.invalidateQueries({
-            predicate: (cacheQuery) => isMatchingKey(cacheQuery, queryKey)
+            predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
         })
     })
 }
@@ -266,91 +267,150 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
-                // @ts-ignore
                 const queryKeysMatrix = {
+                    // OK
                     updateCustomer: {
                         update: [
                             [
                                 '/customers',
+                                // @ts-ignore
                                 params?.parameters?.customerId,
-                                {arg: params?.parameters?.customerId}
+                                // @ts-ignore
+                                {customerId: params?.parameters?.customerId}
                             ]
                         ],
                         invalidate: [
+                            // @ts-ignore
                             ['/customers', params?.parameters?.customerId, '/payment-instruments'],
+                            // @ts-ignore
                             ['/customers', params?.parameters?.customerId, '/addresses'],
                             ['/customers', '/external-profile']
                         ]
                     },
+                    // OK
                     updateCustomerAddress: {
                         update: [
                             [
                                 '/customers',
+                                // @ts-ignore
                                 params?.parameters?.customerId,
                                 '/addresses',
-                                {arg: params?.parameters?.addressName}
+                                // @ts-ignore
+                                {
+                                    // @ts-ignore
+                                    addressName: params?.parameters?.addressName,
+                                    // @ts-ignore
+                                    customerId: params?.parameters?.customerId
+                                }
                             ]
                         ],
                         invalidate: [
                             [
                                 '/customers',
+                                // @ts-ignore
                                 params?.parameters?.customerId,
-                                {arg: params?.parameters?.customerId}
+                                // @ts-ignore
+                                {customerId: params?.parameters?.customerId}
                             ]
                         ]
                     },
-                    // TODO: Create should set a new entry when no match. I was doing that in the init commit..
+                    // OK
                     createCustomerAddress: {
                         update: [
                             [
                                 '/customers',
+                                // @ts-ignore
                                 params?.parameters?.customerId,
-                                {arg: params?.parameters?.customerId}
+                                '/addresses',
+                                // @ts-ignore
+                                {
+                                    // @ts-ignore
+                                    addressName: params?.body?.addressId,
+                                    // @ts-ignore
+                                    customerId: params?.parameters?.customerId
+                                }
                             ]
                         ],
                         invalidate: [
                             [
                                 '/customers',
+                                // @ts-ignore
                                 params?.parameters?.customerId,
-                                '/addresses',
-                                {arg: params?.parameters?.addressName}
+                                // @ts-ignore
+                                {customerId: params?.parameters?.customerId}
                             ]
                         ]
                     },
+
                     removeCustomerAddress: {
                         invalidate: [
+                            // TODO: Remove Query from cache
                             [
                                 '/customers',
+                                // @ts-ignore
                                 params?.parameters?.customerId,
                                 '/addresses',
-                                {arg: params?.parameters?.addressName}
+                                // @ts-ignore
+                                {
+                                    // @ts-ignore
+                                    addressName: params?.body?.addressId,
+                                    // @ts-ignore
+                                    customerId: params?.parameters?.customerId
+                                }
                             ],
+                            // OK
                             [
                                 '/customers',
+                                // @ts-ignore
                                 params?.parameters?.customerId,
-                                {arg: params?.parameters?.customerId}
+                                // @ts-ignore
+                                {customerId: params?.parameters?.customerId}
                             ]
                         ]
                     },
+                    createCustomerPaymentInstrument: {
+                        update: [
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                '/payment-instruments',
+                                {paymentInstrumentId: params?.parameters?.paymentInstrumentId}
+                            ]
+                        ],
+                        invalidate:[[
+                            '/customers',
+                            // @ts-ignore
+                            params?.parameters?.customerId,
+                            // @ts-ignore
+                            {customerId: params?.parameters?.customerId}
+                        ]]
+                },
+                    // TODO:
                     updateCustomerProductListItem: {
                         update: [
                             [
                                 '/customers',
+                                // @ts-ignore
                                 params?.parameters?.customerId,
                                 '/product-list',
+                                // @ts-ignore
                                 params?.parameters?.listId,
-                                {arg: params?.parameters?.itemId}
+                                // @ts-ignore
+                                {itemId: params?.parameters?.itemId}
                             ]
                         ],
                         invalidate: [
                             [
                                 '/customers',
+                                // @ts-ignore
                                 params?.parameters?.customerId,
                                 '/product-list',
-                                {arg: params?.parameters?.listId}
+                                // @ts-ignore
+                                {customerId: params?.parameters?.customerId, listId: params?.parameters?.listId}
                             ]
                         ]
-                    }
+                    },
                 }
 
                 updateCache(queryClient, action, queryKeysMatrix, data)
