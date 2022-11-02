@@ -178,8 +178,12 @@ jobs:
 
             cd /tmp/project
             npm run prod:build
+      - run:
+          command: |
+            echo "NPM VERSION================="
+            npm --version
       - store_artifacts:
-          path: .
+          path: ./packages/progressive-web-sdk/package-lock.json
       - run:
           name: Count Generated Project Dependencies
           environment:
