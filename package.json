@@ -20,7 +20,7 @@
     "test:integration": "lerna run --stream --concurrency=1 test:integration",
     "test:e2e-ci": "lerna run --stream --concurrency=1 test:e2e-ci",
     "test:max-file-size": "lerna run --stream test:max-file-size",
-    "lint": "lerna run --parallel --stream lint -- --silent",
+    "lint": "lerna run --parallel --stream lint",
     "lint:fix": "lerna run lint:fix",
     "format": "lerna run --parallel --stream format",
     "bump-version": "node ./scripts/bump-version.js"
