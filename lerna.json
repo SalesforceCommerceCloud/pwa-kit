@@ -1,15 +1,9 @@
 {
   "lerna": "2.11.0",
-  "packages": [
-    "packages/*"
-  ],
-  "version": "2.4.11",
+  "packages": ["packages/*"],
+  "version": "2.4.12",
   "publish": {
-    "allowBranch": [
-      "master"
-    ],
-    "ignoreChanges": [
-      "*.md"
-    ]
+    "allowBranch": ["master"],
+    "ignoreChanges": ["*.md"]
   }
 }
