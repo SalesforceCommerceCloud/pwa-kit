@@ -1,5 +1,5 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2020 Mobify Research & Development Inc. All rights reserved. */
+/* Copyright (c) 2022 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 const POLL_TIME_INTERVAL = 50
