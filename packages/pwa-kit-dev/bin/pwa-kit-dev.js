@@ -313,8 +313,8 @@ const main = () => {
             )
         })
 
-    managedRuntimeCommand('logs')
-        .description(`display environment logs (without --tail, displays this help text and exits)`)
+    managedRuntimeCommand('tail-logs')
+        .description(`continuously stream environment logs`)
         .addOption(
             new program.Option('-p, --project <projectSlug>', 'the project slug').default(
                 null,
@@ -322,12 +322,7 @@ const main = () => {
             )
         )
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
-        .option('-t, --tail', 'continuously stream logs')
-        .action(async ({project, environment, tail, cloudOrigin, credentialsFile}, command) => {
-            if (!tail) {
-                command.help()
-            }
-
+        .action(async ({project, environment, cloudOrigin, credentialsFile}, command) => {
             if (!project) {
                 project = scriptUtils.readPackageJson('name')
             }
