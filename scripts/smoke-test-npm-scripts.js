@@ -28,9 +28,9 @@ const main = (opts) => {
     const exclude = [
         /^lint.*$/,
         /^test.*$/,
-        /^logs$/,
         /^push$/,
         /^save-credentials$/,
+        /^tail-logs$/,
         /^format$/,
         /^build$/,
         /^start.*$/,
