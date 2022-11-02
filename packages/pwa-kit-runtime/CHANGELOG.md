@@ -1,5 +1,8 @@
-## v2.3.0-dev (Aug 25, 2022)
+## v2.4.0-dev (Oct 27, 2022)
+## v2.3.0 (Oct 27, 2022)
 - Performance: Skip retries when flushing CloudWatch metrics, prioritize returning a response instead. [720](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/720)
+- Add Correlation ID to SCAPI requests. [#728](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/728)
+
 ## v2.2.0 (Aug 25, 2022)
 ## v2.1.0 (Jul 05, 2022)
 

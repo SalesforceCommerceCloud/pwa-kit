@@ -58,6 +58,9 @@ const Home = () => {
                 <li>
                     <Link to="/query-errors">Query errors</Link>
                 </li>
+                <li>
+                    <Link to="/customerId">useCustomerId</Link>
+                </li>
             </ul>
         </>
     )
