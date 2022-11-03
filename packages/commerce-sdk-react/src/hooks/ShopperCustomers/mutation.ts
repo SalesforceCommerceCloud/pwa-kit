@@ -249,6 +249,16 @@ const updateCache = (queryClient, action, queryKeysMatrix, data) => {
             predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
         })
     })
+
+    // STEP 3. Remove cache entries with the matching queryKeys
+    queryKeysMatrix[action]?.remove?.map((queryKey: any) => {
+        queryClient.removeQueries({
+            predicate: (cacheQuery: any) =>{
+                console.log('cacheQuery:', cacheQuery)
+                console.log('queryKey:', queryKey)
+                return isMatchingKey(cacheQuery, queryKey)}
+        })
+    })
 }
 
 /**
@@ -267,6 +277,8 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
+                console.log('params:', params)
+                console.log('data:', data)
                 const queryKeysMatrix = {
                     // OK
                     updateCustomer: {
@@ -341,10 +353,18 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                             ]
                         ]
                     },
-
+                    // OK
                     removeCustomerAddress: {
                         invalidate: [
-                            // TODO: Remove Query from cache
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                // @ts-ignore
+                                {customerId: params?.parameters?.customerId}
+                            ]
+                        ],
+                        remove: [
                             [
                                 '/customers',
                                 // @ts-ignore
@@ -353,18 +373,10 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 // @ts-ignore
                                 {
                                     // @ts-ignore
-                                    addressName: params?.body?.addressId,
+                                    addressName: params?.parameters?.addressName,
                                     // @ts-ignore
                                     customerId: params?.parameters?.customerId
                                 }
-                            ],
-                            // OK
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                // @ts-ignore
-                                {customerId: params?.parameters?.customerId}
                             ]
                         ]
                     },
@@ -375,17 +387,63 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 // @ts-ignore
                                 params?.parameters?.customerId,
                                 '/payment-instruments',
+                                // @ts-ignore
                                 {paymentInstrumentId: params?.parameters?.paymentInstrumentId}
                             ]
                         ],
-                        invalidate:[[
-                            '/customers',
-                            // @ts-ignore
-                            params?.parameters?.customerId,
-                            // @ts-ignore
-                            {customerId: params?.parameters?.customerId}
-                        ]]
-                },
+                        invalidate: [
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                // @ts-ignore
+                                {customerId: params?.parameters?.customerId}
+                            ]
+                        ]
+                    },
+                    createCustomerProductList: {
+                        update: [
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                '/product-list',
+                                // @ts-ignore
+                                {listId: params?.parameters?.listId}
+                            ]
+                        ]
+                    },
+                    createCustomerProductListItem: {
+                        update: [
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                '/product-list',
+                                // @ts-ignore
+                                params?.parameters?.listId,
+                                // @ts-ignore
+                                {itemId: params?.parameters?.itemId}
+                            ]
+                        ],
+                        invalidate: [
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                '/product-list',
+                                // @ts-ignore
+                                {
+                                    customerId: params?.parameters?.customerId,
+                                    listId: params?.parameters?.listId
+                                }
+                            ]
+                        ]
+                    },
+                    deleteCustomerProductListItem: {
+                        update: [],
+                        invalidate: []
+                    },
                     // TODO:
                     updateCustomerProductListItem: {
                         update: [
@@ -407,10 +465,13 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 params?.parameters?.customerId,
                                 '/product-list',
                                 // @ts-ignore
-                                {customerId: params?.parameters?.customerId, listId: params?.parameters?.listId}
+                                {
+                                    customerId: params?.parameters?.customerId,
+                                    listId: params?.parameters?.listId
+                                }
                             ]
                         ]
-                    },
+                    }
                 }
 
                 updateCache(queryClient, action, queryKeysMatrix, data)
