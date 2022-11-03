@@ -182,10 +182,10 @@ const ProductList = (props) => {
 
     /**************** Einstein ****************/
     useEffect(() => {
-        if (searchQuery) {
-            einstein.sendViewSearch(searchQuery, productSearchResult)
-        } else {
-            einstein.sendViewCategory(category, productSearchResult)
+        if (productSearchResult) {
+            searchQuery
+                ? einstein.sendViewSearch(searchQuery, productSearchResult)
+                : einstein.sendViewCategory(category, productSearchResult)
         }
     }, [productSearchResult])
 
@@ -229,7 +229,11 @@ const ProductList = (props) => {
             }
         }
 
-        navigate(`/category/${params.categoryId}?${stringifySearchParams(searchParamsCopy)}`)
+        if (!searchQuery) {
+            navigate(`/category/${params.categoryId}?${stringifySearchParams(searchParamsCopy)}`)
+        } else {
+            navigate(`/search?${stringifySearchParams(searchParamsCopy)}`)
+        }
     }
 
     // Clears all filters

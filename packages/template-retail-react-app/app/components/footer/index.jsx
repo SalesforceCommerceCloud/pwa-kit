@@ -164,11 +164,11 @@ const Footer = ({...otherProps}) => {
 
                     <Box {...styles.bottomHalf}>
                         <Text {...styles.copyright}>
-                            &copy;{' '}
+                            &copy; {new Date().getFullYear()}{' '}
                             {intl.formatMessage({
                                 id: 'footer.message.copyright',
                                 defaultMessage:
-                                    '2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
+                                    'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
                             })}
                         </Text>
 

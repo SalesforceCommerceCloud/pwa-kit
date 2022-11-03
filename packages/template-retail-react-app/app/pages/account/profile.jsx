@@ -197,7 +197,7 @@ const PasswordCard = () => {
     const submit = async (values) => {
         try {
             form.clearErrors()
-            await customer.updatePassword(values)
+            await customer.updatePassword(values, customer.email)
             setIsEditing(false)
             toast({
                 title: formatMessage({

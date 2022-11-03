@@ -111,6 +111,12 @@ describe('url builder test', () => {
         expect(url).toEqual('/search?q=term')
     })
 
+    test('searchUrlBuilder returns expect with & symbol', () => {
+        const url = searchUrlBuilder('term&term')
+
+        expect(url).toEqual('/search?q=term%26term')
+    })
+
     test('productUrlBuilder returns expect', () => {
         const url = productUrlBuilder({id: 'productId'})
 

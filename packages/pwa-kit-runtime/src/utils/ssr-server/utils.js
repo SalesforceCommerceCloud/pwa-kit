@@ -14,8 +14,6 @@ import crypto from 'crypto'
 import {PROXY_PATH_PREFIX} from '../../ssr/server/constants'
 import {proxyConfigs} from '../ssr-shared'
 
-const BUNDLE_ID = process.env.BUNDLE_ID
-
 // TODO: Clean this up or provide a way to toggle
 export const verboseProxyLogging = false
 
@@ -23,7 +21,7 @@ export const isRemote = () =>
     Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
 
 export const getBundleBaseUrl = () => {
-    return `/mobify/bundle/${isRemote() ? BUNDLE_ID : 'development'}/`
+    return `/mobify/bundle/${isRemote() ? process.env.BUNDLE_ID : 'development'}/`
 }
 
 let QUIET = false
