@@ -56,10 +56,6 @@ commands:
   runtests:
     description: 'Run tests'
     parameters:
-      enableIntegrationTests:
-          description: 'Enable expensive integration tests'
-          default: true
-          type: boolean
       cwd:
         description: 'The directory to execute the tests from'
         default: ${PWD}
@@ -82,11 +78,6 @@ commands:
             # End to end tests on nightly builds only
             if [[ $NIGHTLY ]]; then
               npm run test:e2e-ci
-            fi
-
-            # Only run expensive integration tests on these branches
-            if [[ (<< parameters.enableIntegrationTests >> == "true") && ( $MASTER || $DEVELOP || $RELEASE ) ]]; then
-              npm run test:integration
             fi
   smoketestscripts:
     description: 'Smoke test scripts'
@@ -120,8 +111,6 @@ jobs:
     steps:
       - checkout
       - setup
-      - runtests:
-          enableIntegrationTests: false
       - smoketestscripts
       - checkclean
       - store_test_results:
