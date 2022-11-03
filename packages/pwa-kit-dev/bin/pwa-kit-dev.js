@@ -371,11 +371,14 @@ const main = () => {
             ws.on('message', (data) => {
                 JSON.parse(data).forEach((log) => {
                     const {message, shortRequestId, level} = scriptUtils.parseLog(log.message)
+                    const color = chalk[colors[level.toLowerCase()] || 'green']
                     const paddedLevel = level.padEnd(6)
                     console.log(
                         chalk.green(new Date(log.timestamp).toISOString()),
                         chalk.cyan(shortRequestId),
-                        chalk[colors[level.toLowerCase()] || 'green'].bold(paddedLevel),
+                        ['WARN', 'ERROR'].includes(level)
+                            ? color.bold(paddedLevel)
+                            : color(paddedLevel),
                         message
                     )
                 })
