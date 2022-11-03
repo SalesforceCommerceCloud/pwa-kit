@@ -13,7 +13,6 @@
     "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "eslint \"**/*.{js,jsx}\"",
     "test": "jest",
-    "test:integration": "cross-env TEST_TYPE=integration npm run test",
     "format": "prettier --write \"**/*.{js,jsx}\""
   },
   "repository": {

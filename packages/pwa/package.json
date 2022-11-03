@@ -163,7 +163,6 @@
     "test": "jest",
     "test:e2e": "nightwatch --suiteRetries 2 --config tests/e2e/nightwatch.conf.js tests/e2e/workflows/home-plp-pdp.js",
     "test:e2e-ci": "node ./scripts/run-e2e.js",
-    "test:integration": "cross-env TEST_TYPE=integration npm run test",
     "test:max-file-size": "bundlesize",
     "format": "prettier --write \"**/*.{js,jsx}\""
   },

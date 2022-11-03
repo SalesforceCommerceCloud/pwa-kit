@@ -12,8 +12,9 @@ import nock from 'nock'
  *
  * @private
  */
-export const isIntegrationTest = process.env.TEST_TYPE === 'integration'
-nock.back.setMode(isIntegrationTest ? 'wild' : 'record')
+// 2022.11.03 - We've decided to only run the tests in lockdown mode
+// since mobify v2.x is no longer being actively maintained
+nock.back.setMode('lockdown')
 nock.back.fixtures = `${__dirname}/../../cassettes`
 
 /**
