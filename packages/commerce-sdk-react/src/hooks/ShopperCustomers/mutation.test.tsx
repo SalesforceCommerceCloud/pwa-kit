@@ -12,6 +12,7 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {useQueryClient} from '@tanstack/react-query'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {useShopperCustomersMutation, ShopperCustomersMutations} from './mutation'
+import nock from 'nock'
 
 const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
 
@@ -25,7 +26,7 @@ const CustomerMutationComponent = () => {
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
 
     React.useEffect(() => {
-        queryClient.invalidateQueries(['/customer'])
+        queryClient.removeQueries(['/customer'])
         loginRegisteredUser.mutate({
             username: 'kobe@test.com',
             password: 'Test1234!'
@@ -77,10 +78,20 @@ const tests = [
                             name: /update customer/i
                         })
                     )
+
+                    // Mocking the server request
+                    nock('http://localhost:3000')
+                        .post((uri: string | string[]) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(500, {})
+
                     const button = screen.getByRole('button', {
                         name: /update customer/i
                     })
+
                     fireEvent.click(button)
+                    screen.debug(undefined, Infinity)
                     await waitFor(() => screen.getByText(/email/i))
                     expect(screen.getByText(/email/i)).toBeInTheDocument()
                 })
