@@ -253,10 +253,7 @@ const updateCache = (queryClient, action, queryKeysMatrix, data) => {
     // STEP 3. Remove cache entries with the matching queryKeys
     queryKeysMatrix[action]?.remove?.map((queryKey: any) => {
         queryClient.removeQueries({
-            predicate: (cacheQuery: any) =>{
-                console.log('cacheQuery:', cacheQuery)
-                console.log('queryKey:', queryKey)
-                return isMatchingKey(cacheQuery, queryKey)}
+            predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
         })
     })
 }
@@ -277,8 +274,6 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
-                console.log('params:', params)
-                console.log('data:', data)
                 const queryKeysMatrix = {
                     // OK
                     updateCustomer: {
@@ -380,6 +375,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                             ]
                         ]
                     },
+                    // OK
                     createCustomerPaymentInstrument: {
                         update: [
                             [
@@ -388,7 +384,10 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 params?.parameters?.customerId,
                                 '/payment-instruments',
                                 // @ts-ignore
-                                {paymentInstrumentId: params?.parameters?.paymentInstrumentId}
+                                {
+                                    customerId: params?.parameters?.customerId,
+                                    paymentInstrumentId: data?.paymentInstrumentId
+                                }
                             ]
                         ],
                         invalidate: [
@@ -401,6 +400,32 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                             ]
                         ]
                     },
+                    // OK
+                    deleteCustomerPaymentInstrument: {
+                        invalidate: [
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                // @ts-ignore
+                                {customerId: params?.parameters?.customerId}
+                            ]
+                        ],
+                        remove: [
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                '/payment-instruments',
+                                // @ts-ignore
+                                {
+                                    customerId: params?.parameters?.customerId,
+                                    paymentInstrumentId: params?.parameters?.paymentInstrumentId
+                                }
+                            ]
+                        ]
+                    },
+                    // OK
                     createCustomerProductList: {
                         update: [
                             [
@@ -409,11 +434,42 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 params?.parameters?.customerId,
                                 '/product-list',
                                 // @ts-ignore
-                                {listId: params?.parameters?.listId}
+                                {customerId: params?.parameters?.customerId, listId: data?.id}
                             ]
                         ]
                     },
+                    // OK
                     createCustomerProductListItem: {
+                        update: [
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                '/product-list',
+                                // @ts-ignore
+                                params?.parameters?.listId,
+                                // @ts-ignore
+                                {
+                                    itemId: data?.id
+                                }
+                            ]
+                        ],
+                        invalidate: [
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                '/product-list',
+                                // @ts-ignore
+                                {
+                                    customerId: params?.parameters?.customerId,
+                                    listId: params?.parameters?.listId
+                                }
+                            ]
+                        ]
+                    },
+                    // OK
+                    updateCustomerProductListItem: {
                         update: [
                             [
                                 '/customers',
@@ -441,23 +497,6 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                         ]
                     },
                     deleteCustomerProductListItem: {
-                        update: [],
-                        invalidate: []
-                    },
-                    // TODO:
-                    updateCustomerProductListItem: {
-                        update: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                '/product-list',
-                                // @ts-ignore
-                                params?.parameters?.listId,
-                                // @ts-ignore
-                                {itemId: params?.parameters?.itemId}
-                            ]
-                        ],
                         invalidate: [
                             [
                                 '/customers',
@@ -469,6 +508,18 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                     customerId: params?.parameters?.customerId,
                                     listId: params?.parameters?.listId
                                 }
+                            ]
+                        ],
+                        remove: [
+                            [
+                                '/customers',
+                                // @ts-ignore
+                                params?.parameters?.customerId,
+                                '/product-list',
+                                // @ts-ignore
+                                params?.parameters?.listId,
+                                // @ts-ignore
+                                {itemId: params?.parameters?.itemId}
                             ]
                         ]
                     }
