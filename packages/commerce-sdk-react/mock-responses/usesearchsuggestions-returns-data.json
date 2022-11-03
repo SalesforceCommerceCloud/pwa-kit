@@ -1,0 +1,52 @@
+[
+    {
+        "scope": "http://localhost:3000",
+        "method": "GET",
+        "path": "/mobify/proxy/api/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=shirt&currency=USD&locale=en-US",
+        "body": "",
+        "status": 200,
+        "response": [
+            "1f8b0800000000000003000000ffff",
+            "c493316f83301085ff4a743389204003acc9d22155245275a83ab8e60a96c0466753358af8ef15815202a91a3543473fdbdf3ddff31de195984ce22a4d511ba1a486e808ba5d62b2472a3444cf475024522159de281081ce0419a85f6a0b3833982a3a8c189d2cb0bd2f1288a040a9e73c572613329d27845acf4f240d1648562044b069d459fca5968c509a7557e3a13db3ee1050bf58df66771931dd95c30fc6cd96199e41f4c6728d1694a7ed718533c22fcfb5c0f407b82aca1c0d263d9f2b22e4436568c2508516bcb3bcc261fb4e0d54d2a03437655069a38a5b0825a9a4e263139dda3db92242c90f10c163bc69b221c11122c7f517b6dd23ee9ba4575eb8f25cc7de42af77d96d558224678310a0b67e867bf6220ccfd94bdf77022ff0a6ecd8902831b906eb5ec2868ee38653ec8e099de3e1cf6e43c759fab7b8bdd8e12074ee56813be5ee339c3d65c2e07993af1995f697f693a2a737ff67443432e2d96ee4eb130000ffff03005520f7eabd040000"
+        ],
+        "rawHeaders": [
+            "date",
+            "Thu, 20 Oct 2022 19:51:24 GMT",
+            "content-type",
+            "application/json; charset=UTF-8",
+            "transfer-encoding",
+            "chunked",
+            "connection",
+            "close",
+            "cf-ray",
+            "75d449b84ae4a6eb-PHX",
+            "cache-control",
+            "max-age=60",
+            "strict-transport-security",
+            "max-age=31536000; includeSubdomains;",
+            "cf-cache-status",
+            "DYNAMIC",
+            "x-content-type-options",
+            "nosniff",
+            "x-correlation-id",
+            "75d449b84ae4a6eb",
+            "x-frame-options",
+            "SAMEORIGIN",
+            "x-ratelimit-limit",
+            "7200",
+            "x-ratelimit-remaining",
+            "7200",
+            "x-xss-protection",
+            "1; mode=block",
+            "vary",
+            "Accept-Encoding",
+            "server",
+            "cloudflare",
+            "content-encoding",
+            "gzip",
+            "x-proxy-request-url",
+            "https://kv7kzm78.api.commercecloud.salesforce.com/search/shopper-search/v1/organizations/f_ecom_zzrf_001/search-suggestions?siteId=RefArchGlobal&q=shirt&currency=USD&locale=en-US"
+        ],
+        "responseIsBinary": false
+    }
+]

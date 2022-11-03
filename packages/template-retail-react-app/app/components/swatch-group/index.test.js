@@ -26,7 +26,7 @@ const data = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwad8e7f28/images/swatch/PG.52002RUBN4Q.NAVYWL.CP.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwad8e7f28/images/swatch/PG.52002RUBN4Q.NAVYWL.CP.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwad8e7f28/images/swatch/PG.52002RUBN4Q.NAVYWL.CP.jpg',
                 title: 'Navy Single Pleat Wool Suit, Navy'
             }
         },
@@ -40,7 +40,7 @@ const data = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3238595c/images/swatch/PG.10219685.JJ2XNXX.CP.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3238595c/images/swatch/PG.10219685.JJ2XNXX.CP.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3238595c/images/swatch/PG.10219685.JJ2XNXX.CP.jpg',
                 title: 'Long Sleeve Crew Neck, Grey Heather'
             }
         },
@@ -54,7 +54,7 @@ const data = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7b40c85a/images/swatch/PG.10219685.JJ3HDXX.CP.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7b40c85a/images/swatch/PG.10219685.JJ3HDXX.CP.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7b40c85a/images/swatch/PG.10219685.JJ3HDXX.CP.jpg',
                 title: 'Long Sleeve Crew Neck, Meadow Violet'
             }
         }

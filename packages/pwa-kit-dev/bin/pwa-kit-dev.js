@@ -6,19 +6,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const p = require('path')
-const fs = require('fs')
+const fse = require('fs-extra')
 const program = require('commander')
 const isEmail = require('validator/lib/isEmail')
 const {execSync: _execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
-const sh = require('shelljs')
 const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
-
-const pkgRoot = p.join(__dirname, '..')
-
-const projectPkg = require(p.join(process.cwd(), 'package.json'))
 
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
@@ -26,7 +21,9 @@ const execSync = (cmd, opts) => {
 }
 
 const main = () => {
+    const pkgRoot = p.join(__dirname, '..')
     process.env.CONTEXT = process.cwd()
+
     program.description(
         [
             `PWA Kit Dev`,
@@ -85,14 +82,18 @@ const main = () => {
                 }
             }
         )
-        .action(({user, key}) => {
+        .addOption(
+            new program.Option(
+                '-c, --credentialsFile <credentialsFile>',
+                'the file where your credentials should be stored'
+            )
+                .default(scriptUtils.getCredentialsFile())
+                .env('PWA_KIT_CREDENTIALS_FILE')
+        )
+        .action(({user, key, credentialsFile}) => {
             try {
-                const settingsPath = scriptUtils.getSettingsPath()
-                fs.writeFileSync(
-                    settingsPath,
-                    JSON.stringify({username: user, api_key: key}, null, 4)
-                )
-                console.log(`Saved Managed Runtime credentials to "${settingsPath}".`)
+                fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
+                console.log(`Saved Managed Runtime credentials to "${credentialsFile}".`)
             } catch (e) {
                 console.error('Failed to save credentials.')
                 console.error(e)
@@ -106,42 +107,66 @@ const main = () => {
         .addOption(
             new program.Option('--inspect', 'enable debugging with --inspect on the node process')
         )
-        .action(({inspect}) => {
-            execSync(`node${inspect ? ' --inspect' : ''} ${p.join(process.cwd(), 'app', 'ssr.js')}`)
+        .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
+        .action(({inspect, noHMR}) => {
+            execSync(
+                `node${inspect ? ' --inspect' : ''} ${p.join(process.cwd(), 'app', 'ssr.js')}`,
+                {
+                    env: {
+                        ...process.env,
+                        ...(noHMR ? {HMR: 'false'} : {})
+                    }
+                }
+            )
         })
 
     program
         .command('build')
+        .addOption(
+            new program.Option(
+                '-b, --buildDirectory <buildDirectory>',
+                'the directory where your project should be built'
+            )
+                .default(p.join(process.cwd(), 'build'), './build')
+                .env('PWA_KIT_BUILD_DIR')
+        )
         .description(`build your app for production`)
-        .action(() => {
+        .action(({buildDirectory}) => {
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
             const projectWebpack = p.join(process.cwd(), 'webpack.config.js')
-            const webpackConf = fs.existsSync(projectWebpack)
+            const webpackConf = fse.pathExistsSync(projectWebpack)
                 ? projectWebpack
                 : p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
-            const silentState = sh.config.silent
-            sh.rm('-rf', './build')
+            fse.emptyDirSync(buildDirectory)
             execSync(`${webpack} --config ${webpackConf}`, {
                 env: {
                     NODE_ENV: 'production',
-                    ...process.env
+                    ...process.env,
+                    // Command option overrides the env var, so we must continue that pattern
+                    PWA_KIT_BUILD_DIR: buildDirectory
                 }
             })
 
             // Copy the project `package.json` into the build folder.
-            sh.cp(p.resolve('package.json'), './build/package.json')
+            fse.copyFileSync('package.json', p.join(buildDirectory, 'package.json'))
 
             // Copy config files.
             const config = p.resolve('config')
-            if (fs.existsSync(config)) {
-                sh.cp('-R', config, './build')
-                sh.config.silent = true
-                sh.rm('./build/config/local.*')
-                sh.config.silent = silentState
+            if (fse.pathExistsSync(config)) {
+                fse.copySync(
+                    config,
+                    p.join(buildDirectory, 'config'),
+                    (file) => !p.basename(file).startsWith('local.')
+                )
             }
 
-            // This file is required by MRT, for historical reasons.
-            sh.touch('./build/loader.js')
+            const loader = p.join(buildDirectory, 'loader.js')
+            if (!fse.pathExistsSync(loader)) {
+                fse.outputFileSync(
+                    loader,
+                    '// This file is required by Managed Runtime for historical reasons.\n'
+                )
+            }
         })
 
     program
@@ -156,14 +181,19 @@ const main = () => {
         .addOption(
             new program.Option(
                 '-m, --message <message>',
-                "a message to include along with the uploaded bundle in Managed Runtime (default: '<git branch>:<git commit hash>')"
+                'a message to include along with the uploaded bundle in Managed Runtime'
             )
+                // The default message is loaded dynamically as part of `uploadBundle(...)`
+                .default(undefined, '<git branch>:<git commit hash>')
         )
         .addOption(
             new program.Option(
                 '-s, --projectSlug <projectSlug>',
-                "a project slug that differs from the name property in your project's package.json (default: the 'name' key from the package.json)"
-            ).default(projectPkg.name)
+                "a project slug that differs from the name property in your project's package.json"
+            )
+                // We load the slug from the package.json by default, but we don't want to do that
+                // unless we need to, so it is loaded conditionally in the action implementation
+                .default(undefined, "the 'name' key from the package.json")
         )
         .addOption(
             new program.Option(
@@ -171,18 +201,42 @@ const main = () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .action(({buildDirectory, message, projectSlug, target}) => {
+        .addOption(
+            new program.Option(
+                '-c, --credentialsFile <credentialsFile>',
+                'the file where your credentials are stored'
+            )
+                .default(scriptUtils.getCredentialsFile())
+                .env('PWA_KIT_CREDENTIALS_FILE')
+        )
+        .action(({buildDirectory, message, projectSlug, target, credentialsFile}) => {
             // Set the deployment target env var, this is required to ensure we
             // get the correct configuration object.
             process.env.DEPLOY_TARGET = target
 
             const mobify = getConfig() || {}
 
+            if (!projectSlug) {
+                try {
+                    // Using the full path isn't strictly necessary, but results in clearer errors
+                    const projectPkg = p.join(process.cwd(), 'package.json')
+                    const {name} = fse.readJsonSync(projectPkg)
+                    if (!name) throw new Error(`Missing "name" field in ${projectPkg}`)
+                    projectSlug = name
+                } catch (err) {
+                    throw new Error(
+                        `Could not detect project slug from "name" field in package.json: ${err.message}`
+                    )
+                }
+            }
+
             const options = {
                 buildDirectory,
+                // Avoid setting message if it's blank, so that it doesn't override the default
                 ...(message ? {message} : undefined),
                 projectSlug,
                 target,
+                credentialsFile,
                 // Note: Cloud expects snake_case, but package.json uses camelCase.
                 ssr_parameters: mobify.ssrParameters,
                 ssr_only: mobify.ssrOnly,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,7 +7,7 @@
 import React, {useState} from 'react'
 import {Button, useDisclosure} from '@chakra-ui/react'
 import useBasket from '../../../../commerce-api/hooks/useBasket'
-import {useIntl} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
 import ProductViewModal from '../../../../components/product-view-modal'
 import {useToast} from '../../../../hooks/use-toast'
@@ -63,7 +63,10 @@ const WishlistPrimaryAction = () => {
             {isMasterProduct ? (
                 <>
                     <Button w={'full'} variant={'solid'} onClick={onOpen}>
-                        Select Options
+                        <FormattedMessage
+                            defaultMessage="Select Options"
+                            id="wishlist_primary_action.button.select_options"
+                        />
                     </Button>
                     {isOpen && (
                         <ProductViewModal
@@ -82,7 +85,10 @@ const WishlistPrimaryAction = () => {
                     w={'full'}
                     isLoading={isLoading}
                 >
-                    Add To Cart
+                    <FormattedMessage
+                        defaultMessage="Add to Cart"
+                        id="wishlist_primary_action.button.add_to_cart"
+                    />
                 </Button>
             )}
         </>

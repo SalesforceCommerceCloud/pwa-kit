@@ -19,7 +19,7 @@ const MOCK_PRODUCT = {
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
                     link:
-                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
+                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 },
                 {
@@ -27,7 +27,7 @@ const MOCK_PRODUCT = {
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
                     link:
-                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
+                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 }
             ],
@@ -50,7 +50,7 @@ const MOCK_PRODUCT = {
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
                     link:
-                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
+                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 },
                 {
@@ -58,7 +58,7 @@ const MOCK_PRODUCT = {
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
                     link:
-                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
+                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 }
             ],
@@ -81,7 +81,7 @@ const MOCK_PRODUCT = {
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
                     link:
-                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
+                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 },
                 {
@@ -89,7 +89,7 @@ const MOCK_PRODUCT = {
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
                     link:
-                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
+                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 }
             ],
@@ -112,7 +112,7 @@ const MOCK_PRODUCT = {
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
                     link:
-                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
+                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 }
             ],

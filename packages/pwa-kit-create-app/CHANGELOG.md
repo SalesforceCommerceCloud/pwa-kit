@@ -1,4 +1,16 @@
+## v2.3.0 (Oct 27, 2022)
+- Fix generated projects missing required fields in the `manifest.json` file. [#729](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/729)
+- Update ODS instance URL for the `retail-react-app-demo` preset. [#799](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/799)
+
+## v2.2.0 (Aug 25, 2022)
+
+## v2.1.0 (Jul 05, 2022)
+- Throw error if the output directory exists [#627](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/627)
+
 ## v2.0.0 (May 16, 2022)
+-   Pin versions of pwa-kit-* packages [#577](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/577)
+-   Add typescript-minimal and typescript-minimal-test-project presets [#574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/574)
+-   Drop node 12 support for [#589](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/589)
 -   Fix generator log [#571](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/571)
 -   Fix incorrect site related values when generating without use of a preset [#470](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/470)
 -   Support Multi-site implementation using dynamic config [#469](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/469)

@@ -1,13 +1,14 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
+import {useLocation} from 'react-router-dom'
 
 // Components
 import {
@@ -33,6 +34,9 @@ import ProductScroller from '../../components/product-scroller'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from './data'
 
+//Hooks
+import useEinstein from '../../commerce-api/hooks/useEinstein'
+
 // Constants
 import {
     MAX_CACHE_AGE,
@@ -48,6 +52,13 @@ import {
  */
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
+    const einstein = useEinstein()
+    const {pathname} = useLocation()
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        einstein.sendViewPage(pathname)
+    }, [])
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -242,14 +253,14 @@ const Home = ({productSearchResult, isLoading}) => {
                         <>
                             {intl.formatMessage({
                                 defaultMessage: 'Contact our support staff.',
-                                id: 'home.description.contact_our_staff'
+                                id: 'home.description.here_to_help'
                             })}
                         </>
                         <br />
                         <>
                             {intl.formatMessage({
                                 defaultMessage: 'They will get you to the right place.',
-                                id: 'home.description.get_you_to_the_right_place'
+                                id: 'home.description.here_to_help_line_2'
                             })}
                         </>
                     </>

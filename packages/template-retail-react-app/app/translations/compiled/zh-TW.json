@@ -200,7 +200,7 @@
   "account_order_history.label.shipped_to": [
     {
       "type": 0,
-      "value": "已出貨至："
+      "value": "出貨至："
     },
     {
       "type": 1,
@@ -421,44 +421,6 @@
       "value": "新增付款方式"
     }
   ],
-  "cart.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "件商品"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "件商品"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "已新增至願望清單"
-    }
-  ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
@@ -510,7 +472,7 @@
   "cart_secondary_button_group.link_learn_more": [
     {
       "type": 0,
-      "value": "進一步瞭解"
+      "value": "瞭解更多"
     }
   ],
   "cart_skeleton.heading.order_summary": [
@@ -589,6 +551,12 @@
     {
       "type": 0,
       "value": "送出訂單"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "結帳時發生意外錯誤。"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -804,7 +772,7 @@
   "checkout_footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
+      "value": "Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
     }
   ],
   "checkout_header.link.cart": [
@@ -966,23 +934,13 @@
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "此 "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
+      "value": "此 3 位數代碼可在您卡片的背面找到。"
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
     {
       "type": 0,
-      "value": " 位數代碼可在您卡片的"
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": "找到。"
+      "value": "此 4 位數代碼可在您卡片的正面找到。"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1266,7 +1224,7 @@
   "footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
+      "value": "Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
     }
   ],
   "footer.subscribe.button.sign_up": [
@@ -1333,6 +1291,56 @@
     {
       "type": 0,
       "value": "發生錯誤。請再試一次。"
+    }
+  ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "件商品"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "件商品"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "已新增至願望清單"
+    }
+  ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "已從願望清單移除商品"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "檢視"
     }
   ],
   "header.button.assistive_msg.logo": [
@@ -1412,7 +1420,7 @@
     },
     {
       "type": 0,
-      "value": "如何取代。"
+      "value": "來瞭解如何取代。"
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1430,7 +1438,7 @@
   "home.features.description.einstein_recommendations": [
     {
       "type": 0,
-      "value": "透過產品推薦，向每位購物者傳遞下一個最佳產品或優惠 (next best product or offer)。"
+      "value": "透過產品推薦，向每位購物者傳遞下一個最佳產品或優惠。"
     }
   ],
   "home.features.description.my_account": [
@@ -1466,7 +1474,7 @@
   "home.features.heading.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Einstein Recommendations"
+      "value": "Einstein 推薦"
     }
   ],
   "home.features.heading.my_account": [
@@ -1478,7 +1486,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Shopper Login and API Access Service"
+      "value": "Shopper Login and API Access Service (SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1544,7 +1552,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "React PWA 範例零售商店"
+      "value": "零售型 React PWA Starter Store"
     }
   ],
   "item_attributes.label.promotions": [
@@ -1567,6 +1575,12 @@
     {
       "type": 0,
       "value": "特價"
+    }
+  ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "請在上方選擇所有選項"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -1782,7 +1796,7 @@
   "locale_text.message.ko-KR": [
     {
       "type": 0,
-      "value": "韓文 (大韓民國)"
+      "value": "韓文 (韓國)"
     }
   ],
   "locale_text.message.nl-BE": [
@@ -2065,12 +2079,12 @@
   ],
   "pagination.field.num_of_pages": [
     {
-      "type": 1,
-      "value": "numOfPages"
+      "type": 0,
+      "value": "/ "
     },
     {
-      "type": 0,
-      "value": " 頁"
+      "type": 1,
+      "value": "numOfPages"
     }
   ],
   "pagination.link.next": [
@@ -2124,7 +2138,7 @@
   "password_requirements.error.one_special_character": [
     {
       "type": 0,
-      "value": "1 個特殊字元 (例如：, S ! % #)"
+      "value": "1 個特殊字元 (例如：, $ ! % #)"
     }
   ],
   "password_requirements.error.one_uppercase_letter": [
@@ -2199,44 +2213,6 @@
       "value": "即將推出"
     }
   ],
-  "product_detail.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "件商品"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "件商品"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "已新增至願望清單"
-    }
-  ],
   "product_detail.recommended_products.title.complete_set": [
     {
       "type": 0,
@@ -2281,50 +2257,6 @@
     {
       "type": 0,
       "value": "排序方式"
-    }
-  ],
-  "product_list.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "件商品"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "件商品"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "已新增至願望清單"
-    }
-  ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "已從願望清單移除商品"
     }
   ],
   "product_list.modal.button.clear_filters": [
@@ -2463,50 +2395,6 @@
     {
       "type": 0,
       "value": "最近搜尋"
-    }
-  ],
-  "recommended_products.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "件商品"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "件商品"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "已新增至願望清單"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "已從願望清單移除商品"
     }
   ],
   "register_form.action.sign_in": [
@@ -3247,6 +3135,18 @@
     {
       "type": 0,
       "value": "新密碼"
+    }
+  ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "新增至購物車"
+    }
+  ],
+  "wishlist_primary_action.button.select_options": [
+    {
+      "type": 0,
+      "value": "選擇選項"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [

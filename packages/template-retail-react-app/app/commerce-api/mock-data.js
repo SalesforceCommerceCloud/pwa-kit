@@ -134,7 +134,7 @@ export const ocapiBasketWithItem = {
     notes: {
         _type: 'simple_link',
         link:
-            'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/baskets/6d0ef818e2b431645b844e6ac2/notes'
+            'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/baskets/6d0ef818e2b431645b844e6ac2/notes'
     },
     order_total: null,
     product_items: [
@@ -268,7 +268,7 @@ export const ocapiBasketWithPaymentInstrumentAndBillingAddress = {
     notes: {
         _type: 'simple_link',
         link:
-            'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/baskets/6d0ef818e2b431645b844e6ac2/notes'
+            'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/baskets/6d0ef818e2b431645b844e6ac2/notes'
     },
     order_total: null,
     payment_instruments: [
@@ -400,7 +400,7 @@ export const mockShippingMethods = {
                 {
                     callout_msg: 'Free Shipping Amount Above 150',
                     link:
-                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/3184d71eea54c9d27e88dc41ca',
+                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/3184d71eea54c9d27e88dc41ca',
                     promotion_id: 'FreeShippingAmountAbove150',
                     promotion_name: 'Free Shipping Amount Above 150'
                 }
@@ -744,7 +744,7 @@ export const productsResponse = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         },
                         {
@@ -752,7 +752,7 @@ export const productsResponse = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         }
                     ],
@@ -775,7 +775,7 @@ export const productsResponse = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         },
                         {
@@ -783,7 +783,7 @@ export const productsResponse = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         }
                     ],
@@ -806,7 +806,7 @@ export const productsResponse = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         },
                         {
@@ -814,7 +814,7 @@ export const productsResponse = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         }
                     ],
@@ -837,7 +837,7 @@ export const productsResponse = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         }
                     ],
@@ -1773,7 +1773,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6dc64ae1/images/large/PG.10201818.JJ1ANXX.PZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6dc64ae1/images/large/PG.10201818.JJ1ANXX.PZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6dc64ae1/images/large/PG.10201818.JJ1ANXX.PZ.jpg',
                             title: 'Pleated Bib Long Sleeve Shirt, Silver Grey'
                         },
                         {
@@ -1781,7 +1781,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6c256020/images/large/PG.10201818.JJ1ANXX.BZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6c256020/images/large/PG.10201818.JJ1ANXX.BZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6c256020/images/large/PG.10201818.JJ1ANXX.BZ.jpg',
                             title: 'Pleated Bib Long Sleeve Shirt, Silver Grey'
                         }
                     ],
@@ -1804,7 +1804,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwad2ef842/images/medium/PG.10201818.JJ1ANXX.PZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwad2ef842/images/medium/PG.10201818.JJ1ANXX.PZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwad2ef842/images/medium/PG.10201818.JJ1ANXX.PZ.jpg',
                             title: 'Pleated Bib Long Sleeve Shirt, Silver Grey'
                         },
                         {
@@ -1812,7 +1812,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwca64fee1/images/medium/PG.10201818.JJ1ANXX.BZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwca64fee1/images/medium/PG.10201818.JJ1ANXX.BZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwca64fee1/images/medium/PG.10201818.JJ1ANXX.BZ.jpg',
                             title: 'Pleated Bib Long Sleeve Shirt, Silver Grey'
                         }
                     ],
@@ -1835,7 +1835,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2ecc9f4b/images/small/PG.10201818.JJ1ANXX.PZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2ecc9f4b/images/small/PG.10201818.JJ1ANXX.PZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2ecc9f4b/images/small/PG.10201818.JJ1ANXX.PZ.jpg',
                             title: 'Pleated Bib Long Sleeve Shirt, Silver Grey'
                         },
                         {
@@ -1843,7 +1843,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc4b732e9/images/small/PG.10201818.JJ1ANXX.BZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc4b732e9/images/small/PG.10201818.JJ1ANXX.BZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc4b732e9/images/small/PG.10201818.JJ1ANXX.BZ.jpg',
                             title: 'Pleated Bib Long Sleeve Shirt, Silver Grey'
                         }
                     ],
@@ -1866,7 +1866,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc39b144c/images/swatch/PG.10201818.JJ1ANXX.CP.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc39b144c/images/swatch/PG.10201818.JJ1ANXX.CP.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc39b144c/images/swatch/PG.10201818.JJ1ANXX.CP.jpg',
                             title: 'Pleated Bib Long Sleeve Shirt, Silver Grey'
                         }
                     ],
@@ -2019,7 +2019,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         },
                         {
@@ -2027,7 +2027,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         }
                     ],
@@ -2050,7 +2050,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         },
                         {
@@ -2058,7 +2058,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         }
                     ],
@@ -2081,7 +2081,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         },
                         {
@@ -2089,7 +2089,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         }
                     ],
@@ -2112,7 +2112,7 @@ export const mockOrderProducts = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
                             title: 'Long Sleeve Crew Neck, Fire Red'
                         }
                     ],
@@ -2628,7 +2628,7 @@ export const mockedCustomerProductListsDetails = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-electronics-m-catalog/default/dw26470cbd/images/large/ipod-nano-green.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw26470cbd/images/large/ipod-nano-green.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw26470cbd/images/large/ipod-nano-green.jpg',
                             title: 'Apple iPod Nano, Green'
                         }
                     ],
@@ -2651,7 +2651,7 @@ export const mockedCustomerProductListsDetails = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-electronics-m-catalog/default/dw610652b7/images/medium/ipod-nano-green.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw610652b7/images/medium/ipod-nano-green.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw610652b7/images/medium/ipod-nano-green.jpg',
                             title: 'Apple iPod Nano, Green'
                         }
                     ],
@@ -2674,7 +2674,7 @@ export const mockedCustomerProductListsDetails = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-electronics-m-catalog/default/dw09f0fd49/images/small/ipod-nano-green.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw09f0fd49/images/small/ipod-nano-green.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw09f0fd49/images/small/ipod-nano-green.jpg',
                             title: 'Apple iPod Nano, Green'
                         }
                     ],
@@ -2697,7 +2697,7 @@ export const mockedCustomerProductListsDetails = {
                             disBaseLink:
                                 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-electronics-m-catalog/default/dw849cd37f/images/swatch/green.jpg',
                             link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw849cd37f/images/swatch/green.jpg',
+                                'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw849cd37f/images/swatch/green.jpg',
                             title: 'Apple iPod Nano, Green'
                         }
                     ],
@@ -3017,7 +3017,7 @@ export const mockCategories = {
     'mens-clothing-jackets': {
         id: 'mens-clothing-suits',
         image:
-            'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg',
+            'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg',
         name: 'Suits',
         pageDescription:
             "Shop Men's suits for business or pleasure. Enjoy from a variety of different styles and cuts at Commerce Cloud.",
@@ -3040,7 +3040,7 @@ export const mockCategories = {
         c_enableCompare: false,
         c_showInMenu: true,
         c_slotBannerImage:
-            'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw2ec92167/images/slot/landing/cat-landing-slotbottom-mens-suits.jpg'
+            'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw2ec92167/images/slot/landing/cat-landing-slotbottom-mens-suits.jpg'
     }
 }
 
@@ -3055,7 +3055,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg',
                 title: 'Slim Skirt With Back Kick Pleats, '
             },
             orderable: true,
@@ -3154,7 +3154,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg',
                 title: 'Pull On Neutral Pant, '
             },
             orderable: true,
@@ -3237,7 +3237,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwab413b1b/images/large/PG.10243116.JJ2DGXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwab413b1b/images/large/PG.10243116.JJ2DGXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwab413b1b/images/large/PG.10243116.JJ2DGXX.PZ.jpg',
                 title: 'Washable Linen Slim Pant, '
             },
             orderable: true,
@@ -3336,7 +3336,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbce5c490/images/large/PG.10232332.JJ169XX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbce5c490/images/large/PG.10232332.JJ169XX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbce5c490/images/large/PG.10232332.JJ169XX.PZ.jpg',
                 title: 'Classic Crop Pant, '
             },
             orderable: true,
@@ -3435,7 +3435,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwea207073/images/large/PG.10225656.JJ3WDXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwea207073/images/large/PG.10225656.JJ3WDXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwea207073/images/large/PG.10225656.JJ3WDXX.PZ.jpg',
                 title: 'Slim Floral Skirt, '
             },
             orderable: true,
@@ -3534,7 +3534,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg',
                 title: 'Trouser Leg Pant, '
             },
             orderable: true,
@@ -3633,7 +3633,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw0ecd95d1/images/large/PG.10244521.JJ3WDXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw0ecd95d1/images/large/PG.10244521.JJ3WDXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw0ecd95d1/images/large/PG.10244521.JJ3WDXX.PZ.jpg',
                 title: 'Tribal Inspired Slim Skirt, '
             },
             orderable: true,
@@ -3716,7 +3716,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4eee8da9/images/large/PG.10228765.JJ169XX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4eee8da9/images/large/PG.10228765.JJ169XX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4eee8da9/images/large/PG.10228765.JJ169XX.PZ.jpg',
                 title: 'Relaxed Fit Pant, '
             },
             orderable: true,
@@ -3799,7 +3799,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb4de158c/images/large/PG.60113984.JJ169XX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb4de158c/images/large/PG.60113984.JJ169XX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb4de158c/images/large/PG.60113984.JJ169XX.PZ.jpg',
                 title: '5 Pocket Cuffed Capri, '
             },
             orderable: true,
@@ -3898,7 +3898,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf573a20b/images/large/PG.10255878.JJ3WCXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf573a20b/images/large/PG.10255878.JJ3WCXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf573a20b/images/large/PG.10255878.JJ3WCXX.PZ.jpg',
                 title: 'Pleated Skirt., '
             },
             orderable: true,
@@ -3973,7 +3973,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d0a44b0/images/large/PG.10233641.JJ3WRXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d0a44b0/images/large/PG.10233641.JJ3WRXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d0a44b0/images/large/PG.10233641.JJ3WRXX.PZ.jpg',
                 title: 'Classic Glen Plaid Pant, '
             },
             orderable: true,
@@ -4056,7 +4056,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw26c8763f/images/large/PG.10239110.JJ3WCXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw26c8763f/images/large/PG.10239110.JJ3WCXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw26c8763f/images/large/PG.10239110.JJ3WCXX.PZ.jpg',
                 title: 'Long Pleated Skirt, '
             },
             orderable: true,
@@ -4123,7 +4123,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg',
                 title: 'Pleated Skirt With Embroidery., '
             },
             orderable: true,
@@ -4222,7 +4222,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdaccb91d/images/large/PG.10246102.JJ0DDXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdaccb91d/images/large/PG.10246102.JJ0DDXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdaccb91d/images/large/PG.10246102.JJ0DDXX.PZ.jpg',
                 title: 'Straight Ankle Pant., '
             },
             orderable: true,
@@ -4321,7 +4321,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8ae5dac1/images/large/PG.10208897.JJ0QRXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8ae5dac1/images/large/PG.10208897.JJ0QRXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8ae5dac1/images/large/PG.10208897.JJ0QRXX.PZ.jpg',
                 title: 'Classic Tweed Pant, '
             },
             orderable: true,
@@ -4420,7 +4420,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa7953e0e/images/large/PG.10218193.JJ0NLE5.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa7953e0e/images/large/PG.10218193.JJ0NLE5.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa7953e0e/images/large/PG.10218193.JJ0NLE5.PZ.jpg',
                 title: 'Ribbed Pleated Skirt, '
             },
             orderable: true,
@@ -4495,7 +4495,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8641f0b8/images/large/PG.10204133.JJ0CZXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8641f0b8/images/large/PG.10204133.JJ0CZXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8641f0b8/images/large/PG.10204133.JJ0CZXX.PZ.jpg',
                 title: 'Bootleg Trouser, '
             },
             orderable: true,
@@ -4586,7 +4586,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2c21e32c/images/large/PG.10245233.JJ3WDXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2c21e32c/images/large/PG.10245233.JJ3WDXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2c21e32c/images/large/PG.10245233.JJ3WDXX.PZ.jpg',
                 title: 'Wide Leg Pant., '
             },
             orderable: true,
@@ -4685,7 +4685,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9efe5554/images/large/PG.10253481.JJ169XX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9efe5554/images/large/PG.10253481.JJ169XX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9efe5554/images/large/PG.10253481.JJ169XX.PZ.jpg',
                 title: 'Eyelet Skirt., '
             },
             orderable: true,
@@ -4784,7 +4784,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf6272a34/images/large/PG.10176157.JJ5AJXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf6272a34/images/large/PG.10176157.JJ5AJXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf6272a34/images/large/PG.10176157.JJ5AJXX.PZ.jpg',
                 title: 'Washable Wool Classic Straight Skirt , '
             },
             orderable: true,
@@ -4883,7 +4883,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9f11c8e4/images/large/PG.10224067.JJ169XX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9f11c8e4/images/large/PG.10224067.JJ169XX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9f11c8e4/images/large/PG.10224067.JJ169XX.PZ.jpg',
                 title: 'Roll Up Cargo Pant, '
             },
             orderable: true,
@@ -4982,7 +4982,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw05ea84dc/images/large/PG.10227169.JJ3WCXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw05ea84dc/images/large/PG.10227169.JJ3WCXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw05ea84dc/images/large/PG.10227169.JJ3WCXX.PZ.jpg',
                 title: 'Side Button Pleated Skirt, '
             },
             orderable: true,
@@ -5041,7 +5041,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e830b49/images/large/PG.10240166.JJ3WCXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e830b49/images/large/PG.10240166.JJ3WCXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e830b49/images/large/PG.10240166.JJ3WCXX.PZ.jpg',
                 title: 'Flat Front Pant, '
             },
             orderable: true,
@@ -5140,7 +5140,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw900cf60d/images/large/PG.10235198.JJ3WCXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw900cf60d/images/large/PG.10235198.JJ3WCXX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw900cf60d/images/large/PG.10235198.JJ3WCXX.PZ.jpg',
                 title: 'Pencil Skirt, '
             },
             orderable: true,
@@ -5239,7 +5239,7 @@ export const mockProductSearch = {
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe7549446/images/large/PG.60114143.JJ169XX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe7549446/images/large/PG.60114143.JJ169XX.PZ.jpg',
+                    'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe7549446/images/large/PG.60114143.JJ169XX.PZ.jpg',
                 title: 'Light Weight Cargo Capri (Master), '
             },
             orderable: true,

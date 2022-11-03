@@ -10,9 +10,10 @@ import {withRouter} from 'react-router-dom'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {AppErrorContext} from '../../components/app-error-boundary'
 import Throw404 from '../../components/throw-404'
-import AppConfig from '../../components/_app-config'
+import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
+import {withLegacyGetProps} from '../../components/with-legacy-get-props'
 
 const noop = () => undefined
 
@@ -54,7 +55,11 @@ const withErrorHandling = (Wrapped) => {
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
 export const routeComponent = (Wrapped, isPage, locals) => {
+    const AppConfig = getAppConfig()
     const extraArgs = AppConfig.extraGetPropsArgs(locals)
+
+    const hocs = AppConfig.getHOCsInUse()
+    const getPropsEnabled = hocs.indexOf(withLegacyGetProps) >= 0
 
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
@@ -102,6 +107,9 @@ export const routeComponent = (Wrapped, isPage, locals) => {
          * @return {Promise<Boolean>}
          */
         static async shouldGetProps(args) {
+            if (!getPropsEnabled) {
+                return false
+            }
             const defaultImpl = () => {
                 const {previousLocation, location} = args
                 return !previousLocation || previousLocation.pathname !== location.pathname
@@ -153,6 +161,9 @@ export const routeComponent = (Wrapped, isPage, locals) => {
          */
         // eslint-disable-next-line
         static getProps(args) {
+            if (!getPropsEnabled) {
+                return Promise.resolve({})
+            }
             RouteComponent._latestPropsPromise = RouteComponent.getComponent().then((component) =>
                 component.getProps ? component.getProps({...args, ...extraArgs}) : Promise.resolve()
             )
@@ -284,19 +295,6 @@ export const routeComponent = (Wrapped, isPage, locals) => {
 
             const willGetProps = await shouldGetPropsNow()
 
-            // Because `shouldGetPropsNow` is async the app is often
-            // no longer hydrating when you hit this line. That doesn't
-            // matter for initialization. For logging make it clear
-            // that we mean "the app was hydrating on this call to
-            // componentDidUpdate".
-            console.log(
-                JSON.stringify({
-                    templateName,
-                    wasHydratingOnUpdate,
-                    willGetProps
-                })
-            )
-
             if (!willGetProps) {
                 onUpdateComplete()
                 return
@@ -319,7 +317,6 @@ export const routeComponent = (Wrapped, isPage, locals) => {
                  * stores a reference to the promise that we check before we use
                  * the results from it.
                  */
-                console.log(`Calling getProps for '${templateName}'`)
                 const req = undefined
                 const res = undefined
                 const propsPromise = RouteComponent.getProps({

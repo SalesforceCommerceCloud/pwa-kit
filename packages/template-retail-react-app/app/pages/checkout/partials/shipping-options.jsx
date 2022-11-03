@@ -18,6 +18,7 @@ export default function ShippingOptions() {
     const {
         basket,
         step,
+        checkoutSteps,
         shippingMethods,
         getShippingMethods,
         setCheckoutStep,
@@ -35,7 +36,7 @@ export default function ShippingOptions() {
     })
 
     useEffect(() => {
-        if (step === 2) {
+        if (step === checkoutSteps.Shipping_Options) {
             getShippingMethods()
         }
     }, [step])
@@ -74,10 +75,10 @@ export default function ShippingOptions() {
                 defaultMessage: 'Shipping & Gift Options',
                 id: 'shipping_options.title.shipping_gift_options'
             })}
-            editing={step === 2}
+            editing={step === checkoutSteps.Shipping_Options}
             isLoading={form.formState.isSubmitting}
             disabled={selectedShippingMethod == null || !selectedShippingAddress}
-            onEdit={() => setCheckoutStep(2)}
+            onEdit={() => setCheckoutStep(checkoutSteps.Shipping_Options)}
         >
             <ToggleCardEdit>
                 <form

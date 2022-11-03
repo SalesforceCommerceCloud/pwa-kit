@@ -47,7 +47,7 @@ export default {
     notes: {
         _type: 'simple_link',
         link:
-            'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/baskets/9303c9065ccc5fa2c7fca1d4b4/notes'
+            'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/baskets/9303c9065ccc5fa2c7fca1d4b4/notes'
     },
     order_total: 629.98,
     product_items: [
@@ -96,7 +96,7 @@ export default {
                         _type: 'shipping_promotion',
                         callout_msg: 'Free Shipping Amount Above 150',
                         link:
-                            'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/3184d71eea54c9d27e88dc41ca',
+                            'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/3184d71eea54c9d27e88dc41ca',
                         promotion_id: 'FreeShippingAmountAbove150',
                         promotion_name: 'Free Shipping Amount Above 150'
                     }
@@ -130,7 +130,7 @@ export default {
                     price_adjustment_id: '2a520873159147eb9759d2cc6f',
                     promotion_id: 'FreeShippingAmountAbove150',
                     promotion_link:
-                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/FreeShippingAmountAbove150'
+                        'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/FreeShippingAmountAbove150'
                 }
             ],
             price_after_item_discount: 0.0,

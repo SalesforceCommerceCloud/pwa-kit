@@ -258,19 +258,19 @@
   "account_wishlist.description.continue_shopping": [
     {
       "type": 0,
-      "value": "Continue comprando e adicione itens a sua wishlist."
+      "value": "Continue comprando e adicionando itens na sua lista de desejos."
     }
   ],
   "account_wishlist.heading.no_wishlist": [
     {
       "type": 0,
-      "value": "Não há itens na wishlist"
+      "value": "Não há itens na lista de desejos"
     }
   ],
   "account_wishlist.title.wishlist": [
     {
       "type": 0,
-      "value": "Wishlist/Lista de desejos"
+      "value": "Lista de desejos"
     }
   ],
   "action_card.action.edit": [
@@ -425,44 +425,6 @@
       "value": "Adicionar novo método de pagamento"
     }
   ],
-  "cart.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "itens"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " adicionado(s) à wishlist"
-    }
-  ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
@@ -490,7 +452,7 @@
   "cart_secondary_button_group.action.added_to_wishlist": [
     {
       "type": 0,
-      "value": "Adicionar à wishlist"
+      "value": "Adicionar à lista de desejos"
     }
   ],
   "cart_secondary_button_group.action.edit": [
@@ -593,6 +555,12 @@
     {
       "type": 0,
       "value": "Fazer pedido"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "Ocorreu um erro inesperado durante o checkout."
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -812,7 +780,7 @@
   "checkout_footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Está é somente uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
+      "value": "Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
     }
   ],
   "checkout_header.link.cart": [
@@ -884,7 +852,7 @@
   "confirmation_modal.remove_cart_item.action.no": [
     {
       "type": 0,
-      "value": "Não, manter o item"
+      "value": "Não, manter item"
     }
   ],
   "confirmation_modal.remove_cart_item.action.yes": [
@@ -908,7 +876,7 @@
   "confirmation_modal.remove_wishlist_item.action.no": [
     {
       "type": 0,
-      "value": "Não, manter o item"
+      "value": "Não, manter item"
     }
   ],
   "confirmation_modal.remove_wishlist_item.action.yes": [
@@ -920,7 +888,7 @@
   "confirmation_modal.remove_wishlist_item.message.sure_to_remove": [
     {
       "type": 0,
-      "value": "Tem certeza de que deseja remover este item da wishlist?"
+      "value": "Tem certeza de que deseja remover este item da lista de desejos?"
     }
   ],
   "confirmation_modal.remove_wishlist_item.title.confirm_remove": [
@@ -944,7 +912,7 @@
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
-      "value": "Checkout como convidado"
+      "value": "Pagar como convidado"
     }
   ],
   "contact_info.button.login": [
@@ -974,23 +942,13 @@
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "Este código de "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
+      "value": "Este código de 3 dígitos pode ser encontrado no verso do seu cartão."
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
     {
       "type": 0,
-      "value": " dígitos pode ser encontrado no "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " de seu cartão."
+      "value": "Este código de 4 dígitos pode ser encontrado na frente do seu cartão."
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1134,7 +1092,7 @@
   "empty_search_results.info.cant_find_anything_for_category": [
     {
       "type": 0,
-      "value": "Não encontramos resultados para \""
+      "value": "Não encontramos resultados para "
     },
     {
       "type": 1,
@@ -1142,7 +1100,7 @@
     },
     {
       "type": 0,
-      "value": "\". Tente pesquisar um produto ou "
+      "value": ". Tente pesquisar um produto ou "
     },
     {
       "type": 1,
@@ -1274,7 +1232,7 @@
   "footer.message.copyright": [
     {
       "type": 0,
-      "value": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Está é somente uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
+      "value": "Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
     }
   ],
   "footer.subscribe.button.sign_up": [
@@ -1334,13 +1292,63 @@
   "global.account.link.wishlist": [
     {
       "type": 0,
-      "value": "Wishlist/Lista de desejos"
+      "value": "Lista de desejos"
     }
   ],
   "global.error.something_went_wrong": [
     {
       "type": 0,
       "value": "Ocorreu um erro. Tente novamente."
+    }
+  ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "itens"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " adicionado(s) à lista de desejos"
+    }
+  ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Item removido da lista de desejos"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "Ver"
     }
   ],
   "header.button.assistive_msg.logo": [
@@ -1370,7 +1378,7 @@
   "header.button.assistive_msg.wishlist": [
     {
       "type": 0,
-      "value": "Wishlist/Lista de desejos"
+      "value": "Lista de desejos"
     }
   ],
   "header.field.placeholder.search_for_products": [
@@ -1400,13 +1408,13 @@
   "home.description.here_to_help": [
     {
       "type": 0,
-      "value": "Entre em contato com nossa equipe de suporte, e ela levará você"
+      "value": "Entre em contato com nossa equipe de suporte."
     }
   ],
   "home.description.here_to_help_line_2": [
     {
       "type": 0,
-      "value": "ao lugar correto."
+      "value": "Eles vão levá-lo ao lugar certo."
     }
   ],
   "home.description.shop_products": [
@@ -1456,7 +1464,7 @@
   "home.features.description.wishlist": [
     {
       "type": 0,
-      "value": "Os compradores registrados podem adicionar itens de produtos às wishlists para comprá-los mais tarde."
+      "value": "Os compradores registrados podem adicionar itens de produtos à lista de desejos para comprá-los mais tarde."
     }
   ],
   "home.features.heading.cart_checkout": [
@@ -1468,13 +1476,13 @@
   "home.features.heading.components": [
     {
       "type": 0,
-      "value": "Kit de componentes e design"
+      "value": "Componentes e Kit de design"
     }
   ],
   "home.features.heading.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Einstein Recommendations"
+      "value": "Recomendações do Einstein"
     }
   ],
   "home.features.heading.my_account": [
@@ -1486,13 +1494,13 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Logon do comprador e API Access Service"
+      "value": "Shopper Login and API Access Service (SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
     {
       "type": 0,
-      "value": "Wishlist/Lista de desejos"
+      "value": "Lista de desejos"
     }
   ],
   "home.heading.features": [
@@ -1504,13 +1512,13 @@
   "home.heading.here_to_help": [
     {
       "type": 0,
-      "value": "Estamos aqui para ajudar você"
+      "value": "Estamos aqui para ajudar"
     }
   ],
   "home.heading.shop_products": [
     {
       "type": 0,
-      "value": "Ver produtos"
+      "value": "Comprar produtos"
     }
   ],
   "home.hero_features.link.design_kit": [
@@ -1552,7 +1560,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "O React PWA Starter Store for Retail"
+      "value": "React PWA Starter Store para varejo"
     }
   ],
   "item_attributes.label.promotions": [
@@ -1575,6 +1583,12 @@
     {
       "type": 0,
       "value": "Promoção"
+    }
+  ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "Selecione todas as opções acima"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -2114,7 +2128,7 @@
   "password_requirements.error.eight_letter_minimum": [
     {
       "type": 0,
-      "value": "8 caracteres, no mínimo"
+      "value": "Mínimo de 8 caracteres"
     }
   ],
   "password_requirements.error.one_lowercase_letter": [
@@ -2132,7 +2146,7 @@
   "password_requirements.error.one_special_character": [
     {
       "type": 0,
-      "value": "1 caractere especial (exemplo: , S ! % #)"
+      "value": "1 caractere especial (exemplo: , $ ! % #)"
     }
   ],
   "password_requirements.error.one_uppercase_letter": [
@@ -2174,7 +2188,7 @@
   "price_per_item.label.each": [
     {
       "type": 0,
-      "value": "ea"
+      "value": "cada"
     }
   ],
   "product_detail.accordion.button.product_detail": [
@@ -2205,44 +2219,6 @@
     {
       "type": 0,
       "value": "Em breve"
-    }
-  ],
-  "product_detail.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "itens"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " adicionado(s) à wishlist"
     }
   ],
   "product_detail.recommended_products.title.complete_set": [
@@ -2291,50 +2267,6 @@
       "value": "Ordenar por"
     }
   ],
-  "product_list.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "itens"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " adicionado(s) à wishlist"
-    }
-  ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Item removido da wishlist"
-    }
-  ],
   "product_list.modal.button.clear_filters": [
     {
       "type": 0,
@@ -2374,7 +2306,7 @@
   "product_tile.assistive_msg.wishlist": [
     {
       "type": 0,
-      "value": "Wishlist/Lista de desejos"
+      "value": "Lista de desejos"
     }
   ],
   "product_view.button.add_to_cart": [
@@ -2386,7 +2318,7 @@
   "product_view.button.add_to_wishlist": [
     {
       "type": 0,
-      "value": "Adicionar à wishlist"
+      "value": "Adicionar à lista de desejos"
     }
   ],
   "product_view.button.update": [
@@ -2471,50 +2403,6 @@
     {
       "type": 0,
       "value": "Pesquisas recentes"
-    }
-  ],
-  "recommended_products.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "itens"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " adicionado(s) à wishlist"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Item removido da wishlist"
     }
   ],
   "register_form.action.sign_in": [
@@ -2658,7 +2546,7 @@
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
-      "value": "Ir ao Método de entrega"
+      "value": "Ir ao método de entrega"
     }
   ],
   "shipping_address.title.shipping_address": [
@@ -2670,7 +2558,7 @@
   "shipping_address_edit_form.button.save_and_continue": [
     {
       "type": 0,
-      "value": "Salvar e ir ao Método de entrega"
+      "value": "Salvar e ir ao método de entrega"
     }
   ],
   "shipping_address_form.heading.edit_address": [
@@ -2980,7 +2868,7 @@
   "use_credit_card_fields.label.name": [
     {
       "type": 0,
-      "value": "Nome no carrinho"
+      "value": "Nome no cartão"
     }
   ],
   "use_credit_card_fields.label.security_code": [
@@ -3261,6 +3149,18 @@
       "value": "Nova senha"
     }
   ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "Adicionar ao carrinho"
+    }
+  ],
+  "wishlist_primary_action.button.select_options": [
+    {
+      "type": 0,
+      "value": "Selecionar Opções"
+    }
+  ],
   "wishlist_primary_action.info.added_to_cart": [
     {
       "type": 1,
@@ -3308,7 +3208,7 @@
   "wishlist_secondary_button_group.info.item_removed": [
     {
       "type": 0,
-      "value": "Item removido da wishlist"
+      "value": "Item removido da lista de desejos"
     }
   ],
   "with_registration.info.please_sign_in": [
