@@ -81,10 +81,10 @@ const tests = [
 
                     // Mocking the server request
                     nock('http://localhost:3000')
-                        .post((uri: string | string[]) => {
+                        .patch((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(500, {})
+                        .reply(200, {})
 
                     const button = screen.getByRole('button', {
                         name: /update customer/i
