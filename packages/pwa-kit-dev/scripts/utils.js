@@ -295,7 +295,7 @@ Utils.parseLog = (log) => {
     let requestId, shortRequestId, message, level
 
     if (
-        parts.length > 3 &&
+        parts.length >= 3 &&
         validator.isISO8601(parts[0]) &&
         validator.isUUID(parts[1]) &&
         validator.isAlpha(parts[2])

@@ -316,6 +316,14 @@ test('parseLog parses application and platform logs correctly', () => {
                 message: 'Response status: 500\tuh oh!',
                 shortRequestId
             }
+        },
+        {
+            log: `2022-10-31T22:00:00.000Z\t${requestId}\tINFO\t`,
+            expected: {
+                level: 'INFO',
+                message: '',
+                shortRequestId
+            }
         }
     ]
     cases.forEach(({log, expected}) => {

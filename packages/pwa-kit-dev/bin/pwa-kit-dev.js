@@ -18,7 +18,7 @@ const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
 const colors = {
-    info: 'cyan',
+    info: 'green',
     warn: 'yellow',
     error: 'red'
 }
@@ -375,9 +375,7 @@ const main = () => {
                     console.log(
                         chalk.green(new Date(log.timestamp).toISOString()),
                         chalk.cyan(shortRequestId),
-                        ['WARN', 'ERROR'].includes(level)
-                            ? chalk[colors[level.toLowerCase()]].bold(paddedLevel)
-                            : paddedLevel,
+                        chalk[colors[level.toLowerCase()] || 'green'].bold(paddedLevel),
                         message
                     )
                 })
