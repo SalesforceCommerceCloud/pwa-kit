@@ -54,7 +54,7 @@
                     "path": "api"
                 },
                 {
-                    "host": "zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com",
+                    "host": "https://zzrf-001.dx.commercecloud.salesforce.com",
                     "path": "ocapi"
                 },
                 {
