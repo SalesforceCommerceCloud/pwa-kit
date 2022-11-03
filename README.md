@@ -12,7 +12,7 @@ up the front-end of the Mobify platform. These include:
 ## Requirements
 
 ```
-Node ^10.17.0 or ^12.x
+Node ^14
 npm ^5.7.1 or ^6.11.3
 ```
 
