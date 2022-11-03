@@ -34,7 +34,6 @@
     "lint:js": "eslint \"**/*.{js,jsx}\"",
     "lint:sass": "sass-lint -c node_modules/mobify-code-style/css/.sass-lint.yml 'src/**/*.scss' -v",
     "test": "cross-env NODE_ENV=test jest --runInBand --coverage",
-    "test:integration": "cross-env TEST_TYPE=integration npm run test",
     "test:watch": "npm test -- --watch",
     "test:inspect": "node --inspect-brk jest --runInBand",
     "version": "node ./scripts/version.js",
