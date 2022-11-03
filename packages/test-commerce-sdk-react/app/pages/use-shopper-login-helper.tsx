@@ -16,7 +16,7 @@ const UseShopperLoginHelper = () => {
 
     //logout before logging guest user in
     const loginGuestUserFlow = async () => {
-        const data = await logout.mutateAsync()
+        await logout.mutateAsync()
         loginGuestUser.mutate()
     }
 
