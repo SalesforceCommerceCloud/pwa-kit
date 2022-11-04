@@ -81,7 +81,7 @@
     "minimatch": "3.0.4",
     "mkdirp": "0.5.2",
     "morgan": "1.9.1",
-    "postcss-loader": "3.0.0",
+    "postcss-loader": "4.0.0",
     "prompt": "1.1.0",
     "prop-types": "^15.6.0",
     "query-string": "4.3.2",
