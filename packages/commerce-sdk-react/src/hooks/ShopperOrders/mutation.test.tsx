@@ -13,7 +13,6 @@ import {useQueryClient} from '@tanstack/react-query'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {ShopperBasketsMutations, useShopperBasketsMutation} from '../ShopperBaskets'
 import {ShopperOrdersMutations, useShopperOrdersMutation} from './mutation'
-import { useCustomerBaskets } from '../ShopperCustomers'
 import nock from 'nock'
 
 const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
@@ -36,7 +35,7 @@ const OrderMutationComponent = () => {
         createOrder.mutate({
             body: {basketId: BASKET_ID}
         })
-}
+    }
 
     return (
         <>
@@ -46,13 +45,7 @@ const OrderMutationComponent = () => {
                 <div>Logged in as {loginRegisteredUser?.variables?.username}</div>
             )}
             <div>
-                <button
-                    onClick={() =>
-                        createOrderFlow()
-                    }
-                >
-                    Create Order
-                </button>
+                <button onClick={() => createOrderFlow()}>Create Order</button>
 
                 {createOrder.error?.message && (
                     <p style={{color: 'red'}}>Error: {createOrder.error?.message}</p>
@@ -103,7 +96,6 @@ const tests = [
                                 email: 'alex@test.com'
                             }
                         })
-
 
                     const button = screen.getByRole('button', {
                         name: /create order/i
