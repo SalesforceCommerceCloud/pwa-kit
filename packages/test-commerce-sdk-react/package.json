@@ -31,7 +31,8 @@
     "start:inspect": "npm run start -- --inspect",
     "test": "pwa-kit-dev test",
     "build": "pwa-kit-dev build",
-    "push": "npm run build && pwa-kit-dev push"
+    "push": "npm run build && pwa-kit-dev push",
+    "tail-logs": "pwa-kit-dev tail-logs"
   },
   "mobify": {
     "ssrEnabled": true,
