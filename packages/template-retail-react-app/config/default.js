@@ -54,7 +54,7 @@ module.exports = {
                 path: 'api'
             },
             {
-                host: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'zzrf-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             },
             {
