@@ -16,13 +16,319 @@ const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../..
 
 const CUSTOMER_EMAIL = 'kobe@test.com'
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
-const RANDOM_STR = Math.random()
-    .toString(36)
-    .slice(2, 7)
+const ADDRESS_NAME = 'TestAddress'
+const LIST_ID = 'bcd08be6f883120b4960ca8a0b'
+const ITEM_ID = '1d0eee01ead2727a43466d7481'
+const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
+const PRODUCT_ID = '25518823M'
 
-const CustomerMutationComponent = () => {
+const hooksDetails = {
+    updateCustomer: {
+        args: {
+            body: {firstName: `Kobe`},
+            parameters: {customerId: CUSTOMER_ID}
+        },
+        update: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                // @ts-ignore
+                {customerId: CUSTOMER_ID}
+            ]
+        ],
+        invalidate: [
+            // @ts-ignore
+            ['/customers', CUSTOMER_ID, '/payment-instruments'],
+            // @ts-ignore
+            ['/customers', CUSTOMER_ID, '/addresses'],
+            ['/customers', '/external-profile']
+        ]
+    },
+
+    createCustomerAddress: {
+        args: {
+            body: {addressId: `TestNewAddress`, countryCode: 'CA', lastName: 'Murphy'},
+            parameters: {customerId: CUSTOMER_ID}
+        },
+        update: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/addresses',
+                // @ts-ignore
+                {
+                    // @ts-ignore
+                    addressName: `TestNewAddress`,
+                    // @ts-ignore
+                    customerId: CUSTOMER_ID
+                }
+            ]
+        ],
+        invalidate: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                // @ts-ignore
+                {customerId: CUSTOMER_ID}
+            ]
+        ]
+    },
+
+    updateCustomerAddress: {
+        args: {
+            body: {addressId: 'TestAddress', countryCode: 'US', lastName: `Murphy`},
+            parameters: {customerId: CUSTOMER_ID, addressName: ADDRESS_NAME}
+        },
+        update: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/addresses',
+                // @ts-ignore
+                {
+                    // @ts-ignore
+                    addressName: ADDRESS_NAME,
+                    // @ts-ignore
+                    customerId: CUSTOMER_ID
+                }
+            ]
+        ],
+        invalidate: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                // @ts-ignore
+                {customerId: CUSTOMER_ID}
+            ]
+        ]
+    },
+
+    removeCustomerAddress: {
+        args: {
+            body: {},
+            parameters: {customerId: CUSTOMER_ID, addressName: `TestNewAddress`}
+        },
+        invalidate: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                // @ts-ignore
+                {customerId: CUSTOMER_ID}
+            ]
+        ],
+        remove: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/addresses',
+                // @ts-ignore
+                {
+                    // @ts-ignore
+                    addressName: `TestNewAddress`,
+                    // @ts-ignore
+                    customerId: CUSTOMER_ID
+                }
+            ]
+        ]
+    },
+
+    createCustomerProductList: {
+        args: {
+            body: {type: 'wish_list'},
+            parameters: {customerId: CUSTOMER_ID}
+        },
+        update: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/product-list',
+                // @ts-ignore
+                {customerId: CUSTOMER_ID, listId: LIST_ID}
+            ]
+        ]
+    },
+
+    createCustomerProductListItem: {
+        args: {
+            body: {priority: 2, public: true, quantity: 3, type: 'product', productId: PRODUCT_ID},
+            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID}
+        },
+        update: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/product-list',
+                // @ts-ignore
+                LIST_ID,
+                // @ts-ignore
+                {
+                    itemId: ITEM_ID
+                }
+            ]
+        ],
+        invalidate: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/product-list',
+                // @ts-ignore
+                {
+                    customerId: CUSTOMER_ID,
+                    listId: LIST_ID
+                }
+            ]
+        ]
+    },
+
+    updateCustomerProductListItem: {
+        args: {
+            body: {priority: 2, public: true, quantity: 13},
+            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
+        },
+        update: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/product-list',
+                // @ts-ignore
+                LIST_ID,
+                // @ts-ignore
+                {itemId: ITEM_ID}
+            ]
+        ],
+        invalidate: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/product-list',
+                // @ts-ignore
+                {
+                    customerId: CUSTOMER_ID,
+                    listId: LIST_ID
+                }
+            ]
+        ]
+    },
+
+    deleteCustomerProductListItem: {
+        args: {
+            body: {},
+            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
+        },
+        invalidate: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/product-list',
+                // @ts-ignore
+                {
+                    customerId: CUSTOMER_ID,
+                    listId: LIST_ID
+                }
+            ]
+        ],
+        remove: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/product-list',
+                // @ts-ignore
+                LIST_ID,
+                // @ts-ignore
+                {itemId: ITEM_ID}
+            ]
+        ]
+    },
+
+    createCustomerPaymentInstrument: {
+        args: {
+            body: {
+                bankRoutingNumber: 'AB1234',
+                giftCertificateCode: 'gift-code',
+                paymentCard: {
+                    number: '4454852652415965',
+                    validFromMonth: 12,
+                    expirationYear: 2030,
+                    expirationMonth: 12,
+                    cardType: 'Visa',
+                    holder: 'John Smith',
+                    issueNumber: '92743928',
+                    validFromYear: 22
+                },
+                paymentMethodId: 'Credit Card'
+            },
+            parameters: {customerId: CUSTOMER_ID}
+        },
+        update: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/payment-instruments',
+                // @ts-ignore
+                {
+                    customerId: CUSTOMER_ID,
+                    paymentInstrumentId: PAYMENT_INSTRUMENT_ID
+                }
+            ]
+        ],
+        invalidate: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                // @ts-ignore
+                {customerId: CUSTOMER_ID}
+            ]
+        ]
+    },
+    deleteCustomerPaymentInstrument: {
+        args: {
+            body: {},
+            parameters: {customerId: CUSTOMER_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
+        },
+        invalidate: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                // @ts-ignore
+                {customerId: CUSTOMER_ID}
+            ]
+        ],
+        remove: [
+            [
+                '/customers',
+                // @ts-ignore
+                CUSTOMER_ID,
+                '/payment-instruments',
+                // @ts-ignore
+                {
+                    customerId: CUSTOMER_ID,
+                    paymentInstrumentId: PAYMENT_INSTRUMENT_ID
+                }
+            ]
+        ]
+    }
+}
+
+// @ts-ignore
+const CustomerMutationComponent = ({action}) => {
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-    const updateCustomer = useShopperCustomersMutation(ShopperCustomersMutations.UpdateCustomer)
 
     React.useEffect(() => {
         loginRegisteredUser.mutate({
@@ -30,6 +336,12 @@ const CustomerMutationComponent = () => {
             password: 'Test1234!'
         })
     }, [])
+
+    // @ts-ignore
+    const mutationHook = useShopperCustomersMutation(action)
+
+    // @ts-ignore
+    const args = hooksDetails[action]?.args
 
     return (
         <>
@@ -39,65 +351,54 @@ const CustomerMutationComponent = () => {
                 <div>Logged in as {loginRegisteredUser?.variables?.username}</div>
             )}
             <div>
-                <button
-                    onClick={() =>
-                        updateCustomer.mutate({
-                            parameters: {customerId: CUSTOMER_ID},
-                            body: {firstName: `Kobe${RANDOM_STR}`}
-                        })
-                    }
-                >
-                    Update Customer
-                </button>
-
-                {updateCustomer.error?.message && (
-                    <p style={{color: 'red'}}>Error: {updateCustomer.error?.message}</p>
+                <button onClick={() => mutationHook.mutate(args)}>{action}</button>
+                {mutationHook.error?.message && (
+                    <p style={{color: 'red'}}>Error: {mutationHook.error?.message}</p>
                 )}
                 <hr />
-                <div>{JSON.stringify(updateCustomer)}</div>
+                {mutationHook.isSuccess && <span>isSuccess</span>}
             </div>
         </>
     )
 }
 
-const tests = [
-    {
-        hook: 'updateCustomer',
+const tests: {hook: string; cases: {name: string; assertions: () => Promise<void>}[]}[] = []
+Object.entries(hooksDetails).forEach(([key]) => {
+    tests.push({
+        hook: key,
         cases: [
             {
                 name: 'success',
                 assertions: withMocks(async () => {
-                    renderWithProviders(<CustomerMutationComponent />)
+                    renderWithProviders(<CustomerMutationComponent action={key} />)
                     await waitFor(() => screen.getByText(/kobe@test.com/))
                     await waitFor(() =>
                         screen.getByRole('button', {
-                            name: /update customer/i
+                            name: key
                         })
                     )
 
-                    // CACHE Pre-populate cache with the query keys we invalidate on success
-                    queryClient.setQueryData(
-                        ['/customers', CUSTOMER_ID, '/payment-instruments'],
-                        {}
-                    )
-                    queryClient.setQueryData(['/customers', CUSTOMER_ID, '/addresses'], {})
-                    queryClient.setQueryData(['/customers', '/external-profile'], {})
+                    // CACHE Pre-populate cache with the query keys we invalidate/update/remove on success
+                    // @ts-ignore
+                    hooksDetails[key]?.invalidate?.map((queryKey) => {
+                        queryClient.setQueryData(queryKey, {})
+                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
+                    })
 
-                    expect(
-                        queryClient.getQueryState([
-                            '/customers',
-                            CUSTOMER_ID,
-                            '/payment-instruments'
-                        ])?.isInvalidated
-                    ).toBeFalsy()
-                    expect(
-                        queryClient.getQueryState(['/customers', CUSTOMER_ID, '/addresses'])
-                            ?.isInvalidated
-                    ).toBeFalsy()
-                    expect(
-                        queryClient.getQueryState(['/customers', '/external-profile'])
-                            ?.isInvalidated
-                    ).toBeFalsy()
+                    // @ts-ignore
+                    hooksDetails[key]?.update?.map((queryKey) => {
+                        queryClient.setQueryData(queryKey, {})
+                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
+                    })
+
+                    // @ts-ignore
+                    hooksDetails[key]?.remove?.map((queryKey) => {
+                        queryClient.setQueryData(queryKey, {})
+                        expect(queryClient.getQueryState(queryKey)).toBeTruthy()
+                    })
+
+                    // TODO: Remove DEBUG console.log printing queries in cache
+                    // console.log('BEFORE cache:',queryClient.getQueryCache().getAll())
 
                     // Mocking the server request
                     nock('http://localhost:3000')
@@ -107,118 +408,75 @@ const tests = [
                         .reply(200, {
                             customerId: CUSTOMER_ID,
                             email: CUSTOMER_EMAIL,
+                            login: CUSTOMER_EMAIL,
+                            listId: LIST_ID,
+                            itemId: ITEM_ID,
+                            id: ITEM_ID
+                        })
+                    nock('http://localhost:3000')
+                        .put((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(200, {
+                            customerId: CUSTOMER_ID,
+                            email: CUSTOMER_EMAIL,
+                            login: CUSTOMER_EMAIL
+                        })
+                    nock('http://localhost:3000')
+                        .post((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(200, {
+                            customerId: CUSTOMER_ID,
+                            email: CUSTOMER_EMAIL,
+                            login: CUSTOMER_EMAIL,
+                            listId: LIST_ID,
+                            itemId: ITEM_ID,
+                            paymentInstrumentId: PAYMENT_INSTRUMENT_ID
+                        })
+                    nock('http://localhost:3000')
+                        .delete((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(200, {
+                            customerId: CUSTOMER_ID,
+                            email: CUSTOMER_EMAIL,
                             login: CUSTOMER_EMAIL
                         })
 
                     const button = screen.getByRole('button', {
-                        name: /update customer/i
+                        name: key
                     })
 
                     fireEvent.click(button)
-                    await waitFor(() => screen.getByText(/email/i))
-                    expect(screen.getByText(/email/i)).toBeInTheDocument()
-
+                    await waitFor(() => screen.getByText(/isSuccess/i))
+                    expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
+                    // screen.debug(undefined, Infinity)
                     // TODO: Remove DEBUG console.log printing queries in cache
-                    // console.log('queryClient.getQueryCache():',queryClient.getQueryCache())
+                    // console.log('AFTER cache:',queryClient.getQueryCache().getAll())
 
                     // CACHE assert updated query keys
-                    expect(
-                        queryClient.getQueryState([
-                            '/customers',
-                            CUSTOMER_ID,
-                            {customerId: CUSTOMER_ID}
-                        ])?.isInvalidated
-                    ).toBeFalsy()
-
-                    // CACHE assert invalidated query keys
-                    expect(
-                        queryClient.getQueryState([
-                            '/customers',
-                            CUSTOMER_ID,
-                            '/payment-instruments'
-                        ])?.isInvalidated
-                    ).toBeTruthy()
-                    expect(
-                        queryClient.getQueryState(['/customers', CUSTOMER_ID, '/addresses'])
-                            ?.isInvalidated
-                    ).toBeTruthy()
-                    expect(
-                        queryClient.getQueryState(['/customers', '/external-profile'])
-                            ?.isInvalidated
-                    ).toBeTruthy()
-                })
-            },
-            {
-                name: 'error',
-                assertions: withMocks(async () => {
-                    renderWithProviders(<CustomerMutationComponent />)
-                    await waitFor(() => screen.getByText(/kobe@test.com/))
-                    await waitFor(() =>
-                        screen.getByRole('button', {
-                            name: /update customer/i
-                        })
-                    )
-
-                    // CACHE Pre-populate cache with the query keys we invalidate on success
-                    queryClient.setQueryData(
-                        ['/customers', CUSTOMER_ID, '/payment-instruments'],
-                        {}
-                    )
-                    queryClient.setQueryData(['/customers', CUSTOMER_ID, '/addresses'], {})
-                    queryClient.setQueryData(['/customers', '/external-profile'], {})
-
-                    expect(
-                        queryClient.getQueryState([
-                            '/customers',
-                            CUSTOMER_ID,
-                            '/payment-instruments'
-                        ])?.isInvalidated
-                    ).toBeFalsy()
-                    expect(
-                        queryClient.getQueryState(['/customers', CUSTOMER_ID, '/addresses'])
-                            ?.isInvalidated
-                    ).toBeFalsy()
-                    expect(
-                        queryClient.getQueryState(['/customers', '/external-profile'])
-                            ?.isInvalidated
-                    ).toBeFalsy()
-
-                    // Mocking the server request
-                    nock('http://localhost:3000')
-                        .patch((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(500)
-
-                    const button = screen.getByRole('button', {
-                        name: /update customer/i
+                    // @ts-ignore
+                    hooksDetails[key]?.update?.map((queryKey) => {
+                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
                     })
 
-                    fireEvent.click(button)
-                    await waitFor(() => screen.getByText(/error/i))
-                    expect(screen.getByText(/error/i)).toBeInTheDocument()
-
                     // CACHE assert invalidated query keys
-                    expect(
-                        queryClient.getQueryState([
-                            '/customers',
-                            CUSTOMER_ID,
-                            '/payment-instruments'
-                        ])?.isInvalidated
-                    ).toBeFalsy()
-                    expect(
-                        queryClient.getQueryState(['/customers', CUSTOMER_ID, '/addresses'])
-                            ?.isInvalidated
-                    ).toBeFalsy()
-                    expect(
-                        queryClient.getQueryState(['/customers', '/external-profile'])
-                            ?.isInvalidated
-                    ).toBeFalsy()
+                    // @ts-ignore
+                    hooksDetails[key]?.invalidate?.map((queryKey) => {
+                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
+                    })
+
+                    // CACHE assert removed query keys
+                    // @ts-ignore
+                    hooksDetails[key]?.remove?.map((queryKey) => {
+                        expect(queryClient.getQueryState(queryKey)).toBeFalsy()
+                    })
                 })
             }
         ]
-    }
-]
+    })
+})
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {

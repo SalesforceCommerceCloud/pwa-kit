@@ -21,7 +21,7 @@ import {useQueryClient} from '@tanstack/react-query'
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
 const ADDRESS_NAME = 'TestAddress'
 const LIST_ID = 'bcd08be6f883120b4960ca8a0b'
-const ITEM_ID = 'c62653e8d74bb3fa77b75da278'
+const ITEM_ID = '1d0eee01ead2727a43466d7481'
 const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
 const PRODUCT_ID = '25518823M'
 const RANDOM_STR = Math.random()

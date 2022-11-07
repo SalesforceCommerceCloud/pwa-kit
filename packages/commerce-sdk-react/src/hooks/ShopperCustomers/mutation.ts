@@ -220,7 +220,7 @@ The value of this property must be valid for the type of custom attribute define
     UpdateCustomerProductListItem: 'updateCustomerProductListItem'
 } as const
 
-type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
+export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
 const isObject = (item: null) => typeof item === 'object' && !Array.isArray(item) && item !== null
 
@@ -275,7 +275,6 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         {
             onSuccess: (data, params) => {
                 const queryKeysMatrix = {
-                    // OK
                     updateCustomer: {
                         update: [
                             [
@@ -294,7 +293,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                             ['/customers', '/external-profile']
                         ]
                     },
-                    // OK
+
                     updateCustomerAddress: {
                         update: [
                             [
@@ -321,7 +320,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                             ]
                         ]
                     },
-                    // OK
+
                     createCustomerAddress: {
                         update: [
                             [
@@ -348,7 +347,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                             ]
                         ]
                     },
-                    // OK
+
                     removeCustomerAddress: {
                         invalidate: [
                             [
@@ -375,7 +374,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                             ]
                         ]
                     },
-                    // OK
+
                     createCustomerPaymentInstrument: {
                         update: [
                             [
@@ -400,7 +399,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                             ]
                         ]
                     },
-                    // OK
+
                     deleteCustomerPaymentInstrument: {
                         invalidate: [
                             [
@@ -419,13 +418,15 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 '/payment-instruments',
                                 // @ts-ignore
                                 {
+                                    // @ts-ignore
                                     customerId: params?.parameters?.customerId,
+                                    // @ts-ignore
                                     paymentInstrumentId: params?.parameters?.paymentInstrumentId
                                 }
                             ]
                         ]
                     },
-                    // OK
+
                     createCustomerProductList: {
                         update: [
                             [
@@ -438,7 +439,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                             ]
                         ]
                     },
-                    // OK
+
                     createCustomerProductListItem: {
                         update: [
                             [
@@ -462,13 +463,15 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 '/product-list',
                                 // @ts-ignore
                                 {
+                                    // @ts-ignore
                                     customerId: params?.parameters?.customerId,
+                                    // @ts-ignore
                                     listId: params?.parameters?.listId
                                 }
                             ]
                         ]
                     },
-                    // OK
+
                     updateCustomerProductListItem: {
                         update: [
                             [
@@ -490,7 +493,9 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 '/product-list',
                                 // @ts-ignore
                                 {
+                                    // @ts-ignore
                                     customerId: params?.parameters?.customerId,
+                                    // @ts-ignore
                                     listId: params?.parameters?.listId
                                 }
                             ]
@@ -505,7 +510,9 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 '/product-list',
                                 // @ts-ignore
                                 {
+                                    // @ts-ignore
                                     customerId: params?.parameters?.customerId,
+                                    // @ts-ignore
                                     listId: params?.parameters?.listId
                                 }
                             ]
