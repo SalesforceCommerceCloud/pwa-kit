@@ -18,7 +18,7 @@ const CUSTOMER_EMAIL = 'kobe@test.com'
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
 const ADDRESS_NAME = 'TestAddress'
 const LIST_ID = 'bcd08be6f883120b4960ca8a0b'
-const ITEM_ID = '1d0eee01ead2727a43466d7481'
+const ITEM_ID = '60ee899e9305de0df5b0fcade5'
 const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
 const PRODUCT_ID = '25518823M'
 
@@ -400,49 +400,35 @@ Object.entries(hooksDetails).forEach(([key]) => {
                     // TODO: Remove DEBUG console.log printing queries in cache
                     // console.log('BEFORE cache:',queryClient.getQueryCache().getAll())
 
-                    // Mocking the server request
+                    // Mock server responses
+                    const mockReplyBody={
+                        customerId: CUSTOMER_ID,
+                        email: CUSTOMER_EMAIL,
+                        login: CUSTOMER_EMAIL,
+                        listId: LIST_ID,
+                        itemId: ITEM_ID,
+                        paymentInstrumentId: PAYMENT_INSTRUMENT_ID
+                    }
                     nock('http://localhost:3000')
                         .patch((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(200, {
-                            customerId: CUSTOMER_ID,
-                            email: CUSTOMER_EMAIL,
-                            login: CUSTOMER_EMAIL,
-                            listId: LIST_ID,
-                            itemId: ITEM_ID,
-                            id: ITEM_ID
-                        })
+                        .reply(200, mockReplyBody)
                     nock('http://localhost:3000')
                         .put((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(200, {
-                            customerId: CUSTOMER_ID,
-                            email: CUSTOMER_EMAIL,
-                            login: CUSTOMER_EMAIL
-                        })
+                        .reply(200, mockReplyBody)
                     nock('http://localhost:3000')
                         .post((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(200, {
-                            customerId: CUSTOMER_ID,
-                            email: CUSTOMER_EMAIL,
-                            login: CUSTOMER_EMAIL,
-                            listId: LIST_ID,
-                            itemId: ITEM_ID,
-                            paymentInstrumentId: PAYMENT_INSTRUMENT_ID
-                        })
+                        .reply(200, mockReplyBody)
                     nock('http://localhost:3000')
                         .delete((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(200, {
-                            customerId: CUSTOMER_ID,
-                            email: CUSTOMER_EMAIL,
-                            login: CUSTOMER_EMAIL
-                        })
+                        .reply(204, {})
 
                     const button = screen.getByRole('button', {
                         name: key
