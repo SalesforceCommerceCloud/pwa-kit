@@ -27,8 +27,8 @@ const ProductsComponent = ({ids}: {ids: string}): ReactElement => {
             )}
             {data && (
                 <div>
-                    {data.data?.map(({name}) => (
-                        <div key={name}>{name}</div>
+                    {data.data?.map(({name}, i) => (
+                        <div key={i}>{name}</div>
                     ))}
                 </div>
             )}
@@ -83,6 +83,19 @@ const CategoryComponent = ({id}: {id: string}): ReactElement => {
         </div>
     )
 }
+
+const IncorrectArguments = (): ReactElement => {
+    // @ts-ignore
+    const {isLoading, error} = useProducts({FOO: ''})
+
+    return (
+        <div>
+            {isLoading && <span>Loading...</span>}
+            {error && <span>error</span>}
+        </div>
+    )
+}
+
 const tests = [
     {
         hook: 'useProducts',
@@ -117,6 +130,15 @@ const tests = [
                     expect(screen.getByText('error')).toBeInTheDocument()
                     expect(screen.queryByText('Loading...')).toBeNull()
                 })
+            },
+            {
+                name: 'returns validation error',
+                assertions: async () => {
+                    renderWithProviders(<IncorrectArguments />)
+                    await waitFor(() => screen.getByText('error'))
+                    expect(screen.getByText('error')).toBeInTheDocument()
+                    expect(screen.queryByText('Loading...')).toBeNull()
+                }
             }
         ]
     },

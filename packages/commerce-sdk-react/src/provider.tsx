@@ -20,7 +20,6 @@ import {
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-import {QueryClient, QueryClientConfig, QueryClientProvider} from '@tanstack/react-query'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
@@ -29,14 +28,19 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     locale: string
     currency: string
     redirectURI: string
-    queryClientConfig?: QueryClientConfig
     fetchOptions?: ShopperBasketsTypes.FetchOptions
+    headers?: Record<string, string>
 }
 
 /**
  * @internal
  */
 export const CommerceApiContext = React.createContext({} as ApiClients)
+
+/**
+ * @internal
+ */
+export const ConfigContext = React.createContext({} as Omit<CommerceApiProviderProps, 'children'>)
 
 /**
  * @internal
@@ -53,17 +57,20 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {
         children,
         clientId,
+        headers = {},
         organizationId,
-        shortCode,
-        siteId,
         proxy,
         redirectURI,
-        queryClientConfig,
-        fetchOptions
+        fetchOptions,
+        siteId,
+        shortCode,
+        locale,
+        currency
     } = props
 
     const config = {
         proxy,
+        headers,
         parameters: {
             clientId,
             organizationId,
@@ -73,7 +80,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
         fetchOptions
     }
-
     const apiClients = useMemo(() => {
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -87,7 +93,15 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config)
         }
-    }, [clientId, organizationId, shortCode, siteId, proxy, fetchOptions])
+    }, [
+        clientId,
+        organizationId,
+        shortCode,
+        siteId,
+        proxy,
+        fetchOptions,
+        headers?.['correlation-id']
+    ])
 
     const auth = useMemo(() => {
         return new Auth({
@@ -105,18 +119,26 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         auth.ready()
     }, [auth])
 
-    const queryClient = new QueryClient(queryClientConfig)
-
-    // TODO: wrap the children with:
-    // - context for enabling useServerEffect hook
-    // - context for sharing the auth object that would manage the tokens -> this will probably be for internal use only
     return (
-        <QueryClientProvider client={queryClient}>
+        <ConfigContext.Provider
+            value={{
+                clientId,
+                headers,
+                organizationId,
+                proxy,
+                redirectURI,
+                fetchOptions,
+                siteId,
+                shortCode,
+                locale,
+                currency
+            }}
+        >
             <CommerceApiContext.Provider value={apiClients}>
                 <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
             </CommerceApiContext.Provider>
             <ReactQueryDevtools />
-        </QueryClientProvider>
+        </ConfigContext.Provider>
     )
 }
 

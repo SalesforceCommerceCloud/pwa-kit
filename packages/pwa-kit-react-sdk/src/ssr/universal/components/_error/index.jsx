@@ -30,11 +30,13 @@ import PropTypes from 'prop-types'
  *      <br/>
  *      <br/>
  *      <i>This property is typically used to distinguish 404 errors from other types.</i>
+ * @param {string} props.correlationId
  */
-const Error = ({message, stack, status}) => {
+const Error = ({message, stack, status, correlationId}) => {
     return (
         <div>
             <h1>Error Status: {status}</h1>
+            <div>CorrelationId: {correlationId}</div>
             <pre>{stack}</pre>
             <pre>{message}</pre>
         </div>
@@ -44,7 +46,8 @@ const Error = ({message, stack, status}) => {
 Error.propTypes = {
     message: PropTypes.string.isRequired,
     status: PropTypes.number.isRequired,
-    stack: PropTypes.string
+    stack: PropTypes.string,
+    correlationId: PropTypes.string
 }
 
 export default Error

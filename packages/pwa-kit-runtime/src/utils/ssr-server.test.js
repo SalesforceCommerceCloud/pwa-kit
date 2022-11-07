@@ -669,15 +669,8 @@ describe('MetricsSender', () => {
         sender.send(metrics1)
         expect(sender.queueLength).toEqual(metrics1.length)
         return sender.flush().then(() => {
-            const expectedAttempts = sender._retries
-
             // Expect that we retried the correct number of times
-            expect(sender._CW.putMetricData.callCount).toBe(expectedAttempts)
-
-            // Expect that there was a console warning for each retry
-            expect(consoleWarn.callCount).toBe(expectedAttempts)
-
-            // Expect that the MetricsSender is now empty
+            expect(sender._CW.putMetricData.callCount).toBe(1)
             expect(sender.queueLength).toBe(0)
         })
     })

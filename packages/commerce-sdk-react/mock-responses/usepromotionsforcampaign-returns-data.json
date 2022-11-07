@@ -1,0 +1,52 @@
+[
+    {
+        "scope": "http://localhost:3000",
+        "method": "GET",
+        "path": "/mobify/proxy/api/pricing/shopper-promotions/v1/organizations/f_ecom_zzrf_001/promotions/campaigns/promotion-campaign?siteId=RefArchGlobal",
+        "body": "",
+        "status": 200,
+        "response": [
+            "1f8b0800000000000003000000ffff",
+            "ac523b6bc33010defd2bbe0a42170764172fde02593bb5534b07d5961281ac13d6b90f42fe7bb152631a9a52d32e0271dff3b8430608673bcba2c64d3efe5ac54ad478cc00e0905e4034ca391af836ee440d51c815c81874da5f47c4c172c4abe53d1a1a0279914fb456b3b22e8e1cfdd6e8c0967c840ac1bdcf20eddbad623d824a5996eb42aecbea5eca5aca871965db933319930ce789579dbe906a0645563d9fdb14c5649360c7fca7d2d5a7fcddde8660fd0e9b8e06cfd83cd38b4621e5b7b517b096eca1922b3266123d6926c92f8ad3661684f8bf3d51dfeafeea2ff592c2e53667e35f25cf80a774e64cacdc78f4d9f1030000ffff0300718bc69205030000"
+        ],
+        "rawHeaders": [
+            "date",
+            "Thu, 20 Oct 2022 19:51:28 GMT",
+            "content-type",
+            "application/json; charset=UTF-8",
+            "transfer-encoding",
+            "chunked",
+            "connection",
+            "close",
+            "cf-ray",
+            "75d449d13d4ea71a-PHX",
+            "cache-control",
+            "max-age=60",
+            "strict-transport-security",
+            "max-age=31536000; includeSubdomains;",
+            "cf-cache-status",
+            "DYNAMIC",
+            "x-content-type-options",
+            "nosniff",
+            "x-correlation-id",
+            "75d449d13d4ea71a",
+            "x-frame-options",
+            "SAMEORIGIN",
+            "x-ratelimit-limit",
+            "800",
+            "x-ratelimit-remaining",
+            "800",
+            "x-xss-protection",
+            "1; mode=block",
+            "vary",
+            "Accept-Encoding",
+            "server",
+            "cloudflare",
+            "content-encoding",
+            "gzip",
+            "x-proxy-request-url",
+            "https://kv7kzm78.api.commercecloud.salesforce.com/pricing/shopper-promotions/v1/organizations/f_ecom_zzrf_001/promotions/campaigns/promotion-campaign?siteId=RefArchGlobal"
+        ],
+        "responseIsBinary": false
+    }
+]
