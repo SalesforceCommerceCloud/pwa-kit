@@ -208,11 +208,8 @@ const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) =>
     )
 }
 
-const tests: {hook: string; cases: {name: string; assertions: () => Promise<void>}[]}[] = []
-
-const objKeys = Object.keys(hooksDetails) as (keyof typeof hooksDetails)[]
-for (const key of objKeys) {
-    tests.push({
+const tests = Object.keys(hooksDetails).map((key) => {
+    return {
         hook: key,
         cases: [
             {
@@ -262,13 +259,13 @@ for (const key of objKeys) {
                     // Pre-populate cache with query keys we invalidate/update/remove onSuccess
                     // @ts-ignore
                     const {invalidate, update, remove} = hooksDetails[key]
-                    invalidate?.map((queryKey: QueryKey) => {
+                    invalidate?.forEach((queryKey: QueryKey) => {
                         queryClient.setQueryData(queryKey, {})
                     })
-                    update?.map((queryKey: QueryKey) => {
+                    update?.forEach((queryKey: QueryKey) => {
                         queryClient.setQueryData(queryKey, {})
                     })
-                    remove?.map((queryKey: QueryKey) => {
+                    remove?.forEach((queryKey: QueryKey) => {
                         queryClient.setQueryData(queryKey, {})
                     })
 
@@ -281,13 +278,13 @@ for (const key of objKeys) {
                     expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
 
                     // Assert changes in cache
-                    update?.map((queryKey: QueryKey) => {
+                    update?.forEach((queryKey: QueryKey) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
                     })
-                    invalidate?.map((queryKey: QueryKey) => {
+                    invalidate?.forEach((queryKey: QueryKey) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
                     })
-                    remove?.map((queryKey: QueryKey) => {
+                    remove?.forEach((queryKey: QueryKey) => {
                         expect(queryClient.getQueryState(queryKey)).toBeFalsy()
                     })
                 }
@@ -336,8 +333,8 @@ for (const key of objKeys) {
                 }
             }
         ]
-    })
-}
+    }
+})
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {
