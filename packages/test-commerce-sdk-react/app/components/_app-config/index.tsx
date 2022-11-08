@@ -83,7 +83,9 @@ const options = {
             queries: {
                 retry: false,
                 staleTime: 2 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {})
+                ...(isServerSide ? {retryOnMount: false} : {}),
+                //TODO: OPTIONS FOR DEBUGGING. REMOVE BEFORE MERGING.
+                refetchOnWindowFocus: false
             },
             mutations: {
                 retry: false
