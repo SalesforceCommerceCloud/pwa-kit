@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, DataType, Argument} from '../types'
+import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 
@@ -274,104 +274,50 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
+                const {
+                    customerId,
+                    addressName,
+                    paymentInstrumentId,
+                    listId,
+                    itemId
+                }: any = params?.parameters
+
+                // @ts-ignore
+                const {addressId}: any = params?.body
+
                 const queryKeysMatrix = {
                     updateCustomer: {
-                        update: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                // @ts-ignore
-                                {customerId: params?.parameters?.customerId}
-                            ]
-                        ],
+                        update: [['/customers', customerId, {customerId}]],
                         invalidate: [
-                            // @ts-ignore
-                            ['/customers', params?.parameters?.customerId, '/payment-instruments'],
-                            // @ts-ignore
-                            ['/customers', params?.parameters?.customerId, '/addresses'],
+                            ['/customers', customerId, '/payment-instruments'],
+                            ['/customers', customerId, '/addresses'],
                             ['/customers', '/external-profile']
                         ]
                     },
 
                     updateCustomerAddress: {
                         update: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                '/addresses',
-                                // @ts-ignore
-                                {
-                                    // @ts-ignore
-                                    addressName: params?.parameters?.addressName,
-                                    // @ts-ignore
-                                    customerId: params?.parameters?.customerId
-                                }
-                            ]
+                            ['/customers', customerId, '/addresses', {addressName, customerId}]
                         ],
-                        invalidate: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                // @ts-ignore
-                                {customerId: params?.parameters?.customerId}
-                            ]
-                        ]
+                        invalidate: [['/customers', customerId, {customerId}]]
                     },
 
                     createCustomerAddress: {
                         update: [
                             [
                                 '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
+                                customerId,
                                 '/addresses',
-                                // @ts-ignore
-                                {
-                                    // @ts-ignore
-                                    addressName: params?.body?.addressId,
-                                    // @ts-ignore
-                                    customerId: params?.parameters?.customerId
-                                }
+                                {addressName: addressId, customerId}
                             ]
                         ],
-                        invalidate: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                // @ts-ignore
-                                {customerId: params?.parameters?.customerId}
-                            ]
-                        ]
+                        invalidate: [['/customers', customerId, {customerId}]]
                     },
 
                     removeCustomerAddress: {
-                        invalidate: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                // @ts-ignore
-                                {customerId: params?.parameters?.customerId}
-                            ]
-                        ],
+                        invalidate: [['/customers', customerId, {customerId}]],
                         remove: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                '/addresses',
-                                // @ts-ignore
-                                {
-                                    // @ts-ignore
-                                    addressName: params?.parameters?.addressName,
-                                    // @ts-ignore
-                                    customerId: params?.parameters?.customerId
-                                }
-                            ]
+                            ['/customers', customerId, '/addresses', {addressName, customerId}]
                         ]
                     },
 
@@ -379,51 +325,25 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                         update: [
                             [
                                 '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
+                                customerId,
                                 '/payment-instruments',
-                                // @ts-ignore
                                 {
-                                    // @ts-ignore
-                                    customerId: params?.parameters?.customerId,
+                                    customerId: customerId,
                                     paymentInstrumentId: data?.paymentInstrumentId
                                 }
                             ]
                         ],
-                        invalidate: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                // @ts-ignore
-                                {customerId: params?.parameters?.customerId}
-                            ]
-                        ]
+                        invalidate: [['/customers', customerId, {customerId}]]
                     },
 
                     deleteCustomerPaymentInstrument: {
-                        invalidate: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                // @ts-ignore
-                                {customerId: params?.parameters?.customerId}
-                            ]
-                        ],
+                        invalidate: [['/customers', customerId, {customerId}]],
                         remove: [
                             [
                                 '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
+                                customerId,
                                 '/payment-instruments',
-                                // @ts-ignore
-                                {
-                                    // @ts-ignore
-                                    customerId: params?.parameters?.customerId,
-                                    // @ts-ignore
-                                    paymentInstrumentId: params?.parameters?.paymentInstrumentId
-                                }
+                                {customerId, paymentInstrumentId}
                             ]
                         ]
                     },
@@ -432,104 +352,33 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                         update: [
                             [
                                 '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
+                                customerId,
                                 '/product-list',
-                                // @ts-ignore
-                                {customerId: params?.parameters?.customerId, listId: data?.id}
+                                {customerId, listId: data?.id}
                             ]
                         ]
                     },
 
                     createCustomerProductListItem: {
                         update: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                '/product-list',
-                                // @ts-ignore
-                                params?.parameters?.listId,
-                                // @ts-ignore
-                                {
-                                    itemId: data?.id
-                                }
-                            ]
+                            ['/customers', customerId, '/product-list', listId, {itemId: data?.id}]
                         ],
                         invalidate: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                '/product-list',
-                                // @ts-ignore
-                                {
-                                    // @ts-ignore
-                                    customerId: params?.parameters?.customerId,
-                                    // @ts-ignore
-                                    listId: params?.parameters?.listId
-                                }
-                            ]
+                            ['/customers', customerId, '/product-list', {customerId, listId}]
                         ]
                     },
 
                     updateCustomerProductListItem: {
-                        update: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                '/product-list',
-                                // @ts-ignore
-                                params?.parameters?.listId,
-                                // @ts-ignore
-                                {itemId: params?.parameters?.itemId}
-                            ]
-                        ],
+                        update: [['/customers', customerId, '/product-list', listId, {itemId}]],
                         invalidate: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                '/product-list',
-                                // @ts-ignore
-                                {
-                                    // @ts-ignore
-                                    customerId: params?.parameters?.customerId,
-                                    // @ts-ignore
-                                    listId: params?.parameters?.listId
-                                }
-                            ]
+                            ['/customers', customerId, '/product-list', {customerId, listId}]
                         ]
                     },
                     deleteCustomerProductListItem: {
                         invalidate: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                '/product-list',
-                                // @ts-ignore
-                                {
-                                    // @ts-ignore
-                                    customerId: params?.parameters?.customerId,
-                                    // @ts-ignore
-                                    listId: params?.parameters?.listId
-                                }
-                            ]
+                            ['/customers', customerId, '/product-list', {customerId, listId}]
                         ],
-                        remove: [
-                            [
-                                '/customers',
-                                // @ts-ignore
-                                params?.parameters?.customerId,
-                                '/product-list',
-                                // @ts-ignore
-                                params?.parameters?.listId,
-                                // @ts-ignore
-                                {itemId: params?.parameters?.itemId}
-                            ]
-                        ]
+                        remove: [['/customers', customerId, '/product-list', listId, {itemId}]]
                     }
                 }
 
