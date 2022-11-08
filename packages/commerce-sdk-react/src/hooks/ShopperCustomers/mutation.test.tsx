@@ -5,14 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import path from 'path'
-import {mockHttpResponses, renderWithProviders, queryClient, mockAuthCalls} from '../../test-utils'
+import {renderWithProviders, queryClient, mockAuthCalls} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {useShopperCustomersMutation, ShopperCustomersMutations} from './mutation'
 import nock from 'nock'
-
-const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
 
 const CUSTOMER_EMAIL = 'kobe@test.com'
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
@@ -326,8 +323,7 @@ const hooksDetails = {
     }
 }
 
-// @ts-ignore
-const CustomerMutationComponent = ({action}) => {
+const CustomerMutationComponent = ({action}: {action: string}) => {
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
 
     React.useEffect(() => {
