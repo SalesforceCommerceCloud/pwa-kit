@@ -7,7 +7,6 @@
 import React from 'react'
 import path from 'path'
 import {mockHttpResponses, renderWithProviders} from '../../test-utils'
-import {useOrder} from './query'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {useQueryClient} from '@tanstack/react-query'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
@@ -17,25 +16,17 @@ import nock from 'nock'
 
 const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
 
-const BASKET_ID = 'a10ff320829cb0eef93ca5310a'
+// Valid id of prepared basket
+const BASKET_ID = '753b796f71aaaef79b0adde657'
 
 const OrderMutationComponent = () => {
     //Log into registered account when the component is mounted
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
     const createOrder = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
-    const createBasket = useShopperBasketsMutation(ShopperBasketsMutations.CreateBasket)
 
     React.useEffect(() => {
         loginRegisteredUser.mutate({username: 'alex@test.com', password: 'Test1234#'})
     }, [])
-
-    //Need to create a prepared basket in order to create an order with basketID
-    const createOrderFlow = async () => {
-        const {data} = await createBasket.mutateAsync({body: {}})
-        createOrder.mutate({
-            body: {basketId: BASKET_ID}
-        })
-    }
 
     return (
         <>
@@ -45,7 +36,15 @@ const OrderMutationComponent = () => {
                 <div>Logged in as {loginRegisteredUser?.variables?.username}</div>
             )}
             <div>
-                <button onClick={() => createOrderFlow()}>Create Order</button>
+                <button
+                    onClick={() =>
+                        createOrder.mutate({
+                            body: {basketId: BASKET_ID}
+                        })
+                    }
+                >
+                    Create Order
+                </button>
 
                 {createOrder.error?.message && (
                     <p style={{color: 'red'}}>Error: {createOrder.error?.message}</p>
@@ -73,29 +72,27 @@ const tests = [
                         })
                     )
 
-                    // Mocking the server request
-                    nock('http://localhost:3000')
-                        .post((uri) => {
-                            return uri.includes('/checkout/shopper-baskets/')
-                        })
-                        .reply(200, {
-                            basketId: BASKET_ID,
-                            customerInfo: {
-                                email: 'alex@test.com'
-                            }
-                        })
+                    const mockBasketResponse = {
+                        basketId: BASKET_ID,
+                        customerInfo: {
+                            email: 'alex@test.com'
+                        }
+                    }
+
+                    const mockOrderResponse = {
+                        orderNo: '00000410',
+                        customerInfo: {
+                            email: 'alex@test.com'
+                        }
+                    }
 
                     // Mocking the server request
                     nock('http://localhost:3000')
+                        .persist()
                         .post((uri) => {
                             return uri.includes('/checkout/shopper-orders/')
                         })
-                        .reply(200, {
-                            orderNo: '000000410',
-                            customerInfo: {
-                                email: 'alex@test.com'
-                            }
-                        })
+                        .reply(200, mockOrderResponse)
 
                     const button = screen.getByRole('button', {
                         name: /create order/i
@@ -119,7 +116,7 @@ const tests = [
                     // Mocking the server request
                     nock('http://localhost:3000')
                         .post((uri) => {
-                            return uri.includes('/checkout/shopper-baskets/')
+                            return uri.includes('/checkout/shopper-orders/')
                         })
                         .reply(404)
 
