@@ -295,15 +295,6 @@ const tests = Object.keys(hooksDetails).map((key) => {
                 name: 'error',
                 assertions: async () => {
                     mockAuthCalls()
-                    renderWithProviders(
-                        <CustomerMutationComponent action={key as ShopperCustomersMutationType} />
-                    )
-                    await waitFor(() => screen.getByText(/kobe@test.com/))
-                    await waitFor(() =>
-                        screen.getByRole('button', {
-                            name: key
-                        })
-                    )
 
                     // Mock server responses
                     nock('http://localhost:3000')
@@ -326,6 +317,16 @@ const tests = Object.keys(hooksDetails).map((key) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
                         .reply(500, {})
+
+                    renderWithProviders(
+                        <CustomerMutationComponent action={key as ShopperCustomersMutationType} />
+                    )
+                    await waitFor(() => screen.getByText(/kobe@test.com/))
+                    await waitFor(() =>
+                        screen.getByRole('button', {
+                            name: key
+                        })
+                    )
 
                     const button = screen.getByRole('button', {
                         name: key
