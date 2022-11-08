@@ -9,21 +9,14 @@ const Utils = require('./utils')
 const buildRequest = require('./build-request')
 
 const ARCHIVE = 'build.tar'
-const DEFAULT_ORIGIN = process.env.CLOUD_API_BASE || 'https://cloud.mobify.com'
-
-const OPTION_DEFAULTS = {
-    buildDirectory: 'build',
-    credentialsFile: Utils.getCredentialsFile(),
-    origin: DEFAULT_ORIGIN,
-    target: '',
-    message: Utils.setDefaultMessage()
-}
 
 const isEmptyOptions = (options) => {
     return (
         typeof options === 'undefined' ||
         typeof options.projectSlug === 'undefined' ||
-        options.projectSlug.length === 0
+        options.projectSlug.length === 0 ||
+        typeof options.origin === 'undefined' ||
+        options.origin.length === 0
     )
 }
 
@@ -58,12 +51,21 @@ const upload = (options) => {
         })
 }
 
-const uploadBundle = (customOptions) => {
-    if (isEmptyOptions(customOptions)) {
-        Utils.fail('[Error: You must provide a Mobify Cloud project slug to upload a bundle.]')
+const uploadBundle = (opts) => {
+    if (isEmptyOptions(opts)) {
+        Utils.fail(
+            '[Error: You must provide a Managed Runtime project slug and Cloud origin to upload a bundle.]'
+        )
     }
 
-    const options = Object.assign({}, OPTION_DEFAULTS, customOptions)
+    const defaults = {
+        buildDirectory: 'build',
+        credentialsFile: Utils.getCredentialsFile(),
+        target: '',
+        message: Utils.setDefaultMessage()
+    }
+
+    const options = Object.assign({}, defaults, opts)
 
     // Create bundle will generate the archive file and return an updated
     // options object
