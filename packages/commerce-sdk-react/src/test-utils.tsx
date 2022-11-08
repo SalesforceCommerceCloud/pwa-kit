@@ -67,7 +67,6 @@ type NockBackOptions = {
     mode?: nock.BackMode
 }
 
-
 export const mockAuthCalls = () => {
     nock('http://localhost:3000')
         .persist()
