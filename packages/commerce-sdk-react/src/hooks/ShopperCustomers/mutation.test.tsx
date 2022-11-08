@@ -248,7 +248,9 @@ const tests = Object.keys(hooksDetails).map((key) => {
                         })
                         .reply(204, {})
 
-                    renderWithProviders(<CustomerMutationComponent action={key} />)
+                    renderWithProviders(
+                        <CustomerMutationComponent action={key as ShopperCustomersMutationType} />
+                    )
                     await waitFor(() => screen.getByText(/kobe@test.com/))
                     await waitFor(() =>
                         screen.getByRole('button', {
@@ -293,7 +295,9 @@ const tests = Object.keys(hooksDetails).map((key) => {
                 name: 'error',
                 assertions: async () => {
                     mockAuthCalls()
-                    renderWithProviders(<CustomerMutationComponent action={key} />)
+                    renderWithProviders(
+                        <CustomerMutationComponent action={key as ShopperCustomersMutationType} />
+                    )
                     await waitFor(() => screen.getByText(/kobe@test.com/))
                     await waitFor(() =>
                         screen.getByRole('button', {
