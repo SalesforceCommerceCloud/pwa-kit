@@ -370,11 +370,10 @@ Object.entries(hooksDetails).forEach(([key]) => {
             {
                 name: 'success',
                 assertions: async () => {
-
                     mockAuthCalls()
 
                     // Mock server responses
-                    const mockReplyBody={
+                    const mockReplyBody = {
                         customerId: CUSTOMER_ID,
                         email: CUSTOMER_EMAIL,
                         login: CUSTOMER_EMAIL,
