@@ -20,9 +20,8 @@ import {useQueryClient} from '@tanstack/react-query'
 
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
 const ADDRESS_NAME = 'TestAddress'
-const LIST_ID = 'bcd08be6f883120b4960ca8a0b'
-const ITEM_ID = '60ee899e9305de0df5b0fcade5'
-const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
+const LIST_ID = '987ae461a7c6c5fd17006fc774'
+const ITEM_ID = '500cebac3fe6e8aa67e22dca1a'
 const PRODUCT_ID = '25518823M'
 const RANDOM_STR = Math.random()
     .toString(36)
@@ -112,14 +111,13 @@ function UseCustomer() {
             body: {currentPassword: 'Test12345!', password: 'Test1234!'},
             parameters: {customerId: CUSTOMER_ID}
         },
-        // TODO: Not working in PWA Kit Today. Potentially related to the issue scoping tokens
-        //  https://pwa-kit.mobify-storefront.com/global/en-GB/reset-password
+        // TODO: Not working. Potentially related to the issue scoping tokens
         //  {"type":"https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized","title":"Unauthorized","detail":"Your access-token is invalid and could not be used to identify the API client."}
-        {
-            action: 'getResetPasswordToken',
-            body: {login: 'kobe@test.com'},
-            parameters: {}
-        },
+        // {
+        //     action: 'getResetPasswordToken',
+        //     body: {login: 'kobe@test.com'},
+        //     parameters: {}
+        // },
         {
             action: 'createCustomerAddress',
             body: {addressId: `TestAddress${RANDOM_STR}`, countryCode: 'CA', lastName: 'Murphy'},
@@ -147,12 +145,7 @@ function UseCustomer() {
         },
         {
             action: 'updateCustomerProductListItem',
-            body: {priority: 2, public: true, quantity: 13},
-            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
-        },
-        {
-            action: 'deleteCustomerProductListItem',
-            body: {},
+            body: {priority: 2, public: true, quantity: 3},
             parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
         },
         {
@@ -177,7 +170,7 @@ function UseCustomer() {
         {
             action: 'deleteCustomerPaymentInstrument',
             body: {},
-            parameters: {customerId: CUSTOMER_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
+            parameters: {customerId: CUSTOMER_ID, paymentInstrumentId: '812ad603d00ae6cdf0f80803ad'}
         }
     ].map(({action, body, parameters}) => {
         return {

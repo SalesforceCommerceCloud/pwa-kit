@@ -37,7 +37,7 @@ function usePromotions(
 ): UseQueryResult<DataType<Client['getPromotions']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['/promotions', arg],
+        ['promotions', arg],
         (_, {shopperPromotions}) => {
             return shopperPromotions.getPromotions({parameters, headers}, rawResponse)
         },
@@ -80,7 +80,7 @@ function usePromotionsForCampaign(
 ): UseQueryResult<DataType<Client['getPromotionsForCampaign']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['/promotions', '/campaigns', arg],
+        ['promotions-for-campaign', arg],
         (_, {shopperPromotions}) =>
             shopperPromotions.getPromotionsForCampaign({parameters, headers}, rawResponse),
         options

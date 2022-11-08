@@ -38,7 +38,7 @@ function useProducts(
     parameters.locale = parameters.locale || locale
     parameters.currency = parameters.currency || currency
     return useQuery(
-        ['/products', arg],
+        ['products', arg],
         (_, {shopperProducts}) => {
             return shopperProducts.getProducts({parameters, headers}, rawResponse)
         },
@@ -73,7 +73,7 @@ function useProduct(
     parameters.locale = parameters.locale || locale
     parameters.currency = parameters.currency || currency
     return useQuery(
-        ['/products', arg],
+        ['product', arg],
         (_, {shopperProducts}) => {
             return shopperProducts.getProduct({parameters, headers}, rawResponse)
         },
@@ -110,7 +110,7 @@ function useCategories(
     const {locale} = useConfig()
     parameters.locale = parameters.locale || locale
     return useQuery(
-        ['/categories', arg],
+        ['categories', arg],
         (_, {shopperProducts}) => {
             return shopperProducts.getCategories({parameters, headers}, rawResponse)
         },
@@ -149,7 +149,7 @@ function useCategory(
     const {locale} = useConfig()
     parameters.locale = parameters.locale || locale
     return useQuery(
-        ['/categories', arg],
+        ['category', arg],
         (_, {shopperProducts}) => {
             return shopperProducts.getCategory({parameters, headers}, rawResponse)
         },
