@@ -28,6 +28,7 @@ import {FormattedMessage} from 'react-intl'
 import debounce from 'lodash/debounce'
 import {RECENT_SEARCH_KEY, RECENT_SEARCH_LIMIT, RECENT_SEARCH_MIN_LENGTH} from '../../constants'
 import {productUrlBuilder, searchUrlBuilder, categoryUrlBuilder} from '../../utils/url'
+import RecentSearches from './partials/recent-searches'
 
 const formatSuggestions = (searchSuggestions, input) => {
     return {
@@ -94,11 +95,6 @@ const Search = (props) => {
         }
     }, [searchInputRef?.current?.value])
 
-    const searchSuggestionsAvailable =
-        searchSuggestions &&
-        (searchSuggestions?.categorySuggestions?.length ||
-            searchSuggestions?.phraseSuggestions?.length)
-
     const saveRecentSearch = (searchText) => {
         // Get recent searches or an empty array if undefined.
         let searches = getSessionJSONItem(RECENT_SEARCH_KEY) || []
@@ -154,6 +150,9 @@ const Search = (props) => {
             navigate(link)
         }
     }
+
+    const searchSuggestionsAvailable =
+        searchSuggestions && searchSuggestions?.categorySuggestions?.length
 
     const shouldOpenPopover = () => {
         // As per design we only want to show the popover if the input is focused and we have recent searches saved
@@ -214,11 +213,17 @@ const Search = (props) => {
 
                 <HideOnMobile>
                     <PopoverContent data-testid="sf-suggestion-popover">
-                        <SearchSuggestions
-                            closeAndNavigate={closeAndNavigate}
-                            recentSearches={recentSearches}
-                            searchSuggestions={searchSuggestions}
-                        />
+                        {searchSuggestionsAvailable ? (
+                            <SearchSuggestions
+                                searchSuggestions={searchSuggestions}
+                                closeAndNavigate={closeAndNavigate}
+                            />
+                        ) : (
+                            <RecentSearches
+                                recentSearches={recentSearches}
+                                closeAndNavigate={closeAndNavigate}
+                            />
+                        )}
                     </PopoverContent>
                 </HideOnMobile>
             </Popover>
@@ -241,11 +246,15 @@ const Search = (props) => {
                             zIndex="9999"
                             margin="-25px 0 0 -25px"
                         />
-                    ) : (
+                    ) : searchSuggestionsAvailable ? (
                         <SearchSuggestions
-                            closeAndNavigate={closeAndNavigate}
-                            recentSearches={recentSearches}
                             searchSuggestions={searchSuggestions}
+                            closeAndNavigate={closeAndNavigate}
+                        />
+                    ) : (
+                        <RecentSearches
+                            recentSearches={recentSearches}
+                            closeAndNavigate={closeAndNavigate}
                         />
                     )}
                 </Flex>

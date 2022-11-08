@@ -4,40 +4,31 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {Fragment} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {Stack} from '@chakra-ui/react'
-import RecentSearches from './recent-searches'
 import Suggestions from './suggestions'
 
-const SearchSuggestions = ({recentSearches, searchSuggestions, closeAndNavigate}) => {
-    const useSuggestions = searchSuggestions && searchSuggestions?.categorySuggestions?.length
+const SearchSuggestions = ({searchSuggestions, closeAndNavigate}) => {
     return (
         <Stack padding={6} spacing={0}>
-            {useSuggestions ? (
-                <Fragment>
-                    <Suggestions
-                        closeAndNavigate={closeAndNavigate}
-                        suggestions={searchSuggestions?.categorySuggestions}
-                    />
-                    {/* <Suggestions
-                        closeAndNavigate={closeAndNavigate}
-                        suggestions={searchSuggestions?.phraseSuggestions}
-                    /> */}
-                    {/* <Suggestions suggestions={searchSuggestions.productSuggestions} /> */}
-                </Fragment>
-            ) : (
-                <RecentSearches
-                    recentSearches={recentSearches}
-                    closeAndNavigate={closeAndNavigate}
-                />
-            )}
+            <Suggestions
+                closeAndNavigate={closeAndNavigate}
+                suggestions={searchSuggestions?.categorySuggestions}
+            />
+            {/* <Suggestions
+                closeAndNavigate={closeAndNavigate}
+                suggestions={searchSuggestions?.phraseSuggestions}
+            /> */}
+            {/* <Suggestions
+                closeAndNavigate={closeAndNavigate}
+                suggestions={searchSuggestions.productSuggestions}
+            /> */}
         </Stack>
     )
 }
 
 SearchSuggestions.propTypes = {
-    recentSearches: PropTypes.array,
     searchSuggestions: PropTypes.object,
     closeAndNavigate: PropTypes.func
 }
