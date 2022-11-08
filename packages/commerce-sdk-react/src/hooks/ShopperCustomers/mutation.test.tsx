@@ -5,11 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, queryClient, mockAuthCalls} from '../../test-utils'
+import {mockAuthCalls, queryClient, renderWithProviders} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
-import {useShopperCustomersMutation, ShopperCustomersMutations} from './mutation'
+import {ShopperCustomersMutationType, useShopperCustomersMutation} from './mutation'
 import nock from 'nock'
+import {QueryKey} from '@tanstack/react-query'
 
 const CUSTOMER_EMAIL = 'kobe@test.com'
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
@@ -25,19 +26,9 @@ const hooksDetails = {
             body: {firstName: `Kobe`},
             parameters: {customerId: CUSTOMER_ID}
         },
-        update: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                // @ts-ignore
-                {customerId: CUSTOMER_ID}
-            ]
-        ],
+        update: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]],
         invalidate: [
-            // @ts-ignore
             ['/customers', CUSTOMER_ID, '/payment-instruments'],
-            // @ts-ignore
             ['/customers', CUSTOMER_ID, '/addresses'],
             ['/customers', '/external-profile']
         ]
@@ -51,27 +42,12 @@ const hooksDetails = {
         update: [
             [
                 '/customers',
-                // @ts-ignore
                 CUSTOMER_ID,
                 '/addresses',
-                // @ts-ignore
-                {
-                    // @ts-ignore
-                    addressName: `TestNewAddress`,
-                    // @ts-ignore
-                    customerId: CUSTOMER_ID
-                }
+                {addressName: `TestNewAddress`, customerId: CUSTOMER_ID}
             ]
         ],
-        invalidate: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                // @ts-ignore
-                {customerId: CUSTOMER_ID}
-            ]
-        ]
+        invalidate: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]]
     },
 
     updateCustomerAddress: {
@@ -82,27 +58,12 @@ const hooksDetails = {
         update: [
             [
                 '/customers',
-                // @ts-ignore
                 CUSTOMER_ID,
                 '/addresses',
-                // @ts-ignore
-                {
-                    // @ts-ignore
-                    addressName: ADDRESS_NAME,
-                    // @ts-ignore
-                    customerId: CUSTOMER_ID
-                }
+                {addressName: ADDRESS_NAME, customerId: CUSTOMER_ID}
             ]
         ],
-        invalidate: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                // @ts-ignore
-                {customerId: CUSTOMER_ID}
-            ]
-        ]
+        invalidate: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]]
     },
 
     removeCustomerAddress: {
@@ -110,28 +71,13 @@ const hooksDetails = {
             body: {},
             parameters: {customerId: CUSTOMER_ID, addressName: `TestNewAddress`}
         },
-        invalidate: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                // @ts-ignore
-                {customerId: CUSTOMER_ID}
-            ]
-        ],
+        invalidate: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]],
         remove: [
             [
                 '/customers',
-                // @ts-ignore
                 CUSTOMER_ID,
                 '/addresses',
-                // @ts-ignore
-                {
-                    // @ts-ignore
-                    addressName: `TestNewAddress`,
-                    // @ts-ignore
-                    customerId: CUSTOMER_ID
-                }
+                {addressName: `TestNewAddress`, customerId: CUSTOMER_ID}
             ]
         ]
     },
@@ -142,14 +88,7 @@ const hooksDetails = {
             parameters: {customerId: CUSTOMER_ID}
         },
         update: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                '/product-list',
-                // @ts-ignore
-                {customerId: CUSTOMER_ID, listId: LIST_ID}
-            ]
+            ['/customers', CUSTOMER_ID, '/product-list', {customerId: CUSTOMER_ID, listId: LIST_ID}]
         ]
     },
 
@@ -158,32 +97,9 @@ const hooksDetails = {
             body: {priority: 2, public: true, quantity: 3, type: 'product', productId: PRODUCT_ID},
             parameters: {customerId: CUSTOMER_ID, listId: LIST_ID}
         },
-        update: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                '/product-list',
-                // @ts-ignore
-                LIST_ID,
-                // @ts-ignore
-                {
-                    itemId: ITEM_ID
-                }
-            ]
-        ],
+        update: [['/customers', CUSTOMER_ID, '/product-list', LIST_ID, {itemId: ITEM_ID}]],
         invalidate: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                '/product-list',
-                // @ts-ignore
-                {
-                    customerId: CUSTOMER_ID,
-                    listId: LIST_ID
-                }
-            ]
+            ['/customers', CUSTOMER_ID, '/product-list', {customerId: CUSTOMER_ID, listId: LIST_ID}]
         ]
     },
 
@@ -192,30 +108,9 @@ const hooksDetails = {
             body: {priority: 2, public: true, quantity: 13},
             parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
         },
-        update: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                '/product-list',
-                // @ts-ignore
-                LIST_ID,
-                // @ts-ignore
-                {itemId: ITEM_ID}
-            ]
-        ],
+        update: [['/customers', CUSTOMER_ID, '/product-list', LIST_ID, {itemId: ITEM_ID}]],
         invalidate: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                '/product-list',
-                // @ts-ignore
-                {
-                    customerId: CUSTOMER_ID,
-                    listId: LIST_ID
-                }
-            ]
+            ['/customers', CUSTOMER_ID, '/product-list', {customerId: CUSTOMER_ID, listId: LIST_ID}]
         ]
     },
 
@@ -225,30 +120,9 @@ const hooksDetails = {
             parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
         },
         invalidate: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                '/product-list',
-                // @ts-ignore
-                {
-                    customerId: CUSTOMER_ID,
-                    listId: LIST_ID
-                }
-            ]
+            ['/customers', CUSTOMER_ID, '/product-list', {customerId: CUSTOMER_ID, listId: LIST_ID}]
         ],
-        remove: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                '/product-list',
-                // @ts-ignore
-                LIST_ID,
-                // @ts-ignore
-                {itemId: ITEM_ID}
-            ]
-        ]
+        remove: [['/customers', CUSTOMER_ID, '/product-list', LIST_ID, {itemId: ITEM_ID}]]
     },
 
     createCustomerPaymentInstrument: {
@@ -273,57 +147,35 @@ const hooksDetails = {
         update: [
             [
                 '/customers',
-                // @ts-ignore
                 CUSTOMER_ID,
                 '/payment-instruments',
-                // @ts-ignore
-                {
-                    customerId: CUSTOMER_ID,
-                    paymentInstrumentId: PAYMENT_INSTRUMENT_ID
-                }
+                {customerId: CUSTOMER_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
             ]
         ],
-        invalidate: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                // @ts-ignore
-                {customerId: CUSTOMER_ID}
-            ]
-        ]
+        invalidate: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]]
     },
     deleteCustomerPaymentInstrument: {
         args: {
             body: {},
             parameters: {customerId: CUSTOMER_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
         },
-        invalidate: [
-            [
-                '/customers',
-                // @ts-ignore
-                CUSTOMER_ID,
-                // @ts-ignore
-                {customerId: CUSTOMER_ID}
-            ]
-        ],
+        invalidate: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]],
         remove: [
             [
                 '/customers',
-                // @ts-ignore
                 CUSTOMER_ID,
                 '/payment-instruments',
-                // @ts-ignore
-                {
-                    customerId: CUSTOMER_ID,
-                    paymentInstrumentId: PAYMENT_INSTRUMENT_ID
-                }
+                {customerId: CUSTOMER_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
             ]
         ]
     }
 }
 
-const CustomerMutationComponent = ({action}: {action: string}) => {
+interface CustomerMutationComponentParams {
+    action: ShopperCustomersMutationType
+}
+
+const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) => {
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
 
     React.useEffect(() => {
@@ -333,11 +185,9 @@ const CustomerMutationComponent = ({action}: {action: string}) => {
         })
     }, [])
 
-    // @ts-ignore
     const mutationHook = useShopperCustomersMutation(action)
-
     // @ts-ignore
-    const args = hooksDetails[action]?.args
+    const {args} = hooksDetails[action]
 
     return (
         <>
@@ -359,7 +209,9 @@ const CustomerMutationComponent = ({action}: {action: string}) => {
 }
 
 const tests: {hook: string; cases: {name: string; assertions: () => Promise<void>}[]}[] = []
-Object.entries(hooksDetails).forEach(([key]) => {
+
+const objKeys = Object.keys(hooksDetails) as (keyof typeof hooksDetails)[]
+for (const key of objKeys) {
     tests.push({
         hook: key,
         cases: [
@@ -407,27 +259,18 @@ Object.entries(hooksDetails).forEach(([key]) => {
                         })
                     )
 
-                    // CACHE Pre-populate cache with the query keys we invalidate/update/remove on success
+                    // Pre-populate cache with query keys we invalidate/update/remove onSuccess
                     // @ts-ignore
-                    hooksDetails[key]?.invalidate?.map((queryKey) => {
+                    const {invalidate, update, remove} = hooksDetails[key]
+                    invalidate?.map((queryKey: QueryKey) => {
                         queryClient.setQueryData(queryKey, {})
-                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
                     })
-
-                    // @ts-ignore
-                    hooksDetails[key]?.update?.map((queryKey) => {
+                    update?.map((queryKey: QueryKey) => {
                         queryClient.setQueryData(queryKey, {})
-                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
                     })
-
-                    // @ts-ignore
-                    hooksDetails[key]?.remove?.map((queryKey) => {
+                    remove?.map((queryKey: QueryKey) => {
                         queryClient.setQueryData(queryKey, {})
-                        expect(queryClient.getQueryState(queryKey)).toBeTruthy()
                     })
-
-                    // TODO: Remove DEBUG console.log printing queries in cache
-                    // console.log('BEFORE cache:',queryClient.getQueryCache().getAll())
 
                     const button = screen.getByRole('button', {
                         name: key
@@ -436,25 +279,15 @@ Object.entries(hooksDetails).forEach(([key]) => {
                     fireEvent.click(button)
                     await waitFor(() => screen.getByText(/isSuccess/i))
                     expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
-                    // screen.debug(undefined, Infinity)
-                    // TODO: Remove DEBUG console.log printing queries in cache
-                    // console.log('AFTER cache:',queryClient.getQueryCache().getAll())
 
-                    // CACHE assert updated query keys
-                    // @ts-ignore
-                    hooksDetails[key]?.update?.map((queryKey) => {
+                    // Assert changes in cache
+                    update?.map((queryKey: QueryKey) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
                     })
-
-                    // CACHE assert invalidated query keys
-                    // @ts-ignore
-                    hooksDetails[key]?.invalidate?.map((queryKey) => {
+                    invalidate?.map((queryKey: QueryKey) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
                     })
-
-                    // CACHE assert removed query keys
-                    // @ts-ignore
-                    hooksDetails[key]?.remove?.map((queryKey) => {
+                    remove?.map((queryKey: QueryKey) => {
                         expect(queryClient.getQueryState(queryKey)).toBeFalsy()
                     })
                 }
@@ -504,7 +337,7 @@ Object.entries(hooksDetails).forEach(([key]) => {
             }
         ]
     })
-})
+}
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {
