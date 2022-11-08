@@ -7,7 +7,7 @@
 import React from 'react'
 import {useShopperLoginHelper} from './helper'
 import {fireEvent, waitFor, screen} from '@testing-library/react'
-import {renderWithProviders} from '../../test-utils'
+import {mockAuthCalls, renderWithProviders} from '../../test-utils'
 
 const mockLoginGuestUser = jest.fn().mockResolvedValue('mockLoginGuestUser')
 
@@ -64,6 +64,7 @@ const tests = [
                             </>
                         )
                     }
+                    mockAuthCalls()
                     renderWithProviders(<Component />)
                     const button = screen.getByText('login')
                     fireEvent.click(button)

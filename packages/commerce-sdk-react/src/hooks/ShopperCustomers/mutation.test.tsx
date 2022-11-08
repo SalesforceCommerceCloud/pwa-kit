@@ -458,6 +458,49 @@ Object.entries(hooksDetails).forEach(([key]) => {
                         expect(queryClient.getQueryState(queryKey)).toBeFalsy()
                     })
                 }
+            },
+            {
+                name: 'error',
+                assertions: async () => {
+                    mockAuthCalls()
+                    renderWithProviders(<CustomerMutationComponent action={key} />)
+                    await waitFor(() => screen.getByText(/kobe@test.com/))
+                    await waitFor(() =>
+                        screen.getByRole('button', {
+                            name: key
+                        })
+                    )
+
+                    // Mock server responses
+                    nock('http://localhost:3000')
+                        .patch((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(500, {})
+                    nock('http://localhost:3000')
+                        .put((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(500, {})
+                    nock('http://localhost:3000')
+                        .post((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(500, {})
+                    nock('http://localhost:3000')
+                        .delete((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(500, {})
+
+                    const button = screen.getByRole('button', {
+                        name: key
+                    })
+
+                    fireEvent.click(button)
+                    await waitFor(() => screen.getByText(/error/i))
+                    expect(screen.getByText(/error/i)).toBeInTheDocument()
+                }
             }
         ]
     })
