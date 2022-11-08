@@ -14,11 +14,17 @@ const UseShopperLoginHelper = () => {
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
     const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
 
+    //logout before logging guest user in
+    const loginGuestUserFlow = async () => {
+        await logout.mutateAsync()
+        loginGuestUser.mutate()
+    }
+
     return (
         <>
             <h1>LoginGuestUser</h1>
             <Json data={loginGuestUser} />
-            <button onClick={() => loginGuestUser.mutate()}>loginGuestUser</button>
+            <button onClick={() => loginGuestUserFlow()}>loginGuestUser</button>
             {loginGuestUser.error?.message && (
                 <p style={{color: 'red'}}>Error: {loginGuestUser.error?.message}</p>
             )}

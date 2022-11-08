@@ -9,13 +9,17 @@
 'use strict'
 
 const path = require('path')
+const fse = require('fs-extra')
 const git = require('git-rev-sync')
+const validator = require('validator')
 
 const archiver = require('archiver')
 
 const fileUtils = require('./file-utils')
 
 const Matcher = require('../dist/utils/glob').Matcher
+
+const request = require('request')
 
 const SDK_VERSION = require('../package.json').version
 const DEFAULT_DOCS_URL =
@@ -214,6 +218,39 @@ Utils.readCredentials = (filepath) => {
         )
 }
 
+Utils.readPackageJson = (keyName) => {
+    try {
+        // Using the full path isn't strictly necessary, but results in clearer errors
+        const packageJson = path.join(process.cwd(), 'package.json')
+        const key = fse.readJsonSync(packageJson)[keyName]
+        if (!key) Utils.fail(`Error reading ${packageJson}: key '${keyName}' is missing`)
+        return key
+    } catch (e) {
+        Utils.fail(e)
+    }
+}
+
+Utils.createToken = (project, environment, cloudOrigin, apiKey) => {
+    const options = {
+        url: new URL(`/api/projects/${project}/target/${environment}/jwt/`, cloudOrigin).toString(),
+        method: 'POST',
+        headers: Utils.getRequestHeaders({
+            Accept: 'application/json',
+            Authorization: `Bearer ${apiKey}`
+        })
+    }
+    return new Promise((resolve) => {
+        request(options, (error, response, body) => {
+            if (error || (error = Utils.errorForStatus(response))) {
+                Utils.fail(`${cloudOrigin} returned ${error.message}`)
+            }
+            resolve(body)
+        })
+    })
+        .then((body) => JSON.parse(body).token)
+        .catch((e) => Utils.fail(e))
+}
+
 Utils.setDefaultMessage = () => {
     try {
         return `${git.branch()}: ${git.short()}`
@@ -242,6 +279,45 @@ Utils.requestErrorMessage = {
     code404:
         'Resource not found.\nPlease double check your command to make sure the option values are correct.', // wrong target name
     code500: 'Internal Server Error. Please report this to the Salesforce support team.'
+}
+
+/**
+ * @param {string} log
+ * @returns {Object}
+ *  {
+ *      level,
+ *      message,
+ *      requestId
+ *  }
+ */
+Utils.parseLog = (log) => {
+    const parts = log.trim().split('\t')
+    let requestId, shortRequestId, message, level
+
+    if (
+        parts.length >= 3 &&
+        validator.isISO8601(parts[0]) &&
+        validator.isUUID(parts[1]) &&
+        validator.isAlpha(parts[2])
+    ) {
+        // An application log
+        parts.shift()
+        requestId = parts.shift()
+        level = parts.shift()
+    } else {
+        // A platform log
+        const words = parts[0].split(' ')
+        level = words.shift()
+        parts[0] = words.join(' ')
+    }
+    message = parts.join('\t')
+
+    const match = /(?<id>[a-f\d]{8})/.exec(requestId || message)
+    if (match) {
+        shortRequestId = match.groups.id
+    }
+
+    return {level, message, shortRequestId}
 }
 
 module.exports = Utils

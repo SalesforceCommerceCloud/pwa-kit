@@ -30,6 +30,7 @@ const main = (opts) => {
         /^test.*$/,
         /^push$/,
         /^save-credentials$/,
+        /^tail-logs$/,
         /^format$/,
         /^build$/,
         /^start.*$/,
