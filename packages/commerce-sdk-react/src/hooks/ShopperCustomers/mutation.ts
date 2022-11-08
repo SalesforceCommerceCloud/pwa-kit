@@ -384,6 +384,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
                                 '/payment-instruments',
                                 // @ts-ignore
                                 {
+                                    // @ts-ignore
                                     customerId: params?.parameters?.customerId,
                                     paymentInstrumentId: data?.paymentInstrumentId
                                 }

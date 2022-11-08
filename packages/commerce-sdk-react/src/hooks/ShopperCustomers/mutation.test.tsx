@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import path from 'path'
-import {mockHttpResponses, renderWithProviders, queryClient} from '../../test-utils'
+import {mockHttpResponses, renderWithProviders, queryClient, mockAuthCalls} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {useShopperCustomersMutation, ShopperCustomersMutations} from './mutation'
@@ -369,7 +369,41 @@ Object.entries(hooksDetails).forEach(([key]) => {
         cases: [
             {
                 name: 'success',
-                assertions: withMocks(async () => {
+                assertions: async () => {
+
+                    mockAuthCalls()
+
+                    // Mock server responses
+                    const mockReplyBody={
+                        customerId: CUSTOMER_ID,
+                        email: CUSTOMER_EMAIL,
+                        login: CUSTOMER_EMAIL,
+                        listId: LIST_ID,
+                        itemId: ITEM_ID,
+                        paymentInstrumentId: PAYMENT_INSTRUMENT_ID
+                    }
+
+                    nock('http://localhost:3000')
+                        .patch((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(200, mockReplyBody)
+                    nock('http://localhost:3000')
+                        .put((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(200, mockReplyBody)
+                    nock('http://localhost:3000')
+                        .post((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(200, mockReplyBody)
+                    nock('http://localhost:3000')
+                        .delete((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(204, {})
+
                     renderWithProviders(<CustomerMutationComponent action={key} />)
                     await waitFor(() => screen.getByText(/kobe@test.com/))
                     await waitFor(() =>
@@ -400,36 +434,6 @@ Object.entries(hooksDetails).forEach(([key]) => {
                     // TODO: Remove DEBUG console.log printing queries in cache
                     // console.log('BEFORE cache:',queryClient.getQueryCache().getAll())
 
-                    // Mock server responses
-                    const mockReplyBody={
-                        customerId: CUSTOMER_ID,
-                        email: CUSTOMER_EMAIL,
-                        login: CUSTOMER_EMAIL,
-                        listId: LIST_ID,
-                        itemId: ITEM_ID,
-                        paymentInstrumentId: PAYMENT_INSTRUMENT_ID
-                    }
-                    nock('http://localhost:3000')
-                        .patch((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(200, mockReplyBody)
-                    nock('http://localhost:3000')
-                        .put((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(200, mockReplyBody)
-                    nock('http://localhost:3000')
-                        .post((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(200, mockReplyBody)
-                    nock('http://localhost:3000')
-                        .delete((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(204, {})
-
                     const button = screen.getByRole('button', {
                         name: key
                     })
@@ -458,7 +462,7 @@ Object.entries(hooksDetails).forEach(([key]) => {
                     hooksDetails[key]?.remove?.map((queryKey) => {
                         expect(queryClient.getQueryState(queryKey)).toBeFalsy()
                     })
-                })
+                }
             }
         ]
     })
