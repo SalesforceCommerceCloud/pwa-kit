@@ -6,15 +6,13 @@
  */
 import React from 'react'
 import path from 'path'
-import {mockHttpResponses, renderWithProviders} from '../../test-utils'
+import {renderWithProviders, mockAuthCalls} from '../../test-utils'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {useQueryClient} from '@tanstack/react-query'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {ShopperBasketsMutations, useShopperBasketsMutation} from '../ShopperBaskets'
 import {ShopperOrdersMutations, useShopperOrdersMutation} from './mutation'
 import nock from 'nock'
-
-const {withMocks} = mockHttpResponses({directory: path.join(__dirname, '../../../mock-responses')})
 
 // Valid id of prepared basket
 const BASKET_ID = '753b796f71aaaef79b0adde657'
@@ -62,7 +60,8 @@ const tests = [
         cases: [
             {
                 name: 'success',
-                assertions: withMocks(async () => {
+                assertions: async () => {
+                    mockAuthCalls()
                     renderWithProviders(<OrderMutationComponent />)
 
                     await waitFor(() => screen.getByText(/alex@test.com/))
@@ -100,11 +99,12 @@ const tests = [
                     fireEvent.click(button)
                     await waitFor(() => screen.getByText(/orderno/i))
                     expect(screen.getByText(/orderno/i)).toBeInTheDocument()
-                })
+                }
             },
             {
                 name: 'error',
-                assertions: withMocks(async () => {
+                assertions: async () => {
+                    mockAuthCalls()
                     renderWithProviders(<OrderMutationComponent />)
                     await waitFor(() => screen.getByText(/alex@test.com/))
                     await waitFor(() =>
@@ -126,7 +126,7 @@ const tests = [
                     fireEvent.click(button)
                     await waitFor(() => screen.getByText(/error/i))
                     expect(screen.getByText(/error/i)).toBeInTheDocument()
-                })
+                }
             }
         ]
     }
