@@ -321,7 +321,7 @@ const buildAnswers = ({
 const testProjectAnswers = () => {
     const config = {
         projectName: 'retail-react-app',
-        instanceUrl: 'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com',
+        instanceUrl: 'https://zzrf-001.dx.commercecloud.salesforce.com',
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
         siteId: 'RefArch',
         organizationId: 'f_ecom_zzrf_001',

@@ -8,6 +8,7 @@
 const Utils = require('./utils')
 
 const fs = require('fs')
+const fse = require('fs-extra')
 const path = require('path')
 const os = require('os')
 const rimraf = require('rimraf')
@@ -15,6 +16,9 @@ const pkg = require('../package.json')
 
 jest.mock('git-rev-sync')
 const git = require('git-rev-sync')
+
+jest.mock('request')
+const request = require('request')
 
 let realFail
 beforeEach(() => {
@@ -54,6 +58,86 @@ test('errorForStatus returns false for 2xx and 3xx statuses', () => {
 test('errorForStatus returns an Error for 4xx and 5xx statuses', () => {
     ;[400, 401, 403, 404, 500, 503].forEach((statusCode) => {
         expect(Utils.errorForStatus({statusCode})).toBeInstanceOf(Error)
+    })
+})
+
+describe('readPackageJson', () => {
+    const data = {name: 'test'}
+    let mockReadJsonSync
+    beforeAll(() => {
+        mockReadJsonSync = jest.spyOn(fse, 'readJsonSync').mockImplementation(() => data)
+    })
+
+    afterAll(() => {
+        mockReadJsonSync.mockRestore()
+    })
+
+    test('returns key value', () => {
+        const keyName = 'name'
+        const packageJson = path.join(process.cwd(), 'package.json')
+        expect(Utils.readPackageJson(keyName)).toBe(data[keyName])
+        expect(fse.readJsonSync).toBeCalledWith(packageJson)
+    })
+
+    test('fails if key is missing', () => {
+        const keyName = 'fake'
+        expect(Utils.readPackageJson(keyName)).toBeUndefined()
+        expect(fse.readJsonSync).toBeCalled()
+        expect(Utils.fail).toBeCalled()
+
+        const errorMessage = Utils.fail.mock.calls[0][0]
+        expect(errorMessage.includes(`key '${keyName}' is missing`)).toBeTruthy()
+    })
+})
+
+describe('createToken', () => {
+    let args = {
+        project: 'pwa-kit',
+        environment: 'dev',
+        cloudOrigin: 'https://cloud-test.mobify.com',
+        apiKey: 'key'
+    }
+
+    test('makes request and returns token', async () => {
+        const data = {token: 'abcd'}
+        request.mockClear()
+        request.mockImplementationOnce((_, callback) => {
+            callback(null, {}, JSON.stringify(data))
+        })
+
+        const mockGetHeaders = jest.fn((headers) => headers)
+        Utils.getRequestHeaders = mockGetHeaders
+
+        expect(await Utils.createToken(...Object.values(args))).toBe(data.token)
+        expect(request).toBeCalled()
+        expect(mockGetHeaders).toBeCalled()
+
+        const options = request.mock.calls[0][0]
+        expect(options.url).toBe(
+            `${args.cloudOrigin}/api/projects/${args.project}/target/${args.environment}/jwt/`
+        )
+        expect(options.method).toBe('POST')
+        expect(options.headers).toStrictEqual({
+            Accept: 'application/json',
+            Authorization: `Bearer ${args.apiKey}`
+        })
+    })
+
+    test('fails after unsuccessful request', async () => {
+        const error = {statusCode: 403}
+        request.mockClear()
+        request.mockImplementationOnce((_, callback) => {
+            callback(null, error, {})
+        })
+
+        expect(await Utils.createToken(...Object.values(args))).toBeUndefined()
+        expect(request).toBeCalled()
+        expect(Utils.fail).toBeCalled()
+
+        const errorMessage = Utils.fail.mock.calls[0][0]
+        expect(
+            errorMessage.includes(`${args.cloudOrigin} returned HTTP ${error.statusCode}`)
+        ).toBeTruthy()
     })
 })
 
@@ -185,6 +269,67 @@ describe('Create Bundle', () => {
                     expect(result.ssr_shared.sort()).toEqual(expectedSSRShared.sort())
                 })
                 .finally(() => rimraf.sync(tmp))
+        })
+    })
+})
+
+test('parseLog parses application and platform logs correctly', () => {
+    const requestId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+    const shortRequestId = requestId.slice(0, 8)
+    const cases = [
+        {
+            log: `START RequestId: ${requestId} Version: $LATEST`,
+            expected: {
+                level: 'START',
+                message: `RequestId: ${requestId} Version: $LATEST`,
+                shortRequestId
+            }
+        },
+        {
+            log: `END RequestId: ${requestId}`,
+            expected: {
+                level: 'END',
+                message: `RequestId: ${requestId}`,
+                shortRequestId
+            }
+        },
+        {
+            log: `REPORT RequestId: ${requestId}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
+            expected: {
+                level: 'REPORT',
+                message: `RequestId: ${requestId}\tDuration: 21.04 ms\tBilled Duration: 22 ms\tMemory Size: 2496 MB\tMax Memory Used: 94 MB`,
+                shortRequestId
+            }
+        },
+        {
+            log: `2022-10-31T22:00:00.000Z\t${requestId}\tINFO\tRequest: GET /`,
+            expected: {
+                level: 'INFO',
+                message: 'Request: GET /',
+                shortRequestId
+            }
+        },
+        {
+            log: `2022-10-31T22:00:00.000Z\t${requestId}\tERROR\tResponse status: 500\tuh oh!`,
+            expected: {
+                level: 'ERROR',
+                message: 'Response status: 500\tuh oh!',
+                shortRequestId
+            }
+        },
+        {
+            log: `2022-10-31T22:00:00.000Z\t${requestId}\tINFO\t`,
+            expected: {
+                level: 'INFO',
+                message: '',
+                shortRequestId
+            }
+        }
+    ]
+    cases.forEach(({log, expected}) => {
+        const parsed = Utils.parseLog(log)
+        Object.keys(parsed).forEach((key) => {
+            expect(parsed[key]).toBe(expected[key])
         })
     })
 })
