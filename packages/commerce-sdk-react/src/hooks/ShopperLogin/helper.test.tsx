@@ -11,11 +11,16 @@ import {renderWithProviders} from '../../test-utils'
 
 const mockLoginGuestUser = jest.fn().mockResolvedValue('mockLoginGuestUser')
 
-jest.mock('../useAuth', () => {
-    return jest.fn(() => ({
-        ready: () => Promise.resolve({access_token: '123'}),
-        loginGuestUser: mockLoginGuestUser
-    }))
+jest.mock('../../auth', () => {
+    return class Auth {
+        ready() {
+            return Promise.resolve({access_token: '123'})
+        }
+
+        loginGuestUser() {
+            return mockLoginGuestUser()
+        }
+    }
 })
 
 const tests = [
