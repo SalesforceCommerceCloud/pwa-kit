@@ -168,8 +168,9 @@ commands:
           command: |
             set GENERATOR_PRESET=test-project
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
+            
             cd generated-project
-          no_output_timeout: 5m
+            npm run prod:build
       - run:
           name: Generate hello-world project
           environment:
