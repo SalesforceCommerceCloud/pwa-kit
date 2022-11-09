@@ -5,12 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import path from 'path'
 import {renderWithProviders, mockAuthCalls} from '../../test-utils'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
-import {useQueryClient} from '@tanstack/react-query'
+import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
-import {ShopperBasketsMutations, useShopperBasketsMutation} from '../ShopperBaskets'
 import {ShopperOrdersMutations, useShopperOrdersMutation} from './mutation'
 import nock from 'nock'
 
@@ -70,13 +67,6 @@ const tests = [
                             name: /create order/i
                         })
                     )
-
-                    const mockBasketResponse = {
-                        basketId: BASKET_ID,
-                        customerInfo: {
-                            email: 'alex@test.com'
-                        }
-                    }
 
                     const mockOrderResponse = {
                         orderNo: '00000410',
