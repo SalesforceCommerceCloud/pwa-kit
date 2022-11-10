@@ -7,12 +7,18 @@
 import loadable from '@loadable/component'
 
 const Home = loadable(() => import('./pages/home'))
+const Page = loadable(() => import('./pages/page'))
 
 const routes = [
     {
         path: '/',
         exact: true,
         component: Home
+    },
+    {
+        path: '/page/:pageId',
+        exact: true,
+        component: Page
     }
 ]
 
