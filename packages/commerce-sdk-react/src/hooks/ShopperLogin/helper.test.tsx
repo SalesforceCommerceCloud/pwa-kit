@@ -7,7 +7,16 @@
 import React from 'react'
 import {useShopperLoginHelper} from './helper'
 import {fireEvent, waitFor, screen} from '@testing-library/react'
-import {mockAuthCalls, renderWithProviders} from '../../test-utils'
+import {renderWithProviders} from '../../test-utils'
+
+const mockLoginGuestUser = jest.fn().mockResolvedValue('mockLoginGuestUser')
+
+jest.mock('../useAuth', () => {
+    return jest.fn(() => ({
+        ready: () => Promise.resolve({access_token: '123'}),
+        loginGuestUser: mockLoginGuestUser
+    }))
+})
 
 const tests = [
     {
@@ -35,7 +44,6 @@ const tests = [
                             </>
                         )
                     }
-                    mockAuthCalls()
                     renderWithProviders(<Component />)
                     expect(screen.getByText('loginGuestUser:isLoading:false')).toBeInTheDocument()
                     expect(
@@ -52,17 +60,16 @@ const tests = [
                         return (
                             <>
                                 <button onClick={() => loginGuestUser.mutate()}>login</button>
-                                <p>{loginGuestUser.isSuccess && <span>isSuccess</span>}</p>
+                                <p>{loginGuestUser.data}</p>
                             </>
                         )
                     }
-                    mockAuthCalls()
-
                     renderWithProviders(<Component />)
                     const button = screen.getByText('login')
                     fireEvent.click(button)
-                    await waitFor(() => screen.getByText(/isSuccess/i))
-                    expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
+                    await waitFor(() => screen.getByText('mockLoginGuestUser'))
+                    expect(mockLoginGuestUser).toHaveBeenCalled()
+                    expect(screen.getByText('mockLoginGuestUser')).toBeInTheDocument()
                 }
             }
         ]
@@ -72,7 +79,7 @@ const tests = [
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {
         afterEach(() => {
-            jest.clearAllMocks()
+            mockLoginGuestUser.mockClear()
         })
         cases.forEach(({name, assertions}) => {
             test(name, assertions)
