@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import React from 'react'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import AppConfig from 'pwa-kit-react-sdk/ssr/universal/components/_app-config'
-
+import {BuyerProvider} from '../../hooks/useBuyer'
 const isServerSide = typeof window === 'undefined'
 
 // Recommended settings for PWA-Kit usages.
@@ -26,5 +26,14 @@ const options = {
         }
     }
 }
+
+const AppConfig = ({children, locals = {}}) => {
+    const [token, setToken] = React.useState(null)
+    return <BuyerProvider value={{token, setToken}}>{children}</BuyerProvider>
+}
+
+AppConfig.restore = () => {}
+AppConfig.freeze = () => undefined
+AppConfig.extraGetPropsArgs = () => {}
 
 export default withReactQuery(withLegacyGetProps(AppConfig), options)
