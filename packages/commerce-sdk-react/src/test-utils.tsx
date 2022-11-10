@@ -10,28 +10,24 @@ import React from 'react'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
-export const TEST_CONFIG = {
-    proxy: 'http://localhost:3000/mobify/proxy/api',
-    clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-    organizationId: 'f_ecom_zzrf_001',
-    shortCode: '8o7m175y',
-    redirectURI: 'http://localhost:3000/callback',
+export const DEFAULT_TEST_CONFIG = {
+    proxy: 'http://localhost:8888/mobify/proxy/api',
+    clientId: '12345678-1234-1234-1234-123412341234',
+    organizationId: 'f_ecom_zzrmy_orgf_001',
+    shortCode: '12345678',
+    redirectURI: 'http://localhost:8888/callback',
     siteId: 'RefArchGlobal',
     locale: 'en-US',
     currency: 'USD'
 }
-const TestProviders = (props: {
-    children: React.ReactNode
-    commerceApiProvider?: Partial<CommerceApiProviderProps>
-}) => {
-    const {commerceApiProvider} = props
+const TestProviders = (props: Partial<CommerceApiProviderProps>) => {
     const queryClient = new QueryClient({
         // During testing, we want things to fail immediately
         defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
     })
     return (
         <QueryClientProvider client={queryClient}>
-            <CommerceApiProvider {...TEST_CONFIG} {...commerceApiProvider}>
+            <CommerceApiProvider {...DEFAULT_TEST_CONFIG} {...props}>
                 {props.children}
             </CommerceApiProvider>
         </QueryClientProvider>
@@ -42,19 +38,17 @@ const TestProviders = (props: {
  * Render your component, which will be wrapped with all the necessary Provider components
  *
  * @param children
+ * @param props - additional props to pass to providers in TestProvider component
  * @param options - additional options for testing-library's render function
- * @param providerProps - additional props to pass to providers in TestProvider component
  */
 export const renderWithProviders = (
     children: React.ReactElement,
-    options?: Omit<RenderOptions, 'wrapper'>,
-    providerProps?: {
-        commerceApiProvider?: Partial<CommerceApiProviderProps>
-    }
+    props?: Partial<CommerceApiProviderProps>,
+    options?: Omit<RenderOptions, 'wrapper'>
 ): void => {
     render(children, {
         // eslint-disable-next-line react/display-name
-        wrapper: () => <TestProviders {...providerProps}>{children}</TestProviders>,
+        wrapper: ({children}) => <TestProviders {...props}>{children}</TestProviders>,
         ...options
     })
 }

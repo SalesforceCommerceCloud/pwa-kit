@@ -8,23 +8,41 @@ import React from 'react'
 import {screen} from '@testing-library/react'
 import useCommerceApi from './useCommerceApi'
 import {renderWithProviders} from '../test-utils'
+import {ApiClients} from './types'
 
 jest.mock('../auth/index.ts');
 
-test(
-    'useCommerceApi returns a set of api clients',
-    async () => {
-        const Component = () => {
-            const api = useCommerceApi()
-            return (
-                <>
-                    <p>{api?.shopperSearch && 'shopperSearch'}</p>
-                    <p>{api?.shopperBaskets && 'shopperBaskets'}</p>
+describe('useCommerceApi',() => {
+    test(
+        'returns a set of api clients',
+        async () => {
+            const clients: (keyof ApiClients)[] = [
+                'shopperBaskets',
+                'shopperContexts',
+                'shopperCustomers',
+                'shopperDiscoverySearch',
+                'shopperGiftCertificates',
+                'shopperLogin',
+                'shopperOrders',
+                'shopperProducts',
+                'shopperPromotions',
+                'shopperSearch'
+            ]
+
+            const Component = () => {
+                const api = useCommerceApi()
+                return (
+                    <>
+                    {clients.map((name) => {
+                        return <p key={name}>{api[name] && name}</p>
+                    })}
                     </>
-            )
+                )
+            }
+            renderWithProviders(<Component />)
+            clients.forEach((name) => {
+                expect(screen.getByText(name)).toBeInTheDocument()
+            })
         }
-        renderWithProviders(<Component />)
-        expect(screen.getByText('shopperSearch')).toBeInTheDocument()
-        expect(screen.getByText('shopperBaskets')).toBeInTheDocument()
-    }
-)
+    )
+})
