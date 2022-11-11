@@ -37,8 +37,8 @@ export const AuthProvider = ({children}) => {
                     </soap:Header>
                     <soap:Body>
                         <login xmlns="urn:enterprise.soap.sforce.com">
-                            <username></username>
-                            <password></password>
+                            <username>alex.vuong@salesforce.com</username>
+                            <password>Test1234!</password>
                         </login>
                     </soap:Body>
                 </soap:Envelope>`
@@ -68,49 +68,3 @@ export const useAuth = () => {
 
     return context
 }
-
-// export default function useAuth() {
-//     const getToken = async () => {
-//         console.log('fetch')
-//         const response = await fetch(`${getAppOrigin()}/mobify/proxy/scom/services/Soap/c/55.0`, {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'text/xml',
-//                 SOAPAction: 'login'
-//             },
-//             body: `<?xml version="1.0" encoding="utf-8"?>
-//                 <soap:Envelope
-//                 xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-//                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-//                 xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-//                     <soap:Header>
-//                         <LoginScopeHeader xmlns="urn:enterprise.soap.sforce.com">
-//                             <organizationId>00DRO000000BH4w</organizationId>
-//                         </LoginScopeHeader>
-//                     </soap:Header>
-//                     <soap:Body>
-//                         <login xmlns="urn:enterprise.soap.sforce.com">
-//                             <username>alex.vuong@salesforce.com</username>
-//                             <password>Test1234!</password>
-//                         </login>
-//                     </soap:Body>
-//                 </soap:Envelope>`
-//         })
-//         const body = await response.text()
-//         const token = /<sessionId>(.*)<\/sessionId>/.exec(body)[1]
-//         window.localStorage.setItem('token', token)
-//         setToken(token)
-//     }
-//     const {token, setToken} = useContext(AuthContext)
-//
-//     React.useEffect(() => {
-//         const token = window.localStorage.getItem('token')
-//         if (token) {
-//             setToken(token)
-//         } else {
-//             getToken()
-//         }
-//     }, [])
-//
-//     return [token, getToken]
-// }

@@ -122,6 +122,12 @@ export const useCartItems = (cartStateOrId = 'current') => {
     return data
 }
 
+export const useCheckout = (activeOrCheckoutId) => {
+    const url = getApiUrl(`/checkouts/${activeOrCheckoutId}`)
+    const data = useFetch(url)
+    return data
+}
+
 export const useProductCategoryPath = (categoryId, params) => {
     const queryParams = new URLSearchParams(params)
     if (categoryId) {
