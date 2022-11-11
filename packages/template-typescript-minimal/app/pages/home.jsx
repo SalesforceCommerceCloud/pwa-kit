@@ -5,71 +5,56 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
-import {useQuery} from '@tanstack/react-query'
-//@ts-ignore
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-//@ts-ignore
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import useBuyer from '../hooks/useBuyer'
-import useFetch from '../hooks/useFetch'
+import {useCategories, useProductCategoryPath} from '../hooks/useFetch'
+import {useQuery} from '@tanstack/react-query'
+import {Link} from 'react-router-dom'
+
+const Category = ({cate}) => {
+    const {fields} = cate
+    const {data, isLoading} = useCategories(fields.Id)
+    console.log('data', data)
+
+    return (
+        <div>
+            <div>Category {fields.Name}</div>
+            {isLoading ? (
+                <div>Loading...</div>
+            ) : (
+                data?.productCategories && (
+                    <ul>
+                        <li>
+                            {data?.productCategories?.map((cate) => (
+                                <div key={cate.fields.Id}>
+                                    <div>{cate.fields.Name}</div>
+                                </div>
+                            ))}
+                        </li>
+                    </ul>
+                )
+            )}
+        </div>
+    )
+}
 
 const Home = () => {
-    // const [token, setToken] = useState('')
     const {
         app: {webstoreId}
     } = getConfig()
-    const [token, getToken] = useBuyer()
-    const productId = 'fds'
-    const test = useFetch(
-        `${getAppOrigin()}/mobify/proxy/scom/services/data/v55.0/commerce/webstores/${webstoreId}/product-categories/children`
-    )
-    const query = useQuery(
-        ['categories'],
-        () => test
-        // async () => {
-        //     const res = await fetch(
-        //         `${getAppOrigin()}/mobify/proxy/scom/services/data/v55.0/commerce/webstores/${webstoreId}/product-categories/children`,
-        //         {
-        //             headers: {
-        //                 Authorization: `Bearer ${token}`
-        //             }
-        //         }
-        //     )
-        //     const data = await res.json()
-        //     return data
-        // }
-    )
-    React.useEffect(() => {
-        getToken()
-    }, [])
-    console.log('token', token)
+    const {data, isLoading} = useCategories()
+    if (isLoading) {
+        return <div>Loading categories.....</div>
+    }
 
-    console.log('query', query.data)
     return (
         <div>
             <div>
-                <div>{token && token}</div>
-                {token ? (
-                    <div>Logged in as alex.vuong </div>
-                ) : (
-                    <button onClick={getToken}>Log in as alex.vuong@salesforce.com</button>
-                )}
-                <button
-                    onClick={async () => {
-                        const res = await fetch(
-                            `${getAppOrigin()}/mobify/proxy/scom/services/data/v55.0/commerce/webstores/${webstoreId}/product-categories/children`,
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${token}`
-                                }
-                            }
-                        )
-                        const data = await res.json()
-                        console.log('data', data)
-                    }}
-                >
-                    Get a product detail
-                </button>
+                <div>
+                    {data?.productCategories.map((cate) => {
+                        return <Category key={cate.id} cate={cate} />
+                    })}
+                </div>
+                <Link to="/products/go-brew">Go Brew Coffee</Link>
             </div>
         </div>
     )

@@ -7,8 +7,9 @@
 import React from 'react'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {BuyerProvider} from '../../hooks/useBuyer'
+import {AuthProvider} from '../../hooks/useAuth'
 const isServerSide = typeof window === 'undefined'
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 // Recommended settings for PWA-Kit usages.
 // NOTE: they will be applied on both server and client side.
@@ -27,9 +28,13 @@ const options = {
     }
 }
 
-const AppConfig = ({children, locals = {}}) => {
-    const [token, setToken] = React.useState(null)
-    return <BuyerProvider value={{token, setToken}}>{children}</BuyerProvider>
+const AppConfig = ({children}) => {
+    return (
+        <>
+            <AuthProvider>{children}</AuthProvider>
+            <ReactQueryDevtools />
+        </>
+    )
 }
 
 AppConfig.restore = () => {}
