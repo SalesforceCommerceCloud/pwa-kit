@@ -5,17 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {render, RenderOptions} from '@testing-library/react'
 import React from 'react'
-import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
+import {render, RenderOptions} from '@testing-library/react'
+import { renderHook } from '@testing-library/react-hooks/dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 
 export const DEFAULT_TEST_CONFIG = {
+    // localhost:8888 does NOT exist
+    // it is intentional b/c we want to catch the
+    // requests that are not intercepted by nock
     proxy: 'http://localhost:8888/mobify/proxy/api',
+    redirectURI: 'http://localhost:8888/callback',
     clientId: '12345678-1234-1234-1234-123412341234',
     organizationId: 'f_ecom_zzrmy_orgf_001',
     shortCode: '12345678',
-    redirectURI: 'http://localhost:8888/callback',
     siteId: 'RefArchGlobal',
     locale: 'en-US',
     currency: 'USD'
@@ -51,4 +55,21 @@ export const renderWithProviders = (
         wrapper: ({children}) => <TestProviders {...props}>{children}</TestProviders>,
         ...options
     })
+}
+
+/**
+ * Render your hook, which will be wrapped with all the necessary Provider components
+ *
+ * @param children
+ * @param props - additional props to pass to providers in TestProvider component
+ * @param options - additional options for testing-library's render function
+ */
+export function renderHookWithProviders<TProps, TResult>(
+    callback: (props: TProps) => TResult,
+    props?: Partial<CommerceApiProviderProps>,
+) {
+    return renderHook(
+        callback,
+        {wrapper: ({children}) => <TestProviders {...props}>{children}</TestProviders>}
+    )
 }

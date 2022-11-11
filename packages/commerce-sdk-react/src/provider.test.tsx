@@ -15,7 +15,7 @@ jest.mock('./auth/index.ts');
 describe('provider', () => {
     beforeEach(() => {
         (Auth as jest.Mock).mockClear();
-      });
+    });
 
     test(
         'api clients optional config are passed properly',

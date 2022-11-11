@@ -19,5 +19,9 @@ module.exports = {
             statements: 0
         }
     },
-    collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}']
+    collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
+
+    // this reporter hides console.error when tests succeed
+    // this prevent expected errors from polluting jest logs
+    reporters: [["jest-silent-reporter", { "useDots": true, "showPaths": true }]]
 }
