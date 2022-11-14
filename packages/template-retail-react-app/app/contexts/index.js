@@ -5,8 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
+import isEqual from 'lodash/isEqual'
+import omit from 'lodash/omit'
+import {useCommerceAPI} from '../commerce-api/contexts'
 
 /**
  * This is the global state for categories, we use this for navigation and for
@@ -31,11 +34,146 @@ import PropTypes from 'prop-types'
  *
  */
 export const CategoriesContext = React.createContext()
-export const CategoriesProvider = ({categories: initialCategories = {}, children}) => {
-    const [categories, setCategories] = useState(initialCategories)
+export const CategoriesProvider = ({treeRoot = {}, children}) => {
+    const itemsKey = 'categories'
+    const DEFAULT_ROOT_CATEGORY = 'root'
+    const LOCAL_STORAGE_PREFIX = `pwa-kit-cat-`
+
+    const api = useCommerceAPI()
+    const [root, setRoot] = useState({
+        // map over the server-provided cat
+        ...treeRoot[DEFAULT_ROOT_CATEGORY],
+        [itemsKey]: treeRoot[DEFAULT_ROOT_CATEGORY]?.[itemsKey]?.map((item) => ({
+            ...item,
+            loaded: false
+        }))
+    })
+    const [queue, setQueue] = useState({})
+
+    // iterates through each deep nested object and if finds object that has prop and value specified in objToFindBy
+    // argument, it replaces the current object with replacementObj, stops recursive walk and returns the whole tree.
+    // If none is found, it returns false.
+
+    // copied from https://github.com/brojd/obj-traverse/blob/master/src/findAndModifyFirst/findAndModifyFirst.js
+    const findAndModifyFirst = (tree, childrenKey, objToFindBy, replacementObj) => {
+        let treeToReturn = tree
+        let findSuccess = false
+        let modifiedObj = false
+        const findKeys = Object.keys(objToFindBy)
+        findKeys.forEach((key) => {
+            isEqual(tree[key], objToFindBy[key]) ? (findSuccess = true) : (findSuccess = false)
+        })
+        if (findSuccess) {
+            for (let prop in tree) {
+                delete tree[prop]
+            }
+            for (let prop in replacementObj) {
+                tree[prop] = replacementObj[prop]
+            }
+            return tree
+        }
+        const findInChildren = (obj, childrenKey, objToFindBy, replacementObj) => {
+            if (obj.hasOwnProperty(childrenKey)) {
+                for (let i = 0; i < obj[childrenKey].length; i++) {
+                    findKeys.forEach((key) => {
+                        isEqual(obj[childrenKey][i][key], objToFindBy[key])
+                            ? (findSuccess = true)
+                            : (findSuccess = false)
+                    })
+                    if (findSuccess) {
+                        obj[childrenKey][i] = replacementObj
+                        modifiedObj = true
+                        break
+                    }
+                }
+                if (!findSuccess) {
+                    obj[childrenKey].forEach((child) =>
+                        findInChildren(child, childrenKey, objToFindBy, replacementObj)
+                    )
+                }
+            }
+            return obj
+        }
+        findInChildren(tree, childrenKey, objToFindBy, replacementObj)
+        return modifiedObj ? treeToReturn : false
+    }
+
+    const fetchCategoryNode = async (id, depth = 1) => {
+        const STALE_TIME = 10000
+        // return early if there's an in-flight request or one that is less
+        // than the stale time
+        if (queue[id] === 'loading' || Date.now() < queue[id] + STALE_TIME) {
+            return
+        }
+        setQueue({
+            ...queue,
+            [id]: 'loading'
+        })
+        const res = await api.shopperProducts.getCategory({
+            parameters: {
+                id,
+                levels: depth
+            }
+        })
+        const newTree = findAndModifyFirst(
+            root,
+            itemsKey,
+            {id},
+            {
+                ...res,
+                loaded: true,
+                [itemsKey]: res?.[itemsKey]?.map((item) => ({...item, loaded: true}))
+            }
+        )
+        setRoot(newTree)
+        setQueue({
+            ...queue,
+            // store a timestamp for evaluating when to refetch
+            [id]: Date.now()
+        })
+        return res
+    }
+
+    useEffect(() => {
+        // Server side, we only fetch level 0 categories, for performance, here
+        // we request the remaining two levels of category depth
+        root?.[itemsKey]?.forEach(async (cat) => {
+            // check localstorage first for this data to help remediate O(n) server
+            // load burden where n = top level categories
+            const storedCategoryData = JSON.parse(
+                window?.localStorage?.getItem(`${LOCAL_STORAGE_PREFIX + cat?.id}`)
+            )
+            if (storedCategoryData) {
+                const newTree = findAndModifyFirst(
+                    root,
+                    itemsKey,
+                    {id: cat?.id},
+                    {
+                        ...storedCategoryData,
+                        loaded: true,
+                        [itemsKey]: storedCategoryData?.[itemsKey]?.map((item) => ({
+                            ...item,
+                            loaded: true
+                        }))
+                    }
+                )
+                return newTree
+            }
+            const res = await fetchCategoryNode(cat?.id, 2)
+            // store fetched data in local storage for faster access / reduced server load
+            window?.localStorage?.setItem(`${LOCAL_STORAGE_PREFIX + cat?.id}`, JSON.stringify(res))
+        })
+    }, [])
 
     return (
-        <CategoriesContext.Provider value={{categories, setCategories}}>
+        <CategoriesContext.Provider
+            value={{
+                root,
+                findAndModifyFirst,
+                itemsKey,
+                fetchCategoryNode
+            }}
+        >
             {children}
         </CategoriesContext.Provider>
     )
@@ -43,7 +181,7 @@ export const CategoriesProvider = ({categories: initialCategories = {}, children
 
 CategoriesProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    categories: PropTypes.object
+    treeRoot: PropTypes.object
 }
 
 /**

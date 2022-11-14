@@ -13,7 +13,7 @@ import {useIntl} from 'react-intl'
 import LocaleSelector from '../locale-selector'
 import NestedAccordion from '../nested-accordion'
 import SocialIcons from '../social-icons'
-
+import {useCategories} from '../../hooks/use-categories'
 // Components
 import {
     Box,
@@ -77,7 +77,8 @@ const STORE_LOCATOR_HREF = '/store-locator'
  * main usage is to navigate from one category to the next, but also homes links to
  * support, log in and out actions, as support links.
  */
-const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
+const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
+    const {root, itemsKey, setRoot, findFirst} = useCategories()
     const intl = useIntl()
     const customer = useCustomer()
     const navigate = useNavigation()
@@ -122,7 +123,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                 <NestedAccordion
                                     allowMultiple={true}
                                     item={root}
-                                    itemsKey="categories"
+                                    itemsKey={itemsKey}
                                     itemsFilter="c_showInMenu"
                                     fontSizes={FONT_SIZES}
                                     fontWeights={FONT_WEIGHTS}
@@ -382,10 +383,6 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
 DrawerMenu.displayName = 'DrawerMenu'
 
 DrawerMenu.propTypes = {
-    /**
-     * The root category in your commerce cloud back-end.
-     */
-    root: PropTypes.object,
     /**
      * The opened state of the drawer.
      */

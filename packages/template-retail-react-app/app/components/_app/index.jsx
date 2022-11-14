@@ -49,7 +49,7 @@ import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
 
-const DEFAULT_NAV_DEPTH = 3
+const DEFAULT_NAV_DEPTH = 1
 const DEFAULT_ROOT_CATEGORY = 'root'
 const DEFAULT_LOCALE = 'en-US'
 
@@ -165,7 +165,7 @@ const App = (props) => {
                 // - "compile-translations:pseudo"
                 defaultLocale={DEFAULT_LOCALE}
             >
-                <CategoriesProvider categories={allCategories}>
+                <CategoriesProvider treeRoot={allCategories}>
                     <CurrencyProvider currency={currency}>
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
@@ -215,16 +215,12 @@ const App = (props) => {
                                                 isOpen={isOpen}
                                                 onClose={onClose}
                                                 onLogoClick={onLogoClick}
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
                                                 locale={locale}
                                             />
                                         </HideOnDesktop>
 
                                         <HideOnMobile>
-                                            <ListMenu
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
-                                                locale={locale}
-                                            />
+                                            <ListMenu locale={locale} />
                                         </HideOnMobile>
                                     </Header>
                                 ) : (
