@@ -224,34 +224,64 @@ The value of this property must be valid for the type of custom attribute define
 export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
 export const queryKeysMatrix = {
-    authorizeCustomer: (): QueryKeysMatrixElement => {
+    authorizeCustomer: (
+        data: DataType<Client['authorizeCustomer']>,
+        params: Argument<Client['authorizeCustomer']>
+    ): QueryKeysMatrixElement => {
         return {}
     },
-    authorizeTrustedSystem: (): QueryKeysMatrixElement => {
+    authorizeTrustedSystem: (
+        data: DataType<Client['authorizeTrustedSystem']>,
+        params: Argument<Client['authorizeTrustedSystem']>
+    ): QueryKeysMatrixElement => {
         return {}
     },
-    deleteCustomerProductList: (): QueryKeysMatrixElement => {
+    deleteCustomerProductList: (
+        data: DataType<Client['deleteCustomerProductList']>,
+        params: Argument<Client['deleteCustomerProductList']>
+    ): QueryKeysMatrixElement => {
         return {}
     },
-    getResetPasswordToken: (): QueryKeysMatrixElement => {
+    getResetPasswordToken: (
+        data: DataType<Client['getResetPasswordToken']>,
+        params: Argument<Client['getResetPasswordToken']>
+    ): QueryKeysMatrixElement => {
         return {}
     },
-    invalidateCustomerAuth: (): QueryKeysMatrixElement => {
+    invalidateCustomerAuth: (
+        data: DataType<Client['invalidateCustomerAuth']>,
+        params: Argument<Client['invalidateCustomerAuth']>
+    ): QueryKeysMatrixElement => {
         return {}
     },
-    registerCustomer: (): QueryKeysMatrixElement => {
+    registerCustomer: (
+        data: DataType<Client['registerCustomer']>,
+        params: Argument<Client['registerCustomer']>
+    ): QueryKeysMatrixElement => {
         return {}
     },
-    registerExternalProfile: (): QueryKeysMatrixElement => {
+    registerExternalProfile: (
+        data: DataType<Client['registerExternalProfile']>,
+        params: Argument<Client['registerExternalProfile']>
+    ): QueryKeysMatrixElement => {
         return {}
     },
-    resetPassword: (): QueryKeysMatrixElement => {
+    resetPassword: (
+        data: DataType<Client['resetPassword']>,
+        params: Argument<Client['resetPassword']>
+    ): QueryKeysMatrixElement => {
         return {}
     },
-    updateCustomerPassword: (): QueryKeysMatrixElement => {
+    updateCustomerPassword: (
+        data: DataType<Client['updateCustomerPassword']>,
+        params: Argument<Client['updateCustomerPassword']>
+    ): QueryKeysMatrixElement => {
         return {}
     },
-    updateCustomerProductList: (): QueryKeysMatrixElement => {
+    updateCustomerProductList: (
+        data: DataType<Client['updateCustomerProductList']>,
+        params: Argument<Client['updateCustomerProductList']>
+    ): QueryKeysMatrixElement => {
         return {}
     },
     updateCustomer: (

@@ -8,7 +8,11 @@ import React from 'react'
 import {mockAuthCalls, queryClient, renderWithProviders} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
-import {ShopperCustomersMutationType, useShopperCustomersMutation} from './mutation'
+import {
+    ShopperCustomersMutationType,
+    useShopperCustomersMutation,
+    queryKeysMatrix
+} from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
 
@@ -20,154 +24,68 @@ const ITEM_ID = '60ee899e9305de0df5b0fcade5'
 const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
 const PRODUCT_ID = '25518823M'
 
-const hooksDetails = {
+const actionsArgs = {
     updateCustomer: {
-        args: {
-            body: {firstName: `Kobe`},
-            parameters: {customerId: CUSTOMER_ID}
-        },
-        update: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]],
-        invalidate: [
-            ['/customers', CUSTOMER_ID, '/payment-instruments'],
-            ['/customers', CUSTOMER_ID, '/addresses'],
-            ['/customers', '/external-profile']
-        ]
+        body: {firstName: `Kobe`},
+        parameters: {customerId: CUSTOMER_ID}
     },
 
     createCustomerAddress: {
-        args: {
-            body: {addressId: `TestNewAddress`, countryCode: 'CA', lastName: 'Murphy'},
-            parameters: {customerId: CUSTOMER_ID}
-        },
-        update: [
-            [
-                '/customers',
-                CUSTOMER_ID,
-                '/addresses',
-                {addressName: `TestNewAddress`, customerId: CUSTOMER_ID}
-            ]
-        ],
-        invalidate: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]]
+        body: {addressId: `TestNewAddress`, countryCode: 'CA', lastName: 'Murphy'},
+        parameters: {customerId: CUSTOMER_ID}
     },
 
     updateCustomerAddress: {
-        args: {
-            body: {addressId: 'TestAddress', countryCode: 'US', lastName: `Murphy`},
-            parameters: {customerId: CUSTOMER_ID, addressName: ADDRESS_NAME}
-        },
-        update: [
-            [
-                '/customers',
-                CUSTOMER_ID,
-                '/addresses',
-                {addressName: ADDRESS_NAME, customerId: CUSTOMER_ID}
-            ]
-        ],
-        invalidate: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]]
+        body: {addressId: 'TestAddress', countryCode: 'US', lastName: `Murphy`},
+        parameters: {customerId: CUSTOMER_ID, addressName: ADDRESS_NAME}
     },
 
     removeCustomerAddress: {
-        args: {
-            body: {},
-            parameters: {customerId: CUSTOMER_ID, addressName: `TestNewAddress`}
-        },
-        invalidate: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]],
-        remove: [
-            [
-                '/customers',
-                CUSTOMER_ID,
-                '/addresses',
-                {addressName: `TestNewAddress`, customerId: CUSTOMER_ID}
-            ]
-        ]
+        body: {},
+        parameters: {customerId: CUSTOMER_ID, addressName: `TestNewAddress`}
     },
 
     createCustomerProductList: {
-        args: {
-            body: {type: 'wish_list'},
-            parameters: {customerId: CUSTOMER_ID}
-        },
-        update: [
-            ['/customers', CUSTOMER_ID, '/product-list', {customerId: CUSTOMER_ID, listId: LIST_ID}]
-        ]
+        body: {type: 'wish_list'},
+        parameters: {customerId: CUSTOMER_ID}
     },
 
     createCustomerProductListItem: {
-        args: {
-            body: {priority: 2, public: true, quantity: 3, type: 'product', productId: PRODUCT_ID},
-            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID}
-        },
-        update: [['/customers', CUSTOMER_ID, '/product-list', LIST_ID, {itemId: ITEM_ID}]],
-        invalidate: [
-            ['/customers', CUSTOMER_ID, '/product-list', {customerId: CUSTOMER_ID, listId: LIST_ID}]
-        ]
+        body: {priority: 2, public: true, quantity: 3, type: 'product', productId: PRODUCT_ID},
+        parameters: {customerId: CUSTOMER_ID, listId: LIST_ID}
     },
 
     updateCustomerProductListItem: {
-        args: {
-            body: {priority: 2, public: true, quantity: 13},
-            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
-        },
-        update: [['/customers', CUSTOMER_ID, '/product-list', LIST_ID, {itemId: ITEM_ID}]],
-        invalidate: [
-            ['/customers', CUSTOMER_ID, '/product-list', {customerId: CUSTOMER_ID, listId: LIST_ID}]
-        ]
+        body: {priority: 2, public: true, quantity: 13},
+        parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
     },
 
     deleteCustomerProductListItem: {
-        args: {
-            body: {},
-            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
-        },
-        invalidate: [
-            ['/customers', CUSTOMER_ID, '/product-list', {customerId: CUSTOMER_ID, listId: LIST_ID}]
-        ],
-        remove: [['/customers', CUSTOMER_ID, '/product-list', LIST_ID, {itemId: ITEM_ID}]]
+        body: {},
+        parameters: {customerId: CUSTOMER_ID, listId: LIST_ID, itemId: ITEM_ID}
     },
 
     createCustomerPaymentInstrument: {
-        args: {
-            body: {
-                bankRoutingNumber: 'AB1234',
-                giftCertificateCode: 'gift-code',
-                paymentCard: {
-                    number: '4454852652415965',
-                    validFromMonth: 12,
-                    expirationYear: 2030,
-                    expirationMonth: 12,
-                    cardType: 'Visa',
-                    holder: 'John Smith',
-                    issueNumber: '92743928',
-                    validFromYear: 22
-                },
-                paymentMethodId: 'Credit Card'
+        body: {
+            bankRoutingNumber: 'AB1234',
+            giftCertificateCode: 'gift-code',
+            paymentCard: {
+                number: '4454852652415965',
+                validFromMonth: 12,
+                expirationYear: 2030,
+                expirationMonth: 12,
+                cardType: 'Visa',
+                holder: 'John Smith',
+                issueNumber: '92743928',
+                validFromYear: 22
             },
-            parameters: {customerId: CUSTOMER_ID}
+            paymentMethodId: 'Credit Card'
         },
-        update: [
-            [
-                '/customers',
-                CUSTOMER_ID,
-                '/payment-instruments',
-                {customerId: CUSTOMER_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
-            ]
-        ],
-        invalidate: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]]
+        parameters: {customerId: CUSTOMER_ID}
     },
     deleteCustomerPaymentInstrument: {
-        args: {
-            body: {},
-            parameters: {customerId: CUSTOMER_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
-        },
-        invalidate: [['/customers', CUSTOMER_ID, {customerId: CUSTOMER_ID}]],
-        remove: [
-            [
-                '/customers',
-                CUSTOMER_ID,
-                '/payment-instruments',
-                {customerId: CUSTOMER_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
-            ]
-        ]
+        body: {},
+        parameters: {customerId: CUSTOMER_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
     }
 }
 
@@ -186,8 +104,6 @@ const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) =>
     }, [])
 
     const mutationHook = useShopperCustomersMutation(action)
-    // @ts-ignore
-    const {args} = hooksDetails[action]
 
     return (
         <>
@@ -197,7 +113,7 @@ const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) =>
                 <div>Logged in as {loginRegisteredUser?.variables?.username}</div>
             )}
             <div>
-                <button onClick={() => mutationHook.mutate(args)}>{action}</button>
+                <button onClick={() => mutationHook.mutate(actionsArgs[action])}>{action}</button>
                 {mutationHook.error?.message && (
                     <p style={{color: 'red'}}>Error: {mutationHook.error?.message}</p>
                 )}
@@ -208,7 +124,16 @@ const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) =>
     )
 }
 
-const tests = Object.keys(hooksDetails).map((key) => {
+// Remove mutation actions not implemented yet from tests
+const queryKeysToTest = Object.keys(queryKeysMatrix).reduce((next, key, value) => {
+    if (actionsArgs[key]) {
+        return {...next, [key]: queryKeysMatrix[key]}
+    } else {
+        return next
+    }
+}, {})
+
+const tests = Object.keys(queryKeysToTest).map((key) => {
     return {
         hook: key,
         cases: [
@@ -260,7 +185,11 @@ const tests = Object.keys(hooksDetails).map((key) => {
 
                     // Pre-populate cache with query keys we invalidate/update/remove onSuccess
                     // @ts-ignore
-                    const {invalidate, update, remove} = hooksDetails[key]
+                    const {invalidate, update, remove} = queryKeysToTest[key](mockReplyBody, {
+                        body: {},
+                        parameters: actionsArgs[key].parameters
+                    })
+
                     invalidate?.forEach((queryKey: QueryKey) => {
                         queryClient.setQueryData(queryKey, {})
                     })
