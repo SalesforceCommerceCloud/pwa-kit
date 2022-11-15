@@ -37,8 +37,8 @@ export const AuthProvider = ({children}) => {
                     </soap:Header>
                     <soap:Body>
                         <login xmlns="urn:enterprise.soap.sforce.com">
-                            <username>alex.vuong@salesforce.com</username>
-                            <password>Test1234!</password>
+                            <username></username>
+                            <password></password>
                         </login>
                     </soap:Body>
                 </soap:Envelope>`
