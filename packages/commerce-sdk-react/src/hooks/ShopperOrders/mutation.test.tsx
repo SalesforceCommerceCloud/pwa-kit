@@ -10,7 +10,7 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {ShopperOrdersMutations, useShopperOrdersMutation, queryKeysMatrix} from './mutation'
 import nock from 'nock'
-import { QueryKey } from '@tanstack/react-query'
+import {QueryKey} from '@tanstack/react-query'
 
 // Valid id of prepared basket
 const BASKET_ID = '753b796f71aaaef79b0adde657'
@@ -99,13 +99,13 @@ const tests = [
                     const button = screen.getByRole('button', {
                         name: /create order/i
                     })
-                    
+
                     fireEvent.click(button)
                     await waitFor(() => screen.getByText(/orderno/i))
                     expect(screen.getByText(/orderno/i)).toBeInTheDocument()
 
-                     // Assert changes in cache
-                     update?.forEach((queryKey: QueryKey) => {
+                    // Assert changes in cache
+                    update?.forEach((queryKey: QueryKey) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
                     })
                     invalidate?.forEach((queryKey: QueryKey) => {

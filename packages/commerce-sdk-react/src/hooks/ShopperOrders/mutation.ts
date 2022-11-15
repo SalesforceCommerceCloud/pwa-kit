@@ -43,13 +43,15 @@ export function useShopperOrdersMutation<Action extends ShopperOrdersMutationTyp
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
     const queryClient = useQueryClient()
-    return useMutation<Data, Error, Params>((params, apiClients) => {
-        const method = apiClients['shopperOrders'][action] as MutationFunction<Data, Params>
-        return method.call(apiClients['shopperOrders'], params)
-    },
-    {
-        onSuccess: (data, params) => {
-            updateCache(queryClient, action, queryKeysMatrix, data, params)
+    return useMutation<Data, Error, Params>(
+        (params, apiClients) => {
+            const method = apiClients['shopperOrders'][action] as MutationFunction<Data, Params>
+            return method.call(apiClients['shopperOrders'], params)
+        },
+        {
+            onSuccess: (data, params) => {
+                updateCache(queryClient, action, queryKeysMatrix, data, params)
+            }
         }
-    })
+    )
 }
