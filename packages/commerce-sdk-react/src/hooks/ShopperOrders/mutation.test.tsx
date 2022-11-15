@@ -5,11 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, mockAuthCalls} from '../../test-utils'
+import {renderWithProviders, queryClient, mockAuthCalls} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
-import {ShopperOrdersMutations, useShopperOrdersMutation} from './mutation'
+import {ShopperOrdersMutations, useShopperOrdersMutation, queryKeysMatrix} from './mutation'
 import nock from 'nock'
+import { QueryKey } from '@tanstack/react-query'
 
 // Valid id of prepared basket
 const BASKET_ID = '753b796f71aaaef79b0adde657'
@@ -83,12 +84,33 @@ const tests = [
                         })
                         .reply(200, mockOrderResponse)
 
+                    const {invalidate, update} = queryKeysMatrix.createOrder(mockOrderResponse, {
+                        body: {},
+                        parameters: {}
+                    })
+
+                    invalidate?.forEach((queryKey: QueryKey) => {
+                        queryClient.setQueryData(queryKey, {})
+                    })
+                    update?.forEach((queryKey: QueryKey) => {
+                        queryClient.setQueryData(queryKey, {})
+                    })
+
                     const button = screen.getByRole('button', {
                         name: /create order/i
                     })
+                    
                     fireEvent.click(button)
                     await waitFor(() => screen.getByText(/orderno/i))
                     expect(screen.getByText(/orderno/i)).toBeInTheDocument()
+
+                     // Assert changes in cache
+                     update?.forEach((queryKey: QueryKey) => {
+                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
+                    })
+                    invalidate?.forEach((queryKey: QueryKey) => {
+                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
+                    })
                 }
             },
             {
@@ -126,6 +148,7 @@ tests.forEach(({hook, cases}) => {
     describe(hook, () => {
         beforeEach(() => {
             jest.clearAllMocks()
+            queryClient.clear()
         })
         cases.forEach(({name, assertions}) => {
             test(name, assertions)

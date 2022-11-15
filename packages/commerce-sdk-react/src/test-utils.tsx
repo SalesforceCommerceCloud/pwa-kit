@@ -23,15 +23,17 @@ export const TEST_CONFIG = {
     locale: 'en-US',
     currency: 'USD'
 }
+
+export const queryClient = new QueryClient({
+    // During testing, we want things to fail immediately
+    defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
+})
+
 const TestProviders = (props: {
     children: React.ReactNode
     commerceApiProvider?: Partial<CommerceApiProviderProps>
 }) => {
     const {commerceApiProvider} = props
-    const queryClient = new QueryClient({
-        // During testing, we want things to fail immediately
-        defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
-    })
     return (
         <QueryClientProvider client={queryClient}>
             <CommerceApiProvider {...TEST_CONFIG} {...commerceApiProvider}>
