@@ -39,7 +39,7 @@ function useOrder(
 ): UseQueryResult<DataType<Client['getOrder']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['order', arg],
+        ['/orders', arg],
         (_, {shopperOrders}) => {
             return shopperOrders.getOrder({parameters, headers}, rawResponse)
         },

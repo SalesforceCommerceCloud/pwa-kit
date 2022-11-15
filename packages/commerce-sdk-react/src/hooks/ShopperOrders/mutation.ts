@@ -6,7 +6,8 @@
  */
 import {ApiClients, DataType, Argument} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction} from '@tanstack/react-query'
+import {MutationFunction, useQueryClient} from '@tanstack/react-query'
+import {updateCache, QueryKeysMatrixElement} from '../utils'
 
 type Client = ApiClients['shopperOrders']
 
@@ -16,39 +17,24 @@ export const ShopperOrdersMutations = {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=createOrder} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#createorder} for more information on the parameters and returned data type.
      */
-    CreateOrder: 'createOrder',
-    /**
-   * Adds a payment instrument to an order. 
-
-Details:
-
-The payment instrument is added with the provided details. The payment method must be applicable for the order see GET
-/baskets/\{basketId\}/payment-methods, if the payment method is 'CREDIT_CARD' a paymentCard must be specified in the request.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=createPaymentInstrumentForOrder} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#createpaymentinstrumentfororder} for more information on the parameters and returned data type.
-   */
-    CreatePaymentInstrumentForOrder: 'createPaymentInstrumentForOrder',
-    /**
-     * Removes a payment instrument of an order.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=removePaymentInstrumentFromOrder} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#removepaymentinstrumentfromorder} for more information on the parameters and returned data type.
-     */
-    RemovePaymentInstrumentFromOrder: 'removePaymentInstrumentFromOrder',
-    /**
-   * Updates a payment instrument of an order.
-
-Details:
-
-The payment instrument is updated with the provided details. The payment method must be applicable for the
-order see GET /baskets/\{basketId\}/payment-methods, if the payment method is 'CREDIT_CARD' a
-paymentCard must be specified in the request.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=updatePaymentInstrumentForOrder} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#updatepaymentinstrumentfororder} for more information on the parameters and returned data type.
-   */
-    UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
+    CreateOrder: 'createOrder'
 } as const
 
-type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
+export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
+
+export const queryKeysMatrix = {
+    createOrder: (
+        data: DataType<Client['createOrder']>,
+        params: Argument<Client['createOrder']>
+    ): QueryKeysMatrixElement => {
+        const customerId = data?.customerInfo?.customerId
+        const {orderNo} = params.body
+        return {
+            update: [['/orders', orderNo]],
+            invalidate: [['/customers', customerId, '/baskets', {customerId}]]
+        }
+    }
+}
 
 /**
  * A hook for performing mutations with the Shopper Gift Certificates API.
@@ -56,8 +42,14 @@ type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof Shop
 export function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(action: Action) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
+    const queryClient = useQueryClient()
     return useMutation<Data, Error, Params>((params, apiClients) => {
         const method = apiClients['shopperOrders'][action] as MutationFunction<Data, Params>
         return method.call(apiClients['shopperOrders'], params)
+    },
+    {
+        onSuccess: (data, params) => {
+            updateCache(queryClient, action, queryKeysMatrix, data, params)
+        }
     })
 }
