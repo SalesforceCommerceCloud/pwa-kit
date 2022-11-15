@@ -24,7 +24,7 @@ const ITEM_ID = '60ee899e9305de0df5b0fcade5'
 const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
 const PRODUCT_ID = '25518823M'
 
-const actionsArgs = {
+const testActionsArgs = {
     updateCustomer: {
         body: {firstName: `Kobe`},
         parameters: {customerId: CUSTOMER_ID}
@@ -113,7 +113,9 @@ const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) =>
                 <div>Logged in as {loginRegisteredUser?.variables?.username}</div>
             )}
             <div>
-                <button onClick={() => mutationHook.mutate(actionsArgs[action])}>{action}</button>
+                <button onClick={() => mutationHook.mutate(testActionsArgs[action])}>
+                    {action}
+                </button>
                 {mutationHook.error?.message && (
                     <p style={{color: 'red'}}>Error: {mutationHook.error?.message}</p>
                 )}
@@ -124,16 +126,7 @@ const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) =>
     )
 }
 
-// Remove mutation actions not implemented yet from tests
-const queryKeysToTest = Object.keys(queryKeysMatrix).reduce((next, key, value) => {
-    if (actionsArgs[key]) {
-        return {...next, [key]: queryKeysMatrix[key]}
-    } else {
-        return next
-    }
-}, {})
-
-const tests = Object.keys(queryKeysToTest).map((key) => {
+const tests = Object.keys(testActionsArgs).map((key) => {
     return {
         hook: key,
         cases: [
@@ -185,9 +178,9 @@ const tests = Object.keys(queryKeysToTest).map((key) => {
 
                     // Pre-populate cache with query keys we invalidate/update/remove onSuccess
                     // @ts-ignore
-                    const {invalidate, update, remove} = queryKeysToTest[key](mockReplyBody, {
+                    const {invalidate, update, remove} = queryKeysMatrix[key](mockReplyBody, {
                         body: {},
-                        parameters: actionsArgs[key].parameters
+                        parameters: testActionsArgs[key].parameters
                     })
 
                     invalidate?.forEach((queryKey: QueryKey) => {
