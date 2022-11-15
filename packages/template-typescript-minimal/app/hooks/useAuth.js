@@ -13,6 +13,9 @@
  */
 import React, {createContext, useContext, useEffect} from 'react'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+// create a js to store your username and password
+// don't commit
+import LoginInfo from '../../config/user-config'
 
 export const AuthContext = createContext({})
 export const AuthProvider = ({children}) => {
@@ -37,8 +40,8 @@ export const AuthProvider = ({children}) => {
                     </soap:Header>
                     <soap:Body>
                         <login xmlns="urn:enterprise.soap.sforce.com">
-                            <username></username>
-                            <password></password>
+                            <username>${LoginInfo.username}</username>
+                            <password>${LoginInfo.password}</password>
                         </login>
                     </soap:Body>
                 </soap:Envelope>`
