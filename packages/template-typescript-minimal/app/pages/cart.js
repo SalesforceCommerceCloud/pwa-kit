@@ -52,7 +52,7 @@ function Cart() {
             <div style={{display: 'flex'}}>
                 <div style={{flex: 2}}>
                     {cartItems.map((item) => (
-                        <CartItem item={item} />
+                        <CartItem item={item} key={item.cartItem.cartItemId} />
                     ))}
                 </div>
                 <div style={{flex: 1}}>

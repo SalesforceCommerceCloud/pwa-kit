@@ -22,7 +22,8 @@ const options = {
                 ...(isServerSide ? {retryOnMount: false} : {})
             },
             mutations: {
-                retry: false
+                retry: false,
+                refetchOnWindowFocus: false
             }
         }
     }

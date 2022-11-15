@@ -23,7 +23,7 @@ function Header(props) {
             <div>
                 {token ? <h2>Logged in as alex.vuong </h2> : <h2>Logging in as alex.vuong</h2>}
             </div>
-            <Link to={'/cart'}>Cart {cart?.totalProductCount}</Link>
+            <Link to={'/cart'}>Cart ({cart?.totalProductCount})</Link>
             <hr />
         </div>
     )
