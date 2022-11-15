@@ -28,9 +28,8 @@ export const queryKeysMatrix = {
         params: Argument<Client['createOrder']>
     ): QueryKeysMatrixElement => {
         const customerId = data?.customerInfo?.customerId
-        const {orderNo} = params.body
         return {
-            update: [['/orders', orderNo]],
+            update: [['/orders', {orderNo: data.orderNo}]],
             invalidate: [['/customers', customerId, '/baskets', {customerId}]]
         }
     }
