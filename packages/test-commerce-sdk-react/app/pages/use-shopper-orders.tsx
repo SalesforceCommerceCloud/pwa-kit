@@ -54,7 +54,6 @@ function UseShopperOrders() {
     ].map(({action, body, parameters}) => {
         return {
             name: action,
-            // @ts-ignore
             hook: useShopperOrdersMutation(action),
             body,
             parameters

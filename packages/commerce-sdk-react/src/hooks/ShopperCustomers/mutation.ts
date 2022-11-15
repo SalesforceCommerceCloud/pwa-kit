@@ -7,6 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
+import {updateCache, QueryKeysMatrixElement} from '../utils'
 
 type Client = ApiClients['shopperCustomers']
 
@@ -222,40 +223,168 @@ The value of this property must be valid for the type of custom attribute define
 
 export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
-const isObject = (item: null) => typeof item === 'object' && !Array.isArray(item) && item !== null
+export const queryKeysMatrix = {
+    authorizeCustomer: (): QueryKeysMatrixElement => {
+        return {}
+    },
+    authorizeTrustedSystem: (): QueryKeysMatrixElement => {
+        return {}
+    },
+    deleteCustomerProductList: (): QueryKeysMatrixElement => {
+        return {}
+    },
+    getResetPasswordToken: (): QueryKeysMatrixElement => {
+        return {}
+    },
+    invalidateCustomerAuth: (): QueryKeysMatrixElement => {
+        return {}
+    },
+    registerCustomer: (): QueryKeysMatrixElement => {
+        return {}
+    },
+    registerExternalProfile: (): QueryKeysMatrixElement => {
+        return {}
+    },
+    resetPassword: (): QueryKeysMatrixElement => {
+        return {}
+    },
+    updateCustomerPassword: (): QueryKeysMatrixElement => {
+        return {}
+    },
+    updateCustomerProductList: (): QueryKeysMatrixElement => {
+        return {}
+    },
+    updateCustomer: (
+        data: DataType<Client['updateCustomer']>,
+        params: Argument<Client['updateCustomer']>
+    ): QueryKeysMatrixElement => {
+        const {customerId} = params.parameters
+        return {
+            update: [['/customers', customerId, {customerId}]],
+            invalidate: [
+                ['/customers', customerId, '/payment-instruments'],
+                ['/customers', customerId, '/addresses'],
+                ['/customers', '/external-profile']
+            ]
+        }
+    },
 
-// @ts-ignore
-const updateCache = (queryClient, action, queryKeysMatrix, data) => {
-    const isMatchingKey = (cacheQuery: {queryKey: {[x: string]: any}}, queryKey: any[]) =>
-        queryKey.every((item, index) =>
-            isObject(item) && isObject(cacheQuery.queryKey[index])
-                ? Object.entries(cacheQuery.queryKey[index])
-                      .sort()
-                      .toString() ===
-                  Object.entries(item)
-                      .sort()
-                      .toString()
-                : item === cacheQuery.queryKey[index]
-        )
+    updateCustomerAddress: (
+        data: DataType<Client['updateCustomerAddress']>,
+        params: Argument<Client['updateCustomerAddress']>
+    ): QueryKeysMatrixElement => {
+        const {customerId, addressName} = params.parameters
+        return {
+            update: [['/customers', customerId, '/addresses', {addressName, customerId}]],
+            invalidate: [['/customers', customerId, {customerId}]]
+        }
+    },
 
-    // STEP 1. Update data inside query cache for the matching queryKeys
-    queryKeysMatrix[action]?.update?.map((queryKey: any) => {
-        queryClient.setQueryData(queryKey, data)
-    })
+    createCustomerAddress: (
+        data: DataType<Client['createCustomerAddress']>,
+        params: Argument<Client['createCustomerAddress']>
+    ): QueryKeysMatrixElement => {
+        const {customerId} = params.parameters
+        const {addressId} = params.body
+        return {
+            update: [
+                ['/customers', customerId, '/addresses', {addressName: addressId, customerId}]
+            ],
+            invalidate: [['/customers', customerId, {customerId}]]
+        }
+    },
 
-    // STEP 2. Invalidate cache entries with the matching queryKeys
-    queryKeysMatrix[action]?.invalidate?.map((queryKey: any) => {
-        queryClient.invalidateQueries({
-            predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
-        })
-    })
+    removeCustomerAddress: (
+        data: DataType<Client['removeCustomerAddress']>,
+        params: Argument<Client['removeCustomerAddress']>
+    ): QueryKeysMatrixElement => {
+        const {customerId, addressName} = params.parameters
+        return {
+            invalidate: [['/customers', customerId, {customerId}]],
+            remove: [['/customers', customerId, '/addresses', {addressName, customerId}]]
+        }
+    },
 
-    // STEP 3. Remove cache entries with the matching queryKeys
-    queryKeysMatrix[action]?.remove?.map((queryKey: any) => {
-        queryClient.removeQueries({
-            predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
-        })
-    })
+    createCustomerPaymentInstrument: (
+        data: DataType<Client['createCustomerPaymentInstrument']>,
+        params: Argument<Client['createCustomerPaymentInstrument']>
+    ): QueryKeysMatrixElement => {
+        const {customerId} = params.parameters
+        return {
+            update: [
+                [
+                    '/customers',
+                    customerId,
+                    '/payment-instruments',
+                    {
+                        customerId,
+                        paymentInstrumentId: data?.paymentInstrumentId
+                    }
+                ]
+            ],
+            invalidate: [['/customers', customerId, {customerId}]]
+        }
+    },
+
+    deleteCustomerPaymentInstrument: (
+        data: DataType<Client['deleteCustomerPaymentInstrument']>,
+        params: Argument<Client['deleteCustomerPaymentInstrument']>
+    ): QueryKeysMatrixElement => {
+        const {customerId, paymentInstrumentId} = params.parameters
+        return {
+            invalidate: [['/customers', customerId, {customerId}]],
+            remove: [
+                [
+                    '/customers',
+                    customerId,
+                    '/payment-instruments',
+                    {customerId, paymentInstrumentId}
+                ]
+            ]
+        }
+    },
+
+    createCustomerProductList: (
+        data: DataType<Client['createCustomerProductList']>,
+        params: Argument<Client['createCustomerProductList']>
+    ): QueryKeysMatrixElement => {
+        const {customerId} = params.parameters
+        return {
+            update: [['/customers', customerId, '/product-list', {customerId, listId: data?.id}]]
+        }
+    },
+
+    createCustomerProductListItem: (
+        data: DataType<Client['createCustomerProductListItem']>,
+        params: Argument<Client['createCustomerProductListItem']>
+    ): QueryKeysMatrixElement => {
+        const {customerId, listId} = params.parameters
+        return {
+            update: [['/customers', customerId, '/product-list', listId, {itemId: data?.id}]],
+            invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]]
+        }
+    },
+
+    updateCustomerProductListItem: (
+        data: DataType<Client['updateCustomerProductListItem']>,
+        params: Argument<Client['updateCustomerProductListItem']>
+    ): QueryKeysMatrixElement => {
+        const {customerId, listId, itemId} = params.parameters
+        return {
+            update: [['/customers', customerId, '/product-list', listId, {itemId}]],
+            invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]]
+        }
+    },
+    deleteCustomerProductListItem: (
+        data: DataType<Client['deleteCustomerProductListItem']>,
+        params: Argument<Client['deleteCustomerProductListItem']>
+    ): QueryKeysMatrixElement => {
+        const {customerId, listId, itemId} = params.parameters
+        return {
+            invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]],
+            remove: [['/customers', customerId, '/product-list', listId, {itemId}]]
+        }
+    }
 }
 
 /**
@@ -274,115 +403,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
-                const {
-                    customerId,
-                    addressName,
-                    paymentInstrumentId,
-                    listId,
-                    itemId
-                }: any = params?.parameters
-
-                // @ts-ignore
-                const {addressId}: any = params?.body
-
-                const queryKeysMatrix = {
-                    updateCustomer: {
-                        update: [['/customers', customerId, {customerId}]],
-                        invalidate: [
-                            ['/customers', customerId, '/payment-instruments'],
-                            ['/customers', customerId, '/addresses'],
-                            ['/customers', '/external-profile']
-                        ]
-                    },
-
-                    updateCustomerAddress: {
-                        update: [
-                            ['/customers', customerId, '/addresses', {addressName, customerId}]
-                        ],
-                        invalidate: [['/customers', customerId, {customerId}]]
-                    },
-
-                    createCustomerAddress: {
-                        update: [
-                            [
-                                '/customers',
-                                customerId,
-                                '/addresses',
-                                {addressName: addressId, customerId}
-                            ]
-                        ],
-                        invalidate: [['/customers', customerId, {customerId}]]
-                    },
-
-                    removeCustomerAddress: {
-                        invalidate: [['/customers', customerId, {customerId}]],
-                        remove: [
-                            ['/customers', customerId, '/addresses', {addressName, customerId}]
-                        ]
-                    },
-
-                    createCustomerPaymentInstrument: {
-                        update: [
-                            [
-                                '/customers',
-                                customerId,
-                                '/payment-instruments',
-                                {
-                                    customerId: customerId,
-                                    paymentInstrumentId: data?.paymentInstrumentId
-                                }
-                            ]
-                        ],
-                        invalidate: [['/customers', customerId, {customerId}]]
-                    },
-
-                    deleteCustomerPaymentInstrument: {
-                        invalidate: [['/customers', customerId, {customerId}]],
-                        remove: [
-                            [
-                                '/customers',
-                                customerId,
-                                '/payment-instruments',
-                                {customerId, paymentInstrumentId}
-                            ]
-                        ]
-                    },
-
-                    createCustomerProductList: {
-                        update: [
-                            [
-                                '/customers',
-                                customerId,
-                                '/product-list',
-                                {customerId, listId: data?.id}
-                            ]
-                        ]
-                    },
-
-                    createCustomerProductListItem: {
-                        update: [
-                            ['/customers', customerId, '/product-list', listId, {itemId: data?.id}]
-                        ],
-                        invalidate: [
-                            ['/customers', customerId, '/product-list', {customerId, listId}]
-                        ]
-                    },
-
-                    updateCustomerProductListItem: {
-                        update: [['/customers', customerId, '/product-list', listId, {itemId}]],
-                        invalidate: [
-                            ['/customers', customerId, '/product-list', {customerId, listId}]
-                        ]
-                    },
-                    deleteCustomerProductListItem: {
-                        invalidate: [
-                            ['/customers', customerId, '/product-list', {customerId, listId}]
-                        ],
-                        remove: [['/customers', customerId, '/product-list', listId, {itemId}]]
-                    }
-                }
-
-                updateCache(queryClient, action, queryKeysMatrix, data)
+                updateCache(queryClient, action, queryKeysMatrix, data, params)
             }
         }
     )
