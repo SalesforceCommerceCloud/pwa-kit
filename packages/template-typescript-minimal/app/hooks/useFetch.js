@@ -14,8 +14,9 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 const useFetch = (url, params, config) => {
     const {token} = useAuth()
     const key = url.split('webstores')[1]
+
     const context = useQuery({
-        queryKey: [key.toString(), params],
+        queryKey: [key.toString(), params].filter(Boolean),
         queryFn: async ({queryKey}) => {
             const _url = new URL(url)
             if (params) {
@@ -55,7 +56,7 @@ const useMutationFetch = (url, params, config) => {
     )
 }
 
-const getApiUrl = (path) => {
+export const getApiUrl = (path) => {
     const {
         app: {webstoreId}
     } = getConfig()
@@ -105,6 +106,36 @@ export const addItemToCart = (cartStateOrId = 'current') => {
     return context
 }
 
+export const useCartAction = () => {
+    const {
+        app: {webstoreId}
+    } = getConfig()
+    const {token} = useAuth()
+    const queryClient = useQueryClient()
+
+    const context = useMutation(
+        async (variables) => {
+            const {payload, fetchOptions, url} = variables
+            const res = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                method: 'POST',
+                ...fetchOptions,
+                body: JSON.stringify(payload)
+            })
+            const t = fetchOptions.method !== 'DELETE' && (await res.json())
+            return t
+        },
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries([`/${webstoreId}/carts/current`])
+            }
+        }
+    )
+    return context
+}
 export const useProductPrice = (id) => {
     const url = getApiUrl(`/pricing/products/${id}`)
     const data = useFetch(url)
@@ -122,23 +153,18 @@ export const useCartItems = (cartStateOrId = 'current') => {
     return data
 }
 
-export const useCheckoutAction = (checkoutId) => {
+export const useCheckoutAction = () => {
     const {
         app: {webstoreId}
     } = getConfig()
     const {token} = useAuth()
     const queryClient = useQueryClient()
 
-    let _url
-    if (checkoutId) {
-        _url = getApiUrl(`/checkouts/${checkoutId}`)
-    } else {
-        _url = getApiUrl(`/checkouts`)
-    }
     const context = useMutation(
         async (variables) => {
-            const {payload, fetchOptions} = variables
-            const res = await fetch(_url, {
+            const {payload, fetchOptions, url} = variables
+            console.log('url', url)
+            const res = await fetch(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -148,11 +174,11 @@ export const useCheckoutAction = (checkoutId) => {
                 body: JSON.stringify(payload)
             })
             const t = await res.json()
+            return t
         },
         {
             onSuccess: () => {
-                console.log('onSuccess on addresses mutation')
-                queryClient.invalidateQueries([`/${webstoreId}/checkout/active`, null])
+                queryClient.invalidateQueries([`/${webstoreId}/checkouts/active`])
             }
         }
     )
@@ -166,9 +192,8 @@ export const useCheckout = (activeOrCheckoutId = 'active', accountId) => {
 }
 
 export const useUserAddresses = (accountId, params) => {
-    // if (!accountId) return
     const url = getApiUrl(`/accounts/${accountId}/addresses`)
-    const data = useFetch(url, null, {enabled: !!accountId})
+    const data = useFetch(url, params, {enabled: !!accountId})
     return data
 }
 
@@ -200,15 +225,12 @@ export const useAddressAction = (accountId, action) => {
                 ...fetchOptions,
                 ...bodyObj
             })
-            const t = method !== 'DELETE' && (await res.json())
+            const t = fetchOptions.method !== 'DELETE' && (await res.json())
+            return t
         },
         {
             onSuccess: () => {
-                console.log('onSuccess on addresses mutation')
-                queryClient.invalidateQueries([
-                    `/${webstoreId}/accounts/${accountId}/addresses`,
-                    null
-                ])
+                queryClient.invalidateQueries([`/${webstoreId}/accounts/${accountId}/addresses`])
             }
         }
     )

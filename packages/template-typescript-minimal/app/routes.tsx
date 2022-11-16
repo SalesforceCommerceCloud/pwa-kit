@@ -14,6 +14,8 @@ const ProductDetail = loadable(() => import('./pages/product-detail'))
 const Cart = loadable(() => import('./pages/cart'))
 //@ts-ignore
 const Checkout = loadable(() => import('./pages/checkout'))
+//@ts-ignore
+const OrderConfirmed = loadable(() => import('./pages/order-confirmed'))
 
 const routes = [
     {
@@ -35,6 +37,11 @@ const routes = [
         path: '/checkout',
         exact: true,
         component: Checkout
+    },
+    {
+        path: '/order/confirmed',
+        exact: true,
+        component: OrderConfirmed
     }
 ]
 

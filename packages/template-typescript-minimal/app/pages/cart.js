@@ -7,33 +7,53 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useCartItems} from '../hooks/useFetch'
+import {getApiUrl, useCartAction, useCartItems} from '../hooks/useFetch'
 import QuantityPicker from '../components/quantity-picker'
 import {Link} from 'react-router-dom'
 
 Cart.propTypes = {}
 const CartItem = ({item}) => {
     const {productDetails} = item.cartItem
-    return (
-        <div style={{display: 'flex'}}>
-            <div>
-                <img
-                    width={'200px'}
-                    src={productDetails.thumbnailImage.url}
-                    alt="cart-item-thumbnail"
-                />
-            </div>
-            <div>
-                <h4>{productDetails.name}</h4>
-                <div>Sku {productDetails.sku}</div>
-                <div>
-                    Total Price: ${item.cartItem.totalPrice} <s>${item.cartItem.totalListPrice}</s>
-                </div>
-                <div>{item.cartItem.salesPrice} ea</div>
+    const cartAction = useCartAction()
 
+    return (
+        <div>
+            <div style={{display: 'flex'}}>
                 <div>
-                    Quantity:
-                    <QuantityPicker quantity={item.cartItem.quantity} />
+                    <img
+                        width={'200px'}
+                        src={productDetails.thumbnailImage.url}
+                        alt="cart-item-thumbnail"
+                    />
+                </div>
+                <div>
+                    <h4>{productDetails.name}</h4>
+                    <div>Sku {productDetails.sku}</div>
+                    <div>
+                        Total Price: ${item.cartItem.totalPrice}{' '}
+                        <s>${item.cartItem.totalListPrice}</s>
+                    </div>
+                    <div>{item.cartItem.salesPrice} ea</div>
+
+                    <div>
+                        Quantity:
+                        <QuantityPicker quantity={item.cartItem.quantity} />
+                    </div>
+                    <button
+                        style={{marginTop: '10px'}}
+                        onClick={() => {
+                            cartAction.mutate({
+                                url: getApiUrl(
+                                    `/carts/current/cart-items/${item.cartItem.cartItemId}`
+                                ),
+                                fetchOptions: {
+                                    method: 'DELETE'
+                                }
+                            })
+                        }}
+                    >
+                        Remove
+                    </button>
                 </div>
             </div>
         </div>
@@ -41,10 +61,14 @@ const CartItem = ({item}) => {
 }
 function Cart() {
     const {data, isLoading} = useCartItems()
+
     if (isLoading) {
         return <div>Loading...</div>
     }
     const {cartItems, cartSummary} = data
+    if (cartItems.length === 0) {
+        return <div>Cart is empty</div>
+    }
 
     return (
         <div>

@@ -21,7 +21,6 @@ export const AuthContext = createContext({})
 export const AuthProvider = ({children}) => {
     const [token, setToken] = React.useState(null)
     const getToken = async () => {
-        console.log('fetch')
         const response = await fetch(`${getAppOrigin()}/mobify/proxy/scom/services/Soap/c/57.0`, {
             method: 'POST',
             headers: {

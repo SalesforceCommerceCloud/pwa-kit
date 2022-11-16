@@ -38,12 +38,14 @@ const Category = ({cate}) => {
 }
 
 const Home = () => {
-    const {
-        app: {webstoreId}
-    } = getConfig()
-    const {data, isLoading} = useCategories()
+    const {data, isLoading, error} = useCategories()
+
     if (isLoading) {
         return <div>Loading categories.....</div>
+    }
+
+    if (error) {
+        return <h2 style={{color: 'red'}}>Something is wrong</h2>
     }
 
     return (

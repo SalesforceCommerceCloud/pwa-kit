@@ -26,8 +26,6 @@ function ProductDetail(props) {
         return <h3 style={{color: 'red'}}>Something is wrong</h3>
     }
     const {defaultImage, fields} = productDetail
-    console.log('productDetail', productDetail)
-    console.log('productPrice', productPrice)
 
     const handleAddToCart = () => {
         if (quantity === 0) return
@@ -41,7 +39,11 @@ function ProductDetail(props) {
     return (
         <div>
             <div style={{display: 'flex'}}>
-                <img style={{flex: 1}} src={defaultImage.url} alt="big-thumbnail" />
+                <img
+                    style={{flex: 1, maxWidth: '600px'}}
+                    src={defaultImage.url}
+                    alt="big-thumbnail"
+                />
                 <div style={{flex: 1}}>
                     <h3>{fields.Name}</h3>
                     <h4>{`${productPrice?.listPrice} ${productPrice?.currencyIsoCode}`}</h4>

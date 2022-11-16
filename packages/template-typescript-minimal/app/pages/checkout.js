@@ -7,19 +7,22 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {
+    getApiUrl,
     useAddressAction,
     useCart,
     useCheckout,
     useCheckoutAction,
     useUserAddresses
 } from '../hooks/useFetch'
+import {useHistory} from 'react-router-dom/cjs/react-router-dom'
 import {useQueryClient} from '@tanstack/react-query'
 
 Checkout.propTypes = {}
 
 const Address = ({address, accountId}) => {
-    const addNewAddressAction = useAddressAction(accountId)
     if (!address) return null
     return (
         <div
@@ -52,35 +55,92 @@ const Address = ({address, accountId}) => {
 }
 
 function Checkout() {
+    const queryClient = useQueryClient()
+    const {
+        app: {webstoreId}
+    } = getConfig()
+    const history = useHistory()
     const {data: cart, isLoading: isCartLoading} = useCart()
     const {data: checkoutData, isLoading: isCheckoutLoading} = useCheckout()
-    console.log('checkoutData', checkoutData)
-    const {data: addresses, isLoading: isAddressesLoading} = useUserAddresses(cart?.accountId)
-    const addNewAddressAction = useAddressAction(cart?.accountId)
+    const {data: addresses, isLoading: isAddressesLoading} = useUserAddresses(cart?.accountId, {
+        addressType: 'Shipping',
+        sortOrder: 'CreatedDateDesc',
+        excludeUnsupportedCountries: true
+    })
     const checkoutAction = useCheckoutAction(checkoutData?.checkoutId)
 
     const [selectedCarrier, setSelectedCarrier] = React.useState(null)
+    // React.useEffect(() => {
+    //     console.log('useEffecct>>>>>>>>>>>>>>>>>>>>>', checkoutData)
+    //     // if this happens, it means there is no active checkouts, create one
+    //     if (checkoutData?.[0]?.errorCode) {
+    //         console.log('===checkout not found=====')
+    //         checkoutAction.mutate({
+    //             url: getApiUrl(`/checkouts`),
+    //             payload: {
+    //                 cartId: cart.cartId
+    //             }
+    //         })
+    //         const deliverAddress =
+    //             addresses?.items.find((a) => !!a.isDefault) || addresses?.items[0]
+    //         checkoutAction.mutate({
+    //             url: getApiUrl(`/checkouts/${checkoutData.checkoutId}`),
+    //             payload: {
+    //                 deliverAddress: {id: deliverAddress.addressId}
+    //             },
+    //             fetchOptions: {
+    //                 method: 'PATCH'
+    //             }
+    //         })
+    //     }
+    // }, [])
 
     React.useEffect(() => {
-        // if this happens, it means there is no active checkouts, create one
-        if (checkoutData?.[0]?.errorCode) {
-            console.log('===checkout not found=====')
-            checkoutAction.mutate({
-                payload: {
-                    cartId: cart.cartId
+        if (checkoutData?.[0]?.errorCode === 'CHECKOUT_NOT_FOUND') {
+            checkoutAction.mutate(
+                {
+                    url: getApiUrl(`/checkouts`),
+                    payload: {
+                        cartId: cart.cartId
+                    }
+                },
+                {
+                    onSuccess: (data) => {
+                        const deliveryAddress =
+                            addresses?.items.find((a) => !!a.isDefault) || addresses?.items[0]
+                        checkoutAction.mutate(
+                            {
+                                url: getApiUrl(`/checkouts/${data.checkoutId}`),
+                                payload: {
+                                    deliveryAddress: {
+                                        id: deliveryAddress?.addressId
+                                    }
+                                },
+                                fetchOptions: {
+                                    method: 'PATCH'
+                                }
+                            },
+                            {
+                                onSuccess: (e) => {
+                                    // manually refetch the checkout to get carrier details after an arbitrary time
+                                    // because the server needs time to inject available carriers into checkout
+                                    setTimeout(() => {
+                                        queryClient.refetchQueries({
+                                            queryKey: [`/${webstoreId}/checkouts/active`]
+                                        })
+                                    }, 1000)
+                                }
+                            }
+                        )
+                    }
                 }
-            })
+            )
         }
 
         const selectedCarrier = checkoutData?.deliveryGroups?.items?.[0].selectedDeliveryMethod
         setSelectedCarrier(selectedCarrier)
-        console.log('selectedCarrier', selectedCarrier)
-    }, [])
-    React.useEffect(() => {
-        const selectedCarrier = checkoutData?.deliveryGroups?.items?.[0].selectedDeliveryMethod
-        setSelectedCarrier(selectedCarrier)
-        console.log('selectedCarrier', selectedCarrier)
     }, [checkoutData])
+
     if (isAddressesLoading || isCheckoutLoading || isCartLoading) {
         return <div>Loading...</div>
     }
@@ -98,12 +158,11 @@ function Checkout() {
                     <div style={{display: 'flex', justifyContent: 'flex-start', gap: '10px'}}>
                         {deliveryGroups?.items.map((i) => {
                             const {deliveryAddress} = i
-                            console.log('deliveryAddress', deliveryAddress)
                             return (
                                 <Address
                                     address={deliveryAddress}
                                     accountId={cart.accountId}
-                                    key={deliveryAddress.name}
+                                    key={deliveryAddress?.name}
                                 />
                             )
                         })}
@@ -155,6 +214,9 @@ function Checkout() {
                                                 )
                                                 setSelectedCarrier(t)
                                                 checkoutAction.mutate({
+                                                    url: getApiUrl(
+                                                        `/checkouts/${checkoutData?.checkoutId}`
+                                                    ),
                                                     payload: {
                                                         deliveryMethodId: e.target.value
                                                     },
@@ -192,7 +254,54 @@ function Checkout() {
                     </div>
                 </div>
 
-                <button style={{marginTop: '20px'}}>Place Order</button>
+                <button
+                    onClick={() => {
+                        const res = checkoutAction.mutate(
+                            {
+                                url: getApiUrl(`/payments/token`),
+                                payload: {
+                                    cardPaymentMethod: {
+                                        cardHolderName: 'Alex Vuong',
+                                        cardNumber: '4242424242424242',
+                                        expiryMonth: '12',
+                                        expiryYear: '28',
+                                        cvv: '123',
+                                        cardType: 'Visa'
+                                    }
+                                }
+                            },
+                            {
+                                onSuccess: (data) => {
+                                    const {token} = data
+                                    const address = deliveryGroups?.items[0].deliveryAddress
+                                    console.log('address', address)
+                                    const res = checkoutAction.mutate(
+                                        {
+                                            url: getApiUrl(`/checkouts/active/payments`),
+                                            payload: {
+                                                paymentToken: token,
+                                                requestType: 'Auth',
+                                                billingAddress: address
+                                            }
+                                        },
+                                        {
+                                            onSuccess: (data) => {
+                                                if (data?.salesforceResultCode === 'Success') {
+                                                    history.push('/order/confirmed', {
+                                                        checkoutId: checkoutData.checkoutId
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        )
+                    }}
+                    style={{marginTop: '20px'}}
+                >
+                    Place Order
+                </button>
             </div>
         </div>
     )
