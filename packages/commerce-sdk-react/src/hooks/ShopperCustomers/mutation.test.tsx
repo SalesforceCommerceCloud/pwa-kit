@@ -139,31 +139,21 @@ const tests = (Object.keys(testActionsArgs) as ShopperCustomersMutationType[]).m
                 assertions: async () => {
                     mockAuthCalls()
 
-                    // Mock server responses
-                    const mockReplyBody = {
-                        customerId: CUSTOMER_ID,
-                        email: CUSTOMER_EMAIL,
-                        login: CUSTOMER_EMAIL,
-                        listId: LIST_ID,
-                        itemId: ITEM_ID,
-                        paymentInstrumentId: PAYMENT_INSTRUMENT_ID
-                    }
-
                     nock('http://localhost:3000')
                         .patch((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(200, mockReplyBody)
+                        .reply(200, testActionsArgs[key])
                     nock('http://localhost:3000')
                         .put((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(200, mockReplyBody)
+                        .reply(200, testActionsArgs[key])
                     nock('http://localhost:3000')
                         .post((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(200, mockReplyBody)
+                        .reply(200, testActionsArgs[key])
                     nock('http://localhost:3000')
                         .delete((uri) => {
                             return uri.includes('/customer/shopper-customers/')
@@ -183,8 +173,8 @@ const tests = (Object.keys(testActionsArgs) as ShopperCustomersMutationType[]).m
                     // Pre-populate cache with query keys we invalidate/update/remove onSuccess
                     const {invalidate, update, remove} = queryKeysMatrix[key](
                         // @ts-ignore
-                        {},
-                        testActionsArgs[key]
+                        testActionsArgs[key],
+                        {}
                     )
 
                     invalidate?.forEach((queryKey: QueryKey) => {

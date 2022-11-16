@@ -17,7 +17,7 @@ export interface QueryKeysMatrixElement {
 }
 
 type QueryKeysMatrix = {
-    [key in ShopperCustomersMutationType]: (data: any, param: any) => QueryKeysMatrixElement
+    [key in ShopperCustomersMutationType]: (param: any, response: any) => QueryKeysMatrixElement
 }
 
 // TODO: Make Client dynamic
@@ -27,7 +27,7 @@ export const updateCache = <Action extends ShopperCustomersMutationType>(
     queryClient: QueryClient,
     action: Action,
     queryKeysMatrix: QueryKeysMatrix,
-    data: DataType<Client[Action]>,
+    response: DataType<Client[Action]>,
     params: Argument<Client[Action]>
 ) => {
     const isMatchingKey = (cacheQuery: {queryKey: {[x: string]: any}}, queryKey: any[]) =>
@@ -43,19 +43,19 @@ export const updateCache = <Action extends ShopperCustomersMutationType>(
         )
 
     // STEP 1. Update data inside query cache for the matching queryKeys
-    queryKeysMatrix[action](data, params)?.update?.map((queryKey: any) => {
-        queryClient.setQueryData(queryKey, data)
+    queryKeysMatrix[action](params, response)?.update?.map((queryKey: any) => {
+        queryClient.setQueryData(queryKey, response)
     })
 
     // STEP 2. Invalidate cache entries with the matching queryKeys
-    queryKeysMatrix[action](data, params)?.invalidate?.map((queryKey: any) => {
+    queryKeysMatrix[action](params, response)?.invalidate?.map((queryKey: any) => {
         queryClient.invalidateQueries({
             predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
         })
     })
 
     // STEP 3. Remove cache entries with the matching queryKeys
-    queryKeysMatrix[action](data, params)?.remove?.map((queryKey: any) => {
+    queryKeysMatrix[action](params, response)?.remove?.map((queryKey: any) => {
         queryClient.removeQueries({
             predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
         })

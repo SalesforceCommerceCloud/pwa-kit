@@ -225,68 +225,68 @@ export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyo
 
 export const queryKeysMatrix = {
     authorizeCustomer: (
-        data: DataType<Client['authorizeCustomer']>,
-        params: Argument<Client['authorizeCustomer']>
+        params: Argument<Client['authorizeCustomer']>,
+        response: DataType<Client['authorizeCustomer']>
     ): QueryKeysMatrixElement => {
         return {}
     },
     authorizeTrustedSystem: (
-        data: DataType<Client['authorizeTrustedSystem']>,
-        params: Argument<Client['authorizeTrustedSystem']>
+        params: Argument<Client['authorizeTrustedSystem']>,
+        response: DataType<Client['authorizeTrustedSystem']>
     ): QueryKeysMatrixElement => {
         return {}
     },
     deleteCustomerProductList: (
-        data: DataType<Client['deleteCustomerProductList']>,
-        params: Argument<Client['deleteCustomerProductList']>
+        params: Argument<Client['deleteCustomerProductList']>,
+        response: DataType<Client['deleteCustomerProductList']>
     ): QueryKeysMatrixElement => {
         return {}
     },
     getResetPasswordToken: (
-        data: DataType<Client['getResetPasswordToken']>,
-        params: Argument<Client['getResetPasswordToken']>
+        params: Argument<Client['getResetPasswordToken']>,
+        response: DataType<Client['getResetPasswordToken']>
     ): QueryKeysMatrixElement => {
         return {}
     },
     invalidateCustomerAuth: (
-        data: DataType<Client['invalidateCustomerAuth']>,
-        params: Argument<Client['invalidateCustomerAuth']>
+        params: Argument<Client['invalidateCustomerAuth']>,
+        response: DataType<Client['invalidateCustomerAuth']>
     ): QueryKeysMatrixElement => {
         return {}
     },
     registerCustomer: (
-        data: DataType<Client['registerCustomer']>,
-        params: Argument<Client['registerCustomer']>
+        params: Argument<Client['registerCustomer']>,
+        response: DataType<Client['registerCustomer']>
     ): QueryKeysMatrixElement => {
         return {}
     },
     registerExternalProfile: (
-        data: DataType<Client['registerExternalProfile']>,
-        params: Argument<Client['registerExternalProfile']>
+        params: Argument<Client['registerExternalProfile']>,
+        response: DataType<Client['registerExternalProfile']>
     ): QueryKeysMatrixElement => {
         return {}
     },
     resetPassword: (
-        data: DataType<Client['resetPassword']>,
-        params: Argument<Client['resetPassword']>
+        params: Argument<Client['resetPassword']>,
+        response: DataType<Client['resetPassword']>
     ): QueryKeysMatrixElement => {
         return {}
     },
     updateCustomerPassword: (
-        data: DataType<Client['updateCustomerPassword']>,
-        params: Argument<Client['updateCustomerPassword']>
+        params: Argument<Client['updateCustomerPassword']>,
+        response: DataType<Client['updateCustomerPassword']>
     ): QueryKeysMatrixElement => {
         return {}
     },
     updateCustomerProductList: (
-        data: DataType<Client['updateCustomerProductList']>,
-        params: Argument<Client['updateCustomerProductList']>
+        params: Argument<Client['updateCustomerProductList']>,
+        response: DataType<Client['updateCustomerProductList']>
     ): QueryKeysMatrixElement => {
         return {}
     },
     updateCustomer: (
-        data: DataType<Client['updateCustomer']>,
-        params: Argument<Client['updateCustomer']>
+        params: Argument<Client['updateCustomer']>,
+        response: DataType<Client['updateCustomer']>
     ): QueryKeysMatrixElement => {
         const {customerId} = params.parameters
         return {
@@ -300,8 +300,8 @@ export const queryKeysMatrix = {
     },
 
     updateCustomerAddress: (
-        data: DataType<Client['updateCustomerAddress']>,
-        params: Argument<Client['updateCustomerAddress']>
+        params: Argument<Client['updateCustomerAddress']>,
+        response: DataType<Client['updateCustomerAddress']>
     ): QueryKeysMatrixElement => {
         const {customerId, addressName} = params.parameters
         return {
@@ -311,8 +311,8 @@ export const queryKeysMatrix = {
     },
 
     createCustomerAddress: (
-        data: DataType<Client['createCustomerAddress']>,
-        params: Argument<Client['createCustomerAddress']>
+        params: Argument<Client['createCustomerAddress']>,
+        response: DataType<Client['createCustomerAddress']>
     ): QueryKeysMatrixElement => {
         const {customerId} = params.parameters
         const {addressId} = params.body
@@ -325,8 +325,8 @@ export const queryKeysMatrix = {
     },
 
     removeCustomerAddress: (
-        data: DataType<Client['removeCustomerAddress']>,
-        params: Argument<Client['removeCustomerAddress']>
+        params: Argument<Client['removeCustomerAddress']>,
+        response: DataType<Client['removeCustomerAddress']>
     ): QueryKeysMatrixElement => {
         // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
         //  The required parameters become optional accidentally
@@ -339,8 +339,8 @@ export const queryKeysMatrix = {
     },
 
     createCustomerPaymentInstrument: (
-        data: DataType<Client['createCustomerPaymentInstrument']>,
-        params: Argument<Client['createCustomerPaymentInstrument']>
+        params: Argument<Client['createCustomerPaymentInstrument']>,
+        response: DataType<Client['createCustomerPaymentInstrument']>
     ): QueryKeysMatrixElement => {
         const {customerId} = params.parameters
         return {
@@ -351,7 +351,7 @@ export const queryKeysMatrix = {
                     '/payment-instruments',
                     {
                         customerId,
-                        paymentInstrumentId: data?.paymentInstrumentId
+                        paymentInstrumentId: response?.paymentInstrumentId
                     }
                 ]
             ],
@@ -360,8 +360,8 @@ export const queryKeysMatrix = {
     },
 
     deleteCustomerPaymentInstrument: (
-        data: DataType<Client['deleteCustomerPaymentInstrument']>,
-        params: Argument<Client['deleteCustomerPaymentInstrument']>
+        params: Argument<Client['deleteCustomerPaymentInstrument']>,
+        response: DataType<Client['deleteCustomerPaymentInstrument']>
     ): QueryKeysMatrixElement => {
         // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
         //  The required parameters become optional accidentally
@@ -381,29 +381,31 @@ export const queryKeysMatrix = {
     },
 
     createCustomerProductList: (
-        data: DataType<Client['createCustomerProductList']>,
-        params: Argument<Client['createCustomerProductList']>
+        params: Argument<Client['createCustomerProductList']>,
+        response: DataType<Client['createCustomerProductList']>
     ): QueryKeysMatrixElement => {
         const {customerId} = params.parameters
         return {
-            update: [['/customers', customerId, '/product-list', {customerId, listId: data?.id}]]
+            update: [
+                ['/customers', customerId, '/product-list', {customerId, listId: response?.id}]
+            ]
         }
     },
 
     createCustomerProductListItem: (
-        data: DataType<Client['createCustomerProductListItem']>,
-        params: Argument<Client['createCustomerProductListItem']>
+        params: Argument<Client['createCustomerProductListItem']>,
+        response: DataType<Client['createCustomerProductListItem']>
     ): QueryKeysMatrixElement => {
         const {customerId, listId} = params.parameters
         return {
-            update: [['/customers', customerId, '/product-list', listId, {itemId: data?.id}]],
+            update: [['/customers', customerId, '/product-list', listId, {itemId: response?.id}]],
             invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]]
         }
     },
 
     updateCustomerProductListItem: (
-        data: DataType<Client['updateCustomerProductListItem']>,
-        params: Argument<Client['updateCustomerProductListItem']>
+        params: Argument<Client['updateCustomerProductListItem']>,
+        response: DataType<Client['updateCustomerProductListItem']>
     ): QueryKeysMatrixElement => {
         const {customerId, listId, itemId} = params.parameters
         return {
@@ -412,8 +414,8 @@ export const queryKeysMatrix = {
         }
     },
     deleteCustomerProductListItem: (
-        data: DataType<Client['deleteCustomerProductListItem']>,
-        params: Argument<Client['deleteCustomerProductListItem']>
+        params: Argument<Client['deleteCustomerProductListItem']>,
+        response: DataType<Client['deleteCustomerProductListItem']>
     ): QueryKeysMatrixElement => {
         // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
         //  The required parameters become optional accidentally
