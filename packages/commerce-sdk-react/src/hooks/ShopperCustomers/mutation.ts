@@ -328,6 +328,9 @@ export const queryKeysMatrix = {
         data: DataType<Client['removeCustomerAddress']>,
         params: Argument<Client['removeCustomerAddress']>
     ): QueryKeysMatrixElement => {
+        // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
+        //  The required parameters become optional accidentally
+        // @ts-ignore
         const {customerId, addressName} = params.parameters
         return {
             invalidate: [['/customers', customerId, {customerId}]],
@@ -360,6 +363,9 @@ export const queryKeysMatrix = {
         data: DataType<Client['deleteCustomerPaymentInstrument']>,
         params: Argument<Client['deleteCustomerPaymentInstrument']>
     ): QueryKeysMatrixElement => {
+        // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
+        //  The required parameters become optional accidentally
+        // @ts-ignore
         const {customerId, paymentInstrumentId} = params.parameters
         return {
             invalidate: [['/customers', customerId, {customerId}]],
@@ -409,6 +415,9 @@ export const queryKeysMatrix = {
         data: DataType<Client['deleteCustomerProductListItem']>,
         params: Argument<Client['deleteCustomerProductListItem']>
     ): QueryKeysMatrixElement => {
+        // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
+        //  The required parameters become optional accidentally
+        // @ts-ignore
         const {customerId, listId, itemId} = params.parameters
         return {
             invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]],

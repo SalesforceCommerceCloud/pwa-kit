@@ -24,7 +24,11 @@ const ITEM_ID = '60ee899e9305de0df5b0fcade5'
 const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
 const PRODUCT_ID = '25518823M'
 
-const testActionsArgs = {
+type TestActionsArgs = {
+    [key in ShopperCustomersMutationType]?: {body: any; parameters: any}
+}
+
+const testActionsArgs: TestActionsArgs = {
     updateCustomer: {
         body: {firstName: `Kobe`},
         parameters: {customerId: CUSTOMER_ID}
@@ -126,7 +130,7 @@ const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) =>
     )
 }
 
-const tests = Object.keys(testActionsArgs).map((key) => {
+const tests = (Object.keys(testActionsArgs) as ShopperCustomersMutationType[]).map((key) => {
     return {
         hook: key,
         cases: [
@@ -177,11 +181,11 @@ const tests = Object.keys(testActionsArgs).map((key) => {
                     )
 
                     // Pre-populate cache with query keys we invalidate/update/remove onSuccess
-                    // @ts-ignore
-                    const {invalidate, update, remove} = queryKeysMatrix[key](mockReplyBody, {
-                        body: {},
-                        parameters: testActionsArgs[key].parameters
-                    })
+                    const {invalidate, update, remove} = queryKeysMatrix[key](
+                        // @ts-ignore
+                        {},
+                        testActionsArgs[key]
+                    )
 
                     invalidate?.forEach((queryKey: QueryKey) => {
                         queryClient.setQueryData(queryKey, {})

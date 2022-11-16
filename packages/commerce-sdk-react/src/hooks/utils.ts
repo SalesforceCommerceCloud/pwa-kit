@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {QueryClient} from '@tanstack/react-query'
-import {ApiClients, DataType} from './types'
+import {ApiClients, Argument, DataType} from './types'
 import {ShopperCustomersMutationType} from './ShopperCustomers'
 
 const isObject = (item: null) => typeof item === 'object' && !Array.isArray(item) && item !== null
@@ -17,7 +17,7 @@ export interface QueryKeysMatrixElement {
 }
 
 type QueryKeysMatrix = {
-    [key in ShopperCustomersMutationType]: (data: unknown, param: unknown) => QueryKeysMatrixElement
+    [key in ShopperCustomersMutationType]: (data: any, param: any) => QueryKeysMatrixElement
 }
 
 // TODO: Make Client dynamic
@@ -28,7 +28,7 @@ export const updateCache = <Action extends ShopperCustomersMutationType>(
     action: Action,
     queryKeysMatrix: QueryKeysMatrix,
     data: DataType<Client[Action]>,
-    params: Parameters<Client[Action]>
+    params: Argument<Client[Action]>
 ) => {
     const isMatchingKey = (cacheQuery: {queryKey: {[x: string]: any}}, queryKey: any[]) =>
         queryKey.every((item, index) =>
