@@ -34,6 +34,7 @@ const TestProviders = (props: {
     commerceApiProvider?: Partial<CommerceApiProviderProps>
 }) => {
     const {commerceApiProvider} = props
+
     return (
         <QueryClientProvider client={queryClient}>
             <CommerceApiProvider {...TEST_CONFIG} {...commerceApiProvider}>
