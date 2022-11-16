@@ -143,17 +143,17 @@ const tests = (Object.keys(testActionsArgs) as ShopperCustomersMutationType[]).m
                         .patch((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(200, testActionsArgs[key])
+                        .reply(200, {})
                     nock('http://localhost:3000')
                         .put((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(200, testActionsArgs[key])
+                        .reply(200, {})
                     nock('http://localhost:3000')
                         .post((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
-                        .reply(200, testActionsArgs[key])
+                        .reply(200, {})
                     nock('http://localhost:3000')
                         .delete((uri) => {
                             return uri.includes('/customer/shopper-customers/')
