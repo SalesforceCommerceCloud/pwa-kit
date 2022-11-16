@@ -35,7 +35,7 @@ const catcher = (message) => (error) => {
  */
 const getPackageFiles = () => {
     let output = ''
-    const child = exec(`npx npm-packlist`)
+    const child = exec(`npx npm-packlist@v4`)
 
     child.stderr.on('data', (data) => {
         console.log(data)
