@@ -17,7 +17,7 @@ export interface QueryKeysMatrixElement {
     remove?: Array<Array<string | unknown>>
 }
 
-// TODO: Add more types endpoints as needed
+// TODO: Add more endpoints types as needed
 export type CombinedMutationTypes = Partial<
     ShopperOrdersMutationType & ShopperCustomersMutationType
 >
@@ -25,7 +25,7 @@ type QueryKeysMatrix = {
     [key in CombinedMutationTypes]: (data: any, param: any) => QueryKeysMatrixElement
 }
 
-// TODO: Add more types endpoints as needed
+// TODO: Add more endpoints types as needed
 type Client = ApiClients['shopperOrders'] | ApiClients['shopperCustomers']
 
 export const updateCache = <Action extends CombinedMutationTypes>(

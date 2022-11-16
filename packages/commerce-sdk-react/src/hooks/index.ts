@@ -10,6 +10,7 @@ export * from './ShopperCustomers'
 export * from './ShopperDiscoverySearch'
 export * from './ShopperGiftCertificates'
 export * from './ShopperLogin'
+// @ts-ignore
 export * from './ShopperOrders'
 export * from './ShopperProducts'
 export * from './ShopperPromotions'

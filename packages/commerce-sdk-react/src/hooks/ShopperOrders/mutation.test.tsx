@@ -84,10 +84,13 @@ const tests = [
                         })
                         .reply(200, mockOrderResponse)
 
-                    const {invalidate, update} = queryKeysMatrix.createOrder(mockOrderResponse, {
-                        body: {},
-                        parameters: {}
-                    })
+                    const {invalidate, update} = queryKeysMatrix.createOrder(
+                        {
+                            body: {},
+                            parameters: {}
+                        },
+                        mockOrderResponse
+                    )
 
                     invalidate?.forEach((queryKey: QueryKey) => {
                         queryClient.setQueryData(queryKey, {})

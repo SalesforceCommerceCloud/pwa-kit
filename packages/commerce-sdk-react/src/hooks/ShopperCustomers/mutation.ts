@@ -431,7 +431,9 @@ export const queryKeysMatrix = {
 /**
  * A hook for performing mutations with the Shopper Customers API.
  */
-export function useShopperCustomersMutation<Action extends CombinedMutationTypes>(action: Action) {
+export function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
+    action: Action
+) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
     const queryClient = useQueryClient()
@@ -442,6 +444,7 @@ export function useShopperCustomersMutation<Action extends CombinedMutationTypes
         },
         {
             onSuccess: (data, params) => {
+                // @ts-ignore
                 updateCache(queryClient, action, queryKeysMatrix, data, params)
             }
         }
