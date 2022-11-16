@@ -7,6 +7,7 @@
 import {QueryClient} from '@tanstack/react-query'
 import {ApiClients, Argument, DataType} from './types'
 import {ShopperCustomersMutationType} from './ShopperCustomers'
+import {ShopperOrdersMutationType} from './ShopperOrders'
 
 const isObject = (item: null) => typeof item === 'object' && !Array.isArray(item) && item !== null
 
@@ -16,14 +17,18 @@ export interface QueryKeysMatrixElement {
     remove?: Array<Array<string | unknown>>
 }
 
+// TODO: Add more types endpoints as needed
+export type CombinedMutationTypes = Partial<
+    ShopperOrdersMutationType & ShopperCustomersMutationType
+>
 type QueryKeysMatrix = {
-    [key in ShopperCustomersMutationType]: (param: any, response: any) => QueryKeysMatrixElement
+    [key in CombinedMutationTypes]: (data: any, param: any) => QueryKeysMatrixElement
 }
 
-// TODO: Make Client dynamic
-type Client = ApiClients['shopperCustomers']
+// TODO: Add more types endpoints as needed
+type Client = ApiClients['shopperOrders'] | ApiClients['shopperCustomers']
 
-export const updateCache = <Action extends ShopperCustomersMutationType>(
+export const updateCache = <Action extends CombinedMutationTypes>(
     queryClient: QueryClient,
     action: Action,
     queryKeysMatrix: QueryKeysMatrix,

@@ -7,7 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {updateCache, QueryKeysMatrixElement} from '../utils'
+import {updateCache, QueryKeysMatrixElement, CombinedMutationTypes} from '../utils'
 
 type Client = ApiClients['shopperCustomers']
 
@@ -431,9 +431,7 @@ export const queryKeysMatrix = {
 /**
  * A hook for performing mutations with the Shopper Customers API.
  */
-export function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
-    action: Action
-) {
+export function useShopperCustomersMutation<Action extends CombinedMutationTypes>(action: Action) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
     const queryClient = useQueryClient()
