@@ -83,7 +83,9 @@ const options = {
             queries: {
                 retry: false,
                 staleTime: 2 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {})
+                ...(isServerSide ? {retryOnMount: false} : {}),
+                // Option for debugging changes in cache with React Query Dev Tools
+                refetchOnWindowFocus: false
             },
             mutations: {
                 retry: false
