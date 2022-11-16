@@ -16,7 +16,6 @@ import {
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
 
-const CUSTOMER_EMAIL = 'kobe@test.com'
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
 const ADDRESS_NAME = 'TestAddress'
 const LIST_ID = 'bcd08be6f883120b4960ca8a0b'

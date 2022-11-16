@@ -84,7 +84,7 @@ const options = {
                 retry: false,
                 staleTime: 2 * 1000,
                 ...(isServerSide ? {retryOnMount: false} : {}),
-                //TODO: OPTIONS FOR DEBUGGING. REMOVE BEFORE MERGING.
+                // Option for debugging changes in cache with React Query Dev Tools
                 refetchOnWindowFocus: false
             },
             mutations: {
