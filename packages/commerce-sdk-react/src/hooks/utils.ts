@@ -24,8 +24,7 @@ type QueryKeysMatrix = {
     [key in CombinedMutationTypes]: (data: any, param: any) => QueryKeysMatrixElement
 }
 
-// TODO: Add more endpoints types as needed
-type Client = ApiClients['shopperOrders'] | ApiClients['shopperCustomers']
+type Client = ApiClients
 
 export const updateCache = <Action extends CombinedMutationTypes>(
     queryClient: QueryClient,
