@@ -51,7 +51,7 @@ export const ShopperOrdersMutations = {
 
 export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
 
-export const shopperOrdersMutationsQueryKeysMatrix = {
+export const shopperOrdersQueryKeysMatrix = {
     createOrder: (
         params: Argument<Client['createOrder']>,
         response: DataType<Client['createOrder']>
@@ -67,7 +67,7 @@ export const shopperOrdersMutationsQueryKeysMatrix = {
 /**
  * A hook for performing mutations with the Shopper Gift Certificates API.
  */
-export function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(action: Action) {
+export function useShopperOrdersMutation<Action extends CombinedMutationTypes>(action: Action) {
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
     const queryClient = useQueryClient()
@@ -78,14 +78,7 @@ export function useShopperOrdersMutation<Action extends ShopperOrdersMutationTyp
         },
         {
             onSuccess: (data, params) => {
-                // @ts-ignore
-                updateCache(
-                    queryClient,
-                    action,
-                    shopperOrdersMutationsQueryKeysMatrix,
-                    data,
-                    params
-                )
+                updateCache(queryClient, action, shopperOrdersQueryKeysMatrix, data, params)
             }
         }
     )

@@ -11,7 +11,7 @@ import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {
     ShopperOrdersMutations,
     useShopperOrdersMutation,
-    shopperOrdersMutationsQueryKeysMatrix
+    shopperOrdersQueryKeysMatrix
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
@@ -22,6 +22,7 @@ const BASKET_ID = '753b796f71aaaef79b0adde657'
 const OrderMutationComponent = () => {
     //Log into registered account when the component is mounted
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    // @ts-ignore
     const createOrder = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
 
     React.useEffect(() => {
@@ -38,9 +39,12 @@ const OrderMutationComponent = () => {
             <div>
                 <button
                     onClick={() =>
-                        createOrder.mutate({
-                            body: {basketId: BASKET_ID}
-                        })
+                        createOrder.mutate(
+                            // @ts-ignore
+                            {
+                                body: {basketId: BASKET_ID}
+                            }
+                        )
                     }
                 >
                     Create Order
@@ -88,7 +92,7 @@ const tests = [
                         })
                         .reply(200, mockOrderResponse)
 
-                    const {invalidate, update} = shopperOrdersMutationsQueryKeysMatrix.createOrder(
+                    const {invalidate, update} = shopperOrdersQueryKeysMatrix.createOrder(
                         {
                             body: {},
                             parameters: {}

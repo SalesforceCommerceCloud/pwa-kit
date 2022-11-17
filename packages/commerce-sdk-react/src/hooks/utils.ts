@@ -18,9 +18,8 @@ export interface QueryKeysMatrixElement {
 }
 
 // TODO: Add more endpoints types as needed
-export type CombinedMutationTypes = Partial<
-    ShopperOrdersMutationType & ShopperCustomersMutationType
->
+export type CombinedMutationTypes = ShopperOrdersMutationType & ShopperCustomersMutationType
+
 type QueryKeysMatrix = {
     [key in CombinedMutationTypes]: (data: any, param: any) => QueryKeysMatrixElement
 }
