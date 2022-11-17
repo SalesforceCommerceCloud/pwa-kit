@@ -79,7 +79,13 @@ export function useShopperOrdersMutation<Action extends ShopperOrdersMutationTyp
         {
             onSuccess: (data, params) => {
                 // @ts-ignore
-                updateCache(queryClient, action, queryKeysMatrix, data, params)
+                updateCache(
+                    queryClient,
+                    action,
+                    shopperOrdersMutationsQueryKeysMatrix,
+                    data,
+                    params
+                )
             }
         }
     )

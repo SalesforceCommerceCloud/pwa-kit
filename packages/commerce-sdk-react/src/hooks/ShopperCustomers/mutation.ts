@@ -445,7 +445,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         {
             onSuccess: (data, params) => {
                 // @ts-ignore
-                updateCache(queryClient, action, queryKeysMatrix, data, params)
+                updateCache(queryClient, action, shopperCustomersQueryKeysMatrix, data, params)
             }
         }
     )
