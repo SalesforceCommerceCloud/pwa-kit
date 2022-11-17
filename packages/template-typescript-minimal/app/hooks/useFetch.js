@@ -11,12 +11,12 @@ import {useAuth} from './useAuth'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
-const useFetch = (url, params, config) => {
+const useFetch = (url, params, config, fetchOptions) => {
     const {token} = useAuth()
     const key = url.split('webstores')[1]
 
     const context = useQuery({
-        queryKey: [key.toString(), params].filter(Boolean),
+        queryKey: [key, params].filter(Boolean),
         queryFn: async ({queryKey}) => {
             const _url = new URL(url)
             if (params) {
@@ -24,8 +24,10 @@ const useFetch = (url, params, config) => {
             }
             const res = await fetch(_url, {
                 headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                ...fetchOptions
             })
             const data = await res.json()
             return data
@@ -129,7 +131,8 @@ export const useCartAction = () => {
             return t
         },
         {
-            onSuccess: () => {
+            onSuccess: (data) => {
+                console.log('data', data)
                 queryClient.invalidateQueries([`/${webstoreId}/carts/current`])
             }
         }
@@ -247,6 +250,34 @@ export const useProductCategoryPath = (categoryId, params) => {
         `${getApiUrl(`/product-category-path/product-categories/${queryString}`)}`
     )
     return data
+}
+
+export const useProductSearch = (categoryId, searchTerm) => {
+    const {token} = useAuth()
+    const context = useQuery({
+        queryKey: [`/search/product-search`, {categoryId, searchTerm}].filter(Boolean),
+        queryFn: async ({queryKey}) => {
+            const _url = getApiUrl(`/search/product-search`)
+            const res = await fetch(_url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    searchTerm,
+                    categoryId
+                })
+            })
+            const data = await res.json()
+            return data
+        },
+        enabled: !!token,
+        retry: false
+    })
+
+    // const data = useFetch(url, {categoryId, searchTerm}, {}, fetchOptions)
+    return context
 }
 
 export default useFetch

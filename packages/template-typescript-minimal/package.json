@@ -1,5 +1,5 @@
 {
-    "name": "alex-test-01",
+    "name": "typescript-minimal",
     "version": "2.4.0-dev",
     "engines": {
         "node": "^14.0.0",

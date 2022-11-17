@@ -47,16 +47,18 @@ export const AuthProvider = ({children}) => {
         })
         const body = await response.text()
         const token = /<sessionId>(.*)<\/sessionId>/.exec(body)[1]
-        window.localStorage.setItem('token', token)
+        // window.localStorage.setItem('token', token)
         setToken(token)
     }
     React.useEffect(() => {
-        const token = window.localStorage.getItem('token')
-        if (token) {
-            setToken(token)
-        } else {
-            getToken()
-        }
+        getToken()
+
+        // const token = window.localStorage.getItem('token')
+        // if (token) {
+        //     setToken(token)
+        // } else {
+        //     getToken()
+        // }
     }, [])
 
     return <AuthContext.Provider value={{token, setToken}}>{children}</AuthContext.Provider>

@@ -9,20 +9,68 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useAuth} from '../hooks/useAuth'
 import {Link} from 'react-router-dom'
-import {useCart} from '../hooks/useFetch'
+import {useCart, useCategories} from '../hooks/useFetch'
 
 Header.propTypes = {}
-
-function Header(props) {
-    const {token} = useAuth()
-    const {data: cart} = useCart()
+const Category = ({cate}) => {
+    const {fields} = cate
+    const {data, isLoading} = useCategories(fields.Id)
+    console.log('data', data)
 
     return (
         <div>
-            <Link to={'/'}>Home</Link>
+            <Link to={`/category/${fields.Id}/${fields.Name.toLowerCase()}`}>
+                Category {fields.Name}
+            </Link>
+            {isLoading ? (
+                <div>Loading...</div>
+            ) : (
+                data?.productCategories && (
+                    <ul>
+                        {data?.productCategories?.map((cat) => (
+                            <li key={cat.fields.Id}>
+                                <Link
+                                    to={`/category/${
+                                        cat.fields.Id
+                                    }/${cat.fields.Name.toLowerCase()}`}
+                                >
+                                    {cat.fields.Name}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                )
+            )}
+        </div>
+    )
+}
+function Header(props) {
+    const {token} = useAuth()
+    const {data: cart} = useCart()
+    const {data, isLoading, error} = useCategories()
+
+    if (isLoading) {
+        return <div>Loading categories.....</div>
+    }
+
+    if (error) {
+        return <h2 style={{color: 'red'}}>Something is wrong</h2>
+    }
+    return (
+        <div>
             <div>
                 {token ? <h2>Logged in as alex.vuong </h2> : <h2>Logging in as alex.vuong</h2>}
             </div>
+            <Link to={'/'}>Home</Link>
+            <div>
+                <div>
+                    {data?.productCategories.map((cate) => {
+                        return <Category key={cate.id} cate={cate} />
+                    })}
+                </div>
+                <Link to="/products/go-brew">Go Brew Coffee</Link>
+            </div>
+
             <Link to={'/cart'}>
                 Cart {parseInt(cart?.totalProductCount) > 0 ? `(${cart?.totalProductCount})` : null}
             </Link>

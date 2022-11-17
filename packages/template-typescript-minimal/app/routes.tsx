@@ -16,12 +16,19 @@ const Cart = loadable(() => import('./pages/cart'))
 const Checkout = loadable(() => import('./pages/checkout'))
 //@ts-ignore
 const OrderConfirmed = loadable(() => import('./pages/order-confirmed'))
+//@ts-ignore
+const ProductList = loadable(() => import('./pages/product-list'))
 
 const routes = [
     {
         path: '/',
         exact: true,
         component: Home
+    },
+    {
+        path: '/category/:categoryId/:productName',
+        exact: true,
+        component: ProductList
     },
     {
         path: '/products/:productId',

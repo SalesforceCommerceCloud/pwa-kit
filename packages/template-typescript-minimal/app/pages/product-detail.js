@@ -10,12 +10,13 @@ import PropTypes from 'prop-types'
 import {addItemToCart, useCart, useProduct, useProductPrice} from '../hooks/useFetch'
 import QuantityPicker, {useQuantity} from '../components/quantity-picker'
 import {useMutation} from '@tanstack/react-query'
+import {useParams} from 'react-router-dom'
 ProductDetail.propTypes = {}
 
 function ProductDetail(props) {
     const {quantity, onDecrease, onIncrease} = useQuantity()
 
-    const productId = '01tRO000000YoTZYA0'
+    const {productId} = useParams()
     const {data: productDetail, isLoading, error} = useProduct(productId)
     const {data: productPrice, isLoading: isProductPriceLoading} = useProductPrice(productId)
     const addItemToCartAction = addItemToCart()

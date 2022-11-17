@@ -70,30 +70,36 @@ function Checkout() {
     const checkoutAction = useCheckoutAction(checkoutData?.checkoutId)
 
     const [selectedCarrier, setSelectedCarrier] = React.useState(null)
-    // React.useEffect(() => {
-    //     console.log('useEffecct>>>>>>>>>>>>>>>>>>>>>', checkoutData)
-    //     // if this happens, it means there is no active checkouts, create one
-    //     if (checkoutData?.[0]?.errorCode) {
-    //         console.log('===checkout not found=====')
-    //         checkoutAction.mutate({
-    //             url: getApiUrl(`/checkouts`),
-    //             payload: {
-    //                 cartId: cart.cartId
-    //             }
-    //         })
-    //         const deliverAddress =
-    //             addresses?.items.find((a) => !!a.isDefault) || addresses?.items[0]
-    //         checkoutAction.mutate({
-    //             url: getApiUrl(`/checkouts/${checkoutData.checkoutId}`),
-    //             payload: {
-    //                 deliverAddress: {id: deliverAddress.addressId}
-    //             },
-    //             fetchOptions: {
-    //                 method: 'PATCH'
-    //             }
-    //         })
-    //     }
-    // }, [])
+    const addDeliveryAddress = (checkoutId) => {
+        if (!checkoutId) return
+        console.log('addresses', addresses)
+        const deliveryAddress = addresses?.items.find((a) => !!a.isDefault) || addresses?.items[0]
+        console.log('deliveryAddress', deliveryAddress)
+        checkoutAction.mutate(
+            {
+                url: getApiUrl(`/checkouts/${checkoutId}`),
+                payload: {
+                    deliveryAddress: {
+                        id: deliveryAddress?.addressId
+                    }
+                },
+                fetchOptions: {
+                    method: 'PATCH'
+                }
+            },
+            {
+                onSuccess: (e) => {
+                    // manually refetch the checkout to get carrier details after an arbitrary time
+                    // because the server needs time to inject available carriers into checkout
+                    setTimeout(() => {
+                        queryClient.refetchQueries({
+                            queryKey: [`/${webstoreId}/checkouts/active`]
+                        })
+                    }, 1000)
+                }
+            }
+        )
+    }
 
     React.useEffect(() => {
         if (checkoutData?.[0]?.errorCode === 'CHECKOUT_NOT_FOUND') {
@@ -106,37 +112,40 @@ function Checkout() {
                 },
                 {
                     onSuccess: (data) => {
-                        const deliveryAddress =
-                            addresses?.items.find((a) => !!a.isDefault) || addresses?.items[0]
-                        checkoutAction.mutate(
-                            {
-                                url: getApiUrl(`/checkouts/${data.checkoutId}`),
-                                payload: {
-                                    deliveryAddress: {
-                                        id: deliveryAddress?.addressId
-                                    }
-                                },
-                                fetchOptions: {
-                                    method: 'PATCH'
-                                }
-                            },
-                            {
-                                onSuccess: (e) => {
-                                    // manually refetch the checkout to get carrier details after an arbitrary time
-                                    // because the server needs time to inject available carriers into checkout
-                                    setTimeout(() => {
-                                        queryClient.refetchQueries({
-                                            queryKey: [`/${webstoreId}/checkouts/active`]
-                                        })
-                                    }, 1000)
-                                }
-                            }
-                        )
+                        addDeliveryAddress(data.checkoutId)
+                        // const deliveryAddress =
+                        //     addresses?.items.find((a) => !!a.isDefault) || addresses?.items[0]
+                        // checkoutAction.mutate(
+                        //     {
+                        //         url: getApiUrl(`/checkouts/${data.checkoutId}`),
+                        //         payload: {
+                        //             deliveryAddress: {
+                        //                 id: deliveryAddress?.addressId
+                        //             }
+                        //         },
+                        //         fetchOptions: {
+                        //             method: 'PATCH'
+                        //         }
+                        //     },
+                        //     {
+                        //         onSuccess: (e) => {
+                        //             // manually refetch the checkout to get carrier details after an arbitrary time
+                        //             // because the server needs time to inject available carriers into checkout
+                        //             setTimeout(() => {
+                        //                 queryClient.refetchQueries({
+                        //                     queryKey: [`/${webstoreId}/checkouts/active`]
+                        //                 })
+                        //             }, 1000)
+                        //         }
+                        //     }
+                        // )
                     }
                 }
             )
         }
-
+        if (!checkoutData?.deliveryGroups?.items[0].deliveryAddress) {
+            addDeliveryAddress(checkoutData?.checkoutId)
+        }
         const selectedCarrier = checkoutData?.deliveryGroups?.items?.[0].selectedDeliveryMethod
         setSelectedCarrier(selectedCarrier)
     }, [checkoutData])
