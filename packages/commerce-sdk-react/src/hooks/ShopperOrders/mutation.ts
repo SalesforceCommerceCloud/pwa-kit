@@ -51,7 +51,7 @@ export const ShopperOrdersMutations = {
 
 export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
 
-export const queryKeysMatrix = {
+export const shopperOrdersMutationsQueryKeysMatrix = {
     createOrder: (
         params: Argument<Client['createOrder']>,
         response: DataType<Client['createOrder']>

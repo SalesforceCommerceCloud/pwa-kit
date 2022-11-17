@@ -8,7 +8,11 @@ import React from 'react'
 import {renderWithProviders, queryClient, mockAuthCalls} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
-import {ShopperOrdersMutations, useShopperOrdersMutation, queryKeysMatrix} from './mutation'
+import {
+    ShopperOrdersMutations,
+    useShopperOrdersMutation,
+    shopperOrdersMutationsQueryKeysMatrix
+} from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
 
@@ -84,7 +88,7 @@ const tests = [
                         })
                         .reply(200, mockOrderResponse)
 
-                    const {invalidate, update} = queryKeysMatrix.createOrder(
+                    const {invalidate, update} = shopperOrdersMutationsQueryKeysMatrix.createOrder(
                         {
                             body: {},
                             parameters: {}

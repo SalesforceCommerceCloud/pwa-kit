@@ -223,7 +223,7 @@ The value of this property must be valid for the type of custom attribute define
 
 export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
-export const queryKeysMatrix = {
+export const shopperCustomersQueryKeysMatrix = {
     authorizeCustomer: (
         params: Argument<Client['authorizeCustomer']>,
         response: DataType<Client['authorizeCustomer']>
