@@ -18,6 +18,10 @@ const Checkout = loadable(() => import('./pages/checkout'))
 const OrderConfirmed = loadable(() => import('./pages/order-confirmed'))
 //@ts-ignore
 const ProductList = loadable(() => import('./pages/product-list'))
+//@ts-ignore
+const Orders = loadable(() => import('./pages/orders'))
+//@ts-ignore
+const Order = loadable(() => import('./pages/order'))
 
 const routes = [
     {
@@ -36,6 +40,21 @@ const routes = [
         component: ProductDetail
     },
     {
+        path: '/order/confirmed',
+        exact: true,
+        component: OrderConfirmed
+    },
+    {
+        path: '/orders',
+        exact: true,
+        component: Orders
+    },
+    {
+        path: '/orders/:orderId',
+        exact: true,
+        component: Order
+    },
+    {
         path: '/cart',
         exact: true,
         component: Cart
@@ -44,11 +63,6 @@ const routes = [
         path: '/checkout',
         exact: true,
         component: Checkout
-    },
-    {
-        path: '/order/confirmed',
-        exact: true,
-        component: OrderConfirmed
     }
 ]
 

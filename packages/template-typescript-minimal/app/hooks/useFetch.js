@@ -18,8 +18,9 @@ const useFetch = (url, params, config, fetchOptions) => {
     const context = useQuery({
         queryKey: [key, params].filter(Boolean),
         queryFn: async ({queryKey}) => {
+            const method = fetchOptions?.method || 'GET'
             const _url = new URL(url)
-            if (params) {
+            if (params && method === 'GET') {
                 _url.search = new URLSearchParams(params).toString()
             }
             const res = await fetch(_url, {
@@ -27,6 +28,7 @@ const useFetch = (url, params, config, fetchOptions) => {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
+                method,
                 ...fetchOptions
             })
             const data = await res.json()
@@ -62,7 +64,7 @@ export const getApiUrl = (path) => {
     const {
         app: {webstoreId}
     } = getConfig()
-    return `${getAppOrigin()}/mobify/proxy/scom/services/data/v57.0/commerce/webstores/${webstoreId}${path}`
+    return `${getAppOrigin()}/mobify/proxy/scom/services/data/v56.0/commerce/webstores/${webstoreId}${path}`
 }
 
 export const useCategories = (categoryId, params) => {
@@ -278,6 +280,28 @@ export const useProductSearch = (categoryId, searchTerm) => {
 
     // const data = useFetch(url, {categoryId, searchTerm}, {}, fetchOptions)
     return context
+}
+export const useProductsPrice = (productIds) => {
+    const url = getApiUrl(`/pricing/products`)
+    const fetchOptions = {
+        method: 'POST',
+        body: JSON.stringify({
+            pricingLineItems: productIds
+        })
+    }
+    const data = useFetch(url, {productIds}, {enabled: !!productIds?.length}, fetchOptions)
+    return data
+}
+
+export const useOrders = (orderId) => {
+    let url
+    if (orderId) {
+        url = getApiUrl(`/order-summaries/${orderId}`)
+    } else {
+        url = getApiUrl(`/order-summaries`)
+    }
+    const data = useFetch(url)
+    return data
 }
 
 export default useFetch

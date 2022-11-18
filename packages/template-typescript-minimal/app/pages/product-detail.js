@@ -17,7 +17,14 @@ function ProductDetail(props) {
     const {quantity, onDecrease, onIncrease} = useQuantity()
 
     const {productId} = useParams()
-    const {data: productDetail, isLoading, error} = useProduct(productId)
+    const {data: productDetail, isLoading, error} = useProduct(productId, {
+        select: (data) => {
+            const {variationInfo} = data
+            return {
+                ...data
+            }
+        }
+    })
     const {data: productPrice, isLoading: isProductPriceLoading} = useProductPrice(productId)
     const addItemToCartAction = addItemToCart()
     if (isLoading || isProductPriceLoading) {
@@ -37,24 +44,54 @@ function ProductDetail(props) {
         }
         addItemToCartAction.mutate(item)
     }
+    const bigThumbnail = productDetail.mediaGroups.find((media) => media.usageType === 'Listing')
+    const imgSrc = bigThumbnail.mediaItems[0].url.startsWith('/cms/')
+        ? new URL(
+              `https://trialorgsforu-24b.test1.lightning.pc-rnd.force.com${productDetail.defaultImage.url}`
+          )
+        : productDetail.defaultImage.url
+    const smallThumbnails = productDetail.mediaGroups.find(
+        (media) => media.usageType === 'Standard'
+    )
+
+    const {variationInfo} = productDetail
     return (
         <div>
             <div style={{display: 'flex'}}>
-                <img
-                    style={{flex: 1, maxWidth: '600px'}}
-                    src={defaultImage.url}
-                    alt="big-thumbnail"
-                />
+                <div>
+                    <div style={{maxWidth: '600px'}}>
+                        <img src={imgSrc} alt="pdp-big-thumbnail" width={'100%'} />
+                    </div>
+                    <div style={{display: 'flex'}}>
+                        {smallThumbnails.mediaItems.map((media) => {
+                            const smallThumbnailSrc = media.url.startsWith('/cms/')
+                                ? new URL(
+                                      `https://trialorgsforu-24b.test1.lightning.pc-rnd.force.com${media.url}`
+                                  )
+                                : media.url
+
+                            return (
+                                <div style={{maxWidth: '150px'}}>
+                                    <img src={smallThumbnailSrc} alt="small-image" width="150px" />
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
                 <div style={{flex: 1}}>
                     <h3>{fields.Name}</h3>
-                    <h4>{`${productPrice?.listPrice} ${productPrice?.currencyIsoCode}`}</h4>
+                    <h4>{`${
+                        productPrice?.listPrice ? productPrice?.listPrice : productPrice.unitPrice
+                    } ${productPrice?.currencyIsoCode}`}</h4>
                     <div>{fields.Description}</div>
                     <QuantityPicker
                         quantity={quantity}
                         onDecrease={onDecrease}
                         onIncrease={onIncrease}
                     />
-                    <button onClick={handleAddToCart}>Add to cart</button>
+                    <button onClick={handleAddToCart} disabled={addItemToCartAction.isLoading}>
+                        {addItemToCartAction.isLoading ? 'loading..' : 'Add to cart'}
+                    </button>
                 </div>
             </div>
         </div>

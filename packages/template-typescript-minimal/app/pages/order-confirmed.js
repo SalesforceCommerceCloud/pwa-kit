@@ -28,7 +28,6 @@ function OrderConfirmed(props) {
             },
             {
                 onSuccess: (data) => {
-                    console.log('data', data)
                     setData(data)
                     queryClient.invalidateQueries()
                 }

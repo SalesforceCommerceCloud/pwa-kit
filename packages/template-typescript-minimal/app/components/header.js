@@ -68,7 +68,6 @@ function Header(props) {
                         return <Category key={cate.id} cate={cate} />
                     })}
                 </div>
-                <Link to="/products/go-brew">Go Brew Coffee</Link>
             </div>
 
             <Link to={'/cart'}>

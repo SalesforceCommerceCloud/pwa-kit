@@ -11,13 +11,7 @@ import {useQuery} from '@tanstack/react-query'
 import {Link} from 'react-router-dom'
 
 const Home = () => {
-    return (
-        <div>
-            <div>
-                <Link to="/products/go-brew">Go Brew Coffee</Link>
-            </div>
-        </div>
-    )
+    return <div>Home</div>
 }
 
 Home.getTemplateName = () => 'home'

@@ -41,6 +41,7 @@ const CartItem = ({item}) => {
                     </div>
                     <button
                         style={{marginTop: '10px'}}
+                        disabled={cartAction.isLoading}
                         onClick={() => {
                             cartAction.mutate({
                                 url: getApiUrl(
@@ -52,7 +53,7 @@ const CartItem = ({item}) => {
                             })
                         }}
                     >
-                        Remove
+                        {cartAction.isLoading ? 'loading' : 'Remove'}
                     </button>
                 </div>
             </div>
