@@ -15,8 +15,7 @@ Header.propTypes = {}
 const Category = ({cate}) => {
     const {fields} = cate
     const {data, isLoading} = useCategories(fields.Id)
-    console.log('data', data)
-
+    if (isLoading) return <div>Loading...</div>
     return (
         <div>
             <Link to={`/category/${fields.Id}/${fields.Name.toLowerCase()}`}>
@@ -64,7 +63,7 @@ function Header(props) {
             <Link to={'/'}>Home</Link>
             <div>
                 <div>
-                    {data?.productCategories.map((cate) => {
+                    {data?.productCategories?.map((cate) => {
                         return <Category key={cate.id} cate={cate} />
                     })}
                 </div>

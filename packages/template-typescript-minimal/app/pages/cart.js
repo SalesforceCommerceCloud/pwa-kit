@@ -8,13 +8,27 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {getApiUrl, useCartAction, useCartItems} from '../hooks/useFetch'
-import QuantityPicker from '../components/quantity-picker'
+import QuantityPicker, {useQuantity} from '../components/quantity-picker'
 import {Link} from 'react-router-dom'
-
+import {getMediaLink} from '../utils/utils'
+const debounce = (fn, delay) => {
+    let timerId
+    return (...args) => {
+        clearTimeout(timerId)
+        timerId = setTimeout(() => fn(...args), delay)
+    }
+}
 Cart.propTypes = {}
 const CartItem = ({item}) => {
     const {productDetails} = item.cartItem
     const cartAction = useCartAction()
+    const {quantity, setQuantity} = useQuantity()
+
+    React.useEffect(() => {
+        if (item.cartItem.quantity) {
+            setQuantity(parseInt(item.cartItem.quantity))
+        }
+    }, [item])
 
     return (
         <div>
@@ -22,22 +36,59 @@ const CartItem = ({item}) => {
                 <div>
                     <img
                         width={'200px'}
-                        src={productDetails.thumbnailImage.url}
+                        src={getMediaLink(productDetails.thumbnailImage.url)}
                         alt="cart-item-thumbnail"
                     />
                 </div>
                 <div>
                     <h4>{productDetails.name}</h4>
-                    <div>Sku {productDetails.sku}</div>
+                    <div>Sku: {productDetails.sku}</div>
                     <div>
                         Total Price: ${item.cartItem.totalPrice}{' '}
                         <s>${item.cartItem.totalListPrice}</s>
                     </div>
                     <div>{item.cartItem.salesPrice} ea</div>
-
                     <div>
+                        {Object.values(productDetails.variationAttributes).map((attr) => (
+                            <div>
+                                {attr.label}: {attr.value}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div style={{marginTop: '10px'}}>
                         Quantity:
-                        <QuantityPicker quantity={item.cartItem.quantity} />
+                        <QuantityPicker
+                            isLoading={cartAction.isLoading}
+                            quantity={quantity}
+                            onDecrease={debounce(() => {
+                                if (quantity === 1) return
+                                cartAction.mutate({
+                                    url: getApiUrl(
+                                        `/carts/current/cart-items/${item.cartItem.cartItemId}`
+                                    ),
+                                    payload: {
+                                        quantity: quantity - 1
+                                    },
+                                    fetchOptions: {
+                                        method: 'PATCH'
+                                    }
+                                })
+                            }, 400)}
+                            onIncrease={debounce(() => {
+                                cartAction.mutate({
+                                    url: getApiUrl(
+                                        `/carts/current/cart-items/${item.cartItem.cartItemId}`
+                                    ),
+                                    payload: {
+                                        quantity: quantity + 1
+                                    },
+                                    fetchOptions: {
+                                        method: 'PATCH'
+                                    }
+                                })
+                            }, 400)}
+                        />
                     </div>
                     <button
                         style={{marginTop: '10px'}}

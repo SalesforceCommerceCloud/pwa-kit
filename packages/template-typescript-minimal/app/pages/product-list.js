@@ -14,6 +14,7 @@ import {Link} from 'react-router-dom'
 ProductList.propTypes = {}
 
 const ProductTile = ({currency, product, price}) => {
+    if (!price || !product) return null
     const imgSrc = product.defaultImage.url.startsWith('/cms/')
         ? new URL(
               `https://trialorgsforu-24b.test1.lightning.pc-rnd.force.com${product.defaultImage.url}`
@@ -36,30 +37,34 @@ function ProductList(props) {
     const {categoryId} = useParams()
     const {data, isLoading, error} = useProductSearch(categoryId)
     const productIds = data?.productsPage?.products.map((product) => ({productId: product.id}))
+    console.log('productIds', productIds)
     const {
         data: productListPrice,
         isLoading: productListPriceLoading,
         error: productListPriceError
     } = useProductsPrice(productIds)
-    console.log('productListSearch', productListPrice)
-    if (isLoading || productListPriceLoading) {
+    console.log('data', data)
+    if (isLoading) {
         return <div>Loading....</div>
     }
     if (error || productListPriceError) {
         return <div>Something is wrong</div>
     }
     const {productsPage} = data
-    console.log('data', data)
+    if (productsPage?.products.length === 0) {
+        return <div>No product in this category</div>
+    }
     return (
         <div>
             <div style={{display: 'flex', flexWrap: 'wrap', gap: '20px'}}>
-                {productsPage.products.map((product) => {
-                    const price = productListPrice.pricingLineItemResults.find((i) =>
+                {productsPage?.products.map((product) => {
+                    const price = productListPrice?.pricingLineItemResults?.find((i) =>
                         product.id.includes(i.productId)
                     )
                     return (
                         <ProductTile
-                            currency={productListPrice.currencyIsoCode}
+                            key={product.id}
+                            currency={productListPrice?.currencyIsoCode}
                             product={product}
                             price={price}
                         />

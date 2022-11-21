@@ -18,6 +18,7 @@ const useFetch = (url, params, config, fetchOptions) => {
     const context = useQuery({
         queryKey: [key, params].filter(Boolean),
         queryFn: async ({queryKey}) => {
+            console.time(`Request time for ${key}`)
             const method = fetchOptions?.method || 'GET'
             const _url = new URL(url)
             if (params && method === 'GET') {
@@ -31,14 +32,15 @@ const useFetch = (url, params, config, fetchOptions) => {
                 method,
                 ...fetchOptions
             })
-            const data = await res.json()
+            const data = res.status >= 200 && (await res.json())
+            console.timeEnd(`Request time for ${key}`)
+
             return data
         },
         ...config,
         enabled: !!url && !!token && config?.enabled,
         retry: false
     })
-
     return context
 }
 
@@ -120,6 +122,7 @@ export const useCartAction = () => {
     const context = useMutation(
         async (variables) => {
             const {payload, fetchOptions, url} = variables
+            console.time(`Request time for ${url.split('webstores')[1]}`)
             const res = await fetch(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -130,12 +133,14 @@ export const useCartAction = () => {
                 body: JSON.stringify(payload)
             })
             const t = fetchOptions.method !== 'DELETE' && (await res.json())
+            console.timeEnd(`Request time for ${url.split('webstores')[1]}`)
+
             return t
         },
         {
             onSuccess: (data) => {
-                console.log('data', data)
                 queryClient.invalidateQueries([`/${webstoreId}/carts/current`])
+                queryClient.invalidateQueries([`/${webstoreId}/carts/current/cart-items`])
             }
         }
     )
@@ -255,31 +260,21 @@ export const useProductCategoryPath = (categoryId, params) => {
 }
 
 export const useProductSearch = (categoryId, searchTerm) => {
-    const {token} = useAuth()
-    const context = useQuery({
-        queryKey: [`/search/product-search`, {categoryId, searchTerm}].filter(Boolean),
-        queryFn: async ({queryKey}) => {
-            const _url = getApiUrl(`/search/product-search`)
-            const res = await fetch(_url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                body: JSON.stringify({
-                    searchTerm,
-                    categoryId
-                })
-            })
-            const data = await res.json()
-            return data
-        },
-        enabled: !!token,
-        retry: false
-    })
-
-    // const data = useFetch(url, {categoryId, searchTerm}, {}, fetchOptions)
-    return context
+    const fetchOptions = {
+        method: 'POST',
+        body: JSON.stringify({
+            searchTerm,
+            categoryId
+        })
+    }
+    const url = getApiUrl(`/search/product-search`)
+    const data = useFetch(
+        url,
+        {categoryId, searchTerm},
+        {enabled: !!categoryId || !!searchTerm},
+        fetchOptions
+    )
+    return data
 }
 export const useProductsPrice = (productIds) => {
     const url = getApiUrl(`/pricing/products`)

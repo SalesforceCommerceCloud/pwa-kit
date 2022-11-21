@@ -95,7 +95,7 @@ function Checkout() {
                         queryClient.refetchQueries({
                             queryKey: [`/${webstoreId}/checkouts/active`]
                         })
-                    }, 1000)
+                    }, 1500)
                 }
             }
         )
@@ -146,15 +146,25 @@ function Checkout() {
         if (!checkoutData?.deliveryGroups?.items[0].deliveryAddress) {
             addDeliveryAddress(checkoutData?.checkoutId)
         }
+        // if (
+        //     checkoutData?.deliveryGroups?.items[0].deliveryAddress &&
+        //     checkoutData?.deliveryGroups?.items[0].availableDeliveryMethods.length === 0
+        // ) {
+        //     console.log('fdsfdafdafdafdfdsaf==============')
+        //     queryClient.refetchQueries({
+        //         queryKey: [`/${webstoreId}/checkouts/active`]
+        //     })
+        // }
         const selectedCarrier = checkoutData?.deliveryGroups?.items?.[0].selectedDeliveryMethod
         setSelectedCarrier(selectedCarrier)
     }, [checkoutData])
-
+    console.log('isCartLoading', isCartLoading)
     if (isAddressesLoading || isCheckoutLoading || isCartLoading) {
         return <div>Loading...</div>
     }
 
     const {deliveryGroups} = checkoutData
+    console.log('deliveryGroups', deliveryGroups)
     return (
         <div>
             <div>
@@ -164,81 +174,57 @@ function Checkout() {
                         It is possible to edit and add new addresses, but it is omited in this page
                         to avoid complication
                     </div>
-                    <div style={{display: 'flex', justifyContent: 'flex-start', gap: '10px'}}>
-                        {deliveryGroups?.items.map((i) => {
-                            const {deliveryAddress} = i
-                            return (
-                                <Address
-                                    address={deliveryAddress}
-                                    accountId={cart.accountId}
-                                    key={deliveryAddress?.name}
-                                />
-                            )
-                        })}
-                    </div>
-                    {/*{addresses?.items.length > 0 && (*/}
-                    {/*    <div style={{display: 'flex', justifyContent: 'flex-start', gap: '10px'}}>*/}
-                    {/*        {addresses?.items.map((a) => (*/}
-                    {/*            <Address address={a} key={a.addressId} accountId={cart.accountId} />*/}
-                    {/*        ))}*/}
-                    {/*    </div>*/}
-                    {/*)}*/}
-                    {/*<button*/}
-                    {/*    onClick={() => {*/}
-                    {/*        const id = Math.floor(Math.random() * 100)*/}
-                    {/*        addNewAddressAction.mutate({*/}
-                    {/*            payload: {*/}
-                    {/*                city: 'Vancouver',*/}
-                    {/*                country: 'CA',*/}
-                    {/*                addressType: 'Shipping',*/}
-                    {/*                isDefault: true,*/}
-                    {/*                name: `Alex Vuong ${id}`,*/}
-                    {/*                postalCode: '01234',*/}
-                    {/*                region: 'BC',*/}
-                    {/*                street: '123 Main Street'*/}
-                    {/*            },*/}
-                    {/*            accountId: cart.accountId*/}
-                    {/*        })*/}
-                    {/*    }}*/}
-                    {/*>*/}
-                    {/*    Create a dummy address*/}
-                    {/*</button>*/}
+                    {deliveryGroups && (
+                        <div style={{display: 'flex', justifyContent: 'flex-start', gap: '10px'}}>
+                            {deliveryGroups.items.map((i) => {
+                                const {deliveryAddress} = i
+                                return (
+                                    <Address
+                                        address={deliveryAddress}
+                                        accountId={cart.accountId}
+                                        key={i.id}
+                                    />
+                                )
+                            })}
+                        </div>
+                    )}
                 </div>
                 <div>
                     <h3>Shipping method</h3>
 
                     <div>
-                        {deliveryGroups?.items.map((i) => {
-                            return (
-                                <div key={i.id}>
-                                    {i.availableDeliveryMethods.map((method) => (
-                                        <RadioButton
-                                            key={method.id}
-                                            value={method.id}
-                                            isSelected={method.id === selectedCarrier?.id}
-                                            label={method.name}
-                                            onChange={(e) => {
-                                                const t = checkoutData?.deliveryGroups?.items?.[0].availableDeliveryMethods.find(
-                                                    (method) => method.id === e.target.value
-                                                )
-                                                setSelectedCarrier(t)
-                                                checkoutAction.mutate({
-                                                    url: getApiUrl(
-                                                        `/checkouts/${checkoutData?.checkoutId}`
-                                                    ),
-                                                    payload: {
-                                                        deliveryMethodId: e.target.value
-                                                    },
-                                                    fetchOptions: {
-                                                        method: 'PATCH'
-                                                    }
-                                                })
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-                            )
-                        })}
+                        {deliveryGroups &&
+                            deliveryGroups.items.map((i) => {
+                                return (
+                                    <div key={i.id}>
+                                        {i.availableDeliveryMethods.map((method) => (
+                                            <RadioButton
+                                                key={method.id}
+                                                value={method.id}
+                                                isSelected={method.id === selectedCarrier?.id}
+                                                label={method.name}
+                                                onChange={(e) => {
+                                                    const t = checkoutData?.deliveryGroups?.items?.[0].availableDeliveryMethods.find(
+                                                        (method) => method.id === e.target.value
+                                                    )
+                                                    setSelectedCarrier(t)
+                                                    checkoutAction.mutate({
+                                                        url: getApiUrl(
+                                                            `/checkouts/${checkoutData?.checkoutId}`
+                                                        ),
+                                                        payload: {
+                                                            deliveryMethodId: e.target.value
+                                                        },
+                                                        fetchOptions: {
+                                                            method: 'PATCH'
+                                                        }
+                                                    })
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                )
+                            })}
                     </div>
                 </div>
 

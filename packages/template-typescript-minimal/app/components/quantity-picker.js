@@ -30,12 +30,16 @@ export const useQuantity = () => {
 }
 
 function QuantityPicker(props) {
-    const {quantity, onDecrease, onIncrease} = props
+    const {quantity, onDecrease, onIncrease, isLoading} = props
     return (
         <div style={{display: 'flex'}}>
-            <button onClick={onDecrease}>-</button>
+            <button disabled={isLoading} onClick={onDecrease}>
+                -
+            </button>
             <input readOnly type="number" value={quantity} />
-            <button onClick={onIncrease}>+</button>
+            <button disabled={isLoading} onClick={onIncrease}>
+                +
+            </button>
         </div>
     )
 }
