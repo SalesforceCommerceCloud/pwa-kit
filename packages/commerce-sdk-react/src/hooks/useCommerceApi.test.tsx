@@ -5,9 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
 import useCommerceApi from './useCommerceApi'
-import {renderWithProviders} from '../test-utils'
+import {renderHookWithProviders} from '../test-utils'
 import {ApiClients} from './types'
 
 jest.mock('../auth/index.ts');
@@ -28,20 +27,9 @@ describe('useCommerceApi',() => {
                 'shopperPromotions',
                 'shopperSearch'
             ]
-
-            const Component = () => {
-                const api = useCommerceApi()
-                return (
-                    <>
-                    {clients.map((name) => {
-                        return <p key={name}>{api[name] && name}</p>
-                    })}
-                    </>
-                )
-            }
-            renderWithProviders(<Component />)
+            const {result} = renderHookWithProviders(() => useCommerceApi())
             clients.forEach((name) => {
-                expect(screen.getByText(name)).toBeInTheDocument()
+                expect(result.current[name]).toBeDefined()
             })
         }
     )
