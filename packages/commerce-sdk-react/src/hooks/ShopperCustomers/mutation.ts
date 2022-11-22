@@ -9,29 +9,6 @@ import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 import {updateCache, QueryKeysMatrixElement, CombinedMutationTypes, Client} from '../utils'
 
-export interface ShopperCustomersInterface {
-    RegisterCustomer: string
-    InvalidateCustomerAuth: string
-    AuthorizeCustomer: string
-    AuthorizeTrustedSystem: string
-    ResetPassword: string
-    GetResetPasswordToken: string
-    RegisterExternalProfile: string
-    UpdateCustomer: string
-    CreateCustomerAddress: string
-    RemoveCustomerAddress: string
-    UpdateCustomerAddress: string
-    UpdateCustomerPassword: string
-    CreateCustomerPaymentInstrument: string
-    DeleteCustomerPaymentInstrument: string
-    CreateCustomerProductList: string
-    DeleteCustomerProductList: string
-    UpdateCustomerProductList: string
-    CreateCustomerProductListItem: string
-    DeleteCustomerProductListItem: string
-    UpdateCustomerProductListItem: string
-}
-
 export const ShopperCustomersMutations = {
     /**
      * Registers a new customer. The mandatory data are the credentials, profile last name, and email. This requires a JSON Web Token (JWT) which needs to be obtained using the POST /customers/auth API with type \"guest\".
@@ -447,10 +424,6 @@ export const shopperCustomersQueryKeysMatrix = {
             remove: [['/customers', customerId, '/product-list', listId, {itemId}]]
         }
     }
-}
-
-export type ShopperCustomersMatrixType = {
-    [key in ShopperCustomersMutationType]: (data: any, param: any) => QueryKeysMatrixElement
 }
 
 /**

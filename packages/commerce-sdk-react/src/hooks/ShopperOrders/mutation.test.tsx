@@ -15,7 +15,6 @@ import {
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
-import {CombinedMutationTypes} from '../utils'
 
 // Valid id of prepared basket
 const BASKET_ID = '753b796f71aaaef79b0adde657'

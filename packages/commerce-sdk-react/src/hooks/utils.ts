@@ -6,8 +6,8 @@
  */
 import {QueryClient} from '@tanstack/react-query'
 import {ApiClients, Argument, DataType} from './types'
-import {ShopperCustomersMatrixType, ShopperCustomersMutationType} from './ShopperCustomers'
-import {ShopperOrdersMatrixType, ShopperOrdersMutationType} from './ShopperOrders'
+import {ShopperCustomersMutationType} from './ShopperCustomers'
+import {ShopperOrdersMutationType} from './ShopperOrders'
 
 const isObject = (item: null) => typeof item === 'object' && !Array.isArray(item) && item !== null
 

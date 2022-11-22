@@ -15,8 +15,6 @@ import {
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
-import {CombinedMutationTypes} from '../utils'
-import {ShopperOrdersMutationType} from '../ShopperOrders'
 
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
 const ADDRESS_NAME = 'TestAddress'

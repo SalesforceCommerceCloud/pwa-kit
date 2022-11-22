@@ -4,14 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, DataType, Argument} from '../types'
+import {DataType, Argument} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {updateCache, QueryKeysMatrixElement, CombinedMutationTypes, Client} from '../utils'
-
-export interface ShopperOrdersInterface {
-    CreateOrder: string
-}
+import {updateCache, QueryKeysMatrixElement, Client} from '../utils'
 
 export const ShopperOrdersMutations = {
     /**
@@ -52,10 +48,6 @@ export const ShopperOrdersMutations = {
 } as const
 
 export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
-
-export type ShopperOrdersMatrixType = {
-    [key in ShopperOrdersMutationType]: (data: any, param: any) => QueryKeysMatrixElement
-}
 
 export const shopperOrdersQueryKeysMatrix = {
     createOrder: (
