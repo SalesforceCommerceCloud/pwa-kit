@@ -45,24 +45,22 @@ export const updateCache = <Action extends CombinedMutationTypes>(
                 : item === cacheQuery.queryKey[index]
         )
 
-    if (queryKeysMatrix && queryKeysMatrix[action]) {
-        // STEP 1. Update data inside query cache for the matching queryKeys
-        queryKeysMatrix[action]?.(params, response)?.update?.map((queryKey: any) => {
-            queryClient.setQueryData(queryKey, response)
-        })
+    // STEP 1. Update data inside query cache for the matching queryKeys
+    queryKeysMatrix[action]?.(params, response)?.update?.map((queryKey: any) => {
+        queryClient.setQueryData(queryKey, response)
+    })
 
-        // STEP 2. Invalidate cache entries with the matching queryKeys
-        queryKeysMatrix[action]?.(params, response)?.invalidate?.map((queryKey: any) => {
-            queryClient.invalidateQueries({
-                predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
-            })
+    // STEP 2. Invalidate cache entries with the matching queryKeys
+    queryKeysMatrix[action]?.(params, response)?.invalidate?.map((queryKey: any) => {
+        queryClient.invalidateQueries({
+            predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
         })
+    })
 
-        // STEP 3. Remove cache entries with the matching queryKeys
-        queryKeysMatrix[action]?.(params, response)?.remove?.map((queryKey: any) => {
-            queryClient.removeQueries({
-                predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
-            })
+    // STEP 3. Remove cache entries with the matching queryKeys
+    queryKeysMatrix[action]?.(params, response)?.remove?.map((queryKey: any) => {
+        queryClient.removeQueries({
+            predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
         })
-    }
+    })
 }
