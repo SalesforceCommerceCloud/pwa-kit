@@ -7,9 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {updateCache, QueryKeysMatrixElement} from '../utils'
-
-type Client = ApiClients['shopperCustomers']
+import {updateCache, QueryKeysMatrixElement, CombinedMutationTypes, Client} from '../utils'
 
 export const ShopperCustomersMutations = {
     /**
@@ -223,7 +221,7 @@ The value of this property must be valid for the type of custom attribute define
 
 export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
-export const queryKeysMatrix = {
+export const shopperCustomersQueryKeysMatrix = {
     authorizeCustomer: (
         params: Argument<Client['authorizeCustomer']>,
         response: DataType<Client['authorizeCustomer']>
@@ -444,7 +442,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
-                updateCache(queryClient, action, queryKeysMatrix, data, params)
+                updateCache(queryClient, action, shopperCustomersQueryKeysMatrix, data, params)
             }
         }
     )

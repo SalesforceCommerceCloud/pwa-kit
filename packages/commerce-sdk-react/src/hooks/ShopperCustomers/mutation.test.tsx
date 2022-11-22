@@ -11,7 +11,7 @@ import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {
     ShopperCustomersMutationType,
     useShopperCustomersMutation,
-    queryKeysMatrix
+    shopperCustomersQueryKeysMatrix
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
@@ -170,7 +170,7 @@ const tests = (Object.keys(testActionsArgs) as ShopperCustomersMutationType[]).m
                     )
 
                     // Pre-populate cache with query keys we invalidate/update/remove onSuccess
-                    const {invalidate, update, remove} = queryKeysMatrix[key](
+                    const {invalidate, update, remove} = shopperCustomersQueryKeysMatrix[key](
                         // @ts-ignore
                         testActionsArgs[key],
                         {}
