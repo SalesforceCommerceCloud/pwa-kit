@@ -315,6 +315,63 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: develop
+  testNode16:
+    docker:
+      - image: circleci/node:16-stretch-browsers
+    steps:
+      - checkout
+      - setup
+      - runtests
+      - lighthouse-ci
+      - smoketestscripts
+      - early_return_for_forked_pull_requests
+      - create_mrt_credentials_file
+      - run:
+          name: Push Bundle
+          command: |
+              if [[ $DEVELOP || $RELEASE ]]; then
+                target=staging
+                target_commerce_sdk_react="commerce-sdk-react"
+              elif [[ $RELEASE ]]; then
+                target=production
+              else
+                target=""
+              fi
+
+              project="scaffold-pwa"
+
+              if [[ $target ]]; then
+                npm run push --prefix packages/template-retail-react-app -- -s $project --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+              fi
+              if [[ $target_commerce_sdk_react ]]; then
+                npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target_commerce_sdk_react
+              fi
+      - checkclean
+      - run:
+          name: Publish to NPM
+          command: |
+              # Add NPM token to allow publishing from Circle
+              echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+
+              if [[ $RELEASE ]]; then
+                # Publish all changed packages. The "from-package" arg means "look
+                # at the version numbers in each package.json file and if that doesn't
+                # exist on NPM, publish"
+                npm run lerna -- publish from-package --yes --no-verify-access
+              fi
+
+              # Cleanup
+              rm ~/.npmrc
+      - store_test_results:
+          path: packages/template-retail-react-app/tests/reports
+          when: always
+      - store_artifacts:
+          path: packages/template-retail-react-app/tests/screenshots
+          when: always
+      - slack/status:
+          fail_only: true
+          only_for_branches: develop
+  
   generatedTemplate:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -427,6 +484,7 @@ workflows:
   test:
     jobs:
       - testNode14
+      - testNode16
       - testNode14Windows
       - testNode14npm7
       - testNode14npm8
