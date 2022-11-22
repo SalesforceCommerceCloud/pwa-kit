@@ -90,7 +90,6 @@ function Checkout() {
                     // manually refetch the checkout to get carrier details after an arbitrary time
                     // because the server needs time to inject available carriers into checkout
                     setTimeout(() => {
-                        console.log('onSuccess adding an address')
                         queryClient.refetchQueries({
                             queryKey: [`/${webstoreId}/checkouts/active`]
                         })
@@ -269,7 +268,6 @@ function Checkout() {
                                 onSuccess: (data) => {
                                     const {token} = data
                                     const address = deliveryGroups?.items[0].deliveryAddress
-                                    console.log('address', address)
                                     const res = checkoutAction.mutate(
                                         {
                                             url: getApiUrl(`/checkouts/active/payments`),

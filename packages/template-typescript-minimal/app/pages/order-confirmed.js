@@ -9,6 +9,7 @@ import React from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getApiUrl, useCheckoutAction, useOrderConfirmed} from '../hooks/useFetch'
 import {useQueryClient} from '@tanstack/react-query'
+import {Link} from 'react-router-dom'
 
 OrderConfirmed.propTypes = {}
 
@@ -34,7 +35,12 @@ function OrderConfirmed(props) {
             }
         )
     }, [])
-    return <div>Order Confirmed {JSON.stringify(data, null, 2)}</div>
+    return (
+        <div>
+            Order Confirmed {JSON.stringify(data, null, 2)}
+            <Link to={'/orders'}>Go to orders</Link>
+        </div>
+    )
 }
 
 export default OrderConfirmed

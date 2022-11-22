@@ -20,7 +20,6 @@ function Orders(props) {
     if (error) {
         return <h3 style={{color: 'red'}}>Something is wrong</h3>
     }
-    console.log('data', data)
     const {orderSummaries} = data
     return (
         <div>

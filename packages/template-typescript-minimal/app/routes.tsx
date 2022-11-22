@@ -22,12 +22,19 @@ const ProductList = loadable(() => import('./pages/product-list'))
 const Orders = loadable(() => import('./pages/orders'))
 //@ts-ignore
 const Order = loadable(() => import('./pages/order'))
+//@ts-ignore
+const Login = loadable(() => import('./pages/login'))
 
 const routes = [
     {
         path: '/',
         exact: true,
         component: Home
+    },
+    {
+        path: '/search',
+        exact: true,
+        component: ProductList
     },
     {
         path: '/category/:categoryId/:productName',
@@ -61,6 +68,11 @@ const routes = [
     },
     {
         path: '/checkout',
+        exact: true,
+        component: Checkout
+    },
+    {
+        path: '/login',
         exact: true,
         component: Checkout
     }

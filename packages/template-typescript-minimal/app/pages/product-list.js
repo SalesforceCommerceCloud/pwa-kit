@@ -6,20 +6,16 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useParams} from 'react-router-dom/'
 import {useProductSearch, useProductsPrice} from '../hooks/useFetch'
-import {Link} from 'react-router-dom'
+import {Link, useLocation} from 'react-router-dom'
+import {getMediaLink} from '../utils/utils'
 
 ProductList.propTypes = {}
 
 const ProductTile = ({currency, product, price}) => {
     if (!price || !product) return null
-    const imgSrc = product.defaultImage.url.startsWith('/cms/')
-        ? new URL(
-              `https://trialorgsforu-24b.test1.lightning.pc-rnd.force.com${product.defaultImage.url}`
-          )
-        : product.defaultImage.url
+    const imgSrc = getMediaLink(product.defaultImage.url)
     return (
         <Link to={`/products/${product.id}`} style={{textDecoration: 'none', maxWidth: '300px'}}>
             <div style={{width: '150px', minHeight: '150px'}}>
@@ -33,17 +29,18 @@ const ProductTile = ({currency, product, price}) => {
         </Link>
     )
 }
-function ProductList(props) {
+function ProductList() {
     const {categoryId} = useParams()
-    const {data, isLoading, error} = useProductSearch(categoryId)
+    const location = useLocation()
+    const queryParams = new URLSearchParams(location.search.split('?')?.[1])
+    const searchTerm = queryParams.get('q')
+    const {data, isLoading, error} = useProductSearch({categoryId, searchTerm})
     const productIds = data?.productsPage?.products.map((product) => ({productId: product.id}))
-    console.log('productIds', productIds)
     const {
         data: productListPrice,
         isLoading: productListPriceLoading,
         error: productListPriceError
     } = useProductsPrice(productIds)
-    console.log('data', data)
     if (isLoading) {
         return <div>Loading....</div>
     }
@@ -52,7 +49,7 @@ function ProductList(props) {
     }
     const {productsPage} = data
     if (productsPage?.products.length === 0) {
-        return <div>No product in this category</div>
+        return <div>No product found</div>
     }
     return (
         <div>

@@ -11,13 +11,8 @@ import {getApiUrl, useCartAction, useCartItems} from '../hooks/useFetch'
 import QuantityPicker, {useQuantity} from '../components/quantity-picker'
 import {Link} from 'react-router-dom'
 import {getMediaLink} from '../utils/utils'
-const debounce = (fn, delay) => {
-    let timerId
-    return (...args) => {
-        clearTimeout(timerId)
-        timerId = setTimeout(() => fn(...args), delay)
-    }
-}
+import {debounce} from '../utils/utils'
+
 Cart.propTypes = {}
 const CartItem = ({item}) => {
     const {productDetails} = item.cartItem
@@ -128,7 +123,6 @@ function Cart() {
             })
         }
     }, [data])
-    console.log('data', data)
     // keep loading when the cart does not exist, waiting til the cart is created
     if (isLoading || data?.[0]?.errorCode === 'INVALID_ID_FIELD') {
         return <div>Loading...</div>

@@ -259,7 +259,7 @@ export const useProductCategoryPath = (categoryId, params) => {
     return data
 }
 
-export const useProductSearch = (categoryId, searchTerm) => {
+export const useProductSearch = ({categoryId, searchTerm}) => {
     const fetchOptions = {
         method: 'POST',
         body: JSON.stringify({
@@ -296,6 +296,12 @@ export const useOrders = (orderId) => {
         url = getApiUrl(`/order-summaries`)
     }
     const data = useFetch(url)
+    return data
+}
+
+export const useSearchSuggestion = (searchTerm) => {
+    const url = getApiUrl(`/search/suggestions`)
+    const data = useFetch(url, {searchTerm}, {enabled: Boolean(searchTerm)})
     return data
 }
 
