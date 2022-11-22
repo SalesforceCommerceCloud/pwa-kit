@@ -121,7 +121,7 @@ export const useCartAction = () => {
 
     const context = useMutation(
         async (variables) => {
-            const {payload, fetchOptions, url} = variables
+            const {payload, fetchOptions = {}, url} = variables
             console.time(`Request time for ${url.split('webstores')[1]}`)
             const res = await fetch(url, {
                 headers: {

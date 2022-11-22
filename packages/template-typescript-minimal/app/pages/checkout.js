@@ -72,9 +72,7 @@ function Checkout() {
     const [selectedCarrier, setSelectedCarrier] = React.useState(null)
     const addDeliveryAddress = (checkoutId) => {
         if (!checkoutId) return
-        console.log('addresses', addresses)
         const deliveryAddress = addresses?.items.find((a) => !!a.isDefault) || addresses?.items[0]
-        console.log('deliveryAddress', deliveryAddress)
         checkoutAction.mutate(
             {
                 url: getApiUrl(`/checkouts/${checkoutId}`),
@@ -92,10 +90,11 @@ function Checkout() {
                     // manually refetch the checkout to get carrier details after an arbitrary time
                     // because the server needs time to inject available carriers into checkout
                     setTimeout(() => {
+                        console.log('onSuccess adding an address')
                         queryClient.refetchQueries({
                             queryKey: [`/${webstoreId}/checkouts/active`]
                         })
-                    }, 1500)
+                    }, 2000)
                 }
             }
         )
@@ -158,20 +157,18 @@ function Checkout() {
         const selectedCarrier = checkoutData?.deliveryGroups?.items?.[0].selectedDeliveryMethod
         setSelectedCarrier(selectedCarrier)
     }, [checkoutData])
-    console.log('isCartLoading', isCartLoading)
     if (isAddressesLoading || isCheckoutLoading || isCartLoading) {
         return <div>Loading...</div>
     }
 
     const {deliveryGroups} = checkoutData
-    console.log('deliveryGroups', deliveryGroups)
     return (
         <div>
             <div>
                 <div>
                     <h3>Shipping Address</h3>
                     <div>
-                        It is possible to edit and add new addresses, but it is omited in this page
+                        It is possible to edit and add new addresses, but it is omitted in this page
                         to avoid complication
                     </div>
                     {deliveryGroups && (
@@ -190,7 +187,10 @@ function Checkout() {
                     )}
                 </div>
                 <div>
-                    <h3>Shipping method</h3>
+                    <h3>
+                        Shipping method (if address shows up but no delivery methods, please
+                        refresh)
+                    </h3>
 
                     <div>
                         {deliveryGroups &&

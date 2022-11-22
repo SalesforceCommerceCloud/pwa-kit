@@ -8,10 +8,24 @@
 import React from 'react'
 import {addItemToCart, useCart, useProduct, useProductPrice} from '../hooks/useFetch'
 import QuantityPicker, {useQuantity} from '../components/quantity-picker'
-import {useParams} from 'react-router-dom'
+import {Link, useParams} from 'react-router-dom'
 import {getMediaLink} from '../utils/utils'
 ProductDetail.propTypes = {}
-
+const Breadcrumb = ({categories}) => {
+    if (!categories) return null
+    return (
+        <div>
+            {categories.path.map((cate, i) => {
+                return (
+                    <span style={{marginRight: '10px'}}>
+                        <Link to={`/category/${cate.id}/${cate.name}`}>{cate.name}</Link>
+                        {i !== categories.path.length - 1 && <span> / </span>}
+                    </span>
+                )
+            })}
+        </div>
+    )
+}
 function ProductDetail() {
     const {quantity, onDecrease, onIncrease} = useQuantity()
 
@@ -74,7 +88,7 @@ function ProductDetail() {
         (media) => media.usageType === 'Standard'
     )
 
-    const {variationInfo} = productDetail
+    const {variationInfo, primaryProductCategoryPath} = productDetail
     return (
         <div>
             <div style={{display: 'flex'}}>
@@ -95,6 +109,7 @@ function ProductDetail() {
                     </div>
                 </div>
                 <div style={{flex: 1}}>
+                    <Breadcrumb categories={primaryProductCategoryPath} />
                     <div>ProductClass: {productDetail.productClass}</div>
                     <h3>{fields.Name}</h3>
                     <h4>{`${

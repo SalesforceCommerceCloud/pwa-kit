@@ -112,31 +112,68 @@ const CartItem = ({item}) => {
     )
 }
 function Cart() {
-    const {data, isLoading} = useCartItems()
-
-    if (isLoading) {
+    const {data, isLoading, error} = useCartItems()
+    const cartAction = useCartAction()
+    React.useEffect(() => {
+        if (data?.[0]?.errorCode === 'INVALID_ID_FIELD') {
+            cartAction.mutate({
+                url: getApiUrl(`/carts`),
+                payload: {
+                    name: 'Cart',
+                    type: 'Cart'
+                },
+                fetchOptions: {
+                    method: 'POST'
+                }
+            })
+        }
+    }, [data])
+    console.log('data', data)
+    // keep loading when the cart does not exist, waiting til the cart is created
+    if (isLoading || data?.[0]?.errorCode === 'INVALID_ID_FIELD') {
         return <div>Loading...</div>
     }
+    if (error) {
+        return <div>Error</div>
+    }
     const {cartItems, cartSummary} = data
-    if (cartItems.length === 0) {
-        return <div>Cart is empty</div>
+
+    if (cartItems?.length === 0) {
+        return (
+            <div>
+                <button
+                    onClick={() => {
+                        cartAction.mutate({
+                            url: getApiUrl(`/carts/current`),
+                            fetchOptions: {
+                                method: 'DELETE'
+                            }
+                        })
+                    }}
+                >
+                    Delete a cart
+                </button>
+                Cart is empty
+            </div>
+        )
     }
 
     return (
         <div>
-            <h3>Cart ({cartSummary.totalProductCount} item(s))</h3>
+            <h3>Cart ({cartSummary?.totalProductCount} item(s))</h3>
+
             <div style={{display: 'flex'}}>
                 <div style={{flex: 2}}>
-                    {cartItems.map((item) => (
+                    {cartItems?.map((item) => (
                         <CartItem item={item} key={item.cartItem.cartItemId} />
                     ))}
                 </div>
                 <div style={{flex: 1}}>
                     <h3>Cart Summary</h3>
-                    <div>Subtotal: ${cartSummary.totalProductAmountAfterAdjustments}</div>
+                    <div>Subtotal: ${cartSummary?.totalProductAmountAfterAdjustments}</div>
                     <div>Shipping: TBD</div>
-                    <div>Tax: {cartSummary.totalTaxAmount}</div>
-                    <h3>Total {cartSummary.totalProductAmount}</h3>
+                    <div>Tax: {cartSummary?.totalTaxAmount}</div>
+                    <h3>Total {cartSummary?.totalProductAmount}</h3>
                     <Link to={'/checkout'}>Checkout</Link>
                 </div>
             </div>
