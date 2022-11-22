@@ -327,6 +327,7 @@ class Auth {
         const isGuest = true
         return this.queueRequest(
             () =>
+                // TODO: are we missing a call to /logout?
                 helpers.loginGuestUser(this.client, {
                     redirectURI: this.redirectURI
                 }),
