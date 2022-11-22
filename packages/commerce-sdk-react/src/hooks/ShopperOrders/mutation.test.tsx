@@ -5,31 +5,23 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, mockAuthCalls} from '../../test-utils'
+import {renderWithProviders, DEFAULT_TEST_HOST} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {ShopperOrdersMutations, useShopperOrdersMutation} from './mutation'
 import nock from 'nock'
 
-// Valid id of prepared basket
-const BASKET_ID = '753b796f71aaaef79b0adde657'
+jest.mock('../../auth/index.ts', () => {
+    return jest.fn().mockImplementation(() => ({
+        ready: jest.fn().mockResolvedValue({access_token: '123'}),
+    }))
+})
+
+const BASKET_ID = '12345'
 
 const OrderMutationComponent = () => {
-    //Log into registered account when the component is mounted
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
     const createOrder = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
 
-    React.useEffect(() => {
-        loginRegisteredUser.mutate({username: 'alex@test.com', password: 'Test1234#'})
-    }, [])
-
     return (
-        <>
-            {loginRegisteredUser.isLoading ? (
-                <span>Logging in...</span>
-            ) : (
-                <div>Logged in as {loginRegisteredUser?.variables?.username}</div>
-            )}
             <div>
                 <button
                     onClick={() =>
@@ -42,12 +34,11 @@ const OrderMutationComponent = () => {
                 </button>
 
                 {createOrder.error?.message && (
-                    <p style={{color: 'red'}}>Error: {createOrder.error?.message}</p>
+                    <p>Error: {createOrder.error?.message}</p>
                 )}
                 <hr />
-                <div>{JSON.stringify(createOrder)}</div>
+                <div>{JSON.stringify(createOrder.data)}</div>
             </div>
-        </>
     )
 }
 
@@ -58,10 +49,8 @@ const tests = [
             {
                 name: 'success',
                 assertions: async () => {
-                    mockAuthCalls()
                     renderWithProviders(<OrderMutationComponent />)
 
-                    await waitFor(() => screen.getByText(/alex@test.com/))
                     await waitFor(() =>
                         screen.getByRole('button', {
                             name: /create order/i
@@ -75,9 +64,7 @@ const tests = [
                         }
                     }
 
-                    // Mocking the server request
-                    nock('http://localhost:3000')
-                        .persist()
+                    nock(DEFAULT_TEST_HOST)
                         .post((uri) => {
                             return uri.includes('/checkout/shopper-orders/')
                         })
@@ -94,21 +81,18 @@ const tests = [
             {
                 name: 'error',
                 assertions: async () => {
-                    mockAuthCalls()
                     renderWithProviders(<OrderMutationComponent />)
-                    await waitFor(() => screen.getByText(/alex@test.com/))
                     await waitFor(() =>
                         screen.getByRole('button', {
                             name: /create order/i
                         })
                     )
 
-                    // Mocking the server request
-                    nock('http://localhost:3000')
+                    nock(DEFAULT_TEST_HOST)
                         .post((uri) => {
                             return uri.includes('/checkout/shopper-orders/')
                         })
-                        .reply(404)
+                        .reply(500)
 
                     const button = screen.getByRole('button', {
                         name: /create order/i

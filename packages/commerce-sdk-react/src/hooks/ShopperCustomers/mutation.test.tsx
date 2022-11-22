@@ -7,7 +7,6 @@
 import React from 'react'
 import {renderWithProviders, createQueryClient, DEFAULT_TEST_HOST} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {
     ShopperCustomersMutationType,
     useShopperCustomersMutation,
@@ -102,24 +101,10 @@ interface CustomerMutationComponentParams {
     mutation: ShopperCustomersMutationType
 }
 const CustomerMutationComponent = ({mutation}: CustomerMutationComponentParams) => {
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-
-    React.useEffect(() => {
-        loginRegisteredUser.mutate({
-            username: 'kobe@test.com',
-            password: 'Test1234!'
-        })
-    }, [])
-
     const mutationHook = useShopperCustomersMutation(mutation)
 
     return (
         <>
-            {loginRegisteredUser.isLoading ? (
-                <span>Logging in...</span>
-            ) : (
-                <div>Logged in as {loginRegisteredUser?.variables?.username}</div>
-            )}
             <div>
                 <button onClick={() => mutationHook.mutate(mutationPayloads[mutation])}>
                     {mutation}
@@ -165,7 +150,6 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                         <CustomerMutationComponent mutation={mutationName} />,
                         {queryClient}
                     )
-                    await waitFor(() => screen.getByText(/kobe@test.com/))
                     await waitFor(() =>
                         screen.getByRole('button', {
                             name: mutationName
@@ -225,11 +209,10 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                             return uri.includes('/customer/shopper-customers/')
                         })
                         .reply(500, {})
-
+                    
                     renderWithProviders(
                         <CustomerMutationComponent mutation={mutationName} />
                     )
-                    await waitFor(() => screen.getByText(/kobe@test.com/))
                     await waitFor(() =>
                         screen.getByRole('button', {
                             name: mutationName
