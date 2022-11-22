@@ -16,6 +16,7 @@ import {
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
 import {CombinedMutationTypes} from '../utils'
+import {ShopperOrdersMutationType} from '../ShopperOrders'
 
 const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
 const ADDRESS_NAME = 'TestAddress'
@@ -94,7 +95,7 @@ const testActionsArgs: TestActionsArgs = {
 }
 
 interface CustomerMutationComponentParams {
-    action: CombinedMutationTypes
+    action: ShopperCustomersMutationType
 }
 
 const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) => {
@@ -161,7 +162,7 @@ const tests = (Object.keys(testActionsArgs) as ShopperCustomersMutationType[]).m
                         .reply(204, {})
 
                     renderWithProviders(
-                        <CustomerMutationComponent action={key as CombinedMutationTypes} />
+                        <CustomerMutationComponent action={key as ShopperCustomersMutationType} />
                     )
                     await waitFor(() => screen.getByText(/kobe@test.com/))
                     await waitFor(() =>
@@ -235,7 +236,7 @@ const tests = (Object.keys(testActionsArgs) as ShopperCustomersMutationType[]).m
                         .reply(500, {})
 
                     renderWithProviders(
-                        <CustomerMutationComponent action={key as CombinedMutationTypes} />
+                        <CustomerMutationComponent action={key as ShopperCustomersMutationType} />
                     )
                     await waitFor(() => screen.getByText(/kobe@test.com/))
                     await waitFor(() =>

@@ -21,7 +21,7 @@ import {CombinedMutationTypes} from '../utils'
 const BASKET_ID = '753b796f71aaaef79b0adde657'
 
 type TestActionsArgs = {
-    [key in ShopperOrdersMutationType]?: {body: any; parameters: any}
+    [key in ShopperOrdersMutationType]: {body: any; parameters: any}
 }
 
 const testActionsArgs: TestActionsArgs = {
@@ -32,7 +32,7 @@ const testActionsArgs: TestActionsArgs = {
 }
 
 interface OrderMutationComponentParams {
-    action: CombinedMutationTypes
+    action: ShopperOrdersMutationType
 }
 
 const OrderMutationComponent = ({action}: OrderMutationComponentParams) => {
@@ -88,7 +88,7 @@ const tests = (Object.keys(testActionsArgs) as ShopperOrdersMutationType[]).map(
                         .reply(200, {})
 
                     renderWithProviders(
-                        <OrderMutationComponent action={key as CombinedMutationTypes} />
+                        <OrderMutationComponent action={key as ShopperOrdersMutationType} />
                     )
 
                     await waitFor(() => screen.getByText(/kobe@test.com/))
@@ -99,7 +99,6 @@ const tests = (Object.keys(testActionsArgs) as ShopperOrdersMutationType[]).map(
                     )
 
                     const {invalidate, update, remove} = shopperOrdersQueryKeysMatrix[key](
-                        // @ts-ignore
                         testActionsArgs[key],
                         {}
                     )
@@ -147,7 +146,7 @@ const tests = (Object.keys(testActionsArgs) as ShopperOrdersMutationType[]).map(
                         .reply(500)
 
                     renderWithProviders(
-                        <OrderMutationComponent action={key as CombinedMutationTypes} />
+                        <OrderMutationComponent action={key as ShopperOrdersMutationType} />
                     )
                     await waitFor(() => screen.getByText(/kobe@test.com/))
                     await waitFor(() =>
