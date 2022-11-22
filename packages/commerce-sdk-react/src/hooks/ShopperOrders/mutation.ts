@@ -17,34 +17,8 @@ export const ShopperOrdersMutations = {
      */
     CreateOrder: 'createOrder'
 
-    // The following mutation hooks are NOT in use in the PWA Kit currently
-    // /**
-    //  * Adds a payment instrument to an order.
-    // Details:
-    // The payment instrument is added with the provided details. The payment method must be applicable for the order see GET
-    // /baskets/\{basketId\}/payment-methods, if the payment method is 'CREDIT_CARD' a paymentCard must be specified in the request.
-    // * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=createPaymentInstrumentForOrder} for more information about the API endpoint.
-    // * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#createpaymentinstrumentfororder} for more information on the parameters and returned data type.
-    // */
-    // CreatePaymentInstrumentForOrder: 'createPaymentInstrumentForOrder',
-
-    // /**
-    //  * Removes a payment instrument of an order.
-    //  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=removePaymentInstrumentFromOrder} for more information about the API endpoint.
-    //  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#removepaymentinstrumentfromorder} for more information on the parameters and returned data type.
-    //  */
-    // RemovePaymentInstrumentFromOrder: 'removePaymentInstrumentFromOrder',
-
-    // /**
-    // * Updates a payment instrument of an order.
-    // Details:
-    // The payment instrument is updated with the provided details. The payment method must be applicable for the
-    // order see GET /baskets/\{basketId\}/payment-methods, if the payment method is 'CREDIT_CARD' a
-    // paymentCard must be specified in the request.
-    // * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=updatePaymentInstrumentForOrder} for more information about the API endpoint.
-    // * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#updatepaymentinstrumentfororder} for more information on the parameters and returned data type.
-    // */
-    // UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
+    // Payment instrument API call is not implemented yet in PWA kit. 
+    // Reference: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/59d39976567c82baa9f9d393f1ac274c397b4c44/packages/commerce-sdk-react/src/hooks/ShopperOrders/mutation.ts#L23-L49
 } as const
 
 export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
