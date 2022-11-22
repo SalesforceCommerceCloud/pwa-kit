@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, DataType, Argument} from '../types'
+import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
+import {updateCache, QueryKeysMatrixElement} from '../utils'
 
 type Client = ApiClients['shopperCustomers']
 
@@ -220,7 +221,212 @@ The value of this property must be valid for the type of custom attribute define
     UpdateCustomerProductListItem: 'updateCustomerProductListItem'
 } as const
 
-type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
+export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
+
+export const queryKeysMatrix = {
+    authorizeCustomer: (
+        params: Argument<Client['authorizeCustomer']>,
+        response: DataType<Client['authorizeCustomer']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    authorizeTrustedSystem: (
+        params: Argument<Client['authorizeTrustedSystem']>,
+        response: DataType<Client['authorizeTrustedSystem']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    deleteCustomerProductList: (
+        params: Argument<Client['deleteCustomerProductList']>,
+        response: DataType<Client['deleteCustomerProductList']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    getResetPasswordToken: (
+        params: Argument<Client['getResetPasswordToken']>,
+        response: DataType<Client['getResetPasswordToken']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    invalidateCustomerAuth: (
+        params: Argument<Client['invalidateCustomerAuth']>,
+        response: DataType<Client['invalidateCustomerAuth']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    registerCustomer: (
+        params: Argument<Client['registerCustomer']>,
+        response: DataType<Client['registerCustomer']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    registerExternalProfile: (
+        params: Argument<Client['registerExternalProfile']>,
+        response: DataType<Client['registerExternalProfile']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    resetPassword: (
+        params: Argument<Client['resetPassword']>,
+        response: DataType<Client['resetPassword']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    updateCustomerPassword: (
+        params: Argument<Client['updateCustomerPassword']>,
+        response: DataType<Client['updateCustomerPassword']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    updateCustomerProductList: (
+        params: Argument<Client['updateCustomerProductList']>,
+        response: DataType<Client['updateCustomerProductList']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    updateCustomer: (
+        params: Argument<Client['updateCustomer']>,
+        response: DataType<Client['updateCustomer']>
+    ): QueryKeysMatrixElement => {
+        const {customerId} = params.parameters
+        return {
+            update: [['/customers', customerId, {customerId}]],
+            invalidate: [
+                ['/customers', customerId, '/payment-instruments'],
+                ['/customers', customerId, '/addresses'],
+                ['/customers', '/external-profile']
+            ]
+        }
+    },
+
+    updateCustomerAddress: (
+        params: Argument<Client['updateCustomerAddress']>,
+        response: DataType<Client['updateCustomerAddress']>
+    ): QueryKeysMatrixElement => {
+        const {customerId, addressName} = params.parameters
+        return {
+            update: [['/customers', customerId, '/addresses', {addressName, customerId}]],
+            invalidate: [['/customers', customerId, {customerId}]]
+        }
+    },
+
+    createCustomerAddress: (
+        params: Argument<Client['createCustomerAddress']>,
+        response: DataType<Client['createCustomerAddress']>
+    ): QueryKeysMatrixElement => {
+        const {customerId} = params.parameters
+        const {addressId} = params.body
+        return {
+            update: [
+                ['/customers', customerId, '/addresses', {addressName: addressId, customerId}]
+            ],
+            invalidate: [['/customers', customerId, {customerId}]]
+        }
+    },
+
+    removeCustomerAddress: (
+        params: Argument<Client['removeCustomerAddress']>,
+        response: DataType<Client['removeCustomerAddress']>
+    ): QueryKeysMatrixElement => {
+        // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
+        //  The required parameters become optional accidentally
+        // @ts-ignore
+        const {customerId, addressName} = params.parameters
+        return {
+            invalidate: [['/customers', customerId, {customerId}]],
+            remove: [['/customers', customerId, '/addresses', {addressName, customerId}]]
+        }
+    },
+
+    createCustomerPaymentInstrument: (
+        params: Argument<Client['createCustomerPaymentInstrument']>,
+        response: DataType<Client['createCustomerPaymentInstrument']>
+    ): QueryKeysMatrixElement => {
+        const {customerId} = params.parameters
+        return {
+            update: [
+                [
+                    '/customers',
+                    customerId,
+                    '/payment-instruments',
+                    {
+                        customerId,
+                        paymentInstrumentId: response?.paymentInstrumentId
+                    }
+                ]
+            ],
+            invalidate: [['/customers', customerId, {customerId}]]
+        }
+    },
+
+    deleteCustomerPaymentInstrument: (
+        params: Argument<Client['deleteCustomerPaymentInstrument']>,
+        response: DataType<Client['deleteCustomerPaymentInstrument']>
+    ): QueryKeysMatrixElement => {
+        // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
+        //  The required parameters become optional accidentally
+        // @ts-ignore
+        const {customerId, paymentInstrumentId} = params.parameters
+        return {
+            invalidate: [['/customers', customerId, {customerId}]],
+            remove: [
+                [
+                    '/customers',
+                    customerId,
+                    '/payment-instruments',
+                    {customerId, paymentInstrumentId}
+                ]
+            ]
+        }
+    },
+
+    createCustomerProductList: (
+        params: Argument<Client['createCustomerProductList']>,
+        response: DataType<Client['createCustomerProductList']>
+    ): QueryKeysMatrixElement => {
+        const {customerId} = params.parameters
+        return {
+            update: [
+                ['/customers', customerId, '/product-list', {customerId, listId: response?.id}]
+            ]
+        }
+    },
+
+    createCustomerProductListItem: (
+        params: Argument<Client['createCustomerProductListItem']>,
+        response: DataType<Client['createCustomerProductListItem']>
+    ): QueryKeysMatrixElement => {
+        const {customerId, listId} = params.parameters
+        return {
+            update: [['/customers', customerId, '/product-list', listId, {itemId: response?.id}]],
+            invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]]
+        }
+    },
+
+    updateCustomerProductListItem: (
+        params: Argument<Client['updateCustomerProductListItem']>,
+        response: DataType<Client['updateCustomerProductListItem']>
+    ): QueryKeysMatrixElement => {
+        const {customerId, listId, itemId} = params.parameters
+        return {
+            update: [['/customers', customerId, '/product-list', listId, {itemId}]],
+            invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]]
+        }
+    },
+    deleteCustomerProductListItem: (
+        params: Argument<Client['deleteCustomerProductListItem']>,
+        response: DataType<Client['deleteCustomerProductListItem']>
+    ): QueryKeysMatrixElement => {
+        // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
+        //  The required parameters become optional accidentally
+        // @ts-ignore
+        const {customerId, listId, itemId} = params.parameters
+        return {
+            invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]],
+            remove: [['/customers', customerId, '/product-list', listId, {itemId}]]
+        }
+    }
+}
 
 /**
  * A hook for performing mutations with the Shopper Customers API.
@@ -238,14 +444,7 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         },
         {
             onSuccess: (data, params) => {
-                // TODO: Fine grain invalidation of '/customers'
-
-                // @ts-ignore some action doesn't have customerId as parameter
-                if (params?.parameters?.customerId) {
-                    // @ts-ignore
-                    // invalidate all cache entries that are related to the customer
-                    queryClient.invalidateQueries(['/customers', params?.parameters?.customerId])
-                }
+                updateCache(queryClient, action, queryKeysMatrix, data, params)
             }
         }
     )

@@ -11,12 +11,14 @@ import { renderHook } from '@testing-library/react-hooks/dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 
+// Note: this host does NOT exist
+// it is intentional b/c we can catch those unintercepted requests
+// from log easily. You should always make sure all requests are nocked.
+export const DEFAULT_TEST_HOST = 'http://localhost:8888'
+
 export const DEFAULT_TEST_CONFIG = {
-    // localhost:8888 does NOT exist
-    // it is intentional b/c we want to catch the
-    // requests that are not intercepted by nock
-    proxy: 'http://localhost:8888/mobify/proxy/api',
-    redirectURI: 'http://localhost:8888/callback',
+    proxy: `${DEFAULT_TEST_HOST}/mobify/proxy/api`,
+    redirectURI: `${DEFAULT_TEST_HOST}/callback`,
     clientId: '12345678-1234-1234-1234-123412341234',
     organizationId: 'f_ecom_zzrmy_orgf_001',
     shortCode: '12345678',
@@ -24,11 +26,18 @@ export const DEFAULT_TEST_CONFIG = {
     locale: 'en-US',
     currency: 'USD'
 }
-const TestProviders = (props: Partial<CommerceApiProviderProps>) => {
-    const queryClient = new QueryClient({
+
+export const createQueryClient = () => {
+    return new QueryClient({
         // During testing, we want things to fail immediately
         defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
     })
+}
+
+type TestProviderProps = Partial<CommerceApiProviderProps & {queryClient: QueryClient}>
+
+const TestProviders = (props: TestProviderProps) => {
+    const queryClient = props.queryClient || createQueryClient()
     return (
         <QueryClientProvider client={queryClient}>
             <CommerceApiProvider {...DEFAULT_TEST_CONFIG} {...props}>
@@ -47,7 +56,7 @@ const TestProviders = (props: Partial<CommerceApiProviderProps>) => {
  */
 export const renderWithProviders = (
     children: React.ReactElement,
-    props?: Partial<CommerceApiProviderProps>,
+    props?: TestProviderProps,
     options?: Omit<RenderOptions, 'wrapper'>
 ): void => {
     render(children, {
@@ -66,7 +75,7 @@ export const renderWithProviders = (
  */
 export function renderHookWithProviders<TProps, TResult>(
     callback: (props: TProps) => TResult,
-    props?: Partial<CommerceApiProviderProps>,
+    props?: TestProviderProps,
 ) {
     return renderHook(
         callback,

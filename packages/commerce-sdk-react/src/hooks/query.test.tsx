@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import nock from 'nock'
-import {renderHookWithProviders} from '../test-utils'
+import {renderHookWithProviders, DEFAULT_TEST_HOST} from '../test-utils'
 import {useBasket, usePaymentMethodsForBasket, usePriceBooksForBasket, useShippingMethodsForShipment, useTaxesFromBasket} from './ShopperBaskets/query'
 import {useProductSearch, useSearchSuggestions} from './ShopperSearch/query'
 import {
@@ -181,7 +181,7 @@ const QUERY_TESTS = [
 
 test.each(QUERY_TESTS)('%j - 200 returns data', async ({hook, endpoint}) => {
     const data = {test: true}
-    nock('http://localhost:8888')
+    nock(DEFAULT_TEST_HOST)
         .get((uri) => uri.includes(endpoint))
         .reply(200, data)
     // @ts-ignore
@@ -196,7 +196,7 @@ test.each(QUERY_TESTS)('%j - 200 returns data', async ({hook, endpoint}) => {
 })
 
 test.each(QUERY_TESTS)('%j - 400 returns error', async ({hook, endpoint}) => {
-    nock('http://localhost:8888')
+    nock(DEFAULT_TEST_HOST)
         .get((uri) => uri.includes(endpoint))
         .reply(400)
     // @ts-ignore
