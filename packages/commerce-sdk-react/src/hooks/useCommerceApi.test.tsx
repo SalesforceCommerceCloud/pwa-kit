@@ -9,28 +9,25 @@ import useCommerceApi from './useCommerceApi'
 import {renderHookWithProviders} from '../test-utils'
 import {ApiClients} from './types'
 
-jest.mock('../auth/index.ts');
+jest.mock('../auth/index.ts')
 
-describe('useCommerceApi',() => {
-    test(
-        'returns a set of api clients',
-        async () => {
-            const clients: (keyof ApiClients)[] = [
-                'shopperBaskets',
-                'shopperContexts',
-                'shopperCustomers',
-                'shopperDiscoverySearch',
-                'shopperGiftCertificates',
-                'shopperLogin',
-                'shopperOrders',
-                'shopperProducts',
-                'shopperPromotions',
-                'shopperSearch'
-            ]
-            const {result} = renderHookWithProviders(() => useCommerceApi())
-            clients.forEach((name) => {
-                expect(result.current[name]).toBeDefined()
-            })
-        }
-    )
+describe('useCommerceApi', () => {
+    test('returns a set of api clients', async () => {
+        const clients: (keyof ApiClients)[] = [
+            'shopperBaskets',
+            'shopperContexts',
+            'shopperCustomers',
+            'shopperDiscoverySearch',
+            'shopperGiftCertificates',
+            'shopperLogin',
+            'shopperOrders',
+            'shopperProducts',
+            'shopperPromotions',
+            'shopperSearch'
+        ]
+        const {result} = renderHookWithProviders(() => useCommerceApi())
+        clients.forEach((name) => {
+            expect(result.current[name]).toBeDefined()
+        })
+    })
 })

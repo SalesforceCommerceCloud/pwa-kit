@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {render, RenderOptions} from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks/dom'
+import {renderHook} from '@testing-library/react-hooks/dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 
@@ -61,7 +61,9 @@ export const renderWithProviders = (
 ): void => {
     render(children, {
         // eslint-disable-next-line react/display-name
-        wrapper: ({children}) => <TestProviders {...props}>{children}</TestProviders>,
+        wrapper: ({children}: {children?: React.ReactNode}) => (
+            <TestProviders {...props}>{children}</TestProviders>
+        ),
         ...options
     })
 }
@@ -75,10 +77,12 @@ export const renderWithProviders = (
  */
 export function renderHookWithProviders<TProps, TResult>(
     callback: (props: TProps) => TResult,
-    props?: TestProviderProps,
+    props?: TestProviderProps
 ) {
-    return renderHook(
-        callback,
-        {wrapper: ({children}) => <TestProviders {...props}>{children}</TestProviders>}
-    )
+    return renderHook(callback, {
+        // eslint-disable-next-line react/display-name
+        wrapper: ({children}: {children?: React.ReactNode}) => (
+            <TestProviders {...props}>{children}</TestProviders>
+        )
+    })
 }

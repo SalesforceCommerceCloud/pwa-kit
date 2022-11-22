@@ -17,7 +17,7 @@ import {QueryKey} from '@tanstack/react-query'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
-        ready: jest.fn().mockResolvedValue({access_token: '123'}),
+        ready: jest.fn().mockResolvedValue({access_token: '123'})
     }))
 })
 
@@ -119,118 +119,121 @@ const CustomerMutationComponent = ({mutation}: CustomerMutationComponentParams) 
     )
 }
 
-const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).map((mutationName) => {
-    return {
-        hook: mutationName,
-        cases: [
-            {
-                name: 'success',
-                assertions: async () => {
-                    nock(DEFAULT_TEST_HOST)
-                        .patch((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(200, {})
-                        .put((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(200, {})
-                        .post((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(200, {})
-                        .delete((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(204, {})
+const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).map(
+    (mutationName) => {
+        return {
+            hook: mutationName,
+            cases: [
+                {
+                    name: 'success',
+                    assertions: async () => {
+                        nock(DEFAULT_TEST_HOST)
+                            .patch((uri) => {
+                                return uri.includes('/customer/shopper-customers/')
+                            })
+                            .reply(200, {})
+                            .put((uri) => {
+                                return uri.includes('/customer/shopper-customers/')
+                            })
+                            .reply(200, {})
+                            .post((uri) => {
+                                return uri.includes('/customer/shopper-customers/')
+                            })
+                            .reply(200, {})
+                            .delete((uri) => {
+                                return uri.includes('/customer/shopper-customers/')
+                            })
+                            .reply(204, {})
 
-                    const queryClient = createQueryClient()
+                        const queryClient = createQueryClient()
 
-                    renderWithProviders(
-                        <CustomerMutationComponent mutation={mutationName} />,
-                        {queryClient}
-                    )
-                    await waitFor(() =>
-                        screen.getByRole('button', {
+                        renderWithProviders(<CustomerMutationComponent mutation={mutationName} />, {
+                            queryClient
+                        })
+                        await waitFor(() =>
+                            screen.getByRole('button', {
+                                name: mutationName
+                            })
+                        )
+
+                        // Pre-populate cache with query keys we invalidate/update/remove onSuccess
+                        const {invalidate, update, remove} = queryKeysMatrix[mutationName](
+                            // @ts-ignore
+                            mutationPayloads[mutationName],
+                            {}
+                        )
+
+                        const queryKeys = [
+                            ...(invalidate || []),
+                            ...(update || []),
+                            ...(remove || [])
+                        ]
+
+                        queryKeys.forEach((queryKey: QueryKey) => {
+                            queryClient.setQueryData(queryKey, {test: true})
+                        })
+
+                        const button = screen.getByRole('button', {
                             name: mutationName
                         })
-                    )
 
-                    // Pre-populate cache with query keys we invalidate/update/remove onSuccess
-                    const {invalidate, update, remove} = queryKeysMatrix[mutationName](
-                        // @ts-ignore
-                        mutationPayloads[mutationName],
-                        {}
-                    )
+                        fireEvent.click(button)
+                        await waitFor(() => screen.getByText(/isSuccess/i))
+                        expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
 
-                    const queryKeys = [...(invalidate || []), ...(update||[]), ...(remove||[])]
-
-                    queryKeys.forEach((queryKey: QueryKey) => {
-                        queryClient.setQueryData(queryKey, {test:true})
-                    })
-
-                    const button = screen.getByRole('button', {
-                        name: mutationName
-                    })
-
-                    fireEvent.click(button)
-                    await waitFor(() => screen.getByText(/isSuccess/i))
-                    expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
-
-                    // Assert changes in cache
-                    update?.forEach((queryKey: QueryKey) => {
-                        expect(queryClient.getQueryData(queryKey)).not.toEqual({test:true})
-                    })
-                    invalidate?.forEach((queryKey: QueryKey) => {
-                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
-                    })
-                    remove?.forEach((queryKey: QueryKey) => {
-                        expect(queryClient.getQueryState(queryKey)).toBeFalsy()
-                    })
-                }
-            },
-            {
-                name: 'error',
-                assertions: async () => {
-                    nock(DEFAULT_TEST_HOST)
-                        .patch((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
+                        // Assert changes in cache
+                        update?.forEach((queryKey: QueryKey) => {
+                            expect(queryClient.getQueryData(queryKey)).not.toEqual({test: true})
                         })
-                        .reply(500, {})
-                        .put((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
+                        invalidate?.forEach((queryKey: QueryKey) => {
+                            expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
                         })
-                        .reply(500, {})
-                        .post((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
+                        remove?.forEach((queryKey: QueryKey) => {
+                            expect(queryClient.getQueryState(queryKey)).toBeFalsy()
                         })
-                        .reply(500, {})
-                        .delete((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(500, {})
-                    
-                    renderWithProviders(
-                        <CustomerMutationComponent mutation={mutationName} />
-                    )
-                    await waitFor(() =>
-                        screen.getByRole('button', {
+                    }
+                },
+                {
+                    name: 'error',
+                    assertions: async () => {
+                        nock(DEFAULT_TEST_HOST)
+                            .patch((uri) => {
+                                return uri.includes('/customer/shopper-customers/')
+                            })
+                            .reply(500, {})
+                            .put((uri) => {
+                                return uri.includes('/customer/shopper-customers/')
+                            })
+                            .reply(500, {})
+                            .post((uri) => {
+                                return uri.includes('/customer/shopper-customers/')
+                            })
+                            .reply(500, {})
+                            .delete((uri) => {
+                                return uri.includes('/customer/shopper-customers/')
+                            })
+                            .reply(500, {})
+
+                        renderWithProviders(<CustomerMutationComponent mutation={mutationName} />)
+                        await waitFor(() =>
+                            screen.getByRole('button', {
+                                name: mutationName
+                            })
+                        )
+
+                        const button = screen.getByRole('button', {
                             name: mutationName
                         })
-                    )
 
-                    const button = screen.getByRole('button', {
-                        name: mutationName
-                    })
-
-                    fireEvent.click(button)
-                    await waitFor(() => screen.getByText(/error/i))
-                    expect(screen.getByText(/error/i)).toBeInTheDocument()
+                        fireEvent.click(button)
+                        await waitFor(() => screen.getByText(/error/i))
+                        expect(screen.getByText(/error/i)).toBeInTheDocument()
+                    }
                 }
-            }
-        ]
+            ]
+        }
     }
-})
+)
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {

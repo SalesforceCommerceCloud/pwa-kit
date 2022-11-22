@@ -12,7 +12,7 @@ import nock from 'nock'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
-        ready: jest.fn().mockResolvedValue({access_token: '123'}),
+        ready: jest.fn().mockResolvedValue({access_token: '123'})
     }))
 })
 
@@ -22,23 +22,21 @@ const OrderMutationComponent = () => {
     const createOrder = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
 
     return (
-            <div>
-                <button
-                    onClick={() =>
-                        createOrder.mutate({
-                            body: {basketId: BASKET_ID}
-                        })
-                    }
-                >
-                    Create Order
-                </button>
+        <div>
+            <button
+                onClick={() =>
+                    createOrder.mutate({
+                        body: {basketId: BASKET_ID}
+                    })
+                }
+            >
+                Create Order
+            </button>
 
-                {createOrder.error?.message && (
-                    <p>Error: {createOrder.error?.message}</p>
-                )}
-                <hr />
-                <div>{JSON.stringify(createOrder.data)}</div>
-            </div>
+            {createOrder.error?.message && <p>Error: {createOrder.error?.message}</p>}
+            <hr />
+            <div>{JSON.stringify(createOrder.data)}</div>
+        </div>
     )
 }
 
