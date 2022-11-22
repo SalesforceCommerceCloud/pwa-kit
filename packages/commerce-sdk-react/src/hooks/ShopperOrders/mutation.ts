@@ -17,7 +17,7 @@ export const ShopperOrdersMutations = {
      */
     CreateOrder: 'createOrder'
 
-    // Payment instrument API call is not implemented yet in PWA kit. 
+    // Payment instrument API call is not implemented yet in PWA kit.
     // Reference: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/59d39976567c82baa9f9d393f1ac274c397b4c44/packages/commerce-sdk-react/src/hooks/ShopperOrders/mutation.ts#L23-L49
 } as const
 
