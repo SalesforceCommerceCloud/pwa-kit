@@ -79,7 +79,7 @@ function usePaymentMethodsForOrder(
 ): UseQueryResult<DataType<Client['getPaymentMethodsForOrder']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['/paymentMethods', arg],
+        ['/orders', parameters.orderNo, '/paymentMethods', arg],
         (_, {shopperOrders}) => {
             return shopperOrders.getPaymentMethodsForOrder({parameters, headers}, rawResponse)
         },
