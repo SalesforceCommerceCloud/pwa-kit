@@ -19,7 +19,7 @@ import {
     isRemote,
     MetricsSender,
     outgoingRequestHook,
-    PerformanceTimer,
+    // PerformanceTimer,
     processLambdaResponse,
     responseSend,
     configureProxyConfigs,
@@ -482,14 +482,14 @@ export const RemoteServerFactory = {
             locals.afterResponseCalled = false
             locals.responseCaching = {}
 
-            locals.timer = new PerformanceTimer(`req${locals.requestId}`)
+            // locals.timer = new PerformanceTimer(`req${locals.requestId}`)
             locals.originalUrl = req.originalUrl
 
             // Track this response
             req.app._requestMonitor._responseStarted(res)
 
             // Start timing
-            locals.timer.start('express-overall')
+            // locals.timer.start('express-overall')
 
             // If the path is /, we enforce that the only methods
             // allowed are GET, HEAD or OPTIONS. This is a restriction
@@ -506,8 +506,8 @@ export const RemoteServerFactory = {
             const afterResponse = () => {
                 /* istanbul ignore else */
                 if (!locals.afterResponseCalled) {
-                    locals.timer.end('express-overall')
-                    locals.timingResponse && locals.timer.end('express-response')
+                    // locals.timer.end('express-overall')
+                    // locals.timingResponse && locals.timer.end('express-response')
                     locals.afterResponseCalled = true
                     // Emit timing unless the request is for a proxy
                     // or bundle path. We don't want to emit metrics
@@ -534,9 +534,9 @@ export const RemoteServerFactory = {
                         }
                         req.app.sendMetric(metricName)
                     }
-                    locals.timer.finish()
+                    // locals.timer.finish()
                     // Release reference to timer
-                    locals.timer = null
+                    // locals.timer = null
                 }
             }
 
@@ -959,8 +959,8 @@ const prepNonProxyRequest = (req, res, next) => {
  * @private
  */
 const ssrMiddleware = (req, res, next) => {
-    const timer = res.locals.timer
-    timer.start('ssr-overall')
+    // const timer = res.locals.timer
+    // timer.start('ssr-overall')
 
     setDefaultHeaders(req, res)
     const renderStartTime = Date.now()
@@ -968,7 +968,7 @@ const ssrMiddleware = (req, res, next) => {
     const done = () => {
         const elapsedRenderTime = Date.now() - renderStartTime
         req.app.sendMetric('RenderTime', elapsedRenderTime, 'Milliseconds')
-        timer.end('ssr-overall')
+        // timer.end('ssr-overall')
     }
 
     res.on('finish', done)

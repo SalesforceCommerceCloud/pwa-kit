@@ -967,40 +967,40 @@ describe('updateGlobalAgentOptions', () => {
     })
 })
 
-describe('PerformanceTimer tests', () => {
-    let timer
-    beforeEach(() => (timer = new PerformanceTimer('')))
-    afterEach(() => timer?._observer.disconnect())
+// describe('PerformanceTimer tests', () => {
+//     let timer
+//     beforeEach(() => (timer = new PerformanceTimer('')))
+//     afterEach(() => timer?._observer.disconnect())
 
-    test('time() function', () => {
-        const func = sinon.stub()
-        timer.time('test1', func, 1)
-        expect(func.callCount).toBe(1)
-        expect(func.calledWith(1)).toBe(true)
+//     test('time() function', () => {
+//         const func = sinon.stub()
+//         timer.time('test1', func, 1)
+//         expect(func.callCount).toBe(1)
+//         expect(func.calledWith(1)).toBe(true)
 
-        func.reset()
-        func.throws('Error', 'intentional error')
-        expect(() => timer.time('test2', func, 1)).toThrow('intentional error')
-        expect(func.callCount).toBe(1)
-    })
+//         func.reset()
+//         func.throws('Error', 'intentional error')
+//         expect(() => timer.time('test2', func, 1)).toThrow('intentional error')
+//         expect(func.callCount).toBe(1)
+//     })
 
-    test('start() and end()', async () => {
-        timer.start('test3')
-        await new Promise((resolve) => setTimeout(resolve, 10))
-        timer.end('test3')
-        const summary = timer.summary
-        expect(summary.length).toBe(1)
-        const entry = summary[0]
-        expect(entry.name).toEqual('test3')
-        expect(entry.duration).toBeGreaterThanOrEqual(5)
-        expect(entry.duration).toBeLessThanOrEqual(30)
-    })
+//     test('start() and end()', async () => {
+//         timer.start('test3')
+//         await new Promise((resolve) => setTimeout(resolve, 10))
+//         timer.end('test3')
+//         const summary = timer.summary
+//         expect(summary.length).toBe(1)
+//         const entry = summary[0]
+//         expect(entry.name).toEqual('test3')
+//         expect(entry.duration).toBeGreaterThanOrEqual(5)
+//         expect(entry.duration).toBeLessThanOrEqual(30)
+//     })
 
-    test('accessing operationId auto-increments the counter', () => {
-        expect(timer.operationId).toBe(1)
-        expect(timer.operationId).toBe(2)
-    })
-})
+//     test('accessing operationId auto-increments the counter', () => {
+//         expect(timer.operationId).toBe(1)
+//         expect(timer.operationId).toBe(2)
+//     })
+// })
 
 describe('parseCacheControl', () => {
     test('accepts undefined', () => {
