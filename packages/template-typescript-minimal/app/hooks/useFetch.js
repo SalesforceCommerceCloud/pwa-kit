@@ -39,7 +39,9 @@ const useFetch = (url, params, config, fetchOptions) => {
         },
         ...config,
         enabled: !!url && !!token && config?.enabled,
-        retry: false
+        retry: false,
+        retryOnMount: false,
+        refetchOnWindowFocus: false
     })
     return context
 }
@@ -247,30 +249,29 @@ export const useAddressAction = (accountId, action) => {
     return context
 }
 
-export const useProductCategoryPath = (categoryId, params) => {
-    const queryParams = new URLSearchParams(params)
-    if (categoryId) {
-        queryParams.set('parentProductCategoryId', categoryId)
-    }
-    const queryString = `?${queryParams.toString()}`
+export const useProductCategoryPath = (categoryId) => {
     const data = useFetch(
-        `${getApiUrl(`/product-category-path/product-categories/${queryString}`)}`
+        `${getApiUrl(`/product-category-path/product-categories/${categoryId}`)}`,
+        {},
+        {enabled: !!categoryId}
     )
     return data
 }
 
-export const useProductSearch = ({categoryId, searchTerm}) => {
+export const useProductSearch = ({categoryId, searchTerm}, params) => {
+    console.log('params', params)
     const fetchOptions = {
         method: 'POST',
         body: JSON.stringify({
             searchTerm,
-            categoryId
+            categoryId,
+            ...params
         })
     }
     const url = getApiUrl(`/search/product-search`)
     const data = useFetch(
         url,
-        {categoryId, searchTerm},
+        {categoryId, searchTerm, ...params},
         {enabled: !!categoryId || !!searchTerm},
         fetchOptions
     )
@@ -302,6 +303,12 @@ export const useOrders = (orderId) => {
 export const useSearchSuggestion = (searchTerm) => {
     const url = getApiUrl(`/search/suggestions`)
     const data = useFetch(url, {searchTerm}, {enabled: Boolean(searchTerm)})
+    return data
+}
+
+export const useSortRules = () => {
+    const url = getApiUrl(`/search/sort-rules`)
+    const data = useFetch(url)
     return data
 }
 

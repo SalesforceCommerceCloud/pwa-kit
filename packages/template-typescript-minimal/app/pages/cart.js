@@ -135,18 +135,18 @@ function Cart() {
     if (cartItems?.length === 0) {
         return (
             <div>
-                <button
-                    onClick={() => {
-                        cartAction.mutate({
-                            url: getApiUrl(`/carts/current`),
-                            fetchOptions: {
-                                method: 'DELETE'
-                            }
-                        })
-                    }}
-                >
-                    Delete a cart
-                </button>
+                {/*<button*/}
+                {/*    onClick={() => {*/}
+                {/*        cartAction.mutate({*/}
+                {/*            url: getApiUrl(`/carts/current`),*/}
+                {/*            fetchOptions: {*/}
+                {/*                method: 'DELETE'*/}
+                {/*            }*/}
+                {/*        })*/}
+                {/*    }}*/}
+                {/*>*/}
+                {/*    Delete a cart*/}
+                {/*</button>*/}
                 Cart is empty
             </div>
         )

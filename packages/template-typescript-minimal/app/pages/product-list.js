@@ -7,9 +7,15 @@
 
 import React from 'react'
 import {useParams} from 'react-router-dom/'
-import {useProductSearch, useProductsPrice} from '../hooks/useFetch'
+import {
+    useProductCategoryPath,
+    useProductSearch,
+    useProductsPrice,
+    useSortRules
+} from '../hooks/useFetch'
 import {Link, useLocation} from 'react-router-dom'
 import {getMediaLink} from '../utils/utils'
+import Breadcrumb from '../components/breadcrumb'
 
 ProductList.propTypes = {}
 
@@ -30,31 +36,67 @@ const ProductTile = ({currency, product, price}) => {
     )
 }
 function ProductList() {
+    const [sortingId, setSortingId] = React.useState()
     const {categoryId} = useParams()
     const location = useLocation()
+
     const queryParams = new URLSearchParams(location.search.split('?')?.[1])
     const searchTerm = queryParams.get('q')
-    const {data, isLoading, error} = useProductSearch({categoryId, searchTerm})
+    const {data: productPath, isLoading: isProductPathLoading} = useProductCategoryPath(categoryId)
+    const {data: sortRules} = useSortRules()
+    const {data, isLoading: isProductSearchLoading, error} = useProductSearch(
+        {
+            categoryId,
+            searchTerm
+        },
+        {sortRuleId: sortingId}
+    )
     const productIds = data?.productsPage?.products.map((product) => ({productId: product.id}))
     const {
         data: productListPrice,
         isLoading: productListPriceLoading,
         error: productListPriceError
     } = useProductsPrice(productIds)
-    if (isLoading) {
-        return <div>Loading....</div>
-    }
+    React.useEffect(() => {
+        if (!sortingId && sortRules?.sortRules.length > 0) {
+            setSortingId(sortRules?.sortRules[0].id)
+        }
+    }, [sortRules])
     if (error || productListPriceError) {
         return <div>Something is wrong</div>
     }
-    const {productsPage} = data
-    if (productsPage?.products.length === 0) {
+    if (data?.productsPage?.products.length === 0) {
         return <div>No product found</div>
     }
+
     return (
         <div>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                {isProductPathLoading && <div>Loading breadcrumb</div>}
+                {productPath && <Breadcrumb categories={productPath} />}
+                <select
+                    onChange={(e) => {
+                        setSortingId(e.target.value)
+                    }}
+                >
+                    {sortRules?.sortRules?.map((rule) => {
+                        return (
+                            <option key={rule.sortRuleId} value={rule.sortRuleId}>
+                                {rule.label}
+                            </option>
+                        )
+                    })}
+                </select>
+            </div>
+
+            <div>
+                {(isProductSearchLoading || productListPriceLoading) && (
+                    <div>Loading products...</div>
+                )}
+            </div>
+
             <div style={{display: 'flex', flexWrap: 'wrap', gap: '20px'}}>
-                {productsPage?.products.map((product) => {
+                {data?.productsPage?.products?.map((product) => {
                     const price = productListPrice?.pricingLineItemResults?.find((i) =>
                         product.id.includes(i.productId)
                     )

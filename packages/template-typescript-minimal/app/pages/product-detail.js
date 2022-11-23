@@ -10,22 +10,10 @@ import {addItemToCart, useCart, useProduct, useProductPrice} from '../hooks/useF
 import QuantityPicker, {useQuantity} from '../components/quantity-picker'
 import {Link, useParams} from 'react-router-dom'
 import {getMediaLink} from '../utils/utils'
+import Breadcrumb from '../components/breadcrumb'
+
 ProductDetail.propTypes = {}
-const Breadcrumb = ({categories}) => {
-    if (!categories) return null
-    return (
-        <div>
-            {categories.path.map((cate, i) => {
-                return (
-                    <span style={{marginRight: '10px'}}>
-                        <Link to={`/category/${cate.id}/${cate.name}`}>{cate.name}</Link>
-                        {i !== categories.path.length - 1 && <span> / </span>}
-                    </span>
-                )
-            })}
-        </div>
-    )
-}
+
 function ProductDetail() {
     const {quantity, onDecrease, onIncrease} = useQuantity()
 
