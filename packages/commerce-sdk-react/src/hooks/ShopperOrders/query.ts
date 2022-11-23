@@ -39,7 +39,7 @@ function useOrder(
 ): UseQueryResult<DataType<Client['getOrder']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['order', arg],
+        ['/orders', arg],
         (_, {shopperOrders}) => {
             return shopperOrders.getOrder({parameters, headers}, rawResponse)
         },
@@ -79,7 +79,7 @@ function usePaymentMethodsForOrder(
 ): UseQueryResult<DataType<Client['getPaymentMethodsForOrder']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['paymentMethods', arg],
+        ['/orders', parameters.orderNo, '/payment-methods', arg],
         (_, {shopperOrders}) => {
             return shopperOrders.getPaymentMethodsForOrder({parameters, headers}, rawResponse)
         },
@@ -117,7 +117,7 @@ function useTaxesFromOrder(
 ): UseQueryResult<DataType<Client['getTaxesFromOrder']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['taxes', arg],
+        ['/orders', parameters.orderNo, '/taxes', arg],
         (_, {shopperOrders}) => {
             return shopperOrders.getTaxesFromOrder({parameters, headers}, rawResponse)
         },

@@ -10,7 +10,7 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {
     ShopperCustomersMutationType,
     useShopperCustomersMutation,
-    queryKeysMatrix
+    shopperCustomersQueryKeysMatrix
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
@@ -157,7 +157,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                         )
 
                         // Pre-populate cache with query keys we invalidate/update/remove onSuccess
-                        const {invalidate, update, remove} = queryKeysMatrix[mutationName](
+                        const {invalidate, update, remove} = shopperCustomersQueryKeysMatrix[mutationName](
                             // @ts-ignore
                             mutationPayloads[mutationName],
                             {}

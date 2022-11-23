@@ -5,10 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, DEFAULT_TEST_HOST} from '../../test-utils'
+import {renderWithProviders, DEFAULT_TEST_HOST, createQueryClient} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import {ShopperOrdersMutations, useShopperOrdersMutation} from './mutation'
+import {useShopperOrdersMutation, ShopperOrdersMutationType, shopperOrdersQueryKeysMatrix} from './mutation'
 import nock from 'nock'
+import {QueryKey} from '@tanstack/react-query'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
@@ -18,82 +19,122 @@ jest.mock('../../auth/index.ts', () => {
 
 const BASKET_ID = '12345'
 
-const OrderMutationComponent = () => {
-    const createOrder = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
+type MutationPayloads = {
+    [key in ShopperOrdersMutationType]: {body: any; parameters: any}
+}
+
+const mutationPayloads: MutationPayloads = {
+    createOrder: {
+        body: {basketId: BASKET_ID},
+        parameters: {}
+    }
+}
+
+interface OrderMutationComponentParams {
+    action: ShopperOrdersMutationType
+}
+
+
+
+const OrderMutationComponent = ({action}: OrderMutationComponentParams) => {
+    const mutationHook = useShopperOrdersMutation(action)
 
     return (
         <div>
-            <button
-                onClick={() =>
-                    createOrder.mutate({
-                        body: {basketId: BASKET_ID}
-                    })
-                }
-            >
-                Create Order
+            <button onClick={() => mutationHook.mutate(mutationPayloads[action])}>
+                {action}
             </button>
 
-            {createOrder.error?.message && <p>Error: {createOrder.error?.message}</p>}
+            {mutationHook.error?.message && (
+                <p>Error: {mutationHook.error?.message}</p>
+            )}
             <hr />
-            <div>{JSON.stringify(createOrder.data)}</div>
+            {mutationHook.isSuccess && <span>isSuccess</span>}
         </div>
     )
 }
 
-const tests = [
-    {
-        hook: 'createOrder',
+const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map((mutationName) => {
+    return {
+        hook: mutationName,
         cases: [
             {
                 name: 'success',
                 assertions: async () => {
-                    renderWithProviders(<OrderMutationComponent />)
-
-                    await waitFor(() =>
-                        screen.getByRole('button', {
-                            name: /create order/i
-                        })
-                    )
-
-                    const mockOrderResponse = {
-                        orderNo: '00000410',
-                        customerInfo: {
-                            email: 'alex@test.com'
-                        }
-                    }
-
                     nock(DEFAULT_TEST_HOST)
                         .post((uri) => {
                             return uri.includes('/checkout/shopper-orders/')
                         })
-                        .reply(200, mockOrderResponse)
+                        .reply(200, {})
+                    
+                    const queryClient = createQueryClient()
+
+                    const {invalidate, update, remove} = shopperOrdersQueryKeysMatrix[mutationName](
+                        mutationPayloads[mutationName],
+                        {}
+                    )
+
+                    const queryKeys = [
+                        ...(invalidate || []),
+                        ...(update || []),
+                        ...(remove || [])
+                    ]
+
+                    queryKeys.forEach((queryKey: QueryKey) => {
+                        queryClient.setQueryData(queryKey, {test: true})
+                    })
+
+                    renderWithProviders(
+                        <OrderMutationComponent action={mutationName as ShopperOrdersMutationType} />,
+                        {queryClient}
+                    )
+
+                    await waitFor(() =>
+                        screen.getByRole('button', {
+                            name: mutationName
+                        })
+                    )
 
                     const button = screen.getByRole('button', {
-                        name: /create order/i
+                        name: mutationName
                     })
+
                     fireEvent.click(button)
-                    await waitFor(() => screen.getByText(/orderno/i))
-                    expect(screen.getByText(/orderno/i)).toBeInTheDocument()
+                    await waitFor(() => screen.getByText(/isSuccess/i))
+                    expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
+
+                    // Assert changes in cache
+                    update?.forEach((queryKey: QueryKey) => {
+                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
+                    })
+                    invalidate?.forEach((queryKey: QueryKey) => {
+                        expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
+                    })
+                    remove?.forEach((queryKey: QueryKey) => {
+                        expect(queryClient.getQueryState(queryKey)).toBeFalsy()
+                    })
                 }
             },
             {
                 name: 'error',
                 assertions: async () => {
-                    renderWithProviders(<OrderMutationComponent />)
-                    await waitFor(() =>
-                        screen.getByRole('button', {
-                            name: /create order/i
-                        })
-                    )
-
                     nock(DEFAULT_TEST_HOST)
                         .post((uri) => {
                             return uri.includes('/checkout/shopper-orders/')
                         })
                         .reply(500)
 
+                    renderWithProviders(
+                        <OrderMutationComponent action={mutationName as ShopperOrdersMutationType} />
+                    )
+                    await waitFor(() =>
+                        screen.getByRole('button', {
+                            name: mutationName
+                        })
+                    )
+
                     const button = screen.getByRole('button', {
-                        name: /create order/i
+                        name: mutationName
                     })
                     fireEvent.click(button)
                     await waitFor(() => screen.getByText(/error/i))
@@ -102,7 +143,7 @@ const tests = [
             }
         ]
     }
-]
+})
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {
