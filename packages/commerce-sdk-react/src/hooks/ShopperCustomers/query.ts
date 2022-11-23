@@ -7,17 +7,16 @@
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
-import { NotImplemented } from './../utils'
+import {NotImplemented} from './../utils'
 
 // TODO: Remove once phase2 is completed and all hooks are implemented
 import useCommerceApi from '../useCommerceApi'
-
 
 type Client = ApiClients['shopperCustomers']
 
 /**
  * WARNING: This method is not implemented yet.
- * 
+ *
  * A hook for `ShopperCustomers#getExternalProfile`.
  * Gets the new external profile for a customer.This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getExternalProfile} for more information about the API endpoint.
@@ -171,7 +170,7 @@ function useCustomerOrders(
 
 /**
  * WARNING: This method is not implemented yet.
- * 
+ *
  * A hook for `ShopperCustomers#getCustomerPaymentInstrument`.
  * Retrieves a customer's payment instrument by its ID.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerPaymentInstrument} for more information about the API endpoint.
@@ -181,6 +180,18 @@ function useCustomerOrders(
 function useCustomerPaymentInstrument(): void {
     NotImplemented()
 }
+
+type UseCustomerProductListsParameters = NonNullable<
+    Argument<Client['getCustomerProductLists']>
+>['parameters']
+type UseCustomerProductListsHeaders = NonNullable<
+    Argument<Client['getCustomerProductLists']>
+>['headers']
+type UseCustomerProductListsArg = {
+    headers?: UseCustomerProductListsHeaders
+    rawResponse?: boolean
+} & UseCustomerProductListsParameters
+
 /**
  * A hook for `ShopperCustomers#getCustomerProductLists`.
  * Returns all customer product lists.
@@ -189,10 +200,25 @@ function useCustomerPaymentInstrument(): void {
  * @returns An object describing the state of the request.
  */
 function useCustomerProductLists(
-    arg: Argument<Client['getCustomerProductLists']>
-): UseQueryResult<DataType<Client['getCustomerProductLists']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['product-lists', arg], () => client.getCustomerProductLists(arg))
+    arg: Omit<UseCustomerProductListsArg, 'rawResponse'> & {rawResponse?: false},
+    options?: UseQueryOptions<DataType<Client['getCustomerProductLists']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerProductLists']>, Error>
+function useCustomerProductLists(
+    arg: Omit<UseCustomerProductListsArg, 'rawResponse'> & {rawResponse?: true},
+    options?: UseQueryOptions<DataType<Client['getCustomerProductLists']> | Response, Error>
+): UseQueryResult<DataType<Client['getCustomerProductLists']>, Error>
+function useCustomerProductLists(
+    arg: UseCustomerProductListsArg,
+    options?: UseQueryOptions<DataType<Client['getCustomerProductLists']> | Response, Error>
+) {
+    const {headers, rawResponse, ...parameters} = arg
+    return useQuery(
+        ['/customers', parameters.customerId, '/product-lists', arg],
+        (_, {shopperCustomers}) => {
+            return shopperCustomers.getCustomerProductLists({parameters, headers}, rawResponse)
+        },
+        options
+    )
 }
 
 type UseCustomerProductListParameters = NonNullable<
@@ -226,7 +252,7 @@ function useCustomerProductList(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['/customers', parameters.customerId, '/product-list', arg],
+        ['/customers', parameters.customerId, '/product-list', parameters.listId, arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerProductList({parameters, headers}, rawResponse)
         },
@@ -236,7 +262,7 @@ function useCustomerProductList(
 
 /**
  * WARNING: This method is not implemented yet.
- * 
+ *
  * A hook for `ShopperCustomers#getCustomerProductListItem`.
  * Returns an item of a customer product list and the actual product details like image, availability and price.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerProductListItem} for more information about the API endpoint.
@@ -248,7 +274,7 @@ function useCustomerProductListItem(): void {
 }
 /**
  * WARNING: This method is not implemented yet.
- * 
+ *
  * A hook for `ShopperCustomers#getPublicProductListsBySearchTerm`.
  * Retrieves all public product lists as defined by the given search term (for example, email OR first name and last name).
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getPublicProductListsBySearchTerm} for more information about the API endpoint.
@@ -260,7 +286,7 @@ function usePublicProductListsBySearchTerm(): void {
 }
 /**
  * WARNING: This method is not implemented yet.
- * 
+ *
  * A hook for `ShopperCustomers#getPublicProductList`.
  * Retrieves a public product list by ID and the items under that product list.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getPublicProductList} for more information about the API endpoint.
@@ -272,7 +298,7 @@ function usePublicProductList(): void {
 }
 /**
  * WARNING: This method is not implemented yet.
- * 
+ *
  * A hook for `ShopperCustomers#getProductListItem`.
  * Retrieves an item from a public product list and the actual product details like product, image, availability and price.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getProductListItem} for more information about the API endpoint.

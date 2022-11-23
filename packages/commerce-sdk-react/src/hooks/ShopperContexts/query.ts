@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { NotImplemented } from './../utils'
+import {NotImplemented} from './../utils'
 
 /**
  * WARNING: This method is not implemented yet.
- * 
+ *
  * A hook for `ShopperContexts#getShopperContext`.
  * Gets the shopper's context based on the shopperJWT.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-contexts?meta=getShopperContext} for more information about the API endpoint.

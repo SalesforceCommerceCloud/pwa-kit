@@ -7,7 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import { NotImplemented } from '../utils'
+import {NotImplemented} from '../utils'
 
 type Client = ApiClients['shopperOrders']
 
@@ -49,7 +49,7 @@ function useOrder(
 
 /**
  * WARNING: This method is not implemented yet.
- * 
+ *
  * A hook for `ShopperOrders#getPaymentMethodsForOrder`.
  * Gets the applicable payment methods for an existing order considering the open payment amount only.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=getPaymentMethodsForOrder} for more information about the API endpoint.

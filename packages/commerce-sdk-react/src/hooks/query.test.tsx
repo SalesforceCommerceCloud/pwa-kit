@@ -14,6 +14,8 @@ import {
     useTaxesFromBasket
 } from './ShopperBaskets/query'
 import {useProductSearch, useSearchSuggestions} from './ShopperSearch/query'
+import {useShopperContext} from './ShopperContexts/query'
+import {useSuggestions} from './ShopperDiscoverySearch/query'
 import {
     useExternalProfile,
     useCustomer,
@@ -39,6 +41,7 @@ jest.mock('../auth/index.ts', () => {
 })
 
 const QUERY_TESTS = [
+    // ShopperBasket
     {
         name: 'useBasket',
         hook: () => useBasket({basketId: 'test'}),
@@ -51,21 +54,35 @@ const QUERY_TESTS = [
     },
     {
         name: 'usePriceBooksForBasket',
-        hook: () => usePriceBooksForBasket({basketId: 'test'}),
-        endpoint: /\/baskets\/test\/price-books$/
+        hook: () => usePriceBooksForBasket(),
+        endpoint: new RegExp(''),
+        notImplemented: true
+    },
+    {
+        name: 'useTaxesFromBasket',
+        hook: () => useTaxesFromBasket(),
+        endpoint: new RegExp(''),
+        notImplemented: true
     },
     {
         name: 'useShippingMethodsForShipment',
         hook: () => useShippingMethodsForShipment({basketId: 'test', shipmentId: '123'}),
         endpoint: /\/baskets\/test\/shipments\/123\/shipping-methods$/
     },
-
-    // TODO: not implemented
-    // {
-    //     name: 'useExternalProfile',
-    //     hook: () => useExternalProfile({externalId: '123', authenticationProviderId: '456'}),
-    //     endpoint: '/customers/external-profile',
-    // },
+    // ShopperContext
+    {
+        name: 'useShopperContext',
+        hook: () => useShopperContext(),
+        endpoint: new RegExp(''),
+        notImplemented: true
+    },
+    // ShopperCustomers
+    {
+        name: 'useExternalProfile',
+        hook: () => useExternalProfile(),
+        endpoint: new RegExp(''),
+        notImplemented: true
+    },
     {
         name: 'useCustomer',
         hook: () => useCustomer({customerId: '123'}),
@@ -86,43 +103,47 @@ const QUERY_TESTS = [
         hook: () => useCustomerOrders({customerId: '123'}),
         endpoint: /\/customers\/123\/orders$/
     },
-    // TODO: not implemented
-    // {
-    //     name: 'useCustomerPaymentInstrument',
-    //     hook: () => useCustomerPaymentInstrument({customerId: '123', paymentInstrumentId: '456'}),
-    //     endpoint: '/customers/123/payment-instruments/456',
-    // },
-    // {
-    //     name: 'useCustomerProductLists',
-    //     hook: () => useCustomerProductLists({customerId: '123'}),
-    //     endpoint: '/customers/123/product-lists',
-    // },
-    // {
-    //     name: 'useCustomerProductList',
-    //     hook: () => useCustomerProductList({customerId: '123'}),
-    //     endpoint: '/customers/123/product-lists/456',
-    // },
-    // {
-    //     name: 'useCustomerProductListItem',
-    //     hook: () => useCustomerProductListItem({customerId: '123'}),
-    //     endpoint: '/customers/123/product-lists/456/items/789',
-    // },
-    // {
-    //     name: 'usePublicProductListsBySearchTerm',
-    //     hook: () => usePublicProductListsBySearchTerm(),
-    //     endpoint: '',
-    // },
-    // {
-    //     name: 'usePublicProductList',
-    //     hook: () => usePublicProductList(),
-    //     endpoint: '',
-    // },
-    // {
-    //     name: 'useProductListItem',
-    //     hook: () => useProductListItem(),
-    //     endpoint: '',
-    // },
-
+    {
+        name: 'useCustomerPaymentInstrument',
+        hook: () => useCustomerPaymentInstrument(),
+        endpoint: new RegExp(''),
+        notImplemented: true
+    },
+    {
+        name: 'useCustomerProductLists',
+        hook: () => useCustomerProductLists({customerId: '123'}),
+        endpoint: /\/customers\/123\/product-lists$/
+    },
+    {
+        name: 'useCustomerProductList',
+        hook: () => useCustomerProductList({customerId: '123', listId: '456'}),
+        endpoint: /\/customers\/123\/product-lists\/456$/
+    },
+    {
+        name: 'useCustomerProductListItem',
+        hook: () => useCustomerProductListItem(),
+        endpoint: new RegExp(''),
+        notImplemented: true
+    },
+    {
+        name: 'usePublicProductListsBySearchTerm',
+        hook: () => usePublicProductListsBySearchTerm(),
+        endpoint: new RegExp(''),
+        notImplemented: true
+    },
+    {
+        name: 'usePublicProductList',
+        hook: () => usePublicProductList(),
+        endpoint: new RegExp(''),
+        notImplemented: true
+    },
+    {
+        name: 'useProductListItem',
+        hook: () => useProductListItem(),
+        endpoint: new RegExp(''),
+        notImplemented: true
+    },
+    // ShopperOrders
     {
         name: 'useOrder',
         hook: () => useOrder({orderNo: '123'}),
@@ -130,15 +151,17 @@ const QUERY_TESTS = [
     },
     {
         name: 'usePaymentMethodsForOrder',
-        hook: () => usePaymentMethodsForOrder({orderNo: '123'}),
-        endpoint: /\/orders\/123\/payment-methods$/
+        hook: () => usePaymentMethodsForOrder(),
+        endpoint: new RegExp(''),
+        notImplemented: true
     },
     {
         name: 'useTaxesFromOrder',
-        hook: () => useTaxesFromOrder({orderNo: '123'}),
-        endpoint: /\/orders\/123\/taxes$/
+        hook: () => useTaxesFromOrder(),
+        endpoint: new RegExp(''),
+        notImplemented: true
     },
-
+    // ShopperProducts
     {
         name: 'useProducts',
         hook: () => useProducts({ids: '123,456'}),
@@ -159,6 +182,7 @@ const QUERY_TESTS = [
         hook: () => useCategory({id: '123'}),
         endpoint: /\/categories\/123$/
     },
+    // ShopperPromotions
     {
         name: 'usePromotions',
         hook: () => usePromotions({ids: '123,456'}),
@@ -166,10 +190,11 @@ const QUERY_TESTS = [
     },
     {
         name: 'usePromotionsForCampaign',
-        hook: () => usePromotionsForCampaign({campaignId: '123'}),
-        endpoint: /\/promotions\/campaigns\/123$/
+        hook: () => usePromotionsForCampaign(),
+        endpoint: new RegExp(''),
+        notImplemented: true
     },
-
+    // ShopperSearch
     {
         name: 'useProductSearch',
         hook: () => useProductSearch({q: 'test'}),
@@ -179,10 +204,21 @@ const QUERY_TESTS = [
         name: 'useSearchSuggestions',
         hook: () => useSearchSuggestions({q: 'test'}),
         endpoint: /\/search-suggestions$/
+    },
+    // ShopperDiscoverySearch
+    {
+        name: 'useSuggestions',
+        hook: () => useSuggestions(),
+        endpoint: new RegExp(''),
+        notImplemented: true
     }
 ]
 
-test.each(QUERY_TESTS)('%j - 200 returns data', async ({hook, endpoint}) => {
+test.each(QUERY_TESTS)('%j - 200 returns data', async ({hook, endpoint, notImplemented}) => {
+    if (notImplemented) {
+        return
+    }
+
     const data = {test: true}
     nock(DEFAULT_TEST_HOST)
         .get((uri) => endpoint.test(uri.split('?')[0]))
@@ -198,7 +234,10 @@ test.each(QUERY_TESTS)('%j - 200 returns data', async ({hook, endpoint}) => {
     expect(result.current.data).toEqual(data)
 })
 
-test.each(QUERY_TESTS)('%j - 400 returns error', async ({hook, endpoint}) => {
+test.each(QUERY_TESTS)('%j - 400 returns error', async ({hook, endpoint, notImplemented}) => {
+    if (notImplemented) {
+        return
+    }
     nock(DEFAULT_TEST_HOST)
         .get((uri) => endpoint.test(uri.split('?')[0]))
         .reply(400)
@@ -211,4 +250,10 @@ test.each(QUERY_TESTS)('%j - 400 returns error', async ({hook, endpoint}) => {
 
     expect(result.current.isLoading).toBe(false)
     expect(result.current.error).toBeTruthy()
+})
+
+test.each(QUERY_TESTS)('%j - throws error when not implemented', async ({hook, notImplemented}) => {
+    if (notImplemented) {
+        expect(() => hook()).toThrow()
+    }
 })
