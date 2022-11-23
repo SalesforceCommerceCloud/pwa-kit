@@ -24,7 +24,7 @@ module.exports = {
             parameters: {
                 clientId: 'e7e22b7f-a904-4f3a-8022-49dbee696485',
                 organizationId: 'f_ecom_bjnl_prd',
-                shortCode: 'performance-001',
+                shortCode: 'sandbox-001',
                 siteId: 'RefArch'
             }
         },
@@ -51,7 +51,7 @@ module.exports = {
         ssrFunctionNodeVersion: '14.x',
         proxyConfigs: [
             {
-                host: 'performance-001.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
