@@ -17,12 +17,14 @@ export interface QueryKeysMatrixElement {
 }
 
 type QueryKeysMatrix = {
+    // TODO: fix type
     [key in ShopperCustomersMutationType]: (param: any, response: any) => QueryKeysMatrixElement
 }
 
 // TODO: Make Client dynamic
 type Client = ApiClients['shopperCustomers']
 
+// TODO: fix type
 export const updateCache = <Action extends ShopperCustomersMutationType>(
     queryClient: QueryClient,
     action: Action,

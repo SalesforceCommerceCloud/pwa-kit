@@ -7,6 +7,8 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
+import {QueryKeysMatrixElement, updateCache} from '../utils'
+import useCustomerId from '../useCustomerId'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -333,15 +335,80 @@ the body are the following properties if specified:
 
 type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
+export const getQueryKeysMatrix = (customerId: string | null) => {
+    return {
+        addCouponToBasket: (
+            params: Argument<Client['addCouponToBasket']>,
+            response: DataType<Client['addCouponToBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                update: [['/baskets', basketId]],
+                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
+            }
+        },
+        addItemToBasket: (
+            params: Argument<Client['addItemToBasket']>,
+            response: DataType<Client['addItemToBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                update: [['/baskets', basketId]],
+                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
+            }
+        },
+        addPaymentInstrumentToBasket: (
+            params: Argument<Client['addPaymentInstrumentToBasket']>,
+            response: DataType<Client['addPaymentInstrumentToBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                update: [['/baskets', basketId]],
+                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
+            }
+        },
+        createBasket: (
+            params: Argument<Client['createBasket']>,
+            response: DataType<Client['createBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = response.basketId
+
+            return {
+                ...(basketId ? {update: [['/baskets', basketId]]} : {}),
+                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
+            }
+        },
+        deleteBasket: (
+            params: Argument<Client['deleteBasket']>,
+            response: DataType<Client['deleteBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params?.parameters.basketId
+
+            return {
+                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {}),
+                ...(basketId ? {remove: [['/baskets', basketId]]} : {})
+            }
+        }
+    }
+}
+
 /**
  * A hook for performing mutations with the Shopper Baskets API.
  */
 export function useShopperBasketsMutation<Action extends ShopperBasketMutationType>(
     action: Action
 ) {
+    const queryClient = useQueryClient()
+
+    const customerId = useCustomerId()
+    const queryKeysMatrix = getQueryKeysMatrix(customerId)
+
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
-    const queryClient = useQueryClient()
+
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
@@ -349,27 +416,8 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
         },
         {
             onSuccess: (data, params) => {
-                if (
-                    action === 'createBasket' ||
-                    action === 'transferBasket' ||
-                    action === 'mergeBasket'
-                ) {
-                    if ('customerInfo' in data && data.customerInfo?.customerId) {
-                        queryClient.invalidateQueries([
-                            '/customers',
-                            data.customerInfo?.customerId,
-                            '/baskets'
-                        ])
-                        queryClient.setQueryData(['/baskets', data.basketId], data)
-                    }
-                }
-
-                // @ts-ignore some action doesn't have basketId as parameter, like createBasket
-                if (params?.parameters?.basketId) {
-                    // @ts-ignore
-                    // invalidate all cache entries that are related to the basket
-                    queryClient.invalidateQueries(['/baskets', params?.parameters?.basketId])
-                }
+                // @ts-ignore
+                updateCache(queryClient, action, queryKeysMatrix, data, params)
             }
         }
     )
