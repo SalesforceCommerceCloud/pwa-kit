@@ -42,22 +42,22 @@ const QUERY_TESTS = [
     {
         name: 'useBasket',
         hook: () => useBasket({basketId: 'test'}),
-        endpoint: '/baskets/test'
+        endpoint: /\/baskets\/test$/
     },
     {
         name: 'usePaymentMethodsForBasket',
         hook: () => usePaymentMethodsForBasket({basketId: 'test'}),
-        endpoint: '/baskets/test/payment-methods'
+        endpoint: /\/baskets\/test\/payment-methods$/
     },
     {
         name: 'usePriceBooksForBasket',
         hook: () => usePriceBooksForBasket({basketId: 'test'}),
-        endpoint: '/baskets/test/price-books'
+        endpoint: /\/baskets\/test\/price-books$/
     },
     {
         name: 'useShippingMethodsForShipment',
         hook: () => useShippingMethodsForShipment({basketId: 'test', shipmentId: '123'}),
-        endpoint: '/baskets/test/shipments/123/shipping-methods'
+        endpoint: /\/baskets\/test\/shipments\/123\/shipping-methods$/
     },
 
     // TODO: not implemented
@@ -69,22 +69,22 @@ const QUERY_TESTS = [
     {
         name: 'useCustomer',
         hook: () => useCustomer({customerId: '123'}),
-        endpoint: '/customers/123'
+        endpoint: /\/customers\/123$/
     },
     {
         name: 'useCustomerAddress',
         hook: () => useCustomerAddress({customerId: '123', addressName: '456'}),
-        endpoint: '/customers/123/addresses/456'
+        endpoint: /\/customers\/123\/addresses\/456$/
     },
     {
         name: 'useCustomerBaskets',
         hook: () => useCustomerBaskets({customerId: '123'}),
-        endpoint: '/customers/123/baskets'
+        endpoint: /\/customers\/123\/baskets$/
     },
     {
         name: 'useCustomerOrders',
         hook: () => useCustomerOrders({customerId: '123'}),
-        endpoint: '/customers/123/orders'
+        endpoint: /\/customers\/123\/orders$/
     },
     // TODO: not implemented
     // {
@@ -126,66 +126,66 @@ const QUERY_TESTS = [
     {
         name: 'useOrder',
         hook: () => useOrder({orderNo: '123'}),
-        endpoint: '/orders/123'
+        endpoint: /\/orders\/123$/
     },
     {
         name: 'usePaymentMethodsForOrder',
         hook: () => usePaymentMethodsForOrder({orderNo: '123'}),
-        endpoint: '/orders/123/payment-methods'
+        endpoint: /\/orders\/123\/payment-methods$/
     },
     {
         name: 'useTaxesFromOrder',
         hook: () => useTaxesFromOrder({orderNo: '123'}),
-        endpoint: '/orders/123/taxes'
+        endpoint: /\/orders\/123\/taxes$/
     },
 
     {
         name: 'useProducts',
         hook: () => useProducts({ids: '123,456'}),
-        endpoint: '/products'
+        endpoint: /\/products$/
     },
     {
         name: 'useProduct',
         hook: () => useProduct({id: '123'}),
-        endpoint: '/products/123'
+        endpoint: /\/products\/123$/
     },
     {
         name: 'useCategories',
         hook: () => useCategories({ids: '123,456'}),
-        endpoint: '/categories'
+        endpoint: /\/categories$/
     },
     {
         name: 'useCategory',
         hook: () => useCategory({id: '123'}),
-        endpoint: '/categories/123'
+        endpoint: /\/categories\/123$/
     },
     {
         name: 'usePromotions',
         hook: () => usePromotions({ids: '123,456'}),
-        endpoint: '/promotions'
+        endpoint: /\/promotions$/
     },
     {
         name: 'usePromotionsForCampaign',
         hook: () => usePromotionsForCampaign({campaignId: '123'}),
-        endpoint: '/promotions/campaigns/123'
+        endpoint: /\/promotions\/campaigns\/123$/
     },
 
     {
         name: 'useProductSearch',
         hook: () => useProductSearch({q: 'test'}),
-        endpoint: '/product-search'
+        endpoint: /\/product-search$/
     },
     {
         name: 'useSearchSuggestions',
         hook: () => useSearchSuggestions({q: 'test'}),
-        endpoint: '/search-suggestions'
+        endpoint: /\/search-suggestions$/
     }
 ]
 
 test.each(QUERY_TESTS)('%j - 200 returns data', async ({hook, endpoint}) => {
     const data = {test: true}
     nock(DEFAULT_TEST_HOST)
-        .get((uri) => uri.includes(endpoint))
+        .get((uri) => endpoint.test(uri.split('?')[0]))
         .reply(200, data)
     // @ts-ignore
     const {result, waitForNextUpdate} = renderHookWithProviders(hook)
@@ -200,7 +200,7 @@ test.each(QUERY_TESTS)('%j - 200 returns data', async ({hook, endpoint}) => {
 
 test.each(QUERY_TESTS)('%j - 400 returns error', async ({hook, endpoint}) => {
     nock(DEFAULT_TEST_HOST)
-        .get((uri) => uri.includes(endpoint))
+        .get((uri) => endpoint.test(uri.split('?')[0]))
         .reply(400)
     // @ts-ignore
     const {result, waitForNextUpdate} = renderHookWithProviders(hook)
