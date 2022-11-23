@@ -254,6 +254,6 @@ test.each(QUERY_TESTS)('%j - 400 returns error', async ({hook, endpoint, notImpl
 
 test.each(QUERY_TESTS)('%j - throws error when not implemented', async ({hook, notImplemented}) => {
     if (notImplemented) {
-        expect(() => hook()).toThrow()
+        expect(() => hook()).toThrowError('This method is not implemented.')
     }
 })

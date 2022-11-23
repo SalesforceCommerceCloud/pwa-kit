@@ -10,7 +10,8 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {
     useShopperOrdersMutation,
     ShopperOrdersMutationType,
-    shopperOrdersQueryKeysMatrix
+    shopperOrdersQueryKeysMatrix,
+    NOT_IMPLEMENTED
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
@@ -24,7 +25,7 @@ jest.mock('../../auth/index.ts', () => {
 const BASKET_ID = '12345'
 
 type MutationPayloads = {
-    [key in ShopperOrdersMutationType]: {body: any; parameters: any}
+    [key in ShopperOrdersMutationType]?: {body: any; parameters: any}
 }
 
 const mutationPayloads: MutationPayloads = {
@@ -152,4 +153,10 @@ tests.forEach(({hook, cases}) => {
             test(name, assertions)
         })
     })
+})
+
+test.each(NOT_IMPLEMENTED)('%j - throws error when not implemented', (methodName) => {
+    expect(() => {
+        useShopperOrdersMutation(methodName as ShopperOrdersMutationType)
+    }).toThrowError('This method is not implemented.')
 })

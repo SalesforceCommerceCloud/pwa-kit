@@ -7,7 +7,7 @@
 import {NotImplemented} from './../utils'
 
 /**
- * WARNING: This method is not implemented yet.
+ * WARNING: This method is not implemented.
  *
  * A hook for `ShopperContexts#getShopperContext`.
  * Gets the shopper's context based on the shopperJWT.

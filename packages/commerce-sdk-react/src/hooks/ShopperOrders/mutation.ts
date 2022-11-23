@@ -7,7 +7,7 @@
 import {DataType, Argument} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {updateCache, QueryKeysMatrixElement, Client} from '../utils'
+import {updateCache, QueryKeysMatrixElement, Client, NotImplemented} from '../utils'
 
 export const ShopperOrdersMutations = {
     /**
@@ -15,10 +15,31 @@ export const ShopperOrdersMutations = {
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=createOrder} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#createorder} for more information on the parameters and returned data type.
      */
-    CreateOrder: 'createOrder'
-
-    // Payment instrument API call is not implemented yet in PWA kit.
-    // Reference: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/59d39976567c82baa9f9d393f1ac274c397b4c44/packages/commerce-sdk-react/src/hooks/ShopperOrders/mutation.ts#L23-L49
+    CreateOrder: 'createOrder',
+    /**
+     * WARNING: This method is not implemented.
+     *
+     * Adds a payment instrument to an order.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=createPaymentInstrumentForOrder} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#createpaymentinstrumentfororder} for more information on the parameters and returned data type.
+     */
+    CreatePaymentInstrumentForOrder: 'createPaymentInstrumentForOrder',
+    /**
+     * WARNING: This method is not implemented.
+     *
+     * Removes a payment instrument of an order.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=removePaymentInstrumentFromOrder} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#removepaymentinstrumentfromorder} for more information on the parameters and returned data type.
+     */
+    RemovePaymentInstrumentFromOrder: 'removePaymentInstrumentFromOrder',
+    /**
+     * WARNING: This method is not implemented.
+     *
+     * Updates a payment instrument of an order.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=updatePaymentInstrumentForOrder} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#updatepaymentinstrumentfororder} for more information on the parameters and returned data type.
+     */
+    UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
 } as const
 
 export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
@@ -36,10 +57,19 @@ export const shopperOrdersQueryKeysMatrix = {
     }
 }
 
+export const NOT_IMPLEMENTED = [
+    'CreatePaymentInstrumentForOrder',
+    'RemovePaymentInstrumentFromOrder',
+    'UpdatePaymentInstrumentForOrder'
+]
+
 /**
  * A hook for performing mutations with the Shopper Orders API.
  */
 export function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(action: Action) {
+    if (NOT_IMPLEMENTED.includes(action)) {
+        NotImplemented()
+    }
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
     const queryClient = useQueryClient()
