@@ -157,7 +157,9 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                         )
 
                         // Pre-populate cache with query keys we invalidate/update/remove onSuccess
-                        const {invalidate, update, remove} = shopperCustomersQueryKeysMatrix[mutationName](
+                        const {invalidate, update, remove} = shopperCustomersQueryKeysMatrix[
+                            mutationName
+                        ](
                             // @ts-ignore
                             mutationPayloads[mutationName],
                             {}

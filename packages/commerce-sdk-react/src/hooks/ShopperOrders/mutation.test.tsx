@@ -7,7 +7,11 @@
 import React from 'react'
 import {renderWithProviders, DEFAULT_TEST_HOST, createQueryClient} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import {useShopperOrdersMutation, ShopperOrdersMutationType, shopperOrdersQueryKeysMatrix} from './mutation'
+import {
+    useShopperOrdersMutation,
+    ShopperOrdersMutationType,
+    shopperOrdersQueryKeysMatrix
+} from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
 
@@ -34,20 +38,14 @@ interface OrderMutationComponentParams {
     action: ShopperOrdersMutationType
 }
 
-
-
 const OrderMutationComponent = ({action}: OrderMutationComponentParams) => {
     const mutationHook = useShopperOrdersMutation(action)
 
     return (
         <div>
-            <button onClick={() => mutationHook.mutate(mutationPayloads[action])}>
-                {action}
-            </button>
+            <button onClick={() => mutationHook.mutate(mutationPayloads[action])}>{action}</button>
 
-            {mutationHook.error?.message && (
-                <p>Error: {mutationHook.error?.message}</p>
-            )}
+            {mutationHook.error?.message && <p>Error: {mutationHook.error?.message}</p>}
             <hr />
             {mutationHook.isSuccess && <span>isSuccess</span>}
         </div>
@@ -66,7 +64,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
                             return uri.includes('/checkout/shopper-orders/')
                         })
                         .reply(200, {})
-                    
+
                     const queryClient = createQueryClient()
 
                     const {invalidate, update, remove} = shopperOrdersQueryKeysMatrix[mutationName](
@@ -74,18 +72,16 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
                         {}
                     )
 
-                    const queryKeys = [
-                        ...(invalidate || []),
-                        ...(update || []),
-                        ...(remove || [])
-                    ]
+                    const queryKeys = [...(invalidate || []), ...(update || []), ...(remove || [])]
 
                     queryKeys.forEach((queryKey: QueryKey) => {
                         queryClient.setQueryData(queryKey, {test: true})
                     })
 
                     renderWithProviders(
-                        <OrderMutationComponent action={mutationName as ShopperOrdersMutationType} />,
+                        <OrderMutationComponent
+                            action={mutationName as ShopperOrdersMutationType}
+                        />,
                         {queryClient}
                     )
 
@@ -125,7 +121,9 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
                         .reply(500)
 
                     renderWithProviders(
-                        <OrderMutationComponent action={mutationName as ShopperOrdersMutationType} />
+                        <OrderMutationComponent
+                            action={mutationName as ShopperOrdersMutationType}
+                        />
                     )
                     await waitFor(() =>
                         screen.getByRole('button', {
