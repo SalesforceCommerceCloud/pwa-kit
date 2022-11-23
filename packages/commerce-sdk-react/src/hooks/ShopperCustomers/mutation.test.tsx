@@ -157,11 +157,10 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                             })
                         )
 
+                        const mutation: any = shopperCustomersQueryKeysMatrix[mutationName]
+
                         // Pre-populate cache with query keys we invalidate/update/remove onSuccess
-                        const {invalidate, update, remove} = shopperCustomersQueryKeysMatrix[
-                            mutationName
-                        ](
-                            // @ts-ignore
+                        const {invalidate, update, remove} = mutation(
                             mutationPayloads[mutationName],
                             {}
                         )

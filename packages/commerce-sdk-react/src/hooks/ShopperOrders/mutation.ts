@@ -54,6 +54,24 @@ export const shopperOrdersQueryKeysMatrix = {
             update: [['/orders', {orderNo: response.orderNo}]],
             invalidate: [['/customers', customerId, '/baskets']]
         }
+    },
+    createPaymentInstrumentForOrder: (
+        params: Argument<Client['createPaymentInstrumentForOrder']>,
+        response: DataType<Client['createPaymentInstrumentForOrder']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    removePaymentInstrumentFromOrder: (
+        params: Argument<Client['removePaymentInstrumentFromOrder']>,
+        response: DataType<Client['removePaymentInstrumentFromOrder']>
+    ): QueryKeysMatrixElement => {
+        return {}
+    },
+    updatePaymentInstrumentForOrder: (
+        params: Argument<Client['updatePaymentInstrumentForOrder']>,
+        response: DataType<Client['updatePaymentInstrumentForOrder']>
+    ): QueryKeysMatrixElement => {
+        return {}
     }
 }
 

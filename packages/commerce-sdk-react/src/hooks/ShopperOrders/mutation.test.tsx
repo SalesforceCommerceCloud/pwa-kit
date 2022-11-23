@@ -68,7 +68,9 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
 
                     const queryClient = createQueryClient()
 
-                    const {invalidate, update, remove} = shopperOrdersQueryKeysMatrix[mutationName](
+                    const mutation: any = shopperOrdersQueryKeysMatrix[mutationName]
+
+                    const {invalidate, update, remove} = mutation(
                         mutationPayloads[mutationName],
                         {}
                     )
