@@ -4,28 +4,28 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
+import { NotImplemented } from './../utils'
 
 // TODO: Remove once phase2 is completed and all hooks are implemented
 import useCommerceApi from '../useCommerceApi'
 
-import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperCustomers']
 
 /**
+ * WARNING: This method is not implemented yet.
+ * 
  * A hook for `ShopperCustomers#getExternalProfile`.
  * Gets the new external profile for a customer.This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getExternalProfile} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getexternalprofile} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function useExternalProfile(
-    arg: Argument<Client['getExternalProfile']>
-): UseQueryResult<DataType<Client['getExternalProfile']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['external-profile', arg], () => client.getExternalProfile(arg))
+function useExternalProfile(): void {
+    NotImplemented()
 }
 
 type UseCustomerParameters = NonNullable<Argument<Client['getCustomer']>>['parameters']
@@ -170,17 +170,16 @@ function useCustomerOrders(
 }
 
 /**
+ * WARNING: This method is not implemented yet.
+ * 
  * A hook for `ShopperCustomers#getCustomerPaymentInstrument`.
  * Retrieves a customer's payment instrument by its ID.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerPaymentInstrument} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerpaymentinstrument} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function useCustomerPaymentInstrument(
-    arg: Argument<Client['getCustomerPaymentInstrument']>
-): UseQueryResult<DataType<Client['getCustomerPaymentInstrument']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['payment-instrument', arg], () => client.getCustomerPaymentInstrument(arg))
+function useCustomerPaymentInstrument(): void {
+    NotImplemented()
 }
 /**
  * A hook for `ShopperCustomers#getCustomerProductLists`.
@@ -236,58 +235,52 @@ function useCustomerProductList(
 }
 
 /**
+ * WARNING: This method is not implemented yet.
+ * 
  * A hook for `ShopperCustomers#getCustomerProductListItem`.
  * Returns an item of a customer product list and the actual product details like image, availability and price.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerProductListItem} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlistitem} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function useCustomerProductListItem(
-    arg: Argument<Client['getCustomerProductListItem']>
-): UseQueryResult<DataType<Client['getCustomerProductListItem']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['product-list-item', arg], () => client.getCustomerProductListItem(arg))
+function useCustomerProductListItem(): void {
+    NotImplemented()
 }
 /**
+ * WARNING: This method is not implemented yet.
+ * 
  * A hook for `ShopperCustomers#getPublicProductListsBySearchTerm`.
  * Retrieves all public product lists as defined by the given search term (for example, email OR first name and last name).
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getPublicProductListsBySearchTerm} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getpublicproductlistsbysearchterm} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function usePublicProductListsBySearchTerm(
-    arg: Argument<Client['getPublicProductListsBySearchTerm']>
-): UseQueryResult<DataType<Client['getPublicProductListsBySearchTerm']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['product-list-by-search-term', arg], () =>
-        client.getPublicProductListsBySearchTerm(arg)
-    )
+function usePublicProductListsBySearchTerm(): void {
+    NotImplemented()
 }
 /**
+ * WARNING: This method is not implemented yet.
+ * 
  * A hook for `ShopperCustomers#getPublicProductList`.
  * Retrieves a public product list by ID and the items under that product list.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getPublicProductList} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getpublicproductlist} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function usePublicProductList(
-    arg: Argument<Client['getPublicProductList']>
-): UseQueryResult<DataType<Client['getPublicProductList']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['public-product-list', arg], () => client.getPublicProductList(arg))
+function usePublicProductList(): void {
+    NotImplemented()
 }
 /**
+ * WARNING: This method is not implemented yet.
+ * 
  * A hook for `ShopperCustomers#getProductListItem`.
  * Retrieves an item from a public product list and the actual product details like product, image, availability and price.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getProductListItem} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getproductlistitem} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function useProductListItem(
-    arg: Argument<Client['getProductListItem']>
-): UseQueryResult<DataType<Client['getProductListItem']>, Error> {
-    const {shopperCustomers: client} = useCommerceApi()
-    return useQuery(['product-list-item', arg], () => client.getProductListItem(arg))
+function useProductListItem(): void {
+    NotImplemented()
 }
 
 export {
