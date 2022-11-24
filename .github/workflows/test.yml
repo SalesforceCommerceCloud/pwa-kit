@@ -1,0 +1,15 @@
+name: SalesforceCommerceCloud/pwa-kit/test
+on:
+  push:
+    branches:
+    - github-actions
+jobs:
+  testNode14:
+    runs-on: ubuntu-latest
+    container:
+      image: circleci/node:14-stretch-browsers
+    steps:
+    - uses: actions/checkout@v2
+    - uses: "./.github/actions/runtests"
+    - uses: "./.github/actions/lighthouse-ci"
+    - uses: "./.github/actions/smoketestscripts"
