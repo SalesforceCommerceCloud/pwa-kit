@@ -157,8 +157,11 @@ tests.forEach(({hook, cases}) => {
     })
 })
 
-test.each(SHOPPER_ORDERS_NOT_IMPLEMENTED)('%j - throws error when not implemented', (methodName) => {
-    expect(() => {
-        useShopperOrdersMutation(methodName as ShopperOrdersMutationType)
-    }).toThrowError('This method is not implemented.')
-})
+test.each(SHOPPER_ORDERS_NOT_IMPLEMENTED)(
+    '%j - throws error when not implemented',
+    (methodName) => {
+        expect(() => {
+            useShopperOrdersMutation(methodName as ShopperOrdersMutationType)
+        }).toThrowError('This method is not implemented.')
+    }
+)
