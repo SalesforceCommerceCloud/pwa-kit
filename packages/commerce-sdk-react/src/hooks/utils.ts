@@ -8,6 +8,7 @@ import {QueryClient} from '@tanstack/react-query'
 import {ApiClients, Argument, DataType} from './types'
 import {ShopperCustomersMutationType} from './ShopperCustomers'
 import {ShopperOrdersMutationType} from './ShopperOrders'
+import {ShopperBasketMutationType} from './ShopperBaskets'
 
 const isObject = (item: null) => typeof item === 'object' && !Array.isArray(item) && item !== null
 
@@ -18,16 +19,20 @@ export interface QueryKeysMatrixElement {
 }
 
 // TODO: Add more endpoints types as needed
-export type CombinedMutationTypes = ShopperOrdersMutationType | ShopperCustomersMutationType
+export type CombinedMutationTypes =
+    | ShopperOrdersMutationType
+    | ShopperCustomersMutationType
+    | ShopperBasketMutationType
 
 type QueryKeysMatrix = {
-    // TODO: fix type
     [key in CombinedMutationTypes]?: (data: any, param: any) => QueryKeysMatrixElement
 }
 
-export type Client = ApiClients['shopperOrders'] & ApiClients['shopperCustomers']
+// TODO: Add more api clients as needed
+export type Client = ApiClients['shopperOrders'] &
+    ApiClients['shopperCustomers'] &
+    ApiClients['shopperBaskets']
 
-// TODO: fix type
 export const updateCache = <Action extends CombinedMutationTypes>(
     queryClient: QueryClient,
     action: Action,

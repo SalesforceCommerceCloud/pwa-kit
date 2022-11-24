@@ -171,7 +171,7 @@ export const ShopperBasketsMutations = {
     AddTaxesForBasket: 'addTaxesForBasket'
 } as const
 
-type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
+export type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
 export const getQueryKeysMatrix = (customerId: string | null) => {
     return {
@@ -271,7 +271,6 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
         },
         {
             onSuccess: (data, params) => {
-                // @ts-ignore
                 updateCache(queryClient, action, queryKeysMatrix, data, params)
             }
         }
