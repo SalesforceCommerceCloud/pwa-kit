@@ -7,6 +7,7 @@
 import {QueryClient} from '@tanstack/react-query'
 import {ApiClients, Argument, DataType} from './types'
 import {ShopperCustomersMutationType} from './ShopperCustomers'
+import {ShopperOrdersMutationType} from './ShopperOrders'
 
 const isObject = (item: null) => typeof item === 'object' && !Array.isArray(item) && item !== null
 
@@ -16,16 +17,18 @@ export interface QueryKeysMatrixElement {
     remove?: Array<Array<string | unknown>>
 }
 
+// TODO: Add more endpoints types as needed
+export type CombinedMutationTypes = ShopperOrdersMutationType | ShopperCustomersMutationType
+
 type QueryKeysMatrix = {
     // TODO: fix type
-    [key in ShopperCustomersMutationType]: (param: any, response: any) => QueryKeysMatrixElement
+    [key in CombinedMutationTypes]?: (data: any, param: any) => QueryKeysMatrixElement
 }
 
-// TODO: Make Client dynamic
-type Client = ApiClients['shopperCustomers']
+export type Client = ApiClients['shopperOrders'] & ApiClients['shopperCustomers']
 
 // TODO: fix type
-export const updateCache = <Action extends ShopperCustomersMutationType>(
+export const updateCache = <Action extends CombinedMutationTypes>(
     queryClient: QueryClient,
     action: Action,
     queryKeysMatrix: QueryKeysMatrix,
@@ -46,21 +49,25 @@ export const updateCache = <Action extends ShopperCustomersMutationType>(
         )
 
     // STEP 1. Update data inside query cache for the matching queryKeys
-    queryKeysMatrix[action](params, response)?.update?.map((queryKey: any) => {
+    queryKeysMatrix[action]?.(params, response)?.update?.map((queryKey: any) => {
         queryClient.setQueryData(queryKey, response)
     })
 
     // STEP 2. Invalidate cache entries with the matching queryKeys
-    queryKeysMatrix[action](params, response)?.invalidate?.map((queryKey: any) => {
+    queryKeysMatrix[action]?.(params, response)?.invalidate?.map((queryKey: any) => {
         queryClient.invalidateQueries({
             predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
         })
     })
 
     // STEP 3. Remove cache entries with the matching queryKeys
-    queryKeysMatrix[action](params, response)?.remove?.map((queryKey: any) => {
+    queryKeysMatrix[action]?.(params, response)?.remove?.map((queryKey: any) => {
         queryClient.removeQueries({
             predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
         })
     })
+}
+
+export const NotImplemented = () => {
+    throw new Error('This method is not implemented.')
 }

@@ -10,7 +10,8 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {
     ShopperCustomersMutationType,
     useShopperCustomersMutation,
-    queryKeysMatrix
+    shopperCustomersQueryKeysMatrix,
+    SHOPPER_CUSTOMERS_NOT_IMPLEMENTED
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
@@ -21,12 +22,12 @@ jest.mock('../../auth/index.ts', () => {
     }))
 })
 
-const CUSTOMER_ID = 'abkehFwKoXkbcRmrFIlaYYwKtJ'
-const ADDRESS_NAME = 'TestAddress'
-const LIST_ID = 'bcd08be6f883120b4960ca8a0b'
-const ITEM_ID = '60ee899e9305de0df5b0fcade5'
-const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
-const PRODUCT_ID = '25518823M'
+const CUSTOMER_ID = 'CUSTOMER_ID'
+const ADDRESS_NAME = 'ADDRESS_NAME'
+const LIST_ID = 'LIST_ID'
+const ITEM_ID = 'ITEM_ID'
+const PAYMENT_INSTRUMENT_ID = 'PAYMENT_INSTRUMENT_ID'
+const PRODUCT_ID = 'PRODUCT_ID'
 
 type MutationPayloads = {
     [key in ShopperCustomersMutationType]?: {body: any; parameters: any}
@@ -156,9 +157,10 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                             })
                         )
 
+                        const mutation: any = shopperCustomersQueryKeysMatrix[mutationName]
+
                         // Pre-populate cache with query keys we invalidate/update/remove onSuccess
-                        const {invalidate, update, remove} = queryKeysMatrix[mutationName](
-                            // @ts-ignore
+                        const {invalidate, update, remove} = mutation(
                             mutationPayloads[mutationName],
                             {}
                         )
@@ -245,3 +247,12 @@ tests.forEach(({hook, cases}) => {
         })
     })
 })
+
+test.each(SHOPPER_CUSTOMERS_NOT_IMPLEMENTED)(
+    '%j - throws error when not implemented',
+    (methodName) => {
+        expect(() => {
+            useShopperCustomersMutation(methodName as ShopperCustomersMutationType)
+        }).toThrowError('This method is not implemented.')
+    }
+)
