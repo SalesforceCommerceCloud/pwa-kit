@@ -344,7 +344,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                update: [['/baskets', basketId]],
+                update: [['/baskets', basketId, {basketId}]],
                 ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
             }
         },
@@ -355,7 +355,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                update: [['/baskets', basketId]],
+                update: [['/baskets', basketId, {basketId}]],
                 ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
             }
         },
@@ -366,7 +366,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                update: [['/baskets', basketId]],
+                update: [['/baskets', basketId, {basketId}]],
                 ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
             }
         },
@@ -377,7 +377,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = response.basketId
 
             return {
-                ...(basketId ? {update: [['/baskets', basketId]]} : {}),
+                ...(basketId ? {update: [['/baskets', basketId, {basketId}]]} : {}),
                 ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
             }
         },
@@ -391,7 +391,21 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
                 ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {}),
                 ...(basketId ? {remove: [['/baskets', basketId]]} : {})
             }
+        },
+        // TODO: test in http://localhost:3000/basket
+        updateBasket: (
+            params: Argument<Client['updateBasket']>,
+            response: DataType<Client['updateBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = response.basketId
+
+            return {
+                ...(basketId ? {update: [['/baskets', basketId, {basketId}]]} : {}),
+                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
+            }
         }
+
+        // TODO: more actions
     }
 }
 
@@ -401,6 +415,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
 export function useShopperBasketsMutation<Action extends ShopperBasketMutationType>(
     action: Action
 ) {
+    // TODO: where are headers and rawResponse ?
     const queryClient = useQueryClient()
 
     const customerId = useCustomerId()
