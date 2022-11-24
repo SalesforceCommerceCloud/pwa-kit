@@ -6,10 +6,15 @@ on:
 jobs:
   testNode14:
     runs-on: ubuntu-latest
-    container:
-      image: circleci/node:14-stretch-browsers
     steps:
-    - uses: actions/checkout@v3
-    - uses: "./.github/actions/runtests"
-    - uses: "./.github/actions/lighthouse-ci"
-    - uses: "./.github/actions/smoketestscripts"
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14.21.x
+          cache: npm
+
+      - uses: "./.github/actions/runtests"
+
