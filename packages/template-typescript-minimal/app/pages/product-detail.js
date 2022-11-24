@@ -100,9 +100,12 @@ function ProductDetail() {
                     <Breadcrumb categories={primaryProductCategoryPath} />
                     <div>ProductClass: {productDetail.productClass}</div>
                     <h3>{fields.Name}</h3>
-                    <h4>{`${
-                        productPrice?.listPrice ? productPrice?.listPrice : productPrice.unitPrice
-                    } ${productPrice?.currencyIsoCode}`}</h4>
+                    <h4>
+                        List Price {productPrice.listPrice} {productPrice.currencyIsoCode}
+                    </h4>
+                    <h4>
+                        Unit Price {productPrice.unitPrice} {productPrice.currencyIsoCode}
+                    </h4>
                     <div>{fields.Description}</div>
                     {variationInfo &&
                         Object.values(variationInfo.variationAttributeInfo).map((attribute) => {

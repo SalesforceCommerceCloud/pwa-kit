@@ -20,6 +20,7 @@ import LoginInfo from '../../config/user-config'
 export const AuthContext = createContext({})
 export const AuthProvider = ({children}) => {
     const [token, setToken] = React.useState(null)
+    console.log('token', token)
     const getToken = async () => {
         const response = await fetch(`${getAppOrigin()}/mobify/proxy/scom/services/Soap/c/56.0`, {
             method: 'POST',

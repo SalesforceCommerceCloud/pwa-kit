@@ -29,8 +29,12 @@ const ProductTile = ({currency, product, price}) => {
             </div>
             <div>{product.name}</div>
             <div>
-                {price.listPrice || price.unitPrice}
-                {currency}
+                <div>
+                    List Price {price.listPrice} {currency}
+                </div>
+                <div>
+                    Unit Price {price.unitPrice} {currency}
+                </div>
             </div>
         </Link>
     )

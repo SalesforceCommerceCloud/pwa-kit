@@ -10,6 +10,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {useAuth} from './useAuth'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 const useFetch = (url, params, config, fetchOptions) => {
     const {token} = useAuth()
@@ -44,24 +45,6 @@ const useFetch = (url, params, config, fetchOptions) => {
         refetchOnWindowFocus: false
     })
     return context
-}
-
-const useMutationFetch = (url, params, config) => {
-    const {token} = useAuth()
-    const context = useQuery(
-        (item) => {
-            fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
-                method: 'POST',
-                body: JSON.stringify(item)
-            })
-        },
-        {
-            onSuccess: () => {}
-        }
-    )
 }
 
 export const getApiUrl = (path) => {
@@ -175,7 +158,6 @@ export const useCheckoutAction = () => {
     const context = useMutation(
         async (variables) => {
             const {payload, fetchOptions, url} = variables
-            console.log('url', url)
             const res = await fetch(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -259,7 +241,6 @@ export const useProductCategoryPath = (categoryId) => {
 }
 
 export const useProductSearch = ({categoryId, searchTerm}, params) => {
-    console.log('params', params)
     const fetchOptions = {
         method: 'POST',
         body: JSON.stringify({
@@ -310,6 +291,77 @@ export const useSortRules = () => {
     const url = getApiUrl(`/search/sort-rules`)
     const data = useFetch(url)
     return data
+}
+
+export const usePromotions = () => {
+    const url = getApiUrl(`/carts/current/promotions`)
+    const data = useFetch(url)
+    return data
+}
+export const useCartCoupon = () => {
+    const url = getApiUrl(`/carts/current/cart-coupons`)
+    const data = useFetch(url)
+    return data
+}
+
+const useMutationFetch = (params, config) => {
+    const {token} = useAuth()
+
+    const context = useMutation(
+        async (variables) => {
+            const {url, payload, fetchOptions = {}} = variables
+            const bodyObj = {
+                body: JSON.stringify(payload)
+            }
+            try {
+                const res = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'POST',
+                    ...fetchOptions,
+                    ...bodyObj
+                })
+                if (
+                    res.ok &&
+                    res.status >= 200 &&
+                    res.status < 400 &&
+                    fetchOptions.method !== 'DELETE'
+                ) {
+                    const json = await res.json()
+                    return json
+                }
+                if (res.status >= 400) {
+                    const error = await res.json()
+                    throw new HTTPError(res.status, error[0].message)
+                }
+            } catch (e) {
+                console.log('e', e)
+                throw e
+            }
+        },
+        {
+            ...config
+        }
+    )
+    return context
+}
+
+export const useCartCouponAction = (params = {}) => {
+    const queryClient = useQueryClient()
+    const {
+        app: {webstoreId}
+    } = getConfig()
+    const action = useMutationFetch(params, {
+        onSuccess: () => {
+            console.log('onSuccess useCartCouponAction')
+            queryClient.invalidateQueries([`/${webstoreId}/carts/current`])
+            queryClient.invalidateQueries([`/${webstoreId}/carts/current/cart-items`])
+            queryClient.invalidateQueries([`/${webstoreId}/carts/current/cart-coupons`])
+        }
+    })
+    return action
 }
 
 export default useFetch
