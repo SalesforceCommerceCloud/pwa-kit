@@ -32,6 +32,7 @@ export const updateCache = <Action extends ShopperCustomersMutationType>(
     response: DataType<Client[Action]>,
     params: Argument<Client[Action]>
 ) => {
+    // TODO: review this
     const isMatchingKey = (cacheQuery: {queryKey: {[x: string]: any}}, queryKey: any[]) =>
         queryKey.every((item, index) =>
             isObject(item) && isObject(cacheQuery.queryKey[index])

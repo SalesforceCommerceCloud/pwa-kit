@@ -392,7 +392,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
                 ...(basketId ? {remove: [['/baskets', basketId]]} : {})
             }
         },
-        // TODO: test in http://localhost:3000/basket
+        // TODO: test in test-commerce project (http://localhost:3000/basket)
         updateBasket: (
             params: Argument<Client['updateBasket']>,
             response: DataType<Client['updateBasket']>
@@ -400,6 +400,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = response.basketId
 
             return {
+                // NOTE: this is the query key for useBasket hook
+                // TODO: but we're missing headers, rawResponse -> not only {basketId}
                 ...(basketId ? {update: [['/baskets', basketId, {basketId}]]} : {}),
                 ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
             }
