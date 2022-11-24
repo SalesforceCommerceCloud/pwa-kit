@@ -11,7 +11,7 @@ import {
     useShopperOrdersMutation,
     ShopperOrdersMutationType,
     shopperOrdersQueryKeysMatrix,
-    NOT_IMPLEMENTED
+    SHOPPER_ORDERS_NOT_IMPLEMENTED
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
@@ -157,7 +157,7 @@ tests.forEach(({hook, cases}) => {
     })
 })
 
-test.each(NOT_IMPLEMENTED)('%j - throws error when not implemented', (methodName) => {
+test.each(SHOPPER_ORDERS_NOT_IMPLEMENTED)('%j - throws error when not implemented', (methodName) => {
     expect(() => {
         useShopperOrdersMutation(methodName as ShopperOrdersMutationType)
     }).toThrowError('This method is not implemented.')

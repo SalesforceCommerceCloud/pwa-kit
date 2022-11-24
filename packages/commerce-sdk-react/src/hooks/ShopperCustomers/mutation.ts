@@ -367,7 +367,7 @@ export const shopperCustomersQueryKeysMatrix = {
     }
 }
 
-export const NOT_IMPLEMENTED = [
+export const SHOPPER_CUSTOMERS_NOT_IMPLEMENTED = [
     'authorizeCustomer',
     'authorizeTrustedSystem',
     'deleteCustomerProductList',
@@ -385,7 +385,7 @@ export const NOT_IMPLEMENTED = [
 export function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
     action: Action
 ) {
-    if (NOT_IMPLEMENTED.includes(action)) {
+    if (SHOPPER_CUSTOMERS_NOT_IMPLEMENTED.includes(action)) {
         NotImplemented()
     }
     type Params = Argument<Client[Action]>

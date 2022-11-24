@@ -75,7 +75,7 @@ export const shopperOrdersQueryKeysMatrix = {
     }
 }
 
-export const NOT_IMPLEMENTED = [
+export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
     'CreatePaymentInstrumentForOrder',
     'RemovePaymentInstrumentFromOrder',
     'UpdatePaymentInstrumentForOrder'
@@ -85,7 +85,7 @@ export const NOT_IMPLEMENTED = [
  * A hook for performing mutations with the Shopper Orders API.
  */
 export function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(action: Action) {
-    if (NOT_IMPLEMENTED.includes(action)) {
+    if (SHOPPER_ORDERS_NOT_IMPLEMENTED.includes(action)) {
         NotImplemented()
     }
     type Params = Argument<Client[Action]>
