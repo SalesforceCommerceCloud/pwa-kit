@@ -4,74 +4,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import path from 'path'
-import React, {useState, useEffect} from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import React from 'react'
+import {screen} from '@testing-library/react'
 import useCommerceApi from './hooks/useCommerceApi'
-import {renderWithProviders, mockHttpResponses, TEST_CONFIG} from './test-utils'
-import useAuth from './hooks/useAuth'
+import {renderWithProviders} from './test-utils'
+import Auth from './auth'
 
-const {withMocks} = mockHttpResponses({directory: path.join(__dirname, `../mock-responses`)})
+jest.mock('./auth/index.ts')
 
-jest.mock('./hooks/useAuth', () => {
-    return jest.fn(() => ({
-        ready: () => Promise.resolve({access_token: '123'})
-    }))
-})
-
-test(
-    'useCommerceApi returns a set of api clients',
-    withMocks(async () => {
-        const Component = () => {
-            const api = useCommerceApi()
-            const auth = useAuth()
-            const [isAuthReady, setIsAuthReady] = useState(false)
-            useEffect(() => {
-                const waitForAuth = async () => {
-                    await auth.ready()
-                    setIsAuthReady(true)
-                }
-                waitForAuth()
-            }, [])
-            return (
-                <>
-                    <p>{api?.shopperSearch && 'success'}</p>
-                    <p>{isAuthReady && 'ready'}</p>
-                </>
-            )
-        }
-        renderWithProviders(<Component />)
-        await waitFor(() => screen.getByText('success') && screen.getByText('ready'))
-        expect(screen.getByText('success')).toBeInTheDocument()
+describe('provider', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
     })
-)
 
-test(
-    'props are used properly when initializing api clients',
-    withMocks(async () => {
-        const Component = () => {
-            const api = useCommerceApi()
-            return (
-                <ul>
-                    <li>{api?.shopperSearch?.clientConfig?.parameters?.clientId}</li>
-                    <li>{api?.shopperSearch?.clientConfig?.parameters?.siteId}</li>
-                    <li>{api?.shopperSearch?.clientConfig?.parameters?.shortCode}</li>
-                    <li>{api?.shopperSearch?.clientConfig?.parameters?.organizationId}</li>
-                </ul>
-            )
-        }
-        renderWithProviders(<Component />)
-
-        expect(screen.getByText(TEST_CONFIG.clientId)).toBeInTheDocument()
-        expect(screen.getByText(TEST_CONFIG.siteId)).toBeInTheDocument()
-        expect(screen.getByText(TEST_CONFIG.shortCode)).toBeInTheDocument()
-        expect(screen.getByText(TEST_CONFIG.organizationId)).toBeInTheDocument()
-    })
-)
-
-test(
-    'api clients optional config are passed properly',
-    withMocks(async () => {
+    test('api clients optional config are passed properly', async () => {
         const Component = () => {
             const api = useCommerceApi()
             return (
@@ -81,22 +27,22 @@ test(
                 </ul>
             )
         }
-        const commerceApiProviderConfig = {
+        const config = {
             headers: {'correlation-id': '373a3f80-6bbb-4157-a617-63d27fb15769'},
             fetchOptions: {
                 timeout: 50
             }
         }
-        renderWithProviders(
-            <Component />,
-            {},
-            {
-                commerceApiProvider: commerceApiProviderConfig
-            }
-        )
-        expect(
-            screen.getByText(commerceApiProviderConfig.headers['correlation-id'])
-        ).toBeInTheDocument()
-        expect(screen.getByText(commerceApiProviderConfig.fetchOptions.timeout)).toBeInTheDocument()
+        renderWithProviders(<Component />, config)
+        expect(screen.getByText(config.headers['correlation-id'])).toBeInTheDocument()
+        expect(screen.getByText(config.fetchOptions.timeout)).toBeInTheDocument()
     })
-)
+
+    test('Auth is initialized by invoking ready()', () => {
+        renderWithProviders(<h1>I can render with no problem!</h1>)
+        expect(screen.getByText('I can render with no problem!')).toBeInTheDocument()
+        expect(Auth).toHaveBeenCalledTimes(1)
+        const authInstance = (Auth as jest.Mock).mock.instances[0]
+        expect(authInstance.ready).toHaveBeenCalledTimes(1)
+    })
+})
