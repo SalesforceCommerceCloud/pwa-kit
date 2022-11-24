@@ -16,8 +16,9 @@ jobs:
           node-version: 14.21.x
           cache: npm
 
-      - name: Install NPM Dependencies
-        run: npm ci
+      - name: Setup Machine
+        uses: "./.github/actions/setup"
 
-      - uses: "./.github/actions/runtests"
+      - name: Run tests
+        uses: "./.github/actions/runtests"
 
