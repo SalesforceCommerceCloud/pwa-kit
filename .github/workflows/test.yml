@@ -4,6 +4,8 @@ on:
 #    branches:
 #    # TODO: Before merging remove branches filter
 #    - github-actions
+  schedule:
+    - cron: 0 8 * * *
 jobs:
   pwa-kit:
     strategy:
