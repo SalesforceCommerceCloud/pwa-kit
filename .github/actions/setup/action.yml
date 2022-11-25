@@ -7,13 +7,20 @@ description: "Setup Machine Action"
 runs:
   using: composite
   steps:
-    - name: Set environment variables
+    - name: Set DEVELOP environment variable
+      if: ${{ startsWith(github.ref_name, 'github-') }}
       run: |-
-        touch $BASH_ENV
-        if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then echo 'export DEVELOP=true' >> $BASH_ENV; fi
-        if [[ "${CIRCLE_BRANCH}" =~ ^release- ]]; then echo 'export RELEASE=true' >> $BASH_ENV; fi
-        source $BASH_ENV
-      shell: bash
+        echo "DEVELOP=true" >> $GITHUB_ENV
+    - name: Set RELEASE environment variable
+      if: ${{ startsWith(github.ref_name, 'release-') }}
+      run: |-
+        echo "RELEASE=true" >> $GITHUB_ENV
+    - name: Print environment variables values
+      id: step_two
+      run: |-
+        echo "${{ env.DEVELOP }}"
+        echo "${{ env.RELEASE }}"
+
     - name: Install Dependencies
       run: |-
         # Install system dependencies
