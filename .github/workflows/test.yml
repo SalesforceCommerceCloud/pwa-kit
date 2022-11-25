@@ -9,11 +9,12 @@ jobs:
       matrix:
         os: [ windows-latest, ubuntu-latest ]
         node: [ 14 ]
-        include:
-          - os: ubuntu-latest
+        npm: [6, 7, 8]
+        exclude:
+          - os: windows-latest
             node: 14
             npm: 7
-          - os: ubuntu-latest
+          - os: windows-latest
             node: 14
             npm: 8
     runs-on: ${{ matrix.os }}
@@ -28,16 +29,17 @@ jobs:
           cache: npm
 
       - name: Setup Machine Ubuntu
-        if: matrix.npm == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest'
         uses: "./.github/actions/setup-ubuntu"
 
       - name: Setup Machine Windows
-        if: matrix.npm == 'windows-latest'
+        if: matrix.os == 'windows-latest'
         uses: "./.github/actions/setup-windows"
 
       - name: NPM version
-        if: ${{ matrix.npm }}
+        if: matrix.npm != 6
         run: npm install -g npm@${{ matrix.npm }}
+
       - run: npm --version
 
       - name: Run tests
