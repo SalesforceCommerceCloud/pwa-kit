@@ -87,6 +87,14 @@ jobs:
         with:
           node-version: 14
 
+      - name: Setup Ubuntu Machine
+        if: matrix.os == 'ubuntu-latest'
+        uses: "./.github/actions/setup_ubuntu"
+
+      - name: Setup Windows Machine
+        if: matrix.os == 'windows-latest'
+        uses: "./.github/actions/setup_windows"
+
       - name: Generate ${{ matrix.template }} project
         run: |-
           set GENERATOR_PRESET=${{ matrix.template }}
