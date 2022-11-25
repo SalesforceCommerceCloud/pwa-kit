@@ -18,10 +18,10 @@ runs:
         echo "RELEASE=true" >> $GITHUB_ENV
       shell: bash
     - name: Print environment variables values
-      id: step_two
+      if: ${{ env.DEVELOP }}
       run: |-
-        echo "${{ env.DEVELOP }}"
-        echo "${{ env.RELEASE }}"
+        echo "env.DEVELOP: ${{ env.DEVELOP }}"
+        echo "env.RELEASE: ${{ env.RELEASE }}"
       shell: bash
     - name: Install Dependencies
       run: |-
