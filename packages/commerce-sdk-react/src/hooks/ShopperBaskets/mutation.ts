@@ -174,6 +174,16 @@ export const ShopperBasketsMutations = {
 export type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
 export const getQueryKeysMatrix = (customerId: string | null) => {
+    const keys = {
+        useBasket(basketId: string) {
+            // TODO: we're missing headers, rawResponse -> not only {basketId}
+            return ['/baskets', basketId, {basketId}]
+        },
+        useCustomerBaskets(customerId: string) {
+            return ['/customers', customerId, '/baskets']
+        }
+    }
+
     return {
         addCouponToBasket: (
             params: Argument<Client['addCouponToBasket']>,
@@ -182,8 +192,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                update: [['/baskets', basketId, {basketId}]],
-                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
+                update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
             }
         },
         addItemToBasket: (
@@ -193,8 +203,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                update: [['/baskets', basketId, {basketId}]],
-                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
+                update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
             }
         },
         addPaymentInstrumentToBasket: (
@@ -204,8 +214,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                update: [['/baskets', basketId, {basketId}]],
-                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
+                update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
             }
         },
         createBasket: (
@@ -215,8 +225,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = response.basketId
 
             return {
-                ...(basketId ? {update: [['/baskets', basketId, {basketId}]]} : {}),
-                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
+                ...(basketId ? {update: [keys.useBasket(basketId)]} : {}),
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
             }
         },
         deleteBasket: (
@@ -226,8 +236,42 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params?.parameters.basketId
 
             return {
-                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {}),
-                ...(basketId ? {remove: [['/baskets', basketId]]} : {})
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {}),
+                ...(basketId ? {remove: [keys.useBasket(basketId)]} : {})
+            }
+        },
+        mergeBasket: (
+            params: Argument<Client['mergeBasket']>,
+            response: DataType<Client['mergeBasket']>
+        ): QueryKeysMatrixElement => {
+            // TODO: mergeBasket does not require a basket id.. what to do now?
+            // const basketId = params.parameters?.basketId
+
+            return {
+                // update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
+            }
+        },
+        removeCouponFromBasket: (
+            params: Argument<Client['removeCouponFromBasket']>,
+            response: DataType<Client['removeCouponFromBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params?.parameters.basketId
+
+            return {
+                ...(basketId ? {update: [keys.useBasket(basketId)]} : {}),
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
+            }
+        },
+        removePaymentInstrumentFromBasket: (
+            params: Argument<Client['removePaymentInstrumentFromBasket']>,
+            response: DataType<Client['removePaymentInstrumentFromBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params?.parameters.basketId
+
+            return {
+                ...(basketId ? {update: [keys.useBasket(basketId)]} : {}),
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
             }
         },
         // TODO: test in test-commerce project (http://localhost:3000/basket)
@@ -235,13 +279,77 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             params: Argument<Client['updateBasket']>,
             response: DataType<Client['updateBasket']>
         ): QueryKeysMatrixElement => {
-            const basketId = response.basketId
+            const basketId = params.parameters.basketId
 
             return {
-                // NOTE: this is the query key for useBasket hook
-                // TODO: but we're missing headers, rawResponse -> not only {basketId}
-                ...(basketId ? {update: [['/baskets', basketId, {basketId}]]} : {}),
-                ...(customerId ? {invalidate: [['/customers', customerId, '/baskets']]} : {})
+                update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
+            }
+        },
+        updateBillingAddressForBasket: (
+            params: Argument<Client['updateBillingAddressForBasket']>,
+            response: DataType<Client['updateBillingAddressForBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
+            }
+        },
+        updateCustomerForBasket: (
+            params: Argument<Client['updateCustomerForBasket']>,
+            response: DataType<Client['updateCustomerForBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
+            }
+        },
+        updateItemInBasket: (
+            params: Argument<Client['updateItemInBasket']>,
+            response: DataType<Client['updateItemInBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
+            }
+        },
+        updatePaymentInstrumentInBasket: (
+            params: Argument<Client['updatePaymentInstrumentInBasket']>,
+            response: DataType<Client['updatePaymentInstrumentInBasket']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
+            }
+        },
+        updateShippingAddressForShipment: (
+            params: Argument<Client['updateShippingAddressForShipment']>,
+            response: DataType<Client['updateShippingAddressForShipment']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
+            }
+        },
+        updateShippingMethodForShipment: (
+            params: Argument<Client['updateShippingMethodForShipment']>,
+            response: DataType<Client['updateShippingMethodForShipment']>
+        ): QueryKeysMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                update: [keys.useBasket(basketId)],
+                ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
             }
         }
 
