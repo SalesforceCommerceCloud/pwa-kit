@@ -4,8 +4,19 @@ on:
     branches:
     - github-actions
 jobs:
-  testNode14:
-    runs-on: ubuntu-latest
+  test_matrix:
+    strategy:
+      matrix:
+        os: [ windows-latest, ubuntu-latest ]
+        node: [ 14 ]
+        include:
+          - os: ubuntu-latest
+            node: 14
+            npm: 7
+          - os: ubuntu-latest
+            node: 14
+            npm: 8
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -13,12 +24,24 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 14.21.x
+          node-version: ${{ matrix.node }}
           cache: npm
 
       - name: Setup Machine
         uses: "./.github/actions/setup"
 
+      - name: NPM version
+        if: ${{ matrix.npm }}
+        run: npm install -g npm@${{ matrix.npm }}
+      - run: npm --version
+
       - name: Run tests
         uses: "./.github/actions/runtests"
+
+
+
+  testNode14:
+    runs-on: ubuntu-latest
+    steps:
+
 
