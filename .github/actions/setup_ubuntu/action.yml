@@ -25,6 +25,7 @@ runs:
         echo "env.RELEASE: ${{ env.RELEASE }}"
       shell: bash
     - name: Install Dependencies
+      # TODO: Read NPM_VERSION and not run npm ci when is 7 or 8 (OR when !6)
       run: |-
         # Install system dependencies
         sudo apt-get update

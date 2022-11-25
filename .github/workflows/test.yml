@@ -5,7 +5,7 @@ on:
 #    # TODO: Before merging remove branches filter
 #    - github-actions
 jobs:
-  matrix:
+  pwa-kit:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
@@ -72,3 +72,22 @@ jobs:
         with:
           path: packages/template-retail-react-app/tests/screenshots
 
+  generated:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate ${{ matrix.template }} project
+        run: |-
+          set GENERATOR_PRESET=${{ matrix.template }}
+          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
+        env:
+          GENERATOR_PRESET: ${{ matrix.template }}
+
+      - name: Store Verdaccio logfile artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
