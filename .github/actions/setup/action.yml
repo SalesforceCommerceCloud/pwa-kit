@@ -11,16 +11,18 @@ runs:
       if: ${{ startsWith(github.ref_name, 'github-') }}
       run: |-
         echo "DEVELOP=true" >> $GITHUB_ENV
+      shell: bash
     - name: Set RELEASE environment variable
       if: ${{ startsWith(github.ref_name, 'release-') }}
       run: |-
         echo "RELEASE=true" >> $GITHUB_ENV
+      shell: bash
     - name: Print environment variables values
       id: step_two
       run: |-
         echo "${{ env.DEVELOP }}"
         echo "${{ env.RELEASE }}"
-
+      shell: bash
     - name: Install Dependencies
       run: |-
         # Install system dependencies
