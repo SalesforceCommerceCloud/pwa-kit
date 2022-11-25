@@ -352,8 +352,6 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
                 ...(customerId ? {invalidate: [keys.useCustomerBaskets(customerId)]} : {})
             }
         }
-
-        // TODO: more actions
     }
 }
 
