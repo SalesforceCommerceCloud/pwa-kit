@@ -1,9 +1,9 @@
-name: setup
+name: setup-ubuntu
 inputs:
   cwd:
     required: false
     default: "${PWD}"
-description: "Setup Machine Action"
+description: "Setup Ubuntu Machine"
 runs:
   using: composite
   steps:

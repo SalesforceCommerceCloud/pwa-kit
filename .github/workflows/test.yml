@@ -27,8 +27,13 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
 
-      - name: Setup Machine
-        uses: "./.github/actions/setup"
+      - name: Setup Machine Ubuntu
+        if: ${{ matrix.npm == 'ubuntu-latest' }}
+        uses: "./.github/actions/setup-ubuntu"
+
+      - name: Setup Machine Windows
+        if: ${{ matrix.npm == 'windows-latest' }}
+        uses: "./.github/actions/setup-windows"
 
       - name: NPM version
         if: ${{ matrix.npm }}
