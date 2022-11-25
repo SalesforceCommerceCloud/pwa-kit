@@ -1,4 +1,4 @@
-name: setup-ubuntu
+name: setup_ubuntu
 inputs:
   cwd:
     required: false
@@ -8,6 +8,7 @@ runs:
   using: composite
   steps:
     - name: Set DEVELOP environment variable
+      # TODO: Before merge change to 'develop'
       if: ${{ startsWith(github.ref_name, 'github-') }}
       run: |-
         echo "DEVELOP=true" >> $GITHUB_ENV

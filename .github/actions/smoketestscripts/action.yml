@@ -2,6 +2,7 @@ name: smoketestscripts
 inputs:
   dir:
     required: false
+    # The path to a project to test
     default: "./packages/template-retail-react-app"
 runs:
   using: composite

@@ -1,0 +1,19 @@
+name: setup_windows
+runs:
+  using: composite
+  steps:
+  - name: restore_cache
+    uses: actions/cache@v2
+    with:
+      key: npm-cache
+      restore-keys: npm-cache
+  - name: Install Dependencies
+    run: |-
+      # Install node dependencies
+      npm ci
+    shell: bash
+  - name: save_cache
+    uses: actions/cache@v2
+    with:
+      path: "/root/.npm"
+      key: npm-cache
