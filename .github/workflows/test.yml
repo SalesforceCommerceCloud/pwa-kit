@@ -79,7 +79,13 @@ jobs:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
 
       - name: Generate ${{ matrix.template }} project
         run: |-
