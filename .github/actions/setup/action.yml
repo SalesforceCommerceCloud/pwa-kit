@@ -27,7 +27,7 @@ runs:
       run: |-
         # Install system dependencies
         sudo apt-get update
-        sudo apt-get install python-dev python-pip time
+        sudo apt-get install python-dev python3-pip time
         sudo pip install -U pip setuptools
         sudo pip install awscli==1.18.85 datadog==0.40.1
 
