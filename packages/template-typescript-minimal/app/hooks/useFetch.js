@@ -188,12 +188,16 @@ export const useSessionContext = () => {
     return data
 }
 export const useWishList = (wishListId, params) => {
-    let _url = getApiUrl(`/wishlists/`)
+    let _url = getApiUrl(`/wishlists`)
     if (wishListId) {
         _url = getApiUrl(`/wishlists/${wishListId}`)
     }
     const data = useFetch(_url, params)
     return data
+}
+export const useWishListItems = (wishlistId, params, config) => {
+    const url = getApiUrl(`/wishlists/${wishlistId}/wishlist-items`)
+    return useFetch(url, params, {enabled: !!wishlistId, ...config})
 }
 export const usePromotions = () => {
     const url = getApiUrl(`/carts/current/promotions`)
@@ -267,7 +271,6 @@ export const useCheckoutAction = () => {
     const {
         app: {webstoreId}
     } = getConfig()
-    const {token} = useAuth()
     const queryClient = useQueryClient()
 
     const action = useMutationFetch({
@@ -277,22 +280,6 @@ export const useCheckoutAction = () => {
     })
 
     return action
-
-    const context = useMutation(async (variables) => {
-        const {payload, fetchOptions, url} = variables
-        const res = await fetch(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            ...fetchOptions,
-            body: JSON.stringify(payload)
-        })
-        const t = await res.json()
-        return t
-    })
-    return context
 }
 export const useCartCouponAction = () => {
     const queryClient = useQueryClient()
@@ -307,33 +294,6 @@ export const useCartCouponAction = () => {
         }
     })
     return action
-}
-export const addItemToCart = (cartStateOrId = 'current') => {
-    const {
-        app: {webstoreId}
-    } = getConfig()
-    const {token} = useAuth()
-    const queryClient = useQueryClient()
-    const url = getApiUrl(`/carts/${cartStateOrId}/cart-items`)
-    const context = useMutation(
-        async (item) => {
-            const res = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                body: JSON.stringify(item)
-            })
-            const t = await res.json()
-        },
-        {
-            onSuccess: () => {
-                queryClient.invalidateQueries([`/${webstoreId}/carts/current`])
-            }
-        }
-    )
-    return context
 }
 
 export const useAddressAction = (accountId = 'current', action) => {
@@ -374,6 +334,21 @@ export const useAddressAction = (accountId = 'current', action) => {
         }
     )
     return context
+}
+
+export const useWishlistAction = (wishListId) => {
+    const queryClient = useQueryClient()
+    const {
+        app: {webstoreId}
+    } = getConfig()
+
+    const action = useMutationFetch({
+        onSuccess: () => {
+            queryClient.invalidateQueries([`/${webstoreId}/wishlists`])
+            queryClient.invalidateQueries([`/${webstoreId}/wishlists/${wishListId}/wishlist-items`])
+        }
+    })
+    return action
 }
 
 export default {useFetch, useMutationFetch}

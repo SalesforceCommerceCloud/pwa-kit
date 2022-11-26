@@ -7,13 +7,13 @@
 
 import React from 'react'
 import {
-    addItemToCart,
     getApiUrl,
-    useCart,
     useCartAction,
     useProduct,
     useProductPrice,
-    useWishList
+    useWishList,
+    useWishlistAction,
+    useWishListItems
 } from '../hooks/useFetch'
 import QuantityPicker, {useQuantity} from '../components/quantity-picker'
 import {Link, useParams} from 'react-router-dom'
@@ -24,8 +24,11 @@ ProductDetail.propTypes = {}
 
 function ProductDetail() {
     const {quantity, onDecrease, onIncrease} = useQuantity()
+    const [variant, setVariant] = React.useState()
     const {data: wishList} = useWishList()
-    // console.log('wishList', wishList)
+    const wishListId = wishList?.summaries?.[0].id
+    const {data: wishlistItems} = useWishListItems(wishListId)
+    const wishListAction = useWishlistAction(wishListId)
     const {productId} = useParams()
     const [selectedVariant, setSelectedVariant] = React.useState({})
 
@@ -78,10 +81,37 @@ function ProductDetail() {
         }
         cartAction.mutate({url: getApiUrl(`/carts/current/cart-items`), payload: item})
     }
-    // const handleWishList = () => {
-    //     if (wishlistCount === 0) {
-    //     }
-    // }
+    const handleWishList = () => {
+        const variant = variationInfo?.attributesToProductMappings.find((variant) => {
+            const {selectedAttributes} = variant
+            return Object.values(selectedVariant).every((v) => {
+                const t = selectedAttributes.find((i) => {
+                    return i.label === v.label && i.value === v.value
+                })
+                return !!t
+            })
+        })
+        if (wishList?.wishlistCount === 0) {
+            wishListAction.mutate({
+                url: getApiUrl('/wishlists'),
+                payload: {
+                    name: 'My Wish List',
+                    products: [
+                        {
+                            productId: variant ? variant.productId : productId
+                        }
+                    ]
+                }
+            })
+        } else {
+            wishListAction.mutate({
+                url: getApiUrl(`/wishlists/${wishList?.summaries?.[0]?.id}/wishlist-items`),
+                payload: {
+                    productId: variant ? variant.productId : productId
+                }
+            })
+        }
+    }
     const bigThumbnail = productDetail?.mediaGroups?.find((media) => media.usageType === 'Listing')
     const imgSrc = getMediaLink(bigThumbnail?.mediaItems[0].url)
     const smallThumbnails = productDetail.mediaGroups.find(
@@ -89,6 +119,21 @@ function ProductDetail() {
     )
 
     const {variationInfo, primaryProductCategoryPath} = productDetail
+    const isProductInWishList = wishlistItems?.items?.find((item) => {
+        const variant = variationInfo?.attributesToProductMappings.find((variant) => {
+            const {selectedAttributes} = variant
+            return Object.values(selectedVariant).every((v) => {
+                const t = selectedAttributes.find((i) => {
+                    return i.label === v.label && i.value === v.value
+                })
+                return !!t
+            })
+        })
+        return (
+            item.productSummary.productId === productId ||
+            item.productSummary.productId === variant?.productId
+        )
+    })
     return (
         <div>
             <div style={{display: 'flex'}}>
@@ -149,21 +194,21 @@ function ProductDetail() {
                         onDecrease={onDecrease}
                         onIncrease={onIncrease}
                     />
-                    <button
-                        style={{marginTop: '10px'}}
-                        onClick={handleAddToCart}
-                        disabled={cartAction.isLoading}
-                    >
-                        {cartAction.isLoading ? 'loading..' : 'Add to cart'}
-                    </button>
-                    <button
-                        style={{marginTop: '10px'}}
-                        onClick={handleWishList}
-                        // disabled={cartAction.isLoading}
-                    >
-                        Add to wishlist
-                        {/*{cartAction.isLoading ? 'loading..' : 'Add to cart'}*/}
-                    </button>
+                    <div style={{marginTop: '10px', marginBottom: '10px'}}>
+                        <button onClick={handleAddToCart} disabled={cartAction.isLoading}>
+                            {cartAction.isLoading ? 'loading..' : 'Add to cart'}
+                        </button>
+                    </div>
+                    {isProductInWishList && <div>Already in wishlist</div>}
+                    {!isProductInWishList && (
+                        <button
+                            style={{marginTop: '10px'}}
+                            onClick={handleWishList}
+                            disabled={cartAction.isLoading}
+                        >
+                            {cartAction.isLoading ? 'loading..' : 'Add to wishlist'}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

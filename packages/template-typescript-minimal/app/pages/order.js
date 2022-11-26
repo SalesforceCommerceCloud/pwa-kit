@@ -6,15 +6,9 @@
  */
 
 import React from 'react'
-import {
-    useOrderDeliveryGroup,
-    useOrderItems,
-    useOrders,
-    useProducts,
-} from '../hooks/useFetch'
+import {useOrderDeliveryGroup, useOrderItems, useOrders, useProducts} from '../hooks/useFetch'
 import {useParams} from 'react-router-dom'
 import {getMediaLink} from '../utils/utils'
-
 
 function Order() {
     const {orderId} = useParams()
