@@ -119,24 +119,10 @@ function Cart() {
     const [coupon, setCoupon] = React.useState('')
     const [couponError, setCouponErr] = React.useState()
     const couponAction = useCartCouponAction()
-    const {data: promotions} = usePromotions()
+    // const {data: promotions} = usePromotions()
     const {data: couponsData} = useCartCoupon()
-    const cartAction = useCartAction()
+    // const cartAction = useCartAction()
 
-    React.useEffect(() => {
-        if (data?.[0]?.errorCode === 'INVALID_ID_FIELD') {
-            cartAction.mutate({
-                url: getApiUrl(`/carts`),
-                payload: {
-                    name: 'Cart',
-                    type: 'Cart'
-                },
-                fetchOptions: {
-                    method: 'POST'
-                }
-            })
-        }
-    }, [data])
     // keep loading when the cart does not exist, waiting til the cart is created
     if (isLoading || data?.[0]?.errorCode === 'INVALID_ID_FIELD') {
         return <div>Loading...</div>
@@ -191,7 +177,6 @@ function Cart() {
                                 setCouponErr('')
                             },
                             onError: (err) => {
-                                console.log('onError useCartCouponAction', err)
                                 setCouponErr(err)
                             }
                         }

@@ -12,7 +12,7 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
-const useFetch = (url, params, config, fetchOptions) => {
+const useFetch = (url, params, config, fetchOptions = {}) => {
     const {token} = useAuth()
     const key = url.split('webstores')[1]
 
@@ -33,10 +33,20 @@ const useFetch = (url, params, config, fetchOptions) => {
                 method,
                 ...fetchOptions
             })
-            const data = res.status >= 200 && (await res.json())
+            if (
+                res.ok &&
+                res.status >= 200 &&
+                res.status < 400 &&
+                fetchOptions.method !== 'DELETE'
+            ) {
+                const json = await res.json()
+                return json
+            }
+            if (res.status >= 400) {
+                const error = await res.json()
+                throw new HTTPError(res.status, error[0].message)
+            }
             console.timeEnd(`Request time for ${key}`)
-
-            return data
         },
         ...config,
         enabled: !!url && !!token && config?.enabled,
@@ -46,7 +56,6 @@ const useFetch = (url, params, config, fetchOptions) => {
     })
     return context
 }
-
 export const getApiUrl = (path) => {
     const {
         app: {webstoreId}
@@ -68,7 +77,237 @@ export const useProduct = (id) => {
     const data = useFetch(url)
     return data
 }
+export const useProductPrice = (id) => {
+    const url = getApiUrl(`/pricing/products/${id}`)
+    const data = useFetch(url)
+    return data
+}
+export const useCart = (cartStateOrId = 'current', params, config) => {
+    const url = getApiUrl(`/carts/${cartStateOrId}`)
+    const data = useFetch(url, params, config)
+    return data
+}
+export const useCartItems = (cartStateOrId = 'current', params, config) => {
+    const url = getApiUrl(`/carts/${cartStateOrId}/cart-items`)
+    const data = useFetch(url, params, config)
+    return data
+}
+export const useCheckout = (activeOrCheckoutId = 'active', params, config) => {
+    const url = getApiUrl(`/checkouts/${activeOrCheckoutId}`)
+    const data = useFetch(url, params, config)
+    return data
+}
+export const useUserAddresses = (accountId = 'current', params) => {
+    const url = getApiUrl(`/accounts/${accountId}/addresses`)
+    const data = useFetch(url, params, {enabled: !!accountId})
+    return data
+}
+export const useProductCategoryPath = (categoryId) => {
+    const data = useFetch(
+        `${getApiUrl(`/product-category-path/product-categories/${categoryId}`)}`,
+        {},
+        {enabled: !!categoryId}
+    )
+    return data
+}
+export const useProductSearch = ({categoryId, searchTerm}, params) => {
+    const fetchOptions = {
+        method: 'POST',
+        body: JSON.stringify({
+            searchTerm,
+            categoryId,
+            ...params
+        })
+    }
+    const url = getApiUrl(`/search/product-search`)
+    const data = useFetch(
+        url,
+        {categoryId, searchTerm, ...params},
+        {enabled: !!categoryId || !!searchTerm},
+        fetchOptions
+    )
+    return data
+}
+export const useProductsPrice = (productIds) => {
+    const url = getApiUrl(`/pricing/products`)
+    const fetchOptions = {
+        method: 'POST',
+        body: JSON.stringify({
+            pricingLineItems: productIds
+        })
+    }
+    const data = useFetch(url, {productIds}, {enabled: !!productIds?.length}, fetchOptions)
+    return data
+}
+export const useProducts = (productIds) => {
+    const url = getApiUrl(`/products`)
+    const data = useFetch(url, {ids: productIds}, {enabled: !!productIds})
+    return data
+}
+export const useOrders = (orderId, params) => {
+    let url
+    if (orderId) {
+        url = getApiUrl(`/order-summaries/${orderId}`)
+    } else {
+        url = getApiUrl(`/order-summaries`)
+    }
+    const data = useFetch(url, params)
+    return data
+}
+export const useOrderItems = (orderId, params) => {
+    const url = getApiUrl(`/order-summaries/${orderId}/items`)
 
+    const data = useFetch(url, params)
+    return data
+}
+export const useOrderShipments = (orderId, params) => {
+    const url = getApiUrl(`/order-summaries/${orderId}/shipments`)
+
+    const data = useFetch(url, params)
+    return data
+}
+export const useOrderDeliveryGroup = (orderId, params) => {
+    const url = getApiUrl(`/order-summaries/${orderId}/delivery-groups`)
+
+    const data = useFetch(url, params)
+    return data
+}
+export const useSearchSuggestion = (searchTerm) => {
+    const url = getApiUrl(`/search/suggestions`)
+    const data = useFetch(url, {searchTerm}, {enabled: Boolean(searchTerm)})
+    return data
+}
+export const useSortRules = () => {
+    const url = getApiUrl(`/search/sort-rules`)
+    const data = useFetch(url)
+    return data
+}
+export const useSessionContext = () => {
+    const url = getApiUrl('/session-context')
+    const data = useFetch(url)
+    return data
+}
+export const useWishList = (wishListId, params) => {
+    let _url = getApiUrl(`/wishlists/`)
+    if (wishListId) {
+        _url = getApiUrl(`/wishlists/${wishListId}`)
+    }
+    const data = useFetch(_url, params)
+    return data
+}
+export const usePromotions = () => {
+    const url = getApiUrl(`/carts/current/promotions`)
+    const data = useFetch(url)
+    return data
+}
+export const useCartCoupon = () => {
+    const url = getApiUrl(`/carts/current/cart-coupons`)
+    const data = useFetch(url)
+    return data
+}
+
+const useMutationFetch = (config) => {
+    const {token} = useAuth()
+
+    const context = useMutation(
+        async (variables) => {
+            const {url, payload, fetchOptions = {}} = variables
+            const bodyObj = {
+                body: JSON.stringify(payload)
+            }
+            try {
+                const res = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'POST',
+                    ...fetchOptions,
+                    ...bodyObj
+                })
+                if (
+                    res.ok &&
+                    res.status >= 200 &&
+                    res.status < 400 &&
+                    fetchOptions.method !== 'DELETE'
+                ) {
+                    const json = await res.json()
+                    return json
+                }
+                if (res.status >= 400) {
+                    const error = await res.json()
+                    throw new HTTPError(res.status, error[0].message)
+                }
+            } catch (e) {
+                throw e
+            }
+        },
+        {
+            ...config
+        }
+    )
+    return context
+}
+export const useCartAction = () => {
+    const {
+        app: {webstoreId}
+    } = getConfig()
+    const queryClient = useQueryClient()
+    const action = useMutationFetch({
+        onSuccess: () => {
+            queryClient.invalidateQueries([`/${webstoreId}/carts/current`])
+            queryClient.invalidateQueries([`/${webstoreId}/carts/current/cart-items`])
+        }
+    })
+    return action
+
+    return context
+}
+export const useCheckoutAction = () => {
+    const {
+        app: {webstoreId}
+    } = getConfig()
+    const {token} = useAuth()
+    const queryClient = useQueryClient()
+
+    const action = useMutationFetch({
+        onSuccess: () => {
+            queryClient.invalidateQueries([`/${webstoreId}/checkouts/active`])
+        }
+    })
+
+    return action
+
+    const context = useMutation(async (variables) => {
+        const {payload, fetchOptions, url} = variables
+        const res = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            ...fetchOptions,
+            body: JSON.stringify(payload)
+        })
+        const t = await res.json()
+        return t
+    })
+    return context
+}
+export const useCartCouponAction = () => {
+    const queryClient = useQueryClient()
+    const {
+        app: {webstoreId}
+    } = getConfig()
+    const action = useMutationFetch({
+        onSuccess: () => {
+            queryClient.invalidateQueries([`/${webstoreId}/carts/current`])
+            queryClient.invalidateQueries([`/${webstoreId}/carts/current/cart-items`])
+            queryClient.invalidateQueries([`/${webstoreId}/carts/current/cart-coupons`])
+        }
+    })
+    return action
+}
 export const addItemToCart = (cartStateOrId = 'current') => {
     const {
         app: {webstoreId}
@@ -97,101 +336,7 @@ export const addItemToCart = (cartStateOrId = 'current') => {
     return context
 }
 
-export const useCartAction = () => {
-    const {
-        app: {webstoreId}
-    } = getConfig()
-    const {token} = useAuth()
-    const queryClient = useQueryClient()
-
-    const context = useMutation(
-        async (variables) => {
-            const {payload, fetchOptions = {}, url} = variables
-            console.time(`Request time for ${url.split('webstores')[1]}`)
-            const res = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                ...fetchOptions,
-                body: JSON.stringify(payload)
-            })
-            const t = fetchOptions.method !== 'DELETE' && (await res.json())
-            console.timeEnd(`Request time for ${url.split('webstores')[1]}`)
-
-            return t
-        },
-        {
-            onSuccess: (data) => {
-                queryClient.invalidateQueries([`/${webstoreId}/carts/current`])
-                queryClient.invalidateQueries([`/${webstoreId}/carts/current/cart-items`])
-            }
-        }
-    )
-    return context
-}
-export const useProductPrice = (id) => {
-    const url = getApiUrl(`/pricing/products/${id}`)
-    const data = useFetch(url)
-    return data
-}
-export const useCart = (cartStateOrId = 'current') => {
-    const url = getApiUrl(`/carts/${cartStateOrId}`)
-    const data = useFetch(url)
-    return data
-}
-
-export const useCartItems = (cartStateOrId = 'current') => {
-    const url = getApiUrl(`/carts/${cartStateOrId}/cart-items`)
-    const data = useFetch(url)
-    return data
-}
-
-export const useCheckoutAction = () => {
-    const {
-        app: {webstoreId}
-    } = getConfig()
-    const {token} = useAuth()
-    const queryClient = useQueryClient()
-
-    const context = useMutation(
-        async (variables) => {
-            const {payload, fetchOptions, url} = variables
-            const res = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                ...fetchOptions,
-                body: JSON.stringify(payload)
-            })
-            const t = await res.json()
-            return t
-        },
-        {
-            onSuccess: () => {
-                queryClient.invalidateQueries([`/${webstoreId}/checkouts/active`])
-            }
-        }
-    )
-    return context
-}
-
-export const useCheckout = (activeOrCheckoutId = 'active', accountId) => {
-    const url = getApiUrl(`/checkouts/${activeOrCheckoutId}`)
-    const data = useFetch(url)
-    return data
-}
-
-export const useUserAddresses = (accountId, params) => {
-    const url = getApiUrl(`/accounts/${accountId}/addresses`)
-    const data = useFetch(url, params, {enabled: !!accountId})
-    return data
-}
-
-export const useAddressAction = (accountId, action) => {
+export const useAddressAction = (accountId = 'current', action) => {
     const {token} = useAuth()
     const queryClient = useQueryClient()
     const {
@@ -231,137 +376,4 @@ export const useAddressAction = (accountId, action) => {
     return context
 }
 
-export const useProductCategoryPath = (categoryId) => {
-    const data = useFetch(
-        `${getApiUrl(`/product-category-path/product-categories/${categoryId}`)}`,
-        {},
-        {enabled: !!categoryId}
-    )
-    return data
-}
-
-export const useProductSearch = ({categoryId, searchTerm}, params) => {
-    const fetchOptions = {
-        method: 'POST',
-        body: JSON.stringify({
-            searchTerm,
-            categoryId,
-            ...params
-        })
-    }
-    const url = getApiUrl(`/search/product-search`)
-    const data = useFetch(
-        url,
-        {categoryId, searchTerm, ...params},
-        {enabled: !!categoryId || !!searchTerm},
-        fetchOptions
-    )
-    return data
-}
-export const useProductsPrice = (productIds) => {
-    const url = getApiUrl(`/pricing/products`)
-    const fetchOptions = {
-        method: 'POST',
-        body: JSON.stringify({
-            pricingLineItems: productIds
-        })
-    }
-    const data = useFetch(url, {productIds}, {enabled: !!productIds?.length}, fetchOptions)
-    return data
-}
-
-export const useOrders = (orderId) => {
-    let url
-    if (orderId) {
-        url = getApiUrl(`/order-summaries/${orderId}`)
-    } else {
-        url = getApiUrl(`/order-summaries`)
-    }
-    const data = useFetch(url)
-    return data
-}
-
-export const useSearchSuggestion = (searchTerm) => {
-    const url = getApiUrl(`/search/suggestions`)
-    const data = useFetch(url, {searchTerm}, {enabled: Boolean(searchTerm)})
-    return data
-}
-
-export const useSortRules = () => {
-    const url = getApiUrl(`/search/sort-rules`)
-    const data = useFetch(url)
-    return data
-}
-
-export const usePromotions = () => {
-    const url = getApiUrl(`/carts/current/promotions`)
-    const data = useFetch(url)
-    return data
-}
-export const useCartCoupon = () => {
-    const url = getApiUrl(`/carts/current/cart-coupons`)
-    const data = useFetch(url)
-    return data
-}
-
-const useMutationFetch = (params, config) => {
-    const {token} = useAuth()
-
-    const context = useMutation(
-        async (variables) => {
-            const {url, payload, fetchOptions = {}} = variables
-            const bodyObj = {
-                body: JSON.stringify(payload)
-            }
-            try {
-                const res = await fetch(url, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    method: 'POST',
-                    ...fetchOptions,
-                    ...bodyObj
-                })
-                if (
-                    res.ok &&
-                    res.status >= 200 &&
-                    res.status < 400 &&
-                    fetchOptions.method !== 'DELETE'
-                ) {
-                    const json = await res.json()
-                    return json
-                }
-                if (res.status >= 400) {
-                    const error = await res.json()
-                    throw new HTTPError(res.status, error[0].message)
-                }
-            } catch (e) {
-                console.log('e', e)
-                throw e
-            }
-        },
-        {
-            ...config
-        }
-    )
-    return context
-}
-
-export const useCartCouponAction = (params = {}) => {
-    const queryClient = useQueryClient()
-    const {
-        app: {webstoreId}
-    } = getConfig()
-    const action = useMutationFetch(params, {
-        onSuccess: () => {
-            console.log('onSuccess useCartCouponAction')
-            queryClient.invalidateQueries([`/${webstoreId}/carts/current`])
-            queryClient.invalidateQueries([`/${webstoreId}/carts/current/cart-items`])
-            queryClient.invalidateQueries([`/${webstoreId}/carts/current/cart-coupons`])
-        }
-    })
-    return action
-}
-
-export default useFetch
+export default {useFetch, useMutationFetch}

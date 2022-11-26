@@ -19,40 +19,9 @@ import {
 } from '../hooks/useFetch'
 import {useHistory} from 'react-router-dom/cjs/react-router-dom'
 import {useQueryClient} from '@tanstack/react-query'
+import Address from '../components/address'
 
 Checkout.propTypes = {}
-
-const Address = ({address, accountId}) => {
-    if (!address) return null
-    return (
-        <div
-            style={{
-                border: '1px solid black',
-                borderRadius: '10px',
-                padding: '20px'
-            }}
-        >
-            <div>isDefault: {address.isDefault ? 'Yes' : 'No'}</div>
-            <div>{address.name}</div>
-            <div>{`${address.street}, ${address.city}`}</div>
-            <div>{`${address.region}, ${address.country}`}</div>
-            {/*<button*/}
-            {/*    onClick={() => {*/}
-            {/*        addNewAddressAction.mutate({*/}
-            {/*            payload: {*/}
-            {/*                addressId: address.addressId*/}
-            {/*            },*/}
-            {/*            fetchOptions: {*/}
-            {/*                method: 'PATCH'*/}
-            {/*            }*/}
-            {/*        })*/}
-            {/*    }}*/}
-            {/*>*/}
-            {/*    Delete*/}
-            {/*</button>*/}
-        </div>
-    )
-}
 
 function Checkout() {
     const queryClient = useQueryClient()
@@ -61,15 +30,6 @@ function Checkout() {
     } = getConfig()
     const history = useHistory()
     const {data: cart, isLoading: isCartLoading} = useCart()
-    const {data: checkoutData, isLoading: isCheckoutLoading} = useCheckout()
-    const {data: addresses, isLoading: isAddressesLoading} = useUserAddresses(cart?.accountId, {
-        addressType: 'Shipping',
-        sortOrder: 'CreatedDateDesc',
-        excludeUnsupportedCountries: true
-    })
-    const checkoutAction = useCheckoutAction(checkoutData?.checkoutId)
-
-    const [selectedCarrier, setSelectedCarrier] = React.useState(null)
     const addDeliveryAddress = (checkoutId) => {
         if (!checkoutId) return
         const deliveryAddress = addresses?.items.find((a) => !!a.isDefault) || addresses?.items[0]
@@ -98,61 +58,36 @@ function Checkout() {
             }
         )
     }
+    const {data: checkoutData, isLoading: isCheckoutLoading} = useCheckout(
+        'active',
+        {},
+        {
+            onError: (err) => {
+                // no checkout availabel, proceed to create one
+                if (err.message.includes("We can't find the checkout.")) {
+                    checkoutAction.mutate({
+                        url: getApiUrl(`/checkouts`),
+                        payload: {
+                            cartId: cart.cartId
+                        }
+                    })
+                }
+            }
+        }
+    )
+    const {data: addresses, isLoading: isAddressesLoading} = useUserAddresses(cart?.accountId, {
+        addressType: 'Shipping',
+        sortOrder: 'CreatedDateDesc',
+        excludeUnsupportedCountries: true
+    })
+    const checkoutAction = useCheckoutAction(checkoutData?.checkoutId)
+
+    const [selectedCarrier, setSelectedCarrier] = React.useState(null)
 
     React.useEffect(() => {
-        if (checkoutData?.[0]?.errorCode === 'CHECKOUT_NOT_FOUND') {
-            checkoutAction.mutate(
-                {
-                    url: getApiUrl(`/checkouts`),
-                    payload: {
-                        cartId: cart.cartId
-                    }
-                },
-                {
-                    onSuccess: (data) => {
-                        addDeliveryAddress(data.checkoutId)
-                        // const deliveryAddress =
-                        //     addresses?.items.find((a) => !!a.isDefault) || addresses?.items[0]
-                        // checkoutAction.mutate(
-                        //     {
-                        //         url: getApiUrl(`/checkouts/${data.checkoutId}`),
-                        //         payload: {
-                        //             deliveryAddress: {
-                        //                 id: deliveryAddress?.addressId
-                        //             }
-                        //         },
-                        //         fetchOptions: {
-                        //             method: 'PATCH'
-                        //         }
-                        //     },
-                        //     {
-                        //         onSuccess: (e) => {
-                        //             // manually refetch the checkout to get carrier details after an arbitrary time
-                        //             // because the server needs time to inject available carriers into checkout
-                        //             setTimeout(() => {
-                        //                 queryClient.refetchQueries({
-                        //                     queryKey: [`/${webstoreId}/checkouts/active`]
-                        //                 })
-                        //             }, 1000)
-                        //         }
-                        //     }
-                        // )
-                    }
-                }
-            )
-        }
         if (!checkoutData?.deliveryGroups?.items[0].deliveryAddress) {
             addDeliveryAddress(checkoutData?.checkoutId)
         }
-        // if (
-        //     checkoutData?.deliveryGroups?.items[0].deliveryAddress &&
-        //     checkoutData?.deliveryGroups?.items[0].availableDeliveryMethods.length === 0
-        // ) {
-        //     console.log('fdsfdafdafdafdfdsaf==============')
-        //     queryClient.refetchQueries({
-        //         queryKey: [`/${webstoreId}/checkouts/active`]
-        //     })
-        // }
         const selectedCarrier = checkoutData?.deliveryGroups?.items?.[0].selectedDeliveryMethod
         setSelectedCarrier(selectedCarrier)
     }, [checkoutData])
@@ -160,7 +95,6 @@ function Checkout() {
         return <div>Loading...</div>
     }
 
-    const {deliveryGroups} = checkoutData
     return (
         <div>
             <div>
@@ -170,20 +104,17 @@ function Checkout() {
                         It is possible to edit and add new addresses, but it is omitted in this page
                         to avoid complication
                     </div>
-                    {deliveryGroups && (
-                        <div style={{display: 'flex', justifyContent: 'flex-start', gap: '10px'}}>
-                            {deliveryGroups.items.map((i) => {
-                                const {deliveryAddress} = i
-                                return (
-                                    <Address
-                                        address={deliveryAddress}
-                                        accountId={cart.accountId}
-                                        key={i.id}
-                                    />
-                                )
-                            })}
-                        </div>
-                    )}
+                    {checkoutData?.deliveryGroups.items.map((i) => {
+                        const {deliveryAddress} = i
+                        return (
+                            <div
+                                key={i.id}
+                                style={{display: 'flex', justifyContent: 'flex-start', gap: '10px'}}
+                            >
+                                <Address address={deliveryAddress} accountId={cart.accountId} />
+                            </div>
+                        )
+                    })}
                 </div>
                 <div>
                     <h3>
@@ -192,38 +123,37 @@ function Checkout() {
                     </h3>
 
                     <div>
-                        {deliveryGroups &&
-                            deliveryGroups.items.map((i) => {
-                                return (
-                                    <div key={i.id}>
-                                        {i.availableDeliveryMethods.map((method) => (
-                                            <RadioButton
-                                                key={method.id}
-                                                value={method.id}
-                                                isSelected={method.id === selectedCarrier?.id}
-                                                label={method.name}
-                                                onChange={(e) => {
-                                                    const t = checkoutData?.deliveryGroups?.items?.[0].availableDeliveryMethods.find(
-                                                        (method) => method.id === e.target.value
-                                                    )
-                                                    setSelectedCarrier(t)
-                                                    checkoutAction.mutate({
-                                                        url: getApiUrl(
-                                                            `/checkouts/${checkoutData?.checkoutId}`
-                                                        ),
-                                                        payload: {
-                                                            deliveryMethodId: e.target.value
-                                                        },
-                                                        fetchOptions: {
-                                                            method: 'PATCH'
-                                                        }
-                                                    })
-                                                }}
-                                            />
-                                        ))}
-                                    </div>
-                                )
-                            })}
+                        {checkoutData?.deliveryGroups.items.map((i) => {
+                            return (
+                                <div key={i.id}>
+                                    {i.availableDeliveryMethods.map((method) => (
+                                        <RadioButton
+                                            key={method.id}
+                                            value={method.id}
+                                            isSelected={method.id === selectedCarrier?.id}
+                                            label={method.name}
+                                            onChange={(e) => {
+                                                const t = checkoutData?.deliveryGroups?.items?.[0].availableDeliveryMethods.find(
+                                                    (method) => method.id === e.target.value
+                                                )
+                                                setSelectedCarrier(t)
+                                                checkoutAction.mutate({
+                                                    url: getApiUrl(
+                                                        `/checkouts/${checkoutData?.checkoutId}`
+                                                    ),
+                                                    payload: {
+                                                        deliveryMethodId: e.target.value
+                                                    },
+                                                    fetchOptions: {
+                                                        method: 'PATCH'
+                                                    }
+                                                })
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
 
@@ -267,8 +197,9 @@ function Checkout() {
                             {
                                 onSuccess: (data) => {
                                     const {token} = data
-                                    const address = deliveryGroups?.items[0].deliveryAddress
-                                    const res = checkoutAction.mutate(
+                                    const address =
+                                        checkoutData?.deliveryGroups?.items[0].deliveryAddress
+                                    checkoutAction.mutate(
                                         {
                                             url: getApiUrl(`/checkouts/active/payments`),
                                             payload: {

@@ -14,7 +14,7 @@
 import React, {createContext, useContext, useEffect} from 'react'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 // create a js to store your username and password
-// don't commit
+// and don't commit it
 import LoginInfo from '../../config/user-config'
 
 export const AuthContext = createContext({})

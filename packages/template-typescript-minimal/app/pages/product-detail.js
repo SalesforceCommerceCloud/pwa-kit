@@ -6,7 +6,15 @@
  */
 
 import React from 'react'
-import {addItemToCart, useCart, useProduct, useProductPrice} from '../hooks/useFetch'
+import {
+    addItemToCart,
+    getApiUrl,
+    useCart,
+    useCartAction,
+    useProduct,
+    useProductPrice,
+    useWishList
+} from '../hooks/useFetch'
 import QuantityPicker, {useQuantity} from '../components/quantity-picker'
 import {Link, useParams} from 'react-router-dom'
 import {getMediaLink} from '../utils/utils'
@@ -16,7 +24,8 @@ ProductDetail.propTypes = {}
 
 function ProductDetail() {
     const {quantity, onDecrease, onIncrease} = useQuantity()
-
+    const {data: wishList} = useWishList()
+    // console.log('wishList', wishList)
     const {productId} = useParams()
     const [selectedVariant, setSelectedVariant] = React.useState({})
 
@@ -42,8 +51,7 @@ function ProductDetail() {
             setSelectedVariant(variant)
         }
     }, [productDetail])
-    const addItemToCartAction = addItemToCart()
-
+    const cartAction = useCartAction()
     if (isLoading || isProductPriceLoading) {
         return <div>Loading a product....</div>
     }
@@ -68,8 +76,12 @@ function ProductDetail() {
             quantity,
             type: 'Product'
         }
-        addItemToCartAction.mutate(item)
+        cartAction.mutate({url: getApiUrl(`/carts/current/cart-items`), payload: item})
     }
+    // const handleWishList = () => {
+    //     if (wishlistCount === 0) {
+    //     }
+    // }
     const bigThumbnail = productDetail?.mediaGroups?.find((media) => media.usageType === 'Listing')
     const imgSrc = getMediaLink(bigThumbnail?.mediaItems[0].url)
     const smallThumbnails = productDetail.mediaGroups.find(
@@ -137,8 +149,20 @@ function ProductDetail() {
                         onDecrease={onDecrease}
                         onIncrease={onIncrease}
                     />
-                    <button onClick={handleAddToCart} disabled={addItemToCartAction.isLoading}>
-                        {addItemToCartAction.isLoading ? 'loading..' : 'Add to cart'}
+                    <button
+                        style={{marginTop: '10px'}}
+                        onClick={handleAddToCart}
+                        disabled={cartAction.isLoading}
+                    >
+                        {cartAction.isLoading ? 'loading..' : 'Add to cart'}
+                    </button>
+                    <button
+                        style={{marginTop: '10px'}}
+                        onClick={handleWishList}
+                        // disabled={cartAction.isLoading}
+                    >
+                        Add to wishlist
+                        {/*{cartAction.isLoading ? 'loading..' : 'Add to cart'}*/}
                     </button>
                 </div>
             </div>

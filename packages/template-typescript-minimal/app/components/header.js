@@ -9,7 +9,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useAuth} from '../hooks/useAuth'
 import {Link} from 'react-router-dom'
-import {useCart, useCategories} from '../hooks/useFetch'
+import {
+    getApiUrl,
+    useCart,
+    useCartAction,
+    useCategories,
+    useSessionContext
+} from '../hooks/useFetch'
 
 Header.propTypes = {}
 const Category = ({cate}) => {
@@ -43,11 +49,45 @@ const Category = ({cate}) => {
         </div>
     )
 }
-function Header(props) {
+function Header() {
     const {token} = useAuth()
-    const {data: cart} = useCart()
+    const {data: cart} = useCart(
+        'current',
+        {},
+        {
+            onError: (err) => {
+                if (err.message === 'Invalid webstoreId or no current cart exists') {
+                    cartAction.mutate({
+                        url: getApiUrl(`/carts`),
+                        payload: {
+                            name: 'Cart',
+                            type: 'Cart'
+                        },
+                        fetchOptions: {
+                            method: 'POST'
+                        }
+                    })
+                }
+            }
+        }
+    )
     const {data, isLoading, error} = useCategories()
-
+    const {data: sessionContext} = useSessionContext()
+    const cartAction = useCartAction()
+    React.useEffect(() => {
+        if (cart?.[0]?.errorCode === 'INVALID_ID_FIELD') {
+            cartAction.mutate({
+                url: getApiUrl(`/carts`),
+                payload: {
+                    name: 'Cart',
+                    type: 'Cart'
+                },
+                fetchOptions: {
+                    method: 'POST'
+                }
+            })
+        }
+    }, [cart])
     if (isLoading) {
         return <div>Loading categories.....</div>
     }
@@ -60,6 +100,17 @@ function Header(props) {
             <div>
                 {token ? <h2>Logged in as alex.vuong </h2> : <h2>Logging in as alex.vuong</h2>}
             </div>
+            <div>
+                {sessionContext?.guestUser ? (
+                    ''
+                ) : (
+                    <>
+                        <Link to={'/orders'}>Orders</Link> <br />
+                        <Link to={'/addresses'}>Addresses</Link>
+                    </>
+                )}
+            </div>
+            <hr />
             <Link to={'/'}>Home</Link>
             <div>
                 <div>

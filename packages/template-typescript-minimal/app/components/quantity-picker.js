@@ -16,7 +16,7 @@ export const useQuantity = () => {
         setQuantity(quantity + 1)
     }
     const onDecrease = () => {
-        if (quantity === 0) {
+        if (quantity === 1) {
             return
         }
         setQuantity(quantity - 1)
