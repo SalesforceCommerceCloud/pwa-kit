@@ -174,7 +174,7 @@ export const ShopperBasketsMutations = {
 export type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
 export const getQueryKeysMatrix = (customerId: string | null) => {
-    const updateBasket = (basketId?: string) => {
+    const updateBasketQuery = (basketId?: string) => {
         // TODO: we're missing headers, rawResponse -> not only {basketId}
         const arg = {basketId}
         return basketId
@@ -184,7 +184,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             : {}
     }
 
-    const removeBasket = (basketId?: string) => {
+    const removeBasketQuery = (basketId?: string) => {
         return basketId
             ? {
                   remove: [['/baskets', basketId]]
@@ -192,7 +192,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             : {}
     }
 
-    const invalidateCustomerBaskets = (customerId: string | null) => {
+    const invalidateCustomerBasketsQuery = (customerId: string | null) => {
         return customerId
             ? {
                   invalidate: [['/customers', customerId, '/baskets']]
@@ -208,8 +208,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         addItemToBasket: (
@@ -219,8 +219,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         addPaymentInstrumentToBasket: (
@@ -230,8 +230,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         createBasket: (
@@ -241,8 +241,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = response.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         deleteBasket: (
@@ -252,8 +252,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params?.parameters.basketId
 
             return {
-                ...invalidateCustomerBaskets(customerId),
-                ...removeBasket(basketId)
+                ...invalidateCustomerBasketsQuery(customerId),
+                ...removeBasketQuery(basketId)
             }
         },
         mergeBasket: (
@@ -265,7 +265,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
 
             return {
                 // ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         removeCouponFromBasket: (
@@ -275,8 +275,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params?.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         removePaymentInstrumentFromBasket: (
@@ -286,8 +286,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params?.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         updateBasket: (
@@ -297,8 +297,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         updateBillingAddressForBasket: (
@@ -308,8 +308,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         updateCustomerForBasket: (
@@ -319,8 +319,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         updateItemInBasket: (
@@ -330,8 +330,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         updatePaymentInstrumentInBasket: (
@@ -341,8 +341,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         updateShippingAddressForShipment: (
@@ -352,8 +352,8 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         updateShippingMethodForShipment: (
@@ -363,13 +363,14 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasket(basketId),
-                ...invalidateCustomerBaskets(customerId)
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
             }
         }
     }
 }
 
+// TODO: have stubs for not-implemented actions -> see ShopperCustomers
 /**
  * A hook for performing mutations with the Shopper Baskets API.
  */
