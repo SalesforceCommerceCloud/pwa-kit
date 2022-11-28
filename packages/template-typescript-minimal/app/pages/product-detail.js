@@ -24,7 +24,6 @@ ProductDetail.propTypes = {}
 
 function ProductDetail() {
     const {quantity, onDecrease, onIncrease} = useQuantity()
-    const [variant, setVariant] = React.useState()
     const {data: wishList} = useWishList()
     const wishListId = wishList?.summaries?.[0].id
     const {data: wishlistItems} = useWishListItems(wishListId)

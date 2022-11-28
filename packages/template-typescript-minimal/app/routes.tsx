@@ -26,6 +26,8 @@ const Order = loadable(() => import('./pages/order'))
 const Login = loadable(() => import('./pages/login'))
 //@ts-ignore
 const Addresses = loadable(() => import('./pages/addresses'))
+//@ts-ignore
+const WishList = loadable(() => import('./pages/wishlist'))
 
 const routes = [
     {
@@ -82,6 +84,11 @@ const routes = [
         path: '/addresses',
         exact: true,
         component: Addresses
+    },
+    {
+        path: '/wishlist',
+        exact: true,
+        component: WishList
     }
 ]
 

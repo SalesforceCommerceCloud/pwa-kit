@@ -106,7 +106,8 @@ function Header() {
                 ) : (
                     <>
                         <Link to={'/orders'}>Orders</Link> <br />
-                        <Link to={'/addresses'}>Addresses</Link>
+                        <Link to={'/addresses'}>Addresses</Link> <br />
+                        <Link to={'/wishlist'}>Wishlist</Link>
                     </>
                 )}
             </div>
