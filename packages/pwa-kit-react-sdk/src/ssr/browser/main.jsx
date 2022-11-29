@@ -6,7 +6,7 @@
  */
 /* global __webpack_require__ */
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {hydrateRoot} from 'react-dom/client'
 import {BrowserRouter as Router} from 'react-router-dom'
 import DeviceContext from '../universal/device-context'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
@@ -46,7 +46,7 @@ export const start = () => {
 
     // Tell webpack how to find javascript files
     Object.defineProperty(__webpack_require__, 'p', {
-        get: () => window.Progressive.buildOrigin
+        get: () => window.Progressive.buildOrigin,
     })
 
     // On the browser we don't have request.locals, so we just provide an empty
@@ -74,7 +74,8 @@ export const start = () => {
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
-            ReactDOM.hydrate(
+            hydrateRoot(
+                rootEl,
                 <ServerContext.Provider value={{}}>
                     <Router>
                         <CorrelationIdProvider correlationId={() => uuidv4()}>
@@ -91,7 +92,6 @@ export const start = () => {
                         </CorrelationIdProvider>
                     </Router>
                 </ServerContext.Provider>,
-                rootEl,
                 () => {
                     window.__HYDRATING__ = false
                 }

@@ -70,7 +70,6 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
                     onChange={updateAccordionState}
                     opacity={isLoading ? 0.2 : 1}
                     allowMultiple={true}
-                    allowToggle={true}
                     defaultIndex={filtersIndexes}
                     reduceMotion={true}
                 >
