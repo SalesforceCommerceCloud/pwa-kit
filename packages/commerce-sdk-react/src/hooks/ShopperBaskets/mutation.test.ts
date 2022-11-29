@@ -7,10 +7,13 @@
 
 import {act} from '@testing-library/react'
 import nock from 'nock'
-import {createQueryClient, DEFAULT_TEST_HOST, renderHookWithProviders} from '../../test-utils'
+import {DEFAULT_TEST_HOST, renderHookWithProviders} from '../../test-utils'
 import {useShopperBasketsMutation} from './mutation'
 import {useBasket} from './query'
 import {useCustomerBaskets} from '../ShopperCustomers/query'
+
+const CUSTOMER_ID = 'CUSTOMER_ID'
+const BASKET_ID = 'BASKET_ID'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
@@ -19,8 +22,7 @@ jest.mock('../../auth/index.ts', () => {
 })
 
 jest.mock('../useCustomerId.ts', () => {
-    // TODO: extract customer id
-    return jest.fn().mockReturnValue('111222')
+    return jest.fn().mockReturnValue(CUSTOMER_ID)
 })
 
 test('success', async () => {
@@ -41,7 +43,7 @@ test('success', async () => {
         .delete((uri) => {
             return uri.includes('/checkout/shopper-baskets/')
         })
-        .reply(204, {test: 'new data'})
+        .reply(204)
 
     // NOTE: for individual tests only
     nock(DEFAULT_TEST_HOST)
@@ -61,14 +63,10 @@ test('success', async () => {
 
     const {result, waitForValueToChange} = renderHookWithProviders(() => {
         const queries = {
-            // TODO: extract these hardcoded strings
-            basket: useBasket({basketId: '12345'}),
-            customerBaskets: useCustomerBaskets({customerId: '111222'})
+            basket: useBasket({basketId: BASKET_ID}),
+            customerBaskets: useCustomerBaskets({customerId: CUSTOMER_ID})
         }
         const mutation = useShopperBasketsMutation('updateBasket')
-
-        // console.log('--- basket', queries.basket.isRefetching)
-        // console.log('--- customer baskets', queries.customerBaskets.isRefetching)
 
         return {
             queries,
@@ -79,7 +77,7 @@ test('success', async () => {
     await waitForValueToChange(() => result.current.queries.basket.data)
 
     act(() => {
-        result.current.mutation.mutate({parameters: {basketId: '12345'}, body: {currency: 'USD'}})
+        result.current.mutation.mutate({parameters: {basketId: BASKET_ID}, body: {currency: 'USD'}})
     })
 
     await waitForValueToChange(() => result.current.mutation.data)
