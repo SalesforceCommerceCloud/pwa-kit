@@ -10,6 +10,7 @@ import nock from 'nock'
 import {createQueryClient, DEFAULT_TEST_HOST, renderHookWithProviders} from '../../test-utils'
 import {useShopperBasketsMutation} from './mutation'
 import {useBasket} from './query'
+import {useCustomerBaskets} from '../ShopperCustomers/query'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
@@ -17,55 +18,80 @@ jest.mock('../../auth/index.ts', () => {
     }))
 })
 
+jest.mock('../useCustomerId.ts', () => {
+    // TODO: extract customer id
+    return jest.fn().mockReturnValue('111222')
+})
+
 test('success', async () => {
+    // NOTE: for _all_ tests
+    nock(DEFAULT_TEST_HOST)
+        .patch((uri) => {
+            return uri.includes('/checkout/shopper-baskets/')
+        })
+        .reply(200, {test: 'new data'})
+        .put((uri) => {
+            return uri.includes('/checkout/shopper-baskets/')
+        })
+        .reply(200, {test: 'new data'})
+        .post((uri) => {
+            return uri.includes('/checkout/shopper-baskets/')
+        })
+        .reply(200, {test: 'new data'})
+        .delete((uri) => {
+            return uri.includes('/checkout/shopper-baskets/')
+        })
+        .reply(204, {test: 'new data'})
+
+    // NOTE: for individual tests only
     nock(DEFAULT_TEST_HOST)
         .get((uri) => {
             return uri.includes('/checkout/shopper-baskets/')
         })
-        .reply(200, {})
-        .patch((uri) => {
-            return uri.includes('/checkout/shopper-baskets/')
+        .reply(200, {test: 'old data'})
+        // TODO: split them up
+        .get((uri) => {
+            return uri.includes('/customer/shopper-customers/')
         })
-        .reply(200, {})
-        .put((uri) => {
-            return uri.includes('/checkout/shopper-baskets/')
+        .reply(200, {test: 'old data'})
+        .get((uri) => {
+            return uri.includes('/customer/shopper-customers/')
         })
-        .reply(200, {})
-        .post((uri) => {
-            return uri.includes('/checkout/shopper-baskets/')
-        })
-        .reply(200, {})
-        .delete((uri) => {
-            return uri.includes('/checkout/shopper-baskets/')
-        })
-        .reply(204, {})
-
-    const queryClient = createQueryClient()
+        .reply(200, {test: 'new data'})
 
     const {result, waitForValueToChange} = renderHookWithProviders(() => {
-        // TODO: also, useCustomerBaskets()
-        const query = useBasket({basketId: '12345'})
+        const queries = {
+            // TODO: extract these hardcoded strings
+            basket: useBasket({basketId: '12345'}),
+            customerBaskets: useCustomerBaskets({customerId: '111222'})
+        }
         const mutation = useShopperBasketsMutation('updateBasket')
 
+        // console.log('--- basket', queries.basket.isRefetching)
+        // console.log('--- customer baskets', queries.customerBaskets.isRefetching)
+
         return {
-            query,
+            queries,
             mutation
         }
     })
 
-    await waitForValueToChange(() => result.current.query.data)
+    await waitForValueToChange(() => result.current.queries.basket.data)
 
     act(() => {
-        result.current.mutation.mutate({parameters: {basketId: 'FOO'}, body: {currency: 'USD'}})
+        result.current.mutation.mutate({parameters: {basketId: '12345'}, body: {currency: 'USD'}})
     })
 
     await waitForValueToChange(() => result.current.mutation.data)
 
-    expect(result.current.mutation.data).toBeDefined()
-    expect(result.current.mutation.isLoading).toBe(false)
+    expect(result.current.mutation.data).toEqual({test: 'new data'})
+    expect(result.current.mutation.isSuccess).toBe(true)
 
-    expect(result.current.query.data).toBeDefined()
-    expect(result.current.query.isLoading).toBe(false)
+    // basket query should be updated without a refetch
+    expect(result.current.queries.basket.data).toEqual({test: 'new data'})
+    expect(result.current.queries.basket.isRefetching).toBe(false)
 
-    // TODO: test the query cache before and after
+    // customerBaskets query should be invalidated and refetching
+    expect(result.current.queries.customerBaskets.data).toEqual({test: 'old data'})
+    expect(result.current.queries.customerBaskets.isRefetching).toBe(true)
 })
