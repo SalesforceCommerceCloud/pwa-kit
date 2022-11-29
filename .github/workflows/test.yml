@@ -105,6 +105,31 @@ jobs:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 5
 
+      - name: Run tests
+        uses: "./.github/actions/runtests"
+        with:
+          cwd: generated-project
+
+      - name: Smoke test scripts
+        uses: "./.github/actions/smoketestscripts"
+        with:
+          dir: generated-project
+
+      - name: Count Generated Project Dependencies
+        run: |-
+          MAX_PACKAGES="2250"
+          total=$(./scripts/count-dependencies.js generated-project)
+          echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
+          source $BASH_ENV
+
+          if [ "$total" -gt "$MAX_PACKAGES" ]; then
+              echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+              exit 1;
+          else
+              echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+          fi
+        shell: bash
+
       - name: Store Verdaccio logfile artifact
         uses: actions/upload-artifact@v3
         with:
