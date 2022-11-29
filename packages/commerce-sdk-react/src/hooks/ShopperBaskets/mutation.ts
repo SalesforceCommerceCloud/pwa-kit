@@ -185,17 +185,21 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
     }
 
     const removeBasketQuery = (basketId?: string) => {
+        const arg = {basketId}
         return basketId
             ? {
-                  remove: [['/baskets', basketId]]
+                  remove: [['/baskets', basketId, arg]]
               }
             : {}
     }
 
     const invalidateCustomerBasketsQuery = (customerId: string | null) => {
+        // NOTE: need arg here too actually because the query key will be used later in the test
+        // TODO: maybe close the ticket https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EWO8MYAX/view
+        const arg = {customerId}
         return customerId
             ? {
-                  invalidate: [['/customers', customerId, '/baskets']]
+                  invalidate: [['/customers', customerId, '/baskets', arg]]
               }
             : {}
     }
