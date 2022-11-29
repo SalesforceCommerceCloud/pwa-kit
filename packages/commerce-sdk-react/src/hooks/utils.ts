@@ -64,3 +64,7 @@ export const updateCache = <Action extends CombinedMutationTypes>(
         })
     })
 }
+
+export const NotImplemented = () => {
+    throw new Error('This method is not implemented.')
+}

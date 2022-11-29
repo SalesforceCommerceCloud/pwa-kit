@@ -327,6 +327,8 @@ class Auth {
         const isGuest = true
         return this.queueRequest(
             () =>
+                // TODO: are we missing a call to /logout?
+                // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
                 helpers.loginGuestUser(this.client, {
                     redirectURI: this.redirectURI
                 }),
