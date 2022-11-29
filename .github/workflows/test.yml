@@ -1,11 +1,11 @@
 name: SalesforceCommerceCloud/pwa-kit/test
 on:
-  push:
-#    branches:
-#    # TODO: Before merging remove branches filter
-#    - github-actions
   schedule:
     - cron: 0 8 * * *
+  push:
+  #    branches:
+  #    # TODO: Before merging remove branches filter
+  #    - github-actions
 jobs:
   pwa-kit:
     strategy:
@@ -21,6 +21,7 @@ jobs:
             node: 14
             npm: 8
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -80,6 +81,7 @@ jobs:
         os: [windows-latest, ubuntu-latest]
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v3
