@@ -25,25 +25,30 @@ jest.mock('../useCustomerId.ts', () => {
     return jest.fn().mockReturnValue(CUSTOMER_ID)
 })
 
-test('success', async () => {
-    // NOTE: for _all_ tests
+const mockMutationEndpoints = (matchingPath: string, options?: {errorResponse: number}) => {
+    const responseStatus = options?.errorResponse ? options.errorResponse : 200
+
     nock(DEFAULT_TEST_HOST)
         .patch((uri) => {
-            return uri.includes('/checkout/shopper-baskets/')
+            return uri.includes(matchingPath)
         })
-        .reply(200, {test: 'new data'})
+        .reply(responseStatus, {test: 'new data'})
         .put((uri) => {
-            return uri.includes('/checkout/shopper-baskets/')
+            return uri.includes(matchingPath)
         })
-        .reply(200, {test: 'new data'})
+        .reply(responseStatus, {test: 'new data'})
         .post((uri) => {
-            return uri.includes('/checkout/shopper-baskets/')
+            return uri.includes(matchingPath)
         })
-        .reply(200, {test: 'new data'})
+        .reply(responseStatus, {test: 'new data'})
         .delete((uri) => {
-            return uri.includes('/checkout/shopper-baskets/')
+            return uri.includes(matchingPath)
         })
-        .reply(204)
+        .reply(options?.errorResponse ? options.errorResponse : 204)
+}
+
+test('success', async () => {
+    mockMutationEndpoints('/checkout/shopper-baskets/')
 
     // NOTE: for individual tests only
     nock(DEFAULT_TEST_HOST)
@@ -92,4 +97,20 @@ test('success', async () => {
     // customerBaskets query should be invalidated and refetching
     expect(result.current.queries.customerBaskets.data).toEqual({test: 'old data'})
     expect(result.current.queries.customerBaskets.isRefetching).toBe(true)
+})
+
+test('error', async () => {
+    mockMutationEndpoints('/checkout/shopper-baskets/', {errorResponse: 500})
+
+    const {result, waitForNextUpdate} = renderHookWithProviders(() => {
+        return useShopperBasketsMutation('updateBasket')
+    })
+
+    act(() => {
+        result.current.mutate({parameters: {basketId: BASKET_ID}, body: {currency: 'USD'}})
+    })
+
+    await waitForNextUpdate()
+
+    expect(result.current.error).toBeDefined()
 })
