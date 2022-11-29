@@ -21,7 +21,6 @@ jobs:
             node: 14
             npm: 8
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -81,7 +80,6 @@ jobs:
         os: [windows-latest, ubuntu-latest]
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -105,6 +103,7 @@ jobs:
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
+        timeout-minutes: 5
 
       - name: Store Verdaccio logfile artifact
         uses: actions/upload-artifact@v3
