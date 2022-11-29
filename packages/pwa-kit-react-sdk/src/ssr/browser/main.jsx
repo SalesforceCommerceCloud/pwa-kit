@@ -75,6 +75,7 @@ export const start = () => {
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
             hydrateRoot(
+                rootEl,
                 <ServerContext.Provider value={{}}>
                     <Router>
                         <CorrelationIdProvider correlationId={() => uuidv4()}>
@@ -91,7 +92,6 @@ export const start = () => {
                         </CorrelationIdProvider>
                     </Router>
                 </ServerContext.Provider>,
-                rootEl,
                 () => {
                     window.__HYDRATING__ = false
                 }

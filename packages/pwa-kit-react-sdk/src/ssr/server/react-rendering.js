@@ -235,7 +235,7 @@ OuterApp.propTypes = {
 }
 
 const renderToString = (jsx, extractor) =>
-    ReactDOMServer.renderToPipeableStream(extractor.collectChunks(jsx))
+    ReactDOMServer.renderToString(extractor.collectChunks(jsx))
 
 const renderApp = (args) => {
     const {req, res, appStateError, appJSX, appState, config, deviceType} = args
@@ -324,7 +324,7 @@ const renderApp = (args) => {
         (tag) => helmet[tag] && helmet[tag].toComponent()
     ).filter((tag) => tag)
 
-    const html = ReactDOMServer.renderToPipeableStream(
+    const html = ReactDOMServer.renderToString(
         <Document
             head={[...helmetHeadTags]}
             html={appHtml}
