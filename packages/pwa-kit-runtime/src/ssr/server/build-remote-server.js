@@ -192,7 +192,7 @@ export const RemoteServerFactory = {
                     tokens['response-time'](req, res),
                     'ms',
                     '-',
-                    tokens.res(req, res, 'content-length')
+                    tokens.res(req, res, 'content-length') || '-'
                 ].join(' ')
             })
         )
