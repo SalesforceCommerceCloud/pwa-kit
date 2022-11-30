@@ -27,15 +27,9 @@ commands:
 
             # Install system dependencies
             sudo apt-get update
-            sudo apt-get install python2.7 google-chrome-stable time
-
-            # python-pip for python2 has issues, workaround via https://stackoverflow.com/a/65125295/187750
-            curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py # Fetch get-pip.py for python 2.7
-            python get-pip.py
-            pip --version
-
-            sudo pip install -U pip setuptools
-            sudo pip install awscli==1.18.85 datadog==0.40.1
+            sudo apt-get install python3-dev python3-pip google-chrome-stable time
+            pip3 install --upgrade pip setuptools
+            sudo pip3 install awscli==1.18.85 datadog==0.40.1
             sudo npm install -g npm@6.14.4
 
             # Install node dependencies
