@@ -25,6 +25,7 @@ jest.mock('../useCustomerId.ts', () => {
     return jest.fn().mockReturnValue(CUSTOMER_ID)
 })
 
+// TODO: should this be in test-utils? So it can be reused across test suites
 const mockMutationEndpoints = (matchingPath: string, options?: {errorResponse: number}) => {
     const responseStatus = options?.errorResponse ? options.errorResponse : 200
 
