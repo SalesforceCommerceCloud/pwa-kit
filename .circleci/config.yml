@@ -31,7 +31,7 @@ commands:
 
             # python-pip for python2 has issues, workaround via https://stackoverflow.com/a/65125295/187750
             curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py # Fetch get-pip.py for python 2.7
-            python2 get-pip.py
+            python get-pip.py
             pip --version
 
             sudo pip install -U pip setuptools
