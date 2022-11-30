@@ -220,7 +220,7 @@ commands:
 jobs:
   docs_build_and_deploy:
     docker:
-      - image: circleci/node:14-stretch-browsers
+      - image: cimg/node:14.21.1-browsers
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -247,21 +247,21 @@ jobs:
       - runtests
   testNode14npm7:
     docker:
-      - image: circleci/node:14-stretch-browsers
+      - image: cimg/node:14.21.1-browsers
     steps:
       - checkout
       - setup_npm_7
       - runtests
   testNode14npm8:
     docker:
-      - image: circleci/node:14-stretch-browsers
+      - image: cimg/node:14.21.1-browsers
     steps:
       - checkout
       - setup_npm_8
       - runtests
   testNode14:
     docker:
-      - image: circleci/node:14-stretch-browsers
+      - image: cimg/node:14.21.1-browsers
     steps:
       - checkout
       - setup
@@ -317,7 +317,7 @@ jobs:
           only_for_branches: develop
   generatedTemplate:
     docker:
-      - image: circleci/node:14-stretch-browsers
+      - image: cimg/node:14.21.1-browsers
     parameters:
       template:
         type: string
@@ -355,7 +355,7 @@ jobs:
       - generator_store_verdaccio_log_file_artifact
   generatedSFCCProjectTest:
     docker:
-      - image: circleci/node:14-stretch-browsers
+      - image: cimg/node:14.21.1-browsers
     steps:
       - checkout
       - setup
