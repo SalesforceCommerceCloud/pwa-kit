@@ -195,6 +195,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
 
     const invalidateCustomerBasketsQuery = (customerId: string | null) => {
         // NOTE: need arg here too actually because the query key will be used later in the test
+        // TODO: actually... it depends on how the test is done
         // TODO: maybe close the ticket https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EWO8MYAX/view
         const arg = {customerId}
         return customerId
@@ -374,7 +375,6 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
     }
 }
 
-// TODO: have stubs for not-implemented actions -> see ShopperCustomers
 /**
  * A hook for performing mutations with the Shopper Baskets API.
  */
@@ -402,3 +402,5 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
         }
     )
 }
+
+// TODO: have stubs for not-implemented actions -> see ShopperCustomers

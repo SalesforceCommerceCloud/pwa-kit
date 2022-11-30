@@ -8,9 +8,10 @@
 import {act} from '@testing-library/react'
 import nock from 'nock'
 import {DEFAULT_TEST_HOST, renderHookWithProviders} from '../../test-utils'
-import {ShopperBasketMutationType, useShopperBasketsMutation} from './mutation'
+import {getQueryKeysMatrix, ShopperBasketMutationType, useShopperBasketsMutation} from './mutation'
 import {useBasket} from './query'
 import {useCustomerBaskets} from '../ShopperCustomers/query'
+import useCustomerId from '../useCustomerId'
 
 const CUSTOMER_ID = 'CUSTOMER_ID'
 const BASKET_ID = 'BASKET_ID'
@@ -51,11 +52,16 @@ type MutationPayloads = {
     [key in ShopperBasketMutationType]?: {body: any; parameters: any}
 }
 const mutationPayloads: MutationPayloads = {
-    updateBasket: {parameters: {basketId: BASKET_ID}, body: {currency: 'USD'}}
+    updateBasket: {parameters: {basketId: BASKET_ID}, body: {}},
+    updateBillingAddressForBasket: {parameters: {basketId: BASKET_ID}, body: {}},
+    deleteBasket: {parameters: {basketId: BASKET_ID}, body: {}}
+
     // TODO: add more payloads
 }
 
 const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map((mutationName) => {
+    const payload = mutationPayloads[mutationName]
+
     return {
         hook: mutationName,
         cases: [
@@ -66,6 +72,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
 
                     // for get basket
                     nock(DEFAULT_TEST_HOST)
+                        .persist()
                         .get((uri) => {
                             return uri.includes('/checkout/shopper-baskets/')
                         })
@@ -73,6 +80,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
 
                     // for get customer basket
                     nock(DEFAULT_TEST_HOST)
+                        .persist()
                         .get((uri) => {
                             return uri.includes('/customer/shopper-customers/')
                         })
@@ -98,22 +106,34 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                     await waitForValueToChange(() => result.current.queries.basket.data)
 
                     act(() => {
-                        const payload = mutationPayloads[mutationName]
                         result.current.mutation.mutate(payload)
                     })
 
-                    await waitForValueToChange(() => result.current.mutation.data)
-
-                    expect(result.current.mutation.data).toEqual({test: 'new data'})
+                    await waitForValueToChange(() => result.current.mutation.isSuccess)
                     expect(result.current.mutation.isSuccess).toBe(true)
 
-                    // basket query should be updated without a refetch
-                    expect(result.current.queries.basket.data).toEqual({test: 'new data'})
-                    expect(result.current.queries.basket.isRefetching).toBe(false)
+                    const queryKeysMatrix = getQueryKeysMatrix(CUSTOMER_ID)
+                    // @ts-ignore
+                    const {invalidate, update, remove} = queryKeysMatrix[mutationName](payload, {})
 
-                    // customerBaskets query should be invalidated and refetching
-                    expect(result.current.queries.customerBaskets.data).toEqual({test: 'old data'})
-                    expect(result.current.queries.customerBaskets.isRefetching).toBe(true)
+                    // TODO: do not assume that `update` will deal with basket query
+                    if (update) {
+                        // basket query should be updated without a refetch
+                        expect(result.current.queries.basket.data).toEqual({test: 'new data'})
+                        expect(result.current.queries.basket.isRefetching).toBe(false)
+                    }
+
+                    if (invalidate) {
+                        // customerBaskets query should be invalidated and refetching
+                        expect(result.current.queries.customerBaskets.data).toEqual({
+                            test: 'old data'
+                        })
+                        expect(result.current.queries.customerBaskets.isRefetching).toBe(true)
+                    }
+
+                    if (remove) {
+                        expect(result.current.queries.basket.data).not.toBeDefined()
+                    }
                 }
             },
             {
@@ -126,7 +146,6 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                     })
 
                     act(() => {
-                        const payload = mutationPayloads[mutationName]
                         result.current.mutate(payload)
                     })
 
