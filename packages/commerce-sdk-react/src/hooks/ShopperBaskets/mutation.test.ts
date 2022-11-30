@@ -52,6 +52,7 @@ type MutationPayloads = {
 }
 const mutationPayloads: MutationPayloads = {
     updateBasket: {parameters: {basketId: BASKET_ID}, body: {currency: 'USD'}}
+    // TODO: add more payloads
 }
 
 const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map((mutationName) => {
@@ -86,7 +87,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                             basket: useBasket({basketId: BASKET_ID}),
                             customerBaskets: useCustomerBaskets({customerId: CUSTOMER_ID})
                         }
-                        const mutation = useShopperBasketsMutation('updateBasket')
+                        const mutation = useShopperBasketsMutation(mutationName)
 
                         return {
                             queries,
@@ -97,10 +98,8 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                     await waitForValueToChange(() => result.current.queries.basket.data)
 
                     act(() => {
-                        result.current.mutation.mutate({
-                            parameters: {basketId: BASKET_ID},
-                            body: {currency: 'USD'}
-                        })
+                        const payload = mutationPayloads[mutationName]
+                        result.current.mutation.mutate(payload)
                     })
 
                     await waitForValueToChange(() => result.current.mutation.data)
@@ -123,14 +122,12 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                     mockMutationEndpoints('/checkout/shopper-baskets/', {errorResponse: 500})
 
                     const {result, waitForNextUpdate} = renderHookWithProviders(() => {
-                        return useShopperBasketsMutation('updateBasket')
+                        return useShopperBasketsMutation(mutationName)
                     })
 
                     act(() => {
-                        result.current.mutate({
-                            parameters: {basketId: BASKET_ID},
-                            body: {currency: 'USD'}
-                        })
+                        const payload = mutationPayloads[mutationName]
+                        result.current.mutate(payload)
                     })
 
                     await waitForNextUpdate()
