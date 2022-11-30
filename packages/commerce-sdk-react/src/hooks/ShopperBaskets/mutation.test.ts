@@ -11,7 +11,6 @@ import {DEFAULT_TEST_HOST, renderHookWithProviders} from '../../test-utils'
 import {getQueryKeysMatrix, ShopperBasketMutationType, useShopperBasketsMutation} from './mutation'
 import {useBasket} from './query'
 import {useCustomerBaskets} from '../ShopperCustomers/query'
-import useCustomerId from '../useCustomerId'
 
 const CUSTOMER_ID = 'CUSTOMER_ID'
 const BASKET_ID = 'BASKET_ID'
