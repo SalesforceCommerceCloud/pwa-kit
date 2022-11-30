@@ -7,7 +7,7 @@
 
 import {act} from '@testing-library/react'
 import nock from 'nock'
-import {DEFAULT_TEST_HOST, renderHookWithProviders} from '../../test-utils'
+import {DEFAULT_TEST_HOST, mockMutationEndpoints, renderHookWithProviders} from '../../test-utils'
 import {getQueryKeysMatrix, ShopperBasketMutationType, useShopperBasketsMutation} from './mutation'
 import {useBasket} from './query'
 import {useCustomerBaskets} from '../ShopperCustomers/query'
@@ -24,29 +24,6 @@ jest.mock('../../auth/index.ts', () => {
 jest.mock('../useCustomerId.ts', () => {
     return jest.fn().mockReturnValue(CUSTOMER_ID)
 })
-
-// TODO: should this be in test-utils? So it can be reused across test suites
-const mockMutationEndpoints = (matchingPath: string, options?: {errorResponse: number}) => {
-    const responseStatus = options?.errorResponse ? options.errorResponse : 200
-
-    nock(DEFAULT_TEST_HOST)
-        .patch((uri) => {
-            return uri.includes(matchingPath)
-        })
-        .reply(responseStatus, {test: 'new data'})
-        .put((uri) => {
-            return uri.includes(matchingPath)
-        })
-        .reply(responseStatus, {test: 'new data'})
-        .post((uri) => {
-            return uri.includes(matchingPath)
-        })
-        .reply(responseStatus, {test: 'new data'})
-        .delete((uri) => {
-            return uri.includes(matchingPath)
-        })
-        .reply(options?.errorResponse ? options.errorResponse : 204)
-}
 
 type MutationPayloads = {
     [key in ShopperBasketMutationType]?: {body: any; parameters: any}
@@ -69,6 +46,8 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                 name: 'success',
                 assertions: async () => {
                     mockMutationEndpoints('/checkout/shopper-baskets/')
+
+                    // TODO: extract this mocking of these query endpoints
 
                     // for get basket
                     nock(DEFAULT_TEST_HOST)

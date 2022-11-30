@@ -9,6 +9,7 @@ import React from 'react'
 import {render, RenderOptions} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks/dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import nock from 'nock'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 
 // Note: this host does NOT exist
@@ -85,4 +86,26 @@ export function renderHookWithProviders<TProps, TResult>(
             <TestProviders {...props}>{children}</TestProviders>
         )
     })
+}
+
+export const mockMutationEndpoints = (matchingPath: string, options?: {errorResponse: number}) => {
+    const responseStatus = options?.errorResponse ? options.errorResponse : 200
+
+    nock(DEFAULT_TEST_HOST)
+        .patch((uri) => {
+            return uri.includes(matchingPath)
+        })
+        .reply(responseStatus, {test: 'new data'})
+        .put((uri) => {
+            return uri.includes(matchingPath)
+        })
+        .reply(responseStatus, {test: 'new data'})
+        .post((uri) => {
+            return uri.includes(matchingPath)
+        })
+        .reply(responseStatus, {test: 'new data'})
+        .delete((uri) => {
+            return uri.includes(matchingPath)
+        })
+        .reply(options?.errorResponse ? options.errorResponse : 204)
 }
