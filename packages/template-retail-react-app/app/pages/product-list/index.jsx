@@ -440,7 +440,8 @@ const ProductList = (props) => {
                                 justifyContent={['center', 'center', 'flex-start']}
                                 paddingTop={8}
                             >
-                                <Pagination currentURL={basePath} urls={pageUrls} />
+                                {/* TODO: this component is causing a hyrdation error for some reason */}
+                                {/* <Pagination currentURL={basePath} urls={pageUrls} /> */}
 
                                 {/*
                             Our design doesn't call for a page size select. Show this element if you want

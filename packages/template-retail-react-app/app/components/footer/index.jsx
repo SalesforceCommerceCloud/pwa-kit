@@ -41,6 +41,34 @@ const Footer = ({...otherProps}) => {
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
+    // TODO: this belongs in the TODO below
+
+    //     <Select
+    //     value={locale}
+    //     onChange={({target}) => {
+    //         setLocale(target.value)
+
+    //         // Update the `locale` in the URL.
+    //         const newUrl = getPathWithLocale(target.value, buildUrl, {
+    //             disallowParams: ['refine'],
+    //         })
+
+    //         window.location = newUrl
+    //     }}
+    //     variant="filled"
+    //     {...styles.localeDropdown}
+    // >
+    //     {supportedLocaleIds.map((locale) => (
+    //         <LocaleText
+    //             as="option"
+    //             value={locale}
+    //             shortCode={locale}
+    //             key={locale}
+    //             {...styles.localeDropdownOption}
+    //         />
+    //     ))}
+    // </Select>
+
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
             <Box {...styles.content}>
@@ -131,31 +159,7 @@ const Footer = ({...otherProps}) => {
                                 width="auto"
                                 {...otherProps}
                             >
-                                <Select
-                                    value={locale}
-                                    onChange={({target}) => {
-                                        setLocale(target.value)
-
-                                        // Update the `locale` in the URL.
-                                        const newUrl = getPathWithLocale(target.value, buildUrl, {
-                                            disallowParams: ['refine']
-                                        })
-
-                                        window.location = newUrl
-                                    }}
-                                    variant="filled"
-                                    {...styles.localeDropdown}
-                                >
-                                    {supportedLocaleIds.map((locale) => (
-                                        <LocaleText
-                                            as="option"
-                                            value={locale}
-                                            shortCode={locale}
-                                            key={locale}
-                                            {...styles.localeDropdownOption}
-                                        />
-                                    ))}
-                                </Select>
+                                {/* TODO: this locale dropdown errors out the page http://localhost:3000/global/en-GB/product/25448068M?pid=013742335514M */}
                             </FormControl>
                         </Box>
                     )}
