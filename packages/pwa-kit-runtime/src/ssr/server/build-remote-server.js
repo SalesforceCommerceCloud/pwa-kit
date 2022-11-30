@@ -182,11 +182,7 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line no-unused-vars
     _setupLogging(app) {
-        console.log('appLogging------------------')
         app.use(
-            // expressLogging(
-            //     '(:res[x-correlation-id]) :method :url :status :response-time ms - :res[content-length]'
-            // )
             expressLogging(function(tokens, req, res) {
                 return [
                     `(${res.locals.requestId})`,
