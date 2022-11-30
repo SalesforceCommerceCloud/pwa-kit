@@ -6,8 +6,8 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
-import useCommerceApi from '../useCommerceApi'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
+import {NotImplemented} from '../utils'
 
 type Client = ApiClients['shopperOrders']
 
@@ -39,7 +39,7 @@ function useOrder(
 ): UseQueryResult<DataType<Client['getOrder']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
-        ['order', arg],
+        ['/orders', arg],
         (_, {shopperOrders}) => {
             return shopperOrders.getOrder({parameters, headers}, rawResponse)
         },
@@ -47,54 +47,22 @@ function useOrder(
     )
 }
 
-type UsePaymentMethodsParameters = NonNullable<
-    Argument<Client['getPaymentMethodsForOrder']>
->['parameters']
-type UsePaymentMethodsHeaders = NonNullable<
-    Argument<Client['getPaymentMethodsForOrder']>
->['headers']
-type UsePaymentMethodsArg = {
-    headers?: UsePaymentMethodsHeaders
-    rawResponse?: boolean
-} & UsePaymentMethodsParameters
-
 /**
+ * WARNING: This method is not implemented yet.
+ *
  * A hook for `ShopperOrders#getPaymentMethodsForOrder`.
  * Gets the applicable payment methods for an existing order considering the open payment amount only.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=getPaymentMethodsForOrder} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#getpaymentmethodsfororder} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function usePaymentMethodsForOrder(
-    arg: Omit<UsePaymentMethodsArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getPaymentMethodsForOrder']> | Response, Error>
-): UseQueryResult<DataType<Client['getPaymentMethodsForOrder']>, Error>
-function usePaymentMethodsForOrder(
-    arg: Omit<UsePaymentMethodsArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getPaymentMethodsForOrder']> | Response, Error>
-): UseQueryResult<Response, Error>
-function usePaymentMethodsForOrder(
-    arg: UsePaymentMethodsArg,
-    options?: UseQueryOptions<DataType<Client['getPaymentMethodsForOrder']> | Response, Error>
-): UseQueryResult<DataType<Client['getPaymentMethodsForOrder']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    return useQuery(
-        ['paymentMethods', arg],
-        (_, {shopperOrders}) => {
-            return shopperOrders.getPaymentMethodsForOrder({parameters, headers}, rawResponse)
-        },
-        options
-    )
+function usePaymentMethodsForOrder(): void {
+    NotImplemented()
 }
 
-type UseTaxesParameters = NonNullable<Argument<Client['getTaxesFromOrder']>>['parameters']
-type UseTaxesHeaders = NonNullable<Argument<Client['getTaxesFromOrder']>>['headers']
-type UseTaxesArg = {
-    headers?: UseTaxesHeaders
-    rawResponse?: boolean
-} & UseTaxesParameters
-
 /**
+ * WARNING: This method is not implemented yet.
+ * 
  * A hook for `ShopperOrders#getTaxesFromOrder`.
  * This method gives you the external taxation data of the order transferred from the basket during
 order creation. This endpoint can be called only if external taxation was used. See POST /baskets
@@ -103,26 +71,8 @@ for more information.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#gettaxesfromorder} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function useTaxesFromOrder(
-    arg: Omit<UseTaxesArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getTaxesFromOrder']> | Response, Error>
-): UseQueryResult<DataType<Client['getTaxesFromOrder']>, Error>
-function useTaxesFromOrder(
-    arg: Omit<UseTaxesArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getTaxesFromOrder']> | Response, Error>
-): UseQueryResult<Response, Error>
-function useTaxesFromOrder(
-    arg: UseTaxesArg,
-    options?: UseQueryOptions<DataType<Client['getTaxesFromOrder']> | Response, Error>
-): UseQueryResult<DataType<Client['getTaxesFromOrder']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    return useQuery(
-        ['taxes', arg],
-        (_, {shopperOrders}) => {
-            return shopperOrders.getTaxesFromOrder({parameters, headers}, rawResponse)
-        },
-        options
-    )
+function useTaxesFromOrder(): void {
+    NotImplemented()
 }
 
 export {useOrder, usePaymentMethodsForOrder, useTaxesFromOrder}
