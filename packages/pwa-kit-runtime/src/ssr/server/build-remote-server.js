@@ -40,6 +40,7 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import awsServerlessExpress from 'aws-serverless-express'
+import expressLogging from 'morgan'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -181,7 +182,24 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line no-unused-vars
     _setupLogging(app) {
-        // Hook for the dev-server
+        console.log('appLogging------------------')
+        app.use(
+            // expressLogging(
+            //     '(:res[x-correlation-id]) :method :url :status :response-time ms - :res[content-length]'
+            // )
+            expressLogging(function(tokens, req, res) {
+                return [
+                    `(${res.locals.requestId})`,
+                    tokens.method(req, res),
+                    tokens.url(req, res),
+                    tokens.status(req, res),
+                    tokens['response-time'](req, res),
+                    'ms',
+                    '-',
+                    tokens.res(req, res, 'content-length')
+                ].join(' ')
+            })
+        )
     },
 
     /**

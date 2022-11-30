@@ -39,6 +39,7 @@
     "header-case": "1.0.1",
     "http-proxy-middleware": "0.21.0",
     "merge-descriptors": "^1.0.1",
+    "morgan": "^1.10.0",
     "node-html-parser": "^3.3.4",
     "rimraf": "2.6.1",
     "semver": "^7.3.2",
