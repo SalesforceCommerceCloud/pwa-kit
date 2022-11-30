@@ -8,7 +8,7 @@
 import {act} from '@testing-library/react'
 import nock from 'nock'
 import {DEFAULT_TEST_HOST, renderHookWithProviders} from '../../test-utils'
-import {useShopperBasketsMutation} from './mutation'
+import {ShopperBasketMutationType, useShopperBasketsMutation} from './mutation'
 import {useBasket} from './query'
 import {useCustomerBaskets} from '../ShopperCustomers/query'
 
@@ -47,70 +47,108 @@ const mockMutationEndpoints = (matchingPath: string, options?: {errorResponse: n
         .reply(options?.errorResponse ? options.errorResponse : 204)
 }
 
-test('success', async () => {
-    mockMutationEndpoints('/checkout/shopper-baskets/')
+type MutationPayloads = {
+    [key in ShopperBasketMutationType]?: {body: any; parameters: any}
+}
+const mutationPayloads: MutationPayloads = {
+    updateBasket: {parameters: {basketId: BASKET_ID}, body: {currency: 'USD'}}
+}
 
-    // NOTE: for individual tests only
-    nock(DEFAULT_TEST_HOST)
-        .get((uri) => {
-            return uri.includes('/checkout/shopper-baskets/')
-        })
-        .reply(200, {test: 'old data'})
-        // TODO: split them up
-        .get((uri) => {
-            return uri.includes('/customer/shopper-customers/')
-        })
-        .reply(200, {test: 'old data'})
-        .get((uri) => {
-            return uri.includes('/customer/shopper-customers/')
-        })
-        .reply(200, {test: 'new data'})
+const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map((mutationName) => {
+    return {
+        hook: mutationName,
+        cases: [
+            {
+                name: 'success',
+                assertions: async () => {
+                    mockMutationEndpoints('/checkout/shopper-baskets/')
 
-    const {result, waitForValueToChange} = renderHookWithProviders(() => {
-        const queries = {
-            basket: useBasket({basketId: BASKET_ID}),
-            customerBaskets: useCustomerBaskets({customerId: CUSTOMER_ID})
-        }
-        const mutation = useShopperBasketsMutation('updateBasket')
+                    // for get basket
+                    nock(DEFAULT_TEST_HOST)
+                        .get((uri) => {
+                            return uri.includes('/checkout/shopper-baskets/')
+                        })
+                        .reply(200, {test: 'old data'})
 
-        return {
-            queries,
-            mutation
-        }
-    })
+                    // for get customer basket
+                    nock(DEFAULT_TEST_HOST)
+                        .get((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(200, {test: 'old data'})
+                        .get((uri) => {
+                            return uri.includes('/customer/shopper-customers/')
+                        })
+                        .reply(200, {test: 'new data'})
 
-    await waitForValueToChange(() => result.current.queries.basket.data)
+                    const {result, waitForValueToChange} = renderHookWithProviders(() => {
+                        const queries = {
+                            basket: useBasket({basketId: BASKET_ID}),
+                            customerBaskets: useCustomerBaskets({customerId: CUSTOMER_ID})
+                        }
+                        const mutation = useShopperBasketsMutation('updateBasket')
 
-    act(() => {
-        result.current.mutation.mutate({parameters: {basketId: BASKET_ID}, body: {currency: 'USD'}})
-    })
+                        return {
+                            queries,
+                            mutation
+                        }
+                    })
 
-    await waitForValueToChange(() => result.current.mutation.data)
+                    await waitForValueToChange(() => result.current.queries.basket.data)
 
-    expect(result.current.mutation.data).toEqual({test: 'new data'})
-    expect(result.current.mutation.isSuccess).toBe(true)
+                    act(() => {
+                        result.current.mutation.mutate({
+                            parameters: {basketId: BASKET_ID},
+                            body: {currency: 'USD'}
+                        })
+                    })
 
-    // basket query should be updated without a refetch
-    expect(result.current.queries.basket.data).toEqual({test: 'new data'})
-    expect(result.current.queries.basket.isRefetching).toBe(false)
+                    await waitForValueToChange(() => result.current.mutation.data)
 
-    // customerBaskets query should be invalidated and refetching
-    expect(result.current.queries.customerBaskets.data).toEqual({test: 'old data'})
-    expect(result.current.queries.customerBaskets.isRefetching).toBe(true)
+                    expect(result.current.mutation.data).toEqual({test: 'new data'})
+                    expect(result.current.mutation.isSuccess).toBe(true)
+
+                    // basket query should be updated without a refetch
+                    expect(result.current.queries.basket.data).toEqual({test: 'new data'})
+                    expect(result.current.queries.basket.isRefetching).toBe(false)
+
+                    // customerBaskets query should be invalidated and refetching
+                    expect(result.current.queries.customerBaskets.data).toEqual({test: 'old data'})
+                    expect(result.current.queries.customerBaskets.isRefetching).toBe(true)
+                }
+            },
+            {
+                name: 'error',
+                assertions: async () => {
+                    mockMutationEndpoints('/checkout/shopper-baskets/', {errorResponse: 500})
+
+                    const {result, waitForNextUpdate} = renderHookWithProviders(() => {
+                        return useShopperBasketsMutation('updateBasket')
+                    })
+
+                    act(() => {
+                        result.current.mutate({
+                            parameters: {basketId: BASKET_ID},
+                            body: {currency: 'USD'}
+                        })
+                    })
+
+                    await waitForNextUpdate()
+
+                    expect(result.current.error).toBeDefined()
+                }
+            }
+        ]
+    }
 })
 
-test('error', async () => {
-    mockMutationEndpoints('/checkout/shopper-baskets/', {errorResponse: 500})
-
-    const {result, waitForNextUpdate} = renderHookWithProviders(() => {
-        return useShopperBasketsMutation('updateBasket')
+tests.forEach(({hook, cases}) => {
+    describe(hook, () => {
+        beforeEach(() => {
+            jest.clearAllMocks()
+        })
+        cases.forEach(({name, assertions}) => {
+            test(name, assertions)
+        })
     })
-
-    act(() => {
-        result.current.mutate({parameters: {basketId: BASKET_ID}, body: {currency: 'USD'}})
-    })
-
-    await waitForNextUpdate()
-
-    expect(result.current.error).toBeDefined()
 })
