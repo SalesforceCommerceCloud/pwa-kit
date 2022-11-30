@@ -27,7 +27,7 @@ commands:
 
             # Install system dependencies
             sudo apt-get update
-            sudo apt-get install python python-pip google-chrome-stable time
+            sudo apt-get install python2.7 python-pip google-chrome-stable time
             sudo pip install -U pip setuptools
             sudo pip install awscli==1.18.85 datadog==0.40.1
             sudo npm install -g npm@6.14.4
