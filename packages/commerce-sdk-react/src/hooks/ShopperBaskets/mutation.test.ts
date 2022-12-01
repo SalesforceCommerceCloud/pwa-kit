@@ -139,24 +139,35 @@ tests.forEach(({hook, cases}) => {
 })
 
 const mockRelatedQueries = () => {
-    // for get basket
-    nock(DEFAULT_TEST_HOST)
-        .persist()
-        .get((uri) => {
-            return uri.includes('/checkout/shopper-baskets/')
-        })
-        .reply(200, {test: 'old data'})
-    // TODO: chain with a get request that replies with 'new data' ?
+    const basketEndpoint = '/checkout/shopper-baskets/'
+    const customerEndpoint = '/customer/shopper-customers/'
 
-    // for get customer basket
+    // The queries would initially respond with 'old data'.
+    // And then subsequent responses would have 'new data' because of the cache updates.
+
+    // For get basket
+    nock(DEFAULT_TEST_HOST)
+        .get((uri) => {
+            return uri.includes(basketEndpoint)
+        })
+        .reply(200, {test: 'old data'})
     nock(DEFAULT_TEST_HOST)
         .persist()
         .get((uri) => {
-            return uri.includes('/customer/shopper-customers/')
+            return uri.includes(basketEndpoint)
+        })
+        .reply(200, {test: 'new data'})
+
+    // For get customer basket
+    nock(DEFAULT_TEST_HOST)
+        .get((uri) => {
+            return uri.includes(customerEndpoint)
         })
         .reply(200, {test: 'old data'})
+    nock(DEFAULT_TEST_HOST)
+        .persist()
         .get((uri) => {
-            return uri.includes('/customer/shopper-customers/')
+            return uri.includes(customerEndpoint)
         })
         .reply(200, {test: 'new data'})
 }
