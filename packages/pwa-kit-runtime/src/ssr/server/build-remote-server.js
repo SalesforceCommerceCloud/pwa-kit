@@ -184,6 +184,7 @@ export const RemoteServerFactory = {
     _setupLogging(app) {
         app.use(
             expressLogging(function(tokens, req, res) {
+                const contentLength = tokens.res(req, res, 'content-length')
                 return [
                     `(${res.locals.requestId})`,
                     tokens.method(req, res),
@@ -191,8 +192,7 @@ export const RemoteServerFactory = {
                     tokens.status(req, res),
                     tokens['response-time'](req, res),
                     'ms',
-                    '-',
-                    tokens.res(req, res, 'content-length') || '-'
+                    contentLength && `- ${contentLength}`
                 ].join(' ')
             })
         )
