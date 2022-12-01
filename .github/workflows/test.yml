@@ -136,8 +136,7 @@ jobs:
         run: |-
           MAX_PACKAGES="2250"
           total=$(./scripts/count-dependencies.js generated-${{ matrix.template }})
-          echo "export TOTAL_PACKAGES=${total}" >> "$BASH_ENV";
-          source $BASH_ENV
+          echo "TOTAL_PACKAGES=${total}" >> $GITHUB_ENV
 
           if [ "$total" -gt "$MAX_PACKAGES" ]; then
               echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
