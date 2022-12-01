@@ -175,6 +175,9 @@ export const ShopperBasketsMutations = {
 
 export type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
+/**
+ * @private
+ */
 export const getCacheUpdateMatrix = (customerId: string | null) => {
     const updateBasketQuery = (basketId?: string) => {
         // TODO: we're missing headers, rawResponse -> not only {basketId}

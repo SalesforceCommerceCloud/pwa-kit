@@ -54,11 +54,13 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                     mockRelatedQueries()
 
                     const {result, waitForValueToChange} = renderHookWithProviders(() => {
+                        const mutation = useShopperBasketsMutation(mutationName)
+
+                        // All of the necessary query hooks needed to verify the cache-update logic
                         const queries = {
                             basket: useBasket({basketId: BASKET_ID}),
                             customerBaskets: useCustomerBaskets({customerId: CUSTOMER_ID})
                         }
-                        const mutation = useShopperBasketsMutation(mutationName)
 
                         return {
                             queries,
