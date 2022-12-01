@@ -1,0 +1,10 @@
+name: create_mrt_credentials_file
+runs:
+  using: composite
+  steps:
+  - name: Create MRT credentials file
+    run: |-
+      # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
+      npm run save-credentials --prefix packages/template-retail-react-app -- --user "${{ secrets.MOBIFY_CLIENT_USER }}" --key "${{ secrets.MOBIFY_CLIENT_API_KEY }}"
+    shell: bash
+

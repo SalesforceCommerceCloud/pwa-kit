@@ -64,15 +64,29 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.npm == 6
         uses: "./.github/actions/smoketestscripts"
 
-      - name: Store test results
-        uses: actions/upload-artifact@v3
-        with:
-          path: packages/template-retail-react-app/tests/reports
+      - name: Create MRT credentials file
+        uses: "./.github/actions/create_mrt_credentials_file"
 
-      - name: Store artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          path: packages/template-retail-react-app/tests/screenshots
+      - name: Push Bundle
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit'
+        #TODO: Change target test-env to staging
+        run: |-
+          if [[ $DEVELOP || $RELEASE ]]; then
+            target=test-env
+            target_commerce_sdk_react="commerce-sdk-react"
+          elif [[ $RELEASE ]]; then
+            target=production
+          else
+            target=""
+          fi
+          project="scaffold-pwa"
+          if [[ $target ]]; then
+            npm run push --prefix packages/template-retail-react-app -- -s $project --message "build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target
+          fi
+          if [[ $target_commerce_sdk_react ]]; then
+            npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target_commerce_sdk_react
+          fi
+      
 
   generated:
     strategy:
@@ -122,7 +136,7 @@ jobs:
         run: |-
           MAX_PACKAGES="2250"
           total=$(./scripts/count-dependencies.js generated-${{ matrix.template }})
-          echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
+          echo "export TOTAL_PACKAGES=${total}" >> "$BASH_ENV";
           source $BASH_ENV
 
           if [ "$total" -gt "$MAX_PACKAGES" ]; then
