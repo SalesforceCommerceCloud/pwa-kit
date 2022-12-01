@@ -8,8 +8,8 @@ import {DataType, Argument, ApiClients} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 import {updateCache, QueryKeysMatrixElement, Client, NotImplemented} from '../utils'
-import { Action } from 'react-query/types/core/query'
-import { UseMutationResult } from 'react-query'
+import {Action} from 'react-query/types/core/query'
+import {UseMutationResult} from 'react-query'
 
 export const ShopperOrdersMutations = {
     /**
@@ -83,26 +83,28 @@ export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
     'UpdatePaymentInstrumentForOrder'
 ]
 
-    type UseShopperOrdersMutationHeaders = NonNullable<Argument<Client[ShopperOrdersMutationType]>>['headers']
-    type UseShopperOrdersMutationArg = {
-        headers?: UseShopperOrdersMutationHeaders
-        rawResponse?: boolean
-    }
+type UseShopperOrdersMutationHeaders = NonNullable<
+    Argument<Client[ShopperOrdersMutationType]>
+>['headers']
+type UseShopperOrdersMutationArg = {
+    headers?: UseShopperOrdersMutationHeaders
+    rawResponse?: boolean
+}
 
 /**
  * A hook for performing mutations with the Shopper Orders API.
  */
 function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
     action: Action,
-    arg: Omit<UseShopperOrdersMutationArg, 'rawResponse'> & {rawResponse?: false}
+    arg?: Omit<UseShopperOrdersMutationArg, 'rawResponse'> & {rawResponse?: false}
 ): UseMutationResult<DataType<Client[Action]>, Error>
 function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
     action: Action,
-    arg: Omit<UseShopperOrdersMutationArg, 'rawResponse'> & {rawResponse: true}
+    arg?: Omit<UseShopperOrdersMutationArg, 'rawResponse'> & {rawResponse: true}
 ): UseMutationResult<Argument<Client[Action]>, Error>
 function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
     action: Action,
-    arg: UseShopperOrdersMutationArg
+    arg?: UseShopperOrdersMutationArg
 ): UseMutationResult<DataType<Client[Action]>, Error, Argument<Client[Action]>> {
     if (SHOPPER_ORDERS_NOT_IMPLEMENTED.includes(action)) {
         NotImplemented()
