@@ -9,6 +9,7 @@ on:
 jobs:
   pwa-kit:
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest]
         node: [14]
@@ -90,6 +91,7 @@ jobs:
 
   generated:
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest]
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]

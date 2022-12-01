@@ -105,7 +105,7 @@ test.skip('ProductView Component renders with addToWishList event handler', asyn
     })
 })
 
-test('ProductView Component renders with updateWishlist event handler', async () => {
+test.skip('ProductView Component renders with updateWishlist event handler', async () => {
     const updateWishlist = jest.fn()
 
     renderWithProviders(
