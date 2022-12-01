@@ -7,8 +7,10 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {QueryKeysMatrixElement, updateCache} from '../utils'
+import {CacheUpdateMatrixElement, updateCache} from './utils'
 import useCustomerId from '../useCustomerId'
+import {queryMap} from './query-map'
+import {queryMap as queryMap2} from '../ShopperCustomers/query-map'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -173,13 +175,13 @@ export const ShopperBasketsMutations = {
 
 export type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
-export const getQueryKeysMatrix = (customerId: string | null) => {
+export const getCacheUpdateMatrix = (customerId: string | null) => {
     const updateBasketQuery = (basketId?: string) => {
         // TODO: we're missing headers, rawResponse -> not only {basketId}
         const arg = {basketId}
         return basketId
             ? {
-                  update: [['/baskets', basketId, arg]]
+                  update: [queryMap.basket({basketId, arg})]
               }
             : {}
     }
@@ -188,19 +190,17 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         const arg = {basketId}
         return basketId
             ? {
-                  remove: [['/baskets', basketId, arg]]
+                  remove: [queryMap.basket({basketId, arg})]
               }
             : {}
     }
 
     const invalidateCustomerBasketsQuery = (customerId: string | null) => {
-        // NOTE: need arg here too actually because the query key will be used later in the test
-        // TODO: actually... it depends on how the test is done
-        // TODO: maybe close the ticket https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EWO8MYAX/view
+        // TODO: should we use arg here or not? The invalidate method does not need exact query key.
         const arg = {customerId}
         return customerId
             ? {
-                  invalidate: [['/customers', customerId, '/baskets', arg]]
+                  invalidate: [queryMap2.customerBaskets({customerId, arg})]
               }
             : {}
     }
@@ -209,7 +209,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         addCouponToBasket: (
             params: Argument<Client['addCouponToBasket']>,
             response: DataType<Client['addCouponToBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params.parameters.basketId
 
             return {
@@ -220,7 +220,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         addItemToBasket: (
             params: Argument<Client['addItemToBasket']>,
             response: DataType<Client['addItemToBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params.parameters.basketId
 
             return {
@@ -231,7 +231,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         addPaymentInstrumentToBasket: (
             params: Argument<Client['addPaymentInstrumentToBasket']>,
             response: DataType<Client['addPaymentInstrumentToBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params.parameters.basketId
 
             return {
@@ -242,7 +242,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         createBasket: (
             params: Argument<Client['createBasket']>,
             response: DataType<Client['createBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = response.basketId
 
             return {
@@ -253,7 +253,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         deleteBasket: (
             params: Argument<Client['deleteBasket']>,
             response: DataType<Client['deleteBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params?.parameters.basketId
 
             return {
@@ -264,7 +264,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         mergeBasket: (
             params: Argument<Client['mergeBasket']>,
             response: DataType<Client['mergeBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             // TODO: mergeBasket does not require a basket id.. what to do now?
             // const basketId = params.parameters?.basketId
 
@@ -276,7 +276,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         removeCouponFromBasket: (
             params: Argument<Client['removeCouponFromBasket']>,
             response: DataType<Client['removeCouponFromBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params?.parameters.basketId
 
             return {
@@ -287,7 +287,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         removePaymentInstrumentFromBasket: (
             params: Argument<Client['removePaymentInstrumentFromBasket']>,
             response: DataType<Client['removePaymentInstrumentFromBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params?.parameters.basketId
 
             return {
@@ -298,7 +298,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         updateBasket: (
             params: Argument<Client['updateBasket']>,
             response: DataType<Client['updateBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params.parameters.basketId
 
             return {
@@ -309,7 +309,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         updateBillingAddressForBasket: (
             params: Argument<Client['updateBillingAddressForBasket']>,
             response: DataType<Client['updateBillingAddressForBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params.parameters.basketId
 
             return {
@@ -320,7 +320,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         updateCustomerForBasket: (
             params: Argument<Client['updateCustomerForBasket']>,
             response: DataType<Client['updateCustomerForBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params.parameters.basketId
 
             return {
@@ -331,7 +331,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         updateItemInBasket: (
             params: Argument<Client['updateItemInBasket']>,
             response: DataType<Client['updateItemInBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params.parameters.basketId
 
             return {
@@ -342,7 +342,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         updatePaymentInstrumentInBasket: (
             params: Argument<Client['updatePaymentInstrumentInBasket']>,
             response: DataType<Client['updatePaymentInstrumentInBasket']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params.parameters.basketId
 
             return {
@@ -353,7 +353,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         updateShippingAddressForShipment: (
             params: Argument<Client['updateShippingAddressForShipment']>,
             response: DataType<Client['updateShippingAddressForShipment']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params.parameters.basketId
 
             return {
@@ -364,7 +364,7 @@ export const getQueryKeysMatrix = (customerId: string | null) => {
         updateShippingMethodForShipment: (
             params: Argument<Client['updateShippingMethodForShipment']>,
             response: DataType<Client['updateShippingMethodForShipment']>
-        ): QueryKeysMatrixElement => {
+        ): CacheUpdateMatrixElement => {
             const basketId = params.parameters.basketId
 
             return {
@@ -385,7 +385,7 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
     const queryClient = useQueryClient()
 
     const customerId = useCustomerId()
-    const queryKeysMatrix = getQueryKeysMatrix(customerId)
+    const cacheUpdateMatrix = getCacheUpdateMatrix(customerId)
 
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
@@ -397,7 +397,7 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
         },
         {
             onSuccess: (data, params) => {
-                updateCache(queryClient, action, queryKeysMatrix, data, params)
+                updateCache(queryClient, action, cacheUpdateMatrix, data, params)
             }
         }
     )

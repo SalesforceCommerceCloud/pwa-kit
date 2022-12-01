@@ -8,9 +8,14 @@
 import {act} from '@testing-library/react'
 import nock from 'nock'
 import {DEFAULT_TEST_HOST, mockMutationEndpoints, renderHookWithProviders} from '../../test-utils'
-import {getQueryKeysMatrix, ShopperBasketMutationType, useShopperBasketsMutation} from './mutation'
+import {
+    getCacheUpdateMatrix,
+    ShopperBasketMutationType,
+    useShopperBasketsMutation
+} from './mutation'
 import {useBasket} from './query'
 import {useCustomerBaskets} from '../ShopperCustomers/query'
+import {CacheUpdateMatrixElement, QueryMap} from './utils'
 
 const CUSTOMER_ID = 'CUSTOMER_ID'
 const BASKET_ID = 'BASKET_ID'
@@ -46,28 +51,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                 name: 'success',
                 assertions: async () => {
                     mockMutationEndpoints('/checkout/shopper-baskets/')
-
-                    // TODO: extract this mocking of these query endpoints
-
-                    // for get basket
-                    nock(DEFAULT_TEST_HOST)
-                        .persist()
-                        .get((uri) => {
-                            return uri.includes('/checkout/shopper-baskets/')
-                        })
-                        .reply(200, {test: 'old data'})
-
-                    // for get customer basket
-                    nock(DEFAULT_TEST_HOST)
-                        .persist()
-                        .get((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(200, {test: 'old data'})
-                        .get((uri) => {
-                            return uri.includes('/customer/shopper-customers/')
-                        })
-                        .reply(200, {test: 'new data'})
+                    mockRelatedQueries()
 
                     const {result, waitForValueToChange} = renderHookWithProviders(() => {
                         const queries = {
@@ -91,28 +75,34 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                     await waitForValueToChange(() => result.current.mutation.isSuccess)
                     expect(result.current.mutation.isSuccess).toBe(true)
 
-                    const queryKeysMatrix = getQueryKeysMatrix(CUSTOMER_ID)
+                    // On successful mutation, the query cache gets updated too. Let's assert it.
+                    const cacheUpdateMatrix = getCacheUpdateMatrix(CUSTOMER_ID)
                     // @ts-ignore
-                    const {invalidate, update, remove} = queryKeysMatrix[mutationName](payload, {})
+                    const matrixElement = cacheUpdateMatrix[mutationName](payload, {})
+                    const {invalidate, update, remove}: CacheUpdateMatrixElement = matrixElement
 
-                    // TODO: do not assume that `update` will deal with basket query
-                    if (update) {
-                        // basket query should be updated without a refetch
-                        expect(result.current.queries.basket.data).toEqual({test: 'new data'})
-                        expect(result.current.queries.basket.isRefetching).toBe(false)
-                    }
+                    update?.forEach(({name}) => {
+                        // query should be updated without a refetch
+                        // @ts-ignore
+                        expect(result.current.queries[name].data).toEqual({test: 'new data'})
+                        // @ts-ignore
+                        expect(result.current.queries[name].isRefetching).toBe(false)
+                    })
 
-                    if (invalidate) {
-                        // customerBaskets query should be invalidated and refetching
-                        expect(result.current.queries.customerBaskets.data).toEqual({
+                    invalidate?.forEach(({name}) => {
+                        // query should be invalidated and refetching
+                        // @ts-ignore
+                        expect(result.current.queries[name].data).toEqual({
                             test: 'old data'
                         })
-                        expect(result.current.queries.customerBaskets.isRefetching).toBe(true)
-                    }
+                        // @ts-ignore
+                        expect(result.current.queries[name].isRefetching).toBe(true)
+                    })
 
-                    if (remove) {
-                        expect(result.current.queries.basket.data).not.toBeDefined()
-                    }
+                    remove?.forEach(({name}) => {
+                        // @ts-ignore
+                        expect(result.current.queries[name].data).not.toBeDefined()
+                    })
                 }
             },
             {
@@ -147,3 +137,26 @@ tests.forEach(({hook, cases}) => {
         })
     })
 })
+
+const mockRelatedQueries = () => {
+    // for get basket
+    nock(DEFAULT_TEST_HOST)
+        .persist()
+        .get((uri) => {
+            return uri.includes('/checkout/shopper-baskets/')
+        })
+        .reply(200, {test: 'old data'})
+    // TODO: chain with a get request that replies with 'new data' ?
+
+    // for get customer basket
+    nock(DEFAULT_TEST_HOST)
+        .persist()
+        .get((uri) => {
+            return uri.includes('/customer/shopper-customers/')
+        })
+        .reply(200, {test: 'old data'})
+        .get((uri) => {
+            return uri.includes('/customer/shopper-customers/')
+        })
+        .reply(200, {test: 'new data'})
+}
