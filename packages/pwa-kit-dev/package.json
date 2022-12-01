@@ -86,7 +86,6 @@
     "jest-fetch-mock": "^2.1.2",
     "mime-types": "2.1.32",
     "minimatch": "3.0.5",
-    "morgan": "1.9.1",
     "open": "^8.4.0",
     "prettier": "^1.18.2",
     "pwa-kit-runtime": "^2.4.0-dev",
