@@ -6,7 +6,6 @@
  */
 
 import {QueryMap} from '../ShopperBaskets/utils'
-import {useCustomerBaskets} from './query'
 
 /**
  * @private
@@ -16,8 +15,7 @@ export const queryMap = {
         const {customerId, arg} = params
         return {
             name: 'customerBaskets',
-            key: ['/customers', customerId, '/baskets', arg],
-            hook: () => useCustomerBaskets(arg)
+            key: ['/customers', customerId, '/baskets', arg]
         }
     }
 

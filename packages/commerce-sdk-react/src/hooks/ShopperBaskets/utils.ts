@@ -18,7 +18,6 @@ const isObject = (item: any) => typeof item === 'object' && !Array.isArray(item)
 export interface QueryMap {
     name: string
     key: QueryKey
-    hook: any
 }
 
 export interface CacheUpdateMatrixElement {
