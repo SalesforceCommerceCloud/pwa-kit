@@ -37,7 +37,6 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "private": true,
   "devDependencies": {
     "@tanstack/react-query": "^4.0.10",
     "@tanstack/react-query-devtools": "^4.2.1",
