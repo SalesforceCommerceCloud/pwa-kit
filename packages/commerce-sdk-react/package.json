@@ -13,7 +13,10 @@
     "LICENSE",
     "scripts",
     "auth",
-    "hooks"
+    "hooks",
+    "*.js",
+    "*.d.ts",
+    "*.d.ts.map"
   ],
   "publishConfig": {
     "directory": "dist"
