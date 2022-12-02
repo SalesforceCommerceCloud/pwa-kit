@@ -1,5 +1,6 @@
-## v2.4.0-dev (Oct 27, 2022)
+## v2.4.0 (Dec 01, 2022)
 -   Add `tail-logs` command [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
+-   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793)
 
 ## v2.3.0 (Oct 27, 2022)
 -   Minimize "Module not found" error during webpack rebuild, whenever a package dependency is being updated/built [#722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/722)
