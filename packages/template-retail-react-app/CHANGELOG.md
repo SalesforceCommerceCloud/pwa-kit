@@ -1,3 +1,4 @@
+## v2.5.0-dev (Dec 01, 2022)
 ## v2.4.0 (Dec 1, 2022)
 - Dynamic footer Copyright date [#741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/741)
 - Footer copyright: remove the remaining hardcoded year [#760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/760)

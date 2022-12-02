@@ -1,5 +1,4 @@
 ## v2.5.0-dev (Dec 01, 2022)
-## v2.5.0-dev (Dec 01, 2022)
 ## v2.4.0 (Dec 01, 2022)
 -   Add `tail-logs` command [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
 -   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793)

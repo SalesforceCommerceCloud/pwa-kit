@@ -1,5 +1,4 @@
 ## v2.5.0-dev (Dec 01, 2022)
-## v2.5.0-dev (Dec 01, 2022)
 ## v2.4.0 (Dec 01, 2022)
 ## v2.3.0 (Oct 27, 2022)
 - Performance: Skip retries when flushing CloudWatch metrics, prioritize returning a response instead. [720](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/720)
