@@ -1,4 +1,4 @@
-## v2.4.0 (Dec 1, 2022)
+## v2.4.0 (Dec 01, 2022)
 - Update instanceUrl on retail-react-app-demo preset [#799](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/799)
 - Update usages of zzrf-001 ODS instance to the new short URL format [#816](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/816)
 
