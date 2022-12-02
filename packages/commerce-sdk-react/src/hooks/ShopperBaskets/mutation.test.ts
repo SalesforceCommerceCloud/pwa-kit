@@ -7,7 +7,14 @@
 
 import {act} from '@testing-library/react'
 import nock from 'nock'
-import {DEFAULT_TEST_HOST, mockMutationEndpoints, renderHookWithProviders} from '../../test-utils'
+import {
+    assertInvalidateQuery,
+    assertRemoveQuery,
+    assertUpdateQuery,
+    DEFAULT_TEST_HOST,
+    mockMutationEndpoints,
+    renderHookWithProviders
+} from '../../test-utils'
 import {
     getCacheUpdateMatrix,
     ShopperBasketMutationType,
@@ -84,26 +91,18 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                     const {invalidate, update, remove}: CacheUpdateMatrixElement = matrixElement
 
                     update?.forEach(({name}) => {
-                        // query should be updated without a refetch
                         // @ts-ignore
-                        expect(result.current.queries[name].data).toEqual({test: 'new data'})
-                        // @ts-ignore
-                        expect(result.current.queries[name].isRefetching).toBe(false)
+                        assertUpdateQuery(result.current.queries[name], {test: 'new data'})
                     })
 
                     invalidate?.forEach(({name}) => {
-                        // query should be invalidated and refetching
                         // @ts-ignore
-                        expect(result.current.queries[name].data).toEqual({
-                            test: 'old data'
-                        })
-                        // @ts-ignore
-                        expect(result.current.queries[name].isRefetching).toBe(true)
+                        assertInvalidateQuery(result.current.queries[name], {test: 'old data'})
                     })
 
                     remove?.forEach(({name}) => {
                         // @ts-ignore
-                        expect(result.current.queries[name].data).not.toBeDefined()
+                        assertRemoveQuery(result.current.queries[name])
                     })
                 }
             },

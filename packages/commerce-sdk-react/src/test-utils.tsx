@@ -7,10 +7,16 @@
 
 import React from 'react'
 import {render, RenderOptions} from '@testing-library/react'
-import {renderHook} from '@testing-library/react-hooks/dom'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {renderHook, RenderResult} from '@testing-library/react-hooks/dom'
+import {
+    QueryClient,
+    QueryClientProvider,
+    UseMutationResult,
+    UseQueryResult
+} from '@tanstack/react-query'
 import nock from 'nock'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
+import {CacheUpdateMatrixElement} from './hooks/ShopperBaskets/utils'
 
 // Note: this host does NOT exist
 // it is intentional b/c we can catch those unintercepted requests
@@ -108,4 +114,26 @@ export const mockMutationEndpoints = (matchingPath: string, options?: {errorResp
             return uri.includes(matchingPath)
         })
         .reply(options?.errorResponse ? options.errorResponse : 204)
+}
+
+export const assertUpdateQuery = (
+    queryResult: UseQueryResult,
+    newData: Record<string, unknown>
+) => {
+    // query should be updated without a refetch
+    expect(queryResult.data).toEqual(newData)
+    expect(queryResult.isRefetching).toBe(false)
+}
+
+export const assertInvalidateQuery = (
+    queryResult: UseQueryResult,
+    oldData: Record<string, unknown>
+) => {
+    // query should be invalidated and refetching
+    expect(queryResult.data).toEqual(oldData)
+    expect(queryResult.isRefetching).toBe(true)
+}
+
+export const assertRemoveQuery = (queryResult: UseQueryResult) => {
+    expect(queryResult.data).not.toBeDefined()
 }
