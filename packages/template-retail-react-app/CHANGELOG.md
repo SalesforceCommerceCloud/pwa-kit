@@ -1,3 +1,4 @@
+## v2.4.0 (Dec 1, 2022)
 ## v2.3.0 (Oct 27, 2022)
 - Fix locale `alias` by including `locale` object inside the MultiSite Context.  [#716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/716)
 - Updated translations. [#725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/725)
