@@ -1,3 +1,5 @@
+## v2.5.0-dev (Dec 01, 2022)
+## v2.5.0-dev (Dec 01, 2022)
 ## v2.4.0 (Dec 01, 2022)
 -   Fix `useServerContext` returning isServerSide=false when on server. [#782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/782)
 -   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793) 
