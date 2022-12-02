@@ -14,7 +14,7 @@ import {
     useCustomerProductList,
     useShopperCustomersMutation,
     useShopperLoginHelper
-} from 'commerce-sdk-react'
+} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 import {useQueryClient} from '@tanstack/react-query'
 

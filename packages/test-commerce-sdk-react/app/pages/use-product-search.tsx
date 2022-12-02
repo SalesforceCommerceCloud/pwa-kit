@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useProductSearch} from 'commerce-sdk-react'
+import {useProductSearch} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 import {Link} from 'react-router-dom'
 
