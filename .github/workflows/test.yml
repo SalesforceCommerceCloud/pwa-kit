@@ -77,11 +77,11 @@ jobs:
 
       - name: Push Bundle
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 && matrix.os == 'ubuntu-latest'
-        #TODO: Change target test-env to staging
+        #TODO: Change target 'test-env' to 'staging' and 'commerce-sdk-react-test-env' to 'commerce-sdk-react'
         run: |-
           if [[ $DEVELOP || $RELEASE ]]; then
             target=test-env
-            target_commerce_sdk_react="commerce-sdk-react"
+            target_commerce_sdk_react="commerce-sdk-react-test-env"
           elif [[ $RELEASE ]]; then
             target=production
           else

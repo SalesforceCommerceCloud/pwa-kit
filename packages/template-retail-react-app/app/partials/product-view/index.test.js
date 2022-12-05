@@ -88,7 +88,7 @@ test('ProductView Component renders with addToCart event handler', () => {
     expect(addToCart).toHaveBeenCalledTimes(1)
 })
 
-test.skip('ProductView Component renders with addToWishList event handler', async () => {
+test('ProductView Component renders with addToWishList event handler', async () => {
     const addToWishlist = jest.fn()
 
     renderWithProviders(<MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />)
@@ -105,7 +105,7 @@ test.skip('ProductView Component renders with addToWishList event handler', asyn
     })
 })
 
-test.skip('ProductView Component renders with updateWishlist event handler', async () => {
+test('ProductView Component renders with updateWishlist event handler', async () => {
     const updateWishlist = jest.fn()
 
     renderWithProviders(
