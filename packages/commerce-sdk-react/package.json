@@ -1,6 +1,6 @@
 {
-  "name": "commerce-sdk-react",
-  "version": "2.4.0-dev",
+  "name": "commerce-sdk-react-preview",
+  "version": "2.5.0-dev",
   "description": "A library that provides react hooks for fetching data from Commerce Cloud",
   "author": "cc-pwa-kit@salesforce.com",
   "license": "See license in LICENSE",
@@ -8,10 +8,20 @@
     "node": "^14.0.0",
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
+  "private": true,
   "files": [
     "CHANGELOG.md",
-    "LICENSE"
+    "LICENSE",
+    "scripts",
+    "auth",
+    "hooks",
+    "*.js",
+    "*.d.ts",
+    "*.d.ts.map"
   ],
+  "publishConfig": {
+    "directory": "dist"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
@@ -37,7 +47,6 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "private": true,
   "devDependencies": {
     "@tanstack/react-query": "^4.0.10",
     "@tanstack/react-query-devtools": "^4.2.1",
@@ -51,7 +60,7 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "cross-env": "^5.2.0",
-    "internal-lib-build": "^2.4.0-dev",
+    "internal-lib-build": "^2.5.0-dev",
     "jest-silent-reporter": "^0.5.0",
     "jsonwebtoken": "^8.5.1",
     "nock": "^13.2.9",
