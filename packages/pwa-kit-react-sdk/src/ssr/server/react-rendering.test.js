@@ -716,7 +716,8 @@ describe('The Node SSR Environment', () => {
             assertions: (res) => {
                 expect(res.statusCode).toBe(404)
 
-                // Because of the prepass step we'll expect that this method is called twice.
+                // we'll expect that this method is called three times,
+                // twice for rendering pipeline because of the prepass step and one for http request logging
                 expect(console.log).toHaveBeenCalledTimes(3)
             }
         }
