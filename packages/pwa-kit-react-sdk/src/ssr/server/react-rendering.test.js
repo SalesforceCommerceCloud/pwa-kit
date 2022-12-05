@@ -717,7 +717,7 @@ describe('The Node SSR Environment', () => {
                 expect(res.statusCode).toBe(404)
 
                 // Because of the prepass step we'll expect that this method is called twice.
-                expect(console.log).toHaveBeenCalledTimes(2)
+                expect(console.log).toHaveBeenCalledTimes(3)
             }
         }
     ]
