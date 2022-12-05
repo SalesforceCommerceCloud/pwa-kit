@@ -66,10 +66,21 @@ jobs:
         uses: "./.github/actions/smoketestscripts"
 
       - name: Create MRT credentials file
-        uses: "./.github/actions/create_mrt_credentials_file"
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 && matrix.os == 'ubuntu-latest'
+        runs:
+          using: composit
+          env:
+            MOBIFY_CLIENT_USER: ${{ secrets.MOBIFY_CLIENT_USER }}
+            MOBIFY_CLIENT_API_KEY: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+          steps:
+            - name: Create MRT credentials file
+              run: |-
+                # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
+                npm run save-credentials --prefix packages/template-retail-react-app -- --user "$MOBIFY_CLIENT_USER" --key "$MOBIFY_CLIENT_API_KEY"
+              shell: bash
 
       - name: Push Bundle
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit'
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 && matrix.os == 'ubuntu-latest'
         #TODO: Change target test-env to staging
         run: |-
           if [[ $DEVELOP || $RELEASE ]]; then
