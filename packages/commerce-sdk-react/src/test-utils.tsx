@@ -94,6 +94,9 @@ export function renderHookWithProviders<TProps, TResult>(
     })
 }
 
+export const NEW_DATA = {test: 'new data'}
+export const OLD_DATA = {test: 'old data'}
+
 export const mockMutationEndpoints = (matchingPath: string, options?: {errorResponse: number}) => {
     const responseStatus = options?.errorResponse ? options.errorResponse : 200
 
@@ -101,15 +104,15 @@ export const mockMutationEndpoints = (matchingPath: string, options?: {errorResp
         .patch((uri) => {
             return uri.includes(matchingPath)
         })
-        .reply(responseStatus, {test: 'new data'})
+        .reply(responseStatus, NEW_DATA)
         .put((uri) => {
             return uri.includes(matchingPath)
         })
-        .reply(responseStatus, {test: 'new data'})
+        .reply(responseStatus, NEW_DATA)
         .post((uri) => {
             return uri.includes(matchingPath)
         })
-        .reply(responseStatus, {test: 'new data'})
+        .reply(responseStatus, NEW_DATA)
         .delete((uri) => {
             return uri.includes(matchingPath)
         })

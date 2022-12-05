@@ -13,6 +13,8 @@ import {
     assertUpdateQuery,
     DEFAULT_TEST_HOST,
     mockMutationEndpoints,
+    NEW_DATA,
+    OLD_DATA,
     renderHookWithProviders
 } from '../../test-utils'
 import {
@@ -92,12 +94,12 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
 
                     update?.forEach(({name}) => {
                         // @ts-ignore
-                        assertUpdateQuery(result.current.queries[name], {test: 'new data'})
+                        assertUpdateQuery(result.current.queries[name], NEW_DATA)
                     })
 
                     invalidate?.forEach(({name}) => {
                         // @ts-ignore
-                        assertInvalidateQuery(result.current.queries[name], {test: 'old data'})
+                        assertInvalidateQuery(result.current.queries[name], OLD_DATA)
                     })
 
                     remove?.forEach(({name}) => {
@@ -151,24 +153,24 @@ const mockRelatedQueries = () => {
         .get((uri) => {
             return uri.includes(basketEndpoint)
         })
-        .reply(200, {test: 'old data'})
+        .reply(200, OLD_DATA)
     nock(DEFAULT_TEST_HOST)
         .persist()
         .get((uri) => {
             return uri.includes(basketEndpoint)
         })
-        .reply(200, {test: 'new data'})
+        .reply(200, NEW_DATA)
 
     // For get customer basket
     nock(DEFAULT_TEST_HOST)
         .get((uri) => {
             return uri.includes(customerEndpoint)
         })
-        .reply(200, {test: 'old data'})
+        .reply(200, OLD_DATA)
     nock(DEFAULT_TEST_HOST)
         .persist()
         .get((uri) => {
             return uri.includes(customerEndpoint)
         })
-        .reply(200, {test: 'new data'})
+        .reply(200, NEW_DATA)
 }
