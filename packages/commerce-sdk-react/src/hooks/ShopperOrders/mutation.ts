@@ -8,8 +8,7 @@ import {DataType, Argument} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 import {updateCache, QueryKeysMatrixElement, Client, NotImplemented} from '../utils'
-import {Action} from 'react-query/types/core/query'
-import {UseMutationResult} from 'react-query'
+import {UseMutationResult} from '@tanstack/react-query'
 
 export const ShopperOrdersMutations = {
     /**
