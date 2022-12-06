@@ -12,7 +12,7 @@ import {
     useShopperOrdersMutation,
     useShopperLoginHelper,
     ShopperLoginHelpers
-} from 'commerce-sdk-react'
+} from 'commerce-sdk-react-preview'
 const orderNos = ['00014202', '00014103']
 
 const renderMutationHooks = ({name, hook, body, parameters}: any) => {
