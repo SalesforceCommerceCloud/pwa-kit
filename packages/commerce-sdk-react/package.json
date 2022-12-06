@@ -17,7 +17,10 @@
     "hooks",
     "*.js",
     "*.d.ts",
-    "*.d.ts.map"
+    "*.d.ts.map",
+    "!*.test.js",
+    "!*.test.d.ts",
+    "!*.test.d.ts.map"
   ],
   "publishConfig": {
     "directory": "dist"
