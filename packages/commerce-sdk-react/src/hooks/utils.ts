@@ -13,7 +13,7 @@ import {ShopperBasketMutationType} from './ShopperBaskets'
 const isObject = (item: unknown) =>
     typeof item === 'object' && !Array.isArray(item) && item !== null
 
-interface QueryKeyMap {
+export interface QueryKeyMap {
     name: string
     key: QueryKey
 }
@@ -24,21 +24,11 @@ export interface CacheUpdateMatrixElement {
     remove?: Array<QueryKeyMap>
 }
 
-export interface QueryKeysMatrixElement {
-    update?: Array<Array<string | unknown>>
-    invalidate?: Array<Array<string | unknown>>
-    remove?: Array<Array<string | unknown>>
-}
-
 // TODO: Add more endpoints types as needed
 export type CombinedMutationTypes =
     | ShopperOrdersMutationType
     | ShopperCustomersMutationType
     | ShopperBasketMutationType
-
-type QueryKeysMatrix = {
-    [key in CombinedMutationTypes]?: (data: any, param: any) => QueryKeysMatrixElement
-}
 
 type CacheUpdateMatrix = {
     [key in CombinedMutationTypes]?: (data: any, param: any) => CacheUpdateMatrixElement

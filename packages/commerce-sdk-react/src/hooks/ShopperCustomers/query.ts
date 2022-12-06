@@ -88,6 +88,7 @@ function useCustomerAddress(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
+        // TODO: `parameters.addressName` is also needed here
         ['/customers', parameters.customerId, '/addresses', arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerAddress({parameters, headers}, rawResponse)

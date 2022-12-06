@@ -7,16 +7,10 @@
 
 import React from 'react'
 import {render, RenderOptions} from '@testing-library/react'
-import {renderHook, RenderResult} from '@testing-library/react-hooks/dom'
-import {
-    QueryClient,
-    QueryClientProvider,
-    UseMutationResult,
-    UseQueryResult
-} from '@tanstack/react-query'
+import {renderHook} from '@testing-library/react-hooks/dom'
+import {QueryClient, QueryClientProvider, UseQueryResult} from '@tanstack/react-query'
 import nock from 'nock'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
-import {CacheUpdateMatrixElement} from './hooks/ShopperBaskets/utils'
 
 // Note: this host does NOT exist
 // it is intentional b/c we can catch those unintercepted requests
