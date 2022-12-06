@@ -21,13 +21,9 @@ commands:
           name: 'Install Dependencies'
           command: |
 
-            # Add Chrome to apt sources
-            wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-            sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-
             # Install system dependencies
             sudo apt-get update
-            sudo apt-get install python-dev python-pip google-chrome-stable time
+            sudo apt-get install python-dev python-pip time
             sudo pip install -U pip setuptools
             sudo pip install awscli==1.18.85 datadog==0.40.1
             sudo npm install -g npm@6.14.4
