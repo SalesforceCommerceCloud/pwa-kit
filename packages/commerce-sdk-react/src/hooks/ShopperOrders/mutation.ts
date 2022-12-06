@@ -97,7 +97,7 @@ function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
 ): UseMutationResult<DataType<Client[Action]>, Error>
 function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
     arg: UseShopperOrdersMutationArg & {rawResponse: true}
-): UseMutationResult<Argument<Client[Action]>, Error>
+): UseMutationResult<Response, Error>
 function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
     arg: UseShopperOrdersMutationArg
 ): UseMutationResult<DataType<Client[Action]>, Error, Argument<Client[Action]>> {
