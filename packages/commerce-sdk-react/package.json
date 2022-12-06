@@ -12,12 +12,12 @@
   "files": [
     "CHANGELOG.md",
     "LICENSE",
-    "scripts",
-    "auth",
-    "hooks",
-    "*.js",
-    "*.d.ts",
-    "*.d.ts.map"
+    "+(auth|hooks|scripts)/**/!(*.test*).{ts,js}",
+    "*.{js,d.ts}",
+    "!*.test*.{js,d.ts}",
+    "!test*.*",
+    "!+(jest|babel).config.js",
+    "!setup-jest.js"
   ],
   "publishConfig": {
     "directory": "dist"
