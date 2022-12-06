@@ -154,7 +154,8 @@ const runGenerator = () => {
 
 const main = () => {
     return Promise.resolve()
-        .then(() => withLocalNPMRepo(runGenerator))
+        // .then(() => withLocalNPMRepo(runGenerator))
+        .then(() => withLocalNPMRepo())
         .then(() => process.exit(0))
         .catch(() => process.exit(1))
 }
