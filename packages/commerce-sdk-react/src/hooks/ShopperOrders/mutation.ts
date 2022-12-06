@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {DataType, Argument, ApiClients} from '../types'
+import {DataType, Argument} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 import {updateCache, QueryKeysMatrixElement, Client, NotImplemented} from '../utils'
@@ -44,8 +44,6 @@ export const ShopperOrdersMutations = {
     UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
 } as const
 
-export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
-
 export const shopperOrdersQueryKeysMatrix = {
     createOrder: (
         params: Argument<Client['createOrder']>,
@@ -83,29 +81,31 @@ export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
     'UpdatePaymentInstrumentForOrder'
 ]
 
+export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
+
 type UseShopperOrdersMutationHeaders = NonNullable<
     Argument<Client[ShopperOrdersMutationType]>
 >['headers']
 type UseShopperOrdersMutationArg = {
     headers?: UseShopperOrdersMutationHeaders
     rawResponse?: boolean
+    action: ShopperOrdersMutationType
 }
 
 /**
  * A hook for performing mutations with the Shopper Orders API.
  */
 function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
-    action: Action,
-    arg?: Omit<UseShopperOrdersMutationArg, 'rawResponse'> & {rawResponse?: false}
+    arg: UseShopperOrdersMutationArg & {rawResponse?: false}
 ): UseMutationResult<DataType<Client[Action]>, Error>
 function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
-    action: Action,
-    arg?: Omit<UseShopperOrdersMutationArg, 'rawResponse'> & {rawResponse: true}
+    arg: UseShopperOrdersMutationArg & {rawResponse: true}
 ): UseMutationResult<Argument<Client[Action]>, Error>
 function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
-    action: Action,
-    arg?: UseShopperOrdersMutationArg
+    arg: UseShopperOrdersMutationArg
 ): UseMutationResult<DataType<Client[Action]>, Error, Argument<Client[Action]>> {
+    const {headers, rawResponse, action} = arg
+
     if (SHOPPER_ORDERS_NOT_IMPLEMENTED.includes(action)) {
         NotImplemented()
     }
