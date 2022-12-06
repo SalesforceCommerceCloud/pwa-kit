@@ -66,6 +66,7 @@ const entryPointExists = (segments) => {
 
 const findInProjectThenSDK = (pkg) => {
     const projectPath = resolve(projectDir, 'node_modules', pkg)
+    console.log('~projectPath', projectPath)
     return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
 }
 

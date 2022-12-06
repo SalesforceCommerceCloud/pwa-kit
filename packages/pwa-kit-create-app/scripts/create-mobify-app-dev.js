@@ -136,9 +136,9 @@ const withLocalNPMRepo = (func) => {
             console.log('Published successfully')
         })
         .then(() => func())
-        .then(() => cleanup())
+        // .then(() => cleanup())
         .catch((err) => {
-            cleanup()
+            // cleanup()
             throw err
         })
 }

@@ -142,6 +142,8 @@ const main = () => {
             }
         })
 
+    const appSSRjs = fse.pathExistsSync(p.join(process.cwd(), 'app', 'ssr.js'))
+
     program
         .command('start')
         .description(`develop your app locally`)
@@ -151,7 +153,11 @@ const main = () => {
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
         .action(({inspect, noHMR}) => {
             execSync(
-                `node${inspect ? ' --inspect' : ''} ${p.join(process.cwd(), 'app', 'ssr.js')}`,
+                `node${inspect ? ' --inspect' : ''} ${
+                    appSSRjs ?
+                    p.join(process.cwd(), 'app', 'ssr.js')
+                    :
+                    p.join(process.cwd(), 'node_modules/retail-react-app', 'app', 'ssr.js')}`,
                 {
                     env: {
                         ...process.env,

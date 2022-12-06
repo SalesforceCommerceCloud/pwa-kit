@@ -1,3 +1,7 @@
+## v2.5.0-dev (Dec 06, 2022)
+## v2.4.0-dev (Dec 06, 2022)
+## v2.5.0-dev (Dec 06, 2022)
+## v2.5.0-dev.0 (Dec 06, 2022)
 ## v2.4.0-dev (Oct 27, 2022)
 -   Add `tail-logs` command [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
 
