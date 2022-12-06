@@ -82,9 +82,7 @@ export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
 
 export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
 
-type UseShopperOrdersMutationHeaders = NonNullable<
-    Argument<Client['createOrder']>
->['headers']
+type UseShopperOrdersMutationHeaders = NonNullable<Argument<Client['createOrder']>>['headers']
 type UseShopperOrdersMutationArg = {
     headers?: UseShopperOrdersMutationHeaders
     rawResponse?: boolean

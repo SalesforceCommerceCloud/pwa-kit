@@ -380,7 +380,9 @@ export const SHOPPER_CUSTOMERS_NOT_IMPLEMENTED = [
 
 export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
-type UseShopperCustomersMutationHeaders = NonNullable<Argument<Client['registerCustomer']>>['headers']
+type UseShopperCustomersMutationHeaders = NonNullable<
+    Argument<Client['registerCustomer']>
+>['headers']
 type UseShopperCustomersMutationArg = {
     headers?: UseShopperCustomersMutationHeaders
     rawResponse?: boolean

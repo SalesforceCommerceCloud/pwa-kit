@@ -148,9 +148,14 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
 
                         const queryClient = createQueryClient()
 
-                        renderWithProviders(<CustomerMutationComponent action={mutationName as ShopperCustomersMutationType} />, {
-                            queryClient
-                        })
+                        renderWithProviders(
+                            <CustomerMutationComponent
+                                action={mutationName as ShopperCustomersMutationType}
+                            />,
+                            {
+                                queryClient
+                            }
+                        )
                         await waitFor(() =>
                             screen.getByRole('button', {
                                 name: mutationName
@@ -216,7 +221,11 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                             })
                             .reply(500, {})
 
-                        renderWithProviders(<CustomerMutationComponent action={mutationName as ShopperCustomersMutationType} />)
+                        renderWithProviders(
+                            <CustomerMutationComponent
+                                action={mutationName as ShopperCustomersMutationType}
+                            />
+                        )
                         await waitFor(() =>
                             screen.getByRole('button', {
                                 name: mutationName
