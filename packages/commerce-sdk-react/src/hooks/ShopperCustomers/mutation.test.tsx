@@ -99,16 +99,16 @@ const mutationPayloads: MutationPayloads = {
 }
 
 interface CustomerMutationComponentParams {
-    mutation: ShopperCustomersMutationType
+    action: ShopperCustomersMutationType
 }
-const CustomerMutationComponent = ({mutation}: CustomerMutationComponentParams) => {
-    const mutationHook = useShopperCustomersMutation(mutation)
+const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) => {
+    const mutationHook = useShopperCustomersMutation({action})
 
     return (
         <>
             <div>
-                <button onClick={() => mutationHook.mutate(mutationPayloads[mutation])}>
-                    {mutation}
+                <button onClick={() => mutationHook.mutate(mutationPayloads[action])}>
+                    {action}
                 </button>
                 {mutationHook.error?.message && (
                     <p style={{color: 'red'}}>Error: {mutationHook.error?.message}</p>
@@ -148,7 +148,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
 
                         const queryClient = createQueryClient()
 
-                        renderWithProviders(<CustomerMutationComponent mutation={mutationName} />, {
+                        renderWithProviders(<CustomerMutationComponent action={mutationName as ShopperCustomersMutationType} />, {
                             queryClient
                         })
                         await waitFor(() =>
@@ -216,7 +216,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                             })
                             .reply(500, {})
 
-                        renderWithProviders(<CustomerMutationComponent mutation={mutationName} />)
+                        renderWithProviders(<CustomerMutationComponent action={mutationName as ShopperCustomersMutationType} />)
                         await waitFor(() =>
                             screen.getByRole('button', {
                                 name: mutationName
@@ -251,8 +251,9 @@ tests.forEach(({hook, cases}) => {
 test.each(SHOPPER_CUSTOMERS_NOT_IMPLEMENTED)(
     '%j - throws error when not implemented',
     (methodName) => {
+        const action = methodName as ShopperCustomersMutationType
         expect(() => {
-            useShopperCustomersMutation(methodName as ShopperCustomersMutationType)
+            useShopperCustomersMutation({action})
         }).toThrowError('This method is not implemented.')
     }
 )

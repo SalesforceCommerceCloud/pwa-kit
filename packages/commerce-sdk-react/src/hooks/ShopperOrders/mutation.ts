@@ -83,7 +83,7 @@ export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
 export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
 
 type UseShopperOrdersMutationHeaders = NonNullable<
-    Argument<Client[ShopperOrdersMutationType]>
+    Argument<Client['createOrder']>
 >['headers']
 type UseShopperOrdersMutationArg = {
     headers?: UseShopperOrdersMutationHeaders
@@ -115,6 +115,7 @@ function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperOrders'][action] as MutationFunction<Data, Params>
+            //Set headers to user-defined header values
             if (params) {
                 params.headers = headers
             }

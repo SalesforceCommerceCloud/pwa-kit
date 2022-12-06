@@ -8,6 +8,7 @@ import {Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 import {updateCache, QueryKeysMatrixElement, Client, NotImplemented} from '../utils'
+import {UseMutationResult} from '@tanstack/react-query'
 
 export const ShopperCustomersMutations = {
     /**
@@ -158,8 +159,6 @@ export const ShopperCustomersMutations = {
      */
     UpdateCustomerProductListItem: 'updateCustomerProductListItem'
 } as const
-
-export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
 export const shopperCustomersQueryKeysMatrix = {
     authorizeCustomer: (
@@ -379,12 +378,29 @@ export const SHOPPER_CUSTOMERS_NOT_IMPLEMENTED = [
     'updateCustomerProductList'
 ]
 
+export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
+
+type UseShopperCustomersMutationHeaders = NonNullable<Argument<Client['registerCustomer']>>['headers']
+type UseShopperCustomersMutationArg = {
+    headers?: UseShopperCustomersMutationHeaders
+    rawResponse?: boolean
+    action: ShopperCustomersMutationType
+}
+
 /**
  * A hook for performing mutations with the Shopper Customers API.
  */
-export function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
-    action: Action
-) {
+function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
+    arg: UseShopperCustomersMutationArg & {rawResponse?: false}
+): UseMutationResult<DataType<Client[Action]>, Error>
+function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
+    arg: UseShopperCustomersMutationArg & {rawResponse: true}
+): UseMutationResult<DataType<Client[Action]>, Error>
+function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
+    arg: UseShopperCustomersMutationArg
+): UseMutationResult<DataType<Client[Action]>, Error, Argument<Client[Action]>> {
+    const {headers, rawResponse, action} = arg
+
     if (SHOPPER_CUSTOMERS_NOT_IMPLEMENTED.includes(action)) {
         NotImplemented()
     }
@@ -394,6 +410,10 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
+            //Set headers to user-defined header values
+            if (params) {
+                params.headers = headers
+            }
             return method.call(apiClients['shopperCustomers'], params)
         },
         {
@@ -403,3 +423,5 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         }
     )
 }
+
+export {useShopperCustomersMutation}
