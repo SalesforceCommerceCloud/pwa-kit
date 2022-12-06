@@ -47,7 +47,7 @@ const mutationPayloads: MutationPayloads = {
     updateBillingAddressForBasket: {parameters: {basketId: BASKET_ID}, body: {}},
     deleteBasket: {parameters: {basketId: BASKET_ID}, body: {}}
 
-    // TODO: add more payloads
+    // AAA: add more payloads
 }
 
 const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map((mutationName) => {

@@ -281,7 +281,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             params: Argument<Client['mergeBasket']>,
             response: DataType<Client['mergeBasket']>
         ): CacheUpdateMatrixElement => {
-            // TODO: mergeBasket does not require a basket id.. what to do now?
+            // AAA: mergeBasket does not require a basket id.. what to do now?
             // const basketId = params.parameters?.basketId
 
             return {
@@ -419,4 +419,4 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
     )
 }
 
-// TODO: have stubs for not-implemented actions -> see ShopperCustomers
+// AAA: have stubs for not-implemented actions -> see ShopperCustomers
