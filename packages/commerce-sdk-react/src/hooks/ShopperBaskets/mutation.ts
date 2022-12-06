@@ -7,10 +7,8 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {CacheUpdateMatrixElement, updateCache} from './utils'
+import {CacheUpdateMatrixElement, updateCache} from '../utils'
 import useCustomerId from '../useCustomerId'
-import {queryMap} from './query-map'
-import {queryMap as queryMap2} from '../ShopperCustomers/query-map'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -184,7 +182,12 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
         const arg = {basketId}
         return basketId
             ? {
-                  update: [queryMap.basket({basketId, arg})]
+                  update: [
+                      {
+                          name: 'basket',
+                          key: ['/baskets', basketId, arg]
+                      }
+                  ]
               }
             : {}
     }
@@ -193,7 +196,12 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
         const arg = {basketId}
         return basketId
             ? {
-                  remove: [queryMap.basket({basketId, arg})]
+                  remove: [
+                      {
+                          name: 'basket',
+                          key: ['/baskets', basketId, arg]
+                      }
+                  ]
               }
             : {}
     }
@@ -203,7 +211,12 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
         const arg = {customerId}
         return customerId
             ? {
-                  invalidate: [queryMap2.customerBaskets({customerId, arg})]
+                  invalidate: [
+                      {
+                          name: 'customerBaskets',
+                          key: ['/customers', customerId, '/baskets', arg]
+                      }
+                  ]
               }
             : {}
     }

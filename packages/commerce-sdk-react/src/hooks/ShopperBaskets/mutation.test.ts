@@ -24,7 +24,7 @@ import {
 } from './mutation'
 import {useBasket} from './query'
 import {useCustomerBaskets} from '../ShopperCustomers/query'
-import {CacheUpdateMatrixElement, QueryMap} from './utils'
+import {CacheUpdateMatrixElement} from '../utils'
 
 const CUSTOMER_ID = 'CUSTOMER_ID'
 const BASKET_ID = 'BASKET_ID'

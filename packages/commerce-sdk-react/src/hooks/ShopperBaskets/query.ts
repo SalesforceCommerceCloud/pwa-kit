@@ -8,7 +8,6 @@ import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 import {NotImplemented} from './../utils'
-import {queryMap} from './query-map'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -41,10 +40,8 @@ function useBasket(
     const defaultOptions = {
         enabled: !!parameters.basketId
     }
-    const queryKey = queryMap.basket({basketId: parameters.basketId, arg}).key
-
     return useQuery(
-        queryKey,
+        ['/baskets', parameters.basketId, arg],
         (_, {shopperBaskets}) => shopperBaskets.getBasket({parameters, headers}, rawResponse),
         {...defaultOptions, ...options}
     )
@@ -83,10 +80,9 @@ function usePaymentMethodsForBasket(
     const defaultOptions = {
         enabled: !!parameters.basketId
     }
-    const queryKey = queryMap.paymentMethodsForBasket({basketId: parameters.basketId, arg}).key
 
     return useQuery(
-        queryKey,
+        ['/baskets', parameters.basketId, '/payment-methods', arg],
         (_, {shopperBaskets}) =>
             shopperBaskets.getPaymentMethodsForBasket({parameters, headers}, rawResponse),
         {...defaultOptions, ...options}
