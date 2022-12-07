@@ -41,6 +41,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 directives: {
                     'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
                     'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
+                    'connect-src': ["'self'", 'api.cquotient.com'],
 
                     // Do not upgrade insecure requests for local development
                     'upgrade-insecure-requests': isRemote() ? [] : null

@@ -47,8 +47,7 @@ class EinsteinAPI {
 
     async einsteinFetch(endpoint, method, body) {
         const config = this.config
-        const {proxyPath, einsteinId} = config
-        const host = `${getAppOrigin()}${proxyPath}`
+        const {host, einsteinId} = config
 
         const headers = {
             'Content-Type': 'application/json',
