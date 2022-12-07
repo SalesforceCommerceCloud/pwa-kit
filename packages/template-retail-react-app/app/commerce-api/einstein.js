@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import fetch from 'cross-fetch'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {keysToCamel} from './utils'
 
 class EinsteinAPI {
