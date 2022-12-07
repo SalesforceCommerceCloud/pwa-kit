@@ -61,6 +61,10 @@
                 {
                     "host": "api.cquotient.com",
                     "path": "einstein"
+                },
+                {
+                    "host": "codeceptscomorgmain-1845e05c6e8.test1.pc-rnd.force.com",
+                    "path": "scom"
                 }
             ]
         }
