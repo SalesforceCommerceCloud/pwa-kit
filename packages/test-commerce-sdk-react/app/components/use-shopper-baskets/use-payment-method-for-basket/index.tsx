@@ -6,7 +6,7 @@
  */
 import React, {ReactElement} from 'react'
 import Json from '../../Json'
-import {usePaymentMethodsForBasket} from 'commerce-sdk-react'
+import {usePaymentMethodsForBasket} from 'commerce-sdk-react-preview'
 
 export const UsePaymentMethodsForBasket = ({basketId}: {basketId: string}): ReactElement | null => {
     const {isLoading, error, data} = usePaymentMethodsForBasket({basketId}, {enabled: !!basketId})
