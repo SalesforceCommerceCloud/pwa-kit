@@ -5,7 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useCustomerBaskets, useShopperBasketsMutation, useCustomerId} from 'commerce-sdk-react'
+import {
+    useCustomerBaskets,
+    useShopperBasketsMutation,
+    useCustomerId
+} from 'commerce-sdk-react-preview'
 import {UseBasket} from '../components/use-shopper-baskets/use-basket'
 import {UsePaymentMethodsForBasket} from '../components/use-shopper-baskets/use-payment-method-for-basket'
 

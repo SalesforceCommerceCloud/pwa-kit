@@ -6,7 +6,7 @@
  */
 import React, {useState, ReactElement} from 'react'
 // @ts-ignore
-import {CommerceApiProvider} from 'commerce-sdk-react'
+import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 // @ts-ignore
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 // @ts-ignore
@@ -83,7 +83,9 @@ const options = {
             queries: {
                 retry: false,
                 staleTime: 2 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {})
+                ...(isServerSide ? {retryOnMount: false} : {}),
+                // Option for debugging changes in cache with React Query Dev Tools
+                refetchOnWindowFocus: false
             },
             mutations: {
                 retry: false
