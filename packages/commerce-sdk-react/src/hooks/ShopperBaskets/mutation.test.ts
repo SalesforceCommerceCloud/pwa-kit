@@ -68,10 +68,10 @@ const mutationPayloads: MutationPayloads = {
         parameters: {basketId: BASKET_ID},
         body: {productId: PRODUCT_ID}
     },
-    // removeItemFromBasket: {
-    //     parameters: {basketId: BASKET_ID, itemId: ITEM_ID},
-    //     body: {}
-    // },
+    removeItemFromBasket: {
+        parameters: {basketId: BASKET_ID, itemId: ITEM_ID},
+        body: {}
+    },
     addPaymentInstrumentToBasket: {
         parameters: {basketId: BASKET_ID},
         body: {paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
@@ -84,14 +84,14 @@ const mutationPayloads: MutationPayloads = {
         parameters: {},
         body: {}
     },
-    // removeCouponFromBasket: {
-    //     parameters: {basketId: BASKET_ID, couponItemId: COUPON_ID},
-    //     body: {}
-    // },
-    // removePaymentInstrumentFromBasket: {
-    //     parameters: {basketId: BASKET_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID},
-    //     body: {}
-    // },
+    removeCouponFromBasket: {
+        parameters: {basketId: BASKET_ID, couponItemId: COUPON_ID},
+        body: {}
+    },
+    removePaymentInstrumentFromBasket: {
+        parameters: {basketId: BASKET_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID},
+        body: {}
+    },
     updateCustomerForBasket: {
         parameters: {basketId: BASKET_ID},
         body: {email: 'alex@test.com'}
