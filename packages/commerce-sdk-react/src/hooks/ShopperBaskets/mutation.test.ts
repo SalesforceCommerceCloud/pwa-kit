@@ -28,6 +28,11 @@ import {CacheUpdateMatrixElement} from '../utils'
 
 const CUSTOMER_ID = 'CUSTOMER_ID'
 const BASKET_ID = 'BASKET_ID'
+const COUPON_ID = 'COUPON_ID'
+const PRODUCT_ID = 'PRODUCT_ID'
+const ITEM_ID = 'ITEM_ID'
+const PAYMENT_INSTRUMENT_ID = 'PAYMENT_INSTRUMENT_ID'
+const SHIPMENT_ID = 'SHIPMENT_ID'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
@@ -55,54 +60,54 @@ const mutationPayloads: MutationPayloads = {
         parameters: {basketId: BASKET_ID}, 
         body: {}
     },
-    // addCouponToBasket: {
-    //     parameters: {basketId: BASKET_ID},
-    //     body: {}
-    // },
-    // addItemToBasket: {
-    //     parameters: {basketId: BASKET_ID},
-    //     body: {}
-    // },
-    // addPaymentInstrumentToBasket: {
-    //     parameters: {basketId: BASKET_ID},
-    //     body: {}
-    // },
-    // createBasket: {
-    //     parameters: {},
-    //     body: {}
-    // },
+    addCouponToBasket: {
+        parameters: {basketId: BASKET_ID},
+        body: {code: COUPON_ID}
+    },
+    addItemToBasket: {
+        parameters: {basketId: BASKET_ID},
+        body: {productId: PRODUCT_ID}
+    },
+    addPaymentInstrumentToBasket: {
+        parameters: {basketId: BASKET_ID},
+        body: {paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
+    },
+    createBasket: {
+        parameters: {},
+        body: {}
+    },
     // mergeBasket: {
     //     parameters: {},
     //     body: {}
     // },
-    // removeCouponFromBasket: {
-    //     parameters: {basketId: BASKET_ID},
-    //     body: {}
-    // },
-    // removePaymentInstrumentFromBasket: {
-    //     parameters: {basketId: BASKET_ID},
-    //     body: {}
-    // },
-    // updateCustomerForBasket: {
-    //     parameters: {basketId: BASKET_ID},
-    //     body: {}
-    // },
-    // updateItemInBasket: {
-    //     parameters: {basketId: BASKET_ID},
-    //     body: {}
-    // },
-    // updatePaymentInstrumentInBasket: {
-    //     parameters: {basketId: BASKET_ID},
-    //     body: {}
-    // },
-    // updateShippingAddressForShipment: {
-    //     parameters: {basketId: BASKET_ID},
-    //     body: {}
-    // },
-    // updateShippingMethodForShipment: {
-    //     parameters: {basketId: BASKET_ID},
-    //     body: {}
-    // }
+    removeCouponFromBasket: {
+        parameters: {basketId: BASKET_ID, couponItemId: COUPON_ID},
+        body: {}
+    },
+    removePaymentInstrumentFromBasket: {
+        parameters: {basketId: BASKET_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID},
+        body: {}
+    },
+    updateCustomerForBasket: {
+        parameters: {basketId: BASKET_ID},
+        body: {email: 'alex@test.com'}
+    },
+    updateItemInBasket: {
+        parameters: {basketId: BASKET_ID, itemId: ITEM_ID},
+        body: {}
+    },
+    updatePaymentInstrumentInBasket: {
+        parameters: {basketId: BASKET_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID},
+        body: {}
+    },
+    updateShippingAddressForShipment: {
+        parameters: {basketId: BASKET_ID, shipmentId: SHIPMENT_ID},
+        body: {}
+    },
+    updateShippingMethodForShipment: {
+        parameters: {basketId: BASKET_ID, shipmentId: SHIPMENT_ID},
+        body: {id: '001'}
+    }
 }
 
 const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map((mutationName) => {
