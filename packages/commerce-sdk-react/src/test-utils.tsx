@@ -110,7 +110,7 @@ export const mockMutationEndpoints = (matchingPath: string, options?: {errorResp
         .delete((uri) => {
             return uri.includes(matchingPath)
         })
-        .reply(options?.errorResponse ? options.errorResponse : 200, NEW_DATA)
+        .reply(responseStatus, NEW_DATA)
 }
 
 export const assertUpdateQuery = (
