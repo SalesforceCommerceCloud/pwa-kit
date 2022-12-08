@@ -7,7 +7,7 @@
 import {DataType, Argument} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {updateCache, CacheUpdateMatrixElement, Client, NotImplemented} from '../utils'
+import {updateCache, CacheUpdateMatrixElement, Client, NotImplementedError} from '../utils'
 
 export const ShopperOrdersMutations = {
     /**
@@ -86,7 +86,7 @@ export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
  */
 export function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(action: Action) {
     if (SHOPPER_ORDERS_NOT_IMPLEMENTED.includes(action)) {
-        NotImplemented()
+        NotImplementedError()
     }
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>

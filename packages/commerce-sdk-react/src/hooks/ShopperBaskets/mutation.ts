@@ -7,7 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {CacheUpdateMatrixElement, updateCache} from '../utils'
+import {CacheUpdateMatrixElement, NotImplementedError, updateCache} from '../utils'
 import useCustomerId from '../useCustomerId'
 
 type Client = ApiClients['shopperBaskets']
@@ -68,6 +68,9 @@ export const ShopperBasketsMutations = {
      */
     UpdateCustomerForBasket: 'updateCustomerForBasket',
     /**
+     *
+     * * WARNING: This method is not implemented.
+     *
      * Adds a gift certificate item to an existing basket.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addGiftCertificateItemToBasket} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addgiftcertificateitemtobasket} for more information on the parameters and returned data type.
@@ -391,12 +394,29 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
     }
 }
 
+export const SHOPPER_BASKETS_NOT_IMPLEMENTED = [
+    'addGiftCertificateItemToBasket',
+    'addPriceBooksToBasket',
+    'addTaxesForBasket',
+    'addTaxesForBasketItem',
+    'createShipmentForBasket',
+    'removeGiftCertificateItemFromBasket',
+    'removeItemFromBasket',
+    'removeShipmentFromBasket',
+    'transferBasket',
+    'updateGiftCertificateItemInBasket',
+    'updateShipmentForBasket'
+]
+
 /**
  * A hook for performing mutations with the Shopper Baskets API.
  */
 export function useShopperBasketsMutation<Action extends ShopperBasketMutationType>(
     action: Action
 ) {
+    if (SHOPPER_BASKETS_NOT_IMPLEMENTED.includes(action)) {
+        NotImplementedError()
+    }
     // TODO: where are headers and rawResponse ?
     const queryClient = useQueryClient()
 
@@ -418,5 +438,3 @@ export function useShopperBasketsMutation<Action extends ShopperBasketMutationTy
         }
     )
 }
-
-// AAA: have stubs for not-implemented actions -> see ShopperCustomers
