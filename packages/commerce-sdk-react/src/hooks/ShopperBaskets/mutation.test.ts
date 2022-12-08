@@ -49,15 +49,15 @@ type MutationPayloads = {
 }
 const mutationPayloads: MutationPayloads = {
     updateBasket: {
-        parameters: {basketId: BASKET_ID}, 
+        parameters: {basketId: BASKET_ID},
         body: {}
     },
     updateBillingAddressForBasket: {
-        parameters: {basketId: BASKET_ID}, 
+        parameters: {basketId: BASKET_ID},
         body: {}
     },
     deleteBasket: {
-        parameters: {basketId: BASKET_ID}, 
+        parameters: {basketId: BASKET_ID},
         body: {}
     },
     addCouponToBasket: {
