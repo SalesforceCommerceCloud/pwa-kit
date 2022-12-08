@@ -7,7 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import {NotImplemented} from './../utils'
+import {NotImplementedError} from './../utils'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -99,7 +99,7 @@ function usePaymentMethodsForBasket(
  * @returns An object describing the state of the request.
  */
 function usePriceBooksForBasket(): void {
-    NotImplemented()
+    NotImplementedError()
 }
 
 type UseShippingMethodsForShipmentParameters = NonNullable<

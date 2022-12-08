@@ -43,9 +43,66 @@ type MutationPayloads = {
     [key in ShopperBasketMutationType]?: {body: any; parameters: any}
 }
 const mutationPayloads: MutationPayloads = {
-    updateBasket: {parameters: {basketId: BASKET_ID}, body: {}},
-    updateBillingAddressForBasket: {parameters: {basketId: BASKET_ID}, body: {}},
-    deleteBasket: {parameters: {basketId: BASKET_ID}, body: {}}
+    updateBasket: {
+        parameters: {basketId: BASKET_ID}, 
+        body: {}
+    },
+    updateBillingAddressForBasket: {
+        parameters: {basketId: BASKET_ID}, 
+        body: {}
+    },
+    deleteBasket: {
+        parameters: {basketId: BASKET_ID}, 
+        body: {}
+    },
+    addCouponToBasket: {
+        parameters: {},
+        body: {}
+    },
+    addItemToBasket: {
+        parameters: {},
+        body: {}
+    },
+    addPaymentInstrumentToBasket: {
+        parameters: {},
+        body: {}
+    },
+    createBasket: {
+        parameters: {},
+        body: {}
+    },
+    mergeBasket: {
+        parameters: {},
+        body: {}
+    },
+    removeCouponFromBasket: {
+        parameters: {},
+        body: {}
+    },
+    removePaymentInstrumentFromBasket: {
+        parameters: {},
+        body: {}
+    },
+    updateCustomerForBasket: {
+        parameters: {},
+        body: {}
+    },
+    updateItemInBasket: {
+        parameters: {},
+        body: {}
+    },
+    updatePaymentInstrumentInBasket: {
+        parameters: {},
+        body: {}
+    },
+    updateShippingAddressForShipment: {
+        parameters: {},
+        body: {}
+    },
+    updateShippingMethodForShipment: {
+        parameters: {},
+        body: {}
+    }
 
     // AAA: add more payloads
 }
