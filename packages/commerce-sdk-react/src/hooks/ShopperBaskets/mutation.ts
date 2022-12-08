@@ -295,11 +295,10 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             params: Argument<Client['mergeBasket']>,
             response: DataType<Client['mergeBasket']>
         ): CacheUpdateMatrixElement => {
-            // AAA: mergeBasket does not require a basket id.. what to do now?
-            // const basketId = params.parameters?.basketId
+            const basketId = response.basketId
 
             return {
-                // ...updateBasket(basketId),
+                ...updateBasketQuery(basketId),
                 ...invalidateCustomerBasketsQuery(customerId)
             }
         },
