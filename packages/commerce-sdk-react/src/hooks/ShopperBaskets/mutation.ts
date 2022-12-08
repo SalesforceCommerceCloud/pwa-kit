@@ -247,6 +247,17 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
                 ...invalidateCustomerBasketsQuery(customerId)
             }
         },
+        removeItemFromBasket: (
+            params: Argument<Client['removeItemFromBasket']>,
+            response: DataType<Client['removeItemFromBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params?.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId),
+                ...invalidateCustomerBasketsQuery(customerId)
+            }
+        },
         addPaymentInstrumentToBasket: (
             params: Argument<Client['addPaymentInstrumentToBasket']>,
             response: DataType<Client['addPaymentInstrumentToBasket']>
@@ -401,7 +412,6 @@ export const SHOPPER_BASKETS_NOT_IMPLEMENTED = [
     'addTaxesForBasketItem',
     'createShipmentForBasket',
     'removeGiftCertificateItemFromBasket',
-    'removeItemFromBasket',
     'removeShipmentFromBasket',
     'transferBasket',
     'updateGiftCertificateItemInBasket',
