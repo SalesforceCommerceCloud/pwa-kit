@@ -29,6 +29,7 @@ import {
 import {randomUUID} from 'crypto'
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
+const projectPackageJSON = path.resolve(projectDir, 'package.json')
 
 const chalk = require('chalk')
 
@@ -203,6 +204,51 @@ export const DevServerMixin = {
                 fallthrough: true
             })
         )
+
+        // // we use two `app.use` servers on the same path with a fallback pattern to check first in
+        // // package.json => mobify.overridesDir and then fall back to mobify.extends (the base app)
+        // if (fs.existsSync(`${process.cwd()}/${projectPackageJSON?.mobify?.overridesDir}`)) {
+        //     // the local overridesDir search
+        //     app.use(
+        //         '/mobify/bundle/development',
+        //         express.static(
+        //             path.resolve(process.cwd(), projectPackageJSON?.mobify?.overridesDir),
+        //             {
+        //                 dotFiles: 'deny',
+        //                 setHeaders: setLocalAssetHeaders,
+        //                 fallthrough: true
+        //             }
+        //         )
+        //     )
+
+        //     // the fallback `mobify.extends` (in package.json) check
+        //     app.use(
+        //         '/mobify/bundle/development',
+        //         express.static(
+        //             path.resolve(
+        //                 process.cwd(),
+        //                 'node_modules',
+        //                 ...projectPackageJSON?.mobify?.extends?.split('/')
+        //             ),
+        //             {
+        //                 dotFiles: 'deny',
+        //                 setHeaders: setLocalAssetHeaders,
+        //                 fallthrough: true
+        //             }
+        //         )
+        //     )
+        // } else {
+        //     // Proxy bundle asset requests to the local
+        //     // build directory.
+        //     app.use(
+        //         '/mobify/bundle/development',
+        //         express.static(path.resolve(process.cwd(), 'src'), {
+        //             dotFiles: 'deny',
+        //             setHeaders: setLocalAssetHeaders,
+        //             fallthrough: true
+        //         })
+        //     )
+        // }
     },
 
     /**

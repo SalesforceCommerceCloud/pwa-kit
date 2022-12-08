@@ -46,7 +46,7 @@ export const start = () => {
 
     // Tell webpack how to find javascript files
     Object.defineProperty(__webpack_require__, 'p', {
-        get: () => window.Progressive.buildOrigin
+        get: () => window.Progressive.buildOrigin,
     })
 
     // On the browser we don't have request.locals, so we just provide an empty
@@ -57,6 +57,8 @@ export const start = () => {
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
     const routes = getRoutes(locals)
+    console.log(`~locals`, locals)
+    console.log(`~routes`, routes)
 
     // We need to tell the routeComponent HOC when the app is hydrating in order to
     // prevent pages from re-fetching data on the first client-side render. The

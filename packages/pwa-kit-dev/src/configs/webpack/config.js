@@ -54,14 +54,23 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
         ...pluginOptions
     })
 
-const entryPointExists = (segments) => {
+const entryPointExists = (segments, overrideSegments = []) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
-        const p = resolve(projectDir, ...segments) + ext
-        if (fs.existsSync(p)) {
+        const primary = resolve(projectDir, ...segments) + ext
+        const override = resolve(projectDir, ...overrideSegments) + ext
+
+        if (fs.existsSync(primary) || fs.existsSync(override)) {
             return true
         }
     }
     return false
+}
+
+const getAppEntryPoint = (pkg) => {
+    const APP_MAIN_PATH = '/app/main'
+    const ret = pkg?.mobify?.overridesDir ? pkg.mobify.overridesDir + APP_MAIN_PATH : APP_MAIN_PATH
+    console.log('~appEntry', ret)
+    return ret
 }
 
 const findInProjectThenSDK = (pkg) => {
@@ -77,6 +86,10 @@ const baseConfig = (target) => {
 
     class Builder {
         constructor() {
+            console.log(
+                `~in constructor findInProjectThenSDK('@loadable/server')`,
+                findInProjectThenSDK('@loadable/server')
+            )
             this.config = {
                 watchOptions: {
                     aggregateTimeout: 1000
@@ -259,7 +272,7 @@ const enableReactRefresh = (config) => {
         },
         entry: {
             ...config.entry,
-            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', './app/main']
+            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getAppEntryPoint(pkg)]
         },
         plugins: [
             ...config.plugins,
@@ -277,11 +290,21 @@ const enableReactRefresh = (config) => {
     }
 }
 
+console.log(
+    '~client entryPointExists()',
+    entryPointExists(['app', 'main'], pkg?.mobify?.overridesDir.split('/'))
+)
+
 const client =
-    entryPointExists(['app', 'main']) &&
+    entryPointExists(
+        ['app', 'main'],
+        [...pkg?.mobify?.overridesDir?.split?.('/'), 'app', 'main']
+    ) &&
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
+            console.log('~got to 303')
+            console.log(`~getAppEntryPoint(pkg)`, getAppEntryPoint(pkg))
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
@@ -289,7 +312,7 @@ const client =
                 // use source map to make debugging easier
                 devtool: mode === development ? 'source-map' : false,
                 entry: {
-                    main: './app/main'
+                    main: getAppEntryPoint(pkg)
                 },
                 plugins: [
                     ...config.plugins,
@@ -358,9 +381,7 @@ const renderer =
 
                     // Must only appear on one config – this one is the only mandatory one.
                     new CopyPlugin({
-                        patterns: [
-                            {from: 'app/static/', to: 'static/', noErrorOnMissing: true},
-                        ]
+                        patterns: [{from: 'app/static/', to: 'static/', noErrorOnMissing: true}]
                     }),
 
                     analyzeBundle && getBundleAnalyzerPlugin('server-renderer')

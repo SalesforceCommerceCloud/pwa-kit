@@ -48,7 +48,7 @@ const VALID_TAG_NAMES = [
     'noscript',
     'script',
     'style',
-    'title'
+    'title',
 ]
 
 export const ALLOWLISTED_INLINE_SCRIPTS = []
@@ -96,7 +96,7 @@ export const render = async (req, res, next) => {
     const [pathname, search] = req.originalUrl.split('?')
     const location = {
         pathname,
-        search: search ? `?${search}` : ''
+        search: search ? `?${search}` : '',
     }
 
     // Step 1 - Find the match.
@@ -126,7 +126,7 @@ export const render = async (req, res, next) => {
         App: WrappedApp,
         routes,
         location,
-        deviceType
+        deviceType,
     }
     let appJSX = <OuterApp {...props} />
 
@@ -144,11 +144,11 @@ export const render = async (req, res, next) => {
             req,
             res,
             location,
-            appJSX
+            appJSX,
         })
         appState = {
             ...ret.appState,
-            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
+            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals),
         }
         appStateError = ret.error
     }
@@ -168,7 +168,7 @@ export const render = async (req, res, next) => {
             location,
             config,
             appJSX,
-            deviceType
+            deviceType,
         })
     } catch (e) {
         // This is an unrecoverable error.
@@ -201,14 +201,16 @@ const OuterApp = ({
     routes,
     routerContext,
     location,
-    deviceType
+    deviceType,
 }) => {
     const AppConfig = getAppConfig()
     return (
         <ServerContext.Provider value={{req, res}}>
             <Router location={location} context={routerContext}>
                 <CorrelationIdProvider
-                    correlationId={res.locals.requestId}
+                    // @TODO: figure out and uncommment
+                    // correlationId={res.locals.requestId}
+                    correlationId={'123'}
                     resetOnPageChange={false}
                 >
                     <DeviceContext.Provider value={{type: deviceType}}>
@@ -231,7 +233,7 @@ OuterApp.propTypes = {
     routes: PropTypes.array,
     routerContext: PropTypes.object,
     location: PropTypes.object,
-    deviceType: PropTypes.string
+    deviceType: PropTypes.string,
 }
 
 const renderToString = (jsx, extractor) =>
@@ -274,7 +276,7 @@ const renderApp = (args) => {
         bundles = extractor.getScriptElements().map((el) =>
             React.cloneElement(el, {
                 ...el.props,
-                ...scriptProps
+                ...scriptProps,
             })
         )
     }
@@ -304,7 +306,7 @@ const renderApp = (args) => {
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
-        Progressive: getWindowProgressive(req, res)
+        Progressive: getWindowProgressive(req, res),
     }
 
     const scripts = [
@@ -313,10 +315,10 @@ const renderApp = (args) => {
             key="mobify-data"
             type="application/json" // Not executable
             dangerouslySetInnerHTML={{
-                __html: serialize(windowGlobals, {isJSON: true, space: indent})
+                __html: serialize(windowGlobals, {isJSON: true, space: indent}),
             }}
         />,
-        ...bundles
+        ...bundles,
     ]
 
     const svgs = [<div key="svg_sprite" dangerouslySetInnerHTML={{__html: sprite.stringify()}} />]
@@ -359,12 +361,15 @@ const getWindowProgressive = (req, res) => {
             deployTarget: process.env.DEPLOY_TARGET || 'local',
             proxyConfigs,
             // The request class (undefined by default)
-            requestClass: res.locals.requestClass
-        }
+            requestClass: res.locals.requestClass,
+        },
     }
 }
 
 // eslint-disable-next-line no-unused-vars
-const serverRenderer = ({clientStats, serverStats}) => (req, res, next) => render(req, res, next)
+const serverRenderer =
+    ({clientStats, serverStats}) =>
+    (req, res, next) =>
+        render(req, res, next)
 
 export default serverRenderer

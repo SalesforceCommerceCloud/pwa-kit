@@ -9,7 +9,12 @@
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
   "mobify": {
-    "extends": "retail-react-app"
+    "extends": "retail-react-app",
+    "overridesDir": "/pwa-kit/overrides",
+    "routes": [
+      {"cart": "retail-react-app/cart"},
+      {"plp": "bens-retail-app/plp"}
+    ]
   },
   "files": [
     "CHANGELOG.md",
