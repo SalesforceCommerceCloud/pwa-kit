@@ -133,8 +133,8 @@ export const createModuleReplacementPlugin = (projectDir) => {
             // @TODO: this should alias by npm package name (`retail-react-app`)
             // but instead looks up `template-retail-react-app`
             path: makeRegExp(`${pkg?.mobify?.extends}/app$`),
-            // newPatnpmh: resolve(projectDir, 'app', 'components', '_app-config', 'index'),
-            newPath: getOverrideArray(['app'])
+            newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index')
+            // newPath: getOverridePath(['app'])
         })
     }
     const extensions = ['.ts', '.tsx', '.js', '.jsx']
