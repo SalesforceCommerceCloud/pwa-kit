@@ -55,56 +55,54 @@ const mutationPayloads: MutationPayloads = {
         parameters: {basketId: BASKET_ID}, 
         body: {}
     },
-    addCouponToBasket: {
-        parameters: {},
-        body: {}
-    },
-    addItemToBasket: {
-        parameters: {},
-        body: {}
-    },
-    addPaymentInstrumentToBasket: {
-        parameters: {},
-        body: {}
-    },
-    createBasket: {
-        parameters: {},
-        body: {}
-    },
-    mergeBasket: {
-        parameters: {},
-        body: {}
-    },
-    removeCouponFromBasket: {
-        parameters: {},
-        body: {}
-    },
-    removePaymentInstrumentFromBasket: {
-        parameters: {},
-        body: {}
-    },
-    updateCustomerForBasket: {
-        parameters: {},
-        body: {}
-    },
-    updateItemInBasket: {
-        parameters: {},
-        body: {}
-    },
-    updatePaymentInstrumentInBasket: {
-        parameters: {},
-        body: {}
-    },
-    updateShippingAddressForShipment: {
-        parameters: {},
-        body: {}
-    },
-    updateShippingMethodForShipment: {
-        parameters: {},
-        body: {}
-    }
-
-    // AAA: add more payloads
+    // addCouponToBasket: {
+    //     parameters: {basketId: BASKET_ID},
+    //     body: {}
+    // },
+    // addItemToBasket: {
+    //     parameters: {basketId: BASKET_ID},
+    //     body: {}
+    // },
+    // addPaymentInstrumentToBasket: {
+    //     parameters: {basketId: BASKET_ID},
+    //     body: {}
+    // },
+    // createBasket: {
+    //     parameters: {},
+    //     body: {}
+    // },
+    // mergeBasket: {
+    //     parameters: {},
+    //     body: {}
+    // },
+    // removeCouponFromBasket: {
+    //     parameters: {basketId: BASKET_ID},
+    //     body: {}
+    // },
+    // removePaymentInstrumentFromBasket: {
+    //     parameters: {basketId: BASKET_ID},
+    //     body: {}
+    // },
+    // updateCustomerForBasket: {
+    //     parameters: {basketId: BASKET_ID},
+    //     body: {}
+    // },
+    // updateItemInBasket: {
+    //     parameters: {basketId: BASKET_ID},
+    //     body: {}
+    // },
+    // updatePaymentInstrumentInBasket: {
+    //     parameters: {basketId: BASKET_ID},
+    //     body: {}
+    // },
+    // updateShippingAddressForShipment: {
+    //     parameters: {basketId: BASKET_ID},
+    //     body: {}
+    // },
+    // updateShippingMethodForShipment: {
+    //     parameters: {basketId: BASKET_ID},
+    //     body: {}
+    // }
 }
 
 const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map((mutationName) => {

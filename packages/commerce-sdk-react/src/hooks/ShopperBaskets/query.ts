@@ -160,7 +160,7 @@ function useShippingMethodsForShipment(
  * @returns An object describing the state of the request.
  */
 function useTaxesFromBasket(): void {
-    NotImplemented()
+    NotImplementedError()
 }
 
 export {
