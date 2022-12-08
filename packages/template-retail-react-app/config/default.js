@@ -35,6 +35,7 @@ module.exports = {
             siteId: 'aaij-MobileFirst'
         }
     },
+    ssrIsProduction: false,
     externals: [],
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,

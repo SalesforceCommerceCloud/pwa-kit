@@ -41,6 +41,10 @@ module.exports = {
             siteId: '${einsteinApi.siteId}'
         }
     },
+    // Flag that marks this config for a live production site
+    // This is currently used to flag Einstein activities as either coming from a production 
+    // environment or not.
+    ssrIsProduction: false,
     // This list contains server-side only libraries that you don't want to be compiled by webpack
     externals: [],
     // Page not found url for your app
