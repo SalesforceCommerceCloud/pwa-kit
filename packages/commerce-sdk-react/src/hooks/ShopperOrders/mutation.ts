@@ -7,7 +7,7 @@
 import {DataType, Argument} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {updateCache, QueryKeysMatrixElement, Client, NotImplemented} from '../utils'
+import {updateCache, CacheUpdateMatrixElement, Client, NotImplementedError} from '../utils'
 
 export const ShopperOrdersMutations = {
     /**
@@ -44,33 +44,33 @@ export const ShopperOrdersMutations = {
 
 export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
 
-export const shopperOrdersQueryKeysMatrix = {
+export const shopperOrdersCacheUpdateMatrix = {
     createOrder: (
         params: Argument<Client['createOrder']>,
         response: DataType<Client['createOrder']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         const customerId = response?.customerInfo?.customerId
         return {
-            update: [['/orders', {orderNo: response.orderNo}]],
-            invalidate: [['/customers', customerId, '/baskets']]
+            update: [{name: 'order', key: ['/orders', {orderNo: response.orderNo}]}],
+            invalidate: [{name: 'customerBaskets', key: ['/customers', customerId, '/baskets']}]
         }
     },
     createPaymentInstrumentForOrder: (
         params: Argument<Client['createPaymentInstrumentForOrder']>,
         response: DataType<Client['createPaymentInstrumentForOrder']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     removePaymentInstrumentFromOrder: (
         params: Argument<Client['removePaymentInstrumentFromOrder']>,
         response: DataType<Client['removePaymentInstrumentFromOrder']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     updatePaymentInstrumentForOrder: (
         params: Argument<Client['updatePaymentInstrumentForOrder']>,
         response: DataType<Client['updatePaymentInstrumentForOrder']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     }
 }
@@ -86,7 +86,7 @@ export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
  */
 export function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(action: Action) {
     if (SHOPPER_ORDERS_NOT_IMPLEMENTED.includes(action)) {
-        NotImplemented()
+        NotImplementedError()
     }
     type Params = Argument<Client[Action]>
     type Data = DataType<Client[Action]>
@@ -98,7 +98,7 @@ export function useShopperOrdersMutation<Action extends ShopperOrdersMutationTyp
         },
         {
             onSuccess: (data, params) => {
-                updateCache(queryClient, action, shopperOrdersQueryKeysMatrix, data, params)
+                updateCache(queryClient, action, shopperOrdersCacheUpdateMatrix, data, params)
             }
         }
     )
