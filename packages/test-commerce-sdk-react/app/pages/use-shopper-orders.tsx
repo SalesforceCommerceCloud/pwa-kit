@@ -11,7 +11,8 @@ import Json from '../components/Json'
 import {
     useShopperOrdersMutation,
     useShopperLoginHelper,
-    ShopperLoginHelpers
+    ShopperLoginHelpers,
+    ShopperOrdersMutationType
 } from 'commerce-sdk-react'
 const orderNos = ['00014202', '00014103']
 
@@ -47,14 +48,14 @@ function UseShopperOrders() {
     }, [])
     const mutationHooks = [
         {
-            action: 'createOrder',
-            body: {basketId: '8140cd55ffa151713f0d88df1d'},
+            action: 'createOrder' as ShopperOrdersMutationType,
+            body: {basketId: 'd84e228c2ff7d0a9af3e2b42e6'},
             parameters: {}
         }
     ].map(({action, body, parameters}) => {
         return {
             name: action,
-            hook: useShopperOrdersMutation(action),
+            hook: useShopperOrdersMutation({action, headers: {'test-header': 'value'}, rawResponse: true}),
             body,
             parameters
         }
