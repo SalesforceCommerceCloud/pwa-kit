@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {NotImplemented} from '../utils'
+import {NotImplementedError} from '../utils'
 
 /**
  * WARNING: This method is not implemented yet.
@@ -16,5 +16,5 @@ import {NotImplemented} from '../utils'
  * @returns An object describing the state of the request.
  */
 export const useSuggestions = (): void => {
-    NotImplemented()
+    NotImplementedError()
 }

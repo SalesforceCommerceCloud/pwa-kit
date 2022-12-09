@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {NotImplemented} from '../utils'
+import {NotImplementedError} from '../utils'
 
 export const ShopperContextsMutations = {
     /**
@@ -39,5 +39,5 @@ export const ShopperContextsMutations = {
  * A hook for performing mutations with the Shopper Contexts API.
  */
 export function useShopperContextsMutation() {
-    NotImplemented()
+    NotImplementedError()
 }
