@@ -477,7 +477,11 @@ function useShopperCustomersMutation<Action extends ShopperCustomersMutationType
             if (params) {
                 params.headers = headers
             }
-            return (method.call as any)(apiClients['shopperCustomers'], params, rawResponse)
+            return (method.call as (
+                apiClient: ShopperCustomersClient,
+                params: Params,
+                rawResponse: boolean | undefined
+            ) => any)(apiClients['shopperCustomers'], params, rawResponse)
         },
         {
             onSuccess: (data, params) => {

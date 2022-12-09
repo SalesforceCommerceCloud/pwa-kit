@@ -9,6 +9,7 @@ import {useMutation} from '../useMutation'
 import {MutationFunction, UseMutationResult, useQueryClient} from '@tanstack/react-query'
 import {CacheUpdateMatrixElement, NotImplementedError, updateCache} from '../utils'
 import useCustomerId from '../useCustomerId'
+import {Method} from 'axios'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -439,12 +440,11 @@ export function useShopperBasketsMutation<Action extends ShopperBasketsMutationT
 
     type Params = Argument<ShopperBasketsClient[Action]>
     type Data = DataType<ShopperBasketsClient[Action]>
+
     if (SHOPPER_BASKETS_NOT_IMPLEMENTED.includes(action)) {
         NotImplementedError()
     }
-    // TODO: where are headers and rawResponse ?
     const queryClient = useQueryClient()
-
     const customerId = useCustomerId()
     const cacheUpdateMatrix = getCacheUpdateMatrix(customerId)
 
@@ -455,7 +455,11 @@ export function useShopperBasketsMutation<Action extends ShopperBasketsMutationT
             if (params) {
                 params.headers = headers
             }
-            return (method.call as any)(apiClients['shopperBaskets'], params, rawResponse)
+            return (method.call as (
+                apiClient: ShopperBasketsClient,
+                params: Params,
+                rawResponse: boolean | undefined
+            ) => any)(apiClients['shopperBaskets'], params, rawResponse)
         },
         {
             onSuccess: (data, params) => {
