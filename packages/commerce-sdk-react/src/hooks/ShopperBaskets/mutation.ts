@@ -9,7 +9,6 @@ import {useMutation} from '../useMutation'
 import {MutationFunction, UseMutationResult, useQueryClient} from '@tanstack/react-query'
 import {CacheUpdateMatrixElement, NotImplementedError, updateCache} from '../utils'
 import useCustomerId from '../useCustomerId'
-import {Method} from 'axios'
 
 type Client = ApiClients['shopperBaskets']
 
