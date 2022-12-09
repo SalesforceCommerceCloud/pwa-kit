@@ -19,7 +19,7 @@ import {
 } from '../../test-utils'
 import {
     getCacheUpdateMatrix,
-    ShopperBasketMutationType,
+    ShopperBasketsMutationType,
     useShopperBasketsMutation
 } from './mutation'
 import {useBasket} from './query'
@@ -45,7 +45,7 @@ jest.mock('../useCustomerId.ts', () => {
 })
 
 type MutationPayloads = {
-    [key in ShopperBasketMutationType]?: {body: any; parameters: any}
+    [key in ShopperBasketsMutationType]?: {body: any; parameters: any}
 }
 const mutationPayloads: MutationPayloads = {
     updateBasket: {
@@ -114,7 +114,7 @@ const mutationPayloads: MutationPayloads = {
     }
 }
 
-const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map((mutationName) => {
+const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).map((mutationName) => {
     const payload = mutationPayloads[mutationName]
 
     return {
@@ -127,7 +127,8 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                     mockRelatedQueries()
 
                     const {result, waitForValueToChange} = renderHookWithProviders(() => {
-                        const mutation = useShopperBasketsMutation(mutationName)
+                        const action = mutationName as ShopperBasketsMutationType
+                        const mutation = useShopperBasketsMutation({action})
 
                         // All of the necessary query hooks needed to verify the cache-update logic
                         const queries = {
@@ -178,7 +179,8 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketMutationType[]).map
                     mockMutationEndpoints('/checkout/shopper-baskets/', {errorResponse: 500})
 
                     const {result, waitForNextUpdate} = renderHookWithProviders(() => {
-                        return useShopperBasketsMutation(mutationName)
+                        const action = mutationName as ShopperBasketsMutationType
+                        return useShopperBasketsMutation({action})
                     })
 
                     act(() => {
