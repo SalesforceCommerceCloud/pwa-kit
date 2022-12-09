@@ -190,7 +190,6 @@ const runGenerator = (answers, {outputDir, verbose}) => {
         siteId: answers['commerce-api'].siteId
     }
     const einsteinApi = {
-        proxyPath: 'einstein',
         einsteinId: answers['einstein-api'].einsteinId,
         siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
     }
