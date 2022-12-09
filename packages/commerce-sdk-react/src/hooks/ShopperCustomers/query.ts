@@ -7,7 +7,7 @@
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
-import {NotImplemented} from './../utils'
+import {NotImplementedError} from './../utils'
 
 // TODO: Remove once phase2 is completed and all hooks are implemented
 import useCommerceApi from '../useCommerceApi'
@@ -24,7 +24,7 @@ type Client = ApiClients['shopperCustomers']
  * @returns An object describing the state of the request.
  */
 function useExternalProfile(): void {
-    NotImplemented()
+    NotImplementedError()
 }
 
 type UseCustomerParameters = NonNullable<Argument<Client['getCustomer']>>['parameters']
@@ -88,6 +88,7 @@ function useCustomerAddress(
 ) {
     const {headers, rawResponse, ...parameters} = arg
     return useQuery(
+        // TODO: `parameters.addressName` is also needed here
         ['/customers', parameters.customerId, '/addresses', arg],
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerAddress({parameters, headers}, rawResponse)
@@ -178,7 +179,7 @@ function useCustomerOrders(
  * @returns An object describing the state of the request.
  */
 function useCustomerPaymentInstrument(): void {
-    NotImplemented()
+    NotImplementedError()
 }
 
 type UseCustomerProductListsParameters = NonNullable<
@@ -270,7 +271,7 @@ function useCustomerProductList(
  * @returns An object describing the state of the request.
  */
 function useCustomerProductListItem(): void {
-    NotImplemented()
+    NotImplementedError()
 }
 /**
  * WARNING: This method is not implemented yet.
@@ -282,7 +283,7 @@ function useCustomerProductListItem(): void {
  * @returns An object describing the state of the request.
  */
 function usePublicProductListsBySearchTerm(): void {
-    NotImplemented()
+    NotImplementedError()
 }
 /**
  * WARNING: This method is not implemented yet.
@@ -294,7 +295,7 @@ function usePublicProductListsBySearchTerm(): void {
  * @returns An object describing the state of the request.
  */
 function usePublicProductList(): void {
-    NotImplemented()
+    NotImplementedError()
 }
 /**
  * WARNING: This method is not implemented yet.
@@ -306,7 +307,7 @@ function usePublicProductList(): void {
  * @returns An object describing the state of the request.
  */
 function useProductListItem(): void {
-    NotImplemented()
+    NotImplementedError()
 }
 
 export {
