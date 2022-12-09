@@ -6,7 +6,7 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction, useQueryClient} from '@tanstack/react-query'
+import {MutationFunction, UseMutationResult, useQueryClient} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -169,21 +169,38 @@ export const ShopperBasketsMutations = {
     AddTaxesForBasket: 'addTaxesForBasket'
 } as const
 
-type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
+type UseShopperBasketsMutationHeaders = NonNullable<Argument<Client['createBasket']>>['headers']
+type UseShopperBasketsMutationArg = {
+    headers?: UseShopperBasketsMutationHeaders
+    rawResponse?: boolean
+    action: ShopperBasketsMutationType
+}
+type ShopperBasketsMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
+type ShopperBasketsClient = ApiClients['shopperBaskets']
 
 /**
  * A hook for performing mutations with the Shopper Baskets API.
  */
-export function useShopperBasketsMutation<Action extends ShopperBasketMutationType>(
-    action: Action
-) {
-    type Params = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
+export function useShopperBasketsMutation<Action extends ShopperBasketsMutationType>(
+    arg: UseShopperBasketsMutationArg
+): UseMutationResult<
+    DataType<ShopperBasketsClient[Action]> | Response,
+    Error,
+    Argument<ShopperBasketsClient[Action]>
+> {
+    const {headers, rawResponse, action} = arg
+
+    type Params = Argument<ShopperBasketsClient[Action]>
+    type Data = DataType<ShopperBasketsClient[Action]>
     const queryClient = useQueryClient()
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
-            return method.call(apiClients['shopperBaskets'], params)
+            //Override param headers to user-defined header values
+            if (params) {
+                params.headers = headers
+            }
+            return (method.call as any)(apiClients['shopperBaskets'], params, rawResponse)
         },
         {
             onSuccess: (data, params) => {

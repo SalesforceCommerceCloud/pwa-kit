@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {Argument, DataType} from '../types'
+import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {MutationFunction, useQueryClient} from '@tanstack/react-query'
 import {updateCache, QueryKeysMatrixElement, Client, NotImplemented} from '../utils'
@@ -389,34 +389,34 @@ type UseShopperCustomersMutationArg = {
     action: ShopperCustomersMutationType
 }
 
+type ShopperCustomersClient = ApiClients['shopperCustomers']
+
 /**
  * A hook for performing mutations with the Shopper Customers API.
  */
 function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
-    arg: UseShopperCustomersMutationArg & {rawResponse?: false}
-): UseMutationResult<DataType<Client[Action]>, Error>
-function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
-    arg: UseShopperCustomersMutationArg & {rawResponse: true}
-): UseMutationResult<Response, Error>
-function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
     arg: UseShopperCustomersMutationArg
-): UseMutationResult<DataType<Client[Action]>, Error, Argument<Client[Action]>> {
+): UseMutationResult<
+    DataType<ShopperCustomersClient[Action]> | Response,
+    Error,
+    Argument<ShopperCustomersClient[Action]>
+> {
     const {headers, rawResponse, action} = arg
 
     if (SHOPPER_CUSTOMERS_NOT_IMPLEMENTED.includes(action)) {
         NotImplemented()
     }
-    type Params = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
+    type Params = Argument<ShopperCustomersClient[Action]>
+    type Data = DataType<ShopperCustomersClient[Action]>
     const queryClient = useQueryClient()
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
-            //Set headers to user-defined header values
+            //Override param headers to user-defined header values
             if (params) {
                 params.headers = headers
             }
-            return method.call(apiClients['shopperCustomers'], params)
+            return (method.call as any)(apiClients['shopperCustomers'], params, rawResponse)
         },
         {
             onSuccess: (data, params) => {

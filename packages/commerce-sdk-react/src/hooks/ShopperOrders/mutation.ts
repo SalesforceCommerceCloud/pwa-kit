@@ -98,7 +98,7 @@ type ShopperOrdersClient = ApiClients['shopperOrders']
 function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
     arg: UseShopperOrdersMutationArg
 ): UseMutationResult<
-    DataType<Client[Action]> | Response,
+    DataType<ShopperOrdersClient[Action]> | Response,
     Error,
     Argument<ShopperOrdersClient[Action]>
 > {
@@ -108,7 +108,7 @@ function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
         NotImplemented()
     }
     type Params = Argument<ShopperOrdersClient[Action]>
-    type Data = DataType<Client[Action]>
+    type Data = DataType<ShopperOrdersClient[Action]>
     const queryClient = useQueryClient()
 
     return useMutation<Data, Error, Params>(
