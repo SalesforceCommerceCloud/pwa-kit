@@ -6,8 +6,7 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {UseMutationResult} from '@tanstack/react-query'
+import {MutationFunction, useQueryClient, UseMutationResult} from '@tanstack/react-query'
 import {updateCache, CacheUpdateMatrixElement, Client, NotImplementedError} from '../utils'
 
 export const ShopperCustomersMutations = {

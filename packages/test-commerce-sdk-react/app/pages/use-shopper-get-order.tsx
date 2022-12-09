@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {useOrder} from 'commerce-sdk-react'
+import {useOrder} from 'commerce-sdk-react-preview'
 import {Link, useParams} from 'react-router-dom'
 import Json from '../components/Json'
 

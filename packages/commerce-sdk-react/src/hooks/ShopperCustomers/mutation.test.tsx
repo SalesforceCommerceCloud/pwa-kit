@@ -10,11 +10,12 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {
     ShopperCustomersMutationType,
     useShopperCustomersMutation,
-    shopperCustomersQueryKeysMatrix,
+    shopperCustomersCacheUpdateMatrix,
     SHOPPER_CUSTOMERS_NOT_IMPLEMENTED
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
+import {QueryKeyMap} from '../utils'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
@@ -162,7 +163,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                             })
                         )
 
-                        const mutation: any = shopperCustomersQueryKeysMatrix[mutationName]
+                        const mutation: any = shopperCustomersCacheUpdateMatrix[mutationName]
 
                         // Pre-populate cache with query keys we invalidate/update/remove onSuccess
                         const {invalidate, update, remove} = mutation(
@@ -176,7 +177,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                             ...(remove || [])
                         ]
 
-                        queryKeys.forEach((queryKey: QueryKey) => {
+                        queryKeys.forEach(({key: queryKey}: QueryKeyMap) => {
                             queryClient.setQueryData(queryKey, {test: true})
                         })
 
@@ -189,13 +190,13 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                         expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
 
                         // Assert changes in cache
-                        update?.forEach((queryKey: QueryKey) => {
+                        update?.forEach(({key: queryKey}: QueryKeyMap) => {
                             expect(queryClient.getQueryData(queryKey)).not.toEqual({test: true})
                         })
-                        invalidate?.forEach((queryKey: QueryKey) => {
+                        invalidate?.forEach(({key: queryKey}: QueryKeyMap) => {
                             expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
                         })
-                        remove?.forEach((queryKey: QueryKey) => {
+                        remove?.forEach(({key: queryKey}: QueryKeyMap) => {
                             expect(queryClient.getQueryState(queryKey)).toBeFalsy()
                         })
                     }
