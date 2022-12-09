@@ -473,15 +473,11 @@ function useShopperCustomersMutation<Action extends ShopperCustomersMutationType
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
-            //Override param headers to user-defined header values
-            if (params) {
-                params.headers = headers
-            }
             return (method.call as (
                 apiClient: ShopperCustomersClient,
                 params: Params,
                 rawResponse: boolean | undefined
-            ) => any)(apiClients['shopperCustomers'], params, rawResponse)
+            ) => any)(apiClients['shopperCustomers'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {
