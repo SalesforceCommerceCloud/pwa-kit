@@ -114,87 +114,89 @@ const mutationPayloads: MutationPayloads = {
     }
 }
 
-const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).map((mutationName) => {
-    const payload = mutationPayloads[mutationName]
+const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).map(
+    (mutationName) => {
+        const payload = mutationPayloads[mutationName]
 
-    return {
-        hook: mutationName,
-        cases: [
-            {
-                name: 'success',
-                assertions: async () => {
-                    mockMutationEndpoints('/checkout/shopper-baskets/')
-                    mockRelatedQueries()
+        return {
+            hook: mutationName,
+            cases: [
+                {
+                    name: 'success',
+                    assertions: async () => {
+                        mockMutationEndpoints('/checkout/shopper-baskets/')
+                        mockRelatedQueries()
 
-                    const {result, waitForValueToChange} = renderHookWithProviders(() => {
-                        const action = mutationName as ShopperBasketsMutationType
-                        const mutation = useShopperBasketsMutation({action})
+                        const {result, waitForValueToChange} = renderHookWithProviders(() => {
+                            const action = mutationName as ShopperBasketsMutationType
+                            const mutation = useShopperBasketsMutation({action})
 
-                        // All of the necessary query hooks needed to verify the cache-update logic
-                        const queries = {
-                            basket: useBasket({basketId: BASKET_ID}),
-                            customerBaskets: useCustomerBaskets({customerId: CUSTOMER_ID})
-                        }
+                            // All of the necessary query hooks needed to verify the cache-update logic
+                            const queries = {
+                                basket: useBasket({basketId: BASKET_ID}),
+                                customerBaskets: useCustomerBaskets({customerId: CUSTOMER_ID})
+                            }
 
-                        return {
-                            queries,
-                            mutation
-                        }
-                    })
+                            return {
+                                queries,
+                                mutation
+                            }
+                        })
 
-                    await waitForValueToChange(() => result.current.queries.basket.data)
+                        await waitForValueToChange(() => result.current.queries.basket.data)
 
-                    act(() => {
-                        result.current.mutation.mutate(payload)
-                    })
+                        act(() => {
+                            result.current.mutation.mutate(payload)
+                        })
 
-                    await waitForValueToChange(() => result.current.mutation.isSuccess)
-                    expect(result.current.mutation.isSuccess).toBe(true)
+                        await waitForValueToChange(() => result.current.mutation.isSuccess)
+                        expect(result.current.mutation.isSuccess).toBe(true)
 
-                    // On successful mutation, the query cache gets updated too. Let's assert it.
-                    const cacheUpdateMatrix = getCacheUpdateMatrix(CUSTOMER_ID)
-                    // @ts-ignore
-                    const matrixElement = cacheUpdateMatrix[mutationName](payload, {})
-                    const {invalidate, update, remove}: CacheUpdateMatrixElement = matrixElement
-
-                    update?.forEach(({name}) => {
+                        // On successful mutation, the query cache gets updated too. Let's assert it.
+                        const cacheUpdateMatrix = getCacheUpdateMatrix(CUSTOMER_ID)
                         // @ts-ignore
-                        assertUpdateQuery(result.current.queries[name], NEW_DATA)
-                    })
+                        const matrixElement = cacheUpdateMatrix[mutationName](payload, {})
+                        const {invalidate, update, remove}: CacheUpdateMatrixElement = matrixElement
 
-                    invalidate?.forEach(({name}) => {
-                        // @ts-ignore
-                        assertInvalidateQuery(result.current.queries[name], OLD_DATA)
-                    })
+                        update?.forEach(({name}) => {
+                            // @ts-ignore
+                            assertUpdateQuery(result.current.queries[name], NEW_DATA)
+                        })
 
-                    remove?.forEach(({name}) => {
-                        // @ts-ignore
-                        assertRemoveQuery(result.current.queries[name])
-                    })
+                        invalidate?.forEach(({name}) => {
+                            // @ts-ignore
+                            assertInvalidateQuery(result.current.queries[name], OLD_DATA)
+                        })
+
+                        remove?.forEach(({name}) => {
+                            // @ts-ignore
+                            assertRemoveQuery(result.current.queries[name])
+                        })
+                    }
+                },
+                {
+                    name: 'error',
+                    assertions: async () => {
+                        mockMutationEndpoints('/checkout/shopper-baskets/', {errorResponse: 500})
+
+                        const {result, waitForNextUpdate} = renderHookWithProviders(() => {
+                            const action = mutationName as ShopperBasketsMutationType
+                            return useShopperBasketsMutation({action})
+                        })
+
+                        act(() => {
+                            result.current.mutate(payload)
+                        })
+
+                        await waitForNextUpdate()
+
+                        expect(result.current.error).toBeDefined()
+                    }
                 }
-            },
-            {
-                name: 'error',
-                assertions: async () => {
-                    mockMutationEndpoints('/checkout/shopper-baskets/', {errorResponse: 500})
-
-                    const {result, waitForNextUpdate} = renderHookWithProviders(() => {
-                        const action = mutationName as ShopperBasketsMutationType
-                        return useShopperBasketsMutation({action})
-                    })
-
-                    act(() => {
-                        result.current.mutate(payload)
-                    })
-
-                    await waitForNextUpdate()
-
-                    expect(result.current.error).toBeDefined()
-                }
-            }
-        ]
+            ]
+        }
     }
-})
+)
 
 tests.forEach(({hook, cases}) => {
     describe(hook, () => {

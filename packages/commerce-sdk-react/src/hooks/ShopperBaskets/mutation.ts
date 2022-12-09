@@ -431,9 +431,9 @@ export const SHOPPER_BASKETS_NOT_IMPLEMENTED = [
 export function useShopperBasketsMutation<Action extends ShopperBasketsMutationType>(
     arg: UseShopperBasketsMutationArg
 ): UseMutationResult<
-DataType<ShopperBasketsClient[Action]> | Response,
-Error,
-Argument<ShopperBasketsClient[Action]>
+    DataType<ShopperBasketsClient[Action]> | Response,
+    Error,
+    Argument<ShopperBasketsClient[Action]>
 > {
     const {headers, rawResponse, action} = arg
 
