@@ -13,13 +13,13 @@ import React from 'react'
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = () => {
-    return <div>This is my new home</div>
+const ProductDetail = () => {
+    return <div>This is my new product detail</div>
 }
 
-Home.getTemplateName = () => 'home'
+ProductDetail.getTemplateName = () => 'product detail'
 
 
-Home.propTypes = {}
+ProductDetail.propTypes = {}
 
-export default Home
+export default ProductDetail
