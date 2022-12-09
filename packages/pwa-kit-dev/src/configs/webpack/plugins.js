@@ -55,9 +55,9 @@ export const createModuleReplacementPlugin = (projectDir) => {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/routes$'),
             // newPath: resolve(projectDir, 'app', 'routes')
             // newPath: resolve(projectDir, extendPath, 'app', 'routes')
-            newPath: fs.existsSync('/Users/bchypak/Projects/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app/routes.jsx') ? 
-                resolve(projectDir, 'pwa-kit', 'overrides', 'app', 'routes') : 
-                resolve(projectDir, extendPath, 'app', 'routes')
+            newPath: fs.existsSync(`${projectDir}/pwa-kit/overrides/app/routes.jsx`)
+                ? resolve(projectDir, 'pwa-kit', 'overrides', 'app', 'routes')
+                : resolve(projectDir, extendPath, 'app', 'routes')
         }
     ]
 
@@ -95,7 +95,7 @@ export const createModuleReplacementPlugin = (projectDir) => {
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-        
+
         const replacement = replacements.find(({path}) => resolved.match(path))
 
         const sdkPaths = [
