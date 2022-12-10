@@ -35,7 +35,7 @@ module.exports = {
             siteId: 'aaij-MobileFirst'
         }
     },
-    ssrIsProduction: false,
+    markEinsteinAnalyticsAsProduction: false,
     externals: [],
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,

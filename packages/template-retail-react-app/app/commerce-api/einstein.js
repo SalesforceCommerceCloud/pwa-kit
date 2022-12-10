@@ -12,7 +12,7 @@ class EinsteinAPI {
     constructor(commerceAPI) {
         this.commerceAPI = commerceAPI
         this.config = commerceAPI?._config?.einsteinConfig
-        this.isProduction = getConfig().ssrIsProduction
+        this.isProduction = getConfig().markEinsteinAnalyticsAsProduction
     }
 
     /**
