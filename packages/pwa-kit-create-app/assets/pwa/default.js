@@ -36,7 +36,7 @@ module.exports = {
         },
         // Einstein api config
         einsteinAPI: {
-            proxyPath: \`/mobify/proxy/${einsteinApi.proxyPath}\`,
+            host: 'https://api.cquotient.com',
             einsteinId: '${einsteinApi.einsteinId}',
             siteId: '${einsteinApi.siteId}'
         }
@@ -74,10 +74,6 @@ module.exports = {
             {
                 host: '${new URL(commerceApi.instanceUrl).hostname}',
                 path: 'ocapi'
-            },
-            {
-                host: 'api.cquotient.com',
-                path: 'einstein'
             }
         ]
     }

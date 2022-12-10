@@ -28,7 +28,7 @@ const getProductsSpy = jest.fn()
 const config = {
     _config: {
         einsteinConfig: {
-            proxyPath: `/test-path`,
+            host: `http://localhost/test-path`,
             einsteinId: 'test-id',
             siteId: 'test-site-id'
         }

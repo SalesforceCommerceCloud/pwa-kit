@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {DataType, Argument} from '../types'
+import {DataType, Argument, ApiClients} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction, useQueryClient} from '@tanstack/react-query'
+import {MutationFunction, UseMutationResult, useQueryClient} from '@tanstack/react-query'
 import {updateCache, CacheUpdateMatrixElement, Client, NotImplementedError} from '../utils'
 
 export const ShopperOrdersMutations = {
@@ -41,8 +41,6 @@ export const ShopperOrdersMutations = {
      */
     UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
 } as const
-
-export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
 
 export const shopperOrdersCacheUpdateMatrix = {
     createOrder: (
@@ -81,20 +79,49 @@ export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
     'UpdatePaymentInstrumentForOrder'
 ]
 
+export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
+
+type UseShopperOrdersMutationHeaders = NonNullable<Argument<Client['createOrder']>>['headers']
+type UseShopperOrdersMutationArg = {
+    headers?: UseShopperOrdersMutationHeaders
+    rawResponse?: boolean
+    action: ShopperOrdersMutationType
+}
+
+type ShopperOrdersClient = ApiClients['shopperOrders']
+
 /**
  * A hook for performing mutations with the Shopper Orders API.
  */
-export function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(action: Action) {
+
+function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
+    arg: UseShopperOrdersMutationArg
+): UseMutationResult<
+    DataType<ShopperOrdersClient[Action]> | Response,
+    Error,
+    Argument<ShopperOrdersClient[Action]>
+> {
+    const {headers, rawResponse, action} = arg
+
     if (SHOPPER_ORDERS_NOT_IMPLEMENTED.includes(action)) {
         NotImplementedError()
     }
-    type Params = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
+    type Params = Argument<ShopperOrdersClient[Action]>
+    type Data = DataType<ShopperOrdersClient[Action]>
     const queryClient = useQueryClient()
+
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperOrders'][action] as MutationFunction<Data, Params>
-            return method.call(apiClients['shopperOrders'], params)
+            //Override param headers to user-defined headers values
+            if (params) {
+                params.headers = headers
+            }
+            return (method.call as (
+                apiClient: ShopperOrdersClient,
+                params: Params,
+                rawResponse: boolean | undefined
+            ) => any)(apiClients['shopperOrders'], params, rawResponse)
         },
         {
             onSuccess: (data, params) => {
@@ -103,3 +130,5 @@ export function useShopperOrdersMutation<Action extends ShopperOrdersMutationTyp
         }
     )
 }
+
+export {useShopperOrdersMutation}
