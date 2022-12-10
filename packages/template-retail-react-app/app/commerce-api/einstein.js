@@ -6,13 +6,11 @@
  */
 import fetch from 'cross-fetch'
 import {keysToCamel} from './utils'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 class EinsteinAPI {
     constructor(commerceAPI) {
         this.commerceAPI = commerceAPI
         this.config = commerceAPI?._config?.einsteinConfig
-        this.isProduction = getConfig().markEinsteinAnalyticsAsProduction
     }
 
     /**
@@ -46,7 +44,7 @@ class EinsteinAPI {
             body.realm = this.config.siteId.split('-')[0]
         }
 
-        if (this.isProduction) {
+        if (this.config.isProduction) {
             body.instanceType = instanceType_prd
         } else {
             body.instanceType = instanceType_sbx

@@ -32,10 +32,10 @@ module.exports = {
             host: 'https://api.cquotient.com',
             einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             // This differs from the siteId in commerceAPIConfig for testing purposes
-            siteId: 'aaij-MobileFirst'
+            siteId: 'aaij-MobileFirst',
+            isProduction: false
         }
     },
-    markEinsteinAnalyticsAsProduction: false,
     externals: [],
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,
