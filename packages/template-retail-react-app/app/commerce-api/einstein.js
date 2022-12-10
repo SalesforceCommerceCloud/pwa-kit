@@ -20,6 +20,9 @@ class EinsteinAPI {
      * @returns {object} The decorated body object.
      */
     _buildBody(params) {
+        const instanceType_prd = 'prd'
+        const instanceType_sbx = 'sbx'
+
         const body = {...params}
 
         // If we have an encrypted user id (authenticaed users only) use it as the `userId` otherwise
@@ -39,6 +42,12 @@ class EinsteinAPI {
         // The first part of the siteId is the realm
         if (this.config.siteId) {
             body.realm = this.config.siteId.split('-')[0]
+        }
+
+        if (this.config.isProduction) {
+            body.instanceType = instanceType_prd
+        } else {
+            body.instanceType = instanceType_sbx
         }
 
         return body
