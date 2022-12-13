@@ -16,6 +16,8 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
+import PropTypes from 'prop-types'
+
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
     return Promise.resolve().then(() => {
@@ -40,14 +42,16 @@ const OuterApp = ({routes, error, WrappedApp, locals}) => {
     return (
         <ServerContext.Provider value={{}}>
             <Router>
-                <CorrelationIdProvider correlationId={() => {
-                    // If we are hydrating an error page use the server correlation id.
-                    if (isInitialPageRef.current && window.__ERROR__) {
-                        isInitialPageRef.current = false
-                        return window.__INITIAL_CORRELATION_ID__
-                    }
-                    return uuidv4()
-                }}>
+                <CorrelationIdProvider
+                    correlationId={() => {
+                        // If we are hydrating an error page use the server correlation id.
+                        if (isInitialPageRef.current && window.__ERROR__) {
+                            isInitialPageRef.current = false
+                            return window.__INITIAL_CORRELATION_ID__
+                        }
+                        return uuidv4()
+                    }}
+                >
                     <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                         <AppConfig locals={locals}>
                             <Switch
@@ -62,6 +66,13 @@ const OuterApp = ({routes, error, WrappedApp, locals}) => {
             </Router>
         </ServerContext.Provider>
     )
+}
+
+OuterApp.propTypes = {
+    routes: PropTypes.array.isRequired,
+    error: PropTypes.object,
+    WrappedApp: PropTypes.element.isRequired,
+    locals: PropTypes.object
 }
 /* istanbul ignore next */
 export const start = () => {
@@ -107,11 +118,8 @@ export const start = () => {
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
-            ReactDOM.hydrate(<OuterApp {...props} />,
-                rootEl,
-                () => {
-                    window.__HYDRATING__ = false
-                }
-            )
+            ReactDOM.hydrate(<OuterApp {...props} />, rootEl, () => {
+                window.__HYDRATING__ = false
+            })
         })
 }
