@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useCustomerId} from 'commerce-sdk-react'
+import {useCustomerId} from 'commerce-sdk-react-preview'
 
 const UseCustomerId = () => {
     const customerId = useCustomerId()

@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import fetch from 'cross-fetch'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {keysToCamel} from './utils'
 
 class EinsteinAPI {
@@ -21,6 +20,9 @@ class EinsteinAPI {
      * @returns {object} The decorated body object.
      */
     _buildBody(params) {
+        const instanceType_prd = 'prd'
+        const instanceType_sbx = 'sbx'
+
         const body = {...params}
 
         // If we have an encrypted user id (authenticaed users only) use it as the `userId` otherwise
@@ -42,13 +44,18 @@ class EinsteinAPI {
             body.realm = this.config.siteId.split('-')[0]
         }
 
+        if (this.config.isProduction) {
+            body.instanceType = instanceType_prd
+        } else {
+            body.instanceType = instanceType_sbx
+        }
+
         return body
     }
 
     async einsteinFetch(endpoint, method, body) {
         const config = this.config
-        const {proxyPath, einsteinId} = config
-        const host = `${getAppOrigin()}${proxyPath}`
+        const {host, einsteinId} = config
 
         const headers = {
             'Content-Type': 'application/json',
