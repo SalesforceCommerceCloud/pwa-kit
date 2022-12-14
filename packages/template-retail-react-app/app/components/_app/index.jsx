@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import fetch from "node-fetch"
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
@@ -53,8 +54,40 @@ const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 const DEFAULT_LOCALE = 'en-US'
 
+// TODO: Fix
+//  const consoleEl = document.getElementById("console")
+
+
+async function preview(access_token, accessToken) {
+
+    // [2] Set the context by asking to preview with our token.
+    let previewResponse = await fetch(
+        new URL("http://localhost:3000/preview"),
+        {
+            method: "POST",
+            body: JSON.stringify({access_token}),
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `${accessToken}`,
+            },
+        }
+    )
+
+    console.log('previewResponse:', previewResponse)
+    if (!previewResponse.ok) {
+        const previewError = await previewResponse.json()
+        console.log({previewError})
+        // TODO: Fix
+        //consoleEl.innerText = JSON.stringify(previewError, null, 4)
+        return
+    }
+
+    //loadProduct()
+}
+
 const App = (props) => {
     const {
+        access_token,
         children,
         targetLocale = DEFAULT_LOCALE,
         messages = {},
@@ -145,6 +178,21 @@ const App = (props) => {
         history.push(path)
     }
 
+    let accessToken
+    if (typeof window !== 'undefined') {
+        accessToken = localStorage.getItem("token")
+        console.log('App accessToken:',accessToken)
+    }
+    console.log('App access_token:',access_token)
+
+    if (accessToken) {
+        preview(access_token, accessToken )
+    }
+
+
+
+
+
     return (
         <Box className="sf-app" {...styles.container}>
             <IntlProvider
@@ -200,7 +248,8 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-
+                            <h2>Console</h2>
+                            <pre id="console"></pre>
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <Header
@@ -303,7 +352,12 @@ App.getProps = async ({api, res}) => {
     const messages = await fetchTranslations(targetLocale)
 
     // Login as `guest` to get session.
-    await api.auth.login()
+    const resultLogin = await api.auth.login()
+    console.log('getProps resultLogin:', resultLogin)
+
+    const access_token = api.auth.authToken
+    console.log('getProps access_token:', access_token )
+
 
     // Get the root category, this will be used for things like the navigation.
     const rootCategory = await api.shopperProducts.getCategory({
@@ -328,7 +382,10 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     // the application.
     const categories = flatten(rootCategory, 'categories')
 
+
+
     return {
+        access_token,
         targetLocale,
         messages,
         categories,
