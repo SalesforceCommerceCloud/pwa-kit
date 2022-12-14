@@ -6,7 +6,7 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction, useQueryClient} from '@tanstack/react-query'
+import {MutationFunction, UseMutationResult, useQueryClient} from '@tanstack/react-query'
 import {CacheUpdateMatrixElement, NotImplementedError, updateCache} from '../utils'
 import useCustomerId from '../useCustomerId'
 
@@ -174,7 +174,15 @@ export const ShopperBasketsMutations = {
     AddTaxesForBasket: 'addTaxesForBasket'
 } as const
 
-export type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
+type UseShopperBasketsMutationHeaders = NonNullable<Argument<Client['createBasket']>>['headers']
+type UseShopperBasketsMutationArg = {
+    headers?: UseShopperBasketsMutationHeaders
+    rawResponse?: boolean
+    action: ShopperBasketsMutationType
+}
+
+type ShopperBasketsClient = ApiClients['shopperBaskets']
+export type ShopperBasketsMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
 /**
  * @private
@@ -420,25 +428,33 @@ export const SHOPPER_BASKETS_NOT_IMPLEMENTED = [
 /**
  * A hook for performing mutations with the Shopper Baskets API.
  */
-export function useShopperBasketsMutation<Action extends ShopperBasketMutationType>(
-    action: Action
-) {
+export function useShopperBasketsMutation<Action extends ShopperBasketsMutationType>(
+    arg: UseShopperBasketsMutationArg
+): UseMutationResult<
+    DataType<ShopperBasketsClient[Action]> | Response,
+    Error,
+    Argument<ShopperBasketsClient[Action]>
+> {
+    const {headers, rawResponse, action} = arg
+
+    type Params = Argument<ShopperBasketsClient[Action]>
+    type Data = DataType<ShopperBasketsClient[Action]>
+
     if (SHOPPER_BASKETS_NOT_IMPLEMENTED.includes(action)) {
         NotImplementedError()
     }
-    // TODO: where are headers and rawResponse ?
     const queryClient = useQueryClient()
-
     const customerId = useCustomerId()
     const cacheUpdateMatrix = getCacheUpdateMatrix(customerId)
-
-    type Params = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
 
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
-            return method.call(apiClients['shopperBaskets'], params)
+            return (method.call as (
+                apiClient: ShopperBasketsClient,
+                params: Params,
+                rawResponse: boolean | undefined
+            ) => any)(apiClients['shopperBaskets'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {

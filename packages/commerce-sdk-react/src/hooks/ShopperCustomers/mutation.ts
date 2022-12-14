@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {Argument, DataType} from '../types'
+import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction, useQueryClient} from '@tanstack/react-query'
+import {MutationFunction, useQueryClient, UseMutationResult} from '@tanstack/react-query'
 import {updateCache, CacheUpdateMatrixElement, Client, NotImplementedError} from '../utils'
 
 export const ShopperCustomersMutations = {
@@ -158,8 +158,6 @@ export const ShopperCustomersMutations = {
      */
     UpdateCustomerProductListItem: 'updateCustomerProductListItem'
 } as const
-
-export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
 export const shopperCustomersCacheUpdateMatrix = {
     authorizeCustomer: (
@@ -441,22 +439,45 @@ export const SHOPPER_CUSTOMERS_NOT_IMPLEMENTED = [
     'updateCustomerProductList'
 ]
 
+export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
+
+type UseShopperCustomersMutationHeaders = NonNullable<
+    Argument<Client['registerCustomer']>
+>['headers']
+type UseShopperCustomersMutationArg = {
+    headers?: UseShopperCustomersMutationHeaders
+    rawResponse?: boolean
+    action: ShopperCustomersMutationType
+}
+
+type ShopperCustomersClient = ApiClients['shopperCustomers']
+
 /**
  * A hook for performing mutations with the Shopper Customers API.
  */
-export function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
-    action: Action
-) {
+function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
+    arg: UseShopperCustomersMutationArg
+): UseMutationResult<
+    DataType<ShopperCustomersClient[Action]> | Response,
+    Error,
+    Argument<ShopperCustomersClient[Action]>
+> {
+    const {headers, rawResponse, action} = arg
+
     if (SHOPPER_CUSTOMERS_NOT_IMPLEMENTED.includes(action)) {
         NotImplementedError()
     }
-    type Params = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
+    type Params = Argument<ShopperCustomersClient[Action]>
+    type Data = DataType<ShopperCustomersClient[Action]>
     const queryClient = useQueryClient()
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
-            return method.call(apiClients['shopperCustomers'], params)
+            return (method.call as (
+                apiClient: ShopperCustomersClient,
+                params: Params,
+                rawResponse: boolean | undefined
+            ) => any)(apiClients['shopperCustomers'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {
@@ -465,3 +486,5 @@ export function useShopperCustomersMutation<Action extends ShopperCustomersMutat
         }
     )
 }
+
+export {useShopperCustomersMutation}

@@ -41,7 +41,7 @@ interface OrderMutationComponentParams {
 }
 
 const OrderMutationComponent = ({action}: OrderMutationComponentParams) => {
-    const mutationHook = useShopperOrdersMutation(action)
+    const mutationHook = useShopperOrdersMutation({action})
 
     return (
         <div>
@@ -161,8 +161,9 @@ tests.forEach(({hook, cases}) => {
 test.each(SHOPPER_ORDERS_NOT_IMPLEMENTED)(
     '%j - throws error when not implemented',
     (methodName) => {
+        const action = methodName as ShopperOrdersMutationType
         expect(() => {
-            useShopperOrdersMutation(methodName as ShopperOrdersMutationType)
+            useShopperOrdersMutation({action})
         }).toThrowError('This method is not implemented.')
     }
 )
