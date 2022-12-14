@@ -31,7 +31,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
         <CommerceApiProvider
             siteId={siteId}
             shortCode="8o7m175y"
-            clientId="c9c45bfd-0ed3-4aa2-9971-40f88962b836"
+            clientId="9cfd09c5-d7d6-4e20-889a-cbe0f3000c65"
             organizationId="f_ecom_zzrf_001"
             redirectURI="http://localhost:3000/callback"
             proxy="http://localhost:3000/mobify/proxy/api"
