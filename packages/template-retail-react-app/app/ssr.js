@@ -124,9 +124,11 @@ async function handlerStorefrontPreview(req, res) {
     console.log('ssr req.body:', req.body.access_token)
     console.log('ssr SLAS_PUBLIC_CLIENT_ID:', SLAS_PUBLIC_CLIENT_ID)
 
+    const token = bits[1]
+
     // [1] Validate the Shopper JWT, and pull the USID from it.
     const { payload, error: slasValdiationError } = await validateSLASJWT(
-        req.body.access_token,
+        token,
         SLAS_PUBLIC_CLIENT_ID
     )
 
