@@ -321,7 +321,8 @@ ProductDetail.getProps = async ({res, params, location, api}) => {
     product = await api.shopperProducts.getProduct({
         parameters: {
             id: urlParams.get('pid') || productId,
-            allImages: true
+            allImages: true,
+            perPricebook: true
         }
     })
 

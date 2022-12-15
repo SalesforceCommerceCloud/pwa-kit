@@ -71,6 +71,9 @@ const ProductTile = (props) => {
     // name as `productName`. ProductList provides a localized name as `productName` and does not
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
+    const strikePrice =
+        product?.c_extend?.priceInfo?.originalPrice?.value != price &&
+        product?.c_extend?.priceInfo?.originalPrice?.value
 
     const {currency: activeCurrency} = useCurrency()
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
@@ -126,6 +129,14 @@ const ProductTile = (props) => {
             <Text {...styles.title}>{localizedProductName}</Text>
 
             {/* Price */}
+            {strikePrice && (
+                <Text {...styles.price} textDecoration="line-through">
+                    {intl.formatNumber(strikePrice, {
+                        style: 'currency',
+                        currency: currency || activeCurrency
+                    })}
+                </Text>
+            )}
             <Text {...styles.price}>
                 {intl.formatNumber(price, {
                     style: 'currency',
@@ -163,7 +174,14 @@ ProductTile.propTypes = {
         // See: https://developer.salesforce.com/docs/commerce/einstein-api/references/einstein-api-quick-start-guide?meta=getRecommendations
         // Note: useEinstein() transforms snake_case property names from the API response to camelCase
         productName: PropTypes.string,
-        productId: PropTypes.string
+        productId: PropTypes.string,
+        c_extend: PropTypes.shape({
+            priceInfo: PropTypes.shape({
+                originalPrice: PropTypes.shape({
+                    value: PropTypes.number
+                })
+            })
+        })
     }),
     /**
      * Enable adding/removing product as a favourite.

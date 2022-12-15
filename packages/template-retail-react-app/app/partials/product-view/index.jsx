@@ -26,7 +26,7 @@ import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
 
-const ProductViewHeader = ({name, price, currency, category}) => {
+const ProductViewHeader = ({name, price, strikePrice, currency, category}) => {
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
     return (
@@ -44,6 +44,19 @@ const ProductViewHeader = ({name, price, currency, category}) => {
 
             {/* Price */}
             <Skeleton isLoaded={price} width={32}>
+                {strikePrice && (
+                    <Text
+                        fontWeight="bold"
+                        fontSize="md"
+                        aria-label="price"
+                        textDecoration="line-through"
+                    >
+                        {intl.formatNumber(strikePrice, {
+                            style: 'currency',
+                            currency: currency || activeCurrency
+                        })}
+                    </Text>
+                )}
                 <Text fontWeight="bold" fontSize="md" aria-label="price">
                     {intl.formatNumber(price, {
                         style: 'currency',
@@ -58,6 +71,7 @@ const ProductViewHeader = ({name, price, currency, category}) => {
 ProductViewHeader.propTypes = {
     name: PropTypes.string,
     price: PropTypes.number,
+    strikePrice: PropTypes.number,
     currency: PropTypes.string,
     category: PropTypes.array
 }
@@ -198,6 +212,13 @@ const ProductView = ({
         }
     }, [variant?.productId])
 
+    const maxPrice =
+        product?.priceRanges &&
+        product?.priceRanges.reduce((acc, val) => {
+            return val.maxPrice > acc ? val.maxPrice : acc
+        }, 0)
+    const strikePrice = maxPrice != product?.price && maxPrice
+
     return (
         <Flex direction={'column'} data-testid="product-view">
             {/* Basic information etc. title, price, breadcrumb*/}
@@ -205,6 +226,7 @@ const ProductView = ({
                 <ProductViewHeader
                     name={product?.name}
                     price={product?.price}
+                    strikePrice={strikePrice}
                     currency={product?.currency}
                     category={category}
                 />
@@ -242,6 +264,7 @@ const ProductView = ({
                         <ProductViewHeader
                             name={product?.name}
                             price={product?.price}
+                            strikePrice={strikePrice}
                             currency={product?.currency}
                             category={category}
                         />

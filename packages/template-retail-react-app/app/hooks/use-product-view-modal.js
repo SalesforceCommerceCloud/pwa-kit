@@ -55,7 +55,8 @@ export const useProductViewModal = (initialProduct) => {
                 const res = await api.shopperProducts.getProduct({
                     parameters: {
                         id: variant.productId,
-                        allImages: true
+                        allImages: true,
+                        perPricebook: true
                     }
                 })
                 if (isError(res)) {
