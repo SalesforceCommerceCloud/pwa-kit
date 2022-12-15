@@ -76,6 +76,7 @@ import LoadingSpinner from '../../components/loading-spinner'
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
 const REFINEMENT_DISALLOW_LIST = ['c_isNew']
+let cachedCategory
 
 /*
  * This is a simple product listing page. It displays a paginated list
@@ -108,6 +109,7 @@ const ProductList = (props) => {
     let category = undefined
     if (!searchQuery) {
         category = categories[params.categoryId]
+        cachedCategory = category;
     }
 
     const basePath = `${location.pathname}${location.search}`
@@ -608,16 +610,29 @@ ProductList.getProps = async ({res, params, location, api}) => {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
 
-    const [category, productSearchResult] = await Promise.all([
-        isSearch
-            ? Promise.resolve()
-            : api.shopperProducts.getCategory({
-                  parameters: {id: categoryId, levels: 0}
-              }),
-        api.shopperSearch.productSearch({
-            parameters: searchParams
-        })
-    ])
+    let category, productSearchResult
+    if (!cachedCategory) {
+        const [freshCategory, freshProductSearchResult] = await Promise.all([
+            isSearch
+                ? Promise.resolve()
+                : api.shopperProducts.getCategory({
+                      parameters: {id: categoryId, levels: 0}
+                  }),
+            api.shopperSearch.productSearch({
+                parameters: searchParams
+            })
+        ])
+        category = freshCategory
+        productSearchResult = freshProductSearchResult
+    } else {
+        category = cachedCategory
+        const [freshProductSearchResult] = await Promise.all([
+            api.shopperSearch.productSearch({
+                parameters: searchParams
+            })
+        ])
+        productSearchResult = freshProductSearchResult
+    }
 
     // Apply disallow list to refinements.
     productSearchResult.refinements = productSearchResult?.refinements?.filter(
