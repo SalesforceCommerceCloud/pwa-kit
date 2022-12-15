@@ -48,6 +48,7 @@ import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 
 const ProductDetail = ({category, product, isLoading}) => {
+
     const {formatMessage} = useIntl()
     const basket = useBasket()
     const history = useHistory()
@@ -143,6 +144,10 @@ const ProductDetail = ({category, product, isLoading}) => {
         }
     }, [product])
 
+    const promos = product?.productPromotions
+        .map((promo) => promo.promotionId)
+        .join("\n")
+
     return (
         <Box
             className="sf-product-detail-page"
@@ -155,6 +160,7 @@ const ProductDetail = ({category, product, isLoading}) => {
             </Helmet>
 
             <Stack spacing={16}>
+                <Box>Promotions: {promos}</Box>
                 <ProductView
                     product={product}
                     category={primaryCategory?.parentCategoryTree || []}

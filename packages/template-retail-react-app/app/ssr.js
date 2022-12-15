@@ -76,8 +76,6 @@ function parseSLASSubClaim(sub) {
 async function validateSLASJWT(jwt, expectedClientID) {
     let ret
     try {
-        console.log('validateSLASJWT jwt:', jwt)
-        console.log('validateSLASJWT JWKS_SLAS:', JWKS_SLAS)
         // TODO: Internally jose.jwtVerify also validates the times of creation
         ret = await jose.jwtVerify(jwt, JWKS_SLAS, {
             algorithms: ["ES256"],
@@ -86,7 +84,6 @@ async function validateSLASJWT(jwt, expectedClientID) {
             // TODO: AUD Same, make zzrf_001 dynamic as a parameter
             audience: "commercecloud/prod/zzrf_001",
         })
-        console.log('AFTER validateSLASJWT try ret:', ret)
     } catch (error) {
         return { error }
     }
@@ -108,7 +105,7 @@ function handlerCallbackSLAS(req, res) {
 // Given a JWT, use TSOB to get a "powerful" JWT with Shopper Context scopes. Use that to set Shopper Context.
 // TODO: This endpoint should probably be called something like /protected-shopper-context
 // TSOB === Trusted System On Behalf
-async function handlerStorefrontPreview(req, res) {
+async function handlerShopperContext(req, res) {
     // TODO: Verify AM JWT BEFORE processing SLAS JWT. SLAS JWT validation can likely be middleware/decorator.
     const auth = req.get("authorization")
     if (!auth) {
@@ -121,8 +118,6 @@ async function handlerStorefrontPreview(req, res) {
 
     req.get("authorization")
 
-    console.log('ssr req.body:', req.body.access_token)
-    console.log('ssr SLAS_PUBLIC_CLIENT_ID:', SLAS_PUBLIC_CLIENT_ID)
 
     const token = bits[1]
 
@@ -132,15 +127,14 @@ async function handlerStorefrontPreview(req, res) {
         SLAS_PUBLIC_CLIENT_ID
     )
 
-    console.log('slasValdiationError:',slasValdiationError)
-
-    // TODO: Fix this
     if (slasValdiationError ) {
         return res.status(400).json({ slasValdiationError })
     }
     const { usid } = parseSLASSubClaim(payload.sub)
 
+
     // TODO: replace with import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+    //  Include the 'locale' and 'currency' config we have in the api declaration in _app-config/index.jsx
     const config = {
         parameters: {
             clientId: SLAS_PRIVATE_CLIENT_ID,
@@ -153,8 +147,6 @@ async function handlerStorefrontPreview(req, res) {
             agent,
         },
     }
-
-    // TODO: Add locale and currency to config like we do in the api declaration in _app-config/index.jsx
 
 
     // [2] Use TSOB to get a token for that USID.
@@ -188,8 +180,6 @@ async function handlerStorefrontPreview(req, res) {
         return res.status(500).json({ errorText })
     }
 
-    console.log('tsobToken:', tsobToken)
-
     // [3] Set Shopper Context.
     // const body = {
     //     // effectiveDateTime: new Date().toISOString(),
@@ -201,16 +191,19 @@ async function handlerStorefrontPreview(req, res) {
         body.effectiveDateTime = req.body.effectiveDateTime
     }
 
-    // if (req.body.customerQualifers) {
-    //     body.customerQualifiers = req.body.customerQualifers
-    // }
-    body.customQualifiers = {
-        testQualifer: "seasame"
-    }
-
-    // TODO: Verify the 'sourceCode' works as expected
+    // TODO: Find the right place to set 'sourceCode'
     //  https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-context?meta=getShopperContext#:~:text=817c%2D73d6b86872d9-,Responses,-200
-    body.sourceCode = "testsourcecode"
+    // body.sourceCode = "testsourcecode"
+    // body.sourceCodeGroup = "testsourcecode"
+    //
+    // body.assignmentQualifiers = {
+    //     sourceCode: "testsourcecode",
+    //     sourceCodeGroup: "testsourcecode"
+    // }
+
+    body.customQualifiers = {
+        sourceCode: "testsourcecode"
+    }
 
     console.log({ body })
 
@@ -274,8 +267,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
 
     // Shopper Context handler
-    app.get("/slas-callback", handlerCallbackSLAS)
-    app.post("/preview", handlerStorefrontPreview)
+    app.post("/shopper-context-handler", handlerShopperContext)
 
     app.get('*', runtime.render)
 })

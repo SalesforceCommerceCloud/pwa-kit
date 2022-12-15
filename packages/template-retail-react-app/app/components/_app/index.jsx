@@ -54,15 +54,12 @@ const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 const DEFAULT_LOCALE = 'en-US'
 
-// TODO: Fix
-//  const consoleEl = document.getElementById("console")
 
-
-async function preview(access_token, accessToken) {
+async function addShopperContext(access_token, accessToken) {
 
     // [2] Set the context by asking to preview with our token.
-    let previewResponse = await fetch(
-        new URL("http://localhost:3000/preview"),
+    let shopperContextResponse = await fetch(
+        new URL("http://localhost:3000/shopper-context-handler"),
         {
             method: "POST",
             body: JSON.stringify({access_token}),
@@ -73,16 +70,11 @@ async function preview(access_token, accessToken) {
         }
     )
 
-    console.log('previewResponse:', previewResponse)
-    if (!previewResponse.ok) {
-        const previewError = await previewResponse.json()
-        console.log({previewError})
-        // TODO: Fix
-        //consoleEl.innerText = JSON.stringify(previewError, null, 4)
+    if (!shopperContextResponse.ok) {
+        const shopperContextError = await shopperContextResponse.json()
+        console.log({shopperContextError})
         return
     }
-
-    //loadProduct()
 }
 
 const App = (props) => {
@@ -181,17 +173,11 @@ const App = (props) => {
     let accessToken
     if (typeof window !== 'undefined') {
         accessToken = localStorage.getItem("token")
-        console.log('App accessToken:',accessToken)
     }
-    console.log('App access_token:',access_token)
 
     if (accessToken) {
-        preview(access_token, accessToken )
+        addShopperContext(access_token, accessToken )
     }
-
-
-
-
 
     return (
         <Box className="sf-app" {...styles.container}>
@@ -248,8 +234,6 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            <h2>Console</h2>
-                            <pre id="console"></pre>
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <Header
@@ -352,12 +336,9 @@ App.getProps = async ({api, res}) => {
     const messages = await fetchTranslations(targetLocale)
 
     // Login as `guest` to get session.
-    const resultLogin = await api.auth.login()
-    console.log('getProps resultLogin:', resultLogin)
+    await api.auth.login()
 
     const access_token = api.auth.authToken
-    console.log('getProps access_token:', access_token )
-
 
     // Get the root category, this will be used for things like the navigation.
     const rootCategory = await api.shopperProducts.getCategory({
@@ -381,8 +362,6 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     // Flatten the root so we can easily access all the categories throughout
     // the application.
     const categories = flatten(rootCategory, 'categories')
-
-
 
     return {
         access_token,
