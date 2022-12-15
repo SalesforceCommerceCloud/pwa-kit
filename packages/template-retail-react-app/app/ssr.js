@@ -40,11 +40,6 @@ const SLAS_PUBLIC_CLIENT_ID = process.env.SLAS_PUBLIC_CLIENT_ID
 const SLAS_PRIVATE_CLIENT_ID = process.env.SLAS_PRIVATE_CLIENT_ID
 const SLAS_PRIVATE_CLIENT_SECRET = process.env.SLAS_PRIVATE_CLIENT_SECRET
 
-const agent = process.env.NODE_EXTRA_CA_CERTS
-    ? new HTTPSProxyAgent("http://localhost:3000")
-    : undefined
-
-
 // https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-login?meta=getJwksUri
 const JWKS_SLAS = jose.createRemoteJWKSet(
     // TODO: The endpoint has the current JWT and the future JWT that we can potentially rotate.
@@ -54,18 +49,17 @@ const JWKS_SLAS = jose.createRemoteJWKSet(
     //   --> https://www.npmjs.com/package/jwt-decode
     //   IMPORTANT: This library doesn't validate the token, any well formed JWT can be decoded. You should validate the token in your server-side logic by using something like express-jwt, koa-jwt, Owin Bearer JWT, etc.
     new URL(
-        "https://kv7kzm78.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_zzrf_001/oauth2/jwks"
+        'https://kv7kzm78.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_zzrf_001/oauth2/jwks'
     )
 )
 
 function parseSLASSubClaim(sub) {
-    return sub.split("::").reduce((acc, part) => {
-        const [key, val] = part.split(":")
+    return sub.split('::').reduce((acc, part) => {
+        const [key, val] = part.split(':')
         acc[key] = val
         return acc
     }, {})
 }
-
 
 // TODO: The goal is to create a library with this validation that we got right and we trust to validate JWT
 //  customers can import this library and use it in their projects.
@@ -78,28 +72,24 @@ async function validateSLASJWT(jwt, expectedClientID) {
     try {
         // TODO: Internally jose.jwtVerify also validates the times of creation
         ret = await jose.jwtVerify(jwt, JWKS_SLAS, {
-            algorithms: ["ES256"],
+            algorithms: ['ES256'],
             //TODO: ISS We want to do zzrf_001 dynamic as a parameter to switch between production and development instance
-            issuer: "slas/prod/zzrf_001",
+            issuer: 'slas/prod/zzrf_001',
             // TODO: AUD Same, make zzrf_001 dynamic as a parameter
-            audience: "commercecloud/prod/zzrf_001",
+            audience: 'commercecloud/prod/zzrf_001'
         })
     } catch (error) {
-        return { error }
+        return {error}
     }
     // TODO: Validating the JWT payload
-    const { scid } = parseSLASSubClaim(ret.payload.sub)
+    const {scid} = parseSLASSubClaim(ret.payload.sub)
 
     console.log('validateSLASJWT scid:', scid)
     console.log('validateSLASJWT expectedClientID:', expectedClientID)
     if (scid !== expectedClientID) {
-        return { error: new Error("Invalid client ID") }
+        return {error: new Error('Invalid client ID')}
     }
     return ret
-}
-
-function handlerCallbackSLAS(req, res) {
-    res.json({ ok: true })
 }
 
 // Given a JWT, use TSOB to get a "powerful" JWT with Shopper Context scopes. Use that to set Shopper Context.
@@ -107,47 +97,41 @@ function handlerCallbackSLAS(req, res) {
 // TSOB === Trusted System On Behalf
 async function handlerShopperContext(req, res) {
     // TODO: Verify AM JWT BEFORE processing SLAS JWT. SLAS JWT validation can likely be middleware/decorator.
-    const auth = req.get("authorization")
+    const auth = req.get('authorization')
     if (!auth) {
-        return res.status(403).json({ error: "Missing Authorization header" })
+        return res.status(403).json({error: 'Missing Authorization header'})
     }
-    const bits = auth.split(" ")
-    if (bits.length !== 2 || bits[0] !== "Bearer") {
-        return res.status(403).json({ error: "Invalid Authorization header" })
+    const bits = auth.split(' ')
+    if (bits.length !== 2 || bits[0] !== 'Bearer') {
+        return res.status(403).json({error: 'Invalid Authorization header'})
     }
 
-    req.get("authorization")
-
+    req.get('authorization')
 
     const token = bits[1]
 
     // [1] Validate the Shopper JWT, and pull the USID from it.
-    const { payload, error: slasValdiationError } = await validateSLASJWT(
+    const {payload, error: slasValdiationError} = await validateSLASJWT(
         token,
         SLAS_PUBLIC_CLIENT_ID
     )
 
-    if (slasValdiationError ) {
-        return res.status(400).json({ slasValdiationError })
+    if (slasValdiationError) {
+        return res.status(400).json({slasValdiationError})
     }
-    const { usid } = parseSLASSubClaim(payload.sub)
-
+    const {usid} = parseSLASSubClaim(payload.sub)
 
     // TODO: replace with import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
     //  Include the 'locale' and 'currency' config we have in the api declaration in _app-config/index.jsx
     const config = {
         parameters: {
             clientId: SLAS_PRIVATE_CLIENT_ID,
-            organizationId: "f_ecom_zzrf_001",
-            shortCode: "kv7kzm78",
-            siteId: "RefArch",
+            organizationId: 'f_ecom_zzrf_001',
+            shortCode: 'kv7kzm78',
+            siteId: 'RefArch'
         },
-        throwOnBadResponse: true,
-        fetchOptions: {
-            agent,
-        },
+        throwOnBadResponse: true
     }
-
 
     // [2] Use TSOB to get a token for that USID.
     const shopperLogin = new sdk.ShopperLogin(config)
@@ -156,28 +140,28 @@ async function handlerShopperContext(req, res) {
         tsobToken = await shopperLogin.getTrustedSystemAccessToken({
             headers: {
                 Authorization:
-                    "Basic " +
-                    Buffer.from(
-                        `${SLAS_PRIVATE_CLIENT_ID}:${SLAS_PRIVATE_CLIENT_SECRET}`
-                    ).toString("base64"),
+                    'Basic ' +
+                    Buffer.from(`${SLAS_PRIVATE_CLIENT_ID}:${SLAS_PRIVATE_CLIENT_SECRET}`).toString(
+                        'base64'
+                    )
             },
             body: {
-                hint: "ts_ext_on_behalf_of",
-                grant_type: "client_credentials",
+                hint: 'ts_ext_on_behalf_of',
+                grant_type: 'client_credentials',
                 // TODO: It can be a registered shopper not always a guest shopper
                 //  We know if it's a register user if the JWT contains an email
                 //  Script to get a JWT https://git.soma.salesforce.com/cc-mobify/test-scapi/blob/main/slas-login.sh
-                login_id: "guest",
-                idp_origin: "ecom",
-                channel_id: "RefArch",
-                usid,
-            },
+                login_id: 'guest',
+                idp_origin: 'ecom',
+                channel_id: 'RefArch',
+                usid
+            }
         })
     } catch (err) {
         // Remember that we're not just using fetch here, we need to look at what the client is doing.
         const errorText = await err.response.json()
-        console.log({ errorText })
-        return res.status(500).json({ errorText })
+        console.log({errorText})
+        return res.status(500).json({errorText})
     }
 
     // [3] Set Shopper Context.
@@ -202,33 +186,32 @@ async function handlerShopperContext(req, res) {
     // }
 
     body.customQualifiers = {
-        sourceCode: "testsourcecode"
+        sourceCode: 'testsourcecode'
     }
 
-    console.log({ body })
+    console.log({body})
 
     const shopperContexts = new sdk.ShopperContexts(config)
     try {
         await shopperContexts.createShopperContext({
             headers: {
-                Authorization: `Bearer ${tsobToken.access_token}`,
+                Authorization: `Bearer ${tsobToken.access_token}`
             },
             parameters: {
-                usid,
+                usid
             },
-            body,
-            agent,
+            body
         })
     } catch (err) {
         const errorText = await err.response.json()
-        console.log({ errorText })
-        return res.status(500).json({ errorText })
+        console.log({errorText})
+        return res.status(500).json({errorText})
     }
 
     res.json({
         usid,
         tsobUSID: tsobToken.usid,
-        equal: usid == tsobToken.usid,
+        equal: usid == tsobToken.usid
     })
 }
 
@@ -267,7 +250,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
 
     // Shopper Context handler
-    app.post("/shopper-context-handler", handlerShopperContext)
+    app.post('/shopper-context-handler', handlerShopperContext)
 
     app.get('*', runtime.render)
 })

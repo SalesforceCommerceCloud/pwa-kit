@@ -48,7 +48,6 @@ import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 
 const ProductDetail = ({category, product, isLoading}) => {
-
     const {formatMessage} = useIntl()
     const basket = useBasket()
     const history = useHistory()
@@ -144,9 +143,7 @@ const ProductDetail = ({category, product, isLoading}) => {
         }
     }, [product])
 
-    const promos = product?.productPromotions
-        .map((promo) => promo.promotionId)
-        .join("\n")
+    const promos = product?.productPromotions.map((promo) => promo.promotionId).join('\n')
 
     return (
         <Box

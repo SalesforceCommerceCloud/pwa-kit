@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import fetch from "node-fetch"
+import fetch from 'node-fetch'
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
@@ -54,19 +54,17 @@ const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 const DEFAULT_LOCALE = 'en-US'
 
-
 async function addShopperContext(access_token, accessToken) {
-
     // [2] Set the context by asking to preview with our token.
     let shopperContextResponse = await fetch(
-        new URL("http://localhost:3000/shopper-context-handler"),
+        new URL('http://localhost:3000/shopper-context-handler'),
         {
-            method: "POST",
+            method: 'POST',
             body: JSON.stringify({access_token}),
             headers: {
-                "Content-Type": "application/json",
-                Authorization: `${accessToken}`,
-            },
+                'Content-Type': 'application/json',
+                Authorization: `${accessToken}`
+            }
         }
     )
 
@@ -172,11 +170,11 @@ const App = (props) => {
 
     let accessToken
     if (typeof window !== 'undefined') {
-        accessToken = localStorage.getItem("token")
+        accessToken = localStorage.getItem('token')
     }
 
     if (accessToken) {
-        addShopperContext(access_token, accessToken )
+        addShopperContext(access_token, accessToken)
     }
 
     return (
@@ -373,6 +371,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
 }
 
 App.propTypes = {
+    access_token: PropTypes.string,
     children: PropTypes.node,
     targetLocale: PropTypes.string,
     messages: PropTypes.object,
