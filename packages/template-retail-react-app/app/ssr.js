@@ -44,10 +44,6 @@ const SLAS_PRIVATE_CLIENT_SECRET = process.env.SLAS_PRIVATE_CLIENT_SECRET
 const JWKS_SLAS = jose.createRemoteJWKSet(
     // TODO: The endpoint has the current JWT and the future JWT that we can potentially rotate.
     //  jose already validates the proper JWT.
-    //  TODO: It looks like we are using jwtDecode in commerce-api
-    //   https://github.com/SalesforceCommerceCloud/pwa-kit/blob/1b27d3e7bbe62fb9e57a3d0777b633a481e29cc2/packages/template-retail-react-app/app/commerce-api/utils.js#L23
-    //   --> https://www.npmjs.com/package/jwt-decode
-    //   IMPORTANT: This library doesn't validate the token, any well formed JWT can be decoded. You should validate the token in your server-side logic by using something like express-jwt, koa-jwt, Owin Bearer JWT, etc.
     new URL(
         'https://kv7kzm78.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_zzrf_001/oauth2/jwks'
     )
@@ -175,7 +171,7 @@ async function handlerShopperContext(req, res) {
         body.effectiveDateTime = req.body.effectiveDateTime
     }
 
-    // TODO: Find the right place to set 'sourceCode'
+    // TODO: Find the right way to set 'sourceCode'
     //  https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-context?meta=getShopperContext#:~:text=817c%2D73d6b86872d9-,Responses,-200
     // body.sourceCode = "testsourcecode"
     // body.sourceCodeGroup = "testsourcecode"
@@ -237,7 +233,6 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Parse request body as JSON
     // TODO: Using Express v4 we should be able to use the built-in middleware app.use(express.json()) instead of the
     //  body-parser package.
-    //  https://stackoverflow.com/a/49943829
     app.use(bodyParser.json())
 
     // Handle the redirect from SLAS as to avoid error
