@@ -1,4 +1,4 @@
-## v2.5.0
+## v2.4.1 (Dec 16, 2022)
 -   Add explicit `ws` dependency [#865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/865)
 
 ## v2.4.0 (Dec 01, 2022)
