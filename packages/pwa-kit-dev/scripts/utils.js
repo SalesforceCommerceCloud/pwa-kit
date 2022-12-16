@@ -169,6 +169,11 @@ Utils.errorForStatus = (response) => {
         error = {}
     }
 
+    if (status === 403) {
+        error.docs_url =
+            'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/mrt-overview.html#users,-abilities,-and-roles'
+    }
+
     return new Error(
         [
             `HTTP ${status}`,
