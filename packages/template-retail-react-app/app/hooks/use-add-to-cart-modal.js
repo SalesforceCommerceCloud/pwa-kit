@@ -201,7 +201,7 @@ export const AddToCartModal = () => {
                             />
                         }
                         recommender={'pdp-similar-items'}
-                        products={product && [product.id]}
+                        products={product && [{id: product.master.masterId, sku: product.id}]}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />
