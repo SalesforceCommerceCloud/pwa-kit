@@ -54,7 +54,9 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         }
 
         // Create the expected args object for products when given
-        const args = {products: _products?.map((id) => ({id}))}
+        const args = {
+            products: _products?.map(({id, sku}) => ({id: id, sku: sku}))
+        }
 
         // Check if the component should fetch results or not. This is useful
         // when you are still waiting on additional data, like `products`.

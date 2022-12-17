@@ -53,6 +53,52 @@ class EinsteinAPI {
         return body
     }
 
+    /**
+     * Given a product source, returns the data that Einstein requires
+     */
+    _destructureProduct(product) {
+        if (product.type && (product.type.master || product.type.variant)) {
+            // handle variants for PDP / viewProduct
+            return {
+                id: product.master.masterId,
+                sku: product.id,
+                altId: '',
+                altIdType: ''
+            }
+        } else if (
+            // handle variants for PLP / viewCategory & viewSearch
+            product.productType &&
+            (product.productType.master || product.productType.variant)
+        ) {
+            return {
+                id: product.productId,
+                sku: product.productId, //TODO: Should this be product.representedProduct.id instead?
+                altId: '',
+                altIdType: ''
+            }
+        } else {
+            // handles non-variants
+            return {
+                id: product.id,
+                sku: '',
+                altId: '',
+                altIdType: ''
+            }
+        }
+    }
+
+    /**
+     * Given a cart item, returns the data that Einstein requires
+     */
+    _destructureItem(item) {
+        return {
+            id: item.productId,
+            sku: '',
+            price: item.price,
+            quantity: item.quantity
+        }
+    }
+
     async einsteinFetch(endpoint, method, body) {
         const config = this.config
         const {host, einsteinId} = config
@@ -88,14 +134,8 @@ class EinsteinAPI {
     async sendViewProduct(product, args) {
         const endpoint = `/activities/${this.config.siteId}/viewProduct`
         const method = 'POST'
-        const {id, sku = '', altId = '', altIdType = ''} = product
         const body = {
-            product: {
-                id,
-                sku,
-                altId,
-                altIdType
-            },
+            product: this._destructureProduct(product),
             ...args
         }
 
@@ -109,15 +149,7 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewSearch`
         const method = 'POST'
 
-        const products = searchResults?.hits?.map((product) => {
-            const {productId, sku = '', altId = '', altIdType = ''} = product
-            return {
-                id: productId,
-                sku,
-                altId,
-                altIdType
-            }
-        })
+        const products = searchResults?.hits?.map((product) => this._destructureProduct(product))
 
         const body = {
             searchText,
@@ -134,15 +166,9 @@ class EinsteinAPI {
     async sendClickSearch(searchText, product, args) {
         const endpoint = `/activities/${this.config.siteId}/clickSearch`
         const method = 'POST'
-        const {productId, sku = '', altId = '', altIdType = ''} = product
         const body = {
             searchText,
-            product: {
-                id: productId,
-                sku,
-                altId,
-                altIdType
-            },
+            product: this._destructureProduct(product),
             ...args
         }
 
@@ -156,15 +182,7 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewCategory`
         const method = 'POST'
 
-        const products = searchResults?.hits?.map((product) => {
-            const {productId, sku = '', altId = '', altIdType = ''} = product
-            return {
-                id: productId,
-                sku,
-                altId,
-                altIdType
-            }
-        })
+        const products = searchResults?.hits?.map((product) => this._destructureProduct(product))
 
         const body = {
             category: {
@@ -184,17 +202,11 @@ class EinsteinAPI {
     async sendClickCategory(category, product, args) {
         const endpoint = `/activities/${this.config.siteId}/clickCategory`
         const method = 'POST'
-        const {productId, sku = '', altId = '', altIdType = ''} = product
         const body = {
             category: {
                 id: category.id
             },
-            product: {
-                id: productId,
-                sku,
-                altId,
-                altIdType
-            },
+            product: this._destructureProduct(product),
             ...args
         }
 
@@ -227,16 +239,10 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/clickReco`
         const method = 'POST'
         const {__recoUUID, recommenderName} = recommenderDetails
-        const {id, sku = '', altId = '', altIdType = ''} = product
         const body = {
             recommenderName,
             __recoUUID,
-            product: {
-                id,
-                sku,
-                altId,
-                altIdType
-            },
+            product: this._destructureProduct(product),
             ...args
         }
 
@@ -264,15 +270,7 @@ class EinsteinAPI {
     async sendBeginCheckout(basket, args) {
         const endpoint = `/activities/${this.config.siteId}/beginCheckout`
         const method = 'POST'
-        const products = basket.productItems.map((product) => {
-            const {productId, sku = '', price = '', quantity = ''} = product
-            return {
-                id: productId,
-                sku,
-                price,
-                quantity
-            }
-        })
+        const products = basket.productItems.map((item) => this._destructureItem(item))
         const subTotal = basket.productSubTotal
         const body = {
             products: products,
@@ -304,11 +302,11 @@ class EinsteinAPI {
      * Tells the Einstein engine when a user adds an item to their cart.
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
-    async sendAddToCart(product, args) {
+    async sendAddToCart(item, args) {
         const endpoint = `/activities/${this.config.siteId}/addToCart`
         const method = 'POST'
         const body = {
-            products: [product],
+            products: [this._destructureItem(item)],
             ...args
         }
 
