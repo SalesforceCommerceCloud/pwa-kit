@@ -215,14 +215,14 @@ const App = (props) => {
                                                 isOpen={isOpen}
                                                 onClose={onClose}
                                                 onLogoClick={onLogoClick}
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
                                                 locale={locale}
                                             />
                                         </HideOnDesktop>
 
                                         <HideOnMobile>
                                             <ListMenu
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
                                                 locale={locale}
                                             />
                                         </HideOnMobile>
