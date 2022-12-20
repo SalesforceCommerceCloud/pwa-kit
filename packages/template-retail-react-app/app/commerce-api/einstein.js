@@ -54,11 +54,13 @@ class EinsteinAPI {
     }
 
     /**
-     * Given a product source, returns the data that Einstein requires
+     * Given a product or item source, returns the product data that Einstein requires
      */
-    _destructureProduct(product) {
+    _constructEinsteinProduct(product) {
         if (product.type && (product.type.master || product.type.variant)) {
             // handle variants for PDP / viewProduct
+            // Assumes product is a Product object from SCAPI Shopper-Products:
+            // https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=type%3AProduct
             return {
                 id: product.master.masterId,
                 sku: product.id,
@@ -66,10 +68,12 @@ class EinsteinAPI {
                 altIdType: ''
             }
         } else if (
-            // handle variants for PLP / viewCategory & viewSearch
             product.productType &&
             (product.productType.master || product.productType.variant)
         ) {
+            // handle variants for PLP / viewCategory & viewSearch
+            // Assumes product is a ProductSearchHit from SCAPI Shopper-Search:
+            // https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-search?meta=type%3AProductSearchHit
             return {
                 id: product.productId,
                 sku: product.productId, //TODO: Should this be product.representedProduct.id instead?
@@ -89,8 +93,11 @@ class EinsteinAPI {
 
     /**
      * Given a cart item, returns the data that Einstein requires
+     *
+     * Assumes item is a ProductItemfrom SCAPI Shopper-Baskets:
+     * https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=type%3AProductItem
      */
-    _destructureItem(item) {
+    _constructEinsteinItem(item) {
         return {
             id: item.productId,
             sku: '',
@@ -135,7 +142,7 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewProduct`
         const method = 'POST'
         const body = {
-            product: this._destructureProduct(product),
+            product: this._constructEinsteinProduct(product),
             ...args
         }
 
@@ -149,7 +156,9 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewSearch`
         const method = 'POST'
 
-        const products = searchResults?.hits?.map((product) => this._destructureProduct(product))
+        const products = searchResults?.hits?.map((product) =>
+            this._constructEinsteinProduct(product)
+        )
 
         const body = {
             searchText,
@@ -168,7 +177,7 @@ class EinsteinAPI {
         const method = 'POST'
         const body = {
             searchText,
-            product: this._destructureProduct(product),
+            product: this._constructEinsteinProduct(product),
             ...args
         }
 
@@ -182,7 +191,9 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewCategory`
         const method = 'POST'
 
-        const products = searchResults?.hits?.map((product) => this._destructureProduct(product))
+        const products = searchResults?.hits?.map((product) =>
+            this._constructEinsteinProduct(product)
+        )
 
         const body = {
             category: {
@@ -206,7 +217,7 @@ class EinsteinAPI {
             category: {
                 id: category.id
             },
-            product: this._destructureProduct(product),
+            product: this._constructEinsteinProduct(product),
             ...args
         }
 
@@ -242,7 +253,7 @@ class EinsteinAPI {
         const body = {
             recommenderName,
             __recoUUID,
-            product: this._destructureProduct(product),
+            product: this._constructEinsteinProduct(product),
             ...args
         }
 
@@ -270,7 +281,7 @@ class EinsteinAPI {
     async sendBeginCheckout(basket, args) {
         const endpoint = `/activities/${this.config.siteId}/beginCheckout`
         const method = 'POST'
-        const products = basket.productItems.map((item) => this._destructureItem(item))
+        const products = basket.productItems.map((item) => this._constructEinsteinItem(item))
         const subTotal = basket.productSubTotal
         const body = {
             products: products,
@@ -306,7 +317,7 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/addToCart`
         const method = 'POST'
         const body = {
-            products: [this._destructureItem(item)],
+            products: [this._constructEinsteinItem(item)],
             ...args
         }
 
@@ -329,10 +340,13 @@ class EinsteinAPI {
      * Get a set of recommendations
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
-    async getRecommendations(recommenderName, args) {
+    async getRecommendations(recommenderName, products, args) {
         const endpoint = `/personalization/recs/${this.config.siteId}/${recommenderName}`
         const method = 'POST'
-        const body = {...args}
+        const body = {
+            products: products?.map((product) => this._constructEinsteinProduct(product)),
+            ...args
+        }
 
         // Fetch the recommendations
         const reco = await this.einsteinFetch(endpoint, method, body)
@@ -346,10 +360,14 @@ class EinsteinAPI {
      * Get a set of recommendations for a zone
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
-    async getZoneRecommendations(zoneName, args) {
+    async getZoneRecommendations(zoneName, products, args) {
         const endpoint = `/personalization/${this.config.siteId}/zones/${zoneName}/recs`
         const method = 'POST'
-        const body = {...args}
+
+        const body = {
+            products: products?.map((product) => this._constructEinsteinProduct(product)),
+            ...args
+        }
 
         // Fetch the recommendations
         const reco = await this.einsteinFetch(endpoint, method, body)

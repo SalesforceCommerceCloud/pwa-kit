@@ -265,7 +265,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                             />
                         }
                         recommender={'complete-the-set'}
-                        products={product && [{id: product.master.masterId, sku: product.id}]}
+                        products={product}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />
@@ -278,7 +278,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                             />
                         }
                         recommender={'pdp-similar-items'}
-                        products={product && [{id: product.master.masterId, sku: product.id}]}
+                        products={product}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />
