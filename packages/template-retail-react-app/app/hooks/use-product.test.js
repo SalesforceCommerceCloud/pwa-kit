@@ -10,12 +10,12 @@ import PropTypes from 'prop-types'
 
 import {screen} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {useProduct} from './use-product'
+import {useProductData} from './use-product'
 import mockProductDetail from '../commerce-api/mocks/variant-750518699578M'
 import {renderWithProviders} from '../utils/test-utils'
 
 const MockComponent = ({product}) => {
-    const {inventoryMessage, quantity, variationParams, variant} = useProduct(product)
+    const {inventoryMessage, quantity, variationParams, variant} = useProductData(product)
 
     return (
         <div>
@@ -31,7 +31,7 @@ MockComponent.propTypes = {
     product: PropTypes.object
 }
 
-describe('useProduct hook', () => {
+describe('useProductData hook', () => {
     test('runs properly', () => {
         const history = createMemoryHistory()
         history.push('/test/path?test')

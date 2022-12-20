@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -28,6 +28,7 @@ import {useVariant} from '../../hooks'
 import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
+import {useProduct, useCategory} from 'commerce-sdk-react'
 
 // Project Components
 import RecommendedProducts from '../../components/recommended-products'
@@ -44,19 +45,41 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST
 } from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
-import {useHistory} from 'react-router-dom'
+import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 
-const ProductDetail = ({category, product, isLoading}) => {
+const ProductDetail = () => {
     const {formatMessage} = useIntl()
     const basket = useBasket()
     const history = useHistory()
+    const location = useLocation()
     const einstein = useEinstein()
-    const variant = useVariant(product)
     const toast = useToast()
     const navigate = useNavigation()
-    const [primaryCategory, setPrimaryCategory] = useState(category)
+    const {productId} = useParams()
+    const urlParams = new URLSearchParams(location.search)
+    console.log('productId', productId)
 
+    // not working Server side?
+    const {data: product, isLoading: isProductLoading} = useProduct({
+        id: '25502228M',
+        allImages: true
+    })
+    console.log('product PDP================================', product)
+
+    if (typeof product?.type === 'string') {
+        throw new HTTPNotFound(product.detail)
+    }
+    const category = {}
+    // const {data: category} = useCategory(
+    //     {
+    //         id: product?.primaryCategoryId,
+    //         level: 1
+    //     }
+    // )
+    const variant = useVariant(product)
+
+    const [primaryCategory, setPrimaryCategory] = useState(category)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
     // attributes are selected (to get the correct inventory values), the category information
@@ -70,6 +93,9 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     /**************** Product Variant ****************/
     useEffect(() => {
+        if (!variant) {
+            return
+        }
         // update the variation attributes parameter on
         // the url accordingly as the variant changes
         const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
@@ -77,7 +103,6 @@ const ProductDetail = ({category, product, isLoading}) => {
         })
         history.replace(updatedUrl)
     }, [variant])
-
     /**************** Wishlist ****************/
     const wishlist = useWishlist()
     // TODO: DRY this handler when intl provider is available globally
@@ -160,7 +185,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                     category={primaryCategory?.parentCategoryTree || []}
                     addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
                     addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                    isProductLoading={isLoading}
+                    isProductLoading={isProductLoading}
                     isCustomerProductListLoading={!wishlist.isInitialized}
                 />
 
@@ -314,22 +339,22 @@ ProductDetail.shouldGetProps = ({previousLocation, location}) => {
 }
 
 ProductDetail.getProps = async ({res, params, location, api}) => {
-    const {productId} = params
-    let category, product
-    const urlParams = new URLSearchParams(location.search)
-
-    product = await api.shopperProducts.getProduct({
-        parameters: {
-            id: urlParams.get('pid') || productId,
-            allImages: true
-        }
-    })
-
-    if (product?.primaryCategoryId) {
-        category = await api.shopperProducts.getCategory({
-            parameters: {id: product?.primaryCategoryId, levels: 1}
-        })
-    }
+    // const {productId} = params
+    // let category, product
+    // const urlParams = new URLSearchParams(location.search)
+    //
+    // product = await api.shopperProducts.getProduct({
+    //     parameters: {
+    //         id: urlParams.get('pid') || productId,
+    //         allImages: true
+    //     }
+    // })
+    //
+    // if (product?.primaryCategoryId) {
+    //     category = await api.shopperProducts.getCategory({
+    //         parameters: {id: product?.primaryCategoryId, levels: 1}
+    //     })
+    // }
 
     // Set the `cache-control` header values similar to those on the product-list.
     if (res) {
@@ -338,14 +363,12 @@ ProductDetail.getProps = async ({res, params, location, api}) => {
 
     // The `commerce-isomorphic-sdk` package does not throw errors, so
     // we have to check the returned object type to inconsistencies.
-    if (typeof product?.type === 'string') {
-        throw new HTTPNotFound(product.detail)
-    }
-    if (typeof category?.type === 'string') {
-        throw new HTTPNotFound(category.detail)
-    }
-
-    return {category, product}
+    // if (typeof product?.type === 'string') {
+    //     throw new HTTPNotFound(product.detail)
+    // }
+    // if (typeof category?.type === 'string') {
+    //     throw new HTTPNotFound(category.detail)
+    // }
 }
 
 ProductDetail.propTypes = {
@@ -353,15 +376,6 @@ ProductDetail.propTypes = {
      * The category object used for breadcrumb construction.
      */
     category: PropTypes.object,
-    /**
-     * The product object to be shown on the page..
-     */
-    product: PropTypes.object,
-    /**
-     * The current state of `getProps` when running this value is `true`, otherwise it's
-     * `false`. (Provided internally)
-     */
-    isLoading: PropTypes.bool,
     /**
      * The current react router match object. (Provided internally)
      */

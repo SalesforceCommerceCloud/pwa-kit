@@ -15,7 +15,7 @@ const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'
 
 // TODO: This needs to be refactored.
-export const useProduct = (product) => {
+export const useProductData = (product) => {
     const showLoading = !product
     const stockLevel = product?.inventory?.stockLevel || 0
     const stepQuantity = product?.stepQuantity || 1
