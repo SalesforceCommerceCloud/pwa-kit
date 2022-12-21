@@ -35,7 +35,7 @@ export const registerServiceWorker = (url) => {
     })
 }
 
-const OuterApp = ({routes, error, WrappedApp, locals}) => {
+export const OuterApp = ({routes, error, WrappedApp, locals}) => {
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
 
@@ -71,7 +71,7 @@ const OuterApp = ({routes, error, WrappedApp, locals}) => {
 OuterApp.propTypes = {
     routes: PropTypes.array.isRequired,
     error: PropTypes.object,
-    WrappedApp: PropTypes.element.isRequired,
+    WrappedApp: PropTypes.func.isRequired,
     locals: PropTypes.object
 }
 /* istanbul ignore next */
