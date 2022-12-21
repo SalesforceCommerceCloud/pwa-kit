@@ -76,7 +76,7 @@ class EinsteinAPI {
             // https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-search?meta=type%3AProductSearchHit
             return {
                 id: product.productId,
-                sku: product.productId, //TODO: Should this be product.representedProduct.id instead?
+                sku: product.productId, //TODO: Should we switch this to product.representedProduct.id once we allow non-master products in search results?
                 altId: '',
                 altIdType: ''
             }
@@ -163,6 +163,7 @@ class EinsteinAPI {
         const body = {
             searchText,
             products,
+            showProducts: true, // Needed by Reports and Dashboards to differentiate searches with results vs no results
             ...args
         }
 
@@ -200,6 +201,7 @@ class EinsteinAPI {
                 id: category.id
             },
             products,
+            showProducts: true, // Needed by Reports and Dashboards to differentiate searches with results vs no results
             ...args
         }
 
