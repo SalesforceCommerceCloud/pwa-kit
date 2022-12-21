@@ -230,14 +230,14 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
                                                 isOpen={isOpen}
                                                 onClose={onClose}
                                                 onLogoClick={onLogoClick}
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
                                                 locale={locale}
                                             />
                                         </HideOnDesktop>
 
                                         <HideOnMobile>
                                             <ListMenu
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
                                                 locale={locale}
                                             />
                                         </HideOnMobile>

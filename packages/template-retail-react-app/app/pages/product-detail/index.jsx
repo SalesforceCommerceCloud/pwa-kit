@@ -29,7 +29,7 @@ import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 import {useProduct, useCategory} from 'commerce-sdk-react'
-
+import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '../../components/recommended-products'
 import ProductView from '../../partials/product-view'
@@ -58,25 +58,34 @@ const ProductDetail = () => {
     const navigate = useNavigation()
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
-    console.log('productId', productId)
 
-    // not working Server side?
-    const {data: product, isLoading: isProductLoading} = useProduct({
-        id: '25502228M',
-        allImages: true
-    })
-    console.log('product PDP================================', product)
+    const {res} = useServerContext()
+    if (res) {
+        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+    }
 
+    const {data: product, isLoading: isProductLoading} = useProduct(
+        {
+            id: urlParams.get('pid') || productId,
+            allImages: true
+        },
+        {
+            keepPreviousData: true
+        }
+    )
     if (typeof product?.type === 'string') {
         throw new HTTPNotFound(product.detail)
     }
-    const category = {}
-    // const {data: category} = useCategory(
-    //     {
-    //         id: product?.primaryCategoryId,
-    //         level: 1
-    //     }
-    // )
+    const {data: category} = useCategory(
+        {
+            id: product?.primaryCategoryId,
+            level: 1
+        },
+        {
+            enabled: !!product?.primaryCategoryId
+        }
+    )
+    console.log('category=========================', category)
     const variant = useVariant(product)
 
     const [primaryCategory, setPrimaryCategory] = useState(category)
@@ -90,6 +99,10 @@ const ProductDetail = () => {
             setPrimaryCategory(category)
         }
     }, [category])
+
+    if (typeof category?.type === 'string') {
+        throw new HTTPNotFound(category.detail)
+    }
 
     /**************** Product Variant ****************/
     useEffect(() => {
@@ -338,44 +351,7 @@ ProductDetail.shouldGetProps = ({previousLocation, location}) => {
     )
 }
 
-ProductDetail.getProps = async ({res, params, location, api}) => {
-    // const {productId} = params
-    // let category, product
-    // const urlParams = new URLSearchParams(location.search)
-    //
-    // product = await api.shopperProducts.getProduct({
-    //     parameters: {
-    //         id: urlParams.get('pid') || productId,
-    //         allImages: true
-    //     }
-    // })
-    //
-    // if (product?.primaryCategoryId) {
-    //     category = await api.shopperProducts.getCategory({
-    //         parameters: {id: product?.primaryCategoryId, levels: 1}
-    //     })
-    // }
-
-    // Set the `cache-control` header values similar to those on the product-list.
-    if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-    }
-
-    // The `commerce-isomorphic-sdk` package does not throw errors, so
-    // we have to check the returned object type to inconsistencies.
-    // if (typeof product?.type === 'string') {
-    //     throw new HTTPNotFound(product.detail)
-    // }
-    // if (typeof category?.type === 'string') {
-    //     throw new HTTPNotFound(category.detail)
-    // }
-}
-
 ProductDetail.propTypes = {
-    /**
-     * The category object used for breadcrumb construction.
-     */
-    category: PropTypes.object,
     /**
      * The current react router match object. (Provided internally)
      */
