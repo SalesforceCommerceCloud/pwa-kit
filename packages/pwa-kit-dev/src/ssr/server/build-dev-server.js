@@ -28,8 +28,8 @@ import {
 } from '../../configs/webpack/config-names'
 import {randomUUID} from 'crypto'
 const projectDir = process.cwd()
-const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
 const projectPackageJSON = path.resolve(projectDir, 'package.json')
+const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
 
 const chalk = require('chalk')
 
@@ -141,6 +141,7 @@ export const DevServerMixin = {
         if (fs.existsSync(projectWebpackPath)) {
             config = require(projectWebpackPath)
         }
+        console.log('~webpack config', config)
         app.__compiler = webpack(config)
         app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
@@ -205,9 +206,12 @@ export const DevServerMixin = {
             })
         )
 
-        // // we use two `app.use` servers on the same path with a fallback pattern to check first in
-        // // package.json => mobify.overridesDir and then fall back to mobify.extends (the base app)
-        // if (fs.existsSync(`${process.cwd()}/${projectPackageJSON?.mobify?.overridesDir}`)) {
+        // we use two `app.use` servers on the same path with a fallback pattern to check first in
+        // package.json => mobify.overridesDir and then fall back to mobify.extends (the base app)
+        // if (
+        //     fs.existsSync(`${process.cwd()}/node_modules${projectPackageJSON?.mobify?.extends}`) &&
+        //     fs.existsSync(`${process.cwd()}/${projectPackageJSON?.mobify?.overridesDir}`)
+        // ) {
         //     // the local overridesDir search
         //     app.use(
         //         '/mobify/bundle/development',
@@ -228,7 +232,7 @@ export const DevServerMixin = {
         //             path.resolve(
         //                 process.cwd(),
         //                 'node_modules',
-        //                 ...projectPackageJSON?.mobify?.extends?.split('/')
+        //                 projectPackageJSON?.mobify?.extends
         //             ),
         //             {
         //                 dotFiles: 'deny',

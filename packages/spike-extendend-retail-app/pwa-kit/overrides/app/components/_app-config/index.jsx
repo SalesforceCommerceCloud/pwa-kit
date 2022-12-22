@@ -11,19 +11,19 @@ import {ChakraProvider} from '@chakra-ui/react'
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
-import theme from '../../theme'
-import CommerceAPI from '../../commerce-api'
+import theme from 'retail-react-app/app/theme'
+import CommerceAPI from 'retail-react-app/app/commerce-api'
 import {
     BasketProvider,
     CommerceAPIProvider,
     CustomerProductListsProvider,
     CustomerProvider,
-} from '../../commerce-api/contexts'
-import {MultiSiteProvider} from '../../contexts'
-import {resolveSiteFromUrl} from '../../utils/site-utils'
-import {resolveLocaleFromUrl} from '../../utils/utils'
+} from 'retail-react-app/app/commerce-api/contexts'
+import {MultiSiteProvider} from 'retail-react-app/app/contexts'
+import {resolveSiteFromUrl} from 'retail-react-app/app/utils/site-utils'
+import {resolveLocaleFromUrl} from 'retail-react-app/app/utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {createUrlTemplate} from '../../utils/url'
+import {createUrlTemplate} from 'retail-react-app/app/utils/url'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -34,10 +34,9 @@ import {createUrlTemplate} from '../../utils/url'
  * as Redux, or Mobx, if you like.
  */
 const AppConfig = ({children, locals = {}}) => {
-    console.log('~hello from template-retail-react-app/app/components/_app-config')
+    console.log('~hello from overrides _app-config')
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
-
     return (
         <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
             <CommerceAPIProvider value={locals.api}>

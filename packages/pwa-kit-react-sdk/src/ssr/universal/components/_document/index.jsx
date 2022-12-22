@@ -67,7 +67,7 @@ Document.propTypes = {
     head: PropTypes.arrayOf(PropTypes.node).isRequired,
     html: PropTypes.string.isRequired,
     htmlAttributes: PropTypes.object,
-    bodyAttributes: PropTypes.object
+    bodyAttributes: PropTypes.object,
 }
 
 Document.defaultProps = {
@@ -76,7 +76,7 @@ Document.defaultProps = {
     head: [],
     html: '',
     htmlAttributes: {},
-    bodyAttributes: {}
+    bodyAttributes: {},
 }
 
 export default Document

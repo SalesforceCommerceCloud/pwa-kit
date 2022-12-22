@@ -1,8 +1,8 @@
 {
   "name": "client",
-  "hash": "c63104de15edeeabc5dc",
+  "hash": "fd4118e2c92d29713500",
   "publicPath": "/mobify/bundle/development/",
-  "outputPath": "/Users/bchypak/Projects/pwa-kit/packages/spike-extendend-retail-app/build",
+  "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
     "main": [
       "main.js"
@@ -18,7 +18,7 @@
     {
       "type": "asset",
       "name": "vendor.js",
-      "size": 4672509,
+      "size": 2867366,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -45,7 +45,7 @@
     {
       "type": "asset",
       "name": "main.js",
-      "size": 1090806,
+      "size": 216229,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -69,236 +69,8 @@
     },
     {
       "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_en-XB_json.js",
-      "size": 68918,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_en-XB_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_ja-JP_json.js",
-      "size": 48140,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_ja-JP_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_fr-FR_json.js",
-      "size": 45583,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_fr-FR_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_de-DE_json.js",
-      "size": 45199,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_de-DE_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_es-MX_json.js",
-      "size": 44920,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_es-MX_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_ko-KR_json.js",
-      "size": 44685,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_ko-KR_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_it-IT_json.js",
-      "size": 43806,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_it-IT_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_pt-BR_json.js",
-      "size": 43767,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_pt-BR_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_en-GB_json.js",
-      "size": 42943,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_en-GB_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_en-US_json.js",
-      "size": 42374,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_en-US_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_zh-TW_json.js",
-      "size": 42287,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_zh-TW_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "template-retail-react-app_app_translations_compiled_zh-CN_json.js",
-      "size": 42265,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [
-        "template-retail-react-app_app_translations_compiled_zh-CN_json"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
       "name": "pages-home.js",
-      "size": 2807,
+      "size": 19146,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -317,52 +89,6 @@
       "filteredRelated": 1,
       "chunks": [
         "pages-home"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "_8dba.js",
-      "size": 284,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "_8dba.js.map"
-        }
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "_8dba"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "_cc12.js",
-      "size": 284,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "_cc12.js.map"
-        }
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "_cc12"
       ],
       "auxiliaryChunks": []
     }
@@ -413,90 +139,6 @@
       "id": "main",
       "files": [
         "main.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_de-DE_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_de-DE_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_en-GB_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_en-GB_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_en-US_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_en-US_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_en-XB_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_en-XB_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_es-MX_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_es-MX_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_fr-FR_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_fr-FR_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_it-IT_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_it-IT_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_ja-JP_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_ja-JP_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_ko-KR_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_ko-KR_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_pt-BR_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_pt-BR_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_zh-CN_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_zh-CN_json.js"
-      ]
-    },
-    {
-      "id": "template-retail-react-app_app_translations_compiled_zh-TW_json",
-      "files": [
-        "template-retail-react-app_app_translations_compiled_zh-TW_json.js"
-      ]
-    },
-    {
-      "id": "_cc12",
-      "files": [
-        "_cc12.js"
-      ]
-    },
-    {
-      "id": "_8dba",
-      "files": [
-        "_8dba.js"
       ]
     },
     {

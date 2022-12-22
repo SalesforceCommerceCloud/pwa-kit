@@ -6,7 +6,7 @@
  */
 import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
+// import {useIntl} from 'react-intl'
 import {
     useMultiStyleConfig,
     Box,
@@ -28,12 +28,12 @@ import {
     useMediaQuery,
 } from '@chakra-ui/react'
 
-import useBasket from '../../commerce-api/hooks/useBasket'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+// import useBasket from 'retail-react-app/app/commerce-api/hooks/useBasket'
+// import useCustomer from 'retail-react-app/app/commerce-api/hooks/useCustomer'
 
-import Link from '../link'
+// import Link from 'retail-react-app/app/components/link'
 import Search from '../search'
-import withRegistration from '../../hoc/with-registration'
+// import withRegistration from 'retail-react-app/app/hoc/with-registration'
 import {
     AccountIcon,
     BrandLogo,
@@ -42,18 +42,17 @@ import {
     ChevronDownIcon,
     HeartIcon,
     SignoutIcon,
-} from '../icons'
+} from 'retail-react-app/app/components/icons'
 
-import {noop} from '../../utils/utils'
-import {navLinks, messages} from '../../pages/account/constant'
-import useNavigation from '../../hooks/use-navigation'
-import LoadingSpinner from '../loading-spinner'
+import {noop} from 'retail-react-app/app/utils/utils'
+// import {navLinks, messages} from 'retail-react-app/app/pages/account/constant'
+import {navLinks} from '../../pages/account/constant'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
 
 const ENTER_KEY = 'Enter'
 
-const unused = ''
-
-const IconButtonWithRegistration = withRegistration(IconButton)
+// const IconButtonWithRegistration = withRegistration(IconButton)
 /**
  * The header is the main source for accessing
  * navigation, search, basket, and other
@@ -80,39 +79,70 @@ const Header = ({
     onWishlistClick = noop,
     ...props
 }) => {
-    const intl = useIntl()
-    const basket = useBasket()
-    const customer = useCustomer()
-    const navigate = useNavigation()
+    // const intl = useIntl()
+    // const basket = useBasket()
+    // const customer = useCustomer()
+    // const navigate = useNavigation()
 
-    const {isOpen, onClose, onOpen} = useDisclosure()
+    // const {isOpen, onClose, onOpen} = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
 
     const [showLoading, setShowLoading] = useState(false)
-    // tracking if users enter the popover Content,
-    // so we can decide whether to close the menu when users leave account icons
-    const hasEnterPopoverContent = useRef()
+    // // tracking if users enter the popover Content,
+    // // so we can decide whether to close the menu when users leave account icons
+    // const hasEnterPopoverContent = useRef()
 
     const styles = useMultiStyleConfig('Header')
 
     const onSignoutClick = async () => {
         setShowLoading(true)
-        await customer.logout()
+        // await customer.logout()
         navigate('/login')
         setShowLoading(false)
     }
 
-    const keyMap = {
-        Escape: () => onClose(),
-        Enter: () => onOpen(),
-    }
+    // const keyMap = {
+    //     Escape: () => onClose(),
+    //     Enter: () => onOpen(),
+    // }
 
-    const handleIconsMouseLeave = () => {
-        // don't close the menu if users enter the popover content
-        setTimeout(() => {
-            if (!hasEnterPopoverContent.current) onClose()
-        }, 100)
-    }
+    // const handleIconsMouseLeave = () => {
+    //     // don't close the menu if users enter the popover content
+    //     setTimeout(() => {
+    //         if (!hasEnterPopoverContent.current) onClose()
+    //     }, 100)
+    // }
+
+    // return (
+    //     <Box {...styles.container} {...props}>
+    //         <Box {...styles.content}>
+    //             {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+    //             <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>
+    //                 <IconButton
+    //                     // @TODO: modified
+    //                     aria-label="Menu"
+    //                     icon={<HamburgerIcon />}
+    //                     variant="unstyled"
+    //                     display={{lg: 'none'}}
+    //                     {...styles.icons}
+    //                     onClick={onMenuClick}
+    //                 />
+    //                 <IconButton
+    //                     aria-label="Logo"
+    //                     icon={<BrandLogo {...styles.logo} />}
+    //                     {...styles.icons}
+    //                     variant="unstyled"
+    //                     onClick={onLogoClick}
+    //                 />
+    //                 <Box {...styles.bodyContainer}>{children}</Box>
+    //                 <Box {...styles.searchContainer}>
+    //                     <Search placeholder="Search for products..." {...styles.search} />
+    //                 </Box>
+    //                 Hello Header
+    //             </Flex>
+    //         </Box>
+    //     </Box>
+    // )
 
     return (
         <Box {...styles.container} {...props}>
@@ -120,10 +150,8 @@ const Header = ({
                 {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
                 <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>
                     <IconButton
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.menu',
-                            defaultMessage: 'Menu',
-                        })}
+                        // @TODO: modified
+                        aria-label="Menu"
                         icon={<HamburgerIcon />}
                         variant="unstyled"
                         display={{lg: 'none'}}
@@ -131,10 +159,7 @@ const Header = ({
                         onClick={onMenuClick}
                     />
                     <IconButton
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.logo',
-                            defaultMessage: 'Logo',
-                        })}
+                        aria-label="Logo"
                         icon={<BrandLogo {...styles.logo} />}
                         {...styles.icons}
                         variant="unstyled"
@@ -142,13 +167,7 @@ const Header = ({
                     />
                     <Box {...styles.bodyContainer}>{children}</Box>
                     <Box {...styles.searchContainer}>
-                        <Search
-                            placeholder={intl.formatMessage({
-                                id: 'header.field.placeholder.search_for_products',
-                                defaultMessage: 'Search for products...',
-                            })}
-                            {...styles.search}
-                        />
+                        <Search placeholder="Search for products..." {...styles.search} />
                     </Box>
                     <AccountIcon
                         {...styles.accountIcon}
@@ -158,13 +177,10 @@ const Header = ({
                             e.key === ENTER_KEY ? onMyAccountClick() : noop
                         }}
                         onClick={onMyAccountClick}
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.my_account',
-                            defaultMessage: 'My account',
-                        })}
+                        aria-label="My account"
                     />
 
-                    {customer.isRegistered && (
+                    {/* {customer.isRegistered && (
                         <Popover
                             isLazy
                             arrowSize={15}
@@ -198,12 +214,7 @@ const Header = ({
                             >
                                 <PopoverArrow />
                                 <PopoverHeader>
-                                    <Text>
-                                        {intl.formatMessage({
-                                            defaultMessage: 'My Account',
-                                            id: 'header.popover.title.my_account',
-                                        })}
-                                    </Text>
+                                    <Text>My account</Text>
                                 </PopoverHeader>
                                 <PopoverBody>
                                     <Stack spacing={0} as="nav" data-testid="account-detail-nav">
@@ -212,13 +223,12 @@ const Header = ({
                                             return (
                                                 <Button
                                                     key={link.name}
-                                                    as={Link}
                                                     to={`/account${link.path}`}
                                                     useNavLink={true}
                                                     variant="menu-link"
                                                     leftIcon={<LinkIcon boxSize={5} />}
                                                 >
-                                                    {intl.formatMessage(messages[link.name])}
+                                                    {link.name}
                                                 </Button>
                                             )
                                         })}
@@ -230,32 +240,23 @@ const Header = ({
                                         <Flex>
                                             <SignoutIcon boxSize={5} {...styles.signoutIcon} />
                                             <Text as="span" {...styles.signoutText}>
-                                                {intl.formatMessage({
-                                                    defaultMessage: 'Log out',
-                                                    id: 'header.popover.action.log_out',
-                                                })}
+                                                Log out
                                             </Text>
                                         </Flex>
                                     </Button>
                                 </PopoverFooter>
                             </PopoverContent>
                         </Popover>
-                    )}
-                    <IconButtonWithRegistration
-                        aria-label={intl.formatMessage({
-                            defaultMessage: 'Wishlist',
-                            id: 'header.button.assistive_msg.wishlist',
-                        })}
+                    )} */}
+                    {/* <IconButtonWithRegistration
+                        aria-label="Wishlist"
                         icon={<HeartIcon />}
                         variant="unstyled"
                         {...styles.icons}
                         onClick={onWishlistClick}
-                    />
-                    <IconButton
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.my_cart',
-                            defaultMessage: 'My cart',
-                        })}
+                    /> */}
+                    {/* <IconButton
+                        aria-label="My cart"
                         icon={
                             <>
                                 <BasketIcon />
@@ -269,7 +270,7 @@ const Header = ({
                         variant="unstyled"
                         {...styles.icons}
                         onClick={onMyCartClick}
-                    />
+                    /> */}
                 </Flex>
             </Box>
         </Box>

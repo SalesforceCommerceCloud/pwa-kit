@@ -19,13 +19,13 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {createModuleReplacementPlugin} from './plugins'
+import {sdkReplacementPlugin, extendedTemplateReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
+const pkg = require(resolve(projectDir, 'package.json'))
 const sdkDir = resolve(path.join(__dirname, '..', '..', '..'))
 
-const pkg = require(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
     ? resolve(process.env.PWA_KIT_BUILD_DIR)
     : resolve(projectDir, 'build')
@@ -85,10 +85,6 @@ const baseConfig = (target) => {
 
     class Builder {
         constructor() {
-            console.log(
-                `~in constructor findInProjectThenSDK('@loadable/server')`,
-                findInProjectThenSDK('@loadable/server')
-            )
             this.config = {
                 watchOptions: {
                     aggregateTimeout: 1000
@@ -157,7 +153,11 @@ const baseConfig = (target) => {
 
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
-                    createModuleReplacementPlugin(projectDir),
+                    sdkReplacementPlugin(projectDir),
+
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? extendedTemplateReplacementPlugin(projectDir)
+                        : () => null,
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
@@ -288,22 +288,11 @@ const enableReactRefresh = (config) => {
         }
     }
 }
-
-console.log(
-    '~client entryPointExists()',
-    entryPointExists(['app', 'main'], pkg?.mobify?.overridesDir.split('/'))
-)
-
 const client =
-    entryPointExists(
-        ['app', 'main'],
-        [...pkg?.mobify?.overridesDir?.split?.('/'), 'app', 'main']
-    ) &&
+    entryPointExists(['app', 'main']) &&
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
-            console.log('~got to 303')
-            console.log(`~getAppEntryPoint(pkg)`, getAppEntryPoint(pkg))
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
