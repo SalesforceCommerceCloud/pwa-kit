@@ -85,7 +85,6 @@ const ProductDetail = () => {
             enabled: !!product?.primaryCategoryId
         }
     )
-    console.log('category=========================', category)
     const variant = useVariant(product)
 
     const [primaryCategory, setPrimaryCategory] = useState(category)
