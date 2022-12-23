@@ -68,3 +68,11 @@ export type IQueryFunction<TData = unknown> = (
     context: QueryFunctionContext<QueryKey>,
     apiClients: ApiClients
 ) => Promise<TData>
+
+/**
+ * The following type alias will return the type of the elements in an array or tuple
+ * Ref: https://stackoverflow.com/questions/41253310/typescript-retrieve-element-type-information-from-array-type
+ */
+export type ArrayElement<T extends unknown[]> = T extends (infer ElementType)[]
+    ? ElementType
+    : never

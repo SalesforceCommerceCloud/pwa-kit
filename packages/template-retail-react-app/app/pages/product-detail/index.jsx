@@ -47,23 +47,29 @@ import {
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-
+import {useCustomBasket, useShopperBasketsMutation} from 'commerce-sdk-react'
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
-    const basket = useBasket()
     const history = useHistory()
     const location = useLocation()
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
-    const {productId} = useParams()
-    const urlParams = new URLSearchParams(location.search)
+
+    /****************************** Basket *********************************/
+    const {hasBasket, basket, baskets} = useCustomBasket()
+    console.log('baskets', baskets)
+    const createBasket = useShopperBasketsMutation('createBasket')
+    const addItemToBasketAction = useShopperBasketsMutation('addItemToBasket')
 
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
 
+    /*************************** Product Detail and Category ********************/
+    const {productId} = useParams()
+    const urlParams = new URLSearchParams(location.search)
     const {data: product, isLoading: isProductLoading} = useProduct(
         {
             id: urlParams.get('pid') || productId,
@@ -86,7 +92,6 @@ const ProductDetail = () => {
         }
     )
     const variant = useVariant(product)
-
     const [primaryCategory, setPrimaryCategory] = useState(category)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
@@ -115,6 +120,7 @@ const ProductDetail = () => {
         })
         history.replace(updatedUrl)
     }, [variant])
+
     /**************** Wishlist ****************/
     const wishlist = useWishlist()
     // TODO: DRY this handler when intl provider is available globally
@@ -154,20 +160,34 @@ const ProductDetail = () => {
             status: 'error'
         })
     }
+
+    const addItemToBasket = (basketId, variant, quantity) => {
+        const productItems = [
+            {
+                productId: variant.productId,
+                quantity,
+                price: variant.price
+            }
+        ]
+
+        addItemToBasketAction.mutate({parameters: {basketId}, body: productItems})
+    }
+
     const handleAddToCart = async (variant, quantity) => {
         try {
             if (!variant?.orderable || !quantity) return
-            // The basket accepts an array of `ProductItems`, so lets create a single
-            // item array to add to the basket.
-            const productItems = [
-                {
-                    productId: variant.productId,
-                    quantity,
-                    price: variant.price
-                }
-            ]
-
-            await basket.addItemToBasket(productItems)
+            if (!hasBasket) {
+                createBasket.mutate(
+                    {body: {}},
+                    {
+                        onSuccess: (basket) => {
+                            addItemToBasket(basket.basketId, variant, quantity)
+                        }
+                    }
+                )
+            } else {
+                addItemToBasket(basket.basketId, variant, quantity)
+            }
         } catch (error) {
             showError(error)
         }
@@ -337,18 +357,6 @@ const ProductDetail = () => {
 }
 
 ProductDetail.getTemplateName = () => 'product-detail'
-
-ProductDetail.shouldGetProps = ({previousLocation, location}) => {
-    const previousParams = new URLSearchParams(previousLocation?.search || '')
-    const params = new URLSearchParams(location.search)
-
-    // If the product changed via the pathname or `pid` param, allow updated
-    // data to be retrieved.
-    return (
-        previousLocation?.pathname !== location.pathname ||
-        previousParams.get('pid') !== params.get('pid')
-    )
-}
 
 ProductDetail.propTypes = {
     /**

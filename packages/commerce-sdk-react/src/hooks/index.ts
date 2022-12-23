@@ -14,6 +14,7 @@ export * from './ShopperOrders'
 export * from './ShopperProducts'
 export * from './ShopperPromotions'
 export * from './ShopperSearch'
+export * from './utilities/useCustomBasket'
 import useCommerceApi from './useCommerceApi'
 import useCustomerId from './useCustomerId'
 export {useCommerceApi, useCustomerId}
