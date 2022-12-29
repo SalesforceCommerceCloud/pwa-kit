@@ -567,8 +567,6 @@ const ProductList = (props) => {
 ProductList.getTemplateName = () => 'product-list'
 
 ProductList.shouldGetProps = ({previousLocation, location}) =>
-    // server side, always fetch the category
-    (typeof window === 'undefined' && !searchQuery) ||
     !previousLocation ||
     previousLocation.pathname !== location.pathname ||
     previousLocation.search !== location.search
@@ -603,9 +601,11 @@ ProductList.getProps = async ({res, params, location, api}) => {
     }
 
     const [category, productSearchResult] = await Promise.all([
-        api.shopperProducts.getCategory({
-            parameters: {id: categoryId, levels: 0}
-        }),
+        isSearch
+            ? Promise.resolve()
+            : api.shopperProducts.getCategory({
+                parameters: {id: categoryId, levels: 0}
+            }),
         api.shopperSearch.productSearch({
             parameters: searchParams
         })
