@@ -8,7 +8,6 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import isEqual from 'lodash/isEqual'
-import omit from 'lodash/omit'
 import {useCommerceAPI} from '../commerce-api/contexts'
 
 /**
@@ -73,7 +72,7 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
             return tree
         }
         const findInChildren = (obj, childrenKey, objToFindBy, replacementObj) => {
-            if (obj.hasOwnProperty(childrenKey)) {
+            if (Object.prototype.hasOwnProperty.call(obj, childrenKey)) {
                 for (let i = 0; i < obj[childrenKey].length; i++) {
                     findKeys.forEach((key) => {
                         isEqual(obj[childrenKey][i][key], objToFindBy[key])

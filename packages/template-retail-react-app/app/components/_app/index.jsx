@@ -43,7 +43,14 @@ import {IntlProvider} from 'react-intl'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
-import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR, DEFAULT_NAV_DEPTH, DEFAULT_ROOT_CATEGORY, DEFAULT_LOCALE} from '../../constants'
+import {
+    DEFAULT_SITE_TITLE,
+    HOME_HREF,
+    THEME_COLOR,
+    DEFAULT_NAV_DEPTH,
+    DEFAULT_ROOT_CATEGORY,
+    DEFAULT_LOCALE
+} from '../../constants'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'

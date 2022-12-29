@@ -604,8 +604,8 @@ ProductList.getProps = async ({res, params, location, api}) => {
         isSearch
             ? Promise.resolve()
             : api.shopperProducts.getCategory({
-                parameters: {id: categoryId, levels: 0}
-            }),
+                  parameters: {id: categoryId, levels: 0}
+              }),
         api.shopperSearch.productSearch({
             parameters: searchParams
         })
@@ -646,7 +646,8 @@ ProductList.propTypes = {
     location: PropTypes.object,
     searchQuery: PropTypes.string,
     onAddToWishlistClick: PropTypes.func,
-    onRemoveWishlistClick: PropTypes.func
+    onRemoveWishlistClick: PropTypes.func,
+    category: PropTypes.string
 }
 
 export default ProductList

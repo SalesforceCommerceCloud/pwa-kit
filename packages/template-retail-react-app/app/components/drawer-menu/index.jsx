@@ -78,7 +78,7 @@ const STORE_LOCATOR_HREF = '/store-locator'
  * support, log in and out actions, as support links.
  */
 const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
-    const {root, itemsKey, setRoot, findFirst} = useCategories()
+    const {root, itemsKey} = useCategories()
     const intl = useIntl()
     const customer = useCustomer()
     const navigate = useNavigation()

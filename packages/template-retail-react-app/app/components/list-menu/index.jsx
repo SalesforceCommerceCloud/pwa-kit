@@ -5,11 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useRef, forwardRef, useState, useEffect} from 'react'
+import React, {Fragment, useRef, forwardRef} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
-import omit from 'lodash/omit'
 import {useCategories} from '../../hooks/use-categories'
 
 // Project Components
@@ -28,7 +27,6 @@ import {
     PopoverBody,
     Center,
     Spinner,
-    PseudoBox,
 
     // Hooks
     useTheme,
@@ -166,12 +164,13 @@ ListMenuContent.propTypes = {
     items: PropTypes.array,
     maxColumns: PropTypes.number,
     onClose: PropTypes.func,
-    initialFocusRef: PropTypes.object
+    initialFocusRef: PropTypes.object,
+    itemsKey: PropTypes.string
 }
 
 const ListMenuPopover = ({items, item, name, maxColumns}) => {
     const initialFocusRef = useRef()
-    const {root, itemsKey, setRoot, findFirst} = useCategories()
+    const {itemsKey} = useCategories()
     const {isOpen, onClose, onOpen} = useDisclosure()
     return (
         <Box onMouseLeave={onClose}>
@@ -225,7 +224,7 @@ ListMenuPopover.propTypes = {
  * @param maxColumns The maximum number of columns that we want to use per row inside the ListMenu.
  */
 const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
-    const {root, setRoot, findFirst, itemsKey} = useCategories()
+    const {root, itemsKey} = useCategories()
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
     return (
@@ -236,9 +235,8 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
                         {root?.[itemsKey]?.map &&
                             root?.[itemsKey]?.map((item) => {
                                 const {id, name} = item
-                                const items = item[itemsKey]
                                 return (
-                                    <Box>
+                                    <Box key={id}>
                                         <ListMenuPopover
                                             key={id}
                                             maxColumns={maxColumns}
