@@ -228,7 +228,7 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
     return (
-        <nav aria-label="main">
+        <nav aria-label="main" aria-live="polite">
             <Flex {...baseStyle.container}>
                 {root?.[itemsKey] ? (
                     <Stack direction={'row'} spacing={0} {...baseStyle.stackContainer}>

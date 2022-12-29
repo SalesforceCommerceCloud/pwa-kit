@@ -115,7 +115,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
 
                     {/* Main Content */}
                     <DrawerBody>
-                        {showLoading && <LoadingSpinner />}
+                        {showLoading && <LoadingSpinner aria-live="polite"/>}
 
                         {/* Category Navigation */}
                         {root ? (
