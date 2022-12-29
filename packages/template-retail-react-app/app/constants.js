@@ -19,6 +19,11 @@ export const RECENT_SEARCH_MIN_LENGTH = 3
 export const HOME_SHOP_PRODUCTS_CATEGORY_ID = 'newarrivals'
 export const HOME_SHOP_PRODUCTS_LIMIT = 10
 
+// Constants for Mega Menu
+export const DEFAULT_NAV_DEPTH = 1
+export const DEFAULT_ROOT_CATEGORY = 'root'
+export const DEFAULT_LOCALE = 'en-US'
+
 export const cssColorGroups = {
     beige: '#d3bca9',
     black: '#000000',

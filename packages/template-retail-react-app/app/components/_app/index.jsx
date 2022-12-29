@@ -43,15 +43,11 @@ import {IntlProvider} from 'react-intl'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
-import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
+import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR, DEFAULT_NAV_DEPTH, DEFAULT_ROOT_CATEGORY, DEFAULT_LOCALE} from '../../constants'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
-
-const DEFAULT_NAV_DEPTH = 1
-const DEFAULT_ROOT_CATEGORY = 'root'
-const DEFAULT_LOCALE = 'en-US'
 
 const App = (props) => {
     const {
