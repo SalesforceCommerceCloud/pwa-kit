@@ -15,6 +15,7 @@ const {execSync: _execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
 const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
+const projectPkg = require(process.cwd() + '/package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
 const colors = {
@@ -142,7 +143,11 @@ const main = () => {
             }
         })
 
-    const appSSRjs = fse.pathExistsSync(p.join(process.cwd(), 'app', 'ssr.js'))
+    const appSSRpath = p.join(process.cwd(), 'app', 'ssr.js')
+    const appSSRjs = fse.pathExistsSync(appSSRpath)
+    const overrideSSRpath = p.join(process.cwd(), projectPkg?.mobify?.overridesDir, 'app', 'ssr.js')
+    const overrideSSRjs = fse.pathExistsSync(overrideSSRpath)
+    const resolvedSSRPath = appSSRjs ? appSSRpath : overrideSSRjs ? overrideSSRpath : null
 
     program
         .command('start')
@@ -152,19 +157,12 @@ const main = () => {
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
         .action(({inspect, noHMR}) => {
-            execSync(
-                `node${inspect ? ' --inspect' : ''} ${
-                    appSSRjs ?
-                    p.join(process.cwd(), 'app', 'ssr.js')
-                    :
-                    p.join(process.cwd(), 'node_modules/retail-react-app', 'app', 'ssr.js')}`,
-                {
-                    env: {
-                        ...process.env,
-                        ...(noHMR ? {HMR: 'false'} : {})
-                    }
+            execSync(`node${inspect ? ' --inspect' : ''} ${resolvedSSRPath}`, {
+                env: {
+                    ...process.env,
+                    ...(noHMR ? {HMR: 'false'} : {})
                 }
-            )
+            })
         })
 
     program

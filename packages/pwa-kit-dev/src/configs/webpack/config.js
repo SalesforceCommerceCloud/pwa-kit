@@ -54,12 +54,14 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
         ...pluginOptions
     })
 
-const entryPointExists = (segments, overrideSegments = []) => {
+const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
         const primary = resolve(projectDir, ...segments) + ext
-        const override = resolve(projectDir, ...overrideSegments) + ext
+        const override = pkg?.mobify?.overridesDir
+            ? resolve(projectDir, pkg?.mobify?.overridesDir?.replace(/^\//, ''), ...segments) + ext
+            : null
 
-        if (fs.existsSync(primary) || fs.existsSync(override)) {
+        if (fs.existsSync(primary) || (override && fs.existsSync(override))) {
             return true
         }
     }
@@ -68,9 +70,7 @@ const entryPointExists = (segments, overrideSegments = []) => {
 
 const getAppEntryPoint = (pkg) => {
     const APP_MAIN_PATH = '/app/main'
-    const ret = pkg?.mobify?.overridesDir ? pkg.mobify.overridesDir + APP_MAIN_PATH : APP_MAIN_PATH
-    console.log('~appEntry', ret)
-    return ret
+    return pkg?.mobify?.overridesDir ? pkg.mobify.overridesDir + APP_MAIN_PATH : APP_MAIN_PATH
 }
 
 const findInProjectThenSDK = (pkg) => {
@@ -369,7 +369,19 @@ const renderer =
 
                     // Must only appear on one config – this one is the only mandatory one.
                     new CopyPlugin({
-                        patterns: [{from: 'app/static/', to: 'static/', noErrorOnMissing: true}]
+                        patterns: [
+                            {
+                                from:
+                                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                                        ? `${pkg?.mobify?.overridesDir?.replace(
+                                              /^\//,
+                                              ''
+                                          )}/app/static`
+                                        : 'app/static/',
+                                to: 'static/',
+                                noErrorOnMissing: true
+                            }
+                        ]
                     }),
 
                     analyzeBundle && getBundleAnalyzerPlugin('server-renderer')

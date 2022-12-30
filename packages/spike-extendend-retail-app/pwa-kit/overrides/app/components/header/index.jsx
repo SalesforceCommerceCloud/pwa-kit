@@ -84,7 +84,7 @@ const Header = ({
     // const customer = useCustomer()
     // const navigate = useNavigation()
 
-    // const {isOpen, onClose, onOpen} = useDisclosure()
+    const {isOpen, onClose, onOpen} = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
 
     const [showLoading, setShowLoading] = useState(false)
