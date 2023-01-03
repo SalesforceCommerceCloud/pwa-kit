@@ -228,7 +228,7 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
     return (
-        <nav aria-label="main" aria-live="polite">
+        <nav aria-label="main" aria-live="polite" aria-busy="true" aria-atomic="true">
             <Flex {...baseStyle.container}>
                 {root?.[itemsKey] ? (
                     <Stack direction={'row'} spacing={0} {...baseStyle.stackContainer}>
@@ -251,7 +251,7 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
                     </Stack>
                 ) : (
                     <Center p="2">
-                        <Spinner size="lg" />
+                        <Spinner id="spinner" size="lg" />
                     </Center>
                 )}
             </Flex>

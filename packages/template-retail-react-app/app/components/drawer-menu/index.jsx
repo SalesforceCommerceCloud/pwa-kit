@@ -53,6 +53,7 @@ import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
 import useMultiSite from '../../hooks/use-multi-site'
+import {useEffect} from 'react'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
@@ -98,6 +99,14 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
+    useEffect(() => {
+        var spinner = document.getElementById('spinner')
+        var catNav = document.getElementById('category-nav')
+        if (!spinner && catNav) {
+            catNav.setAttribute('aria-busy', 'false')
+        }
+    })
+
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
             <DrawerOverlay>
@@ -115,49 +124,56 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
 
                     {/* Main Content */}
                     <DrawerBody>
-                        {showLoading && <LoadingSpinner aria-live="polite" />}
+                        <div
+                            id="category-nav"
+                            aria-live="polite"
+                            aria-busy="true"
+                            aria-atomic="true"
+                        >
+                            {showLoading && <LoadingSpinner />}
 
-                        {/* Category Navigation */}
-                        {root ? (
-                            <Fade in={true}>
-                                <NestedAccordion
-                                    allowMultiple={true}
-                                    item={root}
-                                    itemsKey={itemsKey}
-                                    itemsFilter="c_showInMenu"
-                                    fontSizes={FONT_SIZES}
-                                    fontWeights={FONT_WEIGHTS}
-                                    itemsBefore={({depth, item}) =>
-                                        depth > 0 ? (
-                                            [
-                                                <AccordionItem border="none" key="show-all">
-                                                    <AccordionButton
-                                                        paddingLeft={8}
-                                                        as={Link}
-                                                        to={categoryUrlBuilder(item)}
-                                                        fontSize={FONT_SIZES[depth]}
-                                                        fontWeight={FONT_WEIGHTS[depth]}
-                                                        color="black"
-                                                    >
-                                                        {intl.formatMessage({
-                                                            id: 'drawer_menu.link.shop_all',
-                                                            defaultMessage: 'Shop All'
-                                                        })}
-                                                    </AccordionButton>
-                                                </AccordionItem>
-                                            ]
-                                        ) : (
-                                            <></>
-                                        )
-                                    }
-                                    urlBuilder={categoryUrlBuilder}
-                                />
-                            </Fade>
-                        ) : (
-                            <Center p="8">
-                                <Spinner size="xl" />
-                            </Center>
-                        )}
+                            {/* Category Navigation */}
+                            {root ? (
+                                <Fade in={true}>
+                                    <NestedAccordion
+                                        allowMultiple={true}
+                                        item={root}
+                                        itemsKey={itemsKey}
+                                        itemsFilter="c_showInMenu"
+                                        fontSizes={FONT_SIZES}
+                                        fontWeights={FONT_WEIGHTS}
+                                        itemsBefore={({depth, item}) =>
+                                            depth > 0 ? (
+                                                [
+                                                    <AccordionItem border="none" key="show-all">
+                                                        <AccordionButton
+                                                            paddingLeft={8}
+                                                            as={Link}
+                                                            to={categoryUrlBuilder(item)}
+                                                            fontSize={FONT_SIZES[depth]}
+                                                            fontWeight={FONT_WEIGHTS[depth]}
+                                                            color="black"
+                                                        >
+                                                            {intl.formatMessage({
+                                                                id: 'drawer_menu.link.shop_all',
+                                                                defaultMessage: 'Shop All'
+                                                            })}
+                                                        </AccordionButton>
+                                                    </AccordionItem>
+                                                ]
+                                            ) : (
+                                                <></>
+                                            )
+                                        }
+                                        urlBuilder={categoryUrlBuilder}
+                                    />
+                                </Fade>
+                            ) : (
+                                <Center p="8">
+                                    <Spinner id="spinner" size="xl" />
+                                </Center>
+                            )}
+                        </div>
 
                         <DrawerSeparator />
 
