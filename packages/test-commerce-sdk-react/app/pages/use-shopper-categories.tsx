@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {useCategories} from 'commerce-sdk-react'
+import {useCategories} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 import {Link} from 'react-router-dom'
 import {flatten} from '../utils/utils'

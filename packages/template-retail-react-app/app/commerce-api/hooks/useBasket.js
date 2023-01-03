@@ -123,13 +123,7 @@ export default function useBasket(opts = {}) {
                     throw new Error(response)
                 } else {
                     setBasket(response)
-                    const einsteinProduct = {
-                        id: item[0].productId,
-                        sku: '',
-                        price: item[0].price,
-                        quantity: item[0].quantity
-                    }
-                    einstein.sendAddToCart(einsteinProduct)
+                    einstein.sendAddToCart(item[0])
                 }
             },
 

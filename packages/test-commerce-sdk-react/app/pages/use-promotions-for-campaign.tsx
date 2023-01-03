@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {usePromotionsForCampaign} from 'commerce-sdk-react'
+import {usePromotionsForCampaign} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 
 const UsePromotionsForCampaign = () => {

@@ -6,7 +6,7 @@
  */
 import React, {ReactElement} from 'react'
 import Json from '../../Json'
-import {useBasket} from 'commerce-sdk-react'
+import {useBasket} from 'commerce-sdk-react-preview'
 
 export const UseBasket = ({basketId}: {basketId: string}): ReactElement | null => {
     const {isLoading, error, data} = useBasket({basketId}, {enabled: !!basketId})
