@@ -41,7 +41,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
                             cardType: 'Visa',
                             creditCardExpired: false,
                             expirationMonth: 12,
-                            expirationYear: 2022,
+                            expirationYear: 2030,
                             holder: 'Test Customer',
                             maskedNumber: '************1111',
                             numberLastDigits: '1111',
