@@ -450,15 +450,11 @@ export function useShopperBasketsMutation<Action extends ShopperBasketsMutationT
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
-            //Override param headers to user-defined header values
-            if (params) {
-                params.headers = headers
-            }
             return (method.call as (
                 apiClient: ShopperBasketsClient,
                 params: Params,
                 rawResponse: boolean | undefined
-            ) => any)(apiClients['shopperBaskets'], params, rawResponse)
+            ) => any)(apiClients['shopperBaskets'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {
