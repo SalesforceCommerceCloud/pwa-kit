@@ -11,8 +11,11 @@ import {renderWithProviders} from '../../utils/test-utils'
 
 describe('ListMenu', () => {
     test('ListMenu renders without errors', () => {
-        renderWithProviders(<ListMenu isOpen={true} />)
+        renderWithProviders(<ListMenu />)
 
+        const drawer = document.getElementById('chakra-toast-portal')
+
+        expect(drawer).toBeInTheDocument()
         expect(screen.getByRole('navigation', {name: 'main'})).toBeInTheDocument()
     })
 })

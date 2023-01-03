@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useRef, forwardRef} from 'react'
+import React, {Fragment, useRef, forwardRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
@@ -168,9 +168,8 @@ ListMenuContent.propTypes = {
     itemsKey: PropTypes.string
 }
 
-const ListMenuPopover = ({items, item, name, maxColumns}) => {
+const ListMenuPopover = ({items, item, name, itemsKey, maxColumns}) => {
     const initialFocusRef = useRef()
-    const {itemsKey} = useCategories()
     const {isOpen, onClose, onOpen} = useDisclosure()
     return (
         <Box onMouseLeave={onClose}>
@@ -227,8 +226,23 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
     const {root, itemsKey} = useCategories()
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
+
+    useEffect(() => {
+        var spinner = document.getElementById('spinner')
+        var listMenu = document.getElementById('list-menu')
+        if (!spinner && listMenu) {
+            listMenu.setAttribute('aria-busy', 'false')
+        }
+    })
+
     return (
-        <nav aria-label="main" aria-live="polite" aria-busy="true" aria-atomic="true">
+        <nav
+            id="list-menu"
+            aria-label="main"
+            aria-live="polite"
+            aria-busy="true"
+            aria-atomic="true"
+        >
             <Flex {...baseStyle.container}>
                 {root?.[itemsKey] ? (
                     <Stack direction={'row'} spacing={0} {...baseStyle.stackContainer}>

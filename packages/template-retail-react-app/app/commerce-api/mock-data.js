@@ -3014,34 +3014,20 @@ export const mockedCustomerProductListsDetails = {
 }
 
 export const mockCategories = {
-    'mens-clothing-jackets': {
-        id: 'mens-clothing-suits',
-        image:
-            'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg',
-        name: 'Suits',
-        pageDescription:
-            "Shop Men's suits for business or pleasure. Enjoy from a variety of different styles and cuts at Commerce Cloud.",
-        pageTitle: 'Mens Suits for Business and Casual',
-        parentCategoryId: 'mens-clothing',
-        parentCategoryTree: [
-            {
-                id: 'mens',
-                name: 'Mens'
-            },
-            {
-                id: 'mens-clothing',
-                name: 'Clothing'
-            },
-            {
-                id: 'mens-clothing-suits',
-                name: 'Suits'
-            }
-        ],
-        c_enableCompare: false,
-        c_showInMenu: true,
-        c_slotBannerImage:
-            'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw2ec92167/images/slot/landing/cat-landing-slotbottom-mens-suits.jpg'
-    }
+    id: 'mens',
+    name: 'Mens',
+    categories: [
+        {
+            id: 'mens-clothing',
+            name: 'Clothing',
+            categories: [
+                {
+                    id: 'mens-clothing-suits',
+                    name: 'Suits'
+                }
+            ]
+        }
+    ]
 }
 
 export const mockProductSearch = {
