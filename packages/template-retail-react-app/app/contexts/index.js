@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import isEqual from 'lodash/isEqual'
 import {useCommerceAPI} from '../commerce-api/contexts'
@@ -48,6 +48,7 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
         }))
     })
     const [queue, setQueue] = useState({})
+    const mounted = useRef()
 
     // iterates through each deep nested object and if finds object that has prop and value specified in objToFindBy
     // argument, it replaces the current object with replacementObj, stops recursive walk and returns the whole tree.
@@ -104,6 +105,9 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
         if (queue[id] === 'loading' || Date.now() < queue[id] + STALE_TIME) {
             return
         }
+        if (!mounted.current) {
+            return
+        }
         setQueue({
             ...queue,
             [id]: 'loading'
@@ -134,6 +138,7 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
     }
 
     useEffect(() => {
+        mounted.current = true
         // Server side, we only fetch level 0 categories, for performance, here
         // we request the remaining two levels of category depth
         root?.[itemsKey]?.forEach(async (cat) => {
@@ -162,6 +167,9 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
             // store fetched data in local storage for faster access / reduced server load
             window?.localStorage?.setItem(`${LOCAL_STORAGE_PREFIX + cat?.id}`, JSON.stringify(res))
         })
+        return () => {
+            mounted.current = false
+        }
     }, [])
 
     return (
