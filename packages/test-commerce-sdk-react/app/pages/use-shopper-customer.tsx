@@ -182,7 +182,7 @@ function UseCustomer() {
     ].map(({action, body, parameters}) => {
         return {
             name: action,
-            hook: useShopperCustomersMutation(action),
+            hook: useShopperCustomersMutation({action}),
             body,
             parameters
         }
