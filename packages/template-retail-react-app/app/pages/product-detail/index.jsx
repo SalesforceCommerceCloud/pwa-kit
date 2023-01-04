@@ -48,6 +48,7 @@ import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 import {useCustomBasket, useShopperBasketsMutation} from 'commerce-sdk-react'
+
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
     const history = useHistory()
