@@ -3014,20 +3014,31 @@ export const mockedCustomerProductListsDetails = {
 }
 
 export const mockCategories = {
-    id: 'mens',
-    name: 'Mens',
-    categories: [
-        {
-            id: 'mens-clothing',
-            name: 'Clothing',
-            categories: [
-                {
-                    id: 'mens-clothing-suits',
-                    name: 'Suits'
-                }
-            ]
-        }
-    ]
+    root: {
+        categories: [
+            {
+                id: 'mens',
+                name: 'Mens',
+                loaded: true,
+                categories: [
+                    {
+                        id: 'mens-clothing',
+                        name: 'Clothing',
+                        loaded: true,
+                        categories: [
+                            {
+                                id: 'mens-clothing-suits',
+                                name: 'Suits',
+                                loaded: true
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        id: 'root',
+        name: 'Storefront Catalog - Non-EN'
+    }
 }
 
 export const mockProductSearch = {

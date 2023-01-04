@@ -5,17 +5,39 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {screen, act} from '@testing-library/react'
 import ListMenu from './index'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+
+jest.mock('../../commerce-api/utils', () => {
+    const originalModule = jest.requireActual('../../commerce-api/utils')
+    return {
+        ...originalModule,
+        isTokenValid: jest.fn().mockReturnValue(true)
+    }
+})
+
+const server = setupMockServer()
 
 describe('ListMenu', () => {
-    test('ListMenu renders without errors', () => {
+    test('ListMenu renders without errors', async () => {
         renderWithProviders(<ListMenu />)
 
         const drawer = document.getElementById('chakra-toast-portal')
 
+        expect(await screen.getByText(/Mens/i)).toBeInTheDocument()
         expect(drawer).toBeInTheDocument()
         expect(screen.getByRole('navigation', {name: 'main'})).toBeInTheDocument()
     })
 })
+
+// Set up and clean up
+beforeEach(() => {
+    jest.resetModules()
+    server.listen({onUnhandledRequest: 'error'})
+})
+afterEach(() => {
+    localStorage.clear()
+    server.resetHandlers()
+})
+afterAll(() => server.close())
