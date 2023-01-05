@@ -295,6 +295,22 @@ const ProductDetail = ({category, product, isLoading}) => {
                     />
                 </Stack>
             </Stack>
+
+            {/* Product Set */}
+            <Stack marginTop={16} spacing={16}>
+                {product.setProducts &&
+                    product.setProducts.map((childProduct) => (
+                        <ProductView
+                            key={childProduct.id}
+                            product={childProduct}
+                            category={primaryCategory?.parentCategoryTree || []}
+                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                            isProductLoading={isLoading}
+                            isCustomerProductListLoading={!wishlist.isInitialized}
+                        />
+                    ))}
+            </Stack>
         </Box>
     )
 }
