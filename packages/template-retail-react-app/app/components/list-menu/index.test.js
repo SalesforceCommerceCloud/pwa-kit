@@ -5,9 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import ListMenu from './index'
 import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+
+// jest.mock('../../contexts/index', () => {
+//     const originalModule = jest.requireActual('../../contexts/index')
+//     return {
+//         ...originalModule,
+//         fetchCategoryNode: jest.fn().mockReturnValue({
+//             id: 'mens-clothing',
+//             name: 'Clothing',
+//             loaded: true
+//         })
+//     }
+// })
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -25,8 +37,8 @@ describe('ListMenu', () => {
 
         const drawer = document.getElementById('chakra-toast-portal')
 
-        // const category = await waitFor(() => screen.getByText(/Mens/i))
-        // expect(category).toBeInTheDocument()
+        const category = await waitFor(() => screen.getByText(/Clothing/i))
+        expect(category).toBeInTheDocument()
         expect(drawer).toBeInTheDocument()
         expect(screen.getByRole('navigation', {name: 'main'})).toBeInTheDocument()
     })
@@ -40,5 +52,6 @@ beforeEach(() => {
 afterEach(() => {
     localStorage.clear()
     server.resetHandlers()
+    jest.clearAllMocks()
 })
 afterAll(() => server.close())

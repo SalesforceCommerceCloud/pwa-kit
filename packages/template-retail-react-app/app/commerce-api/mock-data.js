@@ -3019,21 +3019,12 @@ export const mockCategories = {
             {
                 id: 'mens',
                 name: 'Mens',
-                loaded: true,
-                categories: [
-                    {
-                        id: 'mens-clothing',
-                        name: 'Clothing',
-                        loaded: true,
-                        categories: [
-                            {
-                                id: 'mens-clothing-suits',
-                                name: 'Suits',
-                                loaded: true
-                            }
-                        ]
-                    }
-                ]
+                pageDescription:
+                    "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
+                pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
+                pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
+                parentCategoryId: 'root',
+                loaded: true
             }
         ],
         id: 'root',

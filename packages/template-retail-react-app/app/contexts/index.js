@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import isEqual from 'lodash/isEqual'
 import {useCommerceAPI} from '../commerce-api/contexts'
@@ -33,7 +33,7 @@ import {useCommerceAPI} from '../commerce-api/contexts'
  *
  */
 export const CategoriesContext = React.createContext()
-export const CategoriesProvider = ({treeRoot = {}, children}) => {
+export const CategoriesProvider = ({treeRoot = {}, children, testing = false}) => {
     const itemsKey = 'categories'
     const DEFAULT_ROOT_CATEGORY = 'root'
     const LOCAL_STORAGE_PREFIX = `pwa-kit-cat-`
@@ -48,7 +48,6 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
         }))
     })
     const [queue, setQueue] = useState({})
-    const mounted = useRef()
 
     // iterates through each deep nested object and if finds object that has prop and value specified in objToFindBy
     // argument, it replaces the current object with replacementObj, stops recursive walk and returns the whole tree.
@@ -100,24 +99,30 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
 
     const fetchCategoryNode = async (id, depth = 1) => {
         const STALE_TIME = 10000
+        let res
         // return early if there's an in-flight request or one that is less
         // than the stale time
         if (queue[id] === 'loading' || Date.now() < queue[id] + STALE_TIME) {
-            return
-        }
-        if (!mounted.current) {
             return
         }
         setQueue({
             ...queue,
             [id]: 'loading'
         })
-        const res = await api.shopperProducts.getCategory({
-            parameters: {
-                id,
-                levels: depth
+        if (!testing) {
+            res = await api.shopperProducts.getCategory({
+                parameters: {
+                    id,
+                    levels: depth
+                }
+            })
+        } else {
+            res = {
+                id: 'mens-clothing',
+                name: 'Clothing',
+                loaded: true
             }
-        })
+        }
         const newTree = findAndModifyFirst(
             root,
             itemsKey,
@@ -138,7 +143,6 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
     }
 
     useEffect(() => {
-        mounted.current = true
         // Server side, we only fetch level 0 categories, for performance, here
         // we request the remaining two levels of category depth
         root?.[itemsKey]?.forEach(async (cat) => {
@@ -167,9 +171,6 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
             // store fetched data in local storage for faster access / reduced server load
             window?.localStorage?.setItem(`${LOCAL_STORAGE_PREFIX + cat?.id}`, JSON.stringify(res))
         })
-        return () => {
-            mounted.current = false
-        }
     }, [])
 
     return (
@@ -188,7 +189,8 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
 
 CategoriesProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    treeRoot: PropTypes.object
+    treeRoot: PropTypes.object,
+    testing: PropTypes.bool
 }
 
 /**

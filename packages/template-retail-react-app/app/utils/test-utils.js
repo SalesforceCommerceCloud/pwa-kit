@@ -137,7 +137,7 @@ export const TestProviders = ({
         <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
             <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
                 <CommerceAPIProvider value={api}>
-                    <CategoriesProvider treeRoot={initialCategories}>
+                    <CategoriesProvider treeRoot={initialCategories} testing={true}>
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
                             <CustomerProvider value={{customer, setCustomer}}>
                                 <BasketProvider value={{basket, setBasket}}>
@@ -236,7 +236,15 @@ export const setupMockServer = (...handlers) => {
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         ),
         rest.get('*/categories/*', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json({}))
+            res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    id: 'mens-clothing',
+                    name: 'Clothing',
+                    loaded: true
+                })
+            )
         ),
         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
         rest.post('*/oauth2/token', (req, res, ctx) =>
