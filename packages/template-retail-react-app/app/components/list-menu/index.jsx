@@ -86,7 +86,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
                 </Link>
             )}
 
-            {!hasItems && !item.loaded && <Spinner size="sm" />}
+            {!hasItems && !item.loaded && <Spinner opacity="0" size="sm" />}
         </Box>
     )
 }
@@ -265,7 +265,7 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
                     </Stack>
                 ) : (
                     <Center p="2">
-                        <Spinner id="spinner" size="lg" />
+                        <Spinner id="spinner" opacity="0" size="lg" />
                     </Center>
                 )}
             </Flex>

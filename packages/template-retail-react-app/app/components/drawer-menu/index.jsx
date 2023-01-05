@@ -130,7 +130,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
                             aria-busy="true"
                             aria-atomic="true"
                         >
-                            {showLoading && <LoadingSpinner />}
+                            {showLoading && <LoadingSpinner opacity="0"/>}
 
                             {/* Category Navigation */}
                             {root ? (
@@ -170,7 +170,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
                                 </Fade>
                             ) : (
                                 <Center p="8">
-                                    <Spinner id="spinner" size="xl" />
+                                    <Spinner id="spinner" opacity="0" size="xl" />
                                 </Center>
                             )}
                         </div>
