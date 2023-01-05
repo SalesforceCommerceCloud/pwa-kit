@@ -9,18 +9,6 @@ import {screen, waitFor} from '@testing-library/react'
 import ListMenu from './index'
 import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
 
-// jest.mock('../../contexts/index', () => {
-//     const originalModule = jest.requireActual('../../contexts/index')
-//     return {
-//         ...originalModule,
-//         fetchCategoryNode: jest.fn().mockReturnValue({
-//             id: 'mens-clothing',
-//             name: 'Clothing',
-//             loaded: true
-//         })
-//     }
-// })
-
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {

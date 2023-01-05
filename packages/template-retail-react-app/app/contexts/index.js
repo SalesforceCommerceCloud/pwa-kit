@@ -33,7 +33,7 @@ import {useCommerceAPI} from '../commerce-api/contexts'
  *
  */
 export const CategoriesContext = React.createContext()
-export const CategoriesProvider = ({treeRoot = {}, children, testing = false}) => {
+export const CategoriesProvider = ({treeRoot = {}, children, testData = {}}) => {
     const itemsKey = 'categories'
     const DEFAULT_ROOT_CATEGORY = 'root'
     const LOCAL_STORAGE_PREFIX = `pwa-kit-cat-`
@@ -109,7 +109,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, testing = false}) =
             ...queue,
             [id]: 'loading'
         })
-        if (!testing) {
+        if (Object.keys(testData).length == 0) {
             res = await api.shopperProducts.getCategory({
                 parameters: {
                     id,
@@ -117,11 +117,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, testing = false}) =
                 }
             })
         } else {
-            res = {
-                id: 'mens-clothing',
-                name: 'Clothing',
-                loaded: true
-            }
+            res = testData
         }
         const newTree = findAndModifyFirst(
             root,
@@ -190,7 +186,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, testing = false}) =
 CategoriesProvider.propTypes = {
     children: PropTypes.node.isRequired,
     treeRoot: PropTypes.object,
-    testing: PropTypes.bool
+    testData: PropTypes.object
 }
 
 /**

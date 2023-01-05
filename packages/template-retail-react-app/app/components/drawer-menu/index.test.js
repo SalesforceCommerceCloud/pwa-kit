@@ -9,7 +9,7 @@ import DrawerMenu from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
 describe('DrawerMenu', () => {
-    test('Renders DrawerMenu without errors', () => {
+    test('Renders DrawerMenu without errors', async () => {
         renderWithProviders(<DrawerMenu isOpen={true} />)
 
         const drawer = document.querySelector('.chakra-portal')
@@ -20,4 +20,11 @@ describe('DrawerMenu', () => {
         expect(accordion).toBeInTheDocument()
         expect(socialIcons).toBeInTheDocument()
     })
+    // test('Renders DrawerMenu Spinner without root', () => {
+    //     renderWithProviders(<DrawerMenu isOpen={true} />)
+
+    //     const spinner = document.querySelector('.chakra-spinner')
+
+    //     expect(spinner).toBeInTheDocument()
+    // })
 })
