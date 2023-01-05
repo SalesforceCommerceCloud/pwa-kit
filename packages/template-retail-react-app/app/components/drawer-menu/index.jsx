@@ -130,7 +130,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
                             aria-busy="true"
                             aria-atomic="true"
                         >
-                            {showLoading && <LoadingSpinner opacity="0"/>}
+                            {showLoading && <LoadingSpinner opacity="0" />}
 
                             {/* Category Navigation */}
                             {root ? (
