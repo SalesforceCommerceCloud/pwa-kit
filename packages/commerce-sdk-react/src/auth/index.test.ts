@@ -4,16 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {LocalStorage} from './storage'
-/*
- * Copyright (c) 2022, Salesforce, Inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
-
 import Auth, {injectAccessToken} from './'
 import jwt from 'jsonwebtoken'
+import {helpers} from 'commerce-sdk-isomorphic'
 
 jest.mock('./storage', () => {
     return {
@@ -48,21 +41,16 @@ jest.mock('./storage', () => {
     }
 })
 
-const mockRefreshAccessToken = jest.fn().mockResolvedValue('')
-const mockLoginGuestUser = jest.fn().mockResolvedValue('')
-const mockLoginRegisteredUserB2C = jest.fn().mockResolvedValue('')
-const mockLogout = jest.fn().mockResolvedValue('')
-
 jest.mock('commerce-sdk-isomorphic', () => {
     const originalModule = jest.requireActual('commerce-sdk-isomorphic')
 
     return {
         ...originalModule,
         helpers: {
-            refreshAccessToken: mockRefreshAccessToken,
-            loginGuestUser: mockLoginGuestUser,
-            loginRegisteredUserB2C: mockLoginRegisteredUserB2C,
-            logout: mockLogout
+            refreshAccessToken: jest.fn().mockResolvedValue(''),
+            loginGuestUser: jest.fn().mockResolvedValue(''),
+            loginRegisteredUserB2C: jest.fn().mockResolvedValue(''),
+            logout: jest.fn().mockResolvedValue('')
         }
     }
 })
@@ -83,10 +71,7 @@ const config = {
 
 describe('Auth', () => {
     beforeEach(() => {
-        mockRefreshAccessToken.mockClear()
-        mockLoginGuestUser.mockClear()
-        mockLoginRegisteredUserB2C.mockClear()
-        mockLogout.mockClear()
+        jest.clearAllMocks()
     })
     test('get/set storage value', () => {
         const auth = new Auth(config)
@@ -211,7 +196,7 @@ describe('Auth', () => {
 
         expect(auth.ready()).resolves.toEqual(result)
     })
-    test('ready - use refresh token when access token is expired', () => {
+    test('ready - use refresh token when access token is expired', async () => {
         const auth = new Auth(config)
 
         const data = {
@@ -232,33 +217,33 @@ describe('Auth', () => {
             auth.set(key, data[key])
         })
 
-        auth.ready().then(() => {
-            expect(mockRefreshAccessToken).toBeCalled()
+        await auth.ready().then(() => {
+            expect(helpers.refreshAccessToken).toBeCalled()
         })
     })
-    test('ready - PKCE flow', () => {
+    test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
 
-        auth.ready().then(() => {
-            expect(mockLoginGuestUser).toBeCalled()
+        await auth.ready().then(() => {
+            expect(helpers.loginGuestUser).toBeCalled()
         })
     })
-    test('loginGuestUser', () => {
+    test('loginGuestUser', async () => {
         const auth = new Auth(config)
-        auth.loginGuestUser().then(() => {
-            expect(mockLoginGuestUser).toBeCalled()
+        await auth.loginGuestUser().then(() => {
+            expect(helpers.loginGuestUser).toBeCalled()
         })
     })
-    test('loginRegisteredUserB2C', () => {
+    test('loginRegisteredUserB2C', async () => {
         const auth = new Auth(config)
-        auth.loginRegisteredUserB2C({username: 'test', password: 'test'}).then(() => {
-            expect(mockLoginRegisteredUserB2C).toBeCalled()
+        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'}).then(() => {
+            expect(helpers.loginRegisteredUserB2C).toBeCalled()
         })
     })
-    test('logout', () => {
+    test('logout', async () => {
         const auth = new Auth(config)
-        auth.logout().then(() => {
-            expect(mockLogout).toBeCalled()
+        await auth.logout().then(() => {
+            expect(helpers.loginGuestUser).toBeCalled()
         })
     })
 })

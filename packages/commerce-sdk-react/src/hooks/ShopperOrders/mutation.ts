@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, DataType, Argument} from '../types'
+import {DataType, Argument, ApiClients} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction} from '@tanstack/react-query'
-
-type Client = ApiClients['shopperOrders']
+import {MutationFunction, UseMutationResult, useQueryClient} from '@tanstack/react-query'
+import {updateCache, CacheUpdateMatrixElement, Client, NotImplementedError} from '../utils'
 
 export const ShopperOrdersMutations = {
     /**
@@ -18,46 +17,114 @@ export const ShopperOrdersMutations = {
      */
     CreateOrder: 'createOrder',
     /**
-   * Adds a payment instrument to an order. 
-
-Details:
-
-The payment instrument is added with the provided details. The payment method must be applicable for the order see GET
-/baskets/\{basketId\}/payment-methods, if the payment method is 'CREDIT_CARD' a paymentCard must be specified in the request.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=createPaymentInstrumentForOrder} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#createpaymentinstrumentfororder} for more information on the parameters and returned data type.
-   */
+     * WARNING: This method is not implemented.
+     *
+     * Adds a payment instrument to an order.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=createPaymentInstrumentForOrder} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#createpaymentinstrumentfororder} for more information on the parameters and returned data type.
+     */
     CreatePaymentInstrumentForOrder: 'createPaymentInstrumentForOrder',
     /**
+     * WARNING: This method is not implemented.
+     *
      * Removes a payment instrument of an order.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=removePaymentInstrumentFromOrder} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#removepaymentinstrumentfromorder} for more information on the parameters and returned data type.
      */
     RemovePaymentInstrumentFromOrder: 'removePaymentInstrumentFromOrder',
     /**
-   * Updates a payment instrument of an order.
-
-Details:
-
-The payment instrument is updated with the provided details. The payment method must be applicable for the
-order see GET /baskets/\{basketId\}/payment-methods, if the payment method is 'CREDIT_CARD' a
-paymentCard must be specified in the request.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=updatePaymentInstrumentForOrder} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#updatepaymentinstrumentfororder} for more information on the parameters and returned data type.
-   */
+     * WARNING: This method is not implemented.
+     *
+     * Updates a payment instrument of an order.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=updatePaymentInstrumentForOrder} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#updatepaymentinstrumentfororder} for more information on the parameters and returned data type.
+     */
     UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
 } as const
 
-type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
+export const shopperOrdersCacheUpdateMatrix = {
+    createOrder: (
+        params: Argument<Client['createOrder']>,
+        response: DataType<Client['createOrder']>
+    ): CacheUpdateMatrixElement => {
+        const customerId = response?.customerInfo?.customerId
+        return {
+            update: [{name: 'order', key: ['/orders', {orderNo: response.orderNo}]}],
+            invalidate: [{name: 'customerBaskets', key: ['/customers', customerId, '/baskets']}]
+        }
+    },
+    createPaymentInstrumentForOrder: (
+        params: Argument<Client['createPaymentInstrumentForOrder']>,
+        response: DataType<Client['createPaymentInstrumentForOrder']>
+    ): CacheUpdateMatrixElement => {
+        return {}
+    },
+    removePaymentInstrumentFromOrder: (
+        params: Argument<Client['removePaymentInstrumentFromOrder']>,
+        response: DataType<Client['removePaymentInstrumentFromOrder']>
+    ): CacheUpdateMatrixElement => {
+        return {}
+    },
+    updatePaymentInstrumentForOrder: (
+        params: Argument<Client['updatePaymentInstrumentForOrder']>,
+        response: DataType<Client['updatePaymentInstrumentForOrder']>
+    ): CacheUpdateMatrixElement => {
+        return {}
+    }
+}
+
+export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
+    'CreatePaymentInstrumentForOrder',
+    'RemovePaymentInstrumentFromOrder',
+    'UpdatePaymentInstrumentForOrder'
+]
+
+export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
+
+type UseShopperOrdersMutationHeaders = NonNullable<Argument<Client['createOrder']>>['headers']
+type UseShopperOrdersMutationArg = {
+    headers?: UseShopperOrdersMutationHeaders
+    rawResponse?: boolean
+    action: ShopperOrdersMutationType
+}
+
+type ShopperOrdersClient = ApiClients['shopperOrders']
 
 /**
- * A hook for performing mutations with the Shopper Gift Certificates API.
+ * A hook for performing mutations with the Shopper Orders API.
  */
-export function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(action: Action) {
-    type Params = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
-    return useMutation<Data, Error, Params>((params, apiClients) => {
-        const method = apiClients['shopperOrders'][action] as MutationFunction<Data, Params>
-        return method.call(apiClients['shopperOrders'], params)
-    })
+
+function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
+    arg: UseShopperOrdersMutationArg
+): UseMutationResult<
+    DataType<ShopperOrdersClient[Action]> | Response,
+    Error,
+    Argument<ShopperOrdersClient[Action]>
+> {
+    const {headers, rawResponse, action} = arg
+
+    if (SHOPPER_ORDERS_NOT_IMPLEMENTED.includes(action)) {
+        NotImplementedError()
+    }
+    type Params = Argument<ShopperOrdersClient[Action]>
+    type Data = DataType<ShopperOrdersClient[Action]>
+    const queryClient = useQueryClient()
+
+    return useMutation<Data, Error, Params>(
+        (params, apiClients) => {
+            const method = apiClients['shopperOrders'][action] as MutationFunction<Data, Params>
+            return (method.call as (
+                apiClient: ShopperOrdersClient,
+                params: Params,
+                rawResponse: boolean | undefined
+            ) => any)(apiClients['shopperOrders'], {...params, headers}, rawResponse)
+        },
+        {
+            onSuccess: (data, params) => {
+                updateCache(queryClient, action, shopperOrdersCacheUpdateMatrix, data, params)
+            }
+        }
+    )
 }
+
+export {useShopperOrdersMutation}

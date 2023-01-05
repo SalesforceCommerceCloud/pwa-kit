@@ -5,15 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+const chalk = require('chalk')
 const p = require('path')
 const fse = require('fs-extra')
+const WebSocket = require('ws')
 const program = require('commander')
-const isEmail = require('validator/lib/isEmail')
+const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
 const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
+
+const colors = {
+    info: 'green',
+    warn: 'yellow',
+    error: 'red'
+}
 
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
@@ -57,14 +65,55 @@ const main = () => {
         ].join('\n')
     )
 
-    program
-        .command('save-credentials')
+    /**
+     * All Managed Runtime commands take common opts like --cloud-origin
+     * and --credentialsFile. These are set to be split out from the SDK
+     * commands here in the near future.
+     */
+    const managedRuntimeCommand = (name) => {
+        return program
+            .command(name)
+            .addOption(
+                new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
+                    .default('https://cloud.mobify.com')
+                    .env('CLOUD_API_BASE')
+                    .argParser((val) => {
+                        try {
+                            const url = new URL(val)
+                            const labels = url.host.split('.')
+                            if (
+                                labels.length !== 3 ||
+                                !labels[0].startsWith('cloud') ||
+                                !labels[1].startsWith('mobify') ||
+                                labels[2] !== 'com'
+                            ) {
+                                throw new Error()
+                            }
+                        } catch {
+                            throw new program.InvalidArgumentError(
+                                `'${val}' is not a valid Cloud origin`
+                            )
+                        }
+                        return val
+                    })
+            )
+            .addOption(
+                new program.Option(
+                    '-c, --credentialsFile <credentialsFile>',
+                    'override the standard credentials file location'
+                )
+                    .default(scriptUtils.getCredentialsFile())
+                    .env('PWA_KIT_CREDENTIALS_FILE')
+            )
+    }
+
+    managedRuntimeCommand('save-credentials')
         .description(`save API credentials for Managed Runtime`)
         .requiredOption(
             '-u, --user <email>',
             'the e-mail address you used to register with Managed Runtime',
             (val) => {
-                if (!isEmail(val)) {
+                if (!validator.isEmail(val)) {
                     throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
                 } else {
                     return val
@@ -75,20 +124,12 @@ const main = () => {
             '-k, --key <api-key>',
             `find your API key at https://runtime.commercecloud.com/account/settings`,
             (val) => {
-                if (!(typeof val === 'string') && val.length > 0) {
+                if (!(typeof val === 'string' && val.length > 0)) {
                     throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
                 } else {
                     return val
                 }
             }
-        )
-        .addOption(
-            new program.Option(
-                '-c, --credentialsFile <credentialsFile>',
-                'the file where your credentials should be stored'
-            )
-                .default(scriptUtils.getCredentialsFile())
-                .env('PWA_KIT_CREDENTIALS_FILE')
         )
         .action(({user, key, credentialsFile}) => {
             try {
@@ -169,8 +210,7 @@ const main = () => {
             }
         })
 
-    program
-        .command('push')
+    managedRuntimeCommand('push')
         .description(`push a bundle to Managed Runtime`)
         .addOption(
             new program.Option(
@@ -184,7 +224,7 @@ const main = () => {
                 'a message to include along with the uploaded bundle in Managed Runtime'
             )
                 // The default message is loaded dynamically as part of `uploadBundle(...)`
-                .default(undefined, '<git branch>:<git commit hash>')
+                .default(null, '<git branch>:<git commit hash>')
         )
         .addOption(
             new program.Option(
@@ -193,7 +233,7 @@ const main = () => {
             )
                 // We load the slug from the package.json by default, but we don't want to do that
                 // unless we need to, so it is loaded conditionally in the action implementation
-                .default(undefined, "the 'name' key from the package.json")
+                .default(null, "the 'name' key from the package.json")
         )
         .addOption(
             new program.Option(
@@ -201,33 +241,14 @@ const main = () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .addOption(
-            new program.Option(
-                '-c, --credentialsFile <credentialsFile>',
-                'the file where your credentials are stored'
-            )
-                .default(scriptUtils.getCredentialsFile())
-                .env('PWA_KIT_CREDENTIALS_FILE')
-        )
-        .action(({buildDirectory, message, projectSlug, target, credentialsFile}) => {
+        .action(({buildDirectory, message, projectSlug, target, cloudOrigin, credentialsFile}) => {
             // Set the deployment target env var, this is required to ensure we
             // get the correct configuration object.
             process.env.DEPLOY_TARGET = target
-
             const mobify = getConfig() || {}
 
             if (!projectSlug) {
-                try {
-                    // Using the full path isn't strictly necessary, but results in clearer errors
-                    const projectPkg = p.join(process.cwd(), 'package.json')
-                    const {name} = fse.readJsonSync(projectPkg)
-                    if (!name) throw new Error(`Missing "name" field in ${projectPkg}`)
-                    projectSlug = name
-                } catch (err) {
-                    throw new Error(
-                        `Could not detect project slug from "name" field in package.json: ${err.message}`
-                    )
-                }
+                projectSlug = scriptUtils.readPackageJson('name')
             }
 
             const options = {
@@ -241,7 +262,8 @@ const main = () => {
                 ssr_parameters: mobify.ssrParameters,
                 ssr_only: mobify.ssrOnly,
                 ssr_shared: mobify.ssrShared,
-                set_ssr_values: true
+                set_ssr_values: true,
+                origin: cloudOrigin
             }
 
             if (
@@ -290,6 +312,80 @@ const main = () => {
                 `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
             )
         })
+
+    managedRuntimeCommand('tail-logs')
+        .description(`continuously stream environment logs`)
+        .addOption(
+            new program.Option('-p, --project <projectSlug>', 'the project slug').default(
+                null,
+                "the 'name' key from package.json"
+            )
+        )
+        .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
+        .action(async ({project, environment, cloudOrigin, credentialsFile}, command) => {
+            if (!project) {
+                project = scriptUtils.readPackageJson('name')
+            }
+
+            let credentials
+            try {
+                credentials = fse.readJsonSync(credentialsFile)
+            } catch (e) {
+                scriptUtils.fail(`Error reading credentials: ${e}`)
+            }
+
+            const token = await scriptUtils.createToken(
+                project,
+                environment,
+                cloudOrigin,
+                credentials.api_key
+            )
+            const url = new URL(cloudOrigin.replace('cloud', 'logs'))
+            url.protocol = 'wss'
+            url.search = new URLSearchParams({
+                project,
+                environment,
+                user: credentials.username,
+                access_token: token
+            })
+
+            const ws = new WebSocket(url)
+            let heartbeat
+
+            ws.on('open', () => {
+                // Send a heartbeat periodically to bypass idle timeout.
+                const idleTimeout = 10 * 60 * 1000
+                heartbeat = setInterval(() => ws.ping(), idleTimeout / 2)
+            })
+
+            ws.on('close', (code) => {
+                clearInterval(heartbeat)
+                console.log('Connection closed with code', code)
+            })
+
+            ws.on('error', (error) => {
+                clearInterval(heartbeat)
+                scriptUtils.fail(`Error tailing logs: ${error.message}`)
+            })
+
+            ws.on('message', (data) => {
+                JSON.parse(data).forEach((log) => {
+                    const {message, shortRequestId, level} = scriptUtils.parseLog(log.message)
+                    const color = chalk[colors[level.toLowerCase()] || 'green']
+                    const paddedLevel = level.padEnd(6)
+                    console.log(
+                        chalk.green(new Date(log.timestamp).toISOString()),
+                        chalk.cyan(shortRequestId),
+                        ['WARN', 'ERROR'].includes(level)
+                            ? color.bold(paddedLevel)
+                            : color(paddedLevel),
+                        message
+                    )
+                })
+            })
+        })
+
+    // Global options
 
     program.option('-v, --version', 'show version number').action(({version}) => {
         if (version) {
