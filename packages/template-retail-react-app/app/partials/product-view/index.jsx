@@ -85,7 +85,6 @@ const ProductView = ({
     const location = useLocation()
     const {
         isOpen: isAddToCartModalOpen,
-        onOpen: onAddToCartModalOpen,
         onClose: onAddToCartModalClose
     } = useAddToCartModalContext()
     const theme = useTheme()
@@ -124,7 +123,6 @@ const ProductView = ({
                 return
             }
             await addToCart(variant, quantity)
-            onAddToCartModalOpen({product, quantity})
         }
 
         const handleWishlistItem = async () => {

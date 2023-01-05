@@ -29,7 +29,7 @@ import {
 } from '@chakra-ui/react'
 
 import useBasket from '../../commerce-api/hooks/useBasket'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+// import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 import Link from '../link'
 import Search from '../search'
@@ -48,6 +48,7 @@ import {noop} from '../../utils/utils'
 import {navLinks, messages} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../loading-spinner'
+import {useCustomerId, useCustomer} from 'commerce-sdk-react'
 
 const ENTER_KEY = 'Enter'
 
@@ -80,7 +81,9 @@ const Header = ({
 }) => {
     const intl = useIntl()
     const basket = useBasket()
-    const customer = useCustomer()
+    // const customer = useCustomer()
+    const customerId = useCustomerId() || ''
+    const {data: customer} = useCustomer({customerId})
     const navigate = useNavigation()
 
     const {isOpen, onClose, onOpen} = useDisclosure()
@@ -162,7 +165,7 @@ const Header = ({
                         })}
                     />
 
-                    {customer.isRegistered && (
+                    {customer?.authType === 'registered' && (
                         <Popover
                             isLazy
                             arrowSize={15}

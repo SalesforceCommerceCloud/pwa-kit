@@ -47,7 +47,13 @@ import {
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {useCustomBasket, useShopperBasketsMutation} from 'commerce-sdk-react'
+import {
+    useCustomBasket,
+    useShopperBasketsMutation,
+    // useCustomerId,
+    // useCustomerProductLists
+} from 'commerce-sdk-react'
+import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -56,6 +62,11 @@ const ProductDetail = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
+    // const customerId = useCustomerId() || ''
+    // console.log('customerId', customerId)
+    // getCustomerProductLists is not implementent :-o
+    // const {data: wishListTest} = useCustomerProductLists({customerId}, {enabled: !!customerId})
+    const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
 
     /****************************** Basket *********************************/
     const {hasBasket, basket, baskets} = useCustomBasket()
@@ -124,6 +135,7 @@ const ProductDetail = () => {
 
     /**************** Wishlist ****************/
     const wishlist = useWishlist()
+
     // TODO: DRY this handler when intl provider is available globally
     const handleAddToWishlist = async (quantity) => {
         try {
@@ -171,7 +183,15 @@ const ProductDetail = () => {
             }
         ]
 
-        addItemToBasketAction.mutate({parameters: {basketId}, body: productItems})
+        addItemToBasketAction.mutate(
+            {parameters: {basketId}, body: productItems},
+            {
+                onSuccess: () => {
+                    // only show this modal when a product is successfully add to cart
+                    onAddToCartModalOpen({product, quantity})
+                }
+            }
+        )
     }
 
     const handleAddToCart = async (variant, quantity) => {
