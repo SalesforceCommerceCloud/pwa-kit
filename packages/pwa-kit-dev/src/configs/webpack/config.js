@@ -74,18 +74,19 @@ const getAppEntryPoint = (pkg) => {
 }
 
 const findInProjectThenSDK = (pkg) => {
-    let resolvedPath
     const projectPath = resolve(projectDir, 'node_modules', pkg)
-    const extendsPath = resolve(projectDir, 'node_modules', pkg?.extends)
-    const isInExtends = fs.existsSync(extendsPath) ? extendsPath : false
-    if (isInExtends) {
-        resolvedPath = extendsPath
-    } else {
-        resolvedPath = fs.existsSync(projectPath)
-            ? projectPath
-            : resolve(sdkDir, 'node_modules', pkg)
+    return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
+}
+
+const findInProjectThenExtends = (pkg) => {
+    const projectPath = resolve(projectDir, 'node_modules', pkg)
+    if (fs.existsSync(projectPath)) {
+        return projectPath
     }
-    return resolvedPath
+    const extendsPath = resolve(projectDir, 'node_modules', pkg?.extends)
+    return fs.existsSync(extendsPath)
+        ? extendsPath
+        : resolve(projectPath, 'node_modules', pkg?.extends)
 }
 
 const baseConfig = (target) => {
@@ -152,11 +153,11 @@ const baseConfig = (target) => {
 
                         // TODO: these need to be declared in package.json as peerDependencies ?
                         // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
-                        '@chakra-ui/icons': findInProjectThenSDK('@chakra-ui/icons'),
-                        '@chakra-ui/react': finInProjectThenSDK('@chakra-ui/react'),
-                        '@chakra-ui/skip-nav': finInProjectThenSDK('@chakra-ui/skip-nav'),
-                        '@emotion/react': finInProjectThenSDK('@emotion/react'),
-                        '@emotion/styled': finInProjectThenSDK('@emotion/styled')
+                        '@chakra-ui/icons': findInProjectThenExtends('@chakra-ui/icons'),
+                        '@chakra-ui/react': findInProjectThenExtends('@chakra-ui/react'),
+                        '@chakra-ui/skip-nav': findInProjectThenExtends('@chakra-ui/skip-nav'),
+                        '@emotion/react': findInProjectThenExtends('@emotion/react'),
+                        '@emotion/styled': findInProjectThenExtends('@emotion/styled')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
