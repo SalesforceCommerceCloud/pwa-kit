@@ -89,6 +89,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
     const [showLoading, setShowLoading] = useState(false)
+    const [ariaBusy, setAriaBusy] = useState('true')
     const onSignoutClick = async () => {
         setShowLoading(true)
         await customer.logout()
@@ -100,11 +101,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
     useEffect(() => {
-        var spinner = document.getElementById('spinner')
-        var catNav = document.getElementById('category-nav')
-        if (!spinner && catNav) {
-            catNav.setAttribute('aria-busy', 'false')
-        }
+        setAriaBusy('false')
     })
 
     return (
@@ -127,7 +124,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
                         <div
                             id="category-nav"
                             aria-live="polite"
-                            aria-busy="true"
+                            aria-busy={ariaBusy}
                             aria-atomic="true"
                         >
                             {showLoading && <LoadingSpinner opacity="0" />}
@@ -170,7 +167,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
                                 </Fade>
                             ) : (
                                 <Center p="8">
-                                    <Spinner id="spinner" opacity="0" size="xl" />
+                                    <Spinner opacity="0" size="xl" />
                                 </Center>
                             )}
                         </div>

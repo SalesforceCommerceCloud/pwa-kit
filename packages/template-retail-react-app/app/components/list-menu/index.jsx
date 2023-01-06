@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useRef, forwardRef, useEffect} from 'react'
+import React, {Fragment, useRef, forwardRef, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
@@ -226,13 +226,10 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
     const {root, itemsKey} = useCategories()
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
+    const [ariaBusy, setAriaBusy] = useState('true')
 
     useEffect(() => {
-        var spinner = document.getElementById('spinner')
-        var listMenu = document.getElementById('list-menu')
-        if (!spinner && listMenu) {
-            listMenu.setAttribute('aria-busy', 'false')
-        }
+        setAriaBusy('false')
     })
 
     return (
@@ -240,31 +237,31 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
             id="list-menu"
             aria-label="main"
             aria-live="polite"
-            aria-busy="true"
+            aria-busy={ariaBusy}
             aria-atomic="true"
         >
             <Flex {...baseStyle.container}>
                 {root?.[itemsKey] ? (
                     <Stack direction={'row'} spacing={0} {...baseStyle.stackContainer}>
                         {root?.[itemsKey]?.map?.((item) => {
-                                const {id, name} = item
-                                return (
-                                    <Box key={id}>
-                                        <ListMenuPopover
-                                            key={id}
-                                            maxColumns={maxColumns}
-                                            item={item}
-                                            name={name}
-                                            items={item?.[itemsKey]}
-                                            itemsKey={itemsKey}
-                                        />
-                                    </Box>
-                                )
-                            })}
+                            const {id, name} = item
+                            return (
+                                <Box key={id}>
+                                    <ListMenuPopover
+                                        key={id}
+                                        maxColumns={maxColumns}
+                                        item={item}
+                                        name={name}
+                                        items={item?.[itemsKey]}
+                                        itemsKey={itemsKey}
+                                    />
+                                </Box>
+                            )
+                        })}
                     </Stack>
                 ) : (
                     <Center p="2">
-                        <Spinner id="spinner" opacity="0" size="lg" />
+                        <Spinner opacity="0" size="lg" />
                     </Center>
                 )}
             </Flex>

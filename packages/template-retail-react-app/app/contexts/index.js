@@ -98,7 +98,7 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
     }
 
     const fetchCategoryNode = async (id, depth = 1) => {
-        const STALE_TIME = 10000
+        const STALE_TIME = 10000 // 10 seconds
         let res
         // return early if there's an in-flight request or one that is less
         // than the stale time
