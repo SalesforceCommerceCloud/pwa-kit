@@ -67,6 +67,7 @@ const ProductTile = (props) => {
     } = props
 
     // TODO: use `productType` to render things accordingly
+    // eslint-disable-next-line
     const {currency, image, price, productId, hitType: productType} = product
 
     // ProductTile is used by two components, RecommendedProducts and ProductList.
