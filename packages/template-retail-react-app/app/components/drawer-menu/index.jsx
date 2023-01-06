@@ -102,7 +102,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
 
     useEffect(() => {
         setAriaBusy('false')
-    })
+    }, [])
 
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>

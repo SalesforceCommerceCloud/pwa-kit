@@ -230,7 +230,7 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
 
     useEffect(() => {
         setAriaBusy('false')
-    })
+    }, [])
 
     return (
         <nav
