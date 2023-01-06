@@ -138,7 +138,18 @@ const baseConfig = (target) => {
                         'react-router-dom': findInProjectThenSDK('react-router-dom'),
                         'react-dom': findInProjectThenSDK('react-dom'),
                         'react-helmet': findInProjectThenSDK('react-helmet'),
-                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware')
+                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware'),
+
+                        '@chakra-ui/icons':
+                            '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/node_modules/@chakra-ui/icons',
+                        '@chakra-ui/react':
+                            '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/node_modules/@chakra-ui/react',
+                        '@chakra-ui/skip-nav':
+                            '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/node_modules/@chakra-ui/skip-nav',
+                        '@emotion/react':
+                            '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/node_modules/@emotion/react',
+                        '@emotion/styled':
+                            '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/node_modules/@emotion/styled'
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },

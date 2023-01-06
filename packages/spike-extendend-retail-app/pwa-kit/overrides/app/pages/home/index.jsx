@@ -85,7 +85,7 @@ const Home = ({productSearchResult, isLoading}) => {
 
                 <Hero
                     // @TODO: translations not working?
-                    title={'Hello Upgradeable! React Store 🎉'}
+                    title={'🎉 Hello Extensible React Template!'}
                     img={{
                         src: getAssetUrl('static/img/hero.png'),
                         alt: 'npx pwa-kit-create-app',
