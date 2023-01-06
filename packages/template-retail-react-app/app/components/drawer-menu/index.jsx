@@ -130,7 +130,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
                             {showLoading && <LoadingSpinner opacity="0" />}
 
                             {/* Category Navigation */}
-                            {root ? (
+                            {root?.[itemsKey] ? (
                                 <Fade in={true}>
                                     <NestedAccordion
                                         allowMultiple={true}

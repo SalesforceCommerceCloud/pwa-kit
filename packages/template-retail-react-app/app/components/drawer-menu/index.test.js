@@ -20,11 +20,13 @@ describe('DrawerMenu', () => {
         expect(accordion).toBeInTheDocument()
         expect(socialIcons).toBeInTheDocument()
     })
-    // test('Renders DrawerMenu Spinner without root', () => {
-    //     renderWithProviders(<DrawerMenu isOpen={true} />)
+    test('Renders DrawerMenu Spinner without root', async () => {
+        renderWithProviders(<DrawerMenu isOpen={true} />, {
+            wrapperProps: {initialCategories: {}}
+        })
 
-    //     const spinner = document.querySelector('.chakra-spinner')
+        const spinner = document.querySelector('.chakra-spinner')
 
-    //     expect(spinner).toBeInTheDocument()
-    // })
+        expect(spinner).toBeInTheDocument()
+    })
 })

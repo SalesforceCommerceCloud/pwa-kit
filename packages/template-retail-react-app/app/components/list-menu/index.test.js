@@ -30,6 +30,15 @@ describe('ListMenu', () => {
         expect(drawer).toBeInTheDocument()
         expect(screen.getByRole('navigation', {name: 'main'})).toBeInTheDocument()
     })
+    test('ListMenu renders Spinner without root categories', async () => {
+        renderWithProviders(<ListMenu />, {
+            wrapperProps: {initialCategories: {}}
+        })
+
+        const spinner = document.querySelector('.chakra-spinner')
+
+        expect(spinner).toBeInTheDocument()
+    })
 })
 
 // Set up and clean up
