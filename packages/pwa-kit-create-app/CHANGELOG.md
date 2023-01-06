@@ -1,4 +1,6 @@
-## v2.5.0-dev (Dec 01, 2022)
+## v2.5.0 (Jan 5, 2023)
+- Add instanceType to Einstein activity body [#858](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/858)
+- Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
 
 ## v2.4.0 (Dec 01, 2022)
 - Update instanceUrl on retail-react-app-demo preset [#799](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/799)
