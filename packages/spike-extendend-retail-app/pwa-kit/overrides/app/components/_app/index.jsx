@@ -232,7 +232,34 @@ const App = (props) => {
                                 )}
                             </Box>
 
-                            <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
+                            {!isOnline && <OfflineBanner />}
+                            <AddToCartModalProvider>
+                                <SkipNavContent
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        flex: 1,
+                                        outline: 0,
+                                    }}
+                                >
+                                    <Box
+                                        as="main"
+                                        id="app-main"
+                                        role="main"
+                                        display="flex"
+                                        flexDirection="column"
+                                        flex="1"
+                                    >
+                                        <OfflineBoundary isOnline={false}>
+                                            {children}
+                                        </OfflineBoundary>
+                                    </Box>
+                                </SkipNavContent>
+
+                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
+
+                                <AuthModal {...authModal} />
+                            </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>
                 </CategoriesProvider>

@@ -6,7 +6,7 @@
  */
 import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-// import {useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {
     useMultiStyleConfig,
     Box,
@@ -28,12 +28,12 @@ import {
     useMediaQuery,
 } from '@chakra-ui/react'
 
-// import useBasket from 'retail-react-app/app/commerce-api/hooks/useBasket'
-// import useCustomer from 'retail-react-app/app/commerce-api/hooks/useCustomer'
+import useBasket from 'retail-react-app/app/commerce-api/hooks/useBasket'
+import useCustomer from 'retail-react-app/app/commerce-api/hooks/useCustomer'
 
-// import Link from 'retail-react-app/app/components/link'
-import Search from '../search'
-// import withRegistration from 'retail-react-app/app/hoc/with-registration'
+import Link from 'retail-react-app/app/components/link'
+import Search from 'retail-react-app/app/components/search'
+import withRegistration from 'retail-react-app/app/hoc/with-registration'
 import {
     AccountIcon,
     BrandLogo,
@@ -42,17 +42,17 @@ import {
     ChevronDownIcon,
     HeartIcon,
     SignoutIcon,
-} from 'retail-react-app/app/components/icons'
+} from '../icons'
 
 import {noop} from 'retail-react-app/app/utils/utils'
-// import {navLinks, messages} from 'retail-react-app/app/pages/account/constant'
-import {navLinks} from '../../pages/account/constant'
+import {navLinks, messages} from 'retail-react-app/app/pages/account/constant'
+// import {navLinks} from '../../pages/account/constant'
 import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
 
 const ENTER_KEY = 'Enter'
 
-// const IconButtonWithRegistration = withRegistration(IconButton)
+const IconButtonWithRegistration = withRegistration(IconButton)
 /**
  * The header is the main source for accessing
  * navigation, search, basket, and other
@@ -79,10 +79,10 @@ const Header = ({
     onWishlistClick = noop,
     ...props
 }) => {
-    // const intl = useIntl()
-    // const basket = useBasket()
-    // const customer = useCustomer()
-    // const navigate = useNavigation()
+    const intl = useIntl()
+    const basket = useBasket()
+    const customer = useCustomer()
+    const navigate = useNavigation()
 
     const {isOpen, onClose, onOpen} = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
@@ -180,7 +180,7 @@ const Header = ({
                         aria-label="My account"
                     />
 
-                    {/* {customer.isRegistered && (
+                    {customer.isRegistered && (
                         <Popover
                             isLazy
                             arrowSize={15}
@@ -247,15 +247,15 @@ const Header = ({
                                 </PopoverFooter>
                             </PopoverContent>
                         </Popover>
-                    )} */}
-                    {/* <IconButtonWithRegistration
+                    )}
+                    <IconButtonWithRegistration
                         aria-label="Wishlist"
                         icon={<HeartIcon />}
                         variant="unstyled"
                         {...styles.icons}
                         onClick={onWishlistClick}
-                    /> */}
-                    {/* <IconButton
+                    />
+                    <IconButton
                         aria-label="My cart"
                         icon={
                             <>
@@ -270,7 +270,7 @@ const Header = ({
                         variant="unstyled"
                         {...styles.icons}
                         onClick={onMyCartClick}
-                    /> */}
+                    />
                 </Flex>
             </Box>
         </Box>

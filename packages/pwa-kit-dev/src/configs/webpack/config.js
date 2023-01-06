@@ -153,6 +153,7 @@ const baseConfig = (target) => {
 
                         // TODO: these need to be declared in package.json as peerDependencies ?
                         // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
+                        'react-intl': findInProjectThenExtends('react-intl'),
                         '@chakra-ui/icons': findInProjectThenExtends('@chakra-ui/icons'),
                         '@chakra-ui/react': findInProjectThenExtends('@chakra-ui/react'),
                         '@chakra-ui/skip-nav': findInProjectThenExtends('@chakra-ui/skip-nav'),

@@ -132,7 +132,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}
                                       const {name} = item
                                       return {
                                           href: categoryUrlBuilder(item, locale),
-                                          text: name,
+                                          text: '🎉' + ' ' + name,
                                           styles: {
                                               fontSize: 'md',
                                               paddingTop: 3,
