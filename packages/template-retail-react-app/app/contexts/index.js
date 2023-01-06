@@ -52,8 +52,6 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
     // iterates through each deep nested object and if finds object that has prop and value specified in objToFindBy
     // argument, it replaces the current object with replacementObj, stops recursive walk and returns the whole tree.
     // If none is found, it returns false.
-
-    // copied from https://github.com/brojd/obj-traverse/blob/master/src/findAndModifyFirst/findAndModifyFirst.js
     const findAndModifyFirst = (tree, childrenKey, objToFindBy, replacementObj) => {
         let treeToReturn = tree
         let findSuccess = false
