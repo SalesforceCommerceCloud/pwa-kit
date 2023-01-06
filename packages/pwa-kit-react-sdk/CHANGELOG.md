@@ -1,4 +1,9 @@
-## v2.5.0-dev (Dec 01, 2022)
+## v2.6.0-dev (Jan 05, 2023)
+## v2.5.0 (Jan 05, 2023)
+- Replace morgan stream to use console.log [#847](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/847)
+- Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
+- Reuse Server Correlation ID when Hydrating Error Pages [#846](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/846)
+
 ## v2.4.0 (Dec 01, 2022)
 -   Fix `useServerContext` returning isServerSide=false when on server. [#782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/782)
 -   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793) 
