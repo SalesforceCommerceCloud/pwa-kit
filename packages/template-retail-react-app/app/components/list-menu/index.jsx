@@ -246,8 +246,7 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
             <Flex {...baseStyle.container}>
                 {root?.[itemsKey] ? (
                     <Stack direction={'row'} spacing={0} {...baseStyle.stackContainer}>
-                        {root?.[itemsKey]?.map &&
-                            root?.[itemsKey]?.map((item) => {
+                        {root?.[itemsKey]?.map?.((item) => {
                                 const {id, name} = item
                                 return (
                                     <Box key={id}>
