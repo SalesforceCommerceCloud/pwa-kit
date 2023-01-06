@@ -255,6 +255,20 @@ const ProductDetail = ({category, product, isLoading}) => {
                     <Box display={['none', 'none', 'none', 'block']} flex={4}></Box>
                 </Stack>
 
+                {/* Product Set */}
+                {product?.setProducts &&
+                    // TODO: page url params
+                    product.setProducts.map((childProduct) => (
+                        <ProductView
+                            key={childProduct.id}
+                            product={childProduct}
+                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                            isProductLoading={isLoading}
+                            isCustomerProductListLoading={!wishlist.isInitialized}
+                        />
+                    ))}
+
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
                     <RecommendedProducts
@@ -294,22 +308,6 @@ const ProductDetail = ({category, product, isLoading}) => {
                         mx={{base: -4, md: -8, lg: 0}}
                     />
                 </Stack>
-            </Stack>
-
-            {/* Product Set */}
-            <Stack marginTop={16} spacing={16}>
-                {product.setProducts &&
-                    product.setProducts.map((childProduct) => (
-                        <ProductView
-                            key={childProduct.id}
-                            product={childProduct}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                            isProductLoading={isLoading}
-                            isCustomerProductListLoading={!wishlist.isInitialized}
-                        />
-                    ))}
             </Stack>
         </Box>
     )
