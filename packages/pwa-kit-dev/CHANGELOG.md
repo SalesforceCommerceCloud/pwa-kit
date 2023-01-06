@@ -1,3 +1,4 @@
+## v2.6.0-dev (Jan 05, 2023)
 ## v2.5.0 (Jan 05, 2023)
 - Logging cid from res header isntead of req in local development [#821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/821)
 
