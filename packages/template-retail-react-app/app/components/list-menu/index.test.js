@@ -25,7 +25,7 @@ describe('ListMenu', () => {
 
         const drawer = document.getElementById('chakra-toast-portal')
 
-        const category = await waitFor(() => screen.getByText(/Clothing/i))
+        const category = await waitFor(() => screen.getByText(/Mens/i))
         expect(category).toBeInTheDocument()
         expect(drawer).toBeInTheDocument()
         expect(screen.getByRole('navigation', {name: 'main'})).toBeInTheDocument()
