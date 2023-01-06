@@ -3024,7 +3024,10 @@ export const mockCategories = {
                 pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
                 pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
                 parentCategoryId: 'root',
-                loaded: true
+                c_showInMenu: true,
+                loaded: true,
+                image:
+                    'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
             }
         ],
         id: 'root',

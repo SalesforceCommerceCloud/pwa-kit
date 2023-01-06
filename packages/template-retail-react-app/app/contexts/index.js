@@ -29,25 +29,25 @@ import {useCommerceAPI} from '../commerce-api/contexts'
  *
  * import {useCategories} from './hooks'
  *
- * const {categories, setCategories} = useCategories()
+ * const {root, findAndModifyFirst, itemsKey, fetchCategoryNode} = useCategories()
  *
  */
 export const CategoriesContext = React.createContext()
-export const CategoriesProvider = ({treeRoot = {}, children, testData = {}}) => {
+export const CategoriesProvider = ({treeRoot = {}, children}) => {
     const itemsKey = 'categories'
     const DEFAULT_ROOT_CATEGORY = 'root'
     const LOCAL_STORAGE_PREFIX = `pwa-kit-cat-`
 
     const api = useCommerceAPI()
+    const [queue, setQueue] = useState({})
     const [root, setRoot] = useState({
         // map over the server-provided cat
         ...treeRoot[DEFAULT_ROOT_CATEGORY],
         [itemsKey]: treeRoot[DEFAULT_ROOT_CATEGORY]?.[itemsKey]?.map((item) => ({
             ...item,
-            loaded: false
+            loaded: item?.loaded ?? false
         }))
     })
-    const [queue, setQueue] = useState({})
 
     // iterates through each deep nested object and if finds object that has prop and value specified in objToFindBy
     // argument, it replaces the current object with replacementObj, stops recursive walk and returns the whole tree.
@@ -109,16 +109,12 @@ export const CategoriesProvider = ({treeRoot = {}, children, testData = {}}) => 
             ...queue,
             [id]: 'loading'
         })
-        if (Object.keys(testData).length == 0) {
-            res = await api.shopperProducts.getCategory({
-                parameters: {
-                    id,
-                    levels: depth
-                }
-            })
-        } else {
-            res = testData
-        }
+        res = await api.shopperProducts.getCategory({
+            parameters: {
+                id,
+                levels: depth
+            }
+        })
         const newTree = findAndModifyFirst(
             root,
             itemsKey,
@@ -163,7 +159,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, testData = {}}) => 
                 )
                 return newTree
             }
-            const res = await fetchCategoryNode(cat?.id, 2)
+            const res = cat?.loaded ? cat : await fetchCategoryNode(cat?.id, 2)
             // store fetched data in local storage for faster access / reduced server load
             window?.localStorage?.setItem(`${LOCAL_STORAGE_PREFIX + cat?.id}`, JSON.stringify(res))
         })
@@ -185,8 +181,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, testData = {}}) => 
 
 CategoriesProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    treeRoot: PropTypes.object,
-    testData: PropTypes.object
+    treeRoot: PropTypes.object
 }
 
 /**

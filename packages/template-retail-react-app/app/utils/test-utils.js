@@ -137,14 +137,7 @@ export const TestProviders = ({
         <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
             <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
                 <CommerceAPIProvider value={api}>
-                    <CategoriesProvider
-                        treeRoot={initialCategories}
-                        testData={{
-                            id: 'mens-clothing',
-                            name: 'Clothing',
-                            loaded: true
-                        }}
-                    >
+                    <CategoriesProvider treeRoot={initialCategories}>
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
                             <CustomerProvider value={{customer, setCustomer}}>
                                 <BasketProvider value={{basket, setBasket}}>
