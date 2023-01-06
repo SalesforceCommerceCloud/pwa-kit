@@ -7,9 +7,11 @@
 
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useParams} from 'react-router-dom'
+import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
+import {useCategory, useProductSearch} from 'commerce-sdk-react-preview'
+import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 // Components
 import {
@@ -54,7 +56,6 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
 import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
-import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import {useCategories} from '../../hooks/use-categories'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
@@ -84,52 +85,76 @@ const REFINEMENT_DISALLOW_LIST = ['c_isNew']
  */
 const ProductList = (props) => {
     const {
-        searchQuery,
-        productSearchResult,
-        // eslint-disable-next-line react/prop-types
         staticContext,
-        location,
-        isLoading,
+        isLoading: _isLoading, // getProps isLoading. TODO: Think about how we might deal with this `isLoading` props.
         ...rest
     } = props
-    const {total, sortingOptions} = productSearchResult || {}
-
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const [sortOpen, setSortOpen] = useState(false)
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const history = useHistory()
     const params = useParams()
-    const {categories} = useCategories()
+    const location = useLocation()
     const toast = useToast()
     const einstein = useEinstein()
+    const {res} = useServerContext()
+    const wishlist = useWishlist()
+    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams() // TODO: Think about making this return refine as an array.
 
-    // Get the current category from global state.
-    let category = undefined
-    if (!searchQuery) {
-        category = categories[params.categoryId]
+    /**************** Page State ****************/
+    const [filtersLoading, setFiltersLoading] = useState(false)
+    const [wishlistLoading, setWishlistLoading] = useState([])
+    const [sortOpen, setSortOpen] = useState(false)
+
+    const urlParams = new URLSearchParams(location.search)
+    let searchQuery = urlParams.get('q')
+
+    if (params.categoryId) {
+        searchParams.refine.cgid = params.categoryId
+    }   
+    
+    /**************** Data Fetching ****************/
+    // TODO: Think about making a custom hook for this.
+    const {isLoading, isFetching, data: productSearchResult} = useProductSearch({
+        ...searchParams,
+        refine: Object.keys(searchParams.refine).map((key) => (`${key}=${Array.isArray(searchParams.refine[key]) ? searchParams.refine[key].join('|') : searchParams.refine[key]}`))
+        // TODO: This about pushing the above complexity into the useProductSearch utils.
+    }, {keepPreviousData: true})
+    const {data: category} = useCategory({
+        id: params.categoryId
+    })
+
+    /**************** Response Handling ****************/
+    if (res) {
+        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
 
-    const basePath = `${location.pathname}${location.search}`
     // Reset scroll position when `isLoaded` becomes `true`.
     useEffect(() => {
-        isLoading && window.scrollTo(0, 0)
-        setFiltersLoading(isLoading)
-    }, [isLoading])
+        isFetching && window.scrollTo(0, 0)
+        setFiltersLoading(isFetching) // TODO: Fix me!
+    }, [isFetching])
+
+
+    /**************** Render Variables ****************/
+    const basePath = `${location.pathname}${location.search}`
+    const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
+    const {total, sortingOptions} = productSearchResult || {}
+    let selectedSortingOptionLabel = productSearchResult?.sortingOptions?.find(
+        (option) => option.id === productSearchResult?.selectedSortingOption
+    )
+
+    // API does not always return a selected sorting order
+    if (!selectedSortingOptionLabel) {
+        selectedSortingOptionLabel = productSearchResult?.sortingOptions?.[0]
+    }
 
     // Get urls to be used for pagination, page size changes, and sorting.
     const pageUrls = usePageUrls({total})
     const sortUrls = useSortUrls({options: sortingOptions})
     const limitUrls = useLimitUrls()
 
-    // If we are loaded and still have no products, show the no results component.
-    const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
-
-    /**************** Wishlist ****************/
-    const wishlist = useWishlist()
-    // keep track of the items has been add/remove to/from wishlist
-    const [wishlistLoading, setWishlistLoading] = useState([])
-    // TODO: DRY this handler when intl provider is available globally
+    /**************** Action Handlers ****************/
     const addItemToWishlist = async (product) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
@@ -161,7 +186,6 @@ const ProductList = (props) => {
         }
     }
 
-    // TODO: DRY this handler when intl provider is available globally
     const removeItemFromWishlist = async (product) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
@@ -179,19 +203,6 @@ const ProductList = (props) => {
             setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
         }
     }
-
-    /**************** Einstein ****************/
-    useEffect(() => {
-        if (productSearchResult) {
-            searchQuery
-                ? einstein.sendViewSearch(searchQuery, productSearchResult)
-                : einstein.sendViewCategory(category, productSearchResult)
-        }
-    }, [productSearchResult])
-
-    /**************** Filters ****************/
-    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
-    const [filtersLoading, setFiltersLoading] = useState(false)
 
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
@@ -240,15 +251,15 @@ const ProductList = (props) => {
     const resetFilters = () => {
         navigate(window.location.pathname)
     }
-
-    let selectedSortingOptionLabel = productSearchResult?.sortingOptions?.find(
-        (option) => option.id === productSearchResult?.selectedSortingOption
-    )
-
-    // API does not always return a selected sorting order
-    if (!selectedSortingOptionLabel) {
-        selectedSortingOptionLabel = productSearchResult?.sortingOptions?.[0]
-    }
+    
+    /**************** Einstein ****************/
+    useEffect(() => {
+        if (productSearchResult) {
+            searchQuery
+                ? einstein.sendViewSearch(searchQuery, productSearchResult)
+                : einstein.sendViewCategory(category, productSearchResult)
+        }
+    }, [productSearchResult])
 
     return (
         <Box
@@ -258,6 +269,8 @@ const ProductList = (props) => {
             paddingTop={{base: 6, lg: 8}}
             {...rest}
         >
+            {/* <div>isLoading: {isLoading ? 'Loading' : 'Loaded'}</div>
+            <div>isFetching: {isFetching ? 'Fetching' : 'Fetched'}</div> */}
             <Helmet>
                 <title>{category?.pageTitle}</title>
                 <meta name="description" content={category?.pageDescription} />
@@ -384,7 +397,7 @@ const ProductList = (props) => {
                                 spacingX={4}
                                 spacingY={{base: 12, lg: 16}}
                             >
-                                {isLoading || !productSearchResult
+                                {isFetching || !productSearchResult
                                     ? new Array(searchParams.limit)
                                           .fill(0)
                                           .map((value, index) => (
@@ -574,84 +587,7 @@ const ProductList = (props) => {
 
 ProductList.getTemplateName = () => 'product-list'
 
-ProductList.shouldGetProps = ({previousLocation, location}) =>
-    !previousLocation ||
-    previousLocation.pathname !== location.pathname ||
-    previousLocation.search !== location.search
-
-ProductList.getProps = async ({res, params, location, api}) => {
-    const {categoryId} = params
-    const urlParams = new URLSearchParams(location.search)
-    let searchQuery = urlParams.get('q')
-    let isSearch = false
-
-    if (searchQuery) {
-        isSearch = true
-    }
-    // In case somebody navigates to /search without a param
-    if (!categoryId && !isSearch) {
-        // We will simulate search for empty string
-        return {searchQuery: ' ', productSearchResult: {}}
-    }
-
-    const searchParams = parseSearchParams(location.search, false)
-
-    if (!searchParams.refine.includes(`cgid=${categoryId}`) && categoryId) {
-        searchParams.refine.push(`cgid=${categoryId}`)
-    }
-
-    // only search master products
-    searchParams.refine.push('htype=master')
-
-    // Set the `cache-control` header values to align with the Commerce API settings.
-    if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-    }
-
-    const [category, productSearchResult] = await Promise.all([
-        isSearch
-            ? Promise.resolve()
-            : api.shopperProducts.getCategory({
-                  parameters: {id: categoryId, levels: 0}
-              }),
-        api.shopperSearch.productSearch({
-            parameters: searchParams
-        })
-    ])
-
-    // Apply disallow list to refinements.
-    productSearchResult.refinements = productSearchResult?.refinements?.filter(
-        ({attributeId}) => !REFINEMENT_DISALLOW_LIST.includes(attributeId)
-    )
-
-    // The `isomorphic-sdk` returns error objects when they occur, so we
-    // need to check the category type and throw if required.
-    if (category?.type?.endsWith('category-not-found')) {
-        throw new HTTPNotFound(category.detail)
-    }
-
-    return {searchQuery: searchQuery, productSearchResult}
-}
-
 ProductList.propTypes = {
-    /**
-     * The search result object showing all the product hits, that belong
-     * in the supplied category.
-     */
-    productSearchResult: PropTypes.object,
-    /*
-     * Indicated that `getProps` has been called but has yet to complete.
-     *
-     * Notes: This prop is internally provided.
-     */
-    isLoading: PropTypes.bool,
-    /*
-     * Object that represents the current location, it consists of the `pathname`
-     * and `search` values.
-     *
-     * Notes: This prop is internally provided.
-     */
-    location: PropTypes.object,
     searchQuery: PropTypes.string,
     onAddToWishlistClick: PropTypes.func,
     onRemoveWishlistClick: PropTypes.func
