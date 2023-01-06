@@ -74,8 +74,18 @@ const getAppEntryPoint = (pkg) => {
 }
 
 const findInProjectThenSDK = (pkg) => {
+    let resolvedPath
     const projectPath = resolve(projectDir, 'node_modules', pkg)
-    return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
+    const extendsPath = resolve(projectDir, 'node_modules', pkg?.extends)
+    const isInExtends = fs.existsSync(extendsPath) ? extendsPath : false
+    if (isInExtends) {
+        resolvedPath = extendsPath
+    } else {
+        resolvedPath = fs.existsSync(projectPath)
+            ? projectPath
+            : resolve(sdkDir, 'node_modules', pkg)
+    }
+    return resolvedPath
 }
 
 const baseConfig = (target) => {
@@ -140,16 +150,13 @@ const baseConfig = (target) => {
                         'react-helmet': findInProjectThenSDK('react-helmet'),
                         'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware'),
 
-                        '@chakra-ui/icons':
-                            '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/node_modules/@chakra-ui/icons',
-                        '@chakra-ui/react':
-                            '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/node_modules/@chakra-ui/react',
-                        '@chakra-ui/skip-nav':
-                            '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/node_modules/@chakra-ui/skip-nav',
-                        '@emotion/react':
-                            '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/node_modules/@emotion/react',
-                        '@emotion/styled':
-                            '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/node_modules/@emotion/styled'
+                        // TODO: these need to be declared in package.json as peerDependencies ?
+                        // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
+                        '@chakra-ui/icons': findInProjectThenSDK('@chakra-ui/icons'),
+                        '@chakra-ui/react': finInProjectThenSDK('@chakra-ui/react'),
+                        '@chakra-ui/skip-nav': finInProjectThenSDK('@chakra-ui/skip-nav'),
+                        '@emotion/react': finInProjectThenSDK('@emotion/react'),
+                        '@emotion/styled': finInProjectThenSDK('@emotion/styled')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
