@@ -111,9 +111,9 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     /**************** Add To Cart ****************/
     const showToast = useToast()
-    const showError = () => {
+    const showError = (message) => {
         showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
+            title: message,
             status: 'error'
         })
     }
@@ -132,7 +132,7 @@ const ProductDetail = ({category, product, isLoading}) => {
 
             await basket.addItemToBasket(productItems)
         } catch (error) {
-            showError(error)
+            showError(error.message || error)
         }
     }
 
