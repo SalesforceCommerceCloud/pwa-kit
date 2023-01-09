@@ -66,9 +66,7 @@ const ProductTile = (props) => {
         ...rest
     } = props
 
-    // TODO: use `productType` to render things accordingly
-    // eslint-disable-next-line
-    const {currency, image, price, productId, hitType: productType} = product
+    const {currency, image, price, productId, hitType} = product
 
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
@@ -131,6 +129,11 @@ const ProductTile = (props) => {
 
             {/* Price */}
             <Text {...styles.price}>
+                {hitType === 'set' &&
+                    intl.formatMessage({
+                        id: 'product_tile.label.starting_at_price',
+                        defaultMessage: 'Starting at'
+                    })}{' '}
                 {intl.formatNumber(price, {
                     style: 'currency',
                     currency: currency || activeCurrency
