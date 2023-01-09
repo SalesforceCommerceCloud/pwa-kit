@@ -94,6 +94,14 @@ jobs:
           if [[ $target_commerce_sdk_react ]]; then
             npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target_commerce_sdk_react
           fi
+      - name: Try to fail
+        run: exit 1
+      - name: Send GitHub Action trigger data to Slack workflow if a step fails
+        id: slack
+        if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
 
   generated:
@@ -159,3 +167,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
+      - name: Send GitHub Action trigger data to Slack workflow if a step fails
+        id: slack
+        if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
