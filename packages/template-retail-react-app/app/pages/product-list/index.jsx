@@ -118,7 +118,6 @@ const ProductList = (props) => {
     const isSearch = !!searchQuery
 
     if (params.categoryId) {
-        searchParams.refine.cgid = params.categoryId
         searchParams._refine.push(`cgid=${params.categoryId}`)
     }
 
