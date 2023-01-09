@@ -10,7 +10,7 @@
 // it processes requests in whatever way your project requires.
 
 // Uncomment the following line for the example code to work.
-import {QueryParameters} from 'pwa-kit-react-sdk/utils/ssr-request-processing'
+import {QueryParameters} from 'pwa-kit-runtime/utils/ssr-request-processing'
 
 /**
  * The processRequest function is called for *every* non-proxy, non-bundle
@@ -62,10 +62,6 @@ export const processRequest = ({
     path,
     querystring
 }) => {
-    // Example code for filtering query parameters and detecting bots user.
-
-    console.assert(parameters, 'Missing parameters')
-
     // This is an EXAMPLE processRequest implementation. You should
     // replace it with code that processes your requests as needed.
 
