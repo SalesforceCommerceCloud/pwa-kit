@@ -94,14 +94,29 @@ jobs:
           if [[ $target_commerce_sdk_react ]]; then
             npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target_commerce_sdk_react
           fi
-      - name: Try to fail
-        run: exit 1
-      - name: Send GitHub Action data to Slack workflow if a step fails
-        id: slack
-        if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #TODO: remove --dry-run from install command
+      - name: Publish to NPM
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # Add NPM token to allow publishing
+          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > ~/.npmrc
+
+          if [[ $RELEASE ]]; then
+            # Publish all changed packages. The "from-package" arg means "look
+            # at the version numbers in each package.json file and if that doesn't
+            # exist on NPM, publish"
+            npm run lerna -- publish from-package --yes --no-verify-access --dry-run
+          fi
+
+          # Cleanup
+          rm ~/.npmrc
+    - name: Send GitHub Action data to Slack workflow (PWA Kit)
+      id: slack
+      if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
+      uses: slackapi/slack-github-action@v1.23.0
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
 
   generated:
@@ -162,14 +177,13 @@ jobs:
               echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
           fi
         shell: bash
-
       - name: Store Verdaccio logfile artifact
         uses: actions/upload-artifact@v3
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
-      - name: Send GitHub Action trigger data to Slack workflow if a step fails
-        id: slack
-        if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    - name: Send GitHub Action data to Slack workflow (Generated)
+      id: slack
+      if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
+      uses: slackapi/slack-github-action@v1.23.0
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
