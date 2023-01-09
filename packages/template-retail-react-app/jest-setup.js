@@ -10,6 +10,32 @@ require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
 const {Crypto} = require('@peculiar/webcrypto')
 
+const mockCategoriesResponse = {
+    id: 'mens',
+    name: 'Mens',
+    pageDescription:
+        "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
+    pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
+    pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
+    parentCategoryId: 'root',
+    c_showInMenu: true,
+    loaded: true,
+    image:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
+}
+
+jest.mock('commerce-sdk-isomorphic', () => {
+    const sdk = jest.requireActual('commerce-sdk-isomorphic')
+    return {
+        ...sdk,
+        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
+            async getCategory() {
+                return mockCategoriesResponse
+            }
+        }
+    }
+})
+
 // Mock the application configuration to be used in all tests.
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {

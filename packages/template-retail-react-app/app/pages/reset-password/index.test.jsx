@@ -26,6 +26,20 @@ const mockRegisteredCustomer = {
     login: 'darek@test.com'
 }
 
+const mockCategoriesResponse = {
+    id: 'mens',
+    name: 'Mens',
+    pageDescription:
+        "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
+    pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
+    pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
+    parentCategoryId: 'root',
+    c_showInMenu: true,
+    loaded: true,
+    image:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
+}
+
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
     return {
@@ -58,6 +72,11 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     })
                 }
             }
+        },
+        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
+            async getCategory() {
+                return mockCategoriesResponse
+            }
         }
     }
 })
@@ -84,6 +103,7 @@ beforeEach(() => {
 afterEach(() => {
     localStorage.clear()
     server.resetHandlers()
+    jest.clearAllMocks()
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 afterAll(() => server.close())

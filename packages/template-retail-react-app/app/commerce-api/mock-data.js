@@ -3025,7 +3025,6 @@ export const mockCategories = {
                 pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
                 parentCategoryId: 'root',
                 c_showInMenu: true,
-                loaded: true,
                 image:
                     'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
             }

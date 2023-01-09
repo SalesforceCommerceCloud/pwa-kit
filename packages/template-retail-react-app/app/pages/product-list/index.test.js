@@ -8,11 +8,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
-import {
-    mockProductSearch,
-    mockCategories,
-    mockedEmptyCustomerProductList
-} from '../../commerce-api/mock-data'
+import {mockProductSearch, mockedEmptyCustomerProductList} from '../../commerce-api/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
@@ -23,7 +19,6 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useWishlist from '../../hooks/use-wishlist'
 
 jest.setTimeout(60000)
-let mockCategoriesResponse = mockCategories
 let mockProductListSearchResponse = mockProductSearch
 jest.useFakeTimers()
 
@@ -46,9 +41,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
         ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
             async productSearch() {
                 return {data: [mockProductListSearchResponse]}
-            }
-            async getCategory() {
-                return mockCategoriesResponse
             }
         },
         ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {

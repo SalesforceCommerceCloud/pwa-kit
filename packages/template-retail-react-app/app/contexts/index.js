@@ -157,7 +157,7 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
                 )
                 return newTree
             }
-            const res = cat?.loaded ? cat : await fetchCategoryNode(cat?.id, 2)
+            const res = await fetchCategoryNode(cat?.id, 2)
             // store fetched data in local storage for faster access / reduced server load
             window?.localStorage?.setItem(`${LOCAL_STORAGE_PREFIX + cat?.id}`, JSON.stringify(res))
         })
