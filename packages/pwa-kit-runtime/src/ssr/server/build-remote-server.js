@@ -41,6 +41,7 @@ import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
+import {morganStream} from '../../utils/morgan-stream'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -183,18 +184,23 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line no-unused-vars
     _setupLogging(app) {
         app.use(
-            expressLogging(function(tokens, req, res) {
-                const contentLength = tokens.res(req, res, 'content-length')
-                return [
-                    `(${res.locals.requestId})`,
-                    tokens.method(req, res),
-                    tokens.url(req, res),
-                    tokens.status(req, res),
-                    tokens['response-time'](req, res),
-                    'ms',
-                    contentLength && `- ${contentLength}`
-                ].join(' ')
-            })
+            expressLogging(
+                function(tokens, req, res) {
+                    const contentLength = tokens.res(req, res, 'content-length')
+                    return [
+                        `(${res.locals.requestId})`,
+                        tokens.method(req, res),
+                        tokens.url(req, res),
+                        tokens.status(req, res),
+                        tokens['response-time'](req, res),
+                        'ms',
+                        contentLength && `- ${contentLength}`
+                    ].join(' ')
+                },
+                {
+                    stream: morganStream
+                }
+            )
         )
     },
 

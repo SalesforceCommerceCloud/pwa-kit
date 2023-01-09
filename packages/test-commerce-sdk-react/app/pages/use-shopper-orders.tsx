@@ -48,13 +48,17 @@ function UseShopperOrders() {
     const mutationHooks = [
         {
             action: 'createOrder',
-            body: {basketId: '8140cd55ffa151713f0d88df1d'},
+            body: {basketId: '0fb0df8ad1df3d7741081ada63'},
             parameters: {}
         }
     ].map(({action, body, parameters}) => {
         return {
             name: action,
-            hook: useShopperOrdersMutation(action),
+            hook: useShopperOrdersMutation({
+                action,
+                headers: {'test-header': 'value'},
+                rawResponse: false
+            }),
             body,
             parameters
         }
