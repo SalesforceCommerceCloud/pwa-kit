@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {useAddressAction, useUserAddresses} from '../hooks/useFetch'
+import {getApiUrl, useAddressAction, useUserAddresses} from '../hooks/useFetch'
 import Address from '../components/address'
 
 function Addresses() {
@@ -22,15 +22,16 @@ function Addresses() {
                 onClick={() => {
                     const id = Math.floor(Math.random() * 100)
                     addressesActions.mutate({
+                        url: getApiUrl(`/accounts/current/addresses`),
                         payload: {
-                            city: 'Vancouver',
-                            country: 'CA',
+                            city: 'San Francisco',
+                            country: 'US',
                             addressType: 'Shipping',
                             isDefault: true,
-                            name: `Alex Vuong ${id}`,
+                            name: `Tom Lee`,
                             postalCode: '01234',
-                            region: 'BC',
-                            street: '123 Main Street'
+                            region: 'CA',
+                            street: '674 Second Street'
                         },
                         accountId: 'current'
                     })

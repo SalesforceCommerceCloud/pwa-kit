@@ -60,7 +60,7 @@ export const getApiUrl = (path) => {
     const {
         app: {webstoreId}
     } = getConfig()
-    return `${getAppOrigin()}/mobify/proxy/scom/services/data/v56.0/commerce/webstores/${webstoreId}${path}`
+    return `${getAppOrigin()}/mobify/proxy/scom/services/data/v57.0/commerce/webstores/${webstoreId}${path}`
 }
 
 export const useCategories = (categoryId, params) => {
@@ -296,44 +296,52 @@ export const useCartCouponAction = () => {
     return action
 }
 
-export const useAddressAction = (accountId = 'current', action) => {
-    const {token} = useAuth()
+export const useAddressAction = (accountId = 'current') => {
     const queryClient = useQueryClient()
     const {
         app: {webstoreId}
     } = getConfig()
 
-    const context = useMutation(
-        async (variables) => {
-            const {payload, fetchOptions = {}} = variables
-            let _url
-            if (action === 'DELETE') {
-                _url = getApiUrl(`/accounts/${accountId}/addresses/${payload.addressId}`)
-            } else {
-                _url = getApiUrl(`/accounts/${accountId}/addresses`)
-            }
-            const bodyObj = {
-                body: JSON.stringify(payload)
-            }
-            const res = await fetch(_url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                ...fetchOptions,
-                ...bodyObj
-            })
-            const t = fetchOptions.method !== 'DELETE' && (await res.json())
-            return t
-        },
-        {
-            onSuccess: () => {
-                queryClient.invalidateQueries([`/${webstoreId}/accounts/${accountId}/addresses`])
-            }
+    const action = useMutationFetch({
+        onSuccess: () => {
+            queryClient.invalidateQueries([`/${webstoreId}/accounts/${accountId}/addresses`])
         }
-    )
-    return context
+    })
+
+    return action
+
+    // const context = useMutation(
+    //     async (variables) => {
+    //         const {payload, fetchOptions = {}} = variables
+    //         let _url
+    //         if (action === 'DELETE') {
+    //             _url = getApiUrl(`/accounts/${accountId}/addresses/${payload.addressId}`)
+    //         } else {
+    //             _url = getApiUrl(`/accounts/${accountId}/addresses`)
+    //         }
+    //         console.log('_url', _url)
+    //         const bodyObj = {
+    //             body: JSON.stringify(payload)
+    //         }
+    //         const res = await fetch(_url, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             method: 'POST',
+    //             ...fetchOptions,
+    //             ...bodyObj
+    //         })
+    //         const t = fetchOptions.method !== 'DELETE' && (await res.json())
+    //         return t
+    //     },
+    //     {
+    //         onSuccess: () => {
+    //             queryClient.invalidateQueries([`/${webstoreId}/accounts/${accountId}/addresses`])
+    //         }
+    //     }
+    // )
+    // return context
 }
 
 export const useWishlistAction = (wishListId) => {

@@ -63,7 +63,7 @@ export const AuthProvider = ({children}) => {
     //     // }
     // }, [])
     const {data: token} = useQuery(['token'], async () => {
-        const response = await fetch(`${getAppOrigin()}/mobify/proxy/scom/services/Soap/c/56.0`, {
+        const response = await fetch(`${getAppOrigin()}/mobify/proxy/scom/services/Soap/c/57.0`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'text/xml',

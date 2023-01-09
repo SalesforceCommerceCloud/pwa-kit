@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {useAddressAction} from '../hooks/useFetch'
+import {getApiUrl, useAddressAction} from '../hooks/useFetch'
 
 const Address = ({address}) => {
     const addressesActions = useAddressAction()
@@ -26,11 +26,9 @@ const Address = ({address}) => {
             <button
                 onClick={() => {
                     addressesActions.mutate({
-                        payload: {
-                            addressId: address.addressId
-                        },
+                        url: getApiUrl(`/accounts/current/addresses/${address.addressId}`),
                         fetchOptions: {
-                            method: 'PATCH'
+                            method: 'DELETE'
                         }
                     })
                 }}
