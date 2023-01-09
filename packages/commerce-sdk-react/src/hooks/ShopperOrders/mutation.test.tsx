@@ -10,11 +10,12 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {
     useShopperOrdersMutation,
     ShopperOrdersMutationType,
-    shopperOrdersQueryKeysMatrix,
+    shopperOrdersCacheUpdateMatrix,
     SHOPPER_ORDERS_NOT_IMPLEMENTED
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
+import {QueryKeyMap} from '../utils'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
@@ -40,7 +41,7 @@ interface OrderMutationComponentParams {
 }
 
 const OrderMutationComponent = ({action}: OrderMutationComponentParams) => {
-    const mutationHook = useShopperOrdersMutation(action)
+    const mutationHook = useShopperOrdersMutation({action})
 
     return (
         <div>
@@ -68,7 +69,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
 
                     const queryClient = createQueryClient()
 
-                    const mutation: any = shopperOrdersQueryKeysMatrix[mutationName]
+                    const mutation: any = shopperOrdersCacheUpdateMatrix[mutationName]
 
                     const {invalidate, update, remove} = mutation(
                         mutationPayloads[mutationName],
@@ -77,7 +78,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
 
                     const queryKeys = [...(invalidate || []), ...(update || []), ...(remove || [])]
 
-                    queryKeys.forEach((queryKey: QueryKey) => {
+                    queryKeys.forEach(({key: queryKey}: QueryKeyMap) => {
                         queryClient.setQueryData(queryKey, {test: true})
                     })
 
@@ -103,13 +104,13 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
                     expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
 
                     // Assert changes in cache
-                    update?.forEach((queryKey: QueryKey) => {
+                    update?.forEach(({key: queryKey}: QueryKeyMap) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
                     })
-                    invalidate?.forEach((queryKey: QueryKey) => {
+                    invalidate?.forEach(({key: queryKey}: QueryKeyMap) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
                     })
-                    remove?.forEach((queryKey: QueryKey) => {
+                    remove?.forEach(({key: queryKey}: QueryKeyMap) => {
                         expect(queryClient.getQueryState(queryKey)).toBeFalsy()
                     })
                 }
@@ -160,8 +161,9 @@ tests.forEach(({hook, cases}) => {
 test.each(SHOPPER_ORDERS_NOT_IMPLEMENTED)(
     '%j - throws error when not implemented',
     (methodName) => {
+        const action = methodName as ShopperOrdersMutationType
         expect(() => {
-            useShopperOrdersMutation(methodName as ShopperOrdersMutationType)
+            useShopperOrdersMutation({action})
         }).toThrowError('This method is not implemented.')
     }
 )

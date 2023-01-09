@@ -1,6 +1,6 @@
 {
   "name": "commerce-sdk-react-preview",
-  "version": "2.5.0-dev",
+  "version": "2.6.0-dev",
   "description": "A library that provides react hooks for fetching data from Commerce Cloud",
   "author": "cc-pwa-kit@salesforce.com",
   "license": "See license in LICENSE",
@@ -12,12 +12,12 @@
   "files": [
     "CHANGELOG.md",
     "LICENSE",
-    "scripts",
-    "auth",
-    "hooks",
-    "*.js",
-    "*.d.ts",
-    "*.d.ts.map"
+    "+(auth|hooks|scripts)/**/!(*.test*).{ts,js}",
+    "*.{js,d.ts}",
+    "!*.test*.{js,d.ts}",
+    "!test*.*",
+    "!+(jest|babel).config.js",
+    "!setup-jest.js"
   ],
   "publishConfig": {
     "directory": "dist"
@@ -60,7 +60,7 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "cross-env": "^5.2.0",
-    "internal-lib-build": "^2.5.0-dev",
+    "internal-lib-build": "^2.6.0-dev",
     "jest-silent-reporter": "^0.5.0",
     "jsonwebtoken": "^8.5.1",
     "nock": "^13.2.9",
