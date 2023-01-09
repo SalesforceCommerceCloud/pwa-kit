@@ -600,9 +600,6 @@ ProductList.getProps = async ({res, params, location, api}) => {
         searchParams.refine.push(`cgid=${categoryId}`)
     }
 
-    // only search master products
-    searchParams.refine.push('htype=master')
-
     // Set the `cache-control` header values to align with the Commerce API settings.
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
