@@ -3,9 +3,9 @@ on:
   schedule:
     - cron: 0 8 * * *
   push:
-  #    branches:
-  #    # TODO: Before merging remove branches filter
-  #    - github-actions
+     branches:
+     # TODO: Before merging remove branches filter
+     - github-actions
 jobs:
   pwa-kit:
     strategy:
@@ -96,7 +96,7 @@ jobs:
           fi
       - name: Try to fail
         run: exit 1
-      - name: Send GitHub Action trigger data to Slack workflow if a step fails
+      - name: Send GitHub Action data to Slack workflow if a step fails
         id: slack
         if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
         uses: slackapi/slack-github-action@v1.23.0
