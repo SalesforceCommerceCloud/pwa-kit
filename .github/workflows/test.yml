@@ -111,12 +111,12 @@ jobs:
 
           # Cleanup
           rm ~/.npmrc
-    - name: Send GitHub Action data to Slack workflow (PWA Kit)
-      id: slack
-      if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
-      uses: slackapi/slack-github-action@v1.23.0
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Send GitHub Action data to Slack workflow (PWA Kit)
+        id: slack
+        if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
 
   generated:
@@ -181,9 +181,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
-    - name: Send GitHub Action data to Slack workflow (Generated)
-      id: slack
-      if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
-      uses: slackapi/slack-github-action@v1.23.0
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Send GitHub Action data to Slack workflow (Generated)
+        id: slack
+        if: ${{ failure() && github.ref == 'refs/heads/github-actions' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
