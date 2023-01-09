@@ -65,7 +65,9 @@ const ProductTile = (props) => {
         dynamicImageProps,
         ...rest
     } = props
-    const {currency, image, price, productId} = product
+
+    const {currency, image, price, productId, hitType} = product
+
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
@@ -127,6 +129,11 @@ const ProductTile = (props) => {
 
             {/* Price */}
             <Text {...styles.price}>
+                {hitType === 'set' &&
+                    intl.formatMessage({
+                        id: 'product_tile.label.starting_at_price',
+                        defaultMessage: 'Starting at'
+                    })}{' '}
                 {intl.formatNumber(price, {
                     style: 'currency',
                     currency: currency || activeCurrency
@@ -163,7 +170,8 @@ ProductTile.propTypes = {
         // See: https://developer.salesforce.com/docs/commerce/einstein-api/references/einstein-api-quick-start-guide?meta=getRecommendations
         // Note: useEinstein() transforms snake_case property names from the API response to camelCase
         productName: PropTypes.string,
-        productId: PropTypes.string
+        productId: PropTypes.string,
+        hitType: PropTypes.string
     }),
     /**
      * Enable adding/removing product as a favourite.
