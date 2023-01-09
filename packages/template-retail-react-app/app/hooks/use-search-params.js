@@ -20,13 +20,13 @@ const PARSE_OPTIONS = {
  * This hook will return all the location search params pertinant
  * to the product list page.
  */
-export const useSearchParams = (searchParams = DEFAULT_SEARCH_PARAMS) => {
+export const useSearchParams = (searchParams = DEFAULT_SEARCH_PARAMS, parseRefine = true) => {
     const {search} = useLocation()
 
     // Encode the search query, including preset values.
     const searchParamsObject = {
         ...searchParams,
-        ...parse(search.substring(1))
+        ...parse(search.substring(1), parseRefine)
     }
 
     return [searchParamsObject, {stringify, parse}]
@@ -41,6 +41,9 @@ export const useSearchParams = (searchParams = DEFAULT_SEARCH_PARAMS) => {
  */
 export const stringify = (searchParamsObj) => {
     let searchParamsObjCopy = {...searchParamsObj}
+
+    // Remove our copy of the original refinement value so it's not stringified.
+    delete searchParamsObjCopy._refine
 
     // "stringify" the nested refinements
     searchParamsObjCopy.refine = Object.keys(searchParamsObjCopy.refine).map((key) =>
@@ -71,10 +74,13 @@ export const parse = (searchParamsStr, parseRefine = true) => {
     const params = queryString.parse(searchParamsStr, PARSE_OPTIONS)
 
     // Ensure the refinments is an array (make it easier to manipulate).
-    params.refine = Array.isArray(params.refine) ? params.refine : [params.refine]
+    params.refine = Array.isArray(params.refine)
+        ? params.refine
+        : [params.refine].filter((v) => Boolean(v))
 
     // Parse the nested refinement entries.
     if (parseRefine) {
+        params._refine = params.refine
         params.refine = params.refine.reduce((acc, curr) => {
             return {
                 ...acc,
