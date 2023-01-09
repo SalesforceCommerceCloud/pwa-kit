@@ -14,7 +14,7 @@ import {CloseIcon} from '../../../components/icons'
 import {FormattedMessage} from 'react-intl'
 import {useParams} from 'react-router-dom'
 
-const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters}) => {
+const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
     const navigate = useNavigation()
     const params = useParams()
@@ -84,7 +84,7 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters}) => {
                             padding={{sm: 0, base: 2}}
                             variant="link"
                             size="sm"
-                            onClick={resetFilters}
+                            onClick={handleReset}
                         >
                             <FormattedMessage
                                 defaultMessage="Clear All"

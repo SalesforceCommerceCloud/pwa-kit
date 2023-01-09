@@ -10,8 +10,9 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
-import {useCategory, useProductSearch} from 'commerce-sdk-react-preview'
+import {useCategory, useCustomerId, useProductSearch, useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 // Components
 import {
@@ -60,7 +61,7 @@ import {useCategories} from '../../hooks/use-categories'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Others
-import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
+import {HTTPNotFound, HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
 import {
@@ -99,6 +100,8 @@ const ProductList = (props) => {
     const einstein = useEinstein()
     const {res} = useServerContext()
     const wishlist = useWishlist()
+    const customerId = useCustomerId()
+    const customer = useCustomer()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams() // TODO: Think about making this return refine as an array.
 
     /**************** Page State ****************/
@@ -113,16 +116,49 @@ const ProductList = (props) => {
         searchParams.refine.cgid = params.categoryId
     }   
     
-    /**************** Data Fetching ****************/
+    /**************** Mutation Actions ****************/
+    const {mutate: createCustomerProductListItem} = useShopperCustomersMutation({action: 'createCustomerProductListItem'})
+    const {mutate: deleteCustomerProductListItem} = useShopperCustomersMutation({action: 'deleteCustomerProductListItem'})
+    
+    /**************** Query Actions ****************/
     // TODO: Think about making a custom hook for this.
     const {isLoading, isFetching, data: productSearchResult} = useProductSearch({
         ...searchParams,
         refine: Object.keys(searchParams.refine).map((key) => (`${key}=${Array.isArray(searchParams.refine[key]) ? searchParams.refine[key].join('|') : searchParams.refine[key]}`))
         // TODO: This about pushing the above complexity into the useProductSearch utils.
-    }, {keepPreviousData: true})
-    const {data: category} = useCategory({
-        id: params.categoryId
+    }, {
+        keepPreviousData: true,
+        refetchOnWindowFocus: false
     })
+    // TODO: This should be disabled for searches.
+    const {error, data: category} = useCategory({
+        id: params.categoryId
+    }, {
+        enabled: !searchQuery,
+        refetchOnWindowFocus: false
+        // TODO: Why isn't this working?
+        // onError: (error) => {
+        //     const errorStatus = error.response?.status
+        //     switch (errorStatus) {
+        //         case 404: 
+        //             throw new HTTPNotFound('Category Not Found.')
+        //         default:
+        //             throw new HTTPError('Unknown Error Occured.')
+        //     }
+        // }
+    })
+
+    /**************** Error Handling ****************/
+    const errorStatus = error?.response?.status
+    switch (errorStatus) {
+        case undefined:
+            // No Error.
+            break;
+        case 404: 
+            throw new HTTPNotFound('Category Not Found.')
+        default:
+            throw new HTTPError('Unknown Error Occured.')
+    }
 
     /**************** Response Handling ****************/
     if (res) {
@@ -156,52 +192,68 @@ const ProductList = (props) => {
 
     /**************** Action Handlers ****************/
     const addItemToWishlist = async (product) => {
-        try {
-            setWishlistLoading([...wishlistLoading, product.productId])
-            await wishlist.createListItem({
-                id: product.productId,
-                quantity: 1
-            })
-            toast({
-                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                status: 'success',
-                action: (
-                    // it would be better if we could use <Button as={Link}>
-                    // but unfortunately the Link component is not compatible
-                    // with Chakra Toast, since the ToastManager is rendered via portal
-                    // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
-                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                    </Button>
-                )
-            })
-        } catch {
-            toast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
-            })
-        } finally {
-            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-        }
+        setWishlistLoading([...wishlistLoading, product.productId])
+           
+        // TODO: This wishlist object is from an old API, we need to replace it with the new one.
+        const listId = wishlist.data.id
+
+        createCustomerProductListItem({
+            parameters: {customerId, listId, itemId}
+        }, {
+            onError: () => {
+                toast({
+                    title: formatMessage(API_ERROR_MESSAGE),
+                    status: 'error'
+                })
+            },
+            onSuccess: () => {
+                toast({
+                    title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
+                    status: 'success',
+                    action: (
+                        // it would be better if we could use <Button as={Link}>
+                        // but unfortunately the Link component is not compatible
+                        // with Chakra Toast, since the ToastManager is rendered via portal
+                        // and the toast doesn't have access to intl provider, which is a
+                        // requirement of the Link component.
+                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                            {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                        </Button>
+                    )
+                })
+            },
+            onSettled: () => {
+                setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+            }
+        })
     }
 
     const removeItemFromWishlist = async (product) => {
-        try {
-            setWishlistLoading([...wishlistLoading, product.productId])
-            await wishlist.removeListItemByProductId(product.productId)
-            toast({
-                title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
-                status: 'success'
-            })
-        } catch {
-            toast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
-            })
-        } finally {
-            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-        }
+        setWishlistLoading([...wishlistLoading, product.productId])
+            
+        const listId = wishlist.data.id
+        const itemId = ''
+    
+        deleteCustomerProductListItem({
+            body: {},
+            parameters: {customerId, listId, itemId}
+        }, {
+            onError: () => {
+                toast({
+                    title: formatMessage(API_ERROR_MESSAGE),
+                    status: 'error'
+                })
+            },
+            onSuccess: () => {
+                toast({
+                    title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
+                    status: 'success'
+                })
+            },
+            onSettled: () => {
+                setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+            }
+        })
     }
 
     // Toggles filter on and off
@@ -249,7 +301,8 @@ const ProductList = (props) => {
 
     // Clears all filters
     const resetFilters = () => {
-        navigate(window.location.pathname)
+        // TODO: Fix this so we retain the sorting query params and any other non-refinment params.
+        navigate(`${searchQuery ? '/search?q=' + searchQuery : '/category/' + params.categoryId}`)
     }
     
     /**************** Einstein ****************/
@@ -303,6 +356,7 @@ const ProductList = (props) => {
                             <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
+                                handleReset={() => resetFilters()}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
                             />
                         </Box>
