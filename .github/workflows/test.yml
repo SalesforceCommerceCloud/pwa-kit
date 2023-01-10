@@ -103,7 +103,7 @@ jobs:
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit'
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
+        run: |-
           # Add NPM token to allow publishing
           echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > ~/.npmrc
 
