@@ -47,7 +47,7 @@ function ProductList() {
     const queryParams = new URLSearchParams(location.search.split('?')?.[1])
     const searchTerm = queryParams.get('q')
     const {data: productPath, isLoading: isProductPathLoading} = useProductCategoryPath(categoryId)
-    const {data: sortRules} = useSortRules()
+    const {data: sortRulesData} = useSortRules()
     const {data, isLoading: isProductSearchLoading, error} = useProductSearch(
         {
             categoryId,
@@ -62,35 +62,36 @@ function ProductList() {
         error: productListPriceError
     } = useProductsPrice(productIds)
     React.useEffect(() => {
-        if (!sortingId && sortRules?.sortRules.length > 0) {
-            setSortingId(sortRules?.sortRules[0].id)
+        if (!sortingId && sortRulesData?.sortRules.length > 0) {
+            setSortingId(sortRulesData?.sortRules[0].id)
         }
-    }, [sortRules])
+    }, [sortRulesData])
     if (error || productListPriceError) {
         return <div>Something is wrong</div>
     }
     if (data?.productsPage?.products.length === 0) {
         return <div>No product found</div>
     }
-
     return (
         <div>
             <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                {isProductPathLoading && <div>Loading breadcrumb</div>}
+                {!queryParams && isProductPathLoading && <div>Loading breadcrumb</div>}
                 {productPath && <Breadcrumb categories={productPath} />}
-                <select
-                    onChange={(e) => {
-                        setSortingId(e.target.value)
-                    }}
-                >
-                    {sortRules?.sortRules?.map((rule) => {
-                        return (
-                            <option key={rule.sortRuleId} value={rule.sortRuleId}>
-                                {rule.label}
-                            </option>
-                        )
-                    })}
-                </select>
+                {sortRulesData && (
+                    <select
+                        onChange={(e) => {
+                            setSortingId(e.target.value)
+                        }}
+                    >
+                        {sortRulesData?.sortRules?.map((rule) => {
+                            return (
+                                <option key={rule.sortRuleId} value={rule.sortRuleId}>
+                                    {rule.label}
+                                </option>
+                            )
+                        })}
+                    </select>
+                )}
             </div>
 
             <div>

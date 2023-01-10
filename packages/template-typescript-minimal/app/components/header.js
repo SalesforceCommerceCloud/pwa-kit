@@ -97,6 +97,11 @@ function Header() {
     }
     return (
         <div>
+            <h2>PWA Kit project on SCOM API</h2>
+            <div>
+                This demo demonstrates fitness of SCOM APIs against happy-path current PWA kit
+                experience{' '}
+            </div>
             <div>
                 {token ? <h2>Logged in as alex.vuong </h2> : <h2>Logging in as alex.vuong</h2>}
             </div>
