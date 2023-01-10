@@ -100,7 +100,7 @@ jobs:
         run: exit 1
       #TODO: remove --dry-run from install command
       - name: Publish to NPM
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit'
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 && matrix.os == 'ubuntu-latest'
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |-
@@ -193,7 +193,7 @@ jobs:
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
       - name: Send metrics to Datadog
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo') && matrix.os == 'ubuntu-latest'
         run : |
           # Add a dogrc so we can submit metrics to datadog
           printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
