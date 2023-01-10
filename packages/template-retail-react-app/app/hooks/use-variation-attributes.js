@@ -52,7 +52,7 @@ const buildVariantValueHref = (params, location, {productType, productId} = {}) 
     const searchParams = new URLSearchParams(location.search)
 
     if (productType === 'set') {
-        const childProductParams = new URLSearchParams(searchParams.get(productId))
+        const childProductParams = new URLSearchParams(searchParams.get(productId) || '')
 
         Object.entries(params).forEach(([key, value]) => {
             // 0 is a valid value as for a param
