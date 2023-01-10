@@ -94,10 +94,10 @@ jobs:
           if [[ $target_commerce_sdk_react ]]; then
             npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target_commerce_sdk_react
           fi
-      - name: test fail
-        id: demo
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: exit 1
+      # - name: test fail
+      #   id: demo
+      #   if: ${{ matrix.os == 'ubuntu-latest' }}
+      #   run: exit 1
       #TODO: remove --dry-run from install command
       - name: Publish to NPM
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit'
@@ -193,7 +193,7 @@ jobs:
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
       # - name: Send metrics to Datadog
-      #   if: github.repository == 'SalesforceCommerceCloud/pwa-kit'
+      #   if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
       #   run : |
       #     # Add a dogrc so we can submit metrics to datadog
       #     printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
@@ -203,7 +203,7 @@ jobs:
       #     DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
-        if: ${{ failure() && github.ref == 'refs/heads/github-actions' && matrix.template == 'test-project' && matrix.os == 'ubuntu-latest' }}
+        if: ${{ failure() && github.ref == 'refs/heads/github-actions' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo') && matrix.os == 'ubuntu-latest' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
