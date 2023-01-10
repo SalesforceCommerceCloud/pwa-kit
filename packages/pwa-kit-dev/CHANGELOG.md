@@ -1,4 +1,7 @@
-## v2.5.0-dev (Dec 01, 2022)
+## v2.6.0-dev (Jan 05, 2023)
+## v2.5.0 (Jan 05, 2023)
+- Logging cid from res header isntead of req in local development [#821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/821)
+
 ## v2.4.0 (Dec 01, 2022)
 -   Add `tail-logs` command [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
 -   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793)

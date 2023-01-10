@@ -7,7 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import {NotImplemented} from '../utils'
+import {NotImplementedError} from '../utils'
 
 type Client = ApiClients['shopperOrders']
 
@@ -57,7 +57,7 @@ function useOrder(
  * @returns An object describing the state of the request.
  */
 function usePaymentMethodsForOrder(): void {
-    NotImplemented()
+    NotImplementedError()
 }
 
 /**
@@ -72,7 +72,7 @@ for more information.
  * @returns An object describing the state of the request.
  */
 function useTaxesFromOrder(): void {
-    NotImplemented()
+    NotImplementedError()
 }
 
 export {useOrder, usePaymentMethodsForOrder, useTaxesFromOrder}
