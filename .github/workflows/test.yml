@@ -75,7 +75,7 @@ jobs:
           npm run save-credentials --prefix packages/template-retail-react-app -- --user "$MOBIFY_CLIENT_USER" --key "$MOBIFY_CLIENT_API_KEY"
         shell: bash
 
-      - name: Push Bundle
+      - name: Push Bundle to MRT
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 && matrix.os == 'ubuntu-latest'
         #TODO: Change target 'test-env' to 'staging' and 'test-env-3' to 'commerce-sdk-react'
         run: |-
