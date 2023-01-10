@@ -48,28 +48,28 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @returns {String} a product url for the current variation value.
  */
 const buildVariantValueHref = (params, location, {productType, productId} = {}) => {
-    // console.log('--- buildVariantValueHref', params, location)
     const searchParams = new URLSearchParams(location.search)
+    const childProductParams = new URLSearchParams(searchParams.get(productId) || '')
 
     if (productType === 'set') {
-        const childProductParams = new URLSearchParams(searchParams.get(productId) || '')
-
-        Object.entries(params).forEach(([key, value]) => {
-            // 0 is a valid value as for a param
-            if (!value && value !== 0) {
-                childProductParams.delete(key)
-            } else {
-                childProductParams.set(key, value)
-            }
-        })
-
+        updateSearchParams(childProductParams, params)
         searchParams.set(productId, childProductParams.toString())
-
-        return `${location.pathname}?${searchParams.toString()}`
+    } else {
+        updateSearchParams(searchParams, params)
     }
 
-    // TODO: maybe don't call rebuildPathWithParams here
-    return rebuildPathWithParams(`${location.pathname}${location.search}`, params)
+    return `${location.pathname}?${searchParams.toString()}`
+}
+
+const updateSearchParams = (searchParams, params) => {
+    Object.entries(params).forEach(([key, value]) => {
+        // 0 is a valid value as for a param
+        if (!value && value !== 0) {
+            searchParams.delete(key)
+        } else {
+            searchParams.set(key, value)
+        }
+    })
 }
 
 /**
