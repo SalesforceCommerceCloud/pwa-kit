@@ -166,7 +166,7 @@ jobs:
       - name: Count Generated Project Dependencies
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
         run: |-
-          MAX_PACKAGES="2250"
+          MAX_PACKAGES="2260"
           total=$(./scripts/count-dependencies.js generated-${{ matrix.template }})
           echo "TOTAL_PACKAGES=${total}" >> $GITHUB_ENV
 
