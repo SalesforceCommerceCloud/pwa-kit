@@ -17,7 +17,7 @@ export const useVariationParams = (product = {}, productType) => {
     let params = new URLSearchParams(search)
 
     if (productType === 'set') {
-        params = new URLSearchParams(params.get(product.id))
+        params = new URLSearchParams(params.get(product.id) || '')
     }
 
     // Using all the variation attribute id from the array generated below, get

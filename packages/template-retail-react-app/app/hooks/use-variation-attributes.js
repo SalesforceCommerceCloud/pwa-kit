@@ -61,8 +61,8 @@ const buildVariantValueHref = (params, location, {productType, productId} = {}) 
     return `${location.pathname}?${searchParams.toString()}`
 }
 
-const updateSearchParams = (searchParams, params) => {
-    Object.entries(params).forEach(([key, value]) => {
+const updateSearchParams = (searchParams, newParams) => {
+    Object.entries(newParams).forEach(([key, value]) => {
         // 0 is a valid value as for a param
         if (!value && value !== 0) {
             searchParams.delete(key)

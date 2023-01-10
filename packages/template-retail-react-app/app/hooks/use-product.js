@@ -23,7 +23,7 @@ export const useProduct = (product, productType) => {
     const initialQuantity = product?.quantity || product?.minOrderQuantity || 1
 
     const intl = useIntl()
-    const variant = useVariant(product)
+    const variant = useVariant(product, productType)
     const variationParams = useVariationParams(product, productType)
     const variationAttributes = useVariationAttributes(product, productType)
     // console.log('--- variationAttributes', variationAttributes)
