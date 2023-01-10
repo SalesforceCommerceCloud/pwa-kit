@@ -94,10 +94,10 @@ jobs:
           if [[ $target_commerce_sdk_react ]]; then
             npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target_commerce_sdk_react
           fi
-      # - name: test fail
-      #   id: demo
-      #   if: ${{ matrix.os == 'ubuntu-latest' }}
-      #   run: exit 1
+      - name: test fail
+        id: demo
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.npm == 6 }}
+        run: exit 1
       #TODO: remove --dry-run from install command
       - name: Publish to NPM
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit'
@@ -124,7 +124,7 @@ jobs:
         with:
           payload: |
             {
-              "test": "${{ matrix }}"
+              "test": "${{ matrix.npm }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -192,15 +192,15 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
-      # - name: Send metrics to Datadog
-      #   if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
-      #   run : |
-      #     # Add a dogrc so we can submit metrics to datadog
-      #     printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
+      - name: Send metrics to Datadog
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
+        run : |
+          # Add a dogrc so we can submit metrics to datadog
+          printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
 
-      #     dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
-      #   env:
-      #     DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
         if: ${{ failure() && github.ref == 'refs/heads/github-actions' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo') && matrix.os == 'ubuntu-latest' }}
@@ -208,7 +208,7 @@ jobs:
         with:
           payload: |
             {
-              "test": "${{ matrix }}"
+              "test": "${{ matrix.template }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
