@@ -257,11 +257,11 @@ const ProductDetail = ({category, product, isLoading}) => {
 
                 {/* Product Set */}
                 {product?.setProducts &&
-                    // TODO: page url params
                     product.setProducts.map((childProduct) => (
                         <ProductView
                             key={childProduct.id}
                             product={childProduct}
+                            productType="set"
                             addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
                             addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                             isProductLoading={isLoading}

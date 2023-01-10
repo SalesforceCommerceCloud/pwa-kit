@@ -15,7 +15,7 @@ const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'
 
 // TODO: This needs to be refactored.
-export const useProduct = (product) => {
+export const useProduct = (product, productType) => {
     const showLoading = !product
     const stockLevel = product?.inventory?.stockLevel || 0
     const stepQuantity = product?.stepQuantity || 1
@@ -24,8 +24,9 @@ export const useProduct = (product) => {
 
     const intl = useIntl()
     const variant = useVariant(product)
-    const variationParams = useVariationParams(product)
-    const variationAttributes = useVariationAttributes(product)
+    const variationParams = useVariationParams(product, productType)
+    const variationAttributes = useVariationAttributes(product, productType)
+    // console.log('--- variationAttributes', variationAttributes)
     const [quantity, setQuantity] = useState(initialQuantity)
 
     // A product is considered out of stock if the stock level is 0 or if we have all our

@@ -47,7 +47,28 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @param {Object} location
  * @returns {String} a product url for the current variation value.
  */
-const buildVariantValueHref = (product, params, location) => {
+const buildVariantValueHref = (params, location, {productType, productId} = {}) => {
+    // console.log('--- buildVariantValueHref', params, location)
+    const searchParams = new URLSearchParams(location.search)
+
+    if (productType === 'set') {
+        const childProductParams = new URLSearchParams(searchParams.get(productId))
+
+        Object.entries(params).forEach(([key, value]) => {
+            // 0 is a valid value as for a param
+            if (!value && value !== 0) {
+                childProductParams.delete(key)
+            } else {
+                childProductParams.set(key, value)
+            }
+        })
+
+        searchParams.set(productId, childProductParams.toString())
+
+        return `${location.pathname}?${searchParams.toString()}`
+    }
+
+    // TODO: maybe don't call rebuildPathWithParams here
     return rebuildPathWithParams(`${location.pathname}${location.search}`, params)
 }
 
@@ -80,10 +101,10 @@ const isVariantValueOrderable = (product, variationParams) => {
  * @returns {Array} a decorated variation attributes list.
  *
  */
-export const useVariationAttributes = (product = {}) => {
+export const useVariationAttributes = (product = {}, productType) => {
     const {variationAttributes = []} = product
     const location = useLocation()
-    const variationParams = useVariationParams(product)
+    const variationParams = useVariationParams(product, productType)
 
     return useMemo(
         () =>
@@ -104,7 +125,10 @@ export const useVariationAttributes = (product = {}) => {
                     return {
                         ...value,
                         image: getVariantValueSwatch(product, value),
-                        href: buildVariantValueHref(product, params, location),
+                        href: buildVariantValueHref(params, location, {
+                            productType,
+                            productId: product.id
+                        }),
                         orderable: isVariantValueOrderable(product, params)
                     }
                 })

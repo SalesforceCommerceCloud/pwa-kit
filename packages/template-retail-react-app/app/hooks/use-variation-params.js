@@ -11,19 +11,25 @@ import {useLocation} from 'react-router-dom'
  * This hook will return only the params that are also product attributes for the
  * passed in product object.
  */
-export const useVariationParams = (product = {}) => {
+export const useVariationParams = (product = {}, productType) => {
     const {variationAttributes = [], variationValues = {}} = product
-    const variationParams = variationAttributes.map(({id}) => id)
-
     const {search} = useLocation()
-    const params = new URLSearchParams(search)
-    // Using all the variation attribute id from the array generated above, get
+    let params = new URLSearchParams(search)
+
+    if (productType === 'set') {
+        params = new URLSearchParams(params.get(product.id))
+    }
+
+    // Using all the variation attribute id from the array generated below, get
     // the value if there is one from the location search params and add it to the
     // accumulator.
-    const filteredVariationParams = variationParams.reduce((acc, key) => {
-        let value = params.get(`${key}`) || variationValues?.[key]
-        return value ? {...acc, [key]: value} : acc
-    }, {})
+    const variationParams = variationAttributes
+        .map(({id}) => id)
+        .reduce((acc, key) => {
+            let value = params.get(`${key}`) || variationValues?.[key]
+            return value ? {...acc, [key]: value} : acc
+        }, {})
 
-    return filteredVariationParams
+    // console.log('--- variationParams', variationParams, productType)
+    return variationParams
 }
