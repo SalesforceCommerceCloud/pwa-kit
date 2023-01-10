@@ -100,6 +100,7 @@ jobs:
         run: exit 1
       #TODO: remove --dry-run from install command
       - name: Publish to NPM
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit'
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -118,12 +119,12 @@ jobs:
       #TODO: change github-actions to develop
       - name: Send GitHub Action data to Slack workflow (PWA Kit)
         id: slack
-        if: ${{ failure() && github.ref == 'refs/heads/github-actions' && matrix.os == 'windows-latest' }}
+        if: ${{ failure() && github.ref == 'refs/heads/github-actions' && matrix.npm == 6 && matrix.os == 'ubuntu-latest' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {
-              "test": ${{ matrix }}
+              "test": "${{ matrix }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -191,14 +192,23 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
+      # - name: Send metrics to Datadog
+      #   if: github.repository == 'SalesforceCommerceCloud/pwa-kit'
+      #   run : |
+      #     # Add a dogrc so we can submit metrics to datadog
+      #     printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
+
+      #     dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
+      #   env:
+      #     DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
-        if: ${{ failure() && github.ref == 'refs/heads/github-actions' && matrix.template == 'test-project' && matrix.os == 'windows-latest' }}
+        if: ${{ failure() && github.ref == 'refs/heads/github-actions' && matrix.template == 'test-project' && matrix.os == 'ubuntu-latest' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {
-              "test": ${{ matrix }}
+              "test": "${{ matrix }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
