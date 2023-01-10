@@ -10,7 +10,6 @@
 
 // These were all originally in this file, but that made the file large and debugging tedious.
 // This file is kept for backwards compatibility / simpler imports.
-export * from './ssr-server/cached-response'
 export * from './ssr-server/configure-proxy'
 export * from './ssr-server/detect-device-type'
 export * from './ssr-server/metrics-sender'

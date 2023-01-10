@@ -14,7 +14,6 @@ import sinon from 'sinon'
 
 import {
     AGENT_OPTIONS_TO_COPY,
-    CachedResponse,
     escapeJSText,
     getFullRequestURL,
     MetricsSender,
@@ -1118,46 +1117,5 @@ describe('wrapResponseWrite', () => {
         write.reset()
 
         expect(() => response.write({})).toThrow('unexpected type')
-    })
-})
-
-describe('CachedResponse', () => {
-    test('Empty create', () => {
-        const cached = new CachedResponse({})
-        expect(cached.found).toBe(false)
-        expect(cached.data).toBeUndefined()
-        expect(cached.status).toEqual(200)
-        expect(cached.headers).toEqual({})
-        expect(cached.expiration).toBeUndefined()
-    })
-
-    test('Create', () => {
-        const req = {a: 1}
-        const res = {b: 2}
-        const entry = {
-            found: true,
-            key: 'key',
-            namespace: 'namespace',
-            data: Buffer.from('123'),
-            expiration: Date.now(),
-            metadata: {
-                status: 201,
-                headers: {
-                    'x-special': '1'
-                }
-            }
-        }
-        const cached = new CachedResponse({
-            entry,
-            req,
-            res
-        })
-        expect(cached.found).toBe(true)
-        expect(cached.key).toEqual('key')
-        expect(cached.namespace).toEqual('namespace')
-        expect(cached.data).toEqual(entry.data)
-        expect(cached.headers).toEqual(entry.metadata.headers)
-        expect(cached.status).toEqual(201)
-        expect(cached.expiration).toEqual(new Date(entry.expiration))
     })
 })

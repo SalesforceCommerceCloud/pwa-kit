@@ -27,7 +27,6 @@ import {
 } from '../../utils/ssr-server'
 import dns from 'dns'
 import express from 'express'
-import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
 import URL from 'url'
 import {Headers, X_HEADERS_TO_REMOVE, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
@@ -341,20 +340,6 @@ export const RemoteServerFactory = {
                         dimensions: Object.assign({}, dimensions || {}, METRIC_DIMENSIONS)
                     }
                 ])
-            },
-
-            get applicationCache() {
-                if (!this._applicationCache) {
-                    const bucket = process.env.CACHE_BUCKET_NAME
-                    const useLocalCache = !(isRemote() || bucket)
-                    this._applicationCache = new PersistentCache({
-                        useLocalCache,
-                        bucket,
-                        prefix: process.env.CACHE_BUCKET_PREFIX,
-                        sendMetric: app.sendMetric.bind(app)
-                    })
-                }
-                return this._applicationCache
             }
         }
         merge(app, mixin)

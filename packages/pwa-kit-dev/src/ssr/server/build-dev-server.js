@@ -317,8 +317,6 @@ export const DevServerMixin = {
 
         server.on('error', makeErrorHandler(process, server, console.log))
 
-        server.on('close', () => app.applicationCache.close())
-
         server.listen({hostname, port}, () => {
             /* istanbul ignore next */
             if (process.env.NODE_ENV !== 'test') {
