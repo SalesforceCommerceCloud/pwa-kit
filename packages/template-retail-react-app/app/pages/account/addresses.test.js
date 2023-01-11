@@ -16,14 +16,6 @@ let mockCustomer = {}
 
 jest.setTimeout(30000)
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
     return {

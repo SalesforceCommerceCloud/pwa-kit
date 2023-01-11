@@ -15,14 +15,6 @@ import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 
 const mockToastSpy = jest.fn()
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 jest.mock('@chakra-ui/toast', () => {
     return {
         useToast: jest.fn(() => mockToastSpy)

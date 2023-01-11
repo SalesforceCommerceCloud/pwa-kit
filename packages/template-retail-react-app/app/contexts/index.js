@@ -95,9 +95,8 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
         return modifiedObj ? treeToReturn : false
     }
 
-    const fetchCategoryNode = async (id, depth = 1) => {
+    const fetchCategoryNode = async (id, levels = 1) => {
         const STALE_TIME = 10000 // 10 seconds
-        let res
         // return early if there's an in-flight request or one that is less
         // than the stale time
         if (queue[id] === 'loading' || Date.now() < queue[id] + STALE_TIME) {
@@ -107,10 +106,10 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
             ...queue,
             [id]: 'loading'
         })
-        res = await api.shopperProducts.getCategory({
+        const res = await api.shopperProducts.getCategory({
             parameters: {
                 id,
-                levels: depth
+                levels
             }
         })
         const newTree = findAndModifyFirst(
@@ -140,10 +139,10 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
                 // check localstorage first for this data to help remediate O(n) server
                 // load burden where n = top level categories
                 const storedCategoryData = JSON.parse(
-                    window?.localStorage?.getItem(`${LOCAL_STORAGE_PREFIX + cat?.id}`)
+                    window?.localStorage?.getItem(LOCAL_STORAGE_PREFIX + cat?.id)
                 )
                 if (storedCategoryData) {
-                    const newTree = findAndModifyFirst(
+                    findAndModifyFirst(
                         root,
                         itemsKey,
                         {id: cat?.id},
@@ -156,14 +155,14 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
                             }))
                         }
                     )
-                    return Promise.resolve(newTree)
+                } else {
+                    const res = fetchCategoryNode(cat?.id, 2)
+                    // store fetched data in local storage for faster access / reduced server load
+                    window?.localStorage?.setItem(
+                        LOCAL_STORAGE_PREFIX + cat?.id,
+                        JSON.stringify(res)
+                    )
                 }
-                // // store fetched data in local storage for faster access / reduced server load
-                // window?.localStorage?.setItem(
-                //     `${LOCAL_STORAGE_PREFIX + cat?.id}`,
-                //     JSON.stringify(res)
-                // )
-                return fetchCategoryNode(cat?.id, 2)
             })
         )
     }, [])

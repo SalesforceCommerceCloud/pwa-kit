@@ -9,14 +9,6 @@ import {screen, waitFor} from '@testing-library/react'
 import ListMenu from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 describe('ListMenu', () => {
     test('ListMenu renders without errors', async () => {
         renderWithProviders(<ListMenu />)
@@ -28,7 +20,7 @@ describe('ListMenu', () => {
         expect(drawer).toBeInTheDocument()
         expect(screen.getByRole('navigation', {name: 'main'})).toBeInTheDocument()
     })
-    test('ListMenu renders Spinner without root categories', async () => {
+    test('ListMenu renders Spinner without root categories', () => {
         renderWithProviders(<ListMenu />, {
             wrapperProps: {initialCategories: {}}
         })

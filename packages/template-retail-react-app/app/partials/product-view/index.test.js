@@ -14,14 +14,6 @@ import {renderWithProviders} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import userEvent from '@testing-library/user-event'
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 jest.mock('../../commerce-api/einstein')
 
 const MockComponent = ({product, addToCart, addToWishlist, updateWishlist}) => {

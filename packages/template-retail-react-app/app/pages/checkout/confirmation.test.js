@@ -146,14 +146,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
     }
 })
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 const WrappedConfirmation = () => {
     useShopper()
     const basket = useBasket()

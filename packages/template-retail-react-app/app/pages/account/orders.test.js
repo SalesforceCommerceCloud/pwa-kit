@@ -15,14 +15,6 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 const MockedComponent = () => {
     const customer = useCustomer()
 
