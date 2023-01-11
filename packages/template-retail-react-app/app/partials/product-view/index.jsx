@@ -401,6 +401,7 @@ const ProductView = ({
                     </Box>
                 </VStack>
             </Flex>
+            {/* TODO: what to do for product set? */}
             {/*Add to Cart Button for mobile versions*/}
             <Box
                 position="fixed"
