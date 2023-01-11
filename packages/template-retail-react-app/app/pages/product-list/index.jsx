@@ -175,7 +175,7 @@ const ProductList = (props) => {
         case 404:
             throw new HTTPNotFound('Category Not Found.')
         default:
-            throw new HTTPError('Unknown Error Occured.')
+            throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
     }
 
     /**************** Response Handling ****************/
