@@ -12,7 +12,7 @@ import {useLocation} from 'react-router-dom'
 import {useVariationParams} from './use-variation-params'
 
 // Utils
-import {rebuildPathWithParams} from '../utils/url'
+import {updateSearchParams} from '../utils/url'
 
 /**
  * Return the first image in the `swatch` type image group for a given
@@ -59,17 +59,6 @@ const buildVariantValueHref = (params, location, {isSetProduct, productId} = {})
     }
 
     return `${location.pathname}?${searchParams.toString()}`
-}
-
-const updateSearchParams = (searchParams, newParams) => {
-    Object.entries(newParams).forEach(([key, value]) => {
-        // 0 is a valid value as for a param
-        if (!value && value !== 0) {
-            searchParams.delete(key)
-        } else {
-            searchParams.set(key, value)
-        }
-    })
 }
 
 /**

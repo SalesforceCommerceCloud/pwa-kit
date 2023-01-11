@@ -11,16 +11,7 @@ import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-import {
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Box,
-    Button,
-    Stack
-} from '@chakra-ui/react'
+import {Box, Button, Stack} from '@chakra-ui/react'
 
 // Hooks
 import useBasket from '../../commerce-api/hooks/useBasket'
