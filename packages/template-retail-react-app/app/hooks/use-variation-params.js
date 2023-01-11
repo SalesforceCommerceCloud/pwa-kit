@@ -11,7 +11,7 @@ import {useLocation} from 'react-router-dom'
  * This hook will return only the params that are also product attributes for the
  * passed in product object.
  */
-export const useVariationParams = (product = {}, isSetProduct) => {
+export const useVariationParams = (product = {}, isSetProduct = false) => {
     const {variationAttributes = [], variationValues = {}} = product
     const {search} = useLocation()
     let params = new URLSearchParams(search)

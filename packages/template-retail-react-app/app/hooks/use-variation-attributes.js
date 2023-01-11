@@ -101,7 +101,7 @@ const isVariantValueOrderable = (product, variationParams) => {
  * @returns {Array} a decorated variation attributes list.
  *
  */
-export const useVariationAttributes = (product = {}, isSetProduct) => {
+export const useVariationAttributes = (product = {}, isSetProduct = false) => {
     const {variationAttributes = []} = product
     const location = useLocation()
     const variationParams = useVariationParams(product, isSetProduct)
@@ -126,8 +126,8 @@ export const useVariationAttributes = (product = {}, isSetProduct) => {
                         ...value,
                         image: getVariantValueSwatch(product, value),
                         href: buildVariantValueHref(params, location, {
-                            isSetProduct,
-                            productId: product.id
+                            productId: product.id,
+                            isSetProduct
                         }),
                         orderable: isVariantValueOrderable(product, params)
                     }

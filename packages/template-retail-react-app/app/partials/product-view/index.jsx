@@ -79,7 +79,7 @@ const ProductView = ({
     addToWishlist,
     updateWishlist,
     isProductLoading,
-    isSetProduct
+    isSetProduct = false
 }) => {
     const intl = useIntl()
     const history = useHistory()

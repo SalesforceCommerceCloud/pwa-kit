@@ -16,7 +16,7 @@ import {useVariationParams} from './use-variation-params'
  * @param {Object} product
  * @returns {Object} the currently selected `Variant` object.
  */
-export const useVariant = (product = {}, isSetProduct) => {
+export const useVariant = (product = {}, isSetProduct = false) => {
     const {variants = []} = product
     const variationParams = useVariationParams(product, isSetProduct)
 
