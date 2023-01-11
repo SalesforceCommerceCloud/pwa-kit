@@ -120,7 +120,7 @@ jobs:
         with:
           payload: |
             {
-              "test": "${{ matrix.npm }}"
+              "test": "testNode${{ matrix.node }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -229,7 +229,7 @@ jobs:
         with:
           payload: |
             {
-              "test": "${{ matrix.template }}"
+              "test": "generated ${{ matrix.template }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
