@@ -94,10 +94,6 @@ jobs:
           if [[ $target_commerce_sdk_react ]]; then
             npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target_commerce_sdk_react
           fi
-      - name: test fail
-        id: demo
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.npm == 6 }}
-        run: exit 1
       #TODO: remove --dry-run from install command
       - name: Publish to NPM
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 && matrix.os == 'ubuntu-latest'
@@ -119,7 +115,7 @@ jobs:
       #TODO: change github-actions to develop
       - name: Send GitHub Action data to Slack workflow (PWA Kit)
         id: slack
-        if: ${{ failure() && github.ref == 'refs/heads/github-actions' && matrix.npm == 6 && matrix.os == 'ubuntu-latest' }}
+        if: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/github-actions' && matrix.npm == 6 && matrix.os == 'ubuntu-latest' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -201,9 +197,34 @@ jobs:
           dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
         env:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      - name: Create MRT credentials file
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo') && matrix.os == 'ubuntu-latest'
+        env:
+          MOBIFY_CLIENT_USER: ${{ secrets.MOBIFY_CLIENT_USER }}
+          MOBIFY_CLIENT_API_KEY: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+        run: |-
+          # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
+          npm run save-credentials --prefix packages/template-retail-react-app -- --user "$MOBIFY_CLIENT_USER" --key "$MOBIFY_CLIENT_API_KEY"
+        shell: bash
+      - name: Push Bundle
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo') && matrix.os == 'ubuntu-latest'
+        run: |
+          if [[ $DEVELOP ]]; then
+            target='generated-pwa'
+          else
+            target=""
+          fi
+
+          project="scaffold-pwa"
+
+          if [[ $target ]]; then
+            cd generated-project
+            
+            npm run push -- -s $project --message "Generated PWA build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target
+          fi
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
-        if: ${{ failure() && github.ref == 'refs/heads/github-actions' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo') && matrix.os == 'ubuntu-latest' }}
+        if: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/github-actions' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo') && matrix.os == 'ubuntu-latest' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
