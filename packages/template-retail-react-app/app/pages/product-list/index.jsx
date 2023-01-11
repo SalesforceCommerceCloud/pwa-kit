@@ -673,7 +673,6 @@ const ProductList = (props) => {
 ProductList.getTemplateName = () => 'product-list'
 
 ProductList.propTypes = {
-    searchQuery: PropTypes.string,
     onAddToWishlistClick: PropTypes.func,
     onRemoveWishlistClick: PropTypes.func
 }
