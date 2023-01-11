@@ -76,7 +76,7 @@ export const parse = (searchParamsStr, parseRefine = true) => {
     // Ensure the refinments is an array (make it easier to manipulate).
     params.refine = Array.isArray(params.refine)
         ? params.refine
-        : [params.refine].filter((v) => Boolean(v))
+        : [params.refine].filter(Boolean)
 
     // Parse the nested refinement entries.
     if (parseRefine) {
