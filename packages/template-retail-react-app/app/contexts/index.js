@@ -53,46 +53,43 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
     // argument, it replaces the current object with replacementObj, stops recursive walk and returns the whole tree.
     // If none is found, it returns false.
     const findAndModifyFirst = (tree, childrenKey, objToFindBy, replacementObj) => {
-        let treeToReturn = tree
-        let findSuccess = false
-        let modifiedObj = false
         const findKeys = Object.keys(objToFindBy)
-        findKeys.forEach((key) => {
-            isEqual(tree[key], objToFindBy[key]) ? (findSuccess = true) : (findSuccess = false)
-        })
-        if (findSuccess) {
+
+        const rootIsMatch = findKeys.every((key) => isEqual(tree[key], objToFindBy[key]))
+        if (rootIsMatch) {
             for (let prop in tree) {
                 delete tree[prop]
             }
-            for (let prop in replacementObj) {
-                tree[prop] = replacementObj[prop]
-            }
+            Object.assign(tree, replacementObj)
             return tree
         }
-        const findInChildren = (obj, childrenKey, objToFindBy, replacementObj) => {
-            if (Object.prototype.hasOwnProperty.call(obj, childrenKey)) {
-                for (let i = 0; i < obj[childrenKey].length; i++) {
-                    findKeys.forEach((key) => {
-                        isEqual(obj[childrenKey][i][key], objToFindBy[key])
-                            ? (findSuccess = true)
-                            : (findSuccess = false)
-                    })
-                    if (findSuccess) {
-                        obj[childrenKey][i] = replacementObj
-                        modifiedObj = true
-                        break
-                    }
+
+        const findInChildren = (obj) => {
+            if (!Object.prototype.hasOwnProperty.call(obj, childrenKey)) return false
+            const children = obj[childrenKey]
+
+            const someChildIsMatch = children.some((child, idx, arr) => {
+                const childIsMatch = findKeys.every((key) => {
+                    return isEqual(child[key], objToFindBy[key])
+                })
+                if (childIsMatch) {
+                    arr[idx] = replacementObj
                 }
-                if (!findSuccess) {
-                    obj[childrenKey].forEach((child) =>
-                        findInChildren(child, childrenKey, objToFindBy, replacementObj)
-                    )
-                }
-            }
-            return obj
+                return childIsMatch
+            })
+            if (someChildIsMatch) return true
+
+            // We can't use `.some` for the search because it short-circuits
+            // and we still want to check every child.
+            const childrenModified = children.map((child) => {
+                return findInChildren(child)
+            })
+            // If any child was modified, then so was this `obj`
+            return childrenModified.some(Boolean)
         }
-        findInChildren(tree, childrenKey, objToFindBy, replacementObj)
-        return modifiedObj ? treeToReturn : false
+
+        const treeModified = findInChildren(tree)
+        return treeModified && tree
     }
 
     const fetchCategoryNode = async (id, levels = 1) => {
