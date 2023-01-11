@@ -12,9 +12,15 @@ import {createPathWithDefaults, renderWithProviders, setupMockServer} from '../.
 import ResetPassword from '.'
 import mockConfig from '../../../config/mocks/default'
 
-jest.setTimeout(60000)
-
 jest.mock('../../commerce-api/einstein')
+
+jest.mock('../../commerce-api/utils', () => {
+    const originalModule = jest.requireActual('../../commerce-api/utils')
+    return {
+        ...originalModule,
+        isTokenValid: jest.fn().mockReturnValue(true)
+    }
+})
 
 const mockRegisteredCustomer = {
     authType: 'registered',
@@ -24,20 +30,6 @@ const mockRegisteredCustomer = {
     firstName: 'Tester',
     lastName: 'Testing',
     login: 'darek@test.com'
-}
-
-const mockCategoriesResponse = {
-    id: 'mens',
-    name: 'Mens',
-    pageDescription:
-        "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
-    pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
-    pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
-    parentCategoryId: 'root',
-    c_showInMenu: true,
-    loaded: true,
-    image:
-        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
 }
 
 jest.mock('commerce-sdk-isomorphic', () => {
@@ -72,11 +64,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     })
                 }
             }
-        },
-        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
-            async getCategory() {
-                return mockCategoriesResponse
-            }
         }
     }
 })
@@ -89,24 +76,16 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer()
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({
-        onUnhandledRequest: 'error'
-    })
-
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
     jest.clearAllMocks()
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
-afterAll(() => server.close())
 
 test('Allows customer to go to sign in page', async () => {
     // render our test component
@@ -121,8 +100,7 @@ test('Allows customer to go to sign in page', async () => {
 })
 
 test('Allows customer to generate password token', async () => {
-    // mock reset password request
-    server.use(
+    global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
                 ctx.delay(0),
@@ -135,7 +113,6 @@ test('Allows customer to generate password token', async () => {
             )
         )
     )
-
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
@@ -156,10 +133,11 @@ test('Allows customer to generate password token', async () => {
 })
 
 test('Renders error message from server', async () => {
-    server.use(
+    global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
                 ctx.delay(0),
+                ctx.status(500),
                 ctx.json({
                     detail: 'Something went wrong',
                     title: 'Error',
@@ -168,7 +146,6 @@ test('Renders error message from server', async () => {
             )
         )
     )
-
     renderWithProviders(<MockedComponent />)
 
     user.type(screen.getByLabelText('Email'), 'foo@test.com')

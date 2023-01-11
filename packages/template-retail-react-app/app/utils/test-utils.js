@@ -209,6 +209,20 @@ export const createPathWithDefaults = (path) => {
     return updatedPath
 }
 
+const mockCategoriesResponse = {
+    id: 'mens',
+    name: 'Mens',
+    pageDescription:
+        "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
+    pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
+    pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
+    parentCategoryId: 'root',
+    c_showInMenu: true,
+    loaded: true,
+    image:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
+}
+
 /**
  * Set up an API mocking server for testing purposes.
  * This mock server includes the basic oauth flow endpoints.
@@ -218,12 +232,12 @@ export const setupMockServer = (...handlers) => {
         // customer handlers have higher priority
         ...handlers,
         rest.post('*/oauth2/authorize', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+            res(ctx.delay(0), ctx.status(200))
         ),
         rest.get('*/oauth2/authorize', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+            res(ctx.delay(0), ctx.status(200))
         ),
-        rest.get('*/testcallback', (req, res, ctx) => {
+        rest.get('*/callback*', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200))
         }),
         rest.post('*/oauth2/login', (req, res, ctx) =>
@@ -248,6 +262,9 @@ export const setupMockServer = (...handlers) => {
                     id_token: 'testIdToken'
                 })
             )
-        )
+        ),
+        rest.get(/\/categories/, (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockCategoriesResponse))
+        ),
     )
 }
