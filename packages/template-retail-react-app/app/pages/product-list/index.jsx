@@ -193,14 +193,9 @@ const ProductList = (props) => {
     const basePath = `${location.pathname}${location.search}`
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
     const {total, sortingOptions} = productSearchResult || {}
-    let selectedSortingOptionLabel = productSearchResult?.sortingOptions?.find(
+    const selectedSortingOptionLabel = sortingOptions?.find(
         (option) => option.id === productSearchResult?.selectedSortingOption
-    )
-
-    // API does not always return a selected sorting order
-    if (!selectedSortingOptionLabel) {
-        selectedSortingOptionLabel = productSearchResult?.sortingOptions?.[0]
-    }
+    ) ?? sortingOptions?.[0]
 
     // Get urls to be used for pagination, page size changes, and sorting.
     const pageUrls = usePageUrls({total})
