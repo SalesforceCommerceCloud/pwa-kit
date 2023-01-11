@@ -7,7 +7,7 @@
 import React, {useEffect} from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountAddresses from './addresses'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
@@ -67,16 +67,9 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer(
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.json(mockCustomer))
-    )
-)
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
     mockCustomer = {
         authType: 'registered',
         customerId: 'registeredCustomerId',
@@ -89,11 +82,14 @@ beforeEach(() => {
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('Allows customer to add/edit/remove addresses', async () => {
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockCustomer))
+        })
+    )
     renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
 

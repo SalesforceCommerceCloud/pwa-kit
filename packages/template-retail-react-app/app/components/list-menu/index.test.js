@@ -7,7 +7,7 @@
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import ListMenu from './index'
-import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -16,8 +16,6 @@ jest.mock('../../commerce-api/utils', () => {
         isTokenValid: jest.fn().mockReturnValue(true)
     }
 })
-
-const server = setupMockServer()
 
 describe('ListMenu', () => {
     test('ListMenu renders without errors', async () => {
@@ -44,11 +42,8 @@ describe('ListMenu', () => {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
     jest.clearAllMocks()
 })
-afterAll(() => server.close())

@@ -23,12 +23,8 @@ const {
  */
 export const setupMockServer = () => {
     return setupServer(
-        rest.post('*/oauth2/authorize', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200))
-        ),
-        rest.get('*/oauth2/authorize', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200))
-        ),
+        rest.post('*/oauth2/authorize', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
+        rest.get('*/oauth2/authorize', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
         rest.post('*/oauth2/login', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         ),
@@ -55,9 +51,7 @@ export const setupMockServer = () => {
         rest.get('*/categories/:categoryId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
         ),
-        rest.post('*/baskets/actions/merge', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200))
-        )
+        rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200)))
     )
 }
 
@@ -72,7 +66,6 @@ afterEach(() => {
 afterAll(() => {
     global.server.close()
 })
-
 
 // Mock the application configuration to be used in all tests.
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {

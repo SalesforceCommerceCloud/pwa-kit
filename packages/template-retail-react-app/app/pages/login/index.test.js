@@ -8,7 +8,7 @@ import React from 'react'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
@@ -117,28 +117,21 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer()
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({
-        onUnhandledRequest: 'error'
-    })
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('Allows customer to sign in to their account', async () => {
-    server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.json({authType: 'registered', email: 'darek@test.com'}))
-        ),
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json({authType: 'registered', email: 'darek@test.com'}))
+        }),
         rest.post('*/baskets/actions/merge', (req, res, ctx) => {
-            res(ctx.delay(0), ctx.json(mockMergedBasket))
+            return res(ctx.delay(0), ctx.json(mockMergedBasket))
         })
     )
     // render our test component
@@ -158,7 +151,7 @@ test('Allows customer to sign in to their account', async () => {
 
 test('Renders error when given incorrect log in credentials', async () => {
     // mock failed auth request
-    server.use(
+    global.server.use(
         rest.post('*/oauth2/login', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(401), ctx.json({message: 'Invalid Credentials.'}))
         )

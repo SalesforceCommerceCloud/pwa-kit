@@ -8,12 +8,10 @@ import React, {useEffect} from 'react'
 import {screen, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import PaymentMethods from './payments'
-import {
-    mockedRegisteredCustomer,
-} from '../../commerce-api/mock-data'
+import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 
 const mockToastSpy = jest.fn()
 
@@ -54,12 +52,7 @@ afterEach(() => {
 
 test('Allows customer to add and remove payment methods', async () => {
     global.server.use(
-        rest.post('*/payment-instruments', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.status(200)
-            )
-        ),
+        rest.post('*/payment-instruments', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         )
@@ -98,7 +91,7 @@ test('Allows customer to add and remove payment methods', async () => {
     user.type(screen.getByLabelText(/name on card/i), 'Test Customer')
     user.type(screen.getByLabelText(/expiration date/i), '1230')
     user.type(screen.getByLabelText(/security code/i), '555')
-    
+
     user.click(screen.getByText('Save'))
     expect(await screen.findByText('Visa')).toBeInTheDocument()
     expect(await screen.findByText('Test Customer')).toBeInTheDocument()
@@ -115,5 +108,3 @@ test('Allows customer to add and remove payment methods', async () => {
         expect(screen.queryByText('Test Customer')).not.toBeInTheDocument()
     )
 })
-
-

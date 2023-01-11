@@ -9,8 +9,6 @@ import {render} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {ChakraProvider} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import {setupServer} from 'msw/node'
-import {rest} from 'msw'
 
 import theme from '../theme'
 import CommerceAPI from '../commerce-api'
@@ -22,11 +20,7 @@ import {
 } from '../commerce-api/contexts'
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
-import {
-    mockCategories as initialMockCategories,
-    mockedRegisteredCustomer,
-    exampleTokenReponse
-} from '../commerce-api/mock-data'
+import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
 
@@ -207,64 +201,4 @@ export const createPathWithDefaults = (path) => {
 
     const updatedPath = buildUrl(path, siteAlias || defaultSite.id, defaultLocale)
     return updatedPath
-}
-
-const mockCategoriesResponse = {
-    id: 'mens',
-    name: 'Mens',
-    pageDescription:
-        "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
-    pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
-    pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
-    parentCategoryId: 'root',
-    c_showInMenu: true,
-    loaded: true,
-    image:
-        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
-}
-
-/**
- * Set up an API mocking server for testing purposes.
- * This mock server includes the basic oauth flow endpoints.
- */
-export const setupMockServer = (...handlers) => {
-    return setupServer(
-        // customer handlers have higher priority
-        ...handlers,
-        rest.post('*/oauth2/authorize', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200))
-        ),
-        rest.get('*/oauth2/authorize', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200))
-        ),
-        rest.get('*/callback*', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        ),
-        rest.get('*/oauth2/logout', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
-        ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        ),
-        rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId',
-                    id_token: 'testIdToken'
-                })
-            )
-        ),
-        rest.get(/\/categories/, (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockCategoriesResponse))
-        ),
-    )
 }

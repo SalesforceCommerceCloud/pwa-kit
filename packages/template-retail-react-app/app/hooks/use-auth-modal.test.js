@@ -8,7 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
@@ -138,22 +138,17 @@ MockedComponent.propTypes = {
     initialView: PropTypes.string
 }
 
-const server = setupMockServer()
-
 // Set up and clean up
 beforeEach(() => {
     authModal = undefined
     jest.useFakeTimers()
-    server.listen({onUnhandledRequest: 'error'})
 })
 afterEach(() => {
     localStorage.clear()
     jest.resetModules()
     jest.runOnlyPendingTimers()
     jest.useRealTimers()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('Renders login modal by default', async () => {
     renderWithProviders(<MockedComponent />)

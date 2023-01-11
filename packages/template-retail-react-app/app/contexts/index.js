@@ -45,8 +45,8 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
         ...treeRoot[DEFAULT_ROOT_CATEGORY],
         [itemsKey]: treeRoot[DEFAULT_ROOT_CATEGORY]?.[itemsKey]?.map((item) => ({
             ...item,
-            loaded: item?.loaded ?? false,
-        })),
+            loaded: item?.loaded ?? false
+        }))
     })
 
     // iterates through each deep nested object and if finds object that has prop and value specified in objToFindBy
@@ -100,23 +100,19 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
         let res
         // return early if there's an in-flight request or one that is less
         // than the stale time
-        console.log('~103')
         if (queue[id] === 'loading' || Date.now() < queue[id] + STALE_TIME) {
             return
         }
-        console.log('~107')
         setQueue({
             ...queue,
-            [id]: 'loading',
+            [id]: 'loading'
         })
-        console.log('~112')
         res = await api.shopperProducts.getCategory({
             parameters: {
                 id,
-                levels: depth,
-            },
+                levels: depth
+            }
         })
-        console.log('~119 res', res)
         const newTree = findAndModifyFirst(
             root,
             itemsKey,
@@ -124,15 +120,14 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
             {
                 ...res,
                 loaded: true,
-                [itemsKey]: res?.[itemsKey]?.map((item) => ({...item, loaded: true})),
+                [itemsKey]: res?.[itemsKey]?.map((item) => ({...item, loaded: true}))
             }
         )
-        console.log('~130 newTree', newTree)
         setRoot(newTree)
         setQueue({
             ...queue,
             // store a timestamp for evaluating when to refetch
-            [id]: Date.now(),
+            [id]: Date.now()
         })
         return res
     }
@@ -140,9 +135,8 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
     useEffect(() => {
         // Server side, we only fetch level 0 categories, for performance, here
         // we request the remaining two levels of category depth
-        const all = Promise.all(
+        Promise.all(
             root?.[itemsKey]?.map(async (cat) => {
-                console.log('~cat', cat)
                 // check localstorage first for this data to help remediate O(n) server
                 // load burden where n = top level categories
                 const storedCategoryData = JSON.parse(
@@ -158,11 +152,10 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
                             loaded: true,
                             [itemsKey]: storedCategoryData?.[itemsKey]?.map((item) => ({
                                 ...item,
-                                loaded: true,
-                            })),
+                                loaded: true
+                            }))
                         }
                     )
-                    console.log('~160', newTree)
                     return Promise.resolve(newTree)
                 }
                 // // store fetched data in local storage for faster access / reduced server load
@@ -170,7 +163,6 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
                 //     `${LOCAL_STORAGE_PREFIX + cat?.id}`,
                 //     JSON.stringify(res)
                 // )
-                console.log('~169')
                 return fetchCategoryNode(cat?.id, 2)
             })
         )
@@ -182,7 +174,7 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
                 root,
                 findAndModifyFirst,
                 itemsKey,
-                fetchCategoryNode,
+                fetchCategoryNode
             }}
         >
             {children}
@@ -192,7 +184,7 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
 
 CategoriesProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    treeRoot: PropTypes.object,
+    treeRoot: PropTypes.object
 }
 
 /**
@@ -221,7 +213,7 @@ export const MultiSiteProvider = ({
     site: initialSite = {},
     locale: initialLocale = {},
     buildUrl,
-    children,
+    children
 }) => {
     const [site, setSite] = useState(initialSite)
     const [locale, setLocale] = useState(initialLocale)
@@ -237,7 +229,7 @@ MultiSiteProvider.propTypes = {
     children: PropTypes.node.isRequired,
     buildUrl: PropTypes.func,
     site: PropTypes.object,
-    locale: PropTypes.object,
+    locale: PropTypes.object
 }
 
 /**
@@ -275,5 +267,5 @@ export const CurrencyProvider = ({currency: initialCurrency, children}) => {
 
 CurrencyProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    currency: PropTypes.string,
+    currency: PropTypes.string
 }
