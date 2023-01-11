@@ -20,7 +20,7 @@ export default {
             paddingTop: 6,
             paddingRight: [4, 4, 6, 6],
             paddingBottom: 11,
-            paddingLest: [4, 4, 6, 6]
+            paddingLeft: [4, 4, 6, 6]
         }
     }
 }
