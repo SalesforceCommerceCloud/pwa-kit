@@ -206,7 +206,7 @@ jobs:
           # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
           npm run save-credentials --prefix packages/template-retail-react-app -- --user "$MOBIFY_CLIENT_USER" --key "$MOBIFY_CLIENT_API_KEY"
         shell: bash
-      - name: Push Bundle
+      - name: Push Bundle to MRT
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo') && matrix.os == 'ubuntu-latest'
         run: |
           if [[ $DEVELOP ]]; then
@@ -218,7 +218,7 @@ jobs:
           project="scaffold-pwa"
 
           if [[ $target ]]; then
-            cd generated-project
+            cd generated--${{ matrix.template }}
             
             npm run push -- -s $project --message "Generated PWA build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target
           fi
