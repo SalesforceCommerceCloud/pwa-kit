@@ -10,7 +10,7 @@ import {Link as ChakraLink} from '@chakra-ui/react'
 import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
 import useMultiSite from '../../hooks/use-multi-site'
 
-const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref, children) => {
+const Link = React.forwardRef(({href, to, useNavLink = false, children, ...props}, ref) => {
     const _href = to || href
     const {buildUrl} = useMultiSite()
     const updatedHref = buildUrl(_href)
@@ -22,13 +22,18 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref, ch
             to={updatedHref}
             ref={ref}
         >
-            ${children}
+            {children}
         </ChakraLink>
     )
 })
 
 Link.displayName = 'Link'
 
-Link.propTypes = {href: PropTypes.string, to: PropTypes.string, useNavLink: PropTypes.bool}
+Link.propTypes = {
+    href: PropTypes.string,
+    to: PropTypes.string,
+    useNavLink: PropTypes.bool,
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node])
+}
 
 export default React.memo(Link)
