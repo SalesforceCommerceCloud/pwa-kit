@@ -13,6 +13,7 @@ import {useVariationParams} from './use-variation-params'
 
 // Utils
 import {updateSearchParams} from '../utils/url'
+import {useURLSearchParams} from './use-url-search-params'
 
 /**
  * Return the first image in the `swatch` type image group for a given
@@ -47,18 +48,17 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @param {Object} location
  * @returns {String} a product url for the current variation value.
  */
-const buildVariantValueHref = (params, location, {isSetProduct, productId} = {}) => {
-    const searchParams = new URLSearchParams(location.search)
-    const childProductParams = new URLSearchParams(searchParams.get(productId) || '')
+const buildVariantValueHref = ({pathname, existingParams, newParams, productId, isSetProduct}) => {
+    const [allParams, productParam] = existingParams
 
     if (isSetProduct) {
-        updateSearchParams(childProductParams, params)
-        searchParams.set(productId, childProductParams.toString())
+        updateSearchParams(productParam, newParams)
+        allParams.set(productId, productParam.toString())
     } else {
-        updateSearchParams(searchParams, params)
+        updateSearchParams(allParams, newParams)
     }
 
-    return `${location.pathname}?${searchParams.toString()}`
+    return `${pathname}?${allParams.toString()}`
 }
 
 /**
@@ -95,6 +95,8 @@ export const useVariationAttributes = (product = {}, isSetProduct = false) => {
     const location = useLocation()
     const variationParams = useVariationParams(product, isSetProduct)
 
+    const existingParams = useURLSearchParams(product.id)
+
     return useMemo(
         () =>
             variationAttributes.map((variationAttribute) => ({
@@ -114,7 +116,10 @@ export const useVariationAttributes = (product = {}, isSetProduct = false) => {
                     return {
                         ...value,
                         image: getVariantValueSwatch(product, value),
-                        href: buildVariantValueHref(params, location, {
+                        href: buildVariantValueHref({
+                            pathname: location.pathname,
+                            existingParams,
+                            newParams: params,
                             productId: product.id,
                             isSetProduct
                         }),
