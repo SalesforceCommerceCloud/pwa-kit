@@ -421,6 +421,7 @@ const ProductView = ({
 
 ProductView.propTypes = {
     product: PropTypes.object,
+    productType: PropTypes.string,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,
