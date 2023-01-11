@@ -30,7 +30,7 @@ const SwatchGroup = (props) => {
                     return React.cloneElement(child, {
                         selected: childValue === value,
                         key: childValue,
-                        value,
+                        value: childValue,
                         variant,
                         onChange
                     })

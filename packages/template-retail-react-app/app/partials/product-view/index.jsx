@@ -109,6 +109,7 @@ const ProductView = ({
         variant?.orderable &&
         parseInt(quantity) > 0 &&
         parseInt(quantity) <= stockLevel
+    const [selectedVariant, setSelectedVariant] = useState()
 
     const renderActionButtons = () => {
         const buttons = []
@@ -275,12 +276,11 @@ const ProductView = ({
                                     return (
                                         <SwatchGroup
                                             key={id}
-                                            onChange={(_, href) => {
-                                                if (!href) return
-                                                history.replace(href)
+                                            onChange={(value) => {
+                                                setSelectedVariant(value)
                                             }}
                                             variant={id === 'color' ? 'circle' : 'square'}
-                                            value={selectedValue?.value}
+                                            value={selectedVariant}
                                             displayName={selectedValue?.name || ''}
                                             label={name}
                                         >
