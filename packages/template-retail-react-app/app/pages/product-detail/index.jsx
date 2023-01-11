@@ -60,7 +60,8 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     console.log('--- variant', variant)
 
-    const productType = product && Object.keys(product.type)[0]
+    // TODO: see https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProduct
+    // const productType = product && Object.keys(product.type)[0]
 
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
@@ -160,7 +161,7 @@ const ProductDetail = ({category, product, isLoading}) => {
             </Helmet>
 
             <Stack spacing={16}>
-                {productType !== 'set' && (
+                {!product?.type.set && (
                     <Fragment>
                         <ProductView
                             product={product}
@@ -175,12 +176,12 @@ const ProductDetail = ({category, product, isLoading}) => {
                 )}
 
                 {/* Product Set */}
-                {productType === 'set' &&
+                {product?.type.set &&
                     product.setProducts.map((childProduct) => (
                         <Fragment key={childProduct.id}>
                             <ProductView
                                 product={childProduct}
-                                productType="set"
+                                isSetProduct={true}
                                 addToCart={(variant, quantity) =>
                                     handleAddToCart(variant, quantity)
                                 }

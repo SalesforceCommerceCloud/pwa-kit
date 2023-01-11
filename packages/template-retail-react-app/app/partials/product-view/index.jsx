@@ -79,7 +79,7 @@ const ProductView = ({
     addToWishlist,
     updateWishlist,
     isProductLoading,
-    productType
+    isSetProduct
 }) => {
     const intl = useIntl()
     const history = useHistory()
@@ -103,7 +103,7 @@ const ProductView = ({
         variationAttributes,
         stockLevel,
         stepQuantity
-    } = useProduct(product, productType)
+    } = useProduct(product, isSetProduct)
     const canAddToWishlist = !isProductLoading
     const canOrder =
         !isProductLoading &&
@@ -422,7 +422,7 @@ const ProductView = ({
 
 ProductView.propTypes = {
     product: PropTypes.object,
-    productType: PropTypes.string,
+    isSetProduct: PropTypes.bool,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,

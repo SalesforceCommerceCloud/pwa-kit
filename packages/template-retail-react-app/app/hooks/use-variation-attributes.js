@@ -47,11 +47,11 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @param {Object} location
  * @returns {String} a product url for the current variation value.
  */
-const buildVariantValueHref = (params, location, {productType, productId} = {}) => {
+const buildVariantValueHref = (params, location, {isSetProduct, productId} = {}) => {
     const searchParams = new URLSearchParams(location.search)
     const childProductParams = new URLSearchParams(searchParams.get(productId) || '')
 
-    if (productType === 'set') {
+    if (isSetProduct) {
         updateSearchParams(childProductParams, params)
         searchParams.set(productId, childProductParams.toString())
     } else {
@@ -101,10 +101,10 @@ const isVariantValueOrderable = (product, variationParams) => {
  * @returns {Array} a decorated variation attributes list.
  *
  */
-export const useVariationAttributes = (product = {}, productType) => {
+export const useVariationAttributes = (product = {}, isSetProduct) => {
     const {variationAttributes = []} = product
     const location = useLocation()
-    const variationParams = useVariationParams(product, productType)
+    const variationParams = useVariationParams(product, isSetProduct)
 
     return useMemo(
         () =>
@@ -126,7 +126,7 @@ export const useVariationAttributes = (product = {}, productType) => {
                         ...value,
                         image: getVariantValueSwatch(product, value),
                         href: buildVariantValueHref(params, location, {
-                            productType,
+                            isSetProduct,
                             productId: product.id
                         }),
                         orderable: isVariantValueOrderable(product, params)

@@ -11,12 +11,13 @@ import {useLocation} from 'react-router-dom'
  * This hook will return only the params that are also product attributes for the
  * passed in product object.
  */
-export const useVariationParams = (product = {}, productType) => {
+export const useVariationParams = (product = {}, isSetProduct) => {
     const {variationAttributes = [], variationValues = {}} = product
     const {search} = useLocation()
     let params = new URLSearchParams(search)
+    // TODO: usePDPSearchParams(productId?) -> entire params AND the one specific to productId - {searchParams, productParams}
 
-    if (productType === 'set') {
+    if (isSetProduct) {
         params = new URLSearchParams(params.get(product.id) || '')
     }
 
@@ -30,6 +31,6 @@ export const useVariationParams = (product = {}, productType) => {
             return value ? {...acc, [key]: value} : acc
         }, {})
 
-    // console.log('--- variationParams', variationParams, productType)
+    // console.log('--- variationParams', variationParams, isSetProduct)
     return variationParams
 }
