@@ -49,11 +49,6 @@ const ProductDetail = ({category, product, isLoading}) => {
     const navigate = useNavigation()
     const [primaryCategory, setPrimaryCategory] = useState(category)
 
-    console.log('--- variant', variant)
-
-    // TODO: see https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProduct
-    // const productType = product && Object.keys(product.type)[0]
-
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
     // attributes are selected (to get the correct inventory values), the category information
@@ -152,22 +147,8 @@ const ProductDetail = ({category, product, isLoading}) => {
             </Helmet>
 
             <Stack spacing={16}>
-                {!product?.type.set && (
-                    <Fragment>
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                            isProductLoading={isLoading}
-                            isCustomerProductListLoading={!wishlist.isInitialized}
-                        />
-                        <InformationAccordion product={product} />
-                    </Fragment>
-                )}
-
-                {/* Product Set */}
-                {product?.type.set &&
+                {product?.type.set ? (
+                    // Product Set: render the child products
                     product.setProducts.map((childProduct) => (
                         <Fragment key={childProduct.id}>
                             <ProductView
@@ -182,7 +163,20 @@ const ProductDetail = ({category, product, isLoading}) => {
                             />
                             <InformationAccordion product={childProduct} />
                         </Fragment>
-                    ))}
+                    ))
+                ) : (
+                    <Fragment>
+                        <ProductView
+                            product={product}
+                            category={primaryCategory?.parentCategoryTree || []}
+                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                            isProductLoading={isLoading}
+                            isCustomerProductListLoading={!wishlist.isInitialized}
+                        />
+                        <InformationAccordion product={product} />
+                    </Fragment>
+                )}
 
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
