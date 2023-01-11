@@ -218,7 +218,7 @@ jobs:
           project="scaffold-pwa"
 
           if [[ $target ]]; then
-            cd generated--${{ matrix.template }}
+            cd generated-${{ matrix.template }}
             
             npm run push -- -s $project --message "Generated PWA build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target
           fi
