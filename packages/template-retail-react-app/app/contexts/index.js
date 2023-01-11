@@ -33,13 +33,12 @@ import {useCommerceAPI} from '../commerce-api/contexts'
  *
  */
 export const CategoriesContext = React.createContext()
-export const CategoriesProvider = ({treeRoot = {}, children}) => {
+export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
     const itemsKey = 'categories'
     const DEFAULT_ROOT_CATEGORY = 'root'
     const LOCAL_STORAGE_PREFIX = `pwa-kit-cat-`
 
     const api = useCommerceAPI()
-    const [queue, setQueue] = useState({})
     const [root, setRoot] = useState({
         // map over the server-provided cat
         ...treeRoot[DEFAULT_ROOT_CATEGORY],
@@ -94,21 +93,23 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
 
     const fetchCategoryNode = async (id, levels = 1) => {
         const STALE_TIME = 10000 // 10 seconds
-        // return early if there's an in-flight request or one that is less
+        // return early if there's one that is less than stale time
         // than the stale time
-        if (queue[id] === 'loading' || Date.now() < queue[id] + STALE_TIME) {
-            return
+        const storageItem = window?.localStorage?.getItem(LOCAL_STORAGE_PREFIX + id + locale)
+        if (Date.now() < storageItem?.fetchTime + STALE_TIME) {
+            return storageItem
         }
-        setQueue({
-            ...queue,
-            [id]: 'loading'
-        })
-        const res = await api.shopperProducts.getCategory({
-            parameters: {
-                id,
-                levels
-            }
-        })
+        let res
+        try {
+            res = await api.shopperProducts.getCategory({
+                parameters: {
+                    id,
+                    levels
+                }
+            })
+        } catch (e) {
+            return e
+        }
         const newTree = findAndModifyFirst(
             root,
             itemsKey,
@@ -120,11 +121,6 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
             }
         )
         setRoot(newTree)
-        setQueue({
-            ...queue,
-            // store a timestamp for evaluating when to refetch
-            [id]: Date.now()
-        })
         return res
     }
 
@@ -136,7 +132,7 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
                 // check localstorage first for this data to help remediate O(n) server
                 // load burden where n = top level categories
                 const storedCategoryData = JSON.parse(
-                    window?.localStorage?.getItem(LOCAL_STORAGE_PREFIX + cat?.id)
+                    window?.localStorage?.getItem(LOCAL_STORAGE_PREFIX + cat?.id + locale)
                 )
                 if (storedCategoryData) {
                     findAndModifyFirst(
@@ -153,12 +149,19 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
                         }
                     )
                 } else {
-                    const res = fetchCategoryNode(cat?.id, 2)
-                    // store fetched data in local storage for faster access / reduced server load
-                    window?.localStorage?.setItem(
-                        LOCAL_STORAGE_PREFIX + cat?.id,
-                        JSON.stringify(res)
-                    )
+                    try {
+                        const res = await fetchCategoryNode(cat?.id, 2)
+                        // store fetched data in local storage for faster access / reduced server load
+                        window?.localStorage?.setItem(
+                            LOCAL_STORAGE_PREFIX + cat?.id + locale,
+                            JSON.stringify({
+                                ...res,
+                                fetchTime: Date.now()
+                            })
+                        )
+                    } catch (e) {
+                        return e
+                    }
                 }
             })
         )
@@ -180,7 +183,8 @@ export const CategoriesProvider = ({treeRoot = {}, children}) => {
 
 CategoriesProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    treeRoot: PropTypes.object
+    treeRoot: PropTypes.object,
+    locale: PropTypes.string
 }
 
 /**
