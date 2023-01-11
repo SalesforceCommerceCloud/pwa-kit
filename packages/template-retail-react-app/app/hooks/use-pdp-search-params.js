@@ -6,11 +6,11 @@
  */
 import {useLocation} from 'react-router-dom'
 
-export const useURLSearchParams = (key) => {
+export const usePDPSearchParams = (productId) => {
     const {search} = useLocation()
 
     const allParams = new URLSearchParams(search)
-    const keyParam = new URLSearchParams(allParams.get(key) || '')
+    const productParams = new URLSearchParams(allParams.get(productId) || '')
 
-    return [allParams, keyParam]
+    return [allParams, productParams]
 }

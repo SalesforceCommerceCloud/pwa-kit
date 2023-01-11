@@ -13,7 +13,7 @@ import {useVariationParams} from './use-variation-params'
 
 // Utils
 import {updateSearchParams} from '../utils/url'
-import {useURLSearchParams} from './use-url-search-params'
+import {usePDPSearchParams} from './use-pdp-search-params'
 
 /**
  * Return the first image in the `swatch` type image group for a given
@@ -49,11 +49,11 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @returns {String} a product url for the current variation value.
  */
 const buildVariantValueHref = ({pathname, existingParams, newParams, productId, isSetProduct}) => {
-    const [allParams, productParam] = existingParams
+    const [allParams, productParams] = existingParams
 
     if (isSetProduct) {
-        updateSearchParams(productParam, newParams)
-        allParams.set(productId, productParam.toString())
+        updateSearchParams(productParams, newParams)
+        allParams.set(productId, productParams.toString())
     } else {
         updateSearchParams(allParams, newParams)
     }
@@ -95,7 +95,7 @@ export const useVariationAttributes = (product = {}, isSetProduct = false) => {
     const location = useLocation()
     const variationParams = useVariationParams(product, isSetProduct)
 
-    const existingParams = useURLSearchParams(product.id)
+    const existingParams = usePDPSearchParams(product.id)
 
     return useMemo(
         () =>

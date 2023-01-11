@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useURLSearchParams} from './use-url-search-params'
+import {usePDPSearchParams} from './use-pdp-search-params'
 
 /*
  * This hook will return only the params that are also product attributes for the
@@ -14,8 +14,8 @@ import {useURLSearchParams} from './use-url-search-params'
 export const useVariationParams = (product = {}, isSetProduct = false) => {
     const {variationAttributes = [], variationValues = {}} = product
 
-    const [allParams, productParam] = useURLSearchParams(product.id)
-    const params = isSetProduct ? productParam : allParams
+    const [allParams, productParams] = usePDPSearchParams(product.id)
+    const params = isSetProduct ? productParams : allParams
 
     // Using all the variation attribute id from the array generated below, get
     // the value if there is one from the location search params and add it to the
