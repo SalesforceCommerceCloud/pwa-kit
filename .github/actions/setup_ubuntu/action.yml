@@ -28,10 +28,10 @@ runs:
       # TODO: Read NPM_VERSION and not run npm ci when is 7 or 8 (OR when !6)
       run: |-
         # Install system dependencies
-        apt-get update -y
-        apt-get install python2 python3-pip python-pip time -y
-        pip install -U pip setuptools
-        pip install awscli==1.18.85 datadog==0.40.1
+        sudo apt-get update
+        sudo apt-get install python2 python3-pip time 
+        sudo pip install -U pip setuptools
+        sudo pip install awscli==1.18.85 datadog==0.40.1
 
         # Install node dependencies
         node ./scripts/gtime.js monorepo_install npm ci
@@ -46,8 +46,8 @@ runs:
         node ./scripts/check-dependencies.js
 
         # Install Snyk CLI
-        npm install -g snyk
+        sudo npm install -g snyk
 
         # Install Lighthouse CI CLI
-        npm install -g @lhci/cli
+        sudo npm install -g @lhci/cli
       shell: bash
