@@ -395,19 +395,18 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        <Box display={['none', 'none', 'none', 'block']}>
+                        <Box display={isSetProduct ? 'block' : ['none', 'none', 'none', 'block']}>
                             {renderActionButtons()}
                         </Box>
                     </Box>
                 </VStack>
             </Flex>
-            {/* TODO: what to do for product set? */}
             {/*Add to Cart Button for mobile versions*/}
             <Box
                 position="fixed"
                 bg="white"
                 width="100%"
-                display={['block', 'block', 'block', 'none']}
+                display={isSetProduct ? 'none' : ['block', 'block', 'block', 'none']}
                 p={[4, 4, 6]}
                 left={0}
                 bottom={0}
