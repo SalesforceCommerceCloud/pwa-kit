@@ -14,7 +14,7 @@ jobs:
         node: [14]
         npm: [6, 7, 8]
     runs-on: ubuntu-latest
-    container: node:14
+    container: cimg/node:14
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -145,7 +145,7 @@ jobs:
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: ubuntu-latest
-    container: node:14
+    container: cimg/node:14
     steps:
       - name: Checkout
         uses: actions/checkout@v3
