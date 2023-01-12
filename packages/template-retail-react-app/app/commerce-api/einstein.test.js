@@ -58,7 +58,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                    '{"product":{"id":"56736828M","sku":"56736828M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -75,7 +75,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"searchText":"tie","products":[{"id":"25752986M","sku":"","altId":"","altIdType":""},{"id":"25752235M","sku":"","altId":"","altIdType":""},{"id":"25752218M","sku":"","altId":"","altIdType":""},{"id":"25752981M","sku":"","altId":"","altIdType":""}],"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                    '{"searchText":"tie","products":[{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},{"id":"25752235M","sku":"25752235M","altId":"","altIdType":""},{"id":"25752218M","sku":"25752218M","altId":"","altIdType":""},{"id":"25752981M","sku":"25752981M","altId":"","altIdType":""}],"showProducts":true,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -91,7 +91,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"category":{"id":"mens-accessories-ties"},"products":[{"id":"25752986M","sku":"","altId":"","altIdType":""},{"id":"25752235M","sku":"","altId":"","altIdType":""},{"id":"25752218M","sku":"","altId":"","altIdType":""},{"id":"25752981M","sku":"","altId":"","altIdType":""}],"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                    '{"category":{"id":"mens-accessories-ties"},"products":[{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},{"id":"25752235M","sku":"25752235M","altId":"","altIdType":""},{"id":"25752218M","sku":"25752218M","altId":"","altIdType":""},{"id":"25752981M","sku":"25752981M","altId":"","altIdType":""}],"showProducts":true,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -109,7 +109,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"searchText":"tie","product":{"id":"25752986M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                    '{"searchText":"tie","product":{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -126,7 +126,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"category":{"id":"mens-accessories-ties"},"product":{"id":"25752986M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                    '{"category":{"id":"mens-accessories-ties"},"product":{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -209,7 +209,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"56736828M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })

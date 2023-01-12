@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* global __webpack_require__ */
-import React from 'react'
+import React, {useRef} from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
 import DeviceContext from '../universal/device-context'
@@ -16,6 +16,8 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
+import PropTypes from 'prop-types'
+
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
     return Promise.resolve().then(() => {
@@ -33,6 +35,45 @@ export const registerServiceWorker = (url) => {
     })
 }
 
+export const OuterApp = ({routes, error, WrappedApp, locals}) => {
+    const AppConfig = getAppConfig()
+    const isInitialPageRef = useRef(true)
+
+    return (
+        <ServerContext.Provider value={{}}>
+            <Router>
+                <CorrelationIdProvider
+                    correlationId={() => {
+                        // If we are hydrating an error page use the server correlation id.
+                        if (isInitialPageRef.current && window.__ERROR__) {
+                            isInitialPageRef.current = false
+                            return window.__INITIAL_CORRELATION_ID__
+                        }
+                        return uuidv4()
+                    }}
+                >
+                    <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
+                        <AppConfig locals={locals}>
+                            <Switch
+                                error={error}
+                                appState={window.__PRELOADED_STATE__}
+                                routes={routes}
+                                App={WrappedApp}
+                            />
+                        </AppConfig>
+                    </DeviceContext.Provider>
+                </CorrelationIdProvider>
+            </Router>
+        </ServerContext.Provider>
+    )
+}
+
+OuterApp.propTypes = {
+    routes: PropTypes.array.isRequired,
+    error: PropTypes.object,
+    WrappedApp: PropTypes.func.isRequired,
+    locals: PropTypes.object
+}
 /* istanbul ignore next */
 export const start = () => {
     const AppConfig = getAppConfig()
@@ -56,7 +97,6 @@ export const start = () => {
 
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
-    const routes = getRoutes(locals)
 
     // We need to tell the routeComponent HOC when the app is hydrating in order to
     // prevent pages from re-fetching data on the first client-side render. The
@@ -68,33 +108,18 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
-    const WrappedApp = routeComponent(App, false, locals)
-    const error = window.__ERROR__
+    const props = {
+        error: window.__ERROR__,
+        locals: locals,
+        routes: getRoutes(locals),
+        WrappedApp: routeComponent(App, false, locals)
+    }
 
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
-            ReactDOM.hydrate(
-                <ServerContext.Provider value={{}}>
-                    <Router>
-                        <CorrelationIdProvider correlationId={() => uuidv4()}>
-                            <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                                <AppConfig locals={locals}>
-                                    <Switch
-                                        error={error}
-                                        appState={window.__PRELOADED_STATE__}
-                                        routes={routes}
-                                        App={WrappedApp}
-                                    />
-                                </AppConfig>
-                            </DeviceContext.Provider>
-                        </CorrelationIdProvider>
-                    </Router>
-                </ServerContext.Provider>,
-                rootEl,
-                () => {
-                    window.__HYDRATING__ = false
-                }
-            )
+            ReactDOM.hydrate(<OuterApp {...props} />, rootEl, () => {
+                window.__HYDRATING__ = false
+            })
         })
 }

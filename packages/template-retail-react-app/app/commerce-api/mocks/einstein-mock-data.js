@@ -27,7 +27,7 @@ export const mockRecommendersResponse = {
     ]
 }
 
-export const mockAddToCartProduct = {id: '883360544021M', sku: '', price: 155, quantity: 1}
+export const mockAddToCartProduct = {productId: '883360544021M', sku: '', price: 155, quantity: 1}
 
 export const mockRecommenderDetails = {
     __recoUUID: '883360544021M',
