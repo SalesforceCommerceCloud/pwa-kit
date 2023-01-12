@@ -13,4 +13,11 @@ describe('processRequest', () => {
         expect(result.path).toEqual(expect.any(String))
         expect(result.querystring).toEqual(expect.any(String))
     })
+
+    test('SLAS callback parameters are removed', () => {
+        const result = processRequest({path: '/callback', querystring: 'usid=1&code=2&test=3'})
+
+        expect(result.path).toEqual('/callback')
+        expect(result.querystring).toEqual('test=3')
+    })
 })

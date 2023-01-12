@@ -9,9 +9,6 @@
 // 'request-processor.js' and update the processRequest function so that
 // it processes requests in whatever way your project requires.
 
-// Uncomment the following line for the example code to work.
-import {QueryParameters} from 'pwa-kit-runtime/utils/ssr-request-processing'
-
 /**
  * The processRequest function is called for *every* non-proxy, non-bundle
  * request received. That is, all requests that will result in pages being
@@ -75,31 +72,28 @@ export const processRequest = ({
         // 'utm_source'
     ]
 
-    // This is a performance optimization for SLAS .
+    // This is a performance optimization for SLAS.
     // On client side, browser always follow the redirect
-    // to /callback but the response is always the same
-    // so we'd like to strip out the unique query parameters
-    // to take advantage of the CDN cache
+    // to /callback but the response is always the same.
+    // We strip out the unique query parameters so this
+    // endpoint is cached at the CDN level
     if (path === '/callback') {
         exclusions.push('usid')
         exclusions.push('code')
     }
 
     // Build a first QueryParameters object from the given querystring
-    const incomingParameters = new QueryParameters(querystring)
+    const incomingParameters = new URLSearchParams(querystring)
 
     // Build a second QueryParameters from the first, with all
     // excluded parameters removed
-    const filteredParameters = QueryParameters.from(
-        incomingParameters.parameters.filter(
-            // parameter.key is always lower-case
-            (parameter) => !exclusions.includes(parameter.key)
-        )
-    )
+    exclusions.forEach((key) => {
+        incomingParameters.delete(key)
+    })
 
     // Re-generate the querystring
-    querystring = filteredParameters.toString()
-    
+    querystring = incomingParameters.toString()
+
     /***************************************************************************
     // This example code will detect bots by examining the user-agent,
     // and will set the request class to 'bot' for all such requests.
