@@ -124,9 +124,8 @@ const ProductView = ({
                 await updateCart(variant, quantity)
                 return
             }
-            // TODO: for product set, make sure modal shows the product attributes data (e.g. size, colour)
             await addToCart(variant, quantity)
-            onAddToCartModalOpen({product, quantity})
+            onAddToCartModalOpen({product, isSetProduct, quantity})
         }
 
         const handleWishlistItem = async () => {

@@ -54,11 +54,11 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    const {product, quantity} = data || {}
+    const {product, isSetProduct, quantity} = data || {}
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const variationAttributes = useVariationAttributes(product)
+    const variationAttributes = useVariationAttributes(product, isSetProduct)
     if (!isOpen) {
         return null
     }
