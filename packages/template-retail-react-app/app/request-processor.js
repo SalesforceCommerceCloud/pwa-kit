@@ -9,6 +9,9 @@
 // 'request-processor.js' and update the processRequest function so that
 // it processes requests in whatever way your project requires.
 
+// Uncomment the following line for the example code to work.
+import {QueryParameters} from 'pwa-kit-runtime/utils/ssr-request-processing'
+
 /**
  * The processRequest function is called for *every* non-proxy, non-bundle
  * request received. That is, all requests that will result in pages being
@@ -83,16 +86,19 @@ export const processRequest = ({
     }
 
     // Build a first QueryParameters object from the given querystring
-    const incomingParameters = new URLSearchParams(querystring)
+    const incomingParameters = new QueryParameters(querystring)
 
     // Build a second QueryParameters from the first, with all
     // excluded parameters removed
-    exclusions.forEach((key) => {
-        incomingParameters.delete(key)
-    })
+    const filteredParameters = QueryParameters.from(
+        incomingParameters.parameters.filter(
+            // parameter.key is always lower-case
+            (parameter) => !exclusions.includes(parameter.key)
+        )
+    )
 
     // Re-generate the querystring
-    querystring = incomingParameters.toString()
+    querystring = filteredParameters.toString()
 
     /***************************************************************************
     // This example code will detect bots by examining the user-agent,
@@ -104,7 +110,6 @@ export const processRequest = ({
         setRequestClass('bot')
     }
     ***************************************************************************/
-
     // Return the path unchanged, and the updated query string
     return {
         path,
