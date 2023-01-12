@@ -28,6 +28,7 @@ runs:
       # TODO: Read NPM_VERSION and not run npm ci when is 7 or 8 (OR when !6)
       run: |-
         # Install system dependencies
+        apt-get update && apt-get -y install sudo
         sudo apt-get update
         sudo apt-get install python2 python3-pip time
         sudo pip install -U pip setuptools
