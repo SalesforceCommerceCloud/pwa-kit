@@ -103,7 +103,7 @@ jobs:
       #TODO: change github-actions to develop
       - name: Send GitHub Action data to Slack workflow (PWA Kit)
         id: slack
-        if: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/github-actions' && matrix.npm == 6 }}
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/github-actions' && matrix.npm == 6
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -232,7 +232,7 @@ jobs:
           fi
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
-        if: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/github-actions' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/github-actions' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
