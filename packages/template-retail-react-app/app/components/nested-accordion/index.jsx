@@ -23,6 +23,8 @@ import Link from '../link'
 // Icons
 import {ChevronDownIcon, ChevronRightIcon} from '../icons'
 
+import {useCategory} from 'commerce-sdk-react-preview'
+
 /**
  * The nested accordion allows you to create, as the name suggest, a nests
  * accordion given a hierarchical data structure. Each nests accordion will
@@ -32,6 +34,7 @@ const NestedAccordion = (props) => {
     const styles = useStyleConfig('NestedAccordion')
     const {
         item,
+        itemId,
         initialDepth = 0,
         itemsFilter = () => true,
         itemsAfter,
@@ -44,18 +47,25 @@ const NestedAccordion = (props) => {
     } = props
 
     const depth = initialDepth
-    const items = item[itemsKey]
 
     // Handle filters in the folr of a function or a object key string.
-    const filter = (item) =>
-        typeof itemsFilter === 'function' ? itemsFilter(item) : !!item[itemsFilter]
+    // const filter = (item) =>
+    //     typeof itemsFilter === 'function' ? itemsFilter(item) : !!item[itemsFilter]
+
+    // BEGIN
+    const {isSuccess, data: category} = useCategory({
+        id: itemId, 
+        levels: 2
+    })
+    const items = isSuccess ? category[itemsKey] : []
+    // END
 
     return (
         <Accordion className="sf-nested-accordion" allowToggle={true} {...rest}>
             {/* Optional accordion items before others in items list.  */}
-            {typeof itemsBefore === 'function' ? itemsBefore({item, depth}) : itemsBefore}
+            {/* {typeof itemsBefore === 'function' ? itemsBefore({item, depth}) : itemsBefore} */}
 
-            {items.filter(filter).map((item) => {
+            {items.map((item) => {
                 const {id, name} = item
                 const items = item[itemsKey]
 
@@ -66,7 +76,7 @@ const NestedAccordion = (props) => {
                                 {/* Heading */}
                                 <h2>
                                     {/* Show item as a leaf node if it has no visible child items. */}
-                                    {items && items.filter(filter).length > 0 ? (
+                                    {items && items.length > 0 ? (
                                         <AccordionButton {...styles.internalButton}>
                                             {/* Replace default expanded/collapsed icons. */}
                                             {isExpanded ? (
@@ -104,7 +114,8 @@ const NestedAccordion = (props) => {
                                         <NestedAccordion
                                             {...styles.nestedAccordion}
                                             {...props}
-                                            item={item}
+                                            // item={item}
+                                            itemId={isExpanded ? item.id : undefined}
                                             initialDepth={depth + 1}
                                         />
                                     </AccordionPanel>
@@ -116,7 +127,7 @@ const NestedAccordion = (props) => {
             })}
 
             {/* Optional accordion items after others in items list.  */}
-            {typeof itemsAfter === 'function' ? itemsAfter({item, depth}) : itemsAfter}
+            {/* {typeof itemsAfter === 'function' ? itemsAfter({item, depth}) : itemsAfter} */}
         </Accordion>
     )
 }

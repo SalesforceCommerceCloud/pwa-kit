@@ -121,7 +121,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                             <Fade in={true}>
                                 <NestedAccordion
                                     allowMultiple={true}
-                                    item={root}
+                                    // item={root}
+                                    itemId="root"
                                     itemsKey="categories"
                                     itemsFilter="c_showInMenu"
                                     fontSizes={FONT_SIZES}
