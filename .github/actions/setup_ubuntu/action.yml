@@ -27,8 +27,8 @@ runs:
     - name: Install Dependencies
       run: |-
         # Install system dependencies
-        sudo apt-get update -y
-        sudo apt-get install python2 python3-pip python-pip time -y
+        sudo apt-get update
+        sudo apt-get install python2 python3-pip time
         sudo pip install -U pip setuptools
         sudo pip install awscli==1.18.85 datadog==0.40.1
 
