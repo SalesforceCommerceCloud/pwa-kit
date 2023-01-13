@@ -14,8 +14,6 @@ jobs:
         node: [14]
         npm: [6, 7, 8]
     runs-on: ubuntu-latest
-    container: 
-      image: node:14
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -101,10 +99,9 @@ jobs:
 
           # Cleanup
           rm ~/.npmrc
-      #TODO: change github-actions to develop
       - name: Send GitHub Action data to Slack workflow (PWA Kit)
         id: slack
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/github-actions' && matrix.npm == 6
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/develop' && matrix.npm == 6
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -146,7 +143,6 @@ jobs:
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: ubuntu-latest
-    container: node:14
     steps:
       - name: Checkout
         uses: actions/checkout@v3

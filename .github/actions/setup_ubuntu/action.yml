@@ -27,18 +27,16 @@ runs:
     - name: Install Dependencies
       run: |-
         # Install system dependencies
-        apt-get update -y
-        apt-get install python2 python3-pip python-pip time -y
-        pip install -U pip setuptools
-        pip install awscli==1.18.85 datadog==0.40.1
+        sudo apt-get update -y
+        sudo apt-get install python2 python3-pip python-pip time -y
+        sudo pip install -U pip setuptools
+        sudo pip install awscli==1.18.85 datadog==0.40.1
 
         # Install node dependencies
-        if [[ $NPM_VERSION == 6 ]]; then
-          node ./scripts/gtime.js monorepo_install npm ci
-        fi
+        node ./scripts/gtime.js monorepo_install npm ci
 
         # Build the PWA
-        sudo npm run lerna -- run analyze-build --scope "retail-react-app"
+        npm run lerna -- run analyze-build --scope "retail-react-app"
 
         # Report bundle sizes
         node ./scripts/report-bundle-size.js
