@@ -25,7 +25,7 @@ runs:
         echo "env.RELEASE: ${{ env.RELEASE }}"
       shell: bash
     - name: Install Dependencies
-      # TODO: Read NPM_VERSION and not run npm ci when is 7 or 8 (OR when !6)
+      if: NPM_VERSION == 6
       run: |-
         # Install system dependencies
         apt-get update -y
@@ -51,3 +51,24 @@ runs:
         # Install Lighthouse CI CLI
         npm install -g @lhci/cli
       shell: bash
+    - name: Install Dependencies for npm 7/8
+      if: NPM_VERSION != 6
+      run: |-
+        # Install system dependencies
+        apt-get update -y
+        apt-get install python2 python3-pip python-pip time -y
+        pip install -U pip setuptools
+        pip install awscli==1.18.85 datadog==0.40.1
+
+        # Build the PWA
+        npm run lerna -- run analyze-build --scope "retail-react-app"
+
+        # Report bundle sizes
+        node ./scripts/report-bundle-size.js
+    
+        # Check that packages are all using the same versions of compilers, etc.
+        node ./scripts/check-dependencies.js
+
+        # Install Snyk CLI
+        npm install -g snyk
+
