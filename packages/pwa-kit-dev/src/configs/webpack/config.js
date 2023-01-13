@@ -10,6 +10,7 @@
 // For more information on these settings, see https://webpack.js.org/configuration
 import fs from 'fs'
 import path, {resolve} from 'path'
+import glob from 'glob'
 
 import webpack from 'webpack'
 import WebpackNotifierPlugin from 'webpack-notifier'
@@ -78,15 +79,18 @@ const findInProjectThenSDK = (pkg) => {
     return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
 }
 
-const findInProjectThenExtends = (pkg) => {
+const findInProjectThenExtendsThenSDK = (pkg) => {
     const projectPath = resolve(projectDir, 'node_modules', pkg)
-    if (fs.existsSync(projectPath)) {
+    const projectFile = glob.sync(projectPath)
+    if (projectFile?.length) {
         return projectPath
     }
-    const extendsPath = resolve(projectDir, 'node_modules', pkg?.extends)
-    return fs.existsSync(extendsPath)
-        ? extendsPath
-        : resolve(projectPath, 'node_modules', pkg?.extends)
+    const extendPath = resolve(projectDir, 'node_modules', pkg?.extends)
+    const extendFile = glob.sync(extendPath)
+    if (extendFile?.length) {
+        return extendPath
+    }
+    return resolve(sdkDir, 'node_modules', pkg)
 }
 
 const baseConfig = (target) => {
@@ -153,12 +157,14 @@ const baseConfig = (target) => {
 
                         // TODO: these need to be declared in package.json as peerDependencies ?
                         // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
-                        'react-intl': findInProjectThenExtends('react-intl'),
-                        '@chakra-ui/icons': findInProjectThenExtends('@chakra-ui/icons'),
-                        '@chakra-ui/react': findInProjectThenExtends('@chakra-ui/react'),
-                        '@chakra-ui/skip-nav': findInProjectThenExtends('@chakra-ui/skip-nav'),
-                        '@emotion/react': findInProjectThenExtends('@emotion/react'),
-                        '@emotion/styled': findInProjectThenExtends('@emotion/styled')
+                        'react-intl': findInProjectThenExtendsThenSDK('react-intl'),
+                        '@chakra-ui/icons': findInProjectThenExtendsThenSDK('@chakra-ui/icons'),
+                        '@chakra-ui/react': findInProjectThenExtendsThenSDK('@chakra-ui/react'),
+                        '@chakra-ui/skip-nav': findInProjectThenExtendsThenSDK(
+                            '@chakra-ui/skip-nav'
+                        ),
+                        '@emotion/react': findInProjectThenExtendsThenSDK('@emotion/react'),
+                        '@emotion/styled': findInProjectThenExtendsThenSDK('@emotion/styled')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },

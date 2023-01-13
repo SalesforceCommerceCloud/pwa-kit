@@ -8,26 +8,38 @@
 import webpack from 'webpack'
 import path, {resolve} from 'path'
 import fs from 'fs'
-import fg from 'fast-glob'
+import glob from 'glob'
 
 const projectDir = process.cwd()
 const pkg = require(resolve(projectDir, 'package.json'))
 
 const getOverridePath = (path) => {
-    const arr = []
-    // order matters here, we perform look ups starting with the first
-    // override alias, falling back to the default if none are found
+    const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
+    // order matters here, we perform look ups starting in the following order:
+    // pkg.mobify.overridesDir => pkg.mobify.extends => current projectDir
     if (pkg?.mobify?.extends && pkg?.mobify?.overridesDir) {
-        const first = resolve(projectDir, pkg?.mobify?.overridesDir, ...path)
-        console.log('~first', first)
-        if (first) return first
-        const second = resolve(projectDir, extendPath, ...path)
-        console.log('~second', second)
-        if (second) return second
+        const overrideFile = glob.sync(
+            `${projectDir}${resolve(
+                projectDir,
+                pkg?.mobify?.overridesDir,
+                ...path
+            )}.+(js|jsx|ts|tsx)`
+        )
+        if (overrideFile?.length) {
+            return overrideFile?.[0]
+        }
+        const extendFile = glob.sync(
+            `${projectDir}${resolve(projectDir, extendPath, ...path)}.+(js|jsx|ts|tsx)`
+        )
+        if (extendFile?.length) {
+            return extendFile?.[0]
+        }
     }
-    const ret = resolve(projectDir, extendPath, ...path)
-    console.log('~ret', ret)
-    return ret
+    const generatedProjectOverride = glob.sync(
+        `${projectDir}${resolve(projectDir, ...path)}.+(js|jsx|ts|tsx)`
+    )
+
+    return generatedProjectOverride?.length ? generatedProjectOverride?.[0] : null
 }
 
 /**
@@ -52,92 +64,28 @@ export const sdkReplacementPlugin = (projectDir) => {
     const overridables = [
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app-config$'),
-            // newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index'),
-            // newPath: resolve(projectDir, extendPath, 'app', 'components', '_app-config', 'index')
-            // TODO: this needs to be dynamic
-            newPath: fs.existsSync(
-                `${projectDir}/pwa-kit/overrides/app/components/_app-config/index.jsx`
-            )
-                ? resolve(
-                      projectDir,
-                      'pwa-kit',
-                      'overrides',
-                      'app',
-                      'components',
-                      '_app-config',
-                      'index'
-                  )
-                : resolve(projectDir, extendPath, 'app', 'components', '_app-config', 'index')
+            newPath: getOverridePath(['app', 'components', '_app-config', 'index'])
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_document$'),
-            newPath: resolve(projectDir, extendPath, 'app', 'components', '_document', 'index')
+            newPath: getOverridePath(['app', 'components', '_document', 'index'])
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app$'),
-            // newPath: resolve(projectDir, 'app', 'components', '_app', 'index'),
-            // newPath: resolve(projectDir, extendPath, 'app', 'components', '_app', 'index')
-
-            // @TODO: pwa-kit/overrides needs to be dynamic here
-            newPath: fs.existsSync(`${projectDir}/pwa-kit/overrides/app/components/_app/index.jsx`)
-                ? resolve(projectDir, 'pwa-kit', 'overrides', 'app', 'components', '_app', 'index')
-                : resolve(projectDir, extendPath, 'app', 'components', '_app', 'index')
+            newPath: getOverridePath(['app', 'components', '_app', 'index'])
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_error$'),
-            // newPath: resolve(projectDir, 'app', 'components', '_error', 'index'),
-            newPath: resolve(projectDir, extendPath, 'app', 'components', '_error', 'index')
+            newPath: getOverridePath(['app', 'components', '_error', 'index'])
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/routes$'),
-            // newPath: resolve(projectDir, 'app', 'routes')
-            // newPath: resolve(projectDir, extendPath, 'app', 'routes')
-            newPath: fs.existsSync(`${projectDir}/pwa-kit/overrides/app/routes.jsx`)
-                ? resolve(projectDir, 'pwa-kit', 'overrides', 'app', 'routes')
-                : resolve(projectDir, extendPath, 'app', 'routes')
+            newPath: getOverridePath(['app', 'routes'])
         }
     ]
 
-    if (pkg?.mobify?.extends && pkg?.mobify?.overridesDir) {
-        overridables.push({
-            // path: makeRegExp('app$'),
-            // @TODO: this should alias by npm package name (`retail-react-app`)
-            // but instead looks up `template-retail-react-app`
-            path: makeRegExp(`${pkg?.mobify?.extends}/app$`),
-            newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index')
-            // newPath: getOverridePath(['app'])
-        })
-    }
-    const extensions = ['.ts', '.tsx', '.js', '.jsx']
-
-    const replacements = []
-    overridables.forEach(({path, newPath}) => {
-        console.log('~overrideable path', path)
-        console.log('~overrideable newPath', newPath)
-        extensions.forEach((ext) => {
-            const replacement = newPath + ext
-            if (fs.existsSync(replacement)) {
-                // // newPath can be an array for cascading file search, search the array
-                // if (Array.isArray(newPath)) {
-                //     let found = false
-                //     newPath.forEach((_newPath) => {
-                //         if (fs.existsSync(_newPath) && !found) {
-                //             found = true
-                //             newPath = _newPath
-                //         }
-                //     })
-                // }
-                replacements.push({path, newPath: replacement})
-            }
-        })
-    })
-
+    const replacements = overridables?.filter?.((item) => item?.newPath)
     console.log('~replacements', replacements)
-
-    // @TODO: this is currently running on every single resource that webpack loads
-    // which is deoptimized, the regex `/.*/` currently matches all files and then
-    // has an O(n) complexity tax that compares each file to as many file names
-    // as are found in the `overrideables` array
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
@@ -163,32 +111,20 @@ const templateAppPathRegex = makeRegExp(
 
 export const extendedTemplateReplacementPlugin = (projectDir) => {
     const extendPath = `${projectDir}/node_modules/${pkg?.mobify?.extends}`
-    const globPattern = `${pkg?.mobify?.overridesDir?.replace(/\//, '')}/**/*.{js,jsx,ts,tsx}`
-    console.log('~globPattern', globPattern)
-    const overridesMap = fg.sync([
-        // `/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app/components/_app/index.jsx`
-        globPattern
-    ])
-    // TODO: make this agnostic of file extension by replacing `.jsx` in the split here with `.{js,jsx,ts,tsx}`
-    // overridesMap = overridesMap.map((item) => item.split('.')?.[0])
-
+    const globPattern = `${pkg?.mobify?.overridesDir?.replace(/\//, '')}/**/*.+(js|jsx|ts|tsx)`
+    const overridesMap = glob.sync(globPattern)
     console.log('~overridesMap', overridesMap)
 
     return new webpack.NormalModuleReplacementPlugin(templateAppPathRegex, (resource) => {
         const requestedFile = path.resolve(resource.context, resource.request)
         console.log('~requestedFile', requestedFile)
         const found = overridesMap?.filter((override) => {
-            // console.log('~requestedFile?.match?.(override)', requestedFile?.match?.(override))
             return requestedFile?.match?.(override)?.length
         })
-        // console.log('~found', JSON.stringify(found))
         if (!found?.length) {
-            // console.log('~!NOT FOUND requestedFile', requestedFile)
             const relativePath = requestedFile?.split?.(pkg?.mobify?.overridesDir)?.[1]
-            // console.log('~relativePath', relativePath)
             if (!relativePath) return
             const newPath = extendPath + relativePath
-            // console.log('~newPath', newPath)
             resource.request = newPath
             return
         } else {
