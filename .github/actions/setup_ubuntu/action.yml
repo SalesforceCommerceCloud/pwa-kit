@@ -25,7 +25,6 @@ runs:
         echo "env.RELEASE: ${{ env.RELEASE }}"
       shell: bash
     - name: Install Dependencies
-      if: NPM_VERSION == 6
       run: |-
         # Install system dependencies
         apt-get update -y
@@ -34,7 +33,9 @@ runs:
         pip install awscli==1.18.85 datadog==0.40.1
 
         # Install node dependencies
-        node ./scripts/gtime.js monorepo_install npm ci
+        if [[ $NPM_VERSION == 6 ]]; then
+          node ./scripts/gtime.js monorepo_install npm ci
+        fi
 
         # Build the PWA
         sudo npm run lerna -- run analyze-build --scope "retail-react-app"
@@ -50,26 +51,5 @@ runs:
 
         # Install Lighthouse CI CLI
         npm install -g @lhci/cli
-      shell: bash
-    - name: Install Dependencies for npm 7/8
-      if: NPM_VERSION != 6
-      run: |-
-        # Install system dependencies
-        apt-get update -y
-        apt-get install python2 python3-pip python-pip time -y
-        pip install -U pip setuptools
-        pip install awscli==1.18.85 datadog==0.40.1
-
-        # Build the PWA
-        npm run lerna -- run analyze-build --scope "retail-react-app"
-
-        # Report bundle sizes
-        node ./scripts/report-bundle-size.js
-    
-        # Check that packages are all using the same versions of compilers, etc.
-        node ./scripts/check-dependencies.js
-
-        # Install Snyk CLI
-        npm install -g snyk
       shell: bash
 
