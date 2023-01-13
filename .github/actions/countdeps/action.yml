@@ -1,0 +1,17 @@
+name: countdeps
+runs:
+  using: composite
+  steps:
+  - name: Count Generated Project Dependencies
+    run: |-
+      MAX_PACKAGES="2260"
+      total=$(./scripts/count-dependencies.js generated-${{ matrix.template }})
+      echo "TOTAL_PACKAGES=${total}" >> $GITHUB_ENV
+
+      if [ "$total" -gt "$MAX_PACKAGES" ]; then
+          echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+          exit 1;
+      else
+          echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+      fi
+    shell: bash

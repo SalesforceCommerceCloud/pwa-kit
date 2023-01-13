@@ -1,4 +1,4 @@
-name: runtests
+name: unittests
 inputs:
   cwd:
     required: false

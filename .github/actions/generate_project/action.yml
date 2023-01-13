@@ -1,0 +1,11 @@
+name: generate_project
+runs:
+  using: composite
+  steps:
+    - name: Generate ${{ matrix.template }} project
+      run: |-
+          set GENERATOR_PRESET=${{ matrix.template }}
+          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
+      env:
+        GENERATOR_PRESET: ${{ matrix.template }}
+      timeout-minutes: 5

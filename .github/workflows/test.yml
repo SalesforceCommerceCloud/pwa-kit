@@ -42,7 +42,7 @@ jobs:
         run: npm --version
 
       - name: Run tests
-        uses: "./.github/actions/runtests"
+        uses: "./.github/actions/unittests"
 
       - name: Run Lighthouse CI on the PWA
         if: matrix.npm == 6
@@ -54,51 +54,17 @@ jobs:
 
       - name: Create MRT credentials file
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6
-        env:
-          MOBIFY_CLIENT_USER: ${{ secrets.MOBIFY_CLIENT_USER }}
-          MOBIFY_CLIENT_API_KEY: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-        run: |-
-          # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
-          npm run save-credentials --prefix packages/template-retail-react-app -- --user "$MOBIFY_CLIENT_USER" --key "$MOBIFY_CLIENT_API_KEY"
-        shell: bash
+        uses: "./.github/actions/create_mrt"
 
       - name: Push Bundle to MRT
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 
-        #TODO: Change target 'test-env' to 'staging' and 'test-env-3' to 'commerce-sdk-react'
-        run: |-
-          if [[ $DEVELOP || $RELEASE ]]; then
-            target=test-env
-            target_commerce_sdk_react="test-env-3"
-          elif [[ $RELEASE ]]; then
-            target=production
-          else
-            target=""
-          fi
-          project="scaffold-pwa"
-          if [[ $target ]]; then
-            npm run push --prefix packages/template-retail-react-app -- -s $project --message "build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target
-          fi
-          if [[ $target_commerce_sdk_react ]]; then
-            npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target_commerce_sdk_react
-          fi
+        uses: "./.github/actions/push_to_mrt"
+
       #TODO: remove --dry-run from install command
       - name: Publish to NPM
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6
-        env: 
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |-
-          # Add NPM token to allow publishing
-          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > ~/.npmrc
+        uses: "./.github/actions/publish_to_npm"
 
-          if [[ $RELEASE ]]; then
-            # Publish all changed packages. The "from-package" arg means "look
-            # at the version numbers in each package.json file and if that doesn't
-            # exist on NPM, publish"
-            npm run lerna -- publish from-package --yes --no-verify-access --dry-run
-          fi
-
-          # Cleanup
-          rm ~/.npmrc
       - name: Send GitHub Action data to Slack workflow (PWA Kit)
         id: slack
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/develop' && matrix.npm == 6
@@ -134,8 +100,7 @@ jobs:
           run: npm --version
 
         - name: Run tests
-          uses: "./.github/actions/runtests"
-      
+          uses: "./.github/actions/unittests"
 
   generated:
     strategy:
@@ -156,16 +121,11 @@ jobs:
         uses: "./.github/actions/setup_ubuntu"
 
       - name: Generate ${{ matrix.template }} project
-        run: |-
-          set GENERATOR_PRESET=${{ matrix.template }}
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
-        env:
-          GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 5
+        uses: "./.github/actions/generate_project"
 
       - name: Run tests
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
-        uses: "./.github/actions/runtests"
+        uses: "./.github/actions/unittests"
         with:
           cwd: generated-${{ matrix.template }}
 
@@ -177,68 +137,29 @@ jobs:
 
       - name: Count Generated Project Dependencies
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
-        run: |-
-          MAX_PACKAGES="2260"
-          total=$(./scripts/count-dependencies.js generated-${{ matrix.template }})
-          echo "TOTAL_PACKAGES=${total}" >> $GITHUB_ENV
+        uses: "./.github/actions/countdeps"
 
-          if [ "$total" -gt "$MAX_PACKAGES" ]; then
-              echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
-              exit 1;
-          else
-              echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
-          fi
-        shell: bash
       - name: Store Verdaccio logfile artifact
         uses: actions/upload-artifact@v3
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
-      # TODO: update SNYK_TOKEN in secrets
-      # - name: Audit Generated Project
-      #   if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
-      #   run: |-
-      #     if [[ "${{ github.ref }}" == "develop" ]]; then
-      #         # Run snyk auth - authenticate snyk using environment variables to add the token
-      #         snyk auth $SNYK_TOKEN
+      
+      - name: Audit Generated Project
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
+        uses: "./.github/actions/snyk"
 
-      #         snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
-      #     fi
-      #   env:
-      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       - name: Send metrics to Datadog
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
-        run : |
-          # Add a dogrc so we can submit metrics to datadog
-          printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
+        uses: "./.github/action/datadog"
 
-          dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       - name: Create MRT credentials file
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
-        env:
-          MOBIFY_CLIENT_USER: ${{ secrets.MOBIFY_CLIENT_USER }}
-          MOBIFY_CLIENT_API_KEY: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-        run: |-
-          # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
-          npm run save-credentials --prefix packages/template-retail-react-app -- --user "$MOBIFY_CLIENT_USER" --key "$MOBIFY_CLIENT_API_KEY"
-        shell: bash
+        uses: "./.github/actions/create_mrt"
+
       - name: Push Bundle to MRT
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
-        run: |
-          if [[ $DEVELOP ]]; then
-            target='generated-pwa'
-          else
-            target=""
-          fi
+        uses: "./.github/actions/push_to_mrt"
 
-          project="scaffold-pwa"
-
-          if [[ $target ]]; then
-            cd generated-${{ matrix.template }}
-            
-            npm run push -- -s $project --message "Generated PWA build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target
-          fi
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/github-actions' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
@@ -269,16 +190,11 @@ jobs:
         uses: "./.github/actions/setup_windows"
 
       - name: Generate ${{ matrix.template }} project
-        run: |-
-          set GENERATOR_PRESET=${{ matrix.template }}
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
-        env:
-          GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 5
+        uses: "./.github/actions/generate_project"
 
       - name: Run tests
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
-        uses: "./.github/actions/runtests"
+        uses: "./.github/actions/unittests"
         with:
           cwd: generated-${{ matrix.template }}
 
@@ -290,18 +206,8 @@ jobs:
 
       - name: Count Generated Project Dependencies
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
-        run: |-
-          MAX_PACKAGES="2260"
-          total=$(./scripts/count-dependencies.js generated-${{ matrix.template }})
-          echo "TOTAL_PACKAGES=${total}" >> $GITHUB_ENV
+        uses: "./.github/actions/countdeps"
 
-          if [ "$total" -gt "$MAX_PACKAGES" ]; then
-              echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
-              exit 1;
-          else
-              echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
-          fi
-        shell: bash
       - name: Store Verdaccio logfile artifact
         uses: actions/upload-artifact@v3
         with:
