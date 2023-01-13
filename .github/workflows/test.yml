@@ -193,6 +193,18 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
+      # TODO: update SNYK_TOKEN in secrets
+      # - name: Audit Generated Project
+      #   if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
+      #   run: |-
+      #     if [[ "${{ github.ref }}" == "develop" ]]; then
+      #         # Run snyk auth - authenticate snyk using environment variables to add the token
+      #         snyk auth $SNYK_TOKEN
+
+      #         snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
+      #     fi
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       - name: Send metrics to Datadog
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
         run : |

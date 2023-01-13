@@ -27,8 +27,8 @@ runs:
     - name: Install Dependencies
       run: |-
         # Install system dependencies
-        sudo apt-get update
-        sudo apt-get install python2 python3-pip time
+        sudo apt-get update -yq
+        sudo apt-get install python2 python3-pip time -yq
         sudo pip install -U pip setuptools
         sudo pip install awscli==1.18.85 datadog==0.40.1
 
@@ -45,9 +45,9 @@ runs:
         node ./scripts/check-dependencies.js
 
         # Install Snyk CLI
-        npm install -g snyk
+        sudo npm install -g snyk
 
         # Install Lighthouse CI CLI
-        npm install -g @lhci/cli
+        sudo npm install -g @lhci/cli
       shell: bash
 
