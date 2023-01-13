@@ -71,4 +71,5 @@ runs:
 
         # Install Snyk CLI
         npm install -g snyk
+      shell: bash
 
