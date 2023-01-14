@@ -148,22 +148,34 @@ const ProductDetail = ({category, product, isLoading}) => {
 
             <Stack spacing={16}>
                 {product?.type.set ? (
-                    // Product Set: render the child products
-                    product.setProducts.map((childProduct) => (
-                        <Fragment key={childProduct.id}>
-                            <ProductView
-                                product={childProduct}
-                                isSetProduct={true}
-                                addToCart={(variant, quantity) =>
-                                    handleAddToCart(variant, quantity)
-                                }
-                                addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                                isProductLoading={isLoading}
-                                isCustomerProductListLoading={!wishlist.isInitialized}
-                            />
-                            <InformationAccordion product={childProduct} />
-                        </Fragment>
-                    ))
+                    <Fragment>
+                        {/* Product Set: parent product */}
+                        <ProductView
+                            product={product}
+                            category={primaryCategory?.parentCategoryTree || []}
+                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                            isProductLoading={isLoading}
+                            isCustomerProductListLoading={!wishlist.isInitialized}
+                        />
+
+                        {// Product Set: render the child products
+                        product.setProducts.map((childProduct) => (
+                            <Fragment key={childProduct.id}>
+                                <ProductView
+                                    product={childProduct}
+                                    isSetProduct={true}
+                                    addToCart={(variant, quantity) =>
+                                        handleAddToCart(variant, quantity)
+                                    }
+                                    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                                    isProductLoading={isLoading}
+                                    isCustomerProductListLoading={!wishlist.isInitialized}
+                                />
+                                <InformationAccordion product={childProduct} />
+                            </Fragment>
+                        ))}
+                    </Fragment>
                 ) : (
                     <Fragment>
                         <ProductView

@@ -26,13 +26,13 @@ import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
 
-const ProductViewHeader = ({name, price, currency, category}) => {
+const ProductViewHeader = ({name, price, currency, category, productType}) => {
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
-                <Skeleton isLoaded={category} width={64}>
+                <Skeleton isLoaded={category} minWidth={64}>
                     <Breadcrumb categories={category} />
                 </Skeleton>
             )}
@@ -43,8 +43,9 @@ const ProductViewHeader = ({name, price, currency, category}) => {
             </Skeleton>
 
             {/* Price */}
-            <Skeleton isLoaded={price} width={32}>
+            <Skeleton isLoaded={price} minWidth={32}>
                 <Text fontWeight="bold" fontSize="md" aria-label="price">
+                    {productType?.set && 'Starting at '}
                     {intl.formatNumber(price, {
                         style: 'currency',
                         currency: currency || activeCurrency
@@ -199,6 +200,8 @@ const ProductView = ({
         }
     }, [variant?.productId])
 
+    console.log('--- product type', product?.type, product?.name)
+
     return (
         <Flex direction={'column'} data-testid="product-view">
             {/* Basic information etc. title, price, breadcrumb*/}
@@ -206,6 +209,7 @@ const ProductView = ({
                 <ProductViewHeader
                     name={product?.name}
                     price={product?.price}
+                    productType={product?.type}
                     currency={product?.currency}
                     category={category}
                 />
@@ -243,6 +247,7 @@ const ProductView = ({
                         <ProductViewHeader
                             name={product?.name}
                             price={product?.price}
+                            productType={product?.type}
                             currency={product?.currency}
                             category={category}
                         />
@@ -320,47 +325,49 @@ const ProductView = ({
                         )}
 
                         {/* Quantity Selector */}
-                        <VStack align="stretch" maxWidth={'200px'}>
-                            <Box fontWeight="bold">
-                                <label htmlFor="quantity">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Quantity',
-                                        id: 'product_view.label.quantity'
-                                    })}
-                                    :
-                                </label>
-                            </Box>
+                        {!product?.type.set && (
+                            <VStack align="stretch" maxWidth={'200px'}>
+                                <Box fontWeight="bold">
+                                    <label htmlFor="quantity">
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Quantity',
+                                            id: 'product_view.label.quantity'
+                                        })}
+                                        :
+                                    </label>
+                                </Box>
 
-                            <QuantityPicker
-                                id="quantity"
-                                step={stepQuantity}
-                                value={quantity}
-                                min={minOrderQuantity}
-                                onChange={(stringValue, numberValue) => {
-                                    // Set the Quantity of product to value of input if value number
-                                    if (numberValue >= 0) {
-                                        setQuantity(numberValue)
-                                    } else if (stringValue === '') {
-                                        // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
-                                        // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
-                                        setQuantity(stringValue)
-                                    }
-                                }}
-                                onBlur={(e) => {
-                                    // Default to 1the `minOrderQuantity` if a user leaves the box with an invalid value
-                                    const value = e.target.value
-                                    if (parseInt(value) < 0 || value === '') {
-                                        setQuantity(minOrderQuantity)
-                                    }
-                                }}
-                                onFocus={(e) => {
-                                    // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
-                                    // new quantity with one click. NOTE: This is something that can be refactored into the parent
-                                    // component, potentially as a prop called `selectInputOnFocus`.
-                                    e.target.select()
-                                }}
-                            />
-                        </VStack>
+                                <QuantityPicker
+                                    id="quantity"
+                                    step={stepQuantity}
+                                    value={quantity}
+                                    min={minOrderQuantity}
+                                    onChange={(stringValue, numberValue) => {
+                                        // Set the Quantity of product to value of input if value number
+                                        if (numberValue >= 0) {
+                                            setQuantity(numberValue)
+                                        } else if (stringValue === '') {
+                                            // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
+                                            // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
+                                            setQuantity(stringValue)
+                                        }
+                                    }}
+                                    onBlur={(e) => {
+                                        // Default to 1the `minOrderQuantity` if a user leaves the box with an invalid value
+                                        const value = e.target.value
+                                        if (parseInt(value) < 0 || value === '') {
+                                            setQuantity(minOrderQuantity)
+                                        }
+                                    }}
+                                    onFocus={(e) => {
+                                        // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
+                                        // new quantity with one click. NOTE: This is something that can be refactored into the parent
+                                        // component, potentially as a prop called `selectInputOnFocus`.
+                                        e.target.select()
+                                    }}
+                                />
+                            </VStack>
+                        )}
                         <Box>
                             {!showLoading && showOptionsMessage && (
                                 <Fade in={true}>
@@ -384,6 +391,7 @@ const ProductView = ({
                                 </Link>
                             )}
                         </HideOnDesktop>
+                        {product?.type.set && <p>{product?.shortDescription}</p>}
                     </VStack>
 
                     <Box>
@@ -394,9 +402,13 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        <Box display={isSetProduct ? 'block' : ['none', 'none', 'none', 'block']}>
-                            {renderActionButtons()}
-                        </Box>
+                        {!product?.type.set && (
+                            <Box
+                                display={isSetProduct ? 'block' : ['none', 'none', 'none', 'block']}
+                            >
+                                {renderActionButtons()}
+                            </Box>
+                        )}
                     </Box>
                 </VStack>
             </Flex>
@@ -405,7 +417,9 @@ const ProductView = ({
                 position="fixed"
                 bg="white"
                 width="100%"
-                display={isSetProduct ? 'none' : ['block', 'block', 'block', 'none']}
+                display={
+                    isSetProduct || product?.type.set ? 'none' : ['block', 'block', 'block', 'none']
+                }
                 p={[4, 4, 6]}
                 left={0}
                 bottom={0}
