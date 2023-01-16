@@ -161,6 +161,8 @@ const ProductDetail = ({category, product, isLoading}) => {
                             isCustomerProductListLoading={!wishlist.isInitialized}
                         />
 
+                        <hr />
+
                         {// Product Set: render the child products
                         product.setProducts.map((childProduct) => (
                             <Fragment key={childProduct.id}>
@@ -175,6 +177,10 @@ const ProductDetail = ({category, product, isLoading}) => {
                                     isCustomerProductListLoading={!wishlist.isInitialized}
                                 />
                                 <InformationAccordion product={childProduct} />
+
+                                <Box display={['none', 'none', 'none', 'block']}>
+                                    <hr />
+                                </Box>
                             </Fragment>
                         ))}
                     </Fragment>
