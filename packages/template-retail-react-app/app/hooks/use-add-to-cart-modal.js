@@ -29,6 +29,7 @@ import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
 import {useVariationAttributes} from './'
 import {findImageGroupBy} from '../utils/image-groups-utils'
+import {useVariant} from './use-variant'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -54,20 +55,21 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
+    if (!isOpen) {
+        return null
+    }
     const {product, isSetProduct, quantity} = data || {}
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const variationAttributes = useVariationAttributes(product, isSetProduct)
-    if (!isOpen) {
-        return null
-    }
+    const variant = useVariant(product, isSetProduct)
     const {currency, productItems, productSubTotal, itemAccumulatedCount} = basket
     const {id, variationValues} = product
     const lineItemPrice = productItems?.find((item) => item.productId === id)?.basePrice * quantity
     const image = findImageGroupBy(product.imageGroups, {
         viewType: 'small',
-        selectedVariationAttributes: variationValues
+        selectedVariationAttributes: variationValues || variant?.variationValues
     })?.images?.[0]
 
     return (
