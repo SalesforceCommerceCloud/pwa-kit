@@ -44,7 +44,7 @@
         "msw": "^0.28.1",
         "nanoid": "^3.1.31",
         "njwt": "^1.2.0",
-        "node-fetch": "^2.6.7",
+        "node-fetch": "2.6.7",
         "prop-types": "^15.6.0",
         "pwa-kit-dev": "^2.6.0-dev",
         "pwa-kit-react-sdk": "^2.6.0-dev",
