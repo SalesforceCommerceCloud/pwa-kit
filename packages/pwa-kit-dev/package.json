@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-dev",
-  "version": "2.4.0-dev",
+  "version": "2.5.0-dev",
   "description": "Build tools for pwa-kit",
   "repository": {
     "type": "git",
@@ -61,7 +61,7 @@
     "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
     "babel-plugin-formatjs": "10.2.20",
     "chalk": "^4.1.2",
-    "commander": "^8.3.0",
+    "commander": "^9.3.0",
     "compression": "1.7.4",
     "copy-webpack-plugin": "^9.1.0",
     "cross-env": "^5.2.0",
@@ -86,10 +86,9 @@
     "jest-fetch-mock": "^2.1.2",
     "mime-types": "2.1.32",
     "minimatch": "3.0.5",
-    "morgan": "1.9.1",
     "open": "^8.4.0",
     "prettier": "^1.18.2",
-    "pwa-kit-runtime": "^2.4.0-dev",
+    "pwa-kit-runtime": "^2.5.0-dev",
     "react-refresh": "^0.13.0",
     "replace-in-file": "^6.2.0",
     "request": "^2.88.0",
@@ -109,7 +108,7 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.0",
-    "internal-lib-build": "^2.4.0-dev",
+    "internal-lib-build": "^2.5.0-dev",
     "nock": "^13.1.1",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"

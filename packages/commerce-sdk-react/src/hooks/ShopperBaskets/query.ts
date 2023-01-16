@@ -7,6 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
+import {NotImplementedError} from './../utils'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -79,6 +80,7 @@ function usePaymentMethodsForBasket(
     const defaultOptions = {
         enabled: !!parameters.basketId
     }
+
     return useQuery(
         ['/baskets', parameters.basketId, '/payment-methods', arg],
         (_, {shopperBaskets}) =>
@@ -87,45 +89,17 @@ function usePaymentMethodsForBasket(
     )
 }
 
-type UsePriceBooksForBasketParameters = NonNullable<
-    Argument<Client['getPriceBooksForBasket']>
->['parameters']
-type UsePriceBooksForBasketHeaders = NonNullable<
-    Argument<Client['getPriceBooksForBasket']>
->['headers']
-type UsePriceBooksForBasketArg = {
-    headers?: UsePriceBooksForBasketHeaders
-    rawResponse?: boolean
-} & UsePriceBooksForBasketParameters
 /**
+ * WARNING: This method is not implemented yet.
+ *
  * A hook for `ShopperBaskets#getPriceBooksForBasket`.
  * Gets applicable price books for an existing basket.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getPriceBooksForBasket} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getpricebooksforbasket} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function usePriceBooksForBasket(
-    arg: Omit<UsePriceBooksForBasketArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getPriceBooksForBasket']> | Response, Error>
-): UseQueryResult<DataType<Client['getPriceBooksForBasket']>, Error>
-function usePriceBooksForBasket(
-    arg: Omit<UsePriceBooksForBasketArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getPriceBooksForBasket']> | Response, Error>
-): UseQueryResult<Response, Error>
-function usePriceBooksForBasket(
-    arg: UsePriceBooksForBasketArg,
-    options?: UseQueryOptions<DataType<Client['getPriceBooksForBasket']> | Response, Error>
-): UseQueryResult<DataType<Client['getPriceBooksForBasket']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const defaultOptions = {
-        enabled: !!parameters.basketId
-    }
-    return useQuery(
-        ['/baskets', parameters.basketId, '/price-books', arg],
-        (_, {shopperBaskets}) =>
-            shopperBaskets.getPriceBooksForBasket({parameters, headers}, rawResponse),
-        {...defaultOptions, ...options}
-    )
+function usePriceBooksForBasket(): void {
+    NotImplementedError()
 }
 
 type UseShippingMethodsForShipmentParameters = NonNullable<
@@ -176,43 +150,17 @@ function useShippingMethodsForShipment(
     )
 }
 
-type UseTaxesFromBasketParameters = NonNullable<
-    Argument<Client['getTaxesFromBasket']>
->['parameters']
-type UseTaxesFromBasketHeaders = NonNullable<Argument<Client['getTaxesFromBasket']>>['headers']
-type UseTaxesFromBasketArg = {
-    headers?: UseTaxesFromBasketHeaders
-    rawResponse?: boolean
-} & UseTaxesFromBasketParameters
 /**
+ * WARNING: This method is not implemented yet.
+ *
  * A hook for `ShopperBaskets#getTaxesFromBasket`.
  * This method gives you the external taxation data set by the PUT taxes API. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getTaxesFromBasket} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#gettaxesfrombasket} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function useTaxesFromBasket(
-    arg: Omit<UseTaxesFromBasketArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getTaxesFromBasket']> | Response, Error>
-): UseQueryResult<DataType<Client['getTaxesFromBasket']>, Error>
-function useTaxesFromBasket(
-    arg: Omit<UseTaxesFromBasketArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getTaxesFromBasket']> | Response, Error>
-): UseQueryResult<Response, Error>
-function useTaxesFromBasket(
-    arg: UseTaxesFromBasketArg,
-    options?: UseQueryOptions<DataType<Client['getTaxesFromBasket']> | Response, Error>
-): UseQueryResult<DataType<Client['getTaxesFromBasket']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const defaultOptions = {
-        enabled: !!parameters.basketId
-    }
-    return useQuery(
-        ['/baskets', parameters.basketId, '/taxes', arg],
-        (_, {shopperBaskets}) =>
-            shopperBaskets.getTaxesFromBasket({parameters, headers}, rawResponse),
-        {...defaultOptions, ...options}
-    )
+function useTaxesFromBasket(): void {
+    NotImplementedError()
 }
 
 export {

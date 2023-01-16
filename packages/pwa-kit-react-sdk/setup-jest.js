@@ -38,12 +38,8 @@ jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
                         path: 'api'
                     },
                     {
-                        host: 'zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com',
+                        host: 'zzrf-001.dx.commercecloud.salesforce.com',
                         path: 'ocapi'
-                    },
-                    {
-                        host: 'api.cquotient.com',
-                        path: 'einstein'
                     }
                 ]
             }

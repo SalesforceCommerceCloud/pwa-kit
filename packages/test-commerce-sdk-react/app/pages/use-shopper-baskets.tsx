@@ -5,15 +5,19 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useCustomerBaskets, useShopperBasketsMutation, useCustomerId} from 'commerce-sdk-react'
+import {
+    useCustomerBaskets,
+    useShopperBasketsMutation,
+    useCustomerId
+} from 'commerce-sdk-react-preview'
 import {UseBasket} from '../components/use-shopper-baskets/use-basket'
 import {UsePaymentMethodsForBasket} from '../components/use-shopper-baskets/use-payment-method-for-basket'
 
 function UseShopperBaskets() {
     const customerId = useCustomerId() || ''
     const baskets = useCustomerBaskets({customerId})
-    const createBasket = useShopperBasketsMutation('createBasket')
-    const updateBasket = useShopperBasketsMutation('updateBasket')
+    const createBasket = useShopperBasketsMutation({action: 'createBasket'})
+    const updateBasket = useShopperBasketsMutation({action: 'updateBasket'})
 
     const hasBasket = baskets.data?.total !== 0
     const basketId = baskets.data?.baskets ? baskets.data?.baskets[0].basketId : ''

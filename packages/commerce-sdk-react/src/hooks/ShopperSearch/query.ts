@@ -42,7 +42,7 @@ function useProductSearch(
     parameters.locale = parameters.locale || locale
     parameters.currency = parameters.currency || currency
     return useQuery(
-        ['productSearch', arg],
+        ['/product-search', arg],
         (_, {shopperSearch}) => shopperSearch.productSearch({parameters, headers}, rawResponse),
         options
     )
@@ -80,7 +80,7 @@ function useSearchSuggestions(
     parameters.locale = parameters.locale || locale
     parameters.currency = parameters.currency || currency
     return useQuery(
-        ['search-suggestions', arg],
+        ['/search-suggestions', arg],
         (_, {shopperSearch}) =>
             shopperSearch.getSearchSuggestions({parameters, headers}, rawResponse),
         options
