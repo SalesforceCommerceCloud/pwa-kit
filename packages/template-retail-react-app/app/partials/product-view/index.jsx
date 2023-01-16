@@ -244,8 +244,8 @@ const ProductView = ({
                     )}
                 </Box>
 
-                {/* Variations & Quantity Selector */}
-                <VStack align="stretch" spacing={8} flex={1} marginBottom={[16, 16, 16, 0, 0]}>
+                {/* Variations & Quantity Selector & CTA buttons */}
+                <VStack align="stretch" spacing={8} flex={1}>
                     <Box display={['none', 'none', 'none', 'block']}>
                         <ProductViewHeader
                             name={product?.name}
