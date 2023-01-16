@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -59,7 +59,7 @@ const ProductDetail = () => {
     const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
 
     /****************************** Basket *********************************/
-    const {hasBasket, basket, baskets} = useBasket()
+    const {hasBasket, basket} = useBasket()
     const createBasket = useShopperBasketsMutation({action: 'createBasket'})
     const addItemToBasketAction = useShopperBasketsMutation({action: 'addItemToBasket'})
 
