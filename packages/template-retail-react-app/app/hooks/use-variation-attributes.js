@@ -48,10 +48,16 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @param {Object} location
  * @returns {String} a product url for the current variation value.
  */
-const buildVariantValueHref = ({pathname, existingParams, newParams, productId, isSetProduct}) => {
+const buildVariantValueHref = ({
+    pathname,
+    existingParams,
+    newParams,
+    productId,
+    isProductPartOfSet
+}) => {
     const [allParams, productParams] = existingParams
 
-    if (isSetProduct) {
+    if (isProductPartOfSet) {
         updateSearchParams(productParams, newParams)
         allParams.set(productId, productParams.toString())
     } else {
@@ -90,10 +96,10 @@ const isVariantValueOrderable = (product, variationParams) => {
  * @returns {Array} a decorated variation attributes list.
  *
  */
-export const useVariationAttributes = (product = {}, isSetProduct = false) => {
+export const useVariationAttributes = (product = {}, isProductPartOfSet = false) => {
     const {variationAttributes = []} = product
     const location = useLocation()
-    const variationParams = useVariationParams(product, isSetProduct)
+    const variationParams = useVariationParams(product, isProductPartOfSet)
 
     const existingParams = usePDPSearchParams(product.id)
 
@@ -121,7 +127,7 @@ export const useVariationAttributes = (product = {}, isSetProduct = false) => {
                             existingParams,
                             newParams: params,
                             productId: product.id,
-                            isSetProduct
+                            isProductPartOfSet
                         }),
                         orderable: isVariantValueOrderable(product, params)
                     }

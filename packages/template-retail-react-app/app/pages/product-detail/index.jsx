@@ -49,6 +49,8 @@ const ProductDetail = ({category, product, isLoading}) => {
     const navigate = useNavigation()
     const [primaryCategory, setPrimaryCategory] = useState(category)
 
+    const isProductASet = product?.type.set
+
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
     // attributes are selected (to get the correct inventory values), the category information
@@ -147,7 +149,7 @@ const ProductDetail = ({category, product, isLoading}) => {
             </Helmet>
 
             <Stack spacing={16}>
-                {product?.type.set ? (
+                {isProductASet ? (
                     <Fragment>
                         {/* Product Set: parent product */}
                         <ProductView
@@ -164,7 +166,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                             <Fragment key={childProduct.id}>
                                 <ProductView
                                     product={childProduct}
-                                    isSetProduct={true}
+                                    isProductPartOfSet={true}
                                     addToCart={(variant, quantity) =>
                                         handleAddToCart(variant, quantity)
                                     }

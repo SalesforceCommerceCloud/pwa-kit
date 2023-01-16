@@ -80,7 +80,7 @@ const ProductView = ({
     addToWishlist,
     updateWishlist,
     isProductLoading,
-    isSetProduct = false
+    isProductPartOfSet = false
 }) => {
     const intl = useIntl()
     const history = useHistory()
@@ -104,13 +104,15 @@ const ProductView = ({
         variationAttributes,
         stockLevel,
         stepQuantity
-    } = useProduct(product, isSetProduct)
+    } = useProduct(product, isProductPartOfSet)
     const canAddToWishlist = !isProductLoading
     const canOrder =
         !isProductLoading &&
         variant?.orderable &&
         parseInt(quantity) > 0 &&
         parseInt(quantity) <= stockLevel
+
+    const isProductASet = product?.type.set
 
     const renderActionButtons = () => {
         const buttons = []
@@ -126,7 +128,7 @@ const ProductView = ({
                 return
             }
             await addToCart(variant, quantity)
-            onAddToCartModalOpen({product, isSetProduct, quantity})
+            onAddToCartModalOpen({product, isProductPartOfSet, quantity})
         }
 
         const handleWishlistItem = async () => {
@@ -199,8 +201,6 @@ const ProductView = ({
             toggleShowOptionsMessage(false)
         }
     }, [variant?.productId])
-
-    console.log('--- product type', product?.type, product?.name)
 
     return (
         <Flex direction={'column'} data-testid="product-view">
@@ -325,7 +325,7 @@ const ProductView = ({
                         )}
 
                         {/* Quantity Selector */}
-                        {!product?.type.set && (
+                        {!isProductASet && (
                             <VStack align="stretch" maxWidth={'200px'}>
                                 <Box fontWeight="bold">
                                     <label htmlFor="quantity">
@@ -391,7 +391,7 @@ const ProductView = ({
                                 </Link>
                             )}
                         </HideOnDesktop>
-                        {product?.type.set && <p>{product?.shortDescription}</p>}
+                        {isProductASet && <p>{product?.shortDescription}</p>}
                     </VStack>
 
                     <Box>
@@ -402,9 +402,11 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        {!product?.type.set && (
+                        {!isProductASet && (
                             <Box
-                                display={isSetProduct ? 'block' : ['none', 'none', 'none', 'block']}
+                                display={
+                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
+                                }
                             >
                                 {renderActionButtons()}
                             </Box>
@@ -418,7 +420,9 @@ const ProductView = ({
                 bg="white"
                 width="100%"
                 display={
-                    isSetProduct || product?.type.set ? 'none' : ['block', 'block', 'block', 'none']
+                    isProductPartOfSet || isProductASet
+                        ? 'none'
+                        : ['block', 'block', 'block', 'none']
                 }
                 p={[4, 4, 6]}
                 left={0}
@@ -434,7 +438,7 @@ const ProductView = ({
 
 ProductView.propTypes = {
     product: PropTypes.object,
-    isSetProduct: PropTypes.bool,
+    isProductPartOfSet: PropTypes.bool,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,

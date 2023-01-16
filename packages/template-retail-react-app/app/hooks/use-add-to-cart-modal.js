@@ -58,12 +58,12 @@ export const AddToCartModal = () => {
     if (!isOpen) {
         return null
     }
-    const {product, isSetProduct, quantity} = data || {}
+    const {product, isProductPartOfSet, quantity} = data || {}
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const variationAttributes = useVariationAttributes(product, isSetProduct)
-    const variant = useVariant(product, isSetProduct)
+    const variationAttributes = useVariationAttributes(product, isProductPartOfSet)
+    const variant = useVariant(product, isProductPartOfSet)
     const {currency, productItems, productSubTotal, itemAccumulatedCount} = basket
     const {id, variationValues} = product
     const lineItemPrice = productItems?.find((item) => item.productId === id)?.basePrice * quantity
