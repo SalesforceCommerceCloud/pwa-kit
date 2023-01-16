@@ -29,6 +29,8 @@ import QuantityPicker from '../../components/quantity-picker'
 const ProductViewHeader = ({name, price, currency, category, productType}) => {
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
+    const isProductASet = productType?.set
+
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
@@ -45,7 +47,7 @@ const ProductViewHeader = ({name, price, currency, category, productType}) => {
             {/* Price */}
             <Skeleton isLoaded={price} minWidth={32}>
                 <Text fontWeight="bold" fontSize="md" aria-label="price">
-                    {productType?.set && 'Starting at '}
+                    {isProductASet && 'Starting at '}
                     {intl.formatNumber(price, {
                         style: 'currency',
                         currency: currency || activeCurrency
@@ -60,7 +62,8 @@ ProductViewHeader.propTypes = {
     name: PropTypes.string,
     price: PropTypes.number,
     currency: PropTypes.string,
-    category: PropTypes.array
+    category: PropTypes.array,
+    productType: PropTypes.object
 }
 
 const ButtonWithRegistration = withRegistration(Button)
