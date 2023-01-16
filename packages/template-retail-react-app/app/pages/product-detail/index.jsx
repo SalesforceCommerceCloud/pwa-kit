@@ -21,14 +21,14 @@ import {
     Button,
     Stack
 } from '@chakra-ui/react'
+import {useProduct, useCategory, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 
 // Hooks
-import useBasket from '../../commerce-api/hooks/useBasket'
+import {useBasket} from '../../hooks/use-basket'
 import {useVariant} from '../../hooks'
 import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
-import {useProduct, useCategory} from 'commerce-sdk-react'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '../../components/recommended-products'
@@ -47,12 +47,6 @@ import {
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {
-    useCustomBasket,
-    useShopperBasketsMutation,
-    // useCustomerId,
-    // useCustomerProductLists
-} from 'commerce-sdk-react'
 import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
 const ProductDetail = () => {
@@ -62,17 +56,12 @@ const ProductDetail = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
-    // const customerId = useCustomerId() || ''
-    // console.log('customerId', customerId)
-    // getCustomerProductLists is not implementent :-o
-    // const {data: wishListTest} = useCustomerProductLists({customerId}, {enabled: !!customerId})
     const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
 
     /****************************** Basket *********************************/
-    const {hasBasket, basket, baskets} = useCustomBasket()
-    console.log('baskets', baskets)
-    const createBasket = useShopperBasketsMutation('createBasket')
-    const addItemToBasketAction = useShopperBasketsMutation('addItemToBasket')
+    const {hasBasket, basket, baskets} = useBasket()
+    const createBasket = useShopperBasketsMutation({action: 'createBasket'})
+    const addItemToBasketAction = useShopperBasketsMutation({action: 'addItemToBasket'})
 
     const {res} = useServerContext()
     if (res) {
@@ -175,6 +164,7 @@ const ProductDetail = () => {
     }
 
     const addItemToBasket = (basketId, variant, quantity) => {
+        console.log('basketId', basketId)
         const productItems = [
             {
                 productId: variant.productId,
@@ -197,11 +187,14 @@ const ProductDetail = () => {
     const handleAddToCart = async (variant, quantity) => {
         try {
             if (!variant?.orderable || !quantity) return
+            console.log('variant', variant)
+            console.log('hasBasket', hasBasket)
             if (!hasBasket) {
                 createBasket.mutate(
                     {body: {}},
                     {
                         onSuccess: (basket) => {
+                            console.log('basket on', basket)
                             addItemToBasket(basket.basketId, variant, quantity)
                         }
                     }
@@ -343,7 +336,7 @@ const ProductDetail = () => {
                             />
                         }
                         recommender={'complete-the-set'}
-                        products={product}
+                        products={[product]}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />
@@ -356,7 +349,7 @@ const ProductDetail = () => {
                             />
                         }
                         recommender={'pdp-similar-items'}
-                        products={product}
+                        products={[product]}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />

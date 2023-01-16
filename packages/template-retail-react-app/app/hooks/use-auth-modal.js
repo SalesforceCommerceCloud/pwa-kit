@@ -28,7 +28,7 @@ import RegisterForm from '../components/register'
 import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
 import useNavigation from './use-navigation'
-import {ShopperLoginHelpers, useShopperLoginHelper} from 'commerce-sdk-react'
+import {ShopperLoginHelpers, useShopperLoginHelper} from 'commerce-sdk-react-preview'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'

@@ -43,7 +43,6 @@ import {
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
     HOME_SHOP_PRODUCTS_LIMIT
 } from '../../constants'
-import {useProduct} from 'commerce-sdk-react'
 
 /**
  * This is the home page for Retail React App.
@@ -55,6 +54,7 @@ const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
     const einstein = useEinstein()
     const {pathname} = useLocation()
+
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)

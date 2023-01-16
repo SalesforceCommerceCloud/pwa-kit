@@ -5,20 +5,17 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import PropTypes from 'prop-types'
 import {noop} from '../../utils/utils'
 import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {useCustomerId, useCustomer} from 'commerce-sdk-react'
 
 const withRegistration = (Component) => {
     const WrappedComponent = ({onClick = noop, ...passThroughProps}) => {
-        // const customer = useCustomer()
-        const customerId = useCustomerId() || ''
-        const {data: customer} = useCustomer({customerId})
-        console.log('customer', customer)
+        const customer = useCustomer()
         const authModal = useAuthModal()
         const location = useLocation()
         const {formatMessage, locale} = useIntl()
@@ -27,7 +24,7 @@ const withRegistration = (Component) => {
 
         const handleClick = (e) => {
             e.preventDefault()
-            if (!customer?.authType === 'registered') {
+            if (!customer.isRegistered) {
                 // Do not show auth modal if users is already on the login page
                 if (isLoginPage) {
                     showToast({

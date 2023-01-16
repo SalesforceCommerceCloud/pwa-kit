@@ -48,7 +48,7 @@ import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
-import {useCategory, useProduct} from 'commerce-sdk-react'
+import {useCategory} from 'commerce-sdk-react-preview'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
