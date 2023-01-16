@@ -10,7 +10,7 @@ import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, waitForElementToBeRemoved, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import Auth from '../../commerce-api/auth'
 import {
@@ -25,35 +25,11 @@ import {
 } from '../../commerce-api/mock-data'
 import mockConfig from '../../../config/mocks/default'
 
-jest.setTimeout(60000)
-
 jest.mock('../../commerce-api/einstein')
 
 // Make sure fetch is defined in test env
 Object.defineProperty(window, 'fetch', {
     value: require('cross-fetch')
-})
-
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true),
-        createGetTokenBody: jest.fn().mockReturnValue({
-            grantType: 'test',
-            code: 'test',
-            usid: 'test',
-            codeVerifier: 'test',
-            redirectUri: 'http://localhost/test'
-        })
-    }
-})
-
-jest.mock('../../commerce-api/pkce', () => {
-    return {
-        createCodeVerifier: jest.fn().mockReturnValue('codeverifier'),
-        generateCodeChallenge: jest.fn().mockReturnValue('codechallenge')
-    }
 })
 
 const {keysToCamel} = jest.requireActual('../../commerce-api/utils')
@@ -75,65 +51,58 @@ const WrappedCheckout = () => {
     )
 }
 
-// Set up the msw server to intercept fetch requests and returned mocked results. Additional
-// interceptors can be defined in each test for specific requests.
-const server = setupMockServer(
-    // mock empty guest basket
-    rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-        return res(
-            ctx.json({
-                baskets: [keysToCamel(ocapiBasketWithItem)]
-            })
-        )
-    }),
-
-    // mock product variant detail
-    rest.get('*/products', (req, res, ctx) => {
-        return res(ctx.json(productsResponse))
-    }),
-
-    // mock available shipping methods
-    rest.get('*/shipments/me/shipping_methods', (req, res, ctx) => {
-        return res(ctx.json(mockShippingMethods))
-    }),
-
-    // mock available payment methods
-    rest.get('*/baskets/:basketId/payment_methods', (req, res, ctx) => {
-        return res(ctx.json(mockPaymentMethods))
-    }),
-
-    // mock product details
-    rest.get('*/products', (req, res, ctx) => {
-        return res(ctx.json({data: [{id: '701642811398M'}]}))
-    }),
-
-    rest.get('*/customers/:customerId', (req, res, ctx) => {
-        return res(
-            ctx.delay(0),
-            ctx.status(200),
-            ctx.json({
-                authType: 'guest',
-                preferredLocale: 'en_US',
-                ...mockedRegisteredCustomer,
-                // Mocked customer ID should match the mocked basket's customer ID as
-                // it would with real usage, otherwise, the useShopper hook will detect
-                // the mismatch and attempt to refetch a new basket for the customer.
-                customerId: ocapiBasketWithItem.customer_info.customer_id
-            })
-        )
-    })
-)
-
 // Set up and clean up
-beforeAll(() => {
-    jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
+beforeEach(() => {
+    global.server.use(
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    baskets: [keysToCamel(ocapiBasketWithItem)]
+                })
+            )
+        }),
+
+        // mock product variant detail
+        rest.get('*/products', (req, res, ctx) => {
+            return res(ctx.json(productsResponse))
+        }),
+
+        // mock available shipping methods
+        rest.get('*/shipments/me/shipping_methods', (req, res, ctx) => {
+            return res(ctx.json(mockShippingMethods))
+        }),
+
+        // mock available payment methods
+        rest.get('*/baskets/:basketId/payment_methods', (req, res, ctx) => {
+            return res(ctx.json(mockPaymentMethods))
+        }),
+
+        // mock product details
+        rest.get('*/products', (req, res, ctx) => {
+            return res(ctx.json({data: [{id: '701642811398M'}]}))
+        }),
+
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    authType: 'guest',
+                    preferredLocale: 'en_US',
+                    ...mockedRegisteredCustomer,
+                    // Mocked customer ID should match the mocked basket's customer ID as
+                    // it would with real usage, otherwise, the useShopper hook will detect
+                    // the mismatch and attempt to refetch a new basket for the customer.
+                    customerId: ocapiBasketWithItem.customer_info.customer_id
+                })
+            )
+        })
+    )
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('Renders skeleton until customer and basket are loaded', () => {
     const {getByTestId, queryByTestId} = renderWithProviders(<Checkout />)
@@ -150,7 +119,7 @@ test('Can proceed through checkout steps as guest', async () => {
     jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedGuestCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
-    server.use(
+    global.server.use(
         // mock adding guest email to basket
         rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
             currentBasket.customer_info.email = 'test@test.com'
@@ -351,7 +320,7 @@ test('Can proceed through checkout as registered customer', async () => {
     jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
-    server.use(
+    global.server.use(
         // mock adding guest email to basket
         rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
             currentBasket.customer_info.email = 'customer@test.com'
@@ -547,7 +516,7 @@ test('Can edit address during checkout as a registered customer', async () => {
     jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
-    server.use(
+    global.server.use(
         // mock fetch product lists
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.json(mockedCustomerProductLists))
@@ -641,7 +610,7 @@ test('Can add address during checkout as a registered customer', async () => {
     jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
-    server.use(
+    global.server.use(
         // mock adding guest email to basket
         rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
             currentBasket.customer_info.email = 'customer@test.com'

@@ -8,59 +8,12 @@ import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {createPathWithDefaults, renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 import mockConfig from '../../../config/mocks/default'
 
-jest.setTimeout(60000)
 
 jest.mock('../../commerce-api/einstein')
-
-const mockRegisteredCustomer = {
-    authType: 'registered',
-    customerId: 'registeredCustomerId',
-    customerNo: 'testno',
-    email: 'darek@test.com',
-    firstName: 'Tester',
-    lastName: 'Testing',
-    login: 'darek@test.com'
-}
-
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async registerCustomer() {
-                return mockRegisteredCustomer
-            }
-
-            async getCustomer(args) {
-                if (args.parameters.customerId === 'customerid') {
-                    return {
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    }
-                }
-                return mockRegisteredCustomer
-            }
-
-            async authorizeCustomer() {
-                return {
-                    headers: {
-                        get(key) {
-                            return {authorization: 'guestToken'}[key]
-                        }
-                    },
-                    json: async () => ({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                }
-            }
-        }
-    }
-})
 
 const MockedComponent = () => {
     return (
@@ -70,23 +23,14 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer()
-
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
-    server.listen({
-        onUnhandledRequest: 'error'
-    })
-
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
-    server.resetHandlers()
-    window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
-afterAll(() => server.close())
 
 test('Allows customer to go to sign in page', async () => {
     // render our test component
@@ -102,7 +46,7 @@ test('Allows customer to go to sign in page', async () => {
 
 test('Allows customer to generate password token', async () => {
     // mock reset password request
-    server.use(
+    global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
                 ctx.delay(0),
@@ -136,7 +80,7 @@ test('Allows customer to generate password token', async () => {
 })
 
 test('Renders error message from server', async () => {
-    server.use(
+    global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
                 ctx.delay(0),

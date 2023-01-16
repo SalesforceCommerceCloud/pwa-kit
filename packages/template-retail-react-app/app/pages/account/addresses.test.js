@@ -7,22 +7,12 @@
 import React, {useEffect} from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountAddresses from './addresses'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 let mockCustomer = {}
-
-jest.setTimeout(30000)
-
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
 
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
@@ -67,16 +57,9 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer(
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.json(mockCustomer))
-    )
-)
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
     mockCustomer = {
         authType: 'registered',
         customerId: 'registeredCustomerId',
@@ -89,9 +72,7 @@ beforeEach(() => {
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('Allows customer to add/edit/remove addresses', async () => {
     renderWithProviders(<MockedComponent />)

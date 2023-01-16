@@ -5,26 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect} from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {getByPlaceholderText, screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import PaymentMethods from './payments'
 
 let mockCustomer = {}
 
 const mockToastSpy = jest.fn()
-
-jest.setTimeout(30000)
-
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
 
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
@@ -82,16 +72,13 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer(
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.json(mockCustomer))
-    )
-)
-
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.json(mockCustomer))
+        )
+    )
     mockCustomer = {
         authType: 'registered',
         customerId: 'registeredCustomerId',
@@ -103,10 +90,9 @@ beforeEach(() => {
     }
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('Allows customer to add and remove payment methods', async () => {
     renderWithProviders(<MockedComponent />)
