@@ -60,7 +60,9 @@ export const setupMockServer = () => {
 
 global.server = setupMockServer()
 beforeAll(() => {
-    global.server.listen()
+    global.server.listen({
+        onUnhandledRequest: 'error',
+    })
 })
 afterEach(() => {
     global.server.resetHandlers()

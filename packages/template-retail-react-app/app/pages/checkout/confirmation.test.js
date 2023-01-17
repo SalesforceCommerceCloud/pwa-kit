@@ -158,7 +158,7 @@ const WrappedConfirmation = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    global.use(
+    global.server.use(
         rest.get('*/baskets*', (_, res, ctx) => {
             return res(ctx.json(keysToCamel(mockBasketOrder)))
         }),

@@ -24,14 +24,6 @@ jest.mock('@chakra-ui/react', () => {
     }
 })
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 const MockedComponent = ({history}) => {
     const customer = useCustomer()
     useEffect(() => {
