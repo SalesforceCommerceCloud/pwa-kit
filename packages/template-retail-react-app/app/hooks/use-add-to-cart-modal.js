@@ -63,7 +63,6 @@ export const AddToCartModal = () => {
         return null
     }
 
-    console.log('totalItems', totalItems)
     const {currency, productItems, productSubTotal} = basket
     const {id, variationValues} = product
     const lineItemPrice = productItems?.find((item) => item.productId === id)?.basePrice * quantity
