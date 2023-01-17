@@ -26,13 +26,15 @@ import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
 
-const ProductViewHeader = ({name, price, currency, category}) => {
+const ProductViewHeader = ({name, price, currency, category, productType}) => {
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
+    const isProductASet = productType?.set
+
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
-                <Skeleton isLoaded={category} width={64}>
+                <Skeleton isLoaded={category} minWidth={64}>
                     <Breadcrumb categories={category} />
                 </Skeleton>
             )}
@@ -43,8 +45,13 @@ const ProductViewHeader = ({name, price, currency, category}) => {
             </Skeleton>
 
             {/* Price */}
-            <Skeleton isLoaded={price} width={32}>
+            <Skeleton isLoaded={price} minWidth={32}>
                 <Text fontWeight="bold" fontSize="md" aria-label="price">
+                    {isProductASet &&
+                        `${intl.formatMessage({
+                            id: 'product_view.label.starting_at_price',
+                            defaultMessage: 'Starting at'
+                        })} `}
                     {intl.formatNumber(price, {
                         style: 'currency',
                         currency: currency || activeCurrency
@@ -59,7 +66,8 @@ ProductViewHeader.propTypes = {
     name: PropTypes.string,
     price: PropTypes.number,
     currency: PropTypes.string,
-    category: PropTypes.array
+    category: PropTypes.array,
+    productType: PropTypes.object
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -78,7 +86,8 @@ const ProductView = ({
     updateCart,
     addToWishlist,
     updateWishlist,
-    isProductLoading
+    isProductLoading,
+    isProductPartOfSet = false
 }) => {
     const intl = useIntl()
     const history = useHistory()
@@ -102,13 +111,15 @@ const ProductView = ({
         variationAttributes,
         stockLevel,
         stepQuantity
-    } = useProduct(product)
+    } = useProduct(product, isProductPartOfSet)
     const canAddToWishlist = !isProductLoading
     const canOrder =
         !isProductLoading &&
         variant?.orderable &&
         parseInt(quantity) > 0 &&
         parseInt(quantity) <= stockLevel
+
+    const isProductASet = product?.type.set
 
     const renderActionButtons = () => {
         const buttons = []
@@ -124,7 +135,7 @@ const ProductView = ({
                 return
             }
             await addToCart(variant, quantity)
-            onAddToCartModalOpen({product, quantity})
+            onAddToCartModalOpen({product, isProductPartOfSet, quantity})
         }
 
         const handleWishlistItem = async () => {
@@ -205,6 +216,7 @@ const ProductView = ({
                 <ProductViewHeader
                     name={product?.name}
                     price={product?.price}
+                    productType={product?.type}
                     currency={product?.currency}
                     category={category}
                 />
@@ -236,12 +248,13 @@ const ProductView = ({
                     )}
                 </Box>
 
-                {/* Variations & Quantity Selector */}
-                <VStack align="stretch" spacing={8} flex={1} marginBottom={[16, 16, 16, 0, 0]}>
+                {/* Variations & Quantity Selector & CTA buttons */}
+                <VStack align="stretch" spacing={8} flex={1}>
                     <Box display={['none', 'none', 'none', 'block']}>
                         <ProductViewHeader
                             name={product?.name}
                             price={product?.price}
+                            productType={product?.type}
                             currency={product?.currency}
                             category={category}
                         />
@@ -319,47 +332,49 @@ const ProductView = ({
                         )}
 
                         {/* Quantity Selector */}
-                        <VStack align="stretch" maxWidth={'200px'}>
-                            <Box fontWeight="bold">
-                                <label htmlFor="quantity">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Quantity',
-                                        id: 'product_view.label.quantity'
-                                    })}
-                                    :
-                                </label>
-                            </Box>
+                        {!isProductASet && (
+                            <VStack align="stretch" maxWidth={'200px'}>
+                                <Box fontWeight="bold">
+                                    <label htmlFor="quantity">
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Quantity',
+                                            id: 'product_view.label.quantity'
+                                        })}
+                                        :
+                                    </label>
+                                </Box>
 
-                            <QuantityPicker
-                                id="quantity"
-                                step={stepQuantity}
-                                value={quantity}
-                                min={minOrderQuantity}
-                                onChange={(stringValue, numberValue) => {
-                                    // Set the Quantity of product to value of input if value number
-                                    if (numberValue >= 0) {
-                                        setQuantity(numberValue)
-                                    } else if (stringValue === '') {
-                                        // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
-                                        // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
-                                        setQuantity(stringValue)
-                                    }
-                                }}
-                                onBlur={(e) => {
-                                    // Default to 1the `minOrderQuantity` if a user leaves the box with an invalid value
-                                    const value = e.target.value
-                                    if (parseInt(value) < 0 || value === '') {
-                                        setQuantity(minOrderQuantity)
-                                    }
-                                }}
-                                onFocus={(e) => {
-                                    // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
-                                    // new quantity with one click. NOTE: This is something that can be refactored into the parent
-                                    // component, potentially as a prop called `selectInputOnFocus`.
-                                    e.target.select()
-                                }}
-                            />
-                        </VStack>
+                                <QuantityPicker
+                                    id="quantity"
+                                    step={stepQuantity}
+                                    value={quantity}
+                                    min={minOrderQuantity}
+                                    onChange={(stringValue, numberValue) => {
+                                        // Set the Quantity of product to value of input if value number
+                                        if (numberValue >= 0) {
+                                            setQuantity(numberValue)
+                                        } else if (stringValue === '') {
+                                            // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
+                                            // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
+                                            setQuantity(stringValue)
+                                        }
+                                    }}
+                                    onBlur={(e) => {
+                                        // Default to 1the `minOrderQuantity` if a user leaves the box with an invalid value
+                                        const value = e.target.value
+                                        if (parseInt(value) < 0 || value === '') {
+                                            setQuantity(minOrderQuantity)
+                                        }
+                                    }}
+                                    onFocus={(e) => {
+                                        // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
+                                        // new quantity with one click. NOTE: This is something that can be refactored into the parent
+                                        // component, potentially as a prop called `selectInputOnFocus`.
+                                        e.target.select()
+                                    }}
+                                />
+                            </VStack>
+                        )}
                         <Box>
                             {!showLoading && showOptionsMessage && (
                                 <Fade in={true}>
@@ -383,6 +398,7 @@ const ProductView = ({
                                 </Link>
                             )}
                         </HideOnDesktop>
+                        {isProductASet && <p>{product?.shortDescription}</p>}
                     </VStack>
 
                     <Box>
@@ -393,9 +409,15 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        <Box display={['none', 'none', 'none', 'block']}>
-                            {renderActionButtons()}
-                        </Box>
+                        {!isProductASet && (
+                            <Box
+                                display={
+                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
+                                }
+                            >
+                                {renderActionButtons()}
+                            </Box>
+                        )}
                     </Box>
                 </VStack>
             </Flex>
@@ -404,7 +426,11 @@ const ProductView = ({
                 position="fixed"
                 bg="white"
                 width="100%"
-                display={['block', 'block', 'block', 'none']}
+                display={
+                    isProductPartOfSet || isProductASet
+                        ? 'none'
+                        : ['block', 'block', 'block', 'none']
+                }
                 p={[4, 4, 6]}
                 left={0}
                 bottom={0}
@@ -419,6 +445,7 @@ const ProductView = ({
 
 ProductView.propTypes = {
     product: PropTypes.object,
+    isProductPartOfSet: PropTypes.bool,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,

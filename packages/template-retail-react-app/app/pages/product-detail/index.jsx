@@ -5,22 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {Fragment, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-import {
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Box,
-    Button,
-    Stack
-} from '@chakra-ui/react'
+import {Box, Button, Stack} from '@chakra-ui/react'
 
 // Hooks
 import useBasket from '../../commerce-api/hooks/useBasket'
@@ -32,6 +23,7 @@ import useEinstein from '../../commerce-api/hooks/useEinstein'
 // Project Components
 import RecommendedProducts from '../../components/recommended-products'
 import ProductView from '../../partials/product-view'
+import InformationAccordion from './partials/information-accordion'
 
 // Others/Utils
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
@@ -56,6 +48,8 @@ const ProductDetail = ({category, product, isLoading}) => {
     const toast = useToast()
     const navigate = useNavigation()
     const [primaryCategory, setPrimaryCategory] = useState(category)
+
+    const isProductASet = product?.type.set
 
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
@@ -155,105 +149,55 @@ const ProductDetail = ({category, product, isLoading}) => {
             </Helmet>
 
             <Stack spacing={16}>
-                <ProductView
-                    product={product}
-                    category={primaryCategory?.parentCategoryTree || []}
-                    addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                    isProductLoading={isLoading}
-                    isCustomerProductListLoading={!wishlist.isInitialized}
-                />
+                {isProductASet ? (
+                    <Fragment>
+                        {/* Product Set: parent product */}
+                        <ProductView
+                            product={product}
+                            category={primaryCategory?.parentCategoryTree || []}
+                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                            isProductLoading={isLoading}
+                            isCustomerProductListLoading={!wishlist.isInitialized}
+                        />
 
-                {/* Information Accordion */}
-                <Stack direction="row" spacing={[0, 0, 0, 16]}>
-                    <Accordion allowMultiple allowToggle maxWidth={'896px'} flex={[1, 1, 1, 5]}>
-                        {/* Details */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Product Detail',
-                                            id: 'product_detail.accordion.button.product_detail'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: product?.longDescription
-                                    }}
+                        <hr />
+
+                        {/* TODO: consider `childProduct.belongsToSet` */}
+                        {// Product Set: render the child products
+                        product.setProducts.map((childProduct) => (
+                            <Fragment key={childProduct.id}>
+                                <ProductView
+                                    product={childProduct}
+                                    isProductPartOfSet={true}
+                                    addToCart={(variant, quantity) =>
+                                        handleAddToCart(variant, quantity)
+                                    }
+                                    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                                    isProductLoading={isLoading}
+                                    isCustomerProductListLoading={!wishlist.isInitialized}
                                 />
-                            </AccordionPanel>
-                        </AccordionItem>
+                                <InformationAccordion product={childProduct} />
 
-                        {/* Size & Fit */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Size & Fit',
-                                            id: 'product_detail.accordion.button.size_fit'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-
-                        {/* Reviews */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Reviews',
-                                            id: 'product_detail.accordion.button.reviews'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-
-                        {/* Questions */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Questions',
-                                            id: 'product_detail.accordion.button.questions'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-                    </Accordion>
-                    <Box display={['none', 'none', 'none', 'block']} flex={4}></Box>
-                </Stack>
+                                <Box display={['none', 'none', 'none', 'block']}>
+                                    <hr />
+                                </Box>
+                            </Fragment>
+                        ))}
+                    </Fragment>
+                ) : (
+                    <Fragment>
+                        <ProductView
+                            product={product}
+                            category={primaryCategory?.parentCategoryTree || []}
+                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                            isProductLoading={isLoading}
+                            isCustomerProductListLoading={!wishlist.isInitialized}
+                        />
+                        <InformationAccordion product={product} />
+                    </Fragment>
+                )}
 
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
