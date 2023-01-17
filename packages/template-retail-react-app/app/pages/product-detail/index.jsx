@@ -163,6 +163,7 @@ const ProductDetail = ({category, product, isLoading}) => {
 
                         <hr />
 
+                        {/* TODO: consider `childProduct.belongsToSet` */}
                         {// Product Set: render the child products
                         product.setProducts.map((childProduct) => (
                             <Fragment key={childProduct.id}>
