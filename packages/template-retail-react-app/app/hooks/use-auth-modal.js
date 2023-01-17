@@ -20,6 +20,7 @@ import {
     useDisclosure,
     useToast
 } from '@chakra-ui/react'
+import {ShopperLoginHelpers, useShopperLoginHelper} from 'commerce-sdk-react-preview'
 import useCustomer from '../commerce-api/hooks/useCustomer'
 import {BrandLogo} from '../components/icons'
 import LoginForm from '../components/login'
@@ -47,33 +48,34 @@ export const AuthModal = ({
     const form = useForm()
     const submittedEmail = useRef()
     const toast = useToast()
+    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
 
     const submitForm = async (data) => {
         form.clearErrors()
+        loginRegisteredUser.reset()
 
         return {
-            login: handleLogin,
+            login: (data) => loginRegisteredUser.mutateAsync({username: data.email, password: data.password}, {onError: (error) => {
+                error.response.json().then((j) => {
+                    console.log(j)
+                })
+                // TODO: fix isomorphic client error handling to gain access to error.message
+                const message = /invalid credentials/i.test(error.message)
+                    ? formatMessage({
+                        defaultMessage:
+                            "Something's not right with your email or password. Try again.",
+                        id: 'auth_modal.error.incorrect_email_or_password'
+                    })
+                    : formatMessage(API_ERROR_MESSAGE)
+                form.setError('global', {type: 'manual', message})
+            }}),
             register: handleRegister,
             password: handleResetPassword
         }[currentView](data)
     }
 
-    const handleLogin = async (data) => {
-        try {
-            await customer.login(data)
-        } catch (error) {
-            const message = /invalid credentials/i.test(error.message)
-                ? formatMessage({
-                      defaultMessage:
-                          "Something's not right with your email or password. Try again.",
-                      id: 'auth_modal.error.incorrect_email_or_password'
-                  })
-                : formatMessage(API_ERROR_MESSAGE)
-            form.setError('global', {type: 'manual', message})
-        }
-    }
-
     const handleRegister = async (data) => {
+        console.log(data)
         try {
             await customer.registerCustomer(data)
             navigate('/account')
