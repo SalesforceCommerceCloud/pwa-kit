@@ -5,13 +5,12 @@ inputs:
 runs:
   using: composite
   steps:
-    # TODO: update SNYK_TOKEN in secrets
-    # - name: Audit Generated Project
-    #   run: |-
-    #       if [[ "${{ github.ref }}" == "develop" ]]; then
-    #           # Run snyk auth - authenticate snyk using environment variables to add the token
-    #           snyk auth ${{ inputs.snyk_token }}
+  - name: Audit Generated Project
+    run: |-
+        if [[ "${{ github.ref }}" == "develop" ]]; then
+            # Run snyk auth - authenticate snyk using environment variables to add the token
+            snyk auth ${{ inputs.snyk_token }}
 
-    #           snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
-    #       fi
-    #   shell: bash
+            snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
+        fi
+    shell: bash
