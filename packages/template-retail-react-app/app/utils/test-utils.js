@@ -20,9 +20,7 @@ import {
 } from '../commerce-api/contexts'
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
-import {
-    mockCategories as initialMockCategories,
-} from '../commerce-api/mock-data'
+import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
 
@@ -204,4 +202,3 @@ export const createPathWithDefaults = (path) => {
     const updatedPath = buildUrl(path, siteAlias || defaultSite.id, defaultLocale)
     return updatedPath
 }
-

@@ -7,7 +7,7 @@
 import React from 'react'
 import Checkout from './index'
 import {Route, Switch} from 'react-router-dom'
-import {screen, waitFor, waitForElementToBeRemoved, within} from '@testing-library/react'
+import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
@@ -698,7 +698,7 @@ test('Can edit address during checkout as a registered customer', async () => {
 //     user.type(screen.getByRole('textbox', {name: /zip code/i}), '33712')
 
 //     user.click(screen.getByRole('button', {name: /save & continue to shipping method/i}))
-    
+
 //     screen.debug()
 
 //     // Wait for next step to render
