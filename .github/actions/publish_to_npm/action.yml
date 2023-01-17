@@ -1,13 +1,14 @@
 name: publish_to_npm
+input:
+  NODE_AUTH_TOKEN: 
+    description: "Node auth token"
 runs:
   using: composite
   steps:
   - name: Publish to NPM
-    env: 
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     run: |-
       # Add NPM token to allow publishing
-      echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > ~/.npmrc
+      echo "//registry.npmjs.org/:_authToken=${{ inputs.NODE_AUTH_TOKEN }}" > ~/.npmrc
 
       if [[ $RELEASE ]]; then
         # Publish all changed packages. The "from-package" arg means "look

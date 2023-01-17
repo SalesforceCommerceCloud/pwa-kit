@@ -41,7 +41,7 @@ jobs:
       - name: NPM version
         run: npm --version
 
-      - name: Run tests
+      - name: Run unit tests
         uses: "./.github/actions/unittests"
 
       - name: Run Lighthouse CI on the PWA
@@ -55,15 +55,23 @@ jobs:
       - name: Create MRT credentials file
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6
         uses: "./.github/actions/create_mrt"
+        with:
+          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 
         uses: "./.github/actions/push_to_mrt"
+        with:
+          DEVELOP: $DEVELOP
+          RELEASE: $RELEASE
 
       #TODO: remove --dry-run from install command
       - name: Publish to NPM
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6
         uses: "./.github/actions/publish_to_npm"
+        with:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
       - name: Send GitHub Action data to Slack workflow (PWA Kit)
         id: slack
@@ -122,6 +130,9 @@ jobs:
 
       - name: Generate ${{ matrix.template }} project
         uses: "./.github/actions/generate_project"
+        with:
+          template: ${{ matrix.template }}
+        timeout-minutes: 5
 
       - name: Run tests
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
@@ -136,6 +147,7 @@ jobs:
           dir: generated-${{ matrix.template }}
 
       - name: Count Generated Project Dependencies
+        id: countdeps
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
         uses: "./.github/actions/countdeps"
 
@@ -147,18 +159,29 @@ jobs:
       - name: Audit Generated Project
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
         uses: "./.github/actions/snyk"
+        with:
+          snyk_token: ${{ secrets.SNYK_TOKEN }}
 
       - name: Send metrics to Datadog
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
         uses: "./.github/action/datadog"
+        with:
+          datadog_api_key: ${{ secrets.DATADOG_API_KEY }}
+          TOTAL_PACKAGES: $TOTAL_PACKAGES
 
       - name: Create MRT credentials file
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
         uses: "./.github/actions/create_mrt"
+        with:
+          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
         uses: "./.github/actions/push_to_mrt"
+        with:
+          DEVELOP: $DEVELOP
+          RELEASE: $RELEASE
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
@@ -191,8 +214,9 @@ jobs:
 
       - name: Generate ${{ matrix.template }} project
         uses: "./.github/actions/generate_project"
+        timeout-minutes: 5
 
-      - name: Run tests
+      - name: Run unit tests
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
         uses: "./.github/actions/unittests"
         with:

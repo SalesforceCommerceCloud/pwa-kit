@@ -1,4 +1,7 @@
 name: snyk
+inputs:
+  snyk_token:
+    description: "Snyk token"
 runs:
   using: composite
   steps:
@@ -7,9 +10,7 @@ runs:
     #   run: |-
     #       if [[ "${{ github.ref }}" == "develop" ]]; then
     #           # Run snyk auth - authenticate snyk using environment variables to add the token
-    #           snyk auth $SNYK_TOKEN
+    #           snyk auth ${{ inputs.snyk_token }}
 
     #           snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
     #       fi
-    #   env:
-    #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
