@@ -129,9 +129,11 @@ jobs:
         uses: "./.github/actions/setup_ubuntu"
 
       - name: Generate ${{ matrix.template }} project
-        uses: "./.github/actions/generate_project"
-        with:
-          template: ${{ matrix.template }}
+        run: |-
+          set GENERATOR_PRESET=${{ matrix.template }}
+          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
+        env:
+          GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 5
 
       - name: Run tests
@@ -213,7 +215,11 @@ jobs:
         uses: "./.github/actions/setup_windows"
 
       - name: Generate ${{ matrix.template }} project
-        uses: "./.github/actions/generate_project"
+        run: |-
+          set GENERATOR_PRESET=${{ matrix.template }}
+          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
+        env:
+          GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 5
 
       - name: Run unit tests
