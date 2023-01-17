@@ -166,7 +166,7 @@ jobs:
 
       - name: Send metrics to Datadog
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
-        uses: "./.github/action/datadog"
+        uses: "./.github/actions/datadog"
         with:
           datadog_api_key: ${{ secrets.DATADOG_API_KEY }}
           TOTAL_PACKAGES: $TOTAL_PACKAGES
