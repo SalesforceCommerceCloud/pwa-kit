@@ -47,7 +47,11 @@ const ProductViewHeader = ({name, price, currency, category, productType}) => {
             {/* Price */}
             <Skeleton isLoaded={price} minWidth={32}>
                 <Text fontWeight="bold" fontSize="md" aria-label="price">
-                    {isProductASet && 'Starting at '}
+                    {isProductASet &&
+                        `${intl.formatMessage({
+                            id: 'product_view.label.starting_at_price',
+                            defaultMessage: 'Starting at'
+                        })} `}
                     {intl.formatNumber(price, {
                         style: 'currency',
                         currency: currency || activeCurrency

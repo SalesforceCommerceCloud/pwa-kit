@@ -26,7 +26,6 @@ export const useProduct = (product, isProductPartOfSet = false) => {
     const variant = useVariant(product, isProductPartOfSet)
     const variationParams = useVariationParams(product, isProductPartOfSet)
     const variationAttributes = useVariationAttributes(product, isProductPartOfSet)
-    // console.log('--- variationAttributes', variationAttributes)
     const [quantity, setQuantity] = useState(initialQuantity)
 
     // A product is considered out of stock if the stock level is 0 or if we have all our

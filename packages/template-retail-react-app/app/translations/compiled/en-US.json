@@ -2335,6 +2335,12 @@
       "value": "Quantity"
     }
   ],
+  "product_view.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "Starting at"
+    }
+  ],
   "product_view.link.full_details": [
     {
       "type": 0,
