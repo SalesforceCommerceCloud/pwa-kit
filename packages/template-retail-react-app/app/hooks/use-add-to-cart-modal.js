@@ -62,6 +62,8 @@ export const AddToCartModal = () => {
     if (!isOpen) {
         return null
     }
+
+    console.log('totalItems', totalItems)
     const {currency, productItems, productSubTotal} = basket
     const {id, variationValues} = product
     const lineItemPrice = productItems?.find((item) => item.productId === id)?.basePrice * quantity
@@ -153,10 +155,11 @@ export const AddToCartModal = () => {
                                 <Text fontWeight="700">
                                     {intl.formatMessage(
                                         {
-                                            defaultMessage: 'Cart Subtotal ({totalItems} item)',
+                                            defaultMessage:
+                                                'Cart Subtotal ({itemAccumulatedCount} item)',
                                             id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
-                                        {totalItems}
+                                        {itemAccumulatedCount: totalItems}
                                     )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">

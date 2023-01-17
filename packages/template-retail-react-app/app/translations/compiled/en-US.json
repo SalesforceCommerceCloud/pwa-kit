@@ -330,7 +330,7 @@
     },
     {
       "type": 1,
-      "value": "totalItems"
+      "value": "itemAccumulatedCount"
     },
     {
       "type": 0,
