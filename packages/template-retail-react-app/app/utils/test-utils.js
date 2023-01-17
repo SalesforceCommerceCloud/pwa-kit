@@ -11,10 +11,10 @@ import {ChakraProvider} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 
 import theme from '../theme'
-import CommerceAPI from '../commerce-api'
+import _CommerceAPI from '../commerce-api'
 import {
     BasketProvider,
-    CommerceAPIProvider,
+    CommerceAPIProvider as _CommerceAPIProvider,
     CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
@@ -58,15 +58,15 @@ export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
 export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Router>)
 
 export const renderWithRouterAndCommerceAPI = (node) => {
-    const api = new CommerceAPI({
+    const api = new _CommerceAPI({
         ...mockConfig.app.commerceAPI,
         einsteinConfig: mockConfig.app.einsteinAPI,
         proxy: undefined
     })
     return renderWithReactIntl(
-        <CommerceAPIProvider value={api}>
+        <_CommerceAPIProvider value={api}>
             <Router>{node}</Router>
-        </CommerceAPIProvider>
+        </_CommerceAPIProvider>
     )
 }
 
@@ -100,7 +100,7 @@ export const TestProviders = ({
     // @TODO: make this dynamic (getting from package.json during CI tests fails, so hardcoding for now)
     const ocapiHost = 'zzrf-001.dx.commercecloud.salesforce.com'
 
-    const api = new CommerceAPI({
+    const api = new _CommerceAPI({
         ...appConfig.commerceAPI,
         einsteinConfig: appConfig.einsteinAPI,
         proxy,
@@ -136,7 +136,7 @@ export const TestProviders = ({
         <ServerContext.Provider value={{}}>
             <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
-                    <CommerceAPIProvider value={api}>
+                    <_CommerceAPIProvider value={api}>
                         <CommerceApiProvider
                             shortCode={commerceApiConfig.parameters.shortCode}
                             clientId={commerceApiConfig.parameters.clientId}
@@ -165,7 +165,7 @@ export const TestProviders = ({
                                 </CurrencyProvider>
                             </CategoriesProvider>
                         </CommerceApiProvider>
-                    </CommerceAPIProvider>
+                    </_CommerceAPIProvider>
                 </MultiSiteProvider>
             </IntlProvider>
         </ServerContext.Provider>
