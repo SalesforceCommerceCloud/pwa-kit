@@ -19,3 +19,4 @@ runs:
 
       # Cleanup
       rm ~/.npmrc
+    shell: bash

@@ -7,5 +7,6 @@ runs:
   steps:
     - name: Generate ${{ inputs.template }} project
       run: |-
-          set GENERATOR_PRESET=${{ inputs.template }}
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ inputs.template }}
+        set GENERATOR_PRESET=${{ inputs.template }}
+        node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ inputs.template }}
+      shell: bash

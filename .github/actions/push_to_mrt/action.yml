@@ -25,3 +25,4 @@ runs:
         if [[ $target_commerce_sdk_react ]]; then
           npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target_commerce_sdk_react
         fi
+      shell: bash
