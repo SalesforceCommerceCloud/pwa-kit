@@ -29,7 +29,7 @@ import {useCommerceAPI} from '../commerce-api/contexts'
  *
  * import {useCategories} from './hooks'
  *
- * const {root, findAndModifyFirst, itemsKey, fetchCategoryNode} = useCategories()
+ * const {root, itemsKey, fetchCategoryNode} = useCategories()
  *
  */
 export const CategoriesContext = React.createContext()
@@ -44,52 +44,9 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
         ...treeRoot[DEFAULT_ROOT_CATEGORY],
         [itemsKey]: treeRoot[DEFAULT_ROOT_CATEGORY]?.[itemsKey]?.map((item) => ({
             ...item,
-            loaded: item?.loaded ?? false
-        }))
+            loaded: item?.loaded ?? false,
+        })),
     })
-
-    // iterates through each deep nested object and if finds object that has prop and value specified in objToFindBy
-    // argument, it replaces the current object with replacementObj, stops recursive walk and returns the whole tree.
-    // If none is found, it returns false.
-    const findAndModifyFirst = (tree, childrenKey, objToFindBy, replacementObj) => {
-        const findKeys = Object.keys(objToFindBy)
-
-        const rootIsMatch = findKeys.every((key) => isEqual(tree[key], objToFindBy[key]))
-        if (rootIsMatch) {
-            for (let prop in tree) {
-                delete tree[prop]
-            }
-            Object.assign(tree, replacementObj)
-            return tree
-        }
-
-        const findInChildren = (obj) => {
-            if (!Object.prototype.hasOwnProperty.call(obj, childrenKey)) return false
-            const children = obj[childrenKey]
-
-            const someChildIsMatch = children.some((child, idx, arr) => {
-                const childIsMatch = findKeys.every((key) => {
-                    return isEqual(child[key], objToFindBy[key])
-                })
-                if (childIsMatch) {
-                    arr[idx] = replacementObj
-                }
-                return childIsMatch
-            })
-            if (someChildIsMatch) return true
-
-            // We can't use `.some` for the search because it short-circuits
-            // and we still want to check every child.
-            const childrenModified = children.map((child) => {
-                return findInChildren(child)
-            })
-            // If any child was modified, then so was this `obj`
-            return childrenModified.some(Boolean)
-        }
-
-        const treeModified = findInChildren(tree)
-        return treeModified && tree
-    }
 
     const fetchCategoryNode = async (id, levels = 1) => {
         const STALE_TIME = 10000 // 10 seconds
@@ -104,23 +61,19 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
             res = await api.shopperProducts.getCategory({
                 parameters: {
                     id,
-                    levels
-                }
+                    levels,
+                },
             })
         } catch (e) {
             return e
         }
-        const newTree = findAndModifyFirst(
-            root,
-            itemsKey,
-            {id},
-            {
-                ...res,
-                loaded: true,
-                [itemsKey]: res?.[itemsKey]?.map((item) => ({...item, loaded: true}))
-            }
-        )
-        setRoot(newTree)
+
+        setRoot({
+            ...root,
+            [itemsKey]: root?.[itemsKey]?.map((item) => {
+                return item?.id === id ? res : item
+            }),
+        })
         return res
     }
 
@@ -135,19 +88,12 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
                     window?.localStorage?.getItem(LOCAL_STORAGE_PREFIX + cat?.id + locale)
                 )
                 if (storedCategoryData) {
-                    findAndModifyFirst(
-                        root,
-                        itemsKey,
-                        {id: cat?.id},
-                        {
-                            ...storedCategoryData,
-                            loaded: true,
-                            [itemsKey]: storedCategoryData?.[itemsKey]?.map((item) => ({
-                                ...item,
-                                loaded: true
-                            }))
-                        }
-                    )
+                    setRoot({
+                        ...root,
+                        [itemsKey]: root?.[itemsKey]?.map((item) => {
+                            return item?.id === cat?.id ? res : item
+                        }),
+                    })
                 } else {
                     try {
                         const res = await fetchCategoryNode(cat?.id, 2)
@@ -156,7 +102,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
                             LOCAL_STORAGE_PREFIX + cat?.id + locale,
                             JSON.stringify({
                                 ...res,
-                                fetchTime: Date.now()
+                                fetchTime: Date.now(),
                             })
                         )
                     } catch (e) {
@@ -171,9 +117,8 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
         <CategoriesContext.Provider
             value={{
                 root,
-                findAndModifyFirst,
                 itemsKey,
-                fetchCategoryNode
+                fetchCategoryNode,
             }}
         >
             {children}
@@ -184,7 +129,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
 CategoriesProvider.propTypes = {
     children: PropTypes.node.isRequired,
     treeRoot: PropTypes.object,
-    locale: PropTypes.string
+    locale: PropTypes.string,
 }
 
 /**
@@ -213,7 +158,7 @@ export const MultiSiteProvider = ({
     site: initialSite = {},
     locale: initialLocale = {},
     buildUrl,
-    children
+    children,
 }) => {
     const [site, setSite] = useState(initialSite)
     const [locale, setLocale] = useState(initialLocale)
@@ -229,7 +174,7 @@ MultiSiteProvider.propTypes = {
     children: PropTypes.node.isRequired,
     buildUrl: PropTypes.func,
     site: PropTypes.object,
-    locale: PropTypes.object
+    locale: PropTypes.object,
 }
 
 /**
@@ -267,5 +212,5 @@ export const CurrencyProvider = ({currency: initialCurrency, children}) => {
 
 CurrencyProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    currency: PropTypes.string
+    currency: PropTypes.string,
 }
