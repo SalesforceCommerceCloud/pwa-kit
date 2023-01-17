@@ -9,7 +9,7 @@ import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {
     mockOrderHistory,
     mockedGuestCustomer,
@@ -21,14 +21,6 @@ import Account from './index'
 import mockConfig from '../../../config/mocks/default'
 
 jest.mock('../../commerce-api/einstein')
-
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
 
 const MockedComponent = () => {
     const customer = useCustomer()
@@ -49,31 +41,25 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer(
-    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
-    rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.json(mockOrderHistory))
-    )
-)
-
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
+    global.server.use(
+        rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
+        rest.get('*/customers/:customerId/orders', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderHistory))
+    ))
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 const expectedBasePath = '/uk/en-GB'
 test('Redirects to login page if the customer is not logged in', async () => {
-    server.use(
+    global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
         })
@@ -126,7 +112,7 @@ test('Allows customer to sign out', async () => {
 })
 
 test('Allows customer to edit profile details', async () => {
-    server.use(
+    global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(
                 ctx.json({
@@ -161,7 +147,7 @@ test('Allows customer to edit profile details', async () => {
 })
 
 test('Allows customer to update password', async () => {
-    server.use(rest.put('*/password', (req, res, ctx) => res(ctx.json())))
+    global.server.use(rest.put('*/password', (req, res, ctx) => res(ctx.json())))
 
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('account-page')).toBeInTheDocument()

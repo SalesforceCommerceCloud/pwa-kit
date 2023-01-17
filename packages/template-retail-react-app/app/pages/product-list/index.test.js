@@ -12,29 +12,19 @@ import {mockProductSearch, mockCategories} from '../../commerce-api/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
-import {createPathWithDefaults, renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useWishlist from '../../hooks/use-wishlist'
 
-jest.setTimeout(60000)
+let mockCategoriesResponse = mockCategories
 let mockProductListSearchResponse = mockProductSearch
-jest.useFakeTimers()
 
 jest.mock('../../commerce-api/einstein')
 
 jest.mock('../../hooks/use-wishlist')
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
-// TODO: Can this be done with 'msw/node' ???
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
     return {
@@ -90,29 +80,21 @@ const MockedEmptyPage = () => {
     return <EmptySearchResults searchQuery={'test'} category={undefined} />
 }
 
-// Set up the msw server to intercept fetch requests and returned mocked results. Additional
-// interceptors can be defined in each test for specific requests.
-const server = setupMockServer(
-    rest.get('*/categories/mens-clothing-jackets', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockCategories['mens-clothing-jackets']))
-    ),
-    rest.get('*/product-search', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
-    ),
-    rest.post('*/einstein/v3/personalization/*', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
-    )
-)
-
 beforeEach(() => {
-    jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
     useWishlist.mockReturnValue({
         isInitialized: true,
         isEmpty: false,
         data: {},
         findItemByProductId: () => {}
     })
+    global.server.use(
+        rest.get('*/product-search', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
+        ),
+        rest.post('*/einstein/v3/personalization/*', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
+        )
+    )
 })
 
 afterEach(() => {
@@ -120,7 +102,6 @@ afterEach(() => {
     jest.resetModules()
     localStorage.clear()
 })
-afterAll(() => server.close())
 
 test('should render product list page', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
