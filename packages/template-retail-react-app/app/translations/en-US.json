@@ -133,7 +133,7 @@
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
   "add_to_cart_modal.label.cart_subtotal": {
-    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
+    "defaultMessage": "Cart Subtotal ({totalItems} item)"
   },
   "add_to_cart_modal.label.quantity": {
     "defaultMessage": "Qty"
