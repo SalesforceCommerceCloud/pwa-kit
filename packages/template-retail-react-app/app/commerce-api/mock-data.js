@@ -5713,3 +5713,30 @@ export const mockProductSearch = {
     offset: 0,
     total: 43
 }
+
+export const mockCategory = {
+    id: 'mens-accessories-ties',
+    image:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dwd2ff3ec8/images/slot/sub_banners/cat-banner-mens-ties.jpg',
+    name: 'Ties',
+    pageDescription:
+        "Shop Mens's Ties for all occasions including business or casual at Commerce Cloud",
+    pageTitle: "Men's Casual and Business Ties",
+    parentCategoryId: 'mens-accessories',
+    parentCategoryTree: [
+        {
+            id: 'mens',
+            name: 'Mens'
+        },
+        {
+            id: 'mens-accessories',
+            name: 'Accessories'
+        },
+        {
+            id: 'mens-accessories-ties',
+            name: 'Ties'
+        }
+    ],
+    c_enableCompare: false,
+    c_showInMenu: true
+}

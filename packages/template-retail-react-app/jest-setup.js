@@ -18,7 +18,8 @@ const {
     exampleTokenReponse
 } = require('./app/commerce-api/mock-data')
 
-const AJwtThatNeverExpires = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjF9.BDAp9G8nmArdBqAbsE5GUWZ3fiv2LwQKClEFDCGIyy8'
+const AJwtThatNeverExpires =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjF9.BDAp9G8nmArdBqAbsE5GUWZ3fiv2LwQKClEFDCGIyy8'
 
 /**
  * Set up an API mocking server for testing purposes.
@@ -61,7 +62,7 @@ export const setupMockServer = () => {
 global.server = setupMockServer()
 beforeAll(() => {
     global.server.listen({
-        onUnhandledRequest: 'error',
+        onUnhandledRequest: 'error'
     })
 })
 afterEach(() => {

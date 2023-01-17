@@ -193,9 +193,10 @@ const ProductList = (props) => {
     const basePath = `${location.pathname}${location.search}`
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
     const {total, sortingOptions} = productSearchResult || {}
-    const selectedSortingOptionLabel = sortingOptions?.find(
-        (option) => option.id === productSearchResult?.selectedSortingOption
-    ) ?? sortingOptions?.[0]
+    const selectedSortingOptionLabel =
+        sortingOptions?.find(
+            (option) => option.id === productSearchResult?.selectedSortingOption
+        ) ?? sortingOptions?.[0]
 
     // Get urls to be used for pagination, page size changes, and sorting.
     const pageUrls = usePageUrls({total})

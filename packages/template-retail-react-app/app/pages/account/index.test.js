@@ -45,8 +45,10 @@ const MockedComponent = () => {
 beforeEach(() => {
     global.server.use(
         rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
-        rest.get('*/customers/:customerId/orders', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderHistory))
-    ))
+        rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.json(mockOrderHistory))
+        )
+    )
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
