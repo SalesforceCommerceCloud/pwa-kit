@@ -58,40 +58,40 @@ jobs:
         uses: "./.github/actions/unit_tests"
 
       - name: Run Lighthouse CI on the PWA
-        if: env.IS_DEFAULT_NPM
+        if: env.IS_DEFAULT_NPM == true
         uses: "./.github/actions/lighthouse_ci"
 
       - name: Smoke test scripts
-        if: env.IS_DEFAULT_NPM
+        if: env.IS_DEFAULT_NPM == true
         uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK && env.IS_DEFAULT_NPM
+        if: env.IS_NOT_FORK == true && env.IS_DEFAULT_NPM == true
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT
-        if: env.IS_NOT_FORK && env.IS_DEFAULT_NPM 
+        if: env.IS_NOT_FORK == true && env.IS_DEFAULT_NPM == true
         uses: "./.github/actions/push_to_mrt"
         with:
           DEVELOP: ${{ env.DEVELOP }}
           RELEASE: ${{ env.RELEASE }}
 
       - name: Check Repository Clean
-        if: env.IS_NOT_FORK && env.IS_DEFAULT_NPM
+        if: env.IS_NOT_FORK == true && env.IS_DEFAULT_NPM == true
         uses: "./.github/actions/check_clean"
 
       - name: Publish to NPM
-        if: env.IS_NOT_FORK && env.IS_DEFAULT_NPM
+        if: env.IS_NOT_FORK == true && env.IS_DEFAULT_NPM == true && env.RELEASE == true
         uses: "./.github/actions/publish_to_npm"
         with:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
       - name: Send GitHub Action data to Slack workflow (PWA Kit)
         id: slack
-        if: env.IS_NOT_FORK && env.IS_DEFAULT_NPM && env.DEVELOP && failure()
+        if: env.IS_NOT_FORK == true && env.IS_DEFAULT_NPM == true && env.DEVELOP == true && failure()
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -175,13 +175,14 @@ jobs:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
 
       - name: Audit Generated Project
-        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
+        if: env.IS_NOT_FORK == true && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/snyk"
         with:
           snyk_token: ${{ secrets.SNYK_TOKEN }}
+          DEVELOP: ${{ env.DEVELOP }}
 
       - name: Send metrics to Datadog
-        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
+        if: env.IS_NOT_FORK == true && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/datadog"
         with:
           datadog_api_key: ${{ secrets.DATADOG_API_KEY }}
@@ -189,14 +190,14 @@ jobs:
           TOTAL_PACKAGES: $TOTAL_PACKAGES
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
+        if: env.IS_NOT_FORK == true && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT
-        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
+        if: env.IS_NOT_FORK == true && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/push_to_mrt"
         with:
           DEVELOP: ${{ env.DEVELOP }}
@@ -204,7 +205,7 @@ jobs:
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
-        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true && env.DEVELOP && failure()
+        if: env.IS_NOT_FORK == true && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true && env.DEVELOP == true && failure()
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
