@@ -10,10 +10,10 @@ runs:
     - name: Push Bundle to MRT
       #TODO: Change target 'test-env' to 'staging' and 'test-env-3' to 'commerce-sdk-react'
       run: |-
-        if [[ ${{ inputs.DEVELOP }} == true || ${{ inputs.RELEASE }} == true ]]; then
+        if [[ ${{ inputs.DEVELOP }} == "true" || ${{ inputs.RELEASE }} == "true" ]]; then
           target=test-env
           target_commerce_sdk_react="test-env-3"
-        elif [[ ${{ inputs.RELEASE }} == true ]]; then
+        elif [[ ${{ inputs.RELEASE }} == "true" ]]; then
           target=production
         else
           target=""
