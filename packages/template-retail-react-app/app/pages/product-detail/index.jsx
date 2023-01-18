@@ -77,12 +77,12 @@ const ProductDetail = () => {
             allImages: true
         },
         {
+            // When shoppers select a different variant (and the app fetches the new data),
+            // the old data is still rendered (and not the skeletons).
             keepPreviousData: true
         }
     )
-    if (typeof product?.type === 'string') {
-        throw new HTTPNotFound(product.detail)
-    }
+
     const {data: category} = useCategory(
         {
             id: product?.primaryCategoryId,
@@ -104,10 +104,6 @@ const ProductDetail = () => {
             setPrimaryCategory(category)
         }
     }, [category])
-
-    if (typeof category?.type === 'string') {
-        throw new HTTPNotFound(category.detail)
-    }
 
     /**************** Product Variant ****************/
     useEffect(() => {
@@ -164,7 +160,6 @@ const ProductDetail = () => {
     }
 
     const addItemToBasket = (basketId, variant, quantity) => {
-        console.log('basketId', basketId)
         const productItems = [
             {
                 productId: variant.productId,
@@ -179,31 +174,32 @@ const ProductDetail = () => {
                 onSuccess: () => {
                     // only show this modal when a product is successfully add to cart
                     onAddToCartModalOpen({product, quantity})
+                },
+                onError: (err) => {
+                    showError(err)
                 }
             }
         )
     }
 
     const handleAddToCart = async (variant, quantity) => {
-        try {
-            if (!variant?.orderable || !quantity) return
-            console.log('variant', variant)
-            console.log('hasBasket', hasBasket)
-            if (!hasBasket) {
-                createBasket.mutate(
-                    {body: {}},
-                    {
-                        onSuccess: (basket) => {
-                            console.log('basket on', basket)
-                            addItemToBasket(basket.basketId, variant, quantity)
-                        }
+        if (!variant?.orderable || !quantity) return
+        console.log('variant', variant)
+        console.log('hasBasket', hasBasket)
+        if (!hasBasket) {
+            createBasket.mutate(
+                {body: {}},
+                {
+                    onSuccess: (basket) => {
+                        addItemToBasket(basket.basketId, variant, quantity)
+                    },
+                    onError: (err) => {
+                        showError(err)
                     }
-                )
-            } else {
-                addItemToBasket(basket.basketId, variant, quantity)
-            }
-        } catch (error) {
-            showError(error)
+                }
+            )
+        } else {
+            addItemToBasket(basket.basketId, variant, quantity)
         }
     }
 

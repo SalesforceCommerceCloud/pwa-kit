@@ -28,7 +28,6 @@ import RegisterForm from '../components/register'
 import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
 import useNavigation from './use-navigation'
-import {ShopperLoginHelpers, useShopperLoginHelper} from 'commerce-sdk-react-preview'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
@@ -41,8 +40,6 @@ export const AuthModal = ({
     onPasswordResetSuccess = noop,
     ...props
 }) => {
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-
     const {formatMessage} = useIntl()
     const customer = useCustomer()
     const navigate = useNavigation()
@@ -62,18 +59,8 @@ export const AuthModal = ({
     }
 
     const handleLogin = async (data) => {
-        console.log('data', data)
         try {
-            console.log('test')
-            loginRegisteredUser.mutate(
-                {username: data.email, password: data.password},
-                {
-                    onSuccess: (data) => {
-                        console.log('data', data)
-                    }
-                }
-            )
-            // await customer.login(data)
+            await customer.login(data)
         } catch (error) {
             const message = /invalid credentials/i.test(error.message)
                 ? formatMessage({

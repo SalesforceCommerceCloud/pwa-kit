@@ -30,7 +30,7 @@ export const useBasket = ({id = '', shouldFetchProductDetail = false} = {}) => {
     // if id is not defined, by default use the first basket in the list
     const basket =
         basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
-    const productIds = '' ?? basket?.productItems?.map(({productId}) => productId).join(',')
+    const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
             ids: productIds,
@@ -50,7 +50,7 @@ export const useBasket = ({id = '', shouldFetchProductDetail = false} = {}) => {
         basket,
         isLoading: isBasketsLoading && isProductsLoading,
         productDetails: products,
-        hasBasket: basketsData?.total > 0 ?? false,
+        hasBasket: basketsData?.total > 0,
         totalItems: basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0)
     }
 }
