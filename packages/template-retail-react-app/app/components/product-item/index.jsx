@@ -25,7 +25,7 @@ import QuantityPicker from '../quantity-picker'
 import {noop} from '../../utils/utils'
 
 // Hooks
-import {useProductData} from '../../hooks'
+import {useDerivedProduct} from '../../hooks'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -49,7 +49,7 @@ const ProductItem = ({
         inventoryMessage,
         quantity,
         setQuantity
-    } = useProductData(product)
+    } = useDerivedProduct(product)
 
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
