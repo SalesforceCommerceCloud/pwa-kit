@@ -7,23 +7,6 @@ description: "Setup Ubuntu Machine"
 runs:
   using: composite
   steps:
-    - name: Set DEVELOP environment variable
-      # TODO: Before merge change to 'develop'
-      if: ${{ startsWith(github.ref_name, 'github-') }}
-      run: |-
-        echo "DEVELOP=true" >> $GITHUB_ENV
-      shell: bash
-    - name: Set RELEASE environment variable
-      if: ${{ startsWith(github.ref_name, 'release-') }}
-      run: |-
-        echo "RELEASE=true" >> $GITHUB_ENV
-      shell: bash
-    - name: Print environment variables values
-      if: ${{ env.DEVELOP }}
-      run: |-
-        echo "env.DEVELOP: ${{ env.DEVELOP }}"
-        echo "env.RELEASE: ${{ env.RELEASE }}"
-      shell: bash
     - name: Install Dependencies
       run: |-
         # Install system dependencies

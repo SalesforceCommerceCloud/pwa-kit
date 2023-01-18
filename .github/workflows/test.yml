@@ -6,6 +6,11 @@ on:
      branches:
      # TODO: Before merging remove branches filter
      - github-actions
+env:
+  IS_NOT_FORK: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' }}
+  # TODO: Before merge change to 'refs/heads/develop'
+  DEVELOP: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && github.ref == 'refs/heads/github-actions' }}
+  RELEASE: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && startsWith(github.ref, 'refs/heads/release-') }}
 jobs:
   pwa-kit:
     strategy:
@@ -14,6 +19,11 @@ jobs:
         node: [14]
         npm: [6, 7, 8]
     runs-on: ubuntu-latest
+    env:
+      # The "default" npm is the one that ships with a given version of node
+      # node v14 uses npm@6, latest node v16 uses npm@8
+      # For more: https://nodejs.org/en/download/releases/
+      IS_DEFAULT_NPM: ${{ matrix.npm == 6 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -24,6 +34,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
 
+      # TODO: What is this step for? Can it be removed?
       - name: Save NPM version
         run: |-
             echo "NPM_VERSION=${{ matrix.npm }}" >> $GITHUB_ENV
@@ -32,53 +43,55 @@ jobs:
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
 
+      # TODO: Setup Ubuntu does some npm installs - should change npm version prior
       - name: Install node dependencies with NPM version
-        if: matrix.npm != 6
+        if: !env.IS_DEFAULT_NPM
         run: |-
           npm install -g npm@${{ matrix.npm }}
           npm ci
 
-      - name: NPM version
+      # TODO: Change this to cause an error if it doesn't match expectation?
+      - name: Print NPM version
         run: npm --version
 
       - name: Run unit tests
         uses: "./.github/actions/unit_tests"
 
       - name: Run Lighthouse CI on the PWA
-        if: matrix.npm == 6
+        if: env.IS_DEFAULT_NPM
         uses: "./.github/actions/lighthouse_ci"
 
       - name: Smoke test scripts
-        if: matrix.npm == 6
+        if: env.IS_DEFAULT_NPM
         uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6
+        if: env.IS_NOT_FORK && env.IS_DEFAULT_NPM
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 
+        if: env.IS_NOT_FORK && env.IS_DEFAULT_NPM 
         uses: "./.github/actions/push_to_mrt"
         with:
-          DEVELOP: $DEVELOP
-          RELEASE: $RELEASE
+          DEVELOP: ${{ env.DEVELOP }}
+          RELEASE: ${{ env.RELEASE }}
 
       - name: Check Repository Clean
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 
+        if: env.IS_NOT_FORK && env.IS_DEFAULT_NPM
         uses: "./.github/actions/check_clean"
 
       - name: Publish to NPM
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6
+        if: env.IS_NOT_FORK && env.IS_DEFAULT_NPM
         uses: "./.github/actions/publish_to_npm"
         with:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
       - name: Send GitHub Action data to Slack workflow (PWA Kit)
         id: slack
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/develop' && matrix.npm == 6
+        if: env.IS_NOT_FORK && env.IS_DEFAULT_NPM && env.DEVELOP && failure()
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -90,6 +103,8 @@ jobs:
   pwa-kit-windows:
     strategy:
         fail-fast: false
+        # TODO: We don't *need* a matrix with single values,
+        # but is it worth keeping for supporting multiple versions in the future?
         matrix:
           node: [14]
           npm: [6]
@@ -107,9 +122,6 @@ jobs:
         - name: Setup Windows Machine
           uses: "./.github/actions/setup_windows"
 
-        - name: NPM version
-          run: npm --version
-
         - name: Run tests
           uses: "./.github/actions/unit_tests"
 
@@ -119,6 +131,8 @@ jobs:
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: ubuntu-latest
+    env:
+      IS_TESTABLE_TEMPLATE: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -133,64 +147,64 @@ jobs:
 
       - name: Generate ${{ matrix.template }} project
         run: |-
-          set GENERATOR_PRESET=${{ matrix.template }}
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 5
 
       - name: Run tests
-        if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
+        if: env.IS_TESTABLE_TEMPLATE
         uses: "./.github/actions/unit_tests"
         with:
           cwd: generated-${{ matrix.template }}
 
       - name: Smoke test scripts
-        if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
+        if: env.IS_TESTABLE_TEMPLATE
         uses: "./.github/actions/smoke_tests"
         with:
           dir: generated-${{ matrix.template }}
 
       - name: Count Generated Project Dependencies
         id: count_deps
-        if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
+        if: env.IS_TESTABLE_TEMPLATE
         uses: "./.github/actions/count_deps"
 
       - name: Store Verdaccio logfile artifact
         uses: actions/upload-artifact@v3
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
-      
+
       - name: Audit Generated Project
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
+        if: env.IS_NOT_FORK && env.IS_TESTABLE_TEMPLATE
         uses: "./.github/actions/snyk"
         with:
           snyk_token: ${{ secrets.SNYK_TOKEN }}
 
       - name: Send metrics to Datadog
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
+        if: env.IS_NOT_FORK && env.IS_TESTABLE_TEMPLATE
         uses: "./.github/actions/datadog"
         with:
           datadog_api_key: ${{ secrets.DATADOG_API_KEY }}
+          # TODO: The way this is set is a little bit magic - can it be cleaned up?
           TOTAL_PACKAGES: $TOTAL_PACKAGES
 
       - name: Create MRT credentials file
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
+        if: env.IS_NOT_FORK && env.IS_TESTABLE_TEMPLATE
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
+        if: env.IS_NOT_FORK && env.IS_TESTABLE_TEMPLATE
         uses: "./.github/actions/push_to_mrt"
         with:
-          DEVELOP: $DEVELOP
-          RELEASE: $RELEASE
+          DEVELOP: ${{ env.DEVELOP }}
+          RELEASE: ${{ env.RELEASE }}
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
-        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && failure() && github.ref == 'refs/heads/github-actions' && (matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo')
+        if: env.IS_NOT_FORK && env.IS_TESTABLE_TEMPLATE && env.DEVELOP && failure()
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -205,6 +219,8 @@ jobs:
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: windows-latest
+    env:
+      IS_TESTABLE_TEMPLATE: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -219,26 +235,25 @@ jobs:
 
       - name: Generate ${{ matrix.template }} project
         run: |-
-          set GENERATOR_PRESET=${{ matrix.template }}
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 5
 
       - name: Run unit tests
-        if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
+        if: env.IS_TESTABLE_TEMPLATE
         uses: "./.github/actions/unit_tests"
         with:
           cwd: generated-${{ matrix.template }}
 
       - name: Smoke test scripts
-        if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
+        if: env.IS_TESTABLE_TEMPLATE
         uses: "./.github/actions/smoke_tests"
         with:
           dir: generated-${{ matrix.template }}
 
       - name: Count Generated Project Dependencies
-        if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
+        if: env.IS_TESTABLE_TEMPLATE
         uses: "./.github/actions/count_deps"
 
       - name: Store Verdaccio logfile artifact
