@@ -34,7 +34,7 @@ jobs:
 
       - name: Install node dependencies with NPM version
         if: matrix.npm != 6
-        run: |- 
+        run: |-
           npm install -g npm@${{ matrix.npm }}
           npm ci
 

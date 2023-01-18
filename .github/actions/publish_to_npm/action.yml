@@ -1,6 +1,6 @@
 name: publish_to_npm
 input:
-  NODE_AUTH_TOKEN: 
+  NODE_AUTH_TOKEN:
     description: "Node auth token"
 runs:
   using: composite
