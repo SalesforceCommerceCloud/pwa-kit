@@ -7,16 +7,12 @@
 
 name: SalesforceCommerceCloud/pwa-kit/test
 on:
+  push: # All branches
   schedule:
     - cron: 0 8 * * *
-  push:
-     branches:
-     # TODO: Before merging remove branches filter
-     - github-actions
 env:
   IS_NOT_FORK: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' }}
-  # TODO: Before merge change to 'refs/heads/develop'
-  DEVELOP: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && github.ref == 'refs/heads/github-actions' }}
+  DEVELOP: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && github.ref == 'refs/heads/develop' }}
   RELEASE: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && startsWith(github.ref, 'refs/heads/release-') }}
 jobs:
   pwa-kit:
