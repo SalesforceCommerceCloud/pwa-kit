@@ -7,8 +7,8 @@
 
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import isEqual from 'lodash/isEqual'
 import {useCommerceAPI} from '../commerce-api/contexts'
+import {STALE_TIME} from '../constants'
 
 /**
  * This is the global state for categories, we use this for navigation and for
@@ -44,36 +44,29 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
         ...treeRoot[DEFAULT_ROOT_CATEGORY],
         [itemsKey]: treeRoot[DEFAULT_ROOT_CATEGORY]?.[itemsKey]?.map((item) => ({
             ...item,
-            loaded: item?.loaded ?? false,
-        })),
+            loaded: false
+        }))
     })
 
     const fetchCategoryNode = async (id, levels = 1) => {
-        const STALE_TIME = 10000 // 10 seconds
         // return early if there's one that is less than stale time
-        // than the stale time
-        const storageItem = window?.localStorage?.getItem(LOCAL_STORAGE_PREFIX + id + locale)
-        if (Date.now() < storageItem?.fetchTime + STALE_TIME) {
-            return storageItem
+        const storageString = window?.localStorage?.getItem(
+            `${LOCAL_STORAGE_PREFIX}${id}-${locale}`
+        )
+        if (Date.now() < storageString?.fetchTime + STALE_TIME) {
+            return storageString
         }
         let res
         try {
             res = await api.shopperProducts.getCategory({
                 parameters: {
                     id,
-                    levels,
-                },
+                    levels
+                }
             })
         } catch (e) {
-            return e
+            console.error(e)
         }
-
-        setRoot({
-            ...root,
-            [itemsKey]: root?.[itemsKey]?.map((item) => {
-                return item?.id === id ? res : item
-            }),
-        })
         return res
     }
 
@@ -85,32 +78,34 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
                 // check localstorage first for this data to help remediate O(n) server
                 // load burden where n = top level categories
                 const storedCategoryData = JSON.parse(
-                    window?.localStorage?.getItem(LOCAL_STORAGE_PREFIX + cat?.id + locale)
+                    window?.localStorage?.getItem(`${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`)
                 )
                 if (storedCategoryData) {
-                    setRoot({
-                        ...root,
-                        [itemsKey]: root?.[itemsKey]?.map((item) => {
-                            return item?.id === cat?.id ? res : item
-                        }),
-                    })
+                    return storedCategoryData
                 } else {
                     try {
                         const res = await fetchCategoryNode(cat?.id, 2)
                         // store fetched data in local storage for faster access / reduced server load
                         window?.localStorage?.setItem(
-                            LOCAL_STORAGE_PREFIX + cat?.id + locale,
+                            `${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`,
                             JSON.stringify({
                                 ...res,
-                                fetchTime: Date.now(),
+                                fetchTime: Date.now()
                             })
                         )
+                        return res
                     } catch (e) {
                         return e
                     }
                 }
             })
-        )
+        ).then((data) => {
+            const newTree = {
+                ...root,
+                [itemsKey]: data
+            }
+            setRoot(newTree)
+        })
     }, [])
 
     return (
@@ -118,7 +113,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
             value={{
                 root,
                 itemsKey,
-                fetchCategoryNode,
+                fetchCategoryNode
             }}
         >
             {children}
@@ -129,7 +124,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
 CategoriesProvider.propTypes = {
     children: PropTypes.node.isRequired,
     treeRoot: PropTypes.object,
-    locale: PropTypes.string,
+    locale: PropTypes.string
 }
 
 /**
@@ -158,7 +153,7 @@ export const MultiSiteProvider = ({
     site: initialSite = {},
     locale: initialLocale = {},
     buildUrl,
-    children,
+    children
 }) => {
     const [site, setSite] = useState(initialSite)
     const [locale, setLocale] = useState(initialLocale)
@@ -174,7 +169,7 @@ MultiSiteProvider.propTypes = {
     children: PropTypes.node.isRequired,
     buildUrl: PropTypes.func,
     site: PropTypes.object,
-    locale: PropTypes.object,
+    locale: PropTypes.object
 }
 
 /**
@@ -212,5 +207,5 @@ export const CurrencyProvider = ({currency: initialCurrency, children}) => {
 
 CurrencyProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    currency: PropTypes.string,
+    currency: PropTypes.string
 }

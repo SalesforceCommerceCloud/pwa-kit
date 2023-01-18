@@ -23,6 +23,7 @@ export const HOME_SHOP_PRODUCTS_LIMIT = 10
 export const DEFAULT_NAV_DEPTH = 1
 export const DEFAULT_ROOT_CATEGORY = 'root'
 export const DEFAULT_LOCALE = 'en-US'
+export const STALE_TIME = 10000 // 10 seconds
 
 export const cssColorGroups = {
     beige: '#d3bca9',
