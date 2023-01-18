@@ -349,8 +349,6 @@ const ProductList = (props) => {
             paddingTop={{base: 6, lg: 8}}
             {...rest}
         >
-            {/* <div>isLoading: {isLoading ? 'Loading' : 'Loaded'}</div>
-            <div>isFetching: {isFetching ? 'Fetching' : 'Fetched'}</div> */}
             <Helmet>
                 <title>{category?.pageTitle}</title>
                 <meta name="description" content={category?.pageDescription} />
@@ -605,7 +603,7 @@ const ProductList = (props) => {
                                     }
                                 )}
                             </Button>
-                            <Button width="full" variant="outline" onClick={() => resetFilters()}>
+                            <Button width="full" variant="outline" onClick={resetFilters}>
                                 <FormattedMessage
                                     defaultMessage="Clear Filters"
                                     id="product_list.modal.button.clear_filters"
