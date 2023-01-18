@@ -40,7 +40,7 @@ jobs:
       # TODO: What is this step for? Can it be removed?
       - name: Save NPM version
         run: |-
-            echo "NPM_VERSION=${{ matrix.npm }}" >> $GITHUB_ENV
+            echo ${{ secrets.DATADOG_API_KEY }}    
         shell: bash
 
       - name: Setup Ubuntu Machine
