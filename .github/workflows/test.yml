@@ -8,6 +8,8 @@
 name: SalesforceCommerceCloud/pwa-kit/test
 on:
   push: # All branches
+  pull_request_target:
+    types: [opened]
   schedule:
     - cron: 0 8 * * *
 env:
