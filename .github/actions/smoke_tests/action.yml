@@ -1,4 +1,4 @@
-name: smoketestscripts
+name: smoke_tests
 inputs:
   dir:
     required: false

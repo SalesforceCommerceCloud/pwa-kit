@@ -1,4 +1,4 @@
-name: countdeps
+name: count_deps
 runs:
   using: composite
   steps:

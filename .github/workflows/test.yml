@@ -42,15 +42,15 @@ jobs:
         run: npm --version
 
       - name: Run unit tests
-        uses: "./.github/actions/unittests"
+        uses: "./.github/actions/unit_tests"
 
       - name: Run Lighthouse CI on the PWA
         if: matrix.npm == 6
-        uses: "./.github/actions/lighthouse-ci"
+        uses: "./.github/actions/lighthouse_ci"
 
       - name: Smoke test scripts
         if: matrix.npm == 6
-        uses: "./.github/actions/smoketestscripts"
+        uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6
@@ -108,7 +108,7 @@ jobs:
           run: npm --version
 
         - name: Run tests
-          uses: "./.github/actions/unittests"
+          uses: "./.github/actions/unit_tests"
 
   generated:
     strategy:
@@ -138,20 +138,20 @@ jobs:
 
       - name: Run tests
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
-        uses: "./.github/actions/unittests"
+        uses: "./.github/actions/unit_tests"
         with:
           cwd: generated-${{ matrix.template }}
 
       - name: Smoke test scripts
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
-        uses: "./.github/actions/smoketestscripts"
+        uses: "./.github/actions/smoke_tests"
         with:
           dir: generated-${{ matrix.template }}
 
       - name: Count Generated Project Dependencies
-        id: countdeps
+        id: count_deps
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
-        uses: "./.github/actions/countdeps"
+        uses: "./.github/actions/count_deps"
 
       - name: Store Verdaccio logfile artifact
         uses: actions/upload-artifact@v3
@@ -224,13 +224,13 @@ jobs:
 
       - name: Run unit tests
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
-        uses: "./.github/actions/unittests"
+        uses: "./.github/actions/unit_tests"
         with:
           cwd: generated-${{ matrix.template }}
 
       - name: Smoke test scripts
         if: matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo'
-        uses: "./.github/actions/smoketestscripts"
+        uses: "./.github/actions/smoke_tests"
         with:
           dir: generated-${{ matrix.template }}
 

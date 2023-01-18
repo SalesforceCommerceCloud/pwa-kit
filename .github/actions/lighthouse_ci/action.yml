@@ -1,4 +1,4 @@
-name: lighthouse-ci
+name: lighthouse_ci
 runs:
   using: composite
   steps:

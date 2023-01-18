@@ -1,4 +1,4 @@
-name: checkclean
+name: check_clean
 runs:
   using: composite
   steps:
