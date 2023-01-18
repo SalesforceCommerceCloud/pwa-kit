@@ -106,6 +106,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
             }
             setRoot(newTree)
         })
+        .catch((err) => console.log(err))
     }, [])
 
     return (
