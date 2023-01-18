@@ -8,7 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useCommerceAPI} from '../commerce-api/contexts'
-import {STALE_TIME} from '../constants'
+import {CAT_MENU_STALE_TIME} from '../constants'
 
 /**
  * This is the global state for categories, we use this for navigation and for
@@ -43,30 +43,24 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
         // map over the server-provided cat
         ...treeRoot[DEFAULT_ROOT_CATEGORY],
         [itemsKey]: treeRoot[DEFAULT_ROOT_CATEGORY]?.[itemsKey]?.map((item) => ({
-            ...item,
-            loaded: false
+            ...item
         }))
     })
 
     const fetchCategoryNode = async (id, levels = 1) => {
         // return early if there's one that is less than stale time
-        const storageString = window?.localStorage?.getItem(
-            `${LOCAL_STORAGE_PREFIX}${id}-${locale}`
+        const storageItem = JSON.parse(
+            window?.localStorage?.getItem(`${LOCAL_STORAGE_PREFIX}${id}-${locale}`)
         )
-        if (Date.now() < storageString?.fetchTime + STALE_TIME) {
-            return storageString
+        if (storageItem || Date.now() < storageItem?.fetchTime + CAT_MENU_STALE_TIME) {
+            return storageItem
         }
-        let res
-        try {
-            res = await api.shopperProducts.getCategory({
-                parameters: {
-                    id,
-                    levels
-                }
-            })
-        } catch (e) {
-            console.error(e)
-        }
+        const res = await api.shopperProducts.getCategory({
+            parameters: {
+                id,
+                levels
+            }
+        })
         return res
     }
 
@@ -77,27 +71,17 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
             root?.[itemsKey]?.map(async (cat) => {
                 // check localstorage first for this data to help remediate O(n) server
                 // load burden where n = top level categories
-                const storedCategoryData = JSON.parse(
-                    window?.localStorage?.getItem(`${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`)
+
+                const res = await fetchCategoryNode(cat?.id, 2)
+                // store fetched data in local storage for faster access / reduced server load
+                window?.localStorage?.setItem(
+                    `${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`,
+                    JSON.stringify({
+                        ...res,
+                        fetchTime: Date.now()
+                    })
                 )
-                if (storedCategoryData) {
-                    return storedCategoryData
-                } else {
-                    try {
-                        const res = await fetchCategoryNode(cat?.id, 2)
-                        // store fetched data in local storage for faster access / reduced server load
-                        window?.localStorage?.setItem(
-                            `${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`,
-                            JSON.stringify({
-                                ...res,
-                                fetchTime: Date.now()
-                            })
-                        )
-                        return res
-                    } catch (e) {
-                        return e
-                    }
-                }
+                return res
             })
         )
             .then((data) => {
@@ -107,7 +91,9 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
                 }
                 setRoot(newTree)
             })
-            .catch((err) => console.log(err))
+            .catch((err) => {
+                throw err
+            })
     }, [])
 
     return (

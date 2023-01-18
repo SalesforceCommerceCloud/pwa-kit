@@ -20,10 +20,10 @@ export const HOME_SHOP_PRODUCTS_CATEGORY_ID = 'newarrivals'
 export const HOME_SHOP_PRODUCTS_LIMIT = 10
 
 // Constants for Mega Menu
-export const DEFAULT_NAV_DEPTH = 1
-export const DEFAULT_ROOT_CATEGORY = 'root'
-export const DEFAULT_LOCALE = 'en-US'
-export const STALE_TIME = 10000 // 10 seconds
+export const CAT_MENU_DEFAULT_NAV_DEPTH = 1
+export const CAT_MENU_DEFAULT_ROOT_CATEGORY = 'root'
+export const CAT_MENU_DEFAULT_LOCALE = 'en-US'
+export const CAT_MENU_STALE_TIME = 10000 // 10 seconds
 
 export const cssColorGroups = {
     beige: '#d3bca9',

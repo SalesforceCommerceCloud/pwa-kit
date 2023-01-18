@@ -47,9 +47,9 @@ import {
     DEFAULT_SITE_TITLE,
     HOME_HREF,
     THEME_COLOR,
-    DEFAULT_NAV_DEPTH,
-    DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE
+    CAT_MENU_DEFAULT_NAV_DEPTH,
+    CAT_MENU_DEFAULT_ROOT_CATEGORY,
+    CAT_MENU_DEFAULT_LOCALE
 } from '../../constants'
 
 import Seo from '../seo'
@@ -59,7 +59,7 @@ import useMultiSite from '../../hooks/use-multi-site'
 const App = (props) => {
     const {
         children,
-        targetLocale = DEFAULT_LOCALE,
+        targetLocale = CAT_MENU_DEFAULT_LOCALE,
         messages = {},
         categories: allCategories = {}
     } = props
@@ -166,7 +166,7 @@ const App = (props) => {
                 // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:
                 // - "extract-default-translations"
                 // - "compile-translations:pseudo"
-                defaultLocale={DEFAULT_LOCALE}
+                defaultLocale={CAT_MENU_DEFAULT_LOCALE}
             >
                 <CategoriesProvider treeRoot={allCategories} locale={targetLocale}>
                     <CurrencyProvider currency={currency}>
@@ -307,8 +307,8 @@ App.getProps = async ({api, res}) => {
     // Get the root category, this will be used for things like the navigation.
     const rootCategory = await api.shopperProducts.getCategory({
         parameters: {
-            id: DEFAULT_ROOT_CATEGORY,
-            levels: DEFAULT_NAV_DEPTH
+            id: CAT_MENU_DEFAULT_ROOT_CATEGORY,
+            levels: CAT_MENU_DEFAULT_NAV_DEPTH
         }
     })
 
