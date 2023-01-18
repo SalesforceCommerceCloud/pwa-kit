@@ -12,8 +12,7 @@ import queryString from 'query-string'
 import {DEFAULT_SEARCH_PARAMS} from '../constants'
 
 const PARSE_OPTIONS = {
-    parseBooleans: true,
-    parseNumbers: true
+    parseBooleans: true
 }
 
 /*
