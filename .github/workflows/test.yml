@@ -45,7 +45,7 @@ jobs:
 
       # TODO: Setup Ubuntu does some npm installs - should change npm version prior
       - name: Install node dependencies with NPM version
-        if: "!env.IS_DEFAULT_NPM"
+        if: env.IS_DEFAULT_NPM == false
         run: |-
           npm install -g npm@${{ matrix.npm }}
           npm ci
@@ -153,20 +153,20 @@ jobs:
         timeout-minutes: 5
 
       - name: Run tests
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/unit_tests"
         with:
           cwd: generated-${{ matrix.template }}
 
       - name: Smoke test scripts
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/smoke_tests"
         with:
           dir: generated-${{ matrix.template }}
 
       - name: Count Generated Project Dependencies
         id: count_deps
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/count_deps"
 
       - name: Store Verdaccio logfile artifact
@@ -175,13 +175,13 @@ jobs:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
 
       - name: Audit Generated Project
-        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP
+        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/snyk"
         with:
           snyk_token: ${{ secrets.SNYK_TOKEN }}
 
       - name: Send metrics to Datadog
-        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP
+        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/datadog"
         with:
           datadog_api_key: ${{ secrets.DATADOG_API_KEY }}
@@ -189,14 +189,14 @@ jobs:
           TOTAL_PACKAGES: $TOTAL_PACKAGES
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP
+        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT
-        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP
+        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/push_to_mrt"
         with:
           DEVELOP: ${{ env.DEVELOP }}
@@ -204,7 +204,7 @@ jobs:
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
-        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP && env.DEVELOP && failure()
+        if: env.IS_NOT_FORK && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true && env.DEVELOP && failure()
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -241,19 +241,19 @@ jobs:
         timeout-minutes: 5
 
       - name: Run unit tests
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/unit_tests"
         with:
           cwd: generated-${{ matrix.template }}
 
       - name: Smoke test scripts
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/smoke_tests"
         with:
           dir: generated-${{ matrix.template }}
 
       - name: Count Generated Project Dependencies
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == true
         uses: "./.github/actions/count_deps"
 
       - name: Store Verdaccio logfile artifact
