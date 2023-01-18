@@ -12,7 +12,8 @@ import queryString from 'query-string'
 import {DEFAULT_SEARCH_PARAMS} from '../constants'
 
 const PARSE_OPTIONS = {
-    parseBooleans: true
+    parseBooleans: true,
+    parseNumbers: true
 }
 
 /*
@@ -83,6 +84,7 @@ export const parse = (searchParamsStr, parseRefine = true) => {
                 ...acc,
                 ...queryString.parse(curr, {
                     ...PARSE_OPTIONS,
+                    parseNumbers: false,
                     arrayFormat: 'separator',
                     arrayFormatSeparator: '|'
                 })
