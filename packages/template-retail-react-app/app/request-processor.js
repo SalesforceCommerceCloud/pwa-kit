@@ -10,7 +10,7 @@
 // it processes requests in whatever way your project requires.
 
 // Uncomment the following line for the example code to work.
-// import {QueryParameters} from 'pwa-kit-react-sdk/utils/ssr-request-processing'
+import {QueryParameters} from 'pwa-kit-runtime/utils/ssr-request-processing'
 
 /**
  * The processRequest function is called for *every* non-proxy, non-bundle
@@ -62,24 +62,28 @@ export const processRequest = ({
     path,
     querystring
 }) => {
-    // Uncomment the snippet below for the example code to work.
-    /***************************************************************************
-    // Example code for filtering query parameters and detecting bots user.
-
-    console.assert(parameters, 'Missing parameters')
-
     // This is an EXAMPLE processRequest implementation. You should
     // replace it with code that processes your requests as needed.
 
     // This example code will remove any of the parameters whose keys appear
     // in the 'exclusions' array.
     const exclusions = [
-        'gclid',
-        'utm_campaign',
-        'utm_content',
-        'utm_medium',
-        'utm_source'
+        // 'gclid',
+        // 'utm_campaign',
+        // 'utm_content',
+        // 'utm_medium',
+        // 'utm_source'
     ]
+
+    // This is a performance optimization for SLAS.
+    // On client side, browser always follow the redirect
+    // to /callback but the response is always the same.
+    // We strip out the unique query parameters so this
+    // endpoint is cached at the CDN level
+    if (path === '/callback') {
+        exclusions.push('usid')
+        exclusions.push('code')
+    }
 
     // Build a first QueryParameters object from the given querystring
     const incomingParameters = new QueryParameters(querystring)
@@ -96,6 +100,7 @@ export const processRequest = ({
     // Re-generate the querystring
     querystring = filteredParameters.toString()
 
+    /***************************************************************************
     // This example code will detect bots by examining the user-agent,
     // and will set the request class to 'bot' for all such requests.
     const ua = headers.getHeader('user-agent')
