@@ -160,7 +160,7 @@ jobs:
         timeout-minutes: 5
 
       - name: Run tests
-        if: "${{env.IS_TEMPLATE_FROM_RETAIL_REACT_APP}}" == "true"
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == "true"
         uses: "./.github/actions/unit_tests"
         with:
           cwd: generated-${{ matrix.template }}
