@@ -45,7 +45,7 @@ jobs:
 
       # TODO: Setup Ubuntu does some npm installs - should change npm version prior
       - name: Install node dependencies with NPM version
-        if: !env.IS_DEFAULT_NPM
+        if: "!env.IS_DEFAULT_NPM"
         run: |-
           npm install -g npm@${{ matrix.npm }}
           npm ci
