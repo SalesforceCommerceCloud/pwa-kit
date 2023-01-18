@@ -66,7 +66,10 @@ jobs:
           DEVELOP: $DEVELOP
           RELEASE: $RELEASE
 
-      #TODO: remove --dry-run from install command
+      - name: Check Clean
+        if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6 
+        uses: "./.github/actions/check_clean"
+
       - name: Publish to NPM
         if: github.repository == 'SalesforceCommerceCloud/pwa-kit' && matrix.npm == 6
         uses: "./.github/actions/publish_to_npm"
