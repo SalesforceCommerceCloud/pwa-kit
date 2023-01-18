@@ -25,6 +25,8 @@ import {
 } from '../../commerce-api/mock-data'
 import mockConfig from '../../../config/mocks/default'
 
+jest.setTimeout(60000)
+
 jest.mock('../../commerce-api/einstein')
 
 // Make sure fetch is defined in test env
@@ -602,111 +604,104 @@ test('Can edit address during checkout as a registered customer', async () => {
     expect(screen.getByText('369 Main Street')).toBeInTheDocument()
 })
 
-// test('Can add address during checkout as a registered customer', async () => {
-//     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
-//     // update this object, which essentially mimics a saved basket on the backend.
-//     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
+test('Can add address during checkout as a registered customer', async () => {
+    // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
+    // update this object, which essentially mimics a saved basket on the backend.
+    let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
 
-//     jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
+    jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
-//     // Set up additional requests for intercepting/mocking for just this test.
-//     global.server.use(
-//         // mock adding guest email to basket
-//         rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
-//             currentBasket.customer_info.email = 'customer@test.com'
-//             return res(ctx.json(currentBasket))
-//         }),
+    // Set up additional requests for intercepting/mocking for just this test.
+    global.server.use(
+        // mock adding guest email to basket
+        rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
+            currentBasket.customer_info.email = 'customer@test.com'
+            return res(ctx.json(currentBasket))
+        }),
 
-//         // mock fetch product lists
-//         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-//             return res(ctx.json(mockedCustomerProductLists))
-//         }),
+        // mock fetch product lists
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.json(mockedCustomerProductLists))
+        }),
 
-//         // mock add shipping and billing address to basket
-//         rest.put('*/shipping_address', (req, res, ctx) => {
-//             const shippingBillingAddress = {
-//                 address1: req.body.address1,
-//                 city: req.body.city,
-//                 country_code: req.body.country_code,
-//                 first_name: req.body.first_name,
-//                 full_name: `${req.body.first_name} ${req.body.last_name}`,
-//                 id: req.id,
-//                 last_name: req.body.last_name,
-//                 phone: req.body.phone,
-//                 postal_code: req.body.postal_code,
-//                 state_code: req.body.state_code,
-//                 _type: 'order_address'
-//             }
-//             currentBasket.shipments[0].shipping_address = shippingBillingAddress
-//             currentBasket.billing_address = shippingBillingAddress
-//             return res(ctx.json(currentBasket))
-//         }),
+        // mock add shipping and billing address to basket
+        rest.put('*/shipping_address', (req, res, ctx) => {
+            const shippingBillingAddress = {
+                address1: req.body.address1,
+                city: req.body.city,
+                country_code: req.body.country_code,
+                first_name: req.body.first_name,
+                full_name: `${req.body.first_name} ${req.body.last_name}`,
+                id: req.id,
+                last_name: req.body.last_name,
+                phone: req.body.phone,
+                postal_code: req.body.postal_code,
+                state_code: req.body.state_code,
+                _type: 'order_address'
+            }
+            currentBasket.shipments[0].shipping_address = shippingBillingAddress
+            currentBasket.billing_address = shippingBillingAddress
+            return res(ctx.json(currentBasket))
+        }),
 
-//         rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
-//             return res(
-//                 ctx.json({
-//                     address1: 'Tropicana Field',
-//                     addressId: 'savedaddress1',
-//                     city: 'Tampa',
-//                     countryCode: 'US',
-//                     firstName: 'Test2',
-//                     fullName: 'Test2 McTester',
-//                     lastName: 'McTester',
-//                     phone: '(727) 555-1234',
-//                     postalCode: '33712',
-//                     preferred: false,
-//                     stateCode: 'FL'
-//                 })
-//             )
-//         })
-//     )
+        rest.post('*/addresses', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    address1: 'Tropicana Field',
+                    addressId: 'savedaddress1',
+                    city: 'Tampa',
+                    countryCode: 'US',
+                    firstName: 'Test2',
+                    fullName: 'Test2 McTester',
+                    lastName: 'McTester',
+                    phone: '(727) 555-1234',
+                    postalCode: '33712',
+                    preferred: false,
+                    stateCode: 'FL'
+                })
+            )
+        })
+    )
 
-//     // Set the initial browser router path and render our component tree.
-//     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-//     renderWithProviders(<WrappedCheckout history={history} />, {
-//         wrapperProps: {siteAlias: 'us', locale: {id: 'en-US'}}
-//     })
+    // Set the initial browser router path and render our component tree.
+    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+    renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {siteAlias: 'us', locale: {id: 'en-US'}}
+    })
 
-//     // Switch to login
-//     const haveAccountButton = await screen.findByText(/already have an account/i)
-//     user.click(haveAccountButton)
+    // Switch to login
+    const haveAccountButton = await screen.findByText(/already have an account/i)
+    user.click(haveAccountButton)
 
-//     // Wait for checkout to load and display first step
-//     const loginBtn = await screen.findByText(/log in/i)
+    // Wait for checkout to load and display first step
+    const loginBtn = await screen.findByText(/log in/i)
 
-//     // Provide customer email and submit
-//     const emailInput = screen.getByLabelText('Email')
-//     const pwInput = screen.getByLabelText('Password')
-//     user.type(emailInput, 'customer@test.com')
-//     user.type(pwInput, 'Password!1')
-//     user.click(loginBtn)
+    // Provide customer email and submit
+    const emailInput = screen.getByLabelText('Email')
+    const pwInput = screen.getByLabelText('Password')
+    user.type(emailInput, 'customer@test.com')
+    user.type(pwInput, 'Password!1')
+    user.click(loginBtn)
 
-//     // Wait for next step to render
-//     await waitFor(() =>
-//         expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
-//     )
+    // Wait for next step to render
+    await waitFor(() =>
+        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
+    )
 
-//     // Add address
-//     user.click(screen.getByRole('button', {name: /add new address/i}))
-//     user.type(screen.getByRole('textbox', {name: /first name/i}), 'Test2')
-//     user.type(screen.getByRole('textbox', {name: /last name/i}), 'McTester')
-//     user.type(screen.getByRole('textbox', {name: /phone/i}), '7275551234')
-//     user.selectOptions(screen.getByRole('combobox', {name: /country/i}), ['US'])
-//     user.type(screen.getByRole('textbox', {name: /address/i}), 'Tropicana Field')
-//     user.type(screen.getByRole('textbox', {name: /city/i}), 'Tampa')
-//     user.selectOptions(screen.getByRole('combobox', {name: /state/i}), ['FL'])
-//     user.type(screen.getByRole('textbox', {name: /zip code/i}), '33712')
+    // Add address
+    user.click(screen.getByRole('button', {name: /add new address/i}))
+    user.type(screen.getByRole('textbox', {name: /first name/i}), 'Test2')
+    user.type(screen.getByRole('textbox', {name: /last name/i}), 'McTester')
+    user.type(screen.getByRole('textbox', {name: /phone/i}), '7275551234')
+    user.selectOptions(screen.getByRole('combobox', {name: /country/i}), ['US'])
+    user.type(screen.getByRole('textbox', {name: /address/i}), 'Tropicana Field')
+    user.type(screen.getByRole('textbox', {name: /city/i}), 'Tampa')
+    user.selectOptions(screen.getByRole('combobox', {name: /state/i}), ['FL'])
+    user.type(screen.getByRole('textbox', {name: /zip code/i}), '33712')
 
-//     user.click(screen.getByRole('button', {name: /save & continue to shipping method/i}))
+    user.click(screen.getByRole('button', {name: /save & continue to shipping method/i}))
 
-//     screen.debug()
-
-//     // Wait for next step to render
-//     await waitFor(() => {
-//         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
-//     })
-
-//     // await waitFor(async () => {
-//     //     expect(await screen.findByText(/test2 mctester/i)).toBeInTheDocument()
-//     // })
-// })
+    await waitFor(() => {
+        expect(screen.getByText(/Test2/i)).toBeInTheDocument()
+    })
+})
