@@ -5,8 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
+import {useCommerceAPI} from '../commerce-api/contexts'
+import {CAT_MENU_STALE_TIME} from '../constants'
 
 /**
  * This is the global state for categories, we use this for navigation and for
@@ -27,15 +29,86 @@ import PropTypes from 'prop-types'
  *
  * import {useCategories} from './hooks'
  *
- * const {categories, setCategories} = useCategories()
+ * const {root, itemsKey, fetchCategoryNode} = useCategories()
  *
  */
 export const CategoriesContext = React.createContext()
-export const CategoriesProvider = ({categories: initialCategories = {}, children}) => {
-    const [categories, setCategories] = useState(initialCategories)
+export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
+    const itemsKey = 'categories'
+    const DEFAULT_ROOT_CATEGORY = 'root'
+    const LOCAL_STORAGE_PREFIX = `pwa-kit-cat-`
+
+    const api = useCommerceAPI()
+    const [root, setRoot] = useState({
+        // map over the server-provided cat
+        ...treeRoot[DEFAULT_ROOT_CATEGORY],
+        [itemsKey]: treeRoot[DEFAULT_ROOT_CATEGORY]?.[itemsKey]?.map((item) => ({
+            ...item
+        }))
+    })
+
+    const fetchCategoryNode = async (id, levels = 1) => {
+        // return early if there's one that is less than stale time
+        const storageItem = JSON.parse(
+            window.localStorage.getItem(`${LOCAL_STORAGE_PREFIX}${id}-${locale}`)
+        )
+        if (storageItem || Date.now() < storageItem?.fetchTime + CAT_MENU_STALE_TIME) {
+            return storageItem
+        }
+        const res = await api.shopperProducts.getCategory({
+            parameters: {
+                id,
+                levels
+            }
+        })
+        return res
+    }
+
+    useEffect(() => {
+        // Server side, we only fetch level 0 categories, for performance, here
+        // we request the remaining two levels of category depth
+        Promise.all(
+            root?.[itemsKey]?.map(async (cat) => {
+                // check localstorage first for this data to help remediate O(n) server
+                // load burden where n = top level categories
+                let res
+                try {
+                    res = await fetchCategoryNode(cat?.id, 2)
+                    // store fetched data in local storage for faster access / reduced server load
+                    res.loaded = true
+                    window?.localStorage?.setItem(
+                        `${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`,
+                        JSON.stringify({
+                            ...res,
+                            fetchTime: Date.now()
+                        })
+                    )
+                    return res
+                } catch (error) {
+                    return error
+                }
+            })
+        )
+            .then((data) => {
+                const newTree = {
+                    ...root,
+                    [itemsKey]: data
+                }
+                setRoot(newTree)
+            })
+            .catch((err) => {
+                throw err
+            })
+    }, [])
 
     return (
-        <CategoriesContext.Provider value={{categories, setCategories}}>
+        <CategoriesContext.Provider
+            value={{
+                root,
+                itemsKey,
+                fetchCategoryNode
+            }}
+        >
             {children}
         </CategoriesContext.Provider>
     )
@@ -43,7 +116,8 @@ export const CategoriesProvider = ({categories: initialCategories = {}, children
 
 CategoriesProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    categories: PropTypes.object
+    treeRoot: PropTypes.object,
+    locale: PropTypes.string
 }
 
 /**
