@@ -80,11 +80,13 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
         const promises = root?.[itemsKey]?.map(async (cat) => await fetchCategoryNode(cat?.id, 2))
         // TODO: Error handling when fetching data fails.
         // Possibly switch to .allSettled to show partial data?
-        const data = await Promise.all(promises)
-        setRoot({
-            ...root,
-            [itemsKey]: data
-        })
+        if (promises) {
+            const data = await Promise.all(promises)
+            setRoot({
+                ...root,
+                [itemsKey]: data
+            })
+        }
     }, [])
 
     return (
