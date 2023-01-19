@@ -3,6 +3,7 @@ runs:
   using: composite
   steps:
   - name: Count Generated Project Dependencies
+    # TODO: Can TOTAL_PACKAGES be exported in a cleaner way?
     run: |-
       MAX_PACKAGES="2260"
       total=$(./scripts/count-dependencies.js generated-${{ matrix.template }})

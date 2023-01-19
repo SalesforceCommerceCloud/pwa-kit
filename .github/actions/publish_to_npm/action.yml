@@ -5,6 +5,7 @@ inputs:
 runs:
   using: composite
   steps:
+  # TODO: Figure out a way to specify whether to publish to "latest" or "next" tag
   - name: Publish to NPM
     run: |-
       # Add NPM token to allow publishing

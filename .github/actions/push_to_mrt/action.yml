@@ -8,7 +8,6 @@ runs:
   using: composite
   steps:
     - name: Push Bundle to MRT
-      # TODO: Need CWD or some way to specify --prefix
       run: |-
         cd ${{ inputs.CWD }}
         project="scaffold-pwa"
