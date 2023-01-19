@@ -15,13 +15,11 @@ import {renderWithProviders} from '../../utils/test-utils'
 jest.mock('../../commerce-api/einstein')
 
 const MockedComponent = () => {
-    const product = productsResponse.data[0]
-
     return (
         <Switch>
             <Route
                 path="/en-GB/product/:productId"
-                render={(props) => <ProductDetail {...props} product={product} />}
+                render={(props) => <ProductDetail {...props} />}
             />
         </Switch>
     )
@@ -32,6 +30,10 @@ beforeEach(() => {
     global.server.use(
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.json(mockedCustomerProductLists))
+        }),
+
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            return res(ctx.json(productsResponse.data[0]))
         }),
         rest.post('*/customers/:customerId/product-lists/:listId/items', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200))
