@@ -5744,7 +5744,7 @@ export const mockCategory = {
 export const mockCustomerBaskets = {
     baskets: [
         {
-            adjustedMerchandizeTotalTax: 2.93,
+            adjustedMerchandizeTotalTax: 5.123,
             adjustedShippingTotalTax: null,
             agentBasket: false,
             basketId: '10cf6aa40edba4fcfcc6915594',

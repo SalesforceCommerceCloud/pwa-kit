@@ -28,6 +28,7 @@ const AJwtThatNeverExpires =
  * This mock server includes the basic oauth flow endpoints.
  */
 export const setupMockServer = () => {
+    console.log('setup server')
     return setupServer(
         rest.post('*/oauth2/authorize', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
         rest.get('*/oauth2/authorize', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
@@ -37,29 +38,34 @@ export const setupMockServer = () => {
         rest.get('*/oauth2/logout', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
         ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        ),
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            console.log('customers----------------------')
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        }),
         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: AJwtThatNeverExpires,
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId',
-                    id_token: 'testIdToken'
-                })
-            )
+        rest.post(
+            '*/oauth2/token',
+            (req, res, ctx) =>
+                console.log('fdgfdgfdg>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.d') ||
+                res(
+                    ctx.delay(0),
+                    ctx.json({
+                        customer_id: 'test',
+                        access_token: AJwtThatNeverExpires,
+                        refresh_token: 'testrefeshtoken',
+                        usid: 'testusid',
+                        enc_user_id: 'testEncUserId',
+                        id_token: 'testIdToken'
+                    })
+                )
         ),
         rest.get('*/categories/:categoryId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
         ),
-        rest.get('*/customer/:customerId/baskets', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
-        ),
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+            console.log('ffffffff=========================================')
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
+        }),
         rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200)))
     )
 }

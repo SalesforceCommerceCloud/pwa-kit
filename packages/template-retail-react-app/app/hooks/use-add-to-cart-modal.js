@@ -23,7 +23,7 @@ import {
     Stack,
     useBreakpointValue
 } from '@chakra-ui/react'
-import {useCurrentBasket} from '../hooks/use-current-basket'
+import {useCurrentBasket} from './use-current-basket'
 import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'

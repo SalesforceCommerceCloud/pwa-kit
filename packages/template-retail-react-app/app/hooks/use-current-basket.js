@@ -24,8 +24,7 @@ export const useCurrentBasket = ({id = '', shouldFetchProductDetail = false} = {
     const {
         data: basketsData,
         isLoading: isBasketsLoading,
-        error: basketsError,
-        ...restOfBasketsQuery
+        error: basketsError
     } = useCustomerBaskets({customerId})
     // if id is not defined, by default use the first basket in the list
     const basket =
