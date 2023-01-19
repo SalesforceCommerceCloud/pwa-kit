@@ -13,7 +13,11 @@ on:
   # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
   # https://docs.github.com/en/actions/managing-workflow-runs/approving-workflow-runs-from-public-forks
   pull_request: # Default: opened, reopened, synchronize (head branch updated)
-  push: # Default: all branches
+  push:
+    branches:
+      - develop
+      # TODO: Should we run on all pushes to release branches, or should we run on GitHub releases?
+      - 'release-*'
   schedule:
     - cron: 0 8 * * *
 env:
