@@ -55,18 +55,12 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
         if (storageItem || Date.now() < storageItem?.fetchTime + CAT_MENU_STALE_TIME) {
             return storageItem
         }
-        let res
-        try {
-            res = await api.shopperProducts.getCategory({
-                parameters: {
-                    id,
-                    levels
-                }
-            })
-        } catch (error) {
-            throw error
-        }
-
+        const res = await api.shopperProducts.getCategory({
+            parameters: {
+                id,
+                levels
+            }
+        })
         return res
     }
 
