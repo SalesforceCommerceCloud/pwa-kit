@@ -49,7 +49,7 @@ import {
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    CAT_MENU_DEFAULT_LOCALE
+    DEFAULT_LOCALE
 } from '../../constants'
 
 import Seo from '../seo'
@@ -59,7 +59,7 @@ import useMultiSite from '../../hooks/use-multi-site'
 const App = (props) => {
     const {
         children,
-        targetLocale = CAT_MENU_DEFAULT_LOCALE,
+        targetLocale = DEFAULT_LOCALE,
         messages = {},
         categories: allCategories = {}
     } = props
@@ -166,7 +166,7 @@ const App = (props) => {
                 // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:
                 // - "extract-default-translations"
                 // - "compile-translations:pseudo"
-                defaultLocale={CAT_MENU_DEFAULT_LOCALE}
+                defaultLocale={DEFAULT_LOCALE}
             >
                 <CategoriesProvider treeRoot={allCategories} locale={targetLocale}>
                     <CurrencyProvider currency={currency}>

@@ -50,17 +50,23 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
     const fetchCategoryNode = async (id, levels = 1) => {
         // return early if there's one that is less than stale time
         const storageItem = JSON.parse(
-            window?.localStorage?.getItem(`${LOCAL_STORAGE_PREFIX}${id}-${locale}`)
+            window.localStorage.getItem(`${LOCAL_STORAGE_PREFIX}${id}-${locale}`)
         )
         if (storageItem || Date.now() < storageItem?.fetchTime + CAT_MENU_STALE_TIME) {
             return storageItem
         }
-        const res = await api.shopperProducts.getCategory({
-            parameters: {
-                id,
-                levels
-            }
-        })
+        let res
+        try {
+            res = await api.shopperProducts.getCategory({
+                parameters: {
+                    id,
+                    levels
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+
         return res
     }
 
@@ -71,17 +77,22 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
             root?.[itemsKey]?.map(async (cat) => {
                 // check localstorage first for this data to help remediate O(n) server
                 // load burden where n = top level categories
-
-                const res = await fetchCategoryNode(cat?.id, 2)
-                // store fetched data in local storage for faster access / reduced server load
-                window?.localStorage?.setItem(
-                    `${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`,
-                    JSON.stringify({
-                        ...res,
-                        fetchTime: Date.now()
-                    })
-                )
-                return res
+                let res
+                try {
+                    res = await fetchCategoryNode(cat?.id, 2)
+                    // store fetched data in local storage for faster access / reduced server load
+                    res.loaded = true
+                    window?.localStorage?.setItem(
+                        `${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`,
+                        JSON.stringify({
+                            ...res,
+                            fetchTime: Date.now()
+                        })
+                    )
+                    return res
+                } catch (error) {
+                    return error
+                }
             })
         )
             .then((data) => {

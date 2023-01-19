@@ -19,6 +19,7 @@ import {
     Box,
     Container,
     SimpleGrid,
+    Fade,
     Flex,
     Stack,
     Popover,
@@ -70,23 +71,21 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
                 {name}
             </Link>
 
-            {hasItems && (
-                <Link
-                    as={RouteLink}
-                    to={'#'}
-                    onMouseOver={onOpen}
-                    onKeyDown={(e) => {
-                        keyMap[e.key]?.(e)
-                    }}
-                    {...baseStyle.listMenuTriggerLinkIcon}
-                >
-                    <PopoverTrigger>
+            <Link
+                as={RouteLink}
+                to={'#'}
+                onMouseOver={onOpen}
+                onKeyDown={(e) => {
+                    keyMap[e.key]?.(e)
+                }}
+                {...baseStyle.listMenuTriggerLinkIcon}
+            >
+                <PopoverTrigger>
+                    <Fade in={hasItems && item.loaded}>
                         <ChevronIconTrigger {...baseStyle.selectedButtonIcon} />
-                    </PopoverTrigger>
-                </Link>
-            )}
-
-            {!hasItems && !item.loaded && <Spinner opacity="0" size="sm" />}
+                    </Fade>
+                </PopoverTrigger>
+            </Link>
         </Box>
     )
 }
