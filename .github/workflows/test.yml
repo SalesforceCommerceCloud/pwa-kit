@@ -142,13 +142,13 @@ jobs:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 5
 
-      - name: Run tests
+      - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/unit_tests"
         with:
           cwd: generated-${{ matrix.template }}
 
-      - name: Smoke test scripts
+      - name: Run smoke tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/smoke_tests"
         with:
@@ -236,7 +236,7 @@ jobs:
         with:
           cwd: generated-${{ matrix.template }}
 
-      - name: Smoke test scripts
+      - name: Run smoke tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/smoke_tests"
         with:
