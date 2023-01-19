@@ -48,48 +48,44 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
     })
 
     const fetchCategoryNode = async (id, levels = 1) => {
+        const storageKey = `${LOCAL_STORAGE_PREFIX}${id}-${locale}`
+        const storageItem = JSON.parse(window.localStorage.getItem(storageKey))
+
         // return early if there's one that is less than stale time
-        const storageItem = JSON.parse(
-            window.localStorage.getItem(`${LOCAL_STORAGE_PREFIX}${id}-${locale}`)
-        )
-        if (storageItem && Date.now() < storageItem?.fetchTime + CAT_MENU_STALE_TIME) {
+        if (storageItem && Date.now() < storageItem.fetchTime + CAT_MENU_STALE_TIME) {
             return storageItem
         }
+        // get and store fresh data for faster access / reduced server load
+        // TODO: Convert to useCategory hook when hooks are ready
         const res = await api.shopperProducts.getCategory({
             parameters: {
                 id,
                 levels
             }
         })
+        res.loaded = true
+        window.localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+                ...res,
+                fetchTime: Date.now()
+            })
+        )
         return res
     }
 
     useEffect(() => {
         // Server side, we only fetch level 0 categories, for performance, here
         // we request the remaining two levels of category depth
-        Promise.all(
-            root?.[itemsKey]?.map(async (cat) => {
-                // check localstorage first for this data to help remediate O(n) server
-                // load burden where n = top level categories
-                const res = await fetchCategoryNode(cat?.id, 2)
-                // store fetched data in local storage for faster access / reduced server load
-                res.loaded = true
-                window?.localStorage?.setItem(
-                    `${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`,
-                    JSON.stringify({
-                        ...res,
-                        fetchTime: Date.now()
-                    })
-                )
-                return res
-            })
-        ).then((data) => {
-            const newTree = {
-                ...root,
-                [itemsKey]: data
+        Promise.all(root?.[itemsKey]?.map(async (cat) => await fetchCategoryNode(cat?.id, 2))).then(
+            (data) => {
+                const newTree = {
+                    ...root,
+                    [itemsKey]: data
+                }
+                setRoot(newTree)
             }
-            setRoot(newTree)
-        })
+        )
     }, [])
 
     return (
