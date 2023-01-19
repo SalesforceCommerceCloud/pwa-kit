@@ -46,12 +46,14 @@ export const useBasket = ({id = '', shouldFetchProductDetail = false} = {}) => {
         isBasketsLoading,
         isBasketsError,
         ...restOfBasketsQuery,
+        isLoading: isBasketsLoading || isProductsLoading,
+        productItemDetail: {
+            isProductsLoading,
+            productDetails: products,
+            ...restOfProductQuery
+        },
         // current picked basket
         basket,
-        isLoading: isBasketsLoading || isProductsLoading,
-        isProductsLoading,
-        productDetails: products,
-        ...restOfProductQuery,
         hasBasket: basketsData?.total > 0,
         totalItems: basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0)
     }
