@@ -88,17 +88,13 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
                     return error
                 }
             })
-        )
-            .then((data) => {
-                const newTree = {
-                    ...root,
-                    [itemsKey]: data
-                }
-                setRoot(newTree)
-            })
-            .catch((err) => {
-                throw err
-            })
+        ).then((data) => {
+            const newTree = {
+                ...root,
+                [itemsKey]: data
+            }
+            setRoot(newTree)
+        })
     }, [])
 
     return (
