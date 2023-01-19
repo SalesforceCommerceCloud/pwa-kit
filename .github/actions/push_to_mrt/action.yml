@@ -1,27 +1,19 @@
 name: push_to_mrt
 inputs:
-  DEVELOP:
-    description: "Is this the 'develop' branch?"
-  RELEASE:
-    description: "Is this a release?"
+  CWD:
+    description: Project directory
+  TARGET:
+    description: MRT target
 runs:
   using: composite
   steps:
     - name: Push Bundle to MRT
+      # TODO: Need CWD or some way to specify --prefix
       run: |-
-        if [[ ${{ inputs.DEVELOP }} == 'true' || ${{ inputs.RELEASE }} == 'true' ]]; then
-          target=staging
-          target_commerce_sdk_react=commerce-sdk-react
-        elif [[ ${{ inputs.RELEASE }} == 'true' ]]; then
-          target=production
-        else
-          target=""
-        fi
+        cd ${{ inputs.CWD }}
         project="scaffold-pwa"
-        if [[ $target ]]; then
-          npm run push --prefix packages/template-retail-react-app -- -s $project --message "build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target
-        fi
-        if [[ $target_commerce_sdk_react ]]; then
-          npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target_commerce_sdk_react
+        build="build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
+        if [[ ${{ inputs.TARGET }} ]]; then
+          npm run push -- -s $project --message "$build" --target ${{ inputs.TARGET }}
         fi
       shell: bash
