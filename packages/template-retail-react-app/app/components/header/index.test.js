@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import Header from './index'
-import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {rest} from 'msw'
 import {mockedCustomerProductLists} from '../../commerce-api/mock-data'
@@ -21,14 +21,6 @@ jest.mock('@chakra-ui/react', () => {
     return {
         ...originalModule,
         useMediaQuery: jest.fn().mockReturnValue([true])
-    }
-})
-
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
     }
 })
 
@@ -64,12 +56,9 @@ MockedComponent.propTypes = {
     history: PropTypes.object
 }
 
-const server = setupMockServer()
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
@@ -77,9 +66,7 @@ beforeEach(() => {
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('renders Header', () => {
     renderWithProviders(<Header />)
@@ -193,7 +180,7 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
 })
 
 test('shows dropdown menu when an authenticated users hover on the account icon', async () => {
-    server.use(
+    global.server.use(
         // mock fetch product lists
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.json(mockedCustomerProductLists))

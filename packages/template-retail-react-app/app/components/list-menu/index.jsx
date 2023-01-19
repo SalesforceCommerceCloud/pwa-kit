@@ -5,10 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useRef, forwardRef} from 'react'
+import React, {Fragment, useRef, forwardRef, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
+import {useCategories} from '../../hooks/use-categories'
 
 // Project Components
 import LinksList from '../links-list'
@@ -18,6 +19,7 @@ import {
     Box,
     Container,
     SimpleGrid,
+    Fade,
     Flex,
     Stack,
     Popover,
@@ -69,21 +71,21 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
                 {name}
             </Link>
 
-            {hasItems && (
-                <Link
-                    as={RouteLink}
-                    to={'#'}
-                    onMouseOver={onOpen}
-                    onKeyDown={(e) => {
-                        keyMap[e.key]?.(e)
-                    }}
-                    {...baseStyle.listMenuTriggerLinkIcon}
-                >
-                    <PopoverTrigger>
+            <Link
+                as={RouteLink}
+                to={'#'}
+                onMouseOver={onOpen}
+                onKeyDown={(e) => {
+                    keyMap[e.key]?.(e)
+                }}
+                {...baseStyle.listMenuTriggerLinkIcon}
+            >
+                <PopoverTrigger>
+                    <Fade in={hasItems && item.loaded}>
                         <ChevronIconTrigger {...baseStyle.selectedButtonIcon} />
-                    </PopoverTrigger>
-                </Link>
-            )}
+                    </Fade>
+                </PopoverTrigger>
+            </Link>
         </Box>
     )
 }
@@ -160,9 +162,9 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}
 ListMenuContent.propTypes = {
     items: PropTypes.array,
     maxColumns: PropTypes.number,
-    itemsKey: PropTypes.string,
     onClose: PropTypes.func,
-    initialFocusRef: PropTypes.object
+    initialFocusRef: PropTypes.object,
+    itemsKey: PropTypes.string
 }
 
 const ListMenuPopover = ({items, item, name, itemsKey, maxColumns}) => {
@@ -217,40 +219,48 @@ ListMenuPopover.propTypes = {
  * The submenus are open when the user moves the mouse over the trigger and for A11y when
  * users use the keyboard Tab key to focus over the chevron icon and press Enter.
  *
- * @param root The root category in your commerce cloud back-end.
  * @param maxColumns The maximum number of columns that we want to use per row inside the ListMenu.
  */
-const ListMenu = ({root, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
+const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
+    const {root, itemsKey} = useCategories()
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
+    const [ariaBusy, setAriaBusy] = useState('true')
 
-    const itemsKey = 'categories'
-    const items = root ? root[itemsKey] : false
+    useEffect(() => {
+        setAriaBusy('false')
+    }, [])
 
     return (
-        <nav aria-label="main">
+        <nav
+            id="list-menu"
+            aria-label="main"
+            aria-live="polite"
+            aria-busy={ariaBusy}
+            aria-atomic="true"
+        >
             <Flex {...baseStyle.container}>
-                {items ? (
+                {root?.[itemsKey] ? (
                     <Stack direction={'row'} spacing={0} {...baseStyle.stackContainer}>
-                        {items.map((item) => {
+                        {root?.[itemsKey]?.map?.((item) => {
                             const {id, name} = item
-                            const items = item[itemsKey]
-
                             return (
-                                <ListMenuPopover
-                                    key={id}
-                                    maxColumns={maxColumns}
-                                    item={item}
-                                    name={name}
-                                    items={items}
-                                    itemsKey={itemsKey}
-                                />
+                                <Box key={id}>
+                                    <ListMenuPopover
+                                        key={id}
+                                        maxColumns={maxColumns}
+                                        item={item}
+                                        name={name}
+                                        items={item?.[itemsKey]}
+                                        itemsKey={itemsKey}
+                                    />
+                                </Box>
                             )
                         })}
                     </Stack>
                 ) : (
                     <Center p="2">
-                        <Spinner size="lg" />
+                        <Spinner opacity="0" size="lg" />
                     </Center>
                 )}
             </Flex>
@@ -261,10 +271,6 @@ const ListMenu = ({root, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
 ListMenu.displayName = 'ListMenu'
 
 ListMenu.propTypes = {
-    /**
-     * The root category in your commerce cloud back-end.
-     */
-    root: PropTypes.object,
     /**
      * The maximum number of columns that we want to use per row in the menu.
      */
