@@ -5740,3 +5740,83 @@ export const mockCategory = {
     c_enableCompare: false,
     c_showInMenu: true
 }
+
+export const mockCustomerBaskets = {
+    baskets: [
+        {
+            adjustedMerchandizeTotalTax: 2.93,
+            adjustedShippingTotalTax: null,
+            agentBasket: false,
+            basketId: '10cf6aa40edba4fcfcc6915594',
+            channelType: 'storefront',
+            creationDate: '2023-01-19T19:12:06.615Z',
+            currency: 'GBP',
+            customerInfo: {
+                customerId: 'abmuc2wupJxeoRxuo3wqYYmbhI'
+            },
+            lastModified: '2023-01-19T19:12:07.718Z',
+            merchandizeTotalTax: 2.93,
+            notes: {},
+            orderTotal: null,
+            productItems: [
+                {
+                    adjustedTax: 2.93,
+                    basePrice: 61.43,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: '4a9af0a24fe46c3f6d8721b371',
+                    itemText: 'Belted Cardigan With Studs',
+                    price: 61.43,
+                    priceAfterItemDiscount: 61.43,
+                    priceAfterOrderDiscount: 61.43,
+                    productId: '701642889830M',
+                    productName: 'Belted Cardigan With Studs',
+                    quantity: 1,
+                    shipmentId: 'me',
+                    tax: 2.93,
+                    taxBasis: 61.43,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
+            ],
+            productSubTotal: 61.43,
+            productTotal: 61.43,
+            shipments: [
+                {
+                    adjustedMerchandizeTotalTax: 2.93,
+                    adjustedShippingTotalTax: null,
+                    gift: false,
+                    merchandizeTotalTax: 2.93,
+                    productSubTotal: 61.43,
+                    productTotal: 61.43,
+                    shipmentId: 'me',
+                    shipmentTotal: null,
+                    shippingStatus: 'not_shipped',
+                    shippingTotal: null,
+                    shippingTotalTax: null,
+                    taxTotal: null
+                }
+            ],
+            shippingItems: [
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    itemId: '6455af8345d031600c8a8ad67c',
+                    itemText: 'Shipping',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: null,
+                    taxRate: 0.05
+                }
+            ],
+            shippingTotal: null,
+            shippingTotalTax: null,
+            taxation: 'gross',
+            taxTotal: null
+        }
+    ],
+    total: 1
+}

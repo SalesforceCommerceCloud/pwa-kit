@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {mockCustomerBaskets} from './app/commerce-api/mock-data'
+
 const path = require('path')
 const mockConfig = require(path.join(__dirname, 'config/mocks/default.js'))
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
@@ -54,6 +56,9 @@ export const setupMockServer = () => {
         ),
         rest.get('*/categories/:categoryId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
+        ),
+        rest.get('*/customer/:customerId/baskets', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         ),
         rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200)))
     )
