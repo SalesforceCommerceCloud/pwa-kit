@@ -176,8 +176,8 @@ const ProductDetail = () => {
                     // only show this modal when a product is successfully add to cart
                     onAddToCartModalOpen({product, quantity})
                 },
-                onError: (err) => {
-                    showError(err)
+                onError: () => {
+                    showError()
                 }
             }
         )
@@ -192,8 +192,8 @@ const ProductDetail = () => {
                     onSuccess: (basket) => {
                         addItemToBasket(basket.basketId, variant, quantity)
                     },
-                    onError: (err) => {
-                        showError(err)
+                    onError: () => {
+                        showError()
                     }
                 }
             )
