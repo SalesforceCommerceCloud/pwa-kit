@@ -69,35 +69,41 @@ const WishlistPrimaryAction = () => {
     // - if isMasterProduct, render View Options button
     // - else render Add button
 
-    const viewOptionsText = (
-        <FormattedMessage
-            defaultMessage="View Options"
-            id="wishlist_primary_action.button.view_options"
-        />
-    )
+    const buttonText = {
+        viewOptions: (
+            <FormattedMessage
+                defaultMessage="View Options"
+                id="wishlist_primary_action.button.view_options"
+            />
+        ),
+        addToCart: (
+            <FormattedMessage
+                defaultMessage="Add to Cart"
+                id="wishlist_primary_action.button.add_to_cart"
+            />
+        )
+    }
 
     let button
 
     if (isProductASet) {
         // TODO: check if children have variations.. else render Add All button
         button = (
-            <>
-                <Button
-                    as={Link}
-                    href={`/product/${variant.id}`}
-                    w={'full'}
-                    variant={'solid'}
-                    _hover={{textDecoration: 'none'}}
-                >
-                    {viewOptionsText}
-                </Button>
-            </>
+            <Button
+                as={Link}
+                href={`/product/${variant.id}`}
+                w={'full'}
+                variant={'solid'}
+                _hover={{textDecoration: 'none'}}
+            >
+                {buttonText.viewOptions}
+            </Button>
         )
     } else {
         button = isMasterProduct ? (
             <>
                 <Button w={'full'} variant={'solid'} onClick={onOpen}>
-                    {viewOptionsText}
+                    {buttonText.viewOptions}
                 </Button>
                 {isOpen && (
                     <ProductViewModal
@@ -116,10 +122,7 @@ const WishlistPrimaryAction = () => {
                 w={'full'}
                 isLoading={isLoading}
             >
-                <FormattedMessage
-                    defaultMessage="Add to Cart"
-                    id="wishlist_primary_action.button.add_to_cart"
-                />
+                {buttonText.addToCart}
             </Button>
         )
     }
