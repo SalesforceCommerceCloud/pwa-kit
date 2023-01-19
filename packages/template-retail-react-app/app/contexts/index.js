@@ -52,7 +52,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
         const storageItem = JSON.parse(
             window.localStorage.getItem(`${LOCAL_STORAGE_PREFIX}${id}-${locale}`)
         )
-        if (storageItem || Date.now() < storageItem?.fetchTime + CAT_MENU_STALE_TIME) {
+        if (storageItem && Date.now() < storageItem?.fetchTime + CAT_MENU_STALE_TIME) {
             return storageItem
         }
         const res = await api.shopperProducts.getCategory({
