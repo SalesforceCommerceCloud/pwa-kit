@@ -128,6 +128,7 @@ const options = {
         defaultOptions: {
             queries: {
                 retry: false,
+                refetchOnWindowFocus: false,
                 staleTime: 2 * 1000,
                 ...(isServerSide ? {retryOnMount: false} : {})
             },

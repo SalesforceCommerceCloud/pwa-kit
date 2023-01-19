@@ -724,6 +724,45 @@ export const mockedRegisteredCustomer = {
     previousVisitTime: '2021-04-14T13:38:29.778Z'
 }
 
+export const mockedRegisteredCustomerWithNoAddress = {
+    addresses: [],
+    authType: 'registered',
+    creationDate: '2021-03-31T13:32:42.000Z',
+    customerId: 'customerid',
+    customerNo: '00149004',
+    email: 'customer@test.com',
+    enabled: true,
+    lastLoginTime: '2021-04-14T13:38:29.778Z',
+    lastModified: '2021-04-14T13:38:29.778Z',
+    firstName: 'Testing',
+    lastName: 'Tester',
+    phoneHome: '(727) 555-1234',
+    lastVisitTime: '2021-04-14T13:38:29.778Z',
+    login: 'customer@test.com',
+    paymentInstruments: [
+        {
+            creationDate: '2021-04-01T14:34:56.000Z',
+            lastModified: '2021-04-01T14:34:56.000Z',
+            paymentBankAccount: {},
+            paymentCard: {
+                cardType: 'Master Card',
+                creditCardExpired: false,
+                expirationMonth: 1,
+                expirationYear: 2030,
+                holder: 'Test McTester',
+                maskedNumber: '************5454',
+                numberLastDigits: '5454',
+                validFromMonth: 1,
+                validFromYear: 2020
+            },
+            paymentInstrumentId: 'testcard1',
+            paymentMethodId: 'CREDIT_CARD'
+        }
+    ],
+    previousLoginTime: '2021-04-14T13:38:29.778Z',
+    previousVisitTime: '2021-04-14T13:38:29.778Z'
+}
+
 export const mockedGuestCustomer = {
     authType: 'guest',
     customerId: 'customerid',
@@ -5673,4 +5712,31 @@ export const mockProductSearch = {
     ],
     offset: 0,
     total: 43
+}
+
+export const mockCategory = {
+    id: 'mens-accessories-ties',
+    image:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dwd2ff3ec8/images/slot/sub_banners/cat-banner-mens-ties.jpg',
+    name: 'Ties',
+    pageDescription:
+        "Shop Mens's Ties for all occasions including business or casual at Commerce Cloud",
+    pageTitle: "Men's Casual and Business Ties",
+    parentCategoryId: 'mens-accessories',
+    parentCategoryTree: [
+        {
+            id: 'mens',
+            name: 'Mens'
+        },
+        {
+            id: 'mens-accessories',
+            name: 'Accessories'
+        },
+        {
+            id: 'mens-accessories-ties',
+            name: 'Ties'
+        }
+    ],
+    c_enableCompare: false,
+    c_showInMenu: true
 }

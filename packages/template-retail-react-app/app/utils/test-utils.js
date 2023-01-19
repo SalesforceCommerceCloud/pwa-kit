@@ -9,24 +9,22 @@ import {render} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {ChakraProvider} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import {setupServer} from 'msw/node'
-import {rest} from 'msw'
 
 import theme from '../theme'
-import CommerceAPI from '../commerce-api'
+import _CommerceAPI from '../commerce-api'
 import {
     BasketProvider,
-    CommerceAPIProvider,
+    CommerceAPIProvider as _CommerceAPIProvider,
     CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
+import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
-import {
-    mockCategories as initialMockCategories,
-    mockedRegisteredCustomer,
-    exampleTokenReponse
-} from '../commerce-api/mock-data'
+import {CommerceApiProvider} from 'commerce-sdk-react-preview'
+import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
+import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
 
@@ -60,15 +58,15 @@ export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
 export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Router>)
 
 export const renderWithRouterAndCommerceAPI = (node) => {
-    const api = new CommerceAPI({
+    const api = new _CommerceAPI({
         ...mockConfig.app.commerceAPI,
         einsteinConfig: mockConfig.app.einsteinAPI,
         proxy: undefined
     })
     return renderWithReactIntl(
-        <CommerceAPIProvider value={api}>
+        <_CommerceAPIProvider value={api}>
             <Router>{node}</Router>
-        </CommerceAPIProvider>
+        </_CommerceAPIProvider>
     )
 }
 
@@ -102,12 +100,13 @@ export const TestProviders = ({
     // @TODO: make this dynamic (getting from package.json during CI tests fails, so hardcoding for now)
     const ocapiHost = 'zzrf-001.dx.commercecloud.salesforce.com'
 
-    const api = new CommerceAPI({
+    const api = new _CommerceAPI({
         ...appConfig.commerceAPI,
         einsteinConfig: appConfig.einsteinAPI,
         proxy,
         ocapiHost
     })
+    const commerceApiConfig = appConfig.commerceAPI
     const [basket, _setBasket] = useState(initialBasket)
     const [customer, setCustomer] = useState(initialCustomer)
 
@@ -134,31 +133,42 @@ export const TestProviders = ({
     )
 
     return (
-        <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-            <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
-                <CommerceAPIProvider value={api}>
-                    <CategoriesProvider categories={initialCategories}>
-                        <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                            <CustomerProvider value={{customer, setCustomer}}>
-                                <BasketProvider value={{basket, setBasket}}>
-                                    <CustomerProductListsProvider>
-                                        <Router>
-                                            <ChakraProvider theme={theme}>
-                                                <AddToCartModalContext.Provider
-                                                    value={addToCartModal}
-                                                >
-                                                    {children}
-                                                </AddToCartModalContext.Provider>
-                                            </ChakraProvider>
-                                        </Router>
-                                    </CustomerProductListsProvider>
-                                </BasketProvider>
-                            </CustomerProvider>
-                        </CurrencyProvider>
-                    </CategoriesProvider>
-                </CommerceAPIProvider>
-            </MultiSiteProvider>
-        </IntlProvider>
+        <ServerContext.Provider value={{}}>
+            <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+                <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
+                    <_CommerceAPIProvider value={api}>
+                        <CommerceApiProvider
+                            shortCode={commerceApiConfig.parameters.shortCode}
+                            clientId={commerceApiConfig.parameters.clientId}
+                            organizationId={commerceApiConfig.parameters.organizationId}
+                            siteId={site?.id}
+                            locale={locale.id}
+                            redirectURI={`${window.location.origin}/testcallback`}
+                        >
+                            <CategoriesProvider categories={initialCategories}>
+                                <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                                    <CustomerProvider value={{customer, setCustomer}}>
+                                        <BasketProvider value={{basket, setBasket}}>
+                                            <CustomerProductListsProvider>
+                                                <Router>
+                                                    <ChakraProvider theme={theme}>
+                                                        <AddToCartModalContext.Provider
+                                                            value={addToCartModal}
+                                                        >
+                                                            {children}
+                                                        </AddToCartModalContext.Provider>
+                                                    </ChakraProvider>
+                                                </Router>
+                                            </CustomerProductListsProvider>
+                                        </BasketProvider>
+                                    </CustomerProvider>
+                                </CurrencyProvider>
+                            </CategoriesProvider>
+                        </CommerceApiProvider>
+                    </_CommerceAPIProvider>
+                </MultiSiteProvider>
+            </IntlProvider>
+        </ServerContext.Provider>
     )
 }
 
@@ -182,12 +192,32 @@ TestProviders.propTypes = {
  * @param {object} children
  * @param {object} options
  */
-export const renderWithProviders = (children, options) =>
-    render(children, {
+export const renderWithProviders = (children, options) => {
+    const TestProvidersWithDataAPI = withReactQuery(withLegacyGetProps(TestProviders), {
+        queryClientConfig: {
+            defaultOptions: {
+                queries: {
+                    retry: false,
+                    staleTime: 2 * 1000
+                },
+                mutations: {
+                    retry: false
+                }
+            }
+        }
+    })
+    const locals = {}
+
+    return render(children, {
         // eslint-disable-next-line react/display-name
-        wrapper: () => <TestProviders {...options?.wrapperProps}>{children}</TestProviders>,
+        wrapper: () => (
+            <TestProvidersWithDataAPI {...options?.wrapperProps} locals={locals}>
+                {children}
+            </TestProvidersWithDataAPI>
+        ),
         ...options
     })
+}
 
 /**
  * This is used to construct the URL pathname that would include
@@ -207,47 +237,4 @@ export const createPathWithDefaults = (path) => {
 
     const updatedPath = buildUrl(path, siteAlias || defaultSite.id, defaultLocale)
     return updatedPath
-}
-
-/**
- * Set up an API mocking server for testing purposes.
- * This mock server includes the basic oauth flow endpoints.
- */
-export const setupMockServer = (...handlers) => {
-    return setupServer(
-        // customer handlers have higher priority
-        ...handlers,
-        rest.post('*/oauth2/authorize', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-        rest.get('*/oauth2/authorize', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        ),
-        rest.get('*/oauth2/logout', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
-        ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        ),
-        rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId',
-                    id_token: 'testIdToken'
-                })
-            )
-        )
-    )
 }
