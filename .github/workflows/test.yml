@@ -275,5 +275,3 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
-
-

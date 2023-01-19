@@ -33,4 +33,3 @@ runs:
         # Install Lighthouse CI CLI
         sudo npm install -g @lhci/cli
       shell: bash
-
