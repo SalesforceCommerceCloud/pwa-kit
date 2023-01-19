@@ -7,7 +7,13 @@
 
 name: SalesforceCommerceCloud/pwa-kit/test
 on:
-  push: # All branches
+  # PRs from forks trigger `pull_request`, but do NOT have access to secrets.
+  # More info:
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflows-in-forked-repositories-1
+  # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+  # https://docs.github.com/en/actions/managing-workflow-runs/approving-workflow-runs-from-public-forks
+  pull_request: # Default: opened, reopened, synchronize (head branch updated)
+  push: # Default: all branches
   schedule:
     - cron: 0 8 * * *
 env:
