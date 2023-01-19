@@ -36,7 +36,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
 
-      # TODO: What is this step for? Can it be removed?
+      # TODO: This step seems to be a legacy of CircleCI, and can probably be removed.
       - name: Save NPM version
         run: |-
             echo "NPM_VERSION=${{ matrix.npm }}" >> $GITHUB_ENV
@@ -46,13 +46,14 @@ jobs:
         uses: "./.github/actions/setup_ubuntu"
 
       # TODO: Setup Ubuntu does some npm installs - should change npm version prior
-      - name: Install node dependencies with NPM version
+      - name: Update NPM version and reinstall dependencies
         if: env.IS_DEFAULT_NPM == 'false'
         run: |-
           npm install -g npm@${{ matrix.npm }}
           npm ci
 
-      # TODO: Change this to cause an error if it doesn't match expectation?
+      # TODO: This is for manually validating the previous step. It should either
+      # be removed or the previous step updated to fail if the version is wrong
       - name: Print NPM version
         run: npm --version
 

@@ -8,7 +8,6 @@ runs:
   using: composite
   steps:
     - name: Push Bundle to MRT
-      #TODO: Change target 'test-env' to 'staging' and 'test-env-3' to 'commerce-sdk-react'
       run: |-
         if [[ ${{ inputs.DEVELOP }} == 'true' || ${{ inputs.RELEASE }} == 'true' ]]; then
           target=staging
