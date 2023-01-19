@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -40,7 +40,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
 
     const api = useCommerceAPI()
     const [root, setRoot] = useState({
-        // map over the server-provided cat
+        // Clone the server-provided category
         ...treeRoot[DEFAULT_ROOT_CATEGORY],
         [itemsKey]: treeRoot[DEFAULT_ROOT_CATEGORY]?.[itemsKey]?.map((item) => ({
             ...item
@@ -48,57 +48,46 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
     })
 
     const fetchCategoryNode = async (id, levels = 1) => {
+        const storageKey = `${LOCAL_STORAGE_PREFIX}${id}-${locale}`
+        const storageItem = JSON.parse(window.localStorage.getItem(storageKey))
+
         // return early if there's one that is less than stale time
-        const storageItem = JSON.parse(
-            window.localStorage.getItem(`${LOCAL_STORAGE_PREFIX}${id}-${locale}`)
-        )
-        if (storageItem || Date.now() < storageItem?.fetchTime + CAT_MENU_STALE_TIME) {
+        if (storageItem && Date.now() < storageItem.fetchTime + CAT_MENU_STALE_TIME) {
             return storageItem
         }
+        // get and store fresh data for faster access / reduced server load
+        // TODO: Convert to useCategory hook when hooks are ready
         const res = await api.shopperProducts.getCategory({
             parameters: {
                 id,
                 levels
             }
         })
+        res.loaded = true
+        window.localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+                ...res,
+                fetchTime: Date.now()
+            })
+        )
         return res
     }
 
     useEffect(() => {
         // Server side, we only fetch level 0 categories, for performance, here
         // we request the remaining two levels of category depth
-        Promise.all(
-            root?.[itemsKey]?.map(async (cat) => {
-                // check localstorage first for this data to help remediate O(n) server
-                // load burden where n = top level categories
-                let res
-                try {
-                    res = await fetchCategoryNode(cat?.id, 2)
-                    // store fetched data in local storage for faster access / reduced server load
-                    res.loaded = true
-                    window?.localStorage?.setItem(
-                        `${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`,
-                        JSON.stringify({
-                            ...res,
-                            fetchTime: Date.now()
-                        })
-                    )
-                    return res
-                } catch (error) {
-                    return error
-                }
-            })
-        )
-            .then((data) => {
-                const newTree = {
+        const promises = root?.[itemsKey]?.map(async (cat) => await fetchCategoryNode(cat?.id, 2))
+        if (promises) {
+            // TODO: Error handling when fetching data fails.
+            // Possibly switch to .allSettled to show partial data?
+            Promise.all(promises).then((data) => {
+                setRoot({
                     ...root,
                     [itemsKey]: data
-                }
-                setRoot(newTree)
+                })
             })
-            .catch((err) => {
-                throw err
-            })
+        }
     }, [])
 
     return (
