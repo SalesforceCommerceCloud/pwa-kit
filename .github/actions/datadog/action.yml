@@ -1,0 +1,16 @@
+name: datadog
+inputs:
+  datadog_api_key:
+    description: "Datadog API key"
+  TOTAL_PACKAGES:
+    description: "Total # of packages"
+runs:
+  using: composite
+  steps:
+    - name: Send metrics to Datadog
+      run : |
+        # Add a dogrc so we can submit metrics to datadog
+        printf "[Connection]\napikey = ${{inputs.datadog_api_key}}\nappkey =\n" > ~/.dogrc
+
+        dog metric post mobify_platform_sdks.generated_project_total_packages ${{ inputs.TOTAL_PACKAGES }}
+      shell: bash

@@ -1,0 +1,28 @@
+name: push_to_mrt
+inputs:
+  DEVELOP:
+    description: "Is this the 'develop' branch?"
+  RELEASE:
+    description: "Is this a release?"
+runs:
+  using: composite
+  steps:
+    - name: Push Bundle to MRT
+      #TODO: Change target 'test-env' to 'staging' and 'test-env-3' to 'commerce-sdk-react'
+      run: |-
+        if [[ ${{ inputs.DEVELOP }} == 'true' || ${{ inputs.RELEASE }} == 'true' ]]; then
+          target=staging
+          target_commerce_sdk_react=commerce-sdk-react
+        elif [[ ${{ inputs.RELEASE }} == 'true' ]]; then
+          target=production
+        else
+          target=""
+        fi
+        project="scaffold-pwa"
+        if [[ $target ]]; then
+          npm run push --prefix packages/template-retail-react-app -- -s $project --message "build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target
+        fi
+        if [[ $target_commerce_sdk_react ]]; then
+          npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})" --target $target_commerce_sdk_react
+        fi
+      shell: bash
