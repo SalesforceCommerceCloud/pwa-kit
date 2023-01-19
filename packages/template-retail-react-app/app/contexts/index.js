@@ -71,22 +71,17 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
             root?.[itemsKey]?.map(async (cat) => {
                 // check localstorage first for this data to help remediate O(n) server
                 // load burden where n = top level categories
-                let res
-                try {
-                    res = await fetchCategoryNode(cat?.id, 2)
-                    // store fetched data in local storage for faster access / reduced server load
-                    res.loaded = true
-                    window?.localStorage?.setItem(
-                        `${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`,
-                        JSON.stringify({
-                            ...res,
-                            fetchTime: Date.now()
-                        })
-                    )
-                    return res
-                } catch (error) {
-                    return error
-                }
+                const res = await fetchCategoryNode(cat?.id, 2)
+                // store fetched data in local storage for faster access / reduced server load
+                res.loaded = true
+                window?.localStorage?.setItem(
+                    `${LOCAL_STORAGE_PREFIX}${cat?.id}-${locale}`,
+                    JSON.stringify({
+                        ...res,
+                        fetchTime: Date.now()
+                    })
+                )
+                return res
             })
         ).then((data) => {
             const newTree = {
