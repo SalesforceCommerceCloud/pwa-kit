@@ -1,0 +1,14 @@
+name: setup_windows
+inputs:
+  cwd:
+    required: false
+    default: "${PWD}"
+description: "Setup Windows Machine"
+runs:
+  using: composite
+  steps:
+    - name: Install Dependencies
+      run: |-
+        # Install node dependencies
+        npm ci
+      shell: bash
