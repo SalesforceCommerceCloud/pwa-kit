@@ -21,7 +21,7 @@ on:
   schedule:
     - cron: 0 8 * * *
 env:
-  IS_NOT_FORK: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' }}
+  IS_NOT_FORK: ${{ github.repository == github.event.pull_request.head.repo.full_name }}
   DEVELOP: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && github.ref == 'refs/heads/develop' }}
   RELEASE: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && startsWith(github.ref, 'refs/heads/release-') }}
 jobs:
