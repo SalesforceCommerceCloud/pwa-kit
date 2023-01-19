@@ -74,18 +74,17 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
         return res
     }
 
-    useEffect(() => {
+    useEffect(async () => {
         // Server side, we only fetch level 0 categories, for performance, here
         // we request the remaining two levels of category depth
-        Promise.all(root?.[itemsKey]?.map(async (cat) => await fetchCategoryNode(cat?.id, 2))).then(
-            (data) => {
-                const newTree = {
-                    ...root,
-                    [itemsKey]: data
-                }
-                setRoot(newTree)
-            }
-        )
+        const promises = root?.[itemsKey]?.map(async (cat) => await fetchCategoryNode(cat?.id, 2))
+        // TODO: Error handling when fetching data fails.
+        // Possibly switch to .allSettled to show partial data?
+        const data = await Promise.all(promises)
+        setRoot({
+            ...root,
+            [itemsKey]: data
+        })
     }, [])
 
     return (
