@@ -12,6 +12,7 @@ import {useItemVariant} from '../../../../components/item-variant'
 import ProductViewModal from '../../../../components/product-view-modal'
 import {useToast} from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../constants'
+import Link from '../../../../components/link'
 
 /**
  * Renders primary action on a product-item card in the form of a button.
@@ -23,9 +24,11 @@ const WishlistPrimaryAction = () => {
     const basket = useBasket()
     const {formatMessage} = useIntl()
     const isMasterProduct = variant?.type?.master || false
+    const isProductASet = variant?.type?.set
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
+
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
         const productItems = [
@@ -58,41 +61,70 @@ const WishlistPrimaryAction = () => {
         setIsLoading(false)
     }
 
-    return (
-        <>
-            {isMasterProduct ? (
-                <>
-                    <Button w={'full'} variant={'solid'} onClick={onOpen}>
-                        <FormattedMessage
-                            defaultMessage="Select Options"
-                            id="wishlist_primary_action.button.select_options"
-                        />
-                    </Button>
-                    {isOpen && (
-                        <ProductViewModal
-                            isOpen={isOpen}
-                            onOpen={onOpen}
-                            onClose={onClose}
-                            product={variant}
-                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                        />
-                    )}
-                </>
-            ) : (
+    // TODO
+    // If isProductASet
+    // - and if its children are variants, render View Options button
+    // - else render Add All button
+    // Else
+    // - if isMasterProduct, render View Options button
+    // - else render Add button
+
+    let button
+
+    if (isProductASet) {
+        // TODO: check if children have variations
+        button = (
+            <>
                 <Button
-                    variant={'solid'}
-                    onClick={() => handleAddToCart(variant, variant.quantity)}
+                    as={Link}
+                    href={`/product/${variant.id}`}
                     w={'full'}
-                    isLoading={isLoading}
+                    variant={'solid'}
+                    _hover={{textDecoration: 'none'}}
                 >
+                    {/* TODO: update text to "View Options" */}
                     <FormattedMessage
-                        defaultMessage="Add to Cart"
-                        id="wishlist_primary_action.button.add_to_cart"
+                        defaultMessage="Select Options"
+                        id="wishlist_primary_action.button.select_options"
                     />
                 </Button>
-            )}
-        </>
-    )
+            </>
+        )
+    } else {
+        button = isMasterProduct ? (
+            <>
+                <Button w={'full'} variant={'solid'} onClick={onOpen}>
+                    <FormattedMessage
+                        defaultMessage="Select Options"
+                        id="wishlist_primary_action.button.select_options"
+                    />
+                </Button>
+                {isOpen && (
+                    <ProductViewModal
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                        product={variant}
+                        addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                    />
+                )}
+            </>
+        ) : (
+            <Button
+                variant={'solid'}
+                onClick={() => handleAddToCart(variant, variant.quantity)}
+                w={'full'}
+                isLoading={isLoading}
+            >
+                <FormattedMessage
+                    defaultMessage="Add to Cart"
+                    id="wishlist_primary_action.button.add_to_cart"
+                />
+            </Button>
+        )
+    }
+
+    return button
 }
 
 export default WishlistPrimaryAction

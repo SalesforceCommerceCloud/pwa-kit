@@ -48,7 +48,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
     const intl = useIntl()
 
     const {price, basePrice, priceAfterItemDiscount} = variant
-    const isVariantASet = variant.type.set
+    const isProductASet = variant?.type?.set
 
     const displayPrice = priceAfterItemDiscount ? Math.min(price, priceAfterItemDiscount) : price
 
@@ -70,7 +70,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                 </HideOnDesktop>
             )}
             <Text fontWeight="bold" lineHeight={{base: '0.5', lg: '24px'}}>
-                {isVariantASet &&
+                {isProductASet &&
                     `${intl.formatMessage({
                         defaultMessage: 'Starting at',
                         id: 'item_price.label.starting_at'
