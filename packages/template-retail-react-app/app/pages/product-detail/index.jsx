@@ -24,7 +24,7 @@ import {
 import {useProduct, useCategory, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 
 // Hooks
-import {useBasket} from '../../hooks/use-basket'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {useVariant} from '../../hooks'
 import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
@@ -59,7 +59,7 @@ const ProductDetail = () => {
     const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
 
     /****************************** Basket *********************************/
-    const {hasBasket, basket} = useBasket()
+    const {hasBasket, basket} = useCurrentBasket()
     const createBasket = useShopperBasketsMutation({action: 'createBasket'})
     const addItemToBasketAction = useShopperBasketsMutation({action: 'addItemToBasket'})
     const {res} = useServerContext()

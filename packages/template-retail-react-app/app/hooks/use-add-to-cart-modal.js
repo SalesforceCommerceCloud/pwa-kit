@@ -23,7 +23,7 @@ import {
     Stack,
     useBreakpointValue
 } from '@chakra-ui/react'
-import {useBasket} from '../hooks/use-basket'
+import {useCurrentBasket} from '../hooks/use-current-basket'
 import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
@@ -56,7 +56,7 @@ export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, quantity} = data || {}
     const intl = useIntl()
-    const {basket, totalItems} = useBasket()
+    const {basket, totalItems} = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const variationAttributes = useVariationAttributes(product)
     if (!isOpen) {

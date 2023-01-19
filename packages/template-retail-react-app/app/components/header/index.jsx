@@ -28,7 +28,7 @@ import {
     useMediaQuery
 } from '@chakra-ui/react'
 
-import {useBasket} from '../../hooks/use-basket'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 import Link from '../link'
@@ -79,7 +79,7 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
-    const {totalItems, basket} = useBasket()
+    const {totalItems, basket} = useCurrentBasket()
     const customer = useCustomer()
     const navigate = useNavigation()
 

@@ -19,19 +19,19 @@ import {useCustomerBaskets, useCustomerId, useProducts} from 'commerce-sdk-react
  * @param id - basket id to get the current used basket among baskets returned, use first basket in the array if not defined
  * @param shouldFetchProductDetail - boolean to indicate if the baskets should fetch product details based on basket items
  */
-export const useBasket = ({id = '', shouldFetchProductDetail = false} = {}) => {
+export const useCurrentBasket = ({id = '', shouldFetchProductDetail = false} = {}) => {
     const customerId = useCustomerId() || ''
     const {
         data: basketsData,
         isLoading: isBasketsLoading,
-        error: isBasketsError,
+        error: basketsError,
         ...restOfBasketsQuery
     } = useCustomerBaskets({customerId})
     // if id is not defined, by default use the first basket in the list
     const basket =
         basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products, isLoading: isProductsLoading, ...restOfProductQuery} = useProducts(
+    const {data: products, isLoading: isProductsLoading, error: productsError} = useProducts(
         {
             ids: productIds,
             allImages: true
@@ -50,15 +50,10 @@ export const useBasket = ({id = '', shouldFetchProductDetail = false} = {}) => {
     )
 
     return {
-        baskets: basketsData,
-        isBasketsLoading,
-        isBasketsError,
-        ...restOfBasketsQuery,
+        error: basketsError || productsError,
         isLoading: isBasketsLoading || isProductsLoading,
         productItemDetail: {
-            isProductsLoading,
-            products,
-            ...restOfProductQuery
+            products
         },
         // current picked basket
         basket,
