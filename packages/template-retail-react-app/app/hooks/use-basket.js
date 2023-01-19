@@ -37,7 +37,15 @@ export const useBasket = ({id = '', shouldFetchProductDetail = false} = {}) => {
             allImages: true
         },
         {
-            enabled: shouldFetchProductDetail && !!productIds
+            enabled: shouldFetchProductDetail && !!productIds,
+            select: (result) => {
+                // Convert array into key/value object with key is the product id
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
         }
     )
 
@@ -49,7 +57,7 @@ export const useBasket = ({id = '', shouldFetchProductDetail = false} = {}) => {
         isLoading: isBasketsLoading || isProductsLoading,
         productItemDetail: {
             isProductsLoading,
-            productDetails: products,
+            products,
             ...restOfProductQuery
         },
         // current picked basket

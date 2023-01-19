@@ -62,7 +62,6 @@ const ProductDetail = () => {
     const {hasBasket, basket} = useBasket()
     const createBasket = useShopperBasketsMutation({action: 'createBasket'})
     const addItemToBasketAction = useShopperBasketsMutation({action: 'addItemToBasket'})
-
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
@@ -83,6 +82,8 @@ const ProductDetail = () => {
         }
     )
 
+    // Note: Since category needs id from product detail, it can't be server side rendered atm
+    // until we can do dependent query on server
     const {data: category} = useCategory(
         {
             id: product?.primaryCategoryId,
@@ -184,8 +185,6 @@ const ProductDetail = () => {
 
     const handleAddToCart = async (variant, quantity) => {
         if (!variant?.orderable || !quantity) return
-        console.log('variant', variant)
-        console.log('hasBasket', hasBasket)
         if (!hasBasket) {
             createBasket.mutate(
                 {body: {}},
@@ -332,7 +331,7 @@ const ProductDetail = () => {
                             />
                         }
                         recommender={'complete-the-set'}
-                        products={[product]}
+                        products={product}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />
@@ -345,7 +344,7 @@ const ProductDetail = () => {
                             />
                         }
                         recommender={'pdp-similar-items'}
-                        products={[product]}
+                        products={product}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />
