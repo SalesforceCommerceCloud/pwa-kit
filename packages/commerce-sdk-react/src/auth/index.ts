@@ -7,7 +7,7 @@
 import {helpers, ShopperLogin, ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import jwtDecode from 'jwt-decode'
 import {ApiClientConfigParams} from '../hooks/types'
-import {BaseStorage, LocalStorage, CookieStorage} from './storage'
+import {BaseStorage, LocalStorage, CookieStorage, ServerStorage, StorageTypes} from './storage'
 
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
@@ -41,15 +41,13 @@ type AuthDataKeys =
 type AuthDataMap = Record<
     AuthDataKeys,
     {
-        storage: BaseStorage
+        storageType: StorageTypes
         key: string
-        callback?: () => void
+        callback?: (storage: BaseStorage) => void
     }
 >
 
 const onClient = typeof window !== 'undefined'
-const localStorage = onClient ? new LocalStorage() : new Map()
-const cookieStorage = onClient ? new CookieStorage() : new Map()
 
 /**
  * A map of the data that this auth module stores. This maps the name of the property to
@@ -58,53 +56,53 @@ const cookieStorage = onClient ? new CookieStorage() : new Map()
  */
 const DATA_MAP: AuthDataMap = {
     access_token: {
-        storage: localStorage,
+        storageType: 'local',
         key: 'access_token'
     },
     customer_id: {
-        storage: localStorage,
+        storageType: 'local',
         key: 'customer_id'
     },
     usid: {
-        storage: localStorage,
+        storageType: 'local',
         key: 'usid'
     },
     enc_user_id: {
-        storage: localStorage,
+        storageType: 'local',
         key: 'enc_user_id'
     },
     expires_in: {
-        storage: localStorage,
+        storageType: 'local',
         key: 'expires_in'
     },
     id_token: {
-        storage: localStorage,
+        storageType: 'local',
         key: 'id_token'
     },
     idp_access_token: {
-        storage: localStorage,
+        storageType: 'local',
         key: 'idp_access_token'
     },
     token_type: {
-        storage: localStorage,
+        storageType: 'local',
         key: 'token_type'
     },
     refresh_token_guest: {
-        storage: cookieStorage,
+        storageType: 'cookie',
         key: 'cc-nx-g',
-        callback: () => {
-            cookieStorage.delete('cc-nx')
+        callback: (store) => {
+            store.delete('cc-nx')
         }
     },
     refresh_token_registered: {
-        storage: cookieStorage,
+        storageType: 'cookie',
         key: 'cc-nx',
-        callback: () => {
-            cookieStorage.delete('cc-nx-g')
+        callback: (store) => {
+            store.delete('cc-nx-g')
         }
     },
     site_id: {
-        storage: cookieStorage,
+        storageType: 'cookie',
         key: 'cc-site-id'
     }
 }
@@ -122,6 +120,7 @@ class Auth {
     private redirectURI: string
     private pendingToken: Promise<ShopperLoginTypes.TokenResponse> | undefined
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
+    private stores: Record<StorageTypes, BaseStorage>
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
@@ -136,40 +135,45 @@ class Auth {
             fetchOptions: config.fetchOptions
         })
 
-        if (this.get('site_id') && this.get('site_id') !== config.siteId) {
-            // if site is switched, remove all existing auth data in storage
-            // and the next auth.ready() call with restart the auth flow
-            this.clearStorage()
-            this.pendingToken = undefined
-        }
-
-        if (!this.get('site_id')) {
-            this.set('site_id', config.siteId, {
-                expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
-            })
-        }
+        // NOTE: Not too sure how I feel about this, seems a little confusing. Should
+        // the DATA_MAP instead have definitions for serverStorage and clientStorage?
+        // Another idea is to implement a getPrefix function on the storage class. But that
+        // would look kinda gross too.
+        const storageOptions = {keyPrefix: config.siteId}
+        this.stores = onClient
+            ? {
+                  cookie: new CookieStorage(storageOptions),
+                  local: new LocalStorage(storageOptions)
+              }
+            : {
+                  cookie: new ServerStorage(storageOptions),
+                  local: new ServerStorage(storageOptions)
+              }
 
         this.redirectURI = config.redirectURI
     }
 
     get(name: AuthDataKeys) {
-        const storage = DATA_MAP[name].storage
-        const key = DATA_MAP[name].key
+        const {key, storageType} = DATA_MAP[name]
+        const storage = this.stores[storageType]
         return storage.get(key)
     }
 
     private set(name: AuthDataKeys, value: string, options?: unknown) {
-        const {key, storage} = DATA_MAP[name]
+        const {key, storageType} = DATA_MAP[name]
+        const storage = this.stores[storageType]
         storage.set(key, value, options)
-        DATA_MAP[name].callback?.()
+        DATA_MAP[name].callback?.(storage)
     }
 
-    private clearStorage() {
-        Object.keys(DATA_MAP).forEach((key) => {
-            type Key = keyof AuthDataMap
-            DATA_MAP[key as Key].storage.delete(DATA_MAP[key as Key].key)
-        })
-    }
+    // private clearStorage() {
+    //     Object.keys(DATA_MAP).forEach((key) => {
+    //         type Key = keyof AuthDataMap
+    //         const {storageType} = DATA_MAP[key as Key]
+    //         const storage = this.stores[storageType]
+    //         storage.delete(DATA_MAP[key as Key].key)
+    //     })
+    // }
 
     /**
      * Every method in this class that returns a `TokenResponse` constructs it via this getter.

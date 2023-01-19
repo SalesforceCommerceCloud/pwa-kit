@@ -6,10 +6,26 @@
  */
 import Cookies from 'js-cookie'
 
-export interface BaseStorage {
-    set(key: string, value: string, options?: unknown): void
-    get(key: string): string
-    delete(key: string): void
+export type StorageTypes = 'cookie' | 'local'
+
+export interface BaseStorageOptions {
+    keyPrefix?: string
+    keyPrefixSeperator?: string
+}
+
+export abstract class BaseStorage {
+    options?: BaseStorageOptions
+
+    constructor(options?: BaseStorageOptions) {
+        this.options = options
+    }
+    getPrefixedKey(key: string): string {
+        const {keyPrefix, keyPrefixSeperator = '_'} = this?.options || {}
+        return `${keyPrefix ? keyPrefix + keyPrefixSeperator : ''}${key}`
+    }
+    abstract set(key: string, value: string, options?: unknown): void
+    abstract get(key: string): string
+    abstract delete(key: string): void
 }
 
 /**
@@ -18,20 +34,25 @@ export interface BaseStorage {
  * or a customized storage. This class is mainly used for commerce-sdk-react library
  * to store authentication tokens.
  */
-export class CookieStorage implements BaseStorage {
-    constructor() {
+export class CookieStorage extends BaseStorage {
+    constructor(options?: BaseStorageOptions) {
+        super(options)
+
         if (typeof document === 'undefined') {
             throw new Error('CookieStorage is not avaliable on the current environment.')
         }
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
-        Cookies.set(key, value, {...options, secure: true})
+        const prefixedKey = this.getPrefixedKey(key)
+        Cookies.set(prefixedKey, value, {...options, secure: true})
     }
     get(key: string) {
-        return Cookies.get(key) || ''
+        const prefixedKey = this.getPrefixedKey(key)
+        return Cookies.get(prefixedKey) || ''
     }
     delete(key: string) {
-        Cookies.remove(key)
+        const prefixedKey = this.getPrefixedKey(key)
+        Cookies.remove(prefixedKey)
     }
 }
 
@@ -41,33 +62,64 @@ export class CookieStorage implements BaseStorage {
  * or a customized storage. This class is mainly used for commerce-sdk-react library
  * to store authentication tokens.
  */
-export class LocalStorage implements BaseStorage {
-    constructor() {
+export class LocalStorage extends BaseStorage {
+    constructor(options?: BaseStorageOptions) {
+        super(options)
+
         if (typeof window === 'undefined') {
             throw new Error('LocalStorage is not avaliable on the current environment.')
         }
     }
     set(key: string, value: string) {
-        const oldValue = this.get(key)
-        window.localStorage.setItem(key, value)
+        const prefixedKey = this.getPrefixedKey(key)
+        const oldValue = this.get(prefixedKey)
+        window.localStorage.setItem(prefixedKey, value)
         const event = new StorageEvent('storage', {
-            key: key,
+            key: prefixedKey,
             oldValue: oldValue,
             newValue: value
         })
         window.dispatchEvent(event)
     }
     get(key: string) {
-        return window.localStorage.getItem(key) || ''
+        const prefixedKey = this.getPrefixedKey(key)
+        return window.localStorage.getItem(prefixedKey) || ''
     }
     delete(key: string) {
-        const oldValue = this.get(key)
-        window.localStorage.removeItem(key)
+        const prefixedKey = this.getPrefixedKey(key)
+        const oldValue = this.get(prefixedKey)
+        window.localStorage.removeItem(prefixedKey)
         const event = new StorageEvent('storage', {
-            key: key,
+            key: prefixedKey,
             oldValue: oldValue,
             newValue: null
         })
         window.dispatchEvent(event)
+    }
+}
+
+export class ServerStorage extends BaseStorage {
+    map: Map<string, string>
+
+    constructor(options?: BaseStorageOptions) {
+        super(options)
+
+        if (typeof window !== 'undefined') {
+            throw new Error('ServerStorage is not avaliable on the current environment.')
+        }
+
+        this.map = new Map()
+    }
+    set(key: string, value: string) {
+        const prefixedKey = this.getPrefixedKey(key)
+        this.map.set(prefixedKey, value)
+    }
+    get(key: string) {
+        const prefixedKey = this.getPrefixedKey(key)
+        return this.map.get(prefixedKey) || ''
+    }
+    delete(key: string) {
+        const prefixedKey = this.getPrefixedKey(key)
+        this.map.delete(prefixedKey)
     }
 }
