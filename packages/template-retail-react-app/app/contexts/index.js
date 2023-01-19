@@ -40,7 +40,7 @@ export const CategoriesProvider = ({treeRoot = {}, children, locale}) => {
 
     const api = useCommerceAPI()
     const [root, setRoot] = useState({
-        // map over the server-provided cat
+        // Clone the server-provided category
         ...treeRoot[DEFAULT_ROOT_CATEGORY],
         [itemsKey]: treeRoot[DEFAULT_ROOT_CATEGORY]?.[itemsKey]?.map((item) => ({
             ...item
