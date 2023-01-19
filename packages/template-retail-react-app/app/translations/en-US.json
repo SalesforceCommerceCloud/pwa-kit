@@ -668,6 +668,9 @@
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"
   },
+  "item_price.label.starting_at": {
+    "defaultMessage": "Starting at"
+  },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
   },
@@ -1405,8 +1408,8 @@
   "wishlist_primary_action.button.add_to_cart": {
     "defaultMessage": "Add to Cart"
   },
-  "wishlist_primary_action.button.select_options": {
-    "defaultMessage": "Select Options"
+  "wishlist_primary_action.button.view_options": {
+    "defaultMessage": "View Options"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"

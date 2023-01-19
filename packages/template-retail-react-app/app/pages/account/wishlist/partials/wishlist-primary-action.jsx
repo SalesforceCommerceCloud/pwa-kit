@@ -69,10 +69,17 @@ const WishlistPrimaryAction = () => {
     // - if isMasterProduct, render View Options button
     // - else render Add button
 
+    const viewOptionsText = (
+        <FormattedMessage
+            defaultMessage="View Options"
+            id="wishlist_primary_action.button.view_options"
+        />
+    )
+
     let button
 
     if (isProductASet) {
-        // TODO: check if children have variations
+        // TODO: check if children have variations.. else render Add All button
         button = (
             <>
                 <Button
@@ -82,11 +89,7 @@ const WishlistPrimaryAction = () => {
                     variant={'solid'}
                     _hover={{textDecoration: 'none'}}
                 >
-                    {/* TODO: update text to "View Options" */}
-                    <FormattedMessage
-                        defaultMessage="Select Options"
-                        id="wishlist_primary_action.button.select_options"
-                    />
+                    {viewOptionsText}
                 </Button>
             </>
         )
@@ -94,10 +97,7 @@ const WishlistPrimaryAction = () => {
         button = isMasterProduct ? (
             <>
                 <Button w={'full'} variant={'solid'} onClick={onOpen}>
-                    <FormattedMessage
-                        defaultMessage="Select Options"
-                        id="wishlist_primary_action.button.select_options"
-                    />
+                    {viewOptionsText}
                 </Button>
                 {isOpen && (
                     <ProductViewModal

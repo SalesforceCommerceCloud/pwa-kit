@@ -1581,6 +1581,12 @@
       "value": "Sale"
     }
   ],
+  "item_price.label.starting_at": [
+    {
+      "type": 0,
+      "value": "Starting at"
+    }
+  ],
   "lCPCxk": [
     {
       "type": 0,
@@ -3159,10 +3165,10 @@
       "value": "Add to Cart"
     }
   ],
-  "wishlist_primary_action.button.select_options": [
+  "wishlist_primary_action.button.view_options": [
     {
       "type": 0,
-      "value": "Select Options"
+      "value": "View Options"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [
