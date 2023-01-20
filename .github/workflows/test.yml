@@ -22,9 +22,9 @@ on:
     # Run every day at 12pm (PST) - cron uses UTC times
     - cron: '0 8 * * *'
 env:
-  IS_NOT_FORK: ${{ github.repository.name == 'SalesforceCommerceCloud/pwa-kit' }}
+  IS_NOT_FORK: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' }}
   DEVELOP: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && (github.head_ref || github.ref_name) == 'github-actions-tests' }}
-  RELEASE: ${{ github.repository.name == 'SalesforceCommerceCloud/pwa-kit' && startsWith(github.head_ref || github.ref_name, 'release-') }}
+  RELEASE: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && startsWith(github.head_ref || github.ref_name, 'release-') }}
 
 jobs:
   pwa-kit:
@@ -51,7 +51,7 @@ jobs:
       - name: Update NPM version
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REPO_FULL_NAME: ${{ github.event.pull_request.head.repo.full_name }}
+          GITHUB_PULL_REQUEST_REPO_FULL_NAME: ${{ github.event.pull_request.head.repo.full_name }}
           GITHUB_REF_NAME: ${{ github.ref_name  }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
           GITHUB_PULL_REQUEST_HEAD_REF: ${{ github.event.pull_request.head.ref }}
@@ -59,7 +59,7 @@ jobs:
 
         run: |
           echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
-          echo "GITHUB_REPO_FULL_NAME: $GITHUB_REPO_FULL_NAME"
+          echo "GITHUB_PULL_REQUEST_REPO_FULL_NAME: $GITHUB_PULL_REQUEST_REPO_FULL_NAME"
           echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
           echo "GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
           echo "GITHUB_PULL_REQUEST_HEAD_REF: $GITHUB_PULL_REQUEST_HEAD_REF"
