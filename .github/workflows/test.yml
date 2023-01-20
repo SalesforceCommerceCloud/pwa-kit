@@ -23,7 +23,7 @@ on:
     - cron: '0 8 * * *'
 env:
   IS_NOT_FORK: ${{ github.repository == github.event.pull_request.head.repo.full_name }}
-  DEVELOP: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && github.ref == 'refs/heads/develop' }}
+  DEVELOP: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && github.ref == 'refs/heads/github-actions-test' }}
   RELEASE: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && startsWith(github.ref, 'refs/heads/release-') }}
 jobs:
   pwa-kit:
@@ -55,6 +55,9 @@ jobs:
           echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
           echo "GITHUB_REPO_FULL_NAME: $GITHUB_REPO_FULL_NAME"
           echo "IS_NOT_FORK: $IS_NOT_FORK"
+          echo "IS_DEFAULT_NPM: $IS_DEFAULT_NPM"
+          echo "DEVELOP: $DEVELOP"
+          
           npm install -g npm@${{ matrix.npm }}
 
       - name: Setup Ubuntu Machine
