@@ -4,36 +4,52 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ServerStorage} from './storage'
+import {BaseStorage, ServerStorage} from './storage'
 
-describe('Server Storage', () => {
-    const {window} = global
-    const key = 'key'
-    const value = 'value'
+const {window} = global
+const key = 'key'
+const value = 'value'
 
-    beforeAll(() => {
+const testCases = [{
+    description: 'ServerStorage works without options',
+    requiresWindow: false,
+    storageOptions: {},
+    validate: (storage: BaseStorage) => {
+        storage.set(key, value)
+        expect(storage.get(key)).toBe(value)
+        storage.delete(key)
+        expect(storage.get(key)).toBe('')
+    }
+}, {
+    description: 'ServerStorage works with options',
+    requiresWindow: false,
+    storageOptions: {
+        keyPrefix: 'prefix',
+        keyPrefixSeperator: '$'
+    },
+    validate: (storage: BaseStorage) => {
+        storage.set(key, value)
+        expect(storage.get(key)).toBe(value)
         // @ts-ignore
-        delete global.window
-    })
-    afterAll(() => {
-        global.window = window
-    })
-    test('Works without prefix option', () => {
-        const serverStorage = new ServerStorage()
+        expect(Array.from(storage.map.entries())[0][0]).toBe(`prefix$${key}`)
+        storage.delete(key)
+        expect(storage.get(key)).toBe('')
+    }
+}]
 
-        serverStorage.set(key, value)
-        expect(serverStorage.get(key)).toBe(value)
-        serverStorage.delete(key)
-        expect(serverStorage.get(key)).toBe('')
-    })
-    test('Works with prefix option', () => {
-        const serverStorage = new ServerStorage({keyPrefix: 'prefix'})
+describe('Storage Classes', () => {
+    testCases.forEach(({description, requiresWindow, storageOptions, validate}) => {
+        test(description, () => {
+            if (!requiresWindow) {
+                // @ts-ignore
+                delete global.window
+            }
+            const storage = new ServerStorage(storageOptions)
+            validate(storage)
 
-        serverStorage.set(key, value)
-        expect(serverStorage.get(key)).toBe(value)
-        // @ts-ignore
-        expect(Array.from(serverStorage.map.entries())[0][0]).toBe(`prefix_${key}`)
-        serverStorage.delete(key)
-        expect(serverStorage.get(key)).toBe('')
+            if (!requiresWindow) {
+                global.window = window
+            }
+        })
     })
 })
