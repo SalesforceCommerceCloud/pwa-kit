@@ -9,18 +9,6 @@ import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
 import {waitFor, screen} from '@testing-library/react'
 
-// jest.mock('./use-current-basket', () => {
-//     return {
-//         useCurrentBasket: jest.fn().mockImplementation(() => {
-//             return {
-//                 error: undefined,
-//                 isLoading: false,
-//                 productItemDetail: {products: undefined},
-//                 basket: mockCustomerBaskets.baskets[0]
-//             }
-//         })
-//     }
-// })
 const MOCK_PRODUCT = {
     currency: 'USD',
     id: '701642811398M',
