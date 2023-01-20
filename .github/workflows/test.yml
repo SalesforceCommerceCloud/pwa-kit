@@ -23,8 +23,8 @@ on:
     - cron: '0 8 * * *'
 env:
   IS_NOT_FORK: ${{ github.repository == github.event.pull_request.head.repo.full_name }}
-  DEVELOP: ${{ github.repository == github.event.pull_request.head.repo.full_name && github.head_ref == 'refs/heads/github-actions-tests' }}
-  RELEASE: ${{ github.repository == github.event.pull_request.head.repo.full_name && startsWith(github.ref, 'refs/heads/release-') }}
+  DEVELOP: ${{ github.repository == github.event.pull_request.head.repo.full_name && github.ref_name == 'github-actions-tests' }}
+  RELEASE: ${{ github.repository == github.event.pull_request.head.repo.full_name && startsWith(github.ref_name, 'release-') }}
 jobs:
   pwa-kit:
     strategy:
@@ -51,11 +51,11 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REPO_FULL_NAME: ${{ github.event.pull_request.head.repo.full_name }}
-          GITHUB_REF: ${{ github.head_ref  }}
+          GITHUB_REF_NAME: ${{ github.ref_name  }}
         run: |
           echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
           echo "GITHUB_REPO_FULL_NAME: $GITHUB_REPO_FULL_NAME"
-          echo "GITHUB_REF: $GITHUB_REF"
+          echo "GITHUB_REF_NAME: GITHUB_REF_NAME"
           echo "IS_NOT_FORK: $IS_NOT_FORK"
           echo "IS_DEFAULT_NPM: $IS_DEFAULT_NPM"
           echo "DEVELOP: $DEVELOP"
