@@ -23,8 +23,8 @@ on:
     - cron: '0 8 * * *'
 env:
   IS_NOT_FORK: ${{ github.repository == github.event.pull_request.head.repo.full_name }}
-  DEVELOP: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && github.ref == 'refs/heads/github-actions-tests' }}
-  RELEASE: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && startsWith(github.ref, 'refs/heads/release-') }}
+  DEVELOP: ${{ github.repository == github.event.pull_request.head.repo.full_name && github.head_ref == 'refs/heads/github-actions-tests' }}
+  RELEASE: ${{ github.repository == github.event.pull_request.head.repo.full_name && startsWith(github.ref, 'refs/heads/release-') }}
 jobs:
   pwa-kit:
     strategy:
@@ -51,7 +51,7 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REPO_FULL_NAME: ${{ github.event.pull_request.head.repo.full_name }}
-          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REF: ${{ github.head_ref  }}
         run: |
           echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
           echo "GITHUB_REPO_FULL_NAME: $GITHUB_REPO_FULL_NAME"
