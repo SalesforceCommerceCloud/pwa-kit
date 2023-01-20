@@ -19,7 +19,7 @@ export abstract class BaseStorage {
     constructor(options?: BaseStorageOptions) {
         this.options = options
     }
-    getPrefixedKey(key: string): string {
+    protected getPrefixedKey(key: string): string {
         const {keyPrefix, keyPrefixSeperator = '_'} = this?.options || {}
         return `${keyPrefix ? keyPrefix + keyPrefixSeperator : ''}${key}`
     }
@@ -99,7 +99,7 @@ export class LocalStorage extends BaseStorage {
 }
 
 export class ServerStorage extends BaseStorage {
-    map: Map<string, string>
+    private map: Map<string, string>
 
     constructor(options?: BaseStorageOptions) {
         super(options)
