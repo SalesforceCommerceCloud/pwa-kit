@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Button, useDisclosure} from '@chakra-ui/react'
 import useBasket from '../../../../commerce-api/hooks/useBasket'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -13,6 +13,7 @@ import ProductViewModal from '../../../../components/product-view-modal'
 import {useToast} from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 import Link from '../../../../components/link'
+import {useCommerceAPI} from '../../../../commerce-api/contexts'
 
 /**
  * Renders primary action on a product-item card in the form of a button.
@@ -28,16 +29,43 @@ const WishlistPrimaryAction = () => {
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const api = useCommerceAPI()
+    const [productSet, setProductSet] = useState()
+
+    useEffect(() => {
+        if (isProductASet && !productSet) {
+            api.shopperProducts
+                .getProduct({
+                    parameters: {
+                        id: variant.id
+                    }
+                })
+                .then((product) => {
+                    setProductSet({
+                        ...variant,
+                        setProducts: product.setProducts
+                    })
+                })
+        }
+    }, [])
 
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
-        const productItems = [
-            {
-                productId: item.id || item.productId,
-                price: item.price,
-                quantity
-            }
-        ]
+
+        const productItems = item.setProducts
+            ? item.setProducts.map((child) => ({
+                  productId: child.id || child.productId,
+                  price: child.price,
+                  quantity
+              }))
+            : [
+                  {
+                      productId: item.id || item.productId,
+                      price: item.price,
+                      quantity
+                  }
+              ]
+
         try {
             await basket.addItemToBasket(productItems)
             showToast({
@@ -58,16 +86,9 @@ const WishlistPrimaryAction = () => {
                 status: 'error'
             })
         }
+
         setIsLoading(false)
     }
-
-    // TODO
-    // If isProductASet
-    // - and if its children are variants, render View Options button
-    // - else render Add All button
-    // Else
-    // - if isMasterProduct, render View Options button
-    // - else render Add button
 
     const buttonText = {
         viewOptions: (
@@ -81,13 +102,18 @@ const WishlistPrimaryAction = () => {
                 defaultMessage="Add to Cart"
                 id="wishlist_primary_action.button.add_to_cart"
             />
+        ),
+        addAllToCart: (
+            <FormattedMessage
+                defaultMessage="Add All to Cart"
+                id="wishlist_primary_action.button.add_all_to_cart"
+            />
         )
     }
 
     let button
 
     if (isProductASet) {
-        // TODO: check if children have variations.. else render Add All button
         button = (
             <Button
                 as={Link}
@@ -99,6 +125,19 @@ const WishlistPrimaryAction = () => {
                 {buttonText.viewOptions}
             </Button>
         )
+        // TODO: create a new set in BM to test this scenario
+        if (productSet?.setProducts.every((child) => !hasVariants(child))) {
+            button = (
+                <Button
+                    variant={'solid'}
+                    onClick={() => handleAddToCart(productSet, productSet.quantity)}
+                    w={'full'}
+                    isLoading={isLoading}
+                >
+                    {buttonText.addAllToCart}
+                </Button>
+            )
+        }
     } else {
         button = isMasterProduct ? (
             <>
@@ -131,3 +170,7 @@ const WishlistPrimaryAction = () => {
 }
 
 export default WishlistPrimaryAction
+
+const hasVariants = (product) => {
+    return product?.variants?.length > 1
+}

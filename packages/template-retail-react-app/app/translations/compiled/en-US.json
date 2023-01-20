@@ -3159,6 +3159,12 @@
       "value": "New Password"
     }
   ],
+  "wishlist_primary_action.button.add_all_to_cart": [
+    {
+      "type": 0,
+      "value": "Add All to Cart"
+    }
+  ],
   "wishlist_primary_action.button.add_to_cart": [
     {
       "type": 0,
