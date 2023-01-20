@@ -34,9 +34,6 @@ import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import RecommendedProducts from '../../components/recommended-products'
 import ProductView from '../../partials/product-view'
 
-// Others/Utils
-import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
-
 // constant
 import {
     API_ERROR_MESSAGE,
@@ -81,6 +78,8 @@ const ProductDetail = () => {
             keepPreviousData: true
         }
     )
+    console.log('product', product)
+    console.log('product?.primaryCategoryId', product?.primaryCategoryId)
     // console.log('product', product)
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
@@ -93,7 +92,7 @@ const ProductDetail = () => {
             enabled: !!product?.primaryCategoryId
         }
     )
-    // console.log('category', category)
+    console.log('category', category)
     const variant = useVariant(product)
     const [primaryCategory, setPrimaryCategory] = useState(category)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute

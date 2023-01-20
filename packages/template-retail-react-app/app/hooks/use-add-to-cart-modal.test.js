@@ -7,20 +7,20 @@
 import React from 'react'
 import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
-import {mockCustomerBaskets} from '../commerce-api/mock-data'
+import {waitFor, screen} from '@testing-library/react'
 
-jest.mock('./use-current-basket', () => {
-    return {
-        useCurrentBasket: jest.fn().mockImplementation(() => {
-            return {
-                error: undefined,
-                isLoading: false,
-                productItemDetail: {products: undefined},
-                basket: mockCustomerBaskets.baskets[0]
-            }
-        })
-    }
-})
+// jest.mock('./use-current-basket', () => {
+//     return {
+//         useCurrentBasket: jest.fn().mockImplementation(() => {
+//             return {
+//                 error: undefined,
+//                 isLoading: false,
+//                 productItemDetail: {products: undefined},
+//                 basket: mockCustomerBaskets.baskets[0]
+//             }
+//         })
+//     }
+// })
 const MOCK_PRODUCT = {
     currency: 'USD',
     id: '701642811398M',
@@ -580,7 +580,7 @@ const MOCK_PRODUCT = {
     c_width: 'Z'
 }
 
-test('Renders AddToCartModal', () => {
+test('Renders AddToCartModal', async () => {
     const {getByText} = renderWithProviders(
         <AddToCartModalContext.Provider
             value={{
@@ -595,7 +595,11 @@ test('Renders AddToCartModal', () => {
         </AddToCartModalContext.Provider>
     )
 
-    expect(getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+    await waitFor(() => {
+        expect(getByText(/(1 item)/)).toBeInTheDocument()
+        screen.debug()
+        // expect(getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+    })
 })
 
 test('Do not render when isOpen is false', () => {

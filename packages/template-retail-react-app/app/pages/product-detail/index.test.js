@@ -4,12 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
-import {
-    mockCategory,
-    mockedCustomerProductLists,
-    productsResponse
-} from '../../commerce-api/mock-data'
+import React from 'react'
+import {mockMasterProduct} from '../../commerce-api/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
@@ -33,12 +29,7 @@ beforeEach(() => {
     // console.error(global.server)
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
-            // console.log('product detail-----------------------')
-            return res(ctx.json(productsResponse.data[0]))
-        }),
-        rest.get('*/categories/:categoryId', (req, res, ctx) => {
-            // console.log('category---------------')
-            return res(ctx.json(mockCategory))
+            return res(ctx.json(mockMasterProduct))
         })
     )
     // Since we're testing some navigation logic, we are using a simple Router
@@ -52,10 +43,14 @@ afterEach(() => {
 test('should render product details page', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => {
-        const productName = screen.getAllByText(/Long Sleeve Crew Neck/)
+        const productName = screen.getAllByText(/Checked Silk Tie/)
         expect(productName.length).toEqual(2)
+        expect(screen.getAllByText(/19.19/).length).toEqual(2)
+        expect(screen.getAllByText(/Add to Cart/).length).toEqual(2)
+        expect(screen.getAllByText(/Add to Wishlist/).length).toEqual(2)
     })
-    expect(screen.getAllByText(/14.99/).length).toEqual(2)
-    expect(screen.getAllByText(/Add to Cart/).length).toEqual(2)
-    expect(screen.getAllByText(/Add to Wishlist/).length).toEqual(2)
+
+    await waitFor(() => {
+        expect(screen.getAllByText(/Ties/).length).toEqual(2)
+    })
 })

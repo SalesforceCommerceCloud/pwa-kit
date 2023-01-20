@@ -28,7 +28,6 @@ const AJwtThatNeverExpires =
  * This mock server includes the basic oauth flow endpoints.
  */
 export const setupMockServer = () => {
-    console.log('setup server')
     return setupServer(
         rest.post('*/oauth2/authorize', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
         rest.get('*/oauth2/authorize', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
@@ -39,7 +38,6 @@ export const setupMockServer = () => {
             res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
         ),
         rest.get('*/customers/:customerId', (req, res, ctx) => {
-            console.log('customers----------------------')
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         }),
         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
@@ -57,7 +55,6 @@ export const setupMockServer = () => {
             )
         ),
         rest.get('*/categories/:categoryId', (req, res, ctx) =>
-            // console.log('cfdsfdsfs=================') ||
             res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
         ),
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {

@@ -56,7 +56,7 @@ export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, quantity} = data || {}
     const intl = useIntl()
-    const {basket, totalItems} = useCurrentBasket()
+    const {basket = {}, totalItems} = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const variationAttributes = useVariationAttributes(product)
     if (!isOpen) {
