@@ -81,7 +81,7 @@ const ProductDetail = () => {
             keepPreviousData: true
         }
     )
-
+    // console.log('product', product)
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
     const {data: category} = useCategory(
@@ -93,6 +93,7 @@ const ProductDetail = () => {
             enabled: !!product?.primaryCategoryId
         }
     )
+    // console.log('category', category)
     const variant = useVariant(product)
     const [primaryCategory, setPrimaryCategory] = useState(category)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute

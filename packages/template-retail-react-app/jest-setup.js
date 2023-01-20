@@ -43,27 +43,24 @@ export const setupMockServer = () => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         }),
         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-        rest.post(
-            '*/oauth2/token',
-            (req, res, ctx) =>
-                console.log('fdgfdgfdg>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.d') ||
-                res(
-                    ctx.delay(0),
-                    ctx.json({
-                        customer_id: 'test',
-                        access_token: AJwtThatNeverExpires,
-                        refresh_token: 'testrefeshtoken',
-                        usid: 'testusid',
-                        enc_user_id: 'testEncUserId',
-                        id_token: 'testIdToken'
-                    })
-                )
+        rest.post('*/oauth2/token', (req, res, ctx) =>
+            res(
+                ctx.delay(0),
+                ctx.json({
+                    customer_id: 'test',
+                    access_token: AJwtThatNeverExpires,
+                    refresh_token: 'testrefeshtoken',
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId',
+                    id_token: 'testIdToken'
+                })
+            )
         ),
         rest.get('*/categories/:categoryId', (req, res, ctx) =>
+            // console.log('cfdsfdsfs=================') ||
             res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
         ),
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            console.log('ffffffff=========================================')
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         }),
         rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200)))
