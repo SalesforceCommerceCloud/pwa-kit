@@ -1,0 +1,35 @@
+name: setup_ubuntu
+inputs:
+  cwd:
+    required: false
+    default: "${PWD}"
+description: "Setup Ubuntu Machine"
+runs:
+  using: composite
+  steps:
+    - name: Install Dependencies
+      run: |-
+        # Install system dependencies
+        sudo apt-get update -yq
+        sudo apt-get install python2 python3-pip time -yq
+        sudo pip install -U pip setuptools
+        sudo pip install awscli==1.18.85 datadog==0.40.1
+
+        # Install node dependencies
+        node ./scripts/gtime.js monorepo_install npm ci
+
+        # Build the PWA
+        npm run lerna -- run analyze-build --scope "retail-react-app"
+
+        # Report bundle sizes
+        node ./scripts/report-bundle-size.js
+
+        # Check that packages are all using the same versions of compilers, etc.
+        node ./scripts/check-dependencies.js
+
+        # Install Snyk CLI
+        sudo npm install -g snyk
+
+        # Install Lighthouse CI CLI
+        sudo npm install -g @lhci/cli
+      shell: bash
