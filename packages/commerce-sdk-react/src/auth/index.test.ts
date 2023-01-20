@@ -133,17 +133,6 @@ describe('Auth', () => {
         // @ts-expect-error private method
         expect(() => auth.isTokenExpired()).toThrow()
     })
-    // test('site switch clears auth storage', () => {
-    //     const auth = new Auth(config)
-    //     // @ts-expect-error private method
-    //     auth.set('access_token', '123')
-    //     // @ts-expect-error private method
-    //     auth.set('refresh_token_guest', '456')
-    //     const switchSiteConfig = {...config, siteId: 'another site'}
-    //     const newAuth = new Auth(switchSiteConfig)
-    //     expect(newAuth.get('access_token')).not.toBe('123')
-    //     expect(newAuth.get('refresh_token_guest')).not.toBe('456')
-    // })
     test('isTokenExpired', () => {
         const auth = new Auth(config)
         const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')

@@ -166,15 +166,6 @@ class Auth {
         DATA_MAP[name].callback?.(storage)
     }
 
-    // private clearStorage() {
-    //     Object.keys(DATA_MAP).forEach((key) => {
-    //         type Key = keyof AuthDataMap
-    //         const {storageType} = DATA_MAP[key as Key]
-    //         const storage = this.stores[storageType]
-    //         storage.delete(DATA_MAP[key as Key].key)
-    //     })
-    // }
-
     /**
      * Every method in this class that returns a `TokenResponse` constructs it via this getter.
      */
