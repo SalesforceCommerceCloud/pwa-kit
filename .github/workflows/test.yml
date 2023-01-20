@@ -22,9 +22,10 @@ on:
     # Run every day at 12pm (PST) - cron uses UTC times
     - cron: '0 8 * * *'
 env:
-  IS_NOT_FORK: ${{ github.repository == github.event.pull_request.head.repo.full_name }}
-  DEVELOP: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && github.ref == 'refs/heads/develop' }}
-  RELEASE: ${{ github.repository == 'SalesforceCommerceCloud/pwa-kit' && startsWith(github.ref, 'refs/heads/release-') }}
+  IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
+  DEVELOP: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'github-actions-tests' }}
+  RELEASE: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && startsWith(github.head_ref || github.ref_name, 'release-') }}
+
 jobs:
   pwa-kit:
     strategy:
@@ -254,7 +255,7 @@ jobs:
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 5
+        timeout-minutes: 7
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
