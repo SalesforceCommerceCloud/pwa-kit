@@ -48,8 +48,13 @@ jobs:
           cache: npm
 
       - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
-        run: |-
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REPO_FULL_NAME: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+          echo "GITHUB_REPO_FULL_NAME: $GITHUB_REPO_FULL_NAME"
+          echo "IS_NOT_FORK: $IS_NOT_FORK"
           npm install -g npm@${{ matrix.npm }}
 
       - name: Setup Ubuntu Machine
