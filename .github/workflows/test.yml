@@ -23,7 +23,7 @@ on:
     - cron: '0 8 * * *'
 env:
   IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
-  DEVELOP: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'github-actions-tests' }}
+  DEVELOP: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'develop' }}
   RELEASE: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && startsWith(github.head_ref || github.ref_name, 'release-') }}
 
 jobs:
