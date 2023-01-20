@@ -409,15 +409,13 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        {!isProductASet && (
-                            <Box
-                                display={
-                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
-                                }
-                            >
-                                {renderActionButtons()}
-                            </Box>
-                        )}
+                        <Box
+                            display={
+                                isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
+                            }
+                        >
+                            {renderActionButtons()}
+                        </Box>
                     </Box>
                 </VStack>
             </Flex>
