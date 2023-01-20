@@ -10,32 +10,35 @@ const {window} = global
 const key = 'key'
 const value = 'value'
 
-const testCases = [{
-    description: 'ServerStorage works without options',
-    requiresWindow: false,
-    storageOptions: {},
-    validate: (storage: BaseStorage) => {
-        storage.set(key, value)
-        expect(storage.get(key)).toBe(value)
-        storage.delete(key)
-        expect(storage.get(key)).toBe('')
-    }
-}, {
-    description: 'ServerStorage works with options',
-    requiresWindow: false,
-    storageOptions: {
-        keyPrefix: 'prefix',
-        keyPrefixSeperator: '$'
+const testCases = [
+    {
+        description: 'ServerStorage works without options',
+        requiresWindow: false,
+        storageOptions: {},
+        validate: (storage: BaseStorage) => {
+            storage.set(key, value)
+            expect(storage.get(key)).toBe(value)
+            storage.delete(key)
+            expect(storage.get(key)).toBe('')
+        }
     },
-    validate: (storage: BaseStorage) => {
-        storage.set(key, value)
-        expect(storage.get(key)).toBe(value)
-        // @ts-ignore
-        expect(Array.from(storage.map.entries())[0][0]).toBe(`prefix$${key}`)
-        storage.delete(key)
-        expect(storage.get(key)).toBe('')
+    {
+        description: 'ServerStorage works with options',
+        requiresWindow: false,
+        storageOptions: {
+            keyPrefix: 'prefix',
+            keyPrefixSeperator: '$'
+        },
+        validate: (storage: BaseStorage) => {
+            storage.set(key, value)
+            expect(storage.get(key)).toBe(value)
+            // @ts-ignore
+            expect(Array.from(storage.map.entries())[0][0]).toBe(`prefix$${key}`)
+            storage.delete(key)
+            expect(storage.get(key)).toBe('')
+        }
     }
-}]
+]
 
 describe('Storage Classes', () => {
     testCases.forEach(({description, requiresWindow, storageOptions, validate}) => {
