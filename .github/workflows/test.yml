@@ -55,7 +55,7 @@ jobs:
         run: |
           echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
           echo "GITHUB_REPO_FULL_NAME: $GITHUB_REPO_FULL_NAME"
-          echo "GITHUB_REF_NAME: GITHUB_REF_NAME"
+          echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
           echo "IS_NOT_FORK: $IS_NOT_FORK"
           echo "IS_DEFAULT_NPM: $IS_DEFAULT_NPM"
           echo "DEVELOP: $DEVELOP"
