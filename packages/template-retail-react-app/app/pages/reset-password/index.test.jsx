@@ -8,11 +8,9 @@ import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {createPathWithDefaults, renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 import mockConfig from '../../../config/mocks/default'
-
-jest.setTimeout(60000)
 
 jest.mock('../../commerce-api/einstein')
 
@@ -70,23 +68,16 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer()
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({
-        onUnhandledRequest: 'error'
-    })
-
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
+    jest.clearAllMocks()
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
-afterAll(() => server.close())
 
 test('Allows customer to go to sign in page', async () => {
     // render our test component
@@ -101,8 +92,7 @@ test('Allows customer to go to sign in page', async () => {
 })
 
 test('Allows customer to generate password token', async () => {
-    // mock reset password request
-    server.use(
+    global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
                 ctx.delay(0),
@@ -115,7 +105,6 @@ test('Allows customer to generate password token', async () => {
             )
         )
     )
-
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
@@ -136,10 +125,11 @@ test('Allows customer to generate password token', async () => {
 })
 
 test('Renders error message from server', async () => {
-    server.use(
+    global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
                 ctx.delay(0),
+                ctx.status(500),
                 ctx.json({
                     detail: 'Something went wrong',
                     title: 'Error',
@@ -148,7 +138,6 @@ test('Renders error message from server', async () => {
             )
         )
     )
-
     renderWithProviders(<MockedComponent />)
 
     user.type(screen.getByLabelText('Email'), 'foo@test.com')

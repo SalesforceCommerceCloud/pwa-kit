@@ -48,14 +48,6 @@ MockedComponent.propTypes = {
     onRemoveItemClick: PropTypes.func
 }
 
-jest.mock('../../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 jest.mock('../../../commerce-api/hooks/useBasket', () => {
     const originalModule = jest.requireActual('../../../commerce-api/hooks/useBasket')
     const useBasket = originalModule.default
