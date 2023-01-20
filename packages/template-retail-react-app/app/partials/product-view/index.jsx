@@ -86,8 +86,10 @@ const ProductView = ({
     updateCart,
     addToWishlist,
     updateWishlist,
+    canOrder,
     isProductLoading,
-    isProductPartOfSet = false
+    isProductPartOfSet = false,
+    variantSelected = () => {} // TODO: Import noop here
 }) => {
     const intl = useIntl()
     const history = useHistory()
@@ -113,11 +115,13 @@ const ProductView = ({
         stepQuantity
     } = useProduct(product, isProductPartOfSet)
     const canAddToWishlist = !isProductLoading
-    const canOrder =
-        !isProductLoading &&
-        variant?.orderable &&
-        parseInt(quantity) > 0 &&
-        parseInt(quantity) <= stockLevel
+    canOrder =
+        typeof canOrder !== 'undefined'
+            ? canOrder
+            : !isProductLoading &&
+              variant?.orderable &&
+              parseInt(quantity) > 0 &&
+              parseInt(quantity) <= stockLevel
 
     const isProductASet = product?.type.set
 
@@ -148,6 +152,16 @@ const ProductView = ({
         }
 
         if (addToCart || updateCart) {
+            // Make this a pluralizable message.
+            const addToCartMessage = !isProductASet
+                ? intl.formatMessage({
+                      defaultMessage: 'Add to Cart',
+                      id: 'product_view.button.add_to_cart'
+                  })
+                : intl.formatMessage({
+                      defaultMessage: 'Add All to Cart',
+                      id: 'product_view.button.add_all_to_cart'
+                  })
             buttons.push(
                 <Button
                     key="cart-button"
@@ -162,10 +176,7 @@ const ProductView = ({
                               defaultMessage: 'Update',
                               id: 'product_view.button.update'
                           })
-                        : intl.formatMessage({
-                              defaultMessage: 'Add to Cart',
-                              id: 'product_view.button.add_to_cart'
-                          })}
+                        : addToCartMessage}
                 </Button>
             )
         }
@@ -193,7 +204,6 @@ const ProductView = ({
                 </ButtonWithRegistration>
             )
         }
-
         return buttons
     }
 
@@ -208,6 +218,12 @@ const ProductView = ({
             toggleShowOptionsMessage(false)
         }
     }, [variant?.productId])
+
+    useEffect(() => {
+        if (variant) {
+            variantSelected(product, variant, quantity)
+        }
+    }, [variant?.productId, quantity])
 
     return (
         <Flex direction={'column'} data-testid="product-view">
@@ -409,15 +425,13 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        {!isProductASet && (
-                            <Box
-                                display={
-                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
-                                }
-                            >
-                                {renderActionButtons()}
-                            </Box>
-                        )}
+                        <Box
+                            display={
+                                isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
+                            }
+                        >
+                            {renderActionButtons()}
+                        </Box>
                     </Box>
                 </VStack>
             </Flex>
@@ -454,7 +468,8 @@ ProductView.propTypes = {
     updateCart: PropTypes.func,
     updateWishlist: PropTypes.func,
     showFullLink: PropTypes.bool,
-    imageSize: PropTypes.oneOf(['sm', 'md'])
+    imageSize: PropTypes.oneOf(['sm', 'md']),
+    variantSelected: PropTypes.func
 }
 
 export default ProductView

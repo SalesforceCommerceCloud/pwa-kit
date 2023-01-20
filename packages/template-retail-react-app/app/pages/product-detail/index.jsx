@@ -48,6 +48,7 @@ const ProductDetail = ({category, product, isLoading}) => {
     const toast = useToast()
     const navigate = useNavigation()
     const [primaryCategory, setPrimaryCategory] = useState(category)
+    const [productSetSelection, setProductSetSelection] = useState({})
 
     const isProductASet = product?.type.set
 
@@ -111,7 +112,19 @@ const ProductDetail = ({category, product, isLoading}) => {
             status: 'error'
         })
     }
+    const handleAddAllToCart = async (productItems) => {
+        console.log('ProductDetail handleAddAllToCart')
+
+        try {
+            await basket.addItemToBasket(productItems)
+        } catch (error) {
+            showError(error)
+        }
+    }
+
     const handleAddToCart = async (variant, quantity) => {
+        console.log('ProductDetail handleCartItem')
+
         try {
             if (!variant?.orderable || !quantity) return
             // The basket accepts an array of `ProductItems`, so lets create a single
@@ -155,7 +168,19 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            canOrder={true} // TODO: this needs to have some valide logic.
+                            addToCart={() => {
+                                console.log(
+                                    'product: ',
+                                    product.setProducts.length,
+                                    productSetSelection
+                                )
+                                const productItems = Object.values(
+                                    productSetSelection
+                                ).map(({variantId, quantity}) => ({productId: variantId, quantity}))
+
+                                return handleAddAllToCart(productItems)
+                            }}
                             addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
@@ -174,6 +199,22 @@ const ProductDetail = ({category, product, isLoading}) => {
                                         handleAddToCart(variant, quantity)
                                     }
                                     addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                                    variantSelected={(product, variant, quantity) => {
+                                        console.log('variant: ', product.id, variant.productId, quantity)
+                                        if (quantity) {
+                                            setProductSetSelection({
+                                                ...productSetSelection,
+                                                [product.id]: {
+                                                    variantId: variant.productId,
+                                                    quantity
+                                                }
+                                            })
+                                        } else {
+                                            const selections = {...productSetSelection}
+                                            delete selections[product.id]
+                                            setProductSetSelection(selections)
+                                        }
+                                    }}
                                     isProductLoading={isLoading}
                                     isCustomerProductListLoading={!wishlist.isInitialized}
                                 />
