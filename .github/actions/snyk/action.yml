@@ -1,0 +1,15 @@
+name: snyk
+inputs:
+  snyk_token:
+    description: "Snyk token"
+  DEVELOP:
+    description: "Is this the 'develop' branch?"
+runs:
+  using: composite
+  steps:
+  - name: Audit Generated Project
+    run: |-
+        # Run snyk auth - authenticate snyk using environment variables to add the token
+        snyk auth ${{ inputs.snyk_token }}
+        snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
+    shell: bash
