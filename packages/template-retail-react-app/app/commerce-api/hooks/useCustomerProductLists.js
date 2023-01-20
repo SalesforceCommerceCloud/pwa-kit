@@ -263,6 +263,26 @@ export default function useCustomerProductLists() {
                         allImages: true
                     }
                 })
+
+                const promises = []
+                productDetails.data
+                    .filter((product) => product.type.set)
+                    .forEach((product) => {
+                        const promise = api.shopperProducts
+                            .getProduct({
+                                parameters: {
+                                    id: product.id
+                                }
+                            })
+                            .then((data) => {
+                                product.setProducts = data.setProducts
+                            })
+
+                        promises.push(promise)
+                    })
+
+                await Promise.allSettled(promises)
+
                 const result = self.mergeProductDetailsIntoList(list, productDetails)
 
                 // hasDetail is a flag to indicate

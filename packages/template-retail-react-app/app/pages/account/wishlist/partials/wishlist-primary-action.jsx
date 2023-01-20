@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {Button, useDisclosure} from '@chakra-ui/react'
 import useBasket from '../../../../commerce-api/hooks/useBasket'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -13,7 +13,6 @@ import ProductViewModal from '../../../../components/product-view-modal'
 import {useToast} from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 import Link from '../../../../components/link'
-import {useCommerceAPI} from '../../../../commerce-api/contexts'
 
 /**
  * Renders primary action on a product-item card in the form of a button.
@@ -29,25 +28,6 @@ const WishlistPrimaryAction = () => {
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const api = useCommerceAPI()
-    const [productSet, setProductSet] = useState()
-
-    useEffect(() => {
-        if (isProductASet && !productSet) {
-            api.shopperProducts
-                .getProduct({
-                    parameters: {
-                        id: variant.id
-                    }
-                })
-                .then((product) => {
-                    setProductSet({
-                        ...variant,
-                        setProducts: product.setProducts
-                    })
-                })
-        }
-    }, [])
 
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
@@ -126,11 +106,11 @@ const WishlistPrimaryAction = () => {
             </Button>
         )
         // TODO: create a new set in BM to test this scenario
-        if (productSet?.setProducts.every((child) => !hasVariants(child))) {
+        if (variant.setProducts?.every((child) => !hasVariants(child))) {
             button = (
                 <Button
                     variant={'solid'}
-                    onClick={() => handleAddToCart(productSet, productSet.quantity)}
+                    onClick={() => handleAddToCart(variant, variant.quantity)}
                     w={'full'}
                     isLoading={isLoading}
                 >
@@ -172,5 +152,6 @@ const WishlistPrimaryAction = () => {
 export default WishlistPrimaryAction
 
 const hasVariants = (product) => {
+    // Checking whether has more than 1 variant
     return product?.variants?.length > 1
 }
