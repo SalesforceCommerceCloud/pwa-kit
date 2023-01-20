@@ -151,7 +151,4 @@ const WishlistPrimaryAction = () => {
 
 export default WishlistPrimaryAction
 
-const hasVariants = (product) => {
-    // Checking whether has more than 1 variant
-    return product?.variants?.length > 1
-}
+const hasVariants = (product) => Boolean(product?.variants)
