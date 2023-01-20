@@ -25,8 +25,7 @@ const MockedComponent = () => {
 }
 
 beforeEach(() => {
-    console.log('beForeEach')
-    // console.error(global.server)
+    console.error(global.server)
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
             return res(ctx.json(mockMasterProduct))
