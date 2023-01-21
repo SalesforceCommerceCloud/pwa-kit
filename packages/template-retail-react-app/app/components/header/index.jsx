@@ -28,7 +28,7 @@ import {
     useMediaQuery
 } from '@chakra-ui/react'
 
-import useBasket from '../../commerce-api/hooks/useBasket'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 import Link from '../link'
@@ -79,7 +79,7 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
-    const basket = useBasket()
+    const {totalItems, basket} = useCurrentBasket()
     const customer = useCustomer()
     const navigate = useNavigation()
 
@@ -162,7 +162,7 @@ const Header = ({
                         })}
                     />
 
-                    {customer.isRegistered && (
+                    {customer?.authType === 'registered' && (
                         <Popover
                             isLazy
                             arrowSize={15}
@@ -257,11 +257,7 @@ const Header = ({
                         icon={
                             <>
                                 <BasketIcon />
-                                {basket?.loaded && (
-                                    <Badge variant="notification">
-                                        {basket.itemAccumulatedCount}
-                                    </Badge>
-                                )}
+                                {basket && <Badge variant="notification">{totalItems}</Badge>}
                             </>
                         }
                         variant="unstyled"

@@ -7,6 +7,7 @@
 import React from 'react'
 import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
+import {waitFor, screen} from '@testing-library/react'
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -567,7 +568,7 @@ const MOCK_PRODUCT = {
     c_width: 'Z'
 }
 
-test('Renders AddToCartModal', () => {
+test('Renders AddToCartModal', async () => {
     const {getByText} = renderWithProviders(
         <AddToCartModalContext.Provider
             value={{
@@ -582,7 +583,10 @@ test('Renders AddToCartModal', () => {
         </AddToCartModalContext.Provider>
     )
 
-    expect(getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+    await waitFor(() => {
+        expect(getByText(/cart subtotal \(1 item\)/i)).toBeInTheDocument()
+        expect(getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+    })
 })
 
 test('Do not render when isOpen is false', () => {
