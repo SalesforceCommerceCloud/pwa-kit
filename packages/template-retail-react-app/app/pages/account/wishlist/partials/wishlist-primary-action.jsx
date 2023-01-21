@@ -32,7 +32,9 @@ const WishlistPrimaryAction = () => {
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
 
-        const productItems = item.setProducts
+        const isAddingASet = Boolean(item.setProducts)
+
+        const productItems = isAddingASet
             ? item.setProducts.map((child) => ({
                   productId: child.id || child.productId,
                   price: child.price,
@@ -55,7 +57,7 @@ const WishlistPrimaryAction = () => {
                             '{quantity} {quantity, plural, one {item} other {items}} added to cart',
                         id: 'wishlist_primary_action.info.added_to_cart'
                     },
-                    {quantity: quantity}
+                    {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
                 ),
                 status: 'success'
             })
