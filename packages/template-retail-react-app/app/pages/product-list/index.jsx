@@ -647,7 +647,7 @@ ProductList.propTypes = {
     searchQuery: PropTypes.string,
     onAddToWishlistClick: PropTypes.func,
     onRemoveWishlistClick: PropTypes.func,
-    category: PropTypes.string
+    category: PropTypes.object
 }
 
 export default ProductList
