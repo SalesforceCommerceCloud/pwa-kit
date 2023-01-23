@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {act} from '@testing-library/react'
+import {act, waitFor} from '@testing-library/react'
 import nock from 'nock'
 import {
     assertInvalidateQuery,
@@ -127,7 +127,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
                         mockMutationEndpoints('/checkout/shopper-baskets/')
                         mockRelatedQueries()
 
-                        const {result, waitForValueToChange} = renderHookWithProviders(() => {
+                        const {result} = renderHookWithProviders(() => {
                             const action = mutationName as ShopperBasketsMutationType
                             const mutation = useShopperBasketsMutation({action})
 
@@ -143,13 +143,20 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
                             }
                         })
 
-                        await waitForValueToChange(() => result.current.queries.basket.data)
+                        const initialData = result.current.queries.basket.data
+                        await waitFor(() => {
+                            expect(result.current.queries.basket.data).not.toBe(initialData)
+                        })
 
                         act(() => {
                             result.current.mutation.mutate(payload)
                         })
 
-                        await waitForValueToChange(() => result.current.mutation.isSuccess)
+                        const initialSuccess = result.current.mutation.isSuccess
+                        await waitFor(() => {
+                            expect(result.current.mutation.isSuccess).not.toBe(initialSuccess)
+                        })
+
                         expect(result.current.mutation.isSuccess).toBe(true)
 
                         // On successful mutation, the query cache gets updated too. Let's assert it.
@@ -179,7 +186,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
                     assertions: async () => {
                         mockMutationEndpoints('/checkout/shopper-baskets/', {errorResponse: 500})
 
-                        const {result, waitForNextUpdate} = renderHookWithProviders(() => {
+                        const {result} = renderHookWithProviders(() => {
                             const action = mutationName as ShopperBasketsMutationType
                             return useShopperBasketsMutation({action})
                         })
@@ -188,7 +195,10 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
                             result.current.mutate(payload)
                         })
 
-                        await waitForNextUpdate()
+                        const initialValue = result.current
+                        await waitFor(() => {
+                            expect(result.current).not.toBe(initialValue)
+                        })
 
                         expect(result.current.error).toBeDefined()
                     }

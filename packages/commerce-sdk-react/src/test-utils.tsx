@@ -6,8 +6,7 @@
  */
 
 import React from 'react'
-import {render, RenderOptions} from '@testing-library/react'
-import {renderHook} from '@testing-library/react-hooks/dom'
+import {render, renderHook, RenderOptions, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider, UseQueryResult} from '@tanstack/react-query'
 import nock from 'nock'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
@@ -76,7 +75,7 @@ export const renderWithProviders = (
  * @param props - additional props to pass to providers in TestProvider component
  * @param options - additional options for testing-library's render function
  */
-export function renderHookWithProviders<TProps extends { children?: React.ReactNode; }, TResult>(
+export function renderHookWithProviders<TProps extends {children?: React.ReactNode}, TResult>(
     callback: (props: TProps) => TResult,
     props?: TestProviderProps
 ) {

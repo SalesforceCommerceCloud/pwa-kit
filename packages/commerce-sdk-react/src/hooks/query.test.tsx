@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import nock from 'nock'
+import {waitFor} from '@testing-library/react'
 import {renderHookWithProviders, DEFAULT_TEST_HOST} from '../test-utils'
 import {
     useBasket,
@@ -224,11 +225,14 @@ test.each(QUERY_TESTS)('%j - 200 returns data', async ({hook, endpoint, notImple
         .get((uri) => endpoint.test(uri.split('?')[0]))
         .reply(200, data)
     // @ts-ignore
-    const {result, waitForNextUpdate} = renderHookWithProviders(hook)
+    const {result} = renderHookWithProviders(hook)
     expect(result.current.data).toBe(undefined)
     expect(result.current.isLoading).toBe(true)
 
-    await waitForNextUpdate()
+    const initialValue = result.current
+    await waitFor(() => {
+        expect(result.current).not.toBe(initialValue)
+    })
 
     expect(result.current.isLoading).toBe(false)
     expect(result.current.data).toEqual(data)
@@ -242,11 +246,14 @@ test.each(QUERY_TESTS)('%j - 400 returns error', async ({hook, endpoint, notImpl
         .get((uri) => endpoint.test(uri.split('?')[0]))
         .reply(400)
     // @ts-ignore
-    const {result, waitForNextUpdate} = renderHookWithProviders(hook)
+    const {result} = renderHookWithProviders(hook)
     expect(result.current.data).toBe(undefined)
     expect(result.current.isLoading).toBe(true)
 
-    await waitForNextUpdate()
+    const initialValue = result.current
+    await waitFor(() => {
+        expect(result.current).not.toBe(initialValue)
+    })
 
     expect(result.current.isLoading).toBe(false)
     expect(result.current.error).toBeTruthy()
