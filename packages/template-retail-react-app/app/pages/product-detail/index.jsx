@@ -51,6 +51,8 @@ const ProductDetail = ({category, product, isLoading}) => {
     const [productSetSelection, setProductSetSelection] = useState({})
 
     const isProductASet = product?.type.set
+    const setProductsSelected =
+        isProductASet && product.setProducts.length === Object.values(productSetSelection).length
 
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
@@ -112,55 +114,29 @@ const ProductDetail = ({category, product, isLoading}) => {
             status: 'error'
         })
     }
-    const handleAddAllToCart = async (productSelectionValues) => {
+
+    const handleAddToCart = async (productSelectionValues) => {
         let returnVal
-        const productItems = productSelectionValues.map(({variant, quantity}) => ({
-            productId: variant.productId,
-            price: variant.price,
-            quantity
-        }))
 
         try {
+            const productItems = productSelectionValues.map(({variant, quantity}) => ({
+                productId: variant.productId,
+                price: variant.price,
+                quantity
+            }))
+
             await basket.addItemToBasket(productItems)
+
+            // If the items were sucessfully added, set the return value to be used
+            // by the add to cart modal. 
             returnVal = productSelectionValues
         } catch (error) {
             showError(error)
         }
-        return returnVal
-    }
-
-    const handleAddToCart = async (variant, quantity) => {
-        let returnVal
-        try {
-            if (!variant?.orderable || !quantity) {
-                return returnVal
-            }
-
-            // The basket accepts an array of `ProductItems`, so lets create a single
-            // item array to add to the basket.
-            const productItems = [
-                {
-                    productId: variant.productId,
-                    quantity,
-                    price: variant.price
-                }
-            ]
-
-            await basket.addItemToBasket(productItems)
-
-            returnVal = [
-                {
-                    product,
-                    variant,
-                    quantity
-                }
-            ]
-        } catch (error) {
-            showError(error)
-        }
 
         return returnVal
     }
+
 
     /**************** Einstein ****************/
     useEffect(() => {
@@ -187,14 +163,11 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            canOrder={
-                                product.setProducts.length ===
-                                Object.values(productSetSelection).length
-                            } // TODO: this needs to have some valid logic.
+                            canOrder={setProductsSelected}
                             addToCart={() => {
                                 const productSelectionValues = Object.values(productSetSelection)
 
-                                return handleAddAllToCart(productSelectionValues)
+                                return handleAddToCart(productSelectionValues)
                             }}
                             addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                             isProductLoading={isLoading}
@@ -211,19 +184,19 @@ const ProductDetail = ({category, product, isLoading}) => {
                                     product={childProduct}
                                     isProductPartOfSet={true}
                                     addToCart={(variant, quantity) =>
-                                        handleAddToCart(variant, quantity)
+                                        handleAddToCart([{product: childProduct, variant, quantity}])
                                     }
                                     addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                                     variantSelected={(product, variant, quantity) => {
                                         if (quantity) {
-                                            setProductSetSelection({
-                                                ...productSetSelection,
+                                            setProductSetSelection((previousState) => ({
+                                                ...previousState,
                                                 [product.id]: {
                                                     product,
                                                     variant,
                                                     quantity
                                                 }
-                                            })
+                                            }))
                                         } else {
                                             const selections = {...productSetSelection}
                                             delete selections[product.id]
@@ -246,7 +219,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            addToCart={(variant, quantity) =>
+                                handleAddToCart([{product, variant, quantity}])
+                            }
                             addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}

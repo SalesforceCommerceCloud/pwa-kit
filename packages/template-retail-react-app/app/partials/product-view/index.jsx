@@ -140,7 +140,6 @@ const ProductView = ({
             }
             const itemsAdded = await addToCart(variant, quantity)
 
-            // onAddToCartModalOpen({product, isProductPartOfSet, quantity})
             onAddToCartModalOpen({
                 product,
                 itemsAdded
