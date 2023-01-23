@@ -14,8 +14,6 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 let mockCustomer = {}
 
-jest.setTimeout(30000)
-
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
     return {
@@ -36,13 +34,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 return {}
             }
         }
-    }
-})
-
-const mockToastSpy = jest.fn()
-jest.mock('@chakra-ui/toast', () => {
-    return {
-        useToast: jest.fn(() => mockToastSpy)
     }
 })
 
@@ -97,6 +88,7 @@ test('Allows customer to add/edit/remove addresses', async () => {
     user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
     user.type(screen.getByLabelText('Zip Code'), '33701')
     user.click(screen.getByText(/^Save$/i))
+    expect(await screen.findByText(/new address saved/i)).toBeInTheDocument()
     expect(await screen.findByText(/Tropicana Field/i)).toBeInTheDocument()
 
     // edit
@@ -104,6 +96,7 @@ test('Allows customer to add/edit/remove addresses', async () => {
     user.type(screen.getByLabelText('Address'), '333 Main St')
     user.click(screen.getByLabelText(/set as default/i))
     user.click(screen.getByText(/Save$/i))
+    expect(await screen.findByText(/address updated/i)).toBeInTheDocument()
     expect(await screen.findByText(/333 main st/i)).toBeInTheDocument()
     expect(await screen.findByText(/default/i)).toBeInTheDocument()
 

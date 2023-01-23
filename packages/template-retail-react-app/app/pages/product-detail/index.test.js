@@ -12,10 +12,6 @@ import {Route, Switch} from 'react-router-dom'
 import ProductDetail from '.'
 import {renderWithProviders} from '../../utils/test-utils'
 
-jest.setTimeout(60000)
-
-jest.useFakeTimers()
-
 jest.mock('../../commerce-api/einstein')
 
 const MockedComponent = () => {
