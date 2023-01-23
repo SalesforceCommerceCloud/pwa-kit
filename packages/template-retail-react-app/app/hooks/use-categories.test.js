@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {renderHook} from '@testing-library/react-hooks'
+import {renderHook} from '@testing-library/react'
 import {useCategories} from './use-categories'
 import {CategoriesProvider} from '../contexts'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'

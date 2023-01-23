@@ -134,7 +134,7 @@ describe('useProductViewModal hook', () => {
         })
     })
 
-    test('load new variant on variant selection', () => {
+    test('load new variant on variant selection', async () => {
         const history = createMemoryHistory()
         history.push('/test/path')
 
@@ -150,8 +150,10 @@ describe('useProductViewModal hook', () => {
         fireEvent.click(toggleButton)
         expect(screen.getByText('750518699578M')).toBeInTheDocument()
         history.push('/test/path?color=BLACKFB&size=050&width=V&pid=750518699660M')
-        expect(screen.getByTestId('variant')).toHaveTextContent(
-            '{"orderable":true,"price":299.99,"productId":"750518699660M","variationValues":{"color":"BLACKFB","size":"050","width":"V"}}'
-        )
+        await waitFor(() => {
+            expect(screen.getByTestId('variant')).toHaveTextContent(
+                '{"orderable":true,"price":299.99,"productId":"750518699660M","variationValues":{"color":"BLACKFB","size":"050","width":"V"}}'
+            )
+        })
     })
 })
