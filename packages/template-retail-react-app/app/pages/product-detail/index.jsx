@@ -112,21 +112,30 @@ const ProductDetail = ({category, product, isLoading}) => {
             status: 'error'
         })
     }
-    const handleAddAllToCart = async (productItems) => {
-        console.log('ProductDetail handleAddAllToCart')
+    const handleAddAllToCart = async (productSelectionValues) => {
+        let returnVal
+        const productItems = productSelectionValues.map(({variant, quantity}) => ({
+            productId: variant.productId,
+            price: variant.price,
+            quantity
+        }))
 
         try {
             await basket.addItemToBasket(productItems)
+            returnVal = productSelectionValues
         } catch (error) {
             showError(error)
         }
+        return returnVal
     }
 
     const handleAddToCart = async (variant, quantity) => {
-        console.log('ProductDetail handleCartItem')
-
+        let returnVal
         try {
-            if (!variant?.orderable || !quantity) return
+            if (!variant?.orderable || !quantity) {
+                return returnVal
+            }
+
             // The basket accepts an array of `ProductItems`, so lets create a single
             // item array to add to the basket.
             const productItems = [
@@ -138,9 +147,19 @@ const ProductDetail = ({category, product, isLoading}) => {
             ]
 
             await basket.addItemToBasket(productItems)
+
+            returnVal = [
+                {
+                    product,
+                    variant,
+                    quantity
+                }
+            ]
         } catch (error) {
             showError(error)
         }
+
+        return returnVal
     }
 
     /**************** Einstein ****************/
@@ -168,18 +187,14 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            canOrder={true} // TODO: this needs to have some valide logic.
+                            canOrder={
+                                product.setProducts.length ===
+                                Object.values(productSetSelection).length
+                            } // TODO: this needs to have some valid logic.
                             addToCart={() => {
-                                console.log(
-                                    'product: ',
-                                    product.setProducts.length,
-                                    productSetSelection
-                                )
-                                const productItems = Object.values(
-                                    productSetSelection
-                                ).map(({variantId, quantity}) => ({productId: variantId, quantity}))
+                                const productSelectionValues = Object.values(productSetSelection)
 
-                                return handleAddAllToCart(productItems)
+                                return handleAddAllToCart(productSelectionValues)
                             }}
                             addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                             isProductLoading={isLoading}
@@ -200,12 +215,12 @@ const ProductDetail = ({category, product, isLoading}) => {
                                     }
                                     addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                                     variantSelected={(product, variant, quantity) => {
-                                        console.log('variant: ', product.id, variant.productId, quantity)
                                         if (quantity) {
                                             setProductSetSelection({
                                                 ...productSetSelection,
                                                 [product.id]: {
-                                                    variantId: variant.productId,
+                                                    product,
+                                                    variant,
                                                     quantity
                                                 }
                                             })

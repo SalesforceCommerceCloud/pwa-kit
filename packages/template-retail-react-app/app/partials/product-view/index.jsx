@@ -138,8 +138,13 @@ const ProductView = ({
                 await updateCart(variant, quantity)
                 return
             }
-            await addToCart(variant, quantity)
-            onAddToCartModalOpen({product, isProductPartOfSet, quantity})
+            const itemsAdded = await addToCart(variant, quantity)
+
+            // onAddToCartModalOpen({product, isProductPartOfSet, quantity})
+            onAddToCartModalOpen({
+                product,
+                itemsAdded
+            })
         }
 
         const handleWishlistItem = async () => {
