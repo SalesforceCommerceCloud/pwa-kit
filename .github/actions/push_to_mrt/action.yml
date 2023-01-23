@@ -1,0 +1,18 @@
+name: push_to_mrt
+inputs:
+  CWD:
+    description: Project directory
+  TARGET:
+    description: MRT target
+runs:
+  using: composite
+  steps:
+    - name: Push Bundle to MRT
+      run: |-
+        cd ${{ inputs.CWD }}
+        project="scaffold-pwa"
+        build="build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
+        if [[ ${{ inputs.TARGET }} ]]; then
+          npm run push -- -s $project --message "$build" --target ${{ inputs.TARGET }}
+        fi
+      shell: bash

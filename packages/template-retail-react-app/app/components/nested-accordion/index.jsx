@@ -44,7 +44,7 @@ const NestedAccordion = (props) => {
     } = props
 
     const depth = initialDepth
-    const items = item[itemsKey]
+    const items = item[itemsKey] || []
 
     // Handle filters in the folr of a function or a object key string.
     const filter = (item) =>

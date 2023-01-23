@@ -9,7 +9,7 @@ import {Button} from '@chakra-ui/react'
 import {screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import withRegistration from './index'
-import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {mockedGuestCustomer} from '../../commerce-api/mock-data'
@@ -17,14 +17,6 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 jest.setTimeout(60000)
 jest.useFakeTimers()
-
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
 
 const ButtonWithRegistration = withRegistration(Button)
 
@@ -45,10 +37,6 @@ const MockedComponent = (props) => {
     )
 }
 
-// Set up the msw server to intercept fetch requests and returned mocked results. Additional
-// interceptors can be defined in each test for specific requests.
-const server = setupMockServer()
-
 // Set up and clean up
 beforeAll(() => {
     // Since we're testing some navigation logic, we are using a simple Router
@@ -58,13 +46,11 @@ beforeAll(() => {
 
 beforeEach(() => {
     jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
 })
 
 afterEach(() => {
     jest.resetModules()
 })
-afterAll(() => server.close())
 
 test('should execute onClick for registered users', async () => {
     const onClick = jest.fn()
@@ -83,7 +69,7 @@ test('should execute onClick for registered users', async () => {
 })
 
 test('should show login modal if user not registered', () => {
-    server.use(
+    global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
         })

@@ -27,6 +27,13 @@ import {
 
 jest.mock('cross-fetch', () => jest.requireActual('jest-fetch-mock'))
 
+jest.mock('./utils', () => {
+    const originalModule = jest.requireActual('./utils')
+    return {
+        ...originalModule
+    }
+})
+
 const apiConfig = {
     ...appConfig.commerceAPI,
     einsteinConfig: appConfig.einsteinAPI,
