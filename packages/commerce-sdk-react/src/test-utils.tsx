@@ -76,7 +76,7 @@ export const renderWithProviders = (
  * @param props - additional props to pass to providers in TestProvider component
  * @param options - additional options for testing-library's render function
  */
-export function renderHookWithProviders<TProps, TResult>(
+export function renderHookWithProviders<TProps extends { children?: React.ReactNode; }, TResult>(
     callback: (props: TProps) => TResult,
     props?: TestProviderProps
 ) {
