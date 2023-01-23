@@ -121,7 +121,7 @@ export const start = () => {
         .then(() => {
             hydrateRoot(
                 rootEl,
-                <OuterApp {...props} callback={() => window.__HYDRATING__ = false} />
+                <OuterApp {...props} callback={() => (window.__HYDRATING__ = false)} />
             )
         })
 }
