@@ -264,6 +264,8 @@ export default function useCustomerProductLists() {
                     }
                 })
 
+                // `getProducts` endpoint does not include `setProducts` data
+                // so for each product set, we'll fetch it and append it to existing data
                 const promises = []
                 productDetails.data
                     .filter((product) => product.type.set)
