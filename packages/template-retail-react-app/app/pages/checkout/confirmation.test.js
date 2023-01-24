@@ -10,7 +10,7 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, setupMockServer, createPathWithDefaults} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import Confirmation from './confirmation'
 import {keysToCamel} from '../../commerce-api/utils'
 import useBasket from '../../commerce-api/hooks/useBasket'
@@ -146,14 +146,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
     }
 })
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 const WrappedConfirmation = () => {
     useShopper()
     const basket = useBasket()
@@ -164,51 +156,49 @@ const WrappedConfirmation = () => {
     return <Confirmation />
 }
 
-const server = setupMockServer(
-    rest.get('*/baskets*', (_, res, ctx) => {
-        return res(ctx.json(keysToCamel(mockBasketOrder)))
-    }),
-
-    rest.post('*/customers/actions/login', (_, res, ctx) => {
-        return res(
-            ctx.json(mockedGuestCustomer),
-            ctx.set('Authorization', exampleTokenReponse.access_token)
-        )
-    }),
-
-    rest.post('*/customers', (_, res, ctx) => {
-        const successfulAccountCreation = {
-            authType: 'registered',
-            creationDate: '2021-05-03T07:04:56.566Z',
-            customerId: 'abQfkJHegtUQfaCBRL5AjuTKY7',
-            customerNo: '00154003',
-            email: 'test3@foo.com',
-            enabled: true,
-            firstName: 'John',
-            lastModified: '2021-05-03T07:04:56.572Z',
-            lastName: 'Smith',
-            login: 'test3@foo.com'
-        }
-        return res(ctx.json(successfulAccountCreation))
-    })
-)
-
 // Set up and clean up
 beforeAll(() => {
     jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
+beforeEach(() => {
+    global.server.use(
+        rest.get('*/baskets*', (_, res, ctx) => {
+            return res(ctx.json(keysToCamel(mockBasketOrder)))
+        }),
+
+        rest.post('*/customers/actions/login', (_, res, ctx) => {
+            return res(
+                ctx.json(mockedGuestCustomer),
+                ctx.set('Authorization', exampleTokenReponse.access_token)
+            )
+        }),
+
+        rest.post('*/customers', (_, res, ctx) => {
+            const successfulAccountCreation = {
+                authType: 'registered',
+                creationDate: '2021-05-03T07:04:56.566Z',
+                customerId: 'abQfkJHegtUQfaCBRL5AjuTKY7',
+                customerNo: '00154003',
+                email: 'test3@foo.com',
+                enabled: true,
+                firstName: 'John',
+                lastModified: '2021-05-03T07:04:56.572Z',
+                lastName: 'Smith',
+                login: 'test3@foo.com'
+            }
+            return res(ctx.json(successfulAccountCreation))
+        })
+    )
+})
 afterEach(() => {
     localStorage.clear()
     sessionStorage.clear()
-    server.resetHandlers()
     window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
-afterAll(() => server.close())
 
 test('Navigates to homepage when no order present', async () => {
     renderWithProviders(<Confirmation />, {
@@ -247,12 +237,11 @@ test('Renders the Create Account form for guest customer', async () => {
 })
 
 test('Create Account form - renders error message', async () => {
-    server.use(
+    global.server.use(
         rest.post('*/customers', (_, res, ctx) => {
             const failedAccountCreation = {
                 title: 'Login Already In Use',
-                type:
-                    'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/login-already-in-use',
+                type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/login-already-in-use',
                 detail: 'The login is already in use.'
             }
             return res(ctx.json(failedAccountCreation))

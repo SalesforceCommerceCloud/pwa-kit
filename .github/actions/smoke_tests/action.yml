@@ -1,0 +1,14 @@
+name: smoke_tests
+inputs:
+  dir:
+    required: false
+    # The path to a project to test
+    default: "./packages/template-retail-react-app"
+runs:
+  using: composite
+  steps:
+  - name: Smoke test scripts
+    run: |-
+      # Basic smoke-tests for uncommonly run scripts in a project
+      node ./scripts/smoke-test-npm-scripts.js --dir ${{ inputs.dir }}
+    shell: bash
