@@ -1,1 +1,3 @@
-SLAS (Shopper Login & API Authentication Service) APIs enable shoppers to 1) login via federation to any external IDP or 2) to Salesforce B2C Ecom system, get access token and use it to access shopper APIs. SLAS also provides APIs for SSO, refresh a token using the long-term refresh token and revoke a refresh token.
+The Shopper Login and API Access Service (SLAS) enables secure access to Commerce Cloud’s Shopper APIs for a wide range of headless commerce applications.
+
+**Important:** Before using this API, see [Authorization for Shopper APIs](https://developer.salesforce.com/docs/commerce/commerce-api/guide/authorization-for-shopper-apis.html) in the Get Started guides and the more detailed [SLAS guides](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas.html).

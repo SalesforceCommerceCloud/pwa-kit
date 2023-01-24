@@ -1,0 +1,13 @@
+#%RAML 1.0 SecurityScheme
+description: A security scheme that supplements APIs secured with `AmOAuth2` to support the usage of the mocking service. Expects a valid Bearer token passed in the `Authorization` header to permit API access.
+type: x-custom
+displayName: BearerToken
+describedBy:
+  headers:
+    Authorization:
+      description: |-
+        Bearer token
+      type: string
+      pattern: "Bearer .*"
+      examples: 
+        authenticatedUser: Bearer b325e95c-2cd7-11e5-b345-feff819cdc9f

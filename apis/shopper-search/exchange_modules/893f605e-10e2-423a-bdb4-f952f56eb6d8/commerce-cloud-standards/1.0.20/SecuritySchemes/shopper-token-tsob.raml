@@ -1,0 +1,50 @@
+#%RAML 1.0 SecurityScheme
+
+description: |
+  `ShopperTokenTsob` (Tsob = trusted system on behalf) is a child of the `ShopperToken` security scheme and extends the functionality of `ShopperToken` for specific use cases. 
+  A token of type `ShopperTokenTsob` allows you to access Shopper API endpoints, including OCAPI and Salesforce Commerce API for headless applications. Besides endpoints that require this specific subtype, all other endpoints secured by the `ShopperToken` parent scheme can be accessed with a `ShopperTokenTsob`. 
+  To learn how to get a `ShopperTokenTsob` token, see [getTrustedSystemAccessToken](https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=shopper-login:getTrustedSystemAccessToken).
+
+type: OAuth 2.0
+displayName: ShopperTokenTsob
+
+uses:
+
+describedBy:
+  headers:
+    Authorization:
+      description: |
+        OAuth 2.0 access-token in Bearer scheme
+      type: string
+      pattern: "Bearer .*"
+      examples: 
+        authenticatedUser: Bearer b325e95c-2cd7-11e5-b345-feff819cdc9f
+  responses:
+    401:
+      description: Unauthorized. Your access-token is invalid or expired and could not be used to identify an API client or user.
+      headers:
+        WWW-Authenticate: 
+          example: |
+            WWW-Authenticate: Bearer realm="servers",
+                              error="invalid_token",
+                              error_description="The access-token expired"
+      body:
+        application/json:
+          type: !include ../Types/error-response.raml
+          example:
+            type: "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized"
+            title: Unauthorized
+            detail: Your access-token is invalid and could not be used to identify an API client or user.
+    403:
+      description: Forbidden. Your access-token is valid, but you have no permissions to access the resource.
+      body:
+        application/json:
+          type: !include ../Types/error-response.raml
+          example:
+            type: "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/forbidden"
+            title: Forbidden
+            detail: Your access-token is valid, but you have no permissions to access the resource.
+settings:
+  accessTokenUri: https://{short-code}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{organizationId}/oauth2/trusted-system/token
+  authorizationGrants: [client_credentials]
+  

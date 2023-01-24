@@ -2,7 +2,7 @@
 version: v1
 title: Shopper Search
 uses:
-  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.16/commerce-cloud-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.20/commerce-cloud-standards.raml
   ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
   SearchTypeLibrary: shopper-search-library.raml
     
@@ -15,7 +15,7 @@ baseUriParameters:
     example: 0dnz6oep
     pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
 
-description: Provides clients 
+description: !include shopper-search-description.md
 
 /organizations/{organizationId}:
   /product-search:
@@ -71,7 +71,7 @@ description: Provides clients
                         cgid: Allows refinement per single category ID. Multiple category ids are not supported.
                         price: Allows refinement per single price range. Multiple price ranges are not supported.
                         pmid: Allows refinement per promotion ID.
-                        htypes: Allow refinement by including only the provided hit types. Accepted types are 'product', 'master', 'set', 'bundle', 'slicing_group' (deprecated), 'variation_group'.
+                        htype: Allow refinement by including only the provided hit types. Accepted types are 'product', 'master', 'set', 'bundle', 'slicing_group' (deprecated), 'variation_group'.
                         orderable_only: Unavailable products are excluded from the search results if true is set. Multiple refinement values are not supported.                               
           type: string[]
           required: false
@@ -85,6 +85,10 @@ description: Provides clients
           required: false
         locale:
           type: CommerceCloudStandards.LocaleCode
+          required: false
+        expand:
+          description: The expand parameter. A list with the allowed values (availability, images, prices, represented_products, variations). If the parameter is missing all the values will be returned.
+          type: string[]
           required: false
 
   /search-suggestions:

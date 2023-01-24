@@ -10,12 +10,12 @@ baseUriParameters:
     example: 0dnz6oep
     pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
 
-description: Use the Shop Products & Catalogs API to interact with the API in the context of a shop customer to get products and categories by their IDs.
+description: !include shopper-products-description.md
 
 uses:
   ProdTraits: products-traits-library.raml
-  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
-  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.17/commerce-cloud-standards.raml
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.15/api-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.24/commerce-cloud-standards.raml
 
 types:
   BundledProduct:
@@ -405,6 +405,11 @@ types:
         type: string
         required: false
         example: "Awesome Product"
+      slugUrl:
+        description: The complete link to this product's storefront page.
+        type: string
+        required: false
+        example: "https://www.example.com/on/store/Sites-MySite/default/Product-Show?pid=MyProduct"
       stepQuantity:
         description: |-
           The steps in which the order amount of the product can be
@@ -840,7 +845,7 @@ types:
   type: CommerceCloudStandards.Organization
   /products:
     get:     
-      description: 'Allows access to multiple products by a single request. Only products that are online and assigned to a site catalog are returned. The maximum number of productIDs that can be requested are 24. Along with product details, the availability, images, price, promotions, and variations for the valid products will be included, as appropriate.' 
+      description: 'Allows access to multiple products by a single request. Only products that are online and assigned to a site catalog are returned. The maximum number of productIDs that can be requested are 24. Along with product details, the availability, product options, images, price, promotions, and variations for the valid products will be included, as appropriate.' 
       displayName: getProducts      
       is:
         - CommerceCloudStandards.SiteSpecific:
@@ -868,6 +873,11 @@ types:
             type: string
             required: false
             example: USD
+          expand:
+            description: The expand parameter. A comma separated list with the allowed values (availability, links, promotions, options, images, prices, variations, recommendations). All expand parameters are used for the request when no expand parameter is provided. The value "none" may be used to turn off all expand options.
+            type: string
+            required: false
+            example: prices
           locale:
             description: The locale context.
             type: string
@@ -929,6 +939,11 @@ types:
             type: string
             required: false
             example: USD
+          expand:
+            description: The expand parameter. A comma separated list with the allowed values (availability, bundled_products, links, promotions, options, images, prices, variations, set_products, recommendations). All expand parameters are used for the request when no expand parameter is provided. The value "none" may be used to turn off all expand options.
+            type: string
+            required: false
+            example: prices
           locale:
             description: The locale context.
             type: string

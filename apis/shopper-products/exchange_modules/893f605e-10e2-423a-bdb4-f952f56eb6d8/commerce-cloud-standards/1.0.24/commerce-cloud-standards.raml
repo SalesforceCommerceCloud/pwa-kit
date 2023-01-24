@@ -1,0 +1,108 @@
+#%RAML 1.0 Library
+usage: |-
+
+  The Commerce Cloud API Standards is a collection of types, traits, security schemes, and more that follows the standards that are defined for the B2C Commerce APIs. Use this standard library in conjunction with the Salesforce API Standards library, via the `uses` property. See the main RAML file for any of the B2C Commerce APIs for example usage.
+
+  The goal of this library is to expose only the importable objects and keep other, internal details as private. If you have suggestions for adding to the standard, contact the C4E team with your proposal.
+
+  # Security Schemes
+
+  This library provides the following reusable security schemes. Except in rare circumstances, avoid defining a custom security scheme for a single API. The security schemes provided here or in the Salesforce API Standards are designed to meet the needs of most applications.
+
+  Security schemes included in Commerce Cloud Standards:
+
+  -   `AmOAuth2`: for endpoints authenticated against [Account Manager](https://account.demandware.com/dw/account/Home#/) OAuth 2.0.
+  -   `ShopperToken`: for endpoints authenticated via Shopper JWTs.
+  -   `BearerToken`: supplements APIs secured with `AmOAuth2` to support the usage of the mocking service.
+
+  ## Types
+
+  This library provides the following reusable types. These types are referenced in a plurality of APIs, to the point where it makes sense to have a common definition where the documentation, validation, and usage of them can be well documented.
+
+  -   `SiteId`: a type that describes the storefront context for requests by a Shopper. If you need to have a siteId queryParam, use the trait `SiteSpecific`.
+
+  ## Search Specific
+
+  -   `SearchRequest`: a type commonly used for searching that takes a query in a body.
+  -   `PaginatedSearchResult`: a type commonly used for a search response that took a query in a body.
+  -   `SimpleSearchResult`: a type used for a search response that takes a query in a body, but does not return a paginated result.
+
+  ## Standards Followed
+
+  -   `CurrencyCode`: ISO 4217 compliant currency code.
+  -   `Money`: A combination of a CurrencyCode and a number.
+  -   `LanguageCode`: ISO 639-1 compliant language code.
+  -   `CountryCode`: ISO 3166-1 compliant country code.
+  -   `LocaleCode`: A combination of LanguageCode and CountryCode.
+
+  ## Resource Types
+
+  This project provides the following reusable resource types. These resource types are referenced in a plurality of APIs, to the point where it makes sense to have a common definition where the documentation, validation, and usage of them can be well documented.
+
+  -   `Organization`: a type that describes the `organizationId` URI parameter that the majority of Commerce Cloud APIs require in the resource path after the `version`. The beginning of all API resource paths is expected to be `/organizations/{organizationId}`. This resource type provides the documentation and validation of the `organizationId`.
+
+  ## Traits
+
+  This project provides the following reusable traits. These traits are referenced in a plurality of APIs, to the point where it makes sense to have a common definition where the documentation, validation, and usage of them can be well documented.
+
+  -   `SiteSpecific`: adds a query parameter called `siteId` of type `SiteId` to the request.
+  -   `QueryParamsLimit`: adds an offset query parameter without the limit query parameter. Some Commerce Cloud use cases do not currently require both. Prefer the use of `ApiStandards.OffsetPaginated` because this trait will be deprecated in the future if there is no use case for it.
+  -   `QueryParamsOffset`: adds a limit query parameter without the offset query parameter. Some Commerce Cloud use cases do not currently require both. Prefer the use of `ApiStandards.OffsetPaginated` because this trait will be deprecated in the future if there is no use case for it.
+
+uses:
+  AdditionalProperties: Types/additional-properties.raml
+  Search: Types/search-types.raml
+  Pagination: Types/pagination-types.raml
+  ISO: Types/ISO-standards.raml
+  AttributeDefinitions: Types/attribute-definition-types.raml
+
+securitySchemes: 
+  AmOAuth2: !include SecuritySchemes/am-oauth-2.raml
+  ShopperToken: !include SecuritySchemes/shopper-token.raml
+  BearerToken: !include SecuritySchemes/bearer-token.raml
+  ShopperTokenTsob: !include SecuritySchemes/shopper-token-tsob.raml
+
+types:
+  SiteId:
+    description: The identifer of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites
+    example:
+      SiteGenesis
+    type: string
+    minLength: 1
+  SearchRequest: Search.SearchRequestBase
+  PaginatedSearchResult: Search.PaginatedSearchResultBase
+  SimpleSearchResult: Search.SimpleSearchResultBase
+  
+  CurrencyCode: ISO.Currency
+  Money: ISO.MoneyMnemonic
+  LanguageCode: ISO.Language
+  CountryCode: ISO.Country
+  LocaleCode: ISO.Locale
+  LocalizedString: ISO.L10nString
+
+  PropertyDefinition: AttributeDefinitions.AttributeDefinition
+
+  ClosedObject: AdditionalProperties.NoPropertiesAllowed
+  OpenObject: AdditionalProperties.SpecifiedPropertiesAllowed
+  
+resourceTypes:
+  Organization:
+    uriParameters:
+      organizationId:
+        description: An identifier for the organization the request is being made by.
+        example:
+          f_ecom_zzxy_prd
+
+traits:
+  QueryParamsLimit:
+    usage: This trait should not be used unless there is no requirement for QueryParamsOffset. Prefer the usage of ApiStandards.OffsetPaginated.
+    queryParameters:
+      limit?: Pagination.Limit
+  QueryParamsOffset:
+    usage: This trait should not be used unless there is no requirement for QueryParamsLimit. Prefer the usage of ApiStandards.OffsetPaginated.
+    queryParameters:
+      offset?: Pagination.Offset
+  SiteSpecific:
+    usage: This trait should be used whenever a resource has the context of a site assoicated with its request. This will add a siteId query parameter
+    queryParameters:
+      siteId: SiteId
