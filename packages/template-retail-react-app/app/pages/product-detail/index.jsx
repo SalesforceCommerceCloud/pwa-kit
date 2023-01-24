@@ -52,8 +52,6 @@ const ProductDetail = ({category, product, isLoading}) => {
     const setProductsRefs = React.useRef({})
 
     const isProductASet = product?.type.set
-    const setProductsSelected =
-        isProductASet && product.setProducts.length === Object.values(productSetSelection).length
 
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
@@ -163,7 +161,6 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            canOrder={setProductsSelected}
                             addToCart={() => {
                                 const productSelectionValues = Object.values(productSetSelection)
 
