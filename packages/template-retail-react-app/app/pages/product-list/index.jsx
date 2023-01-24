@@ -384,9 +384,8 @@ const ProductList = (props) => {
                                           ))
                                     : productSearchResult.hits.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
-                                          const isInWishlist = !!wishlist.findItemByProductId(
-                                              productId
-                                          )
+                                          const isInWishlist =
+                                              !!wishlist.findItemByProductId(productId)
 
                                           return (
                                               <ProductTile
@@ -647,7 +646,7 @@ ProductList.propTypes = {
     searchQuery: PropTypes.string,
     onAddToWishlistClick: PropTypes.func,
     onRemoveWishlistClick: PropTypes.func,
-    category: PropTypes.string
+    category: PropTypes.object
 }
 
 export default ProductList
