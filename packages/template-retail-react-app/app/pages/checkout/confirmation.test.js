@@ -229,7 +229,7 @@ test('Renders the Create Account form for guest customer', async () => {
     expect(button).toBeInTheDocument()
 
     // Email should already have been auto-filled
-    const email = screen.getByDisplayValue('jeff@lebowski.com')
+    const email = await screen.findByDisplayValue('jeff@lebowski.com')
     expect(email).toBeInTheDocument()
 
     const password = screen.getByLabelText('Password')
