@@ -39,7 +39,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
     }
 })
 
-
 const MockedComponent = () => {
     const customer = useCustomer()
     useEffect(() => {
