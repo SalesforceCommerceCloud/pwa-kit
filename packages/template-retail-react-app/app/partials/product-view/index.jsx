@@ -141,10 +141,10 @@ const ProductView = ({
         const handleWishlistItem = async () => {
             if (!updateWishlist && !addToWishlist) return null
             if (updateWishlist) {
-                updateWishlist(variant, quantity)
+                updateWishlist(variant || product, quantity)
                 return
             }
-            addToWishlist(variant, quantity)
+            addToWishlist(variant || product, quantity)
         }
 
         if (addToCart || updateCart) {
