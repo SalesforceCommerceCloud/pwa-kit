@@ -7,7 +7,7 @@
 import React from 'react'
 import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
-import {waitFor, screen} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 
 const MOCK_PRODUCT = {
     currency: 'USD',
