@@ -33,7 +33,7 @@ const testCases = [
             storage.set(key, value)
             expect(storage.get(key)).toBe(value)
             // @ts-ignore
-            expect(Array.from(storage.map.entries())[0][0]).toBe(`prefix$${key}`)
+            expect([...storage.map.keys()]).toEqual([`prefix$${key}`])
             storage.delete(key)
             expect(storage.get(key)).toBe('')
         }
