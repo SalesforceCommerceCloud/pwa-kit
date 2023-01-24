@@ -14,14 +14,17 @@ export interface BaseStorageOptions {
 }
 
 export abstract class BaseStorage {
-    options?: BaseStorageOptions
+    protected options: Required<BaseStorageOptions>
 
-    constructor(options?: BaseStorageOptions) {
-        this.options = options
+    constructor(options: BaseStorageOptions = {keyPrefixSeparator: '_'}) {
+        this.options = {
+          keyPrefixSeparator: options.keyPrefix ? options.keyPrefixSeparator ?? '_' : ''
+          keyPrefix: options.keyPrefix ?? ''
+        }
     }
+
     protected getPrefixedKey(key: string): string {
-        const {keyPrefix, keyPrefixSeperator = '_'} = this?.options || {}
-        return `${keyPrefix ? keyPrefix + keyPrefixSeperator : ''}${key}`
+        return `${this.keyPrefix}${this.keyPrefixSeparator}${key}`
     }
     abstract set(key: string, value: string, options?: unknown): void
     abstract get(key: string): string
