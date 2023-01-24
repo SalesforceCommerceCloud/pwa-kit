@@ -15,7 +15,6 @@ beforeEach(() => {
     jest.resetModules()
 })
 
-jest.setTimeout(60000)
 const MockedComponent = () => {
     const product = mockedCustomerProductListsDetails.data[0]
     return <ProductItem product={{...product, productName: product.name}} />

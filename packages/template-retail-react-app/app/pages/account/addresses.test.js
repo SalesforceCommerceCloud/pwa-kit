@@ -62,17 +62,17 @@ beforeEach(() => {
         lastName: 'Keane',
         login: 'jkeane@64labs.com'
     }
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockCustomer))
+        })
+    )
 })
 afterEach(() => {
     localStorage.clear()
 })
 
 test('Allows customer to add/edit/remove addresses', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockCustomer))
-        })
-    )
     renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
 
