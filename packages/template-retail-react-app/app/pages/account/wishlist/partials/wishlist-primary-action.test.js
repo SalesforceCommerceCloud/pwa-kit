@@ -45,6 +45,6 @@ test('renders primary action component', async () => {
     await waitFor(() => {
         // Chakra UI renders multiple elements with toast title in DOM for accessibility.
         // We need to assert the actual text within the alert
-        expect(screen.getByRole('alert')).toHaveTextContent(/items added to cart/i)
+        expect(screen.getByRole('status')).toHaveTextContent(/items added to cart/i)
     })
 })

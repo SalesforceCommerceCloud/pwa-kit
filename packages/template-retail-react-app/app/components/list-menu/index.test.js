@@ -13,7 +13,7 @@ describe('ListMenu', () => {
     test('ListMenu renders without errors', async () => {
         renderWithProviders(<ListMenu />)
 
-        const drawer = document.getElementById('chakra-toast-portal')
+        const drawer = document.getElementById('list-menu')
 
         const category = await waitFor(() => screen.getByText(/Mens/i))
         expect(category).toBeInTheDocument()
