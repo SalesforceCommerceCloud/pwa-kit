@@ -3,5 +3,5 @@ runs:
   using: composite
   steps:
   - name: Run Lighthouse CI on the PWA
-    run: npm run test:lighthouse --prefix packages/template-retail-react-app
+    run: npm run test:lighthouse --prefix packages/pwa
     shell: bash

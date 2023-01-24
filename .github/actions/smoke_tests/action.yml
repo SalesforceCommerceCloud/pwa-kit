@@ -3,7 +3,7 @@ inputs:
   dir:
     required: false
     # The path to a project to test
-    default: "./packages/template-retail-react-app"
+    default: "./packages/pwa"
 runs:
   using: composite
   steps:

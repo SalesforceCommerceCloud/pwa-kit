@@ -117,7 +117,7 @@ jobs:
   generated:
     strategy:
       matrix:
-        template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
+        template: [test-project, retail-react-app-demo, hello-world]
     runs-on: ubuntu-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
@@ -177,20 +177,6 @@ jobs:
           # TODO: The way this is set is a little bit magic - can it be cleaned up?
           TOTAL_PACKAGES: $TOTAL_PACKAGES
 
-      - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/create_mrt"
-        with:
-          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Push Bundle to MRT
-        if: env.IS_NOT_FORK == 'true' && env.DEVELOP == 'true' && matrix.template == 'test-project'
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: ${{ env.PROJECT_DIR }}
-          TARGET: generated-pwa
-
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
         if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true' && env.DEVELOP == 'true' && failure()
@@ -205,7 +191,7 @@ jobs:
   generated-windows:
     strategy:
       matrix:
-        template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
+        template: [test-project, retail-react-app-demo, hello-world]
     runs-on: windows-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
