@@ -37,18 +37,18 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-})
-afterEach(() => {
-    localStorage.clear()
-})
-
-test('Allows customer to add and remove payment methods', async () => {
     global.server.use(
         rest.post('*/payment-instruments', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         )
     )
+})
+afterEach(() => {
+    localStorage.clear()
+})
+
+test('Allows customer to add and remove payment methods', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('customerid')).toBeInTheDocument())
 
@@ -88,11 +88,6 @@ test('Allows customer to add and remove payment methods', async () => {
     expect(await screen.findByText('Visa')).toBeInTheDocument()
     expect(await screen.findByText('Test Customer')).toBeInTheDocument()
 
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        )
-    )
     // remove
     user.click(screen.getAllByText(/remove/i)[1])
     const loadingEl = await screen.getAllByText('Loading...')

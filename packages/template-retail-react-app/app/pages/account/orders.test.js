@@ -41,12 +41,6 @@ const MockedComponent = () => {
 beforeEach(() => {
     jest.resetModules()
     window.history.pushState({}, 'Account', createPathWithDefaults('/account/orders'))
-})
-afterEach(() => {
-    localStorage.clear()
-})
-
-test('Renders order history and details', async () => {
     global.server.use(
         rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderHistory))
@@ -55,6 +49,12 @@ test('Renders order history and details', async () => {
             return res(ctx.delay(0), ctx.json(mockOrderProducts))
         })
     )
+})
+afterEach(() => {
+    localStorage.clear()
+})
+
+test('Renders order history and details', async () => {
     renderWithProviders(<MockedComponent history={history} />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
