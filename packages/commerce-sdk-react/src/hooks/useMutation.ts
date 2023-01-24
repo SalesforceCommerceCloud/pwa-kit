@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import useAuthenticatedClient from './useAuthenticatedClient'
 import {useMutation as useReactQueryMutation, UseMutationOptions} from '@tanstack/react-query'
+import useAuthenticatedClient from './useAuthenticatedClient'
 import {IMutationFunction} from './types'
 
-export const useMutation = <TData = unknown, TError = unknown, TVariables = unknown>(
-    fn: IMutationFunction<TData, TVariables>,
-    options?: Omit<UseMutationOptions<TData, TError, TVariables>, 'mutationFn'>
+export const useMutation = <Data = unknown, Err = unknown, Vars = unknown>(
+    fn: IMutationFunction<Data, Vars>,
+    options?: Omit<UseMutationOptions<Data, Err, Vars>, 'mutationFn'>
 ) => {
-    const authenticatedFn = useAuthenticatedClient<TData, TVariables>(fn)
-    return useReactQueryMutation<TData, TError, TVariables>(authenticatedFn, options)
+    const authenticatedFn = useAuthenticatedClient(fn)
+    return useReactQueryMutation(authenticatedFn, options)
 }
