@@ -327,7 +327,7 @@ const ProductDetail = () => {
                             />
                         }
                         recommender={'complete-the-set'}
-                        products={product}
+                        products={[product]}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />
@@ -340,7 +340,7 @@ const ProductDetail = () => {
                             />
                         }
                         recommender={'pdp-similar-items'}
-                        products={product}
+                        products={[product]}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />

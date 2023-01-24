@@ -54,6 +54,7 @@ const WrappedCheckout = () => {
 // Set up and clean up
 beforeEach(() => {
     global.server.use(
+        // mock empty guest basket
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
             return res(
                 ctx.json({

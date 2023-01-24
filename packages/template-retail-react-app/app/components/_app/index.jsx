@@ -43,16 +43,19 @@ import {IntlProvider} from 'react-intl'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
-import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
+import {
+    DEFAULT_SITE_TITLE,
+    HOME_HREF,
+    THEME_COLOR,
+    CAT_MENU_DEFAULT_NAV_DEPTH,
+    CAT_MENU_DEFAULT_ROOT_CATEGORY,
+    DEFAULT_LOCALE
+} from '../../constants'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
 import {useCategory} from 'commerce-sdk-react-preview'
-
-const DEFAULT_NAV_DEPTH = 3
-const DEFAULT_ROOT_CATEGORY = 'root'
-const DEFAULT_LOCALE = 'en-US'
 
 const App = (props) => {
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
@@ -180,7 +183,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
                 // - "compile-translations:pseudo"
                 defaultLocale={DEFAULT_LOCALE}
             >
-                <CategoriesProvider categories={allCategories}>
+                <CategoriesProvider treeRoot={allCategories} locale={targetLocale}>
                     <CurrencyProvider currency={currency}>
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />

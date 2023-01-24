@@ -195,6 +195,7 @@ afterEach(() => {
     jest.resetModules()
     localStorage.clear()
     sessionStorage.clear()
+    window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 
 test('Navigates to homepage when no order present', async () => {

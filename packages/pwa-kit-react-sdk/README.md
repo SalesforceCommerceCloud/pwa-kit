@@ -1,6 +1,6 @@
 # The Progressive Web App (PWA) Kit SDK
 
-[![NPM](https://nodei.co/npm/pwa-kit-react-sdk.png?downloads=true&stars=true)](https://nodei.co/npm/pwa-kit-react-sdk/) [![CircleCI](https://circleci.com/gh/SalesforceCommerceCloud/pwa-kit.svg?style=svg)](https://circleci.com/gh/SalesforceCommerceCloud/pwa-kit)
+[![NPM](https://nodei.co/npm/pwa-kit-react-sdk.png?downloads=true&stars=true)](https://nodei.co/npm/pwa-kit-react-sdk/) [![SalesforceCommerceCloud/pwa-kit/test](https://github.com/SalesforceCommerceCloud/pwa-kit/actions/workflows/test.yml/badge.svg)](https://github.com/SalesforceCommerceCloud/pwa-kit/actions/workflows/test.yml)
 
 A library of components and utilities that supports the rendering pipeline for the Progressive Web App (PWA) Kit from Salesforce.
 

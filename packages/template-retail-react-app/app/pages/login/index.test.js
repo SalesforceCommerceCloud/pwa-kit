@@ -104,7 +104,7 @@ test('Allows customer to sign in to their account', async () => {
             res(ctx.delay(0), ctx.json({authType: 'registered', email: 'darek@test.com'}))
         ),
         rest.post('*/baskets/actions/merge', (req, res, ctx) => {
-            res(ctx.delay(0), ctx.json(mockMergedBasket))
+            return res(ctx.delay(0), ctx.json(mockMergedBasket))
         })
     )
     // render our test component

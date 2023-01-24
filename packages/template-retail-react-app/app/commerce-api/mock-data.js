@@ -3052,34 +3052,38 @@ export const mockedCustomerProductListsDetails = {
     total: 1
 }
 
+export const mockCategory = {
+    id: 'mens',
+    name: 'Mens',
+    pageDescription:
+        "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
+    pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
+    pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
+    parentCategoryId: 'root',
+    c_showInMenu: true,
+    loaded: true,
+    image:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
+}
+
 export const mockCategories = {
-    'mens-clothing-jackets': {
-        id: 'mens-clothing-suits',
-        image:
-            'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg',
-        name: 'Suits',
-        pageDescription:
-            "Shop Men's suits for business or pleasure. Enjoy from a variety of different styles and cuts at Commerce Cloud.",
-        pageTitle: 'Mens Suits for Business and Casual',
-        parentCategoryId: 'mens-clothing',
-        parentCategoryTree: [
+    root: {
+        categories: [
             {
                 id: 'mens',
-                name: 'Mens'
-            },
-            {
-                id: 'mens-clothing',
-                name: 'Clothing'
-            },
-            {
-                id: 'mens-clothing-suits',
-                name: 'Suits'
+                name: 'Mens',
+                pageDescription:
+                    "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
+                pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
+                pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
+                parentCategoryId: 'root',
+                c_showInMenu: true,
+                image:
+                    'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
             }
         ],
-        c_enableCompare: false,
-        c_showInMenu: true,
-        c_slotBannerImage:
-            'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw2ec92167/images/slot/landing/cat-landing-slotbottom-mens-suits.jpg'
+        id: 'root',
+        name: 'Storefront Catalog - Non-EN'
     }
 }
 

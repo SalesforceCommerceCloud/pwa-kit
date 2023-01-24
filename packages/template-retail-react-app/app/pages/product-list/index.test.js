@@ -8,7 +8,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
-import {mockProductSearch} from '../../commerce-api/mock-data'
+import {mockProductSearch, mockedEmptyCustomerProductList} from '../../commerce-api/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
@@ -28,19 +28,15 @@ jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
     return {
         ...sdk,
-        helpers: {
-            ...sdk.helpers,
-            loginGuestUser: async () => ({
-                access_token: '',
-                id_token: '',
-                refresh_token: '',
-                expires_in: 1800,
-                token_type: 'BEARER',
-                usid: '',
-                customer_id: '',
-                enc_user_id: '',
-                idp_access_token: null
-            })
+        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
+            async productSearch() {
+                return {data: [mockProductListSearchResponse]}
+            }
+        },
+        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
+            async getCustomerProductLists() {
+                return mockedEmptyCustomerProductList
+            }
         }
     }
 })

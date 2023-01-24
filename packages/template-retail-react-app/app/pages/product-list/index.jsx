@@ -61,6 +61,10 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
 import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
+<<<<<<< HEAD
+=======
+import {parse as parseSearchParams} from '../../hooks/use-search-params'
+>>>>>>> develop
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Others
@@ -89,18 +93,31 @@ const REFINEMENT_DISALLOW_LIST = ['c_isNew']
  */
 const ProductList = (props) => {
     const {
+<<<<<<< HEAD
         // eslint-disable-next-line react/prop-types
         isLoading: _isLoading, // NOTE: Ignore `getProps` isLoading state.
+=======
+        searchQuery,
+        productSearchResult,
+        category,
+>>>>>>> develop
         // eslint-disable-next-line react/prop-types
         staticContext,
         ...rest
     } = props
+<<<<<<< HEAD
+=======
+    const {total, sortingOptions} = productSearchResult || {}
+>>>>>>> develop
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const history = useHistory()
     const params = useParams()
+<<<<<<< HEAD
     const location = useLocation()
+=======
+>>>>>>> develop
     const toast = useToast()
     const einstein = useEinstein()
     const {res} = useServerContext()
@@ -108,6 +125,7 @@ const ProductList = (props) => {
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
 
+<<<<<<< HEAD
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
     const [wishlistLoading, setWishlistLoading] = useState([])
@@ -183,6 +201,9 @@ const ProductList = (props) => {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
 
+=======
+    const basePath = `${location.pathname}${location.search}`
+>>>>>>> develop
     // Reset scroll position when `isLoaded` becomes `true`.
     useEffect(() => {
         isFetching && window.scrollTo(0, 0)
@@ -666,9 +687,72 @@ const ProductList = (props) => {
 
 ProductList.getTemplateName = () => 'product-list'
 
+<<<<<<< HEAD
+=======
+ProductList.shouldGetProps = ({previousLocation, location}) =>
+    !previousLocation ||
+    previousLocation.pathname !== location.pathname ||
+    previousLocation.search !== location.search
+
+ProductList.getProps = async ({res, params, location, api}) => {
+    const {categoryId} = params
+    const urlParams = new URLSearchParams(location.search)
+    let searchQuery = urlParams.get('q')
+    let isSearch = false
+
+    if (searchQuery) {
+        isSearch = true
+    }
+    // In case somebody navigates to /search without a param
+    if (!categoryId && !isSearch) {
+        // We will simulate search for empty string
+        return {searchQuery: ' ', productSearchResult: {}}
+    }
+
+    const searchParams = parseSearchParams(location.search, false)
+
+    if (!searchParams.refine.includes(`cgid=${categoryId}`) && categoryId) {
+        searchParams.refine.push(`cgid=${categoryId}`)
+    }
+
+    // only search master products
+    searchParams.refine.push('htype=master')
+
+    // Set the `cache-control` header values to align with the Commerce API settings.
+    if (res) {
+        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+    }
+
+    const [category, productSearchResult] = await Promise.all([
+        isSearch
+            ? Promise.resolve()
+            : api.shopperProducts.getCategory({
+                  parameters: {id: categoryId, levels: 0}
+              }),
+        api.shopperSearch.productSearch({
+            parameters: searchParams
+        })
+    ])
+
+    // Apply disallow list to refinements.
+    productSearchResult.refinements = productSearchResult?.refinements?.filter(
+        ({attributeId}) => !REFINEMENT_DISALLOW_LIST.includes(attributeId)
+    )
+
+    // The `isomorphic-sdk` returns error objects when they occur, so we
+    // need to check the category type and throw if required.
+    if (category?.type?.endsWith('category-not-found')) {
+        throw new HTTPNotFound(category.detail)
+    }
+
+    return {searchQuery: searchQuery, productSearchResult, category}
+}
+
+>>>>>>> develop
 ProductList.propTypes = {
     onAddToWishlistClick: PropTypes.func,
-    onRemoveWishlistClick: PropTypes.func
+    onRemoveWishlistClick: PropTypes.func,
+    category: PropTypes.object
 }
 
 export default ProductList

@@ -73,6 +73,14 @@ test('Redirects to login page if the customer is not logged in', async () => {
 })
 
 test('Provides navigation for subpages', async () => {
+    global.server.use(
+        rest.get('*/products', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockOrderProducts))
+        }),
+        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockOrderHistory))
+        })
+    )
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
@@ -115,24 +123,24 @@ test('Allows customer to sign out', async () => {
 
 test('Allows customer to edit profile details', async () => {
     global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(
                 ctx.json({
                     ...mockedRegisteredCustomer,
                     firstName: 'Geordi',
                     phoneHome: '(567) 123-5585'
                 })
             )
-        ),
-        rest.patch('*/customers/:customerId', (req, res, ctx) =>
-            res(
+        }),
+        rest.patch('*/customers/:customerId', (req, res, ctx) => {
+            return res(
                 ctx.json({
                     ...mockedRegisteredCustomer,
                     firstName: 'Geordi',
                     phoneHome: '(567) 123-5585'
                 })
             )
-        )
+        })
     )
 
     renderWithProviders(<MockedComponent />)
