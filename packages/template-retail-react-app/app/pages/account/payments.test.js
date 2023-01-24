@@ -13,7 +13,6 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import PaymentMethods from './payments'
 import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 
-
 const MockedComponent = () => {
     const customer = useCustomer()
     useEffect(() => {
