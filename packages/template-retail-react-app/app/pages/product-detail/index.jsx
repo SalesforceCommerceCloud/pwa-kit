@@ -49,6 +49,7 @@ const ProductDetail = ({category, product, isLoading}) => {
     const navigate = useNavigation()
     const [primaryCategory, setPrimaryCategory] = useState(category)
     const [productSetSelection, setProductSetSelection] = useState({})
+    const setProductsRefs = React.useRef({})
 
     const isProductASet = product?.type.set
     const setProductsSelected =
@@ -128,7 +129,7 @@ const ProductDetail = ({category, product, isLoading}) => {
             await basket.addItemToBasket(productItems)
 
             // If the items were sucessfully added, set the return value to be used
-            // by the add to cart modal. 
+            // by the add to cart modal.
             returnVal = productSelectionValues
         } catch (error) {
             showError(error)
@@ -136,7 +137,6 @@ const ProductDetail = ({category, product, isLoading}) => {
 
         return returnVal
     }
-
 
     /**************** Einstein ****************/
     useEffect(() => {
@@ -172,6 +172,22 @@ const ProductDetail = ({category, product, isLoading}) => {
                             addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
+                            validate={() => {
+                                // Scroll to the first product without its options selected.
+                                const productSelectionKeys = Object.keys(productSetSelection)
+                                const unselected = product.setProducts.find(
+                                    ({id}) => !productSelectionKeys.includes(id)
+                                )
+
+                                if (unselected) {
+                                    setProductsRefs.current[unselected.id].scrollIntoView({
+                                        behavior: 'smooth'
+                                    })
+                                    return false
+                                }
+
+                                return true
+                            }}
                         />
 
                         <hr />
@@ -181,10 +197,15 @@ const ProductDetail = ({category, product, isLoading}) => {
                         product.setProducts.map((childProduct) => (
                             <Fragment key={childProduct.id}>
                                 <ProductView
+                                    ref={(ref) => {
+                                        setProductsRefs.current[childProduct.id] = ref
+                                    }}
                                     product={childProduct}
                                     isProductPartOfSet={true}
                                     addToCart={(variant, quantity) =>
-                                        handleAddToCart([{product: childProduct, variant, quantity}])
+                                        handleAddToCart([
+                                            {product: childProduct, variant, quantity}
+                                        ])
                                     }
                                     addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                                     variantSelected={(product, variant, quantity) => {

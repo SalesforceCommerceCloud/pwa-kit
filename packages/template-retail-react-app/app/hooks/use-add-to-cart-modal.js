@@ -27,9 +27,8 @@ import useBasket from '../commerce-api/hooks/useBasket'
 import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
-import {useVariationAttributes} from './'
 import {findImageGroupBy} from '../utils/image-groups-utils'
-import {useVariant} from './use-variant'
+import {findVariationAttributeValuesBy} from '../utils/product-utils'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -65,21 +64,6 @@ export const AddToCartModal = () => {
     const {currency, productItems, productSubTotal, itemAccumulatedCount} = basket
     const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
-    // TODO: Refactor this into it's own utility.
-    const findVariationAttributeValuesBy = (variationAttributes, values = {}) => {
-        const returnVal = Object.entries(values).reduce((acc, [id, value]) => {
-            const attribute = variationAttributes.find(({id: attributeId}) => attributeId === id)
-            const attributeValue = attribute.values.find(
-                ({value: attributeValue}) => attributeValue === value
-            )
-            return {
-                ...acc,
-                [attribute.name]: attributeValue.name
-            }
-        }, {})
-        return returnVal
-    }
-
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -110,6 +94,8 @@ export const AddToCartModal = () => {
                             flex="1"
                             paddingRight={{lg: '4', xl: '8'}}
                             paddingY={{base: '4', lg: '0'}}
+                            maxHeight="280px"
+                            overflowY="scroll"
                             // divider style
                             borderRightWidth={{lg: '1px'}}
                             borderBottomWidth={{base: '1px', lg: '0px'}}
@@ -132,6 +118,7 @@ export const AddToCartModal = () => {
 
                                 return (
                                     <Flex
+                                        key={variant.productId}
                                         justifyContent="space-between"
                                         marginBottom={index < itemsAdded - 1 ? 0 : 4}
                                     >
