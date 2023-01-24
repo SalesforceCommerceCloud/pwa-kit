@@ -93,23 +93,9 @@ const WishlistPrimaryAction = () => {
         )
     }
 
-    let button
-
     if (isProductASet) {
-        button = (
-            <Button
-                as={Link}
-                href={`/product/${variant.id}`}
-                w={'full'}
-                variant={'solid'}
-                _hover={{textDecoration: 'none'}}
-            >
-                {buttonText.viewOptions}
-            </Button>
-        )
-        // TODO: create a new set in BM to test this scenario
         if (variant.setProducts?.every((child) => !hasVariants(child))) {
-            button = (
+            return (
                 <Button
                     variant={'solid'}
                     onClick={() => handleAddToCart(variant, variant.quantity)}
@@ -119,36 +105,50 @@ const WishlistPrimaryAction = () => {
                     {buttonText.addAllToCart}
                 </Button>
             )
-        }
-    } else {
-        button = isMasterProduct ? (
-            <>
-                <Button w={'full'} variant={'solid'} onClick={onOpen}>
+        } else {
+            return (
+                <Button
+                    as={Link}
+                    href={`/product/${variant.id}`}
+                    w={'full'}
+                    variant={'solid'}
+                    _hover={{textDecoration: 'none'}}
+                >
                     {buttonText.viewOptions}
                 </Button>
-                {isOpen && (
-                    <ProductViewModal
-                        isOpen={isOpen}
-                        onOpen={onOpen}
-                        onClose={onClose}
-                        product={variant}
-                        addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                    />
-                )}
-            </>
-        ) : (
-            <Button
-                variant={'solid'}
-                onClick={() => handleAddToCart(variant, variant.quantity)}
-                w={'full'}
-                isLoading={isLoading}
-            >
-                {buttonText.addToCart}
-            </Button>
-        )
+            )
+        }
+    } else {
+        if (isMasterProduct) {
+            return (
+                <>
+                    <Button w={'full'} variant={'solid'} onClick={onOpen}>
+                        {buttonText.viewOptions}
+                    </Button>
+                    {isOpen && (
+                        <ProductViewModal
+                            isOpen={isOpen}
+                            onOpen={onOpen}
+                            onClose={onClose}
+                            product={variant}
+                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                        />
+                    )}
+                </>
+            )
+        } else {
+            return (
+                <Button
+                    variant={'solid'}
+                    onClick={() => handleAddToCart(variant, variant.quantity)}
+                    w={'full'}
+                    isLoading={isLoading}
+                >
+                    {buttonText.addToCart}
+                </Button>
+            )
+        }
     }
-
-    return button
 }
 
 export default WishlistPrimaryAction
