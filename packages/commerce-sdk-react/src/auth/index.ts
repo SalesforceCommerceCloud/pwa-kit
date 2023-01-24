@@ -136,7 +136,7 @@ class Auth {
         })
 
         // NOTE: Not too sure how I feel about this, seems a little confusing. Should
-        // the DATA_MAP instead have definitions for serverStorage and clientStorage?
+        // the DATA_MAP instead have definitions for MemoryStorage and clientStorage?
         // Another idea is to implement a getPrefix function on the storage class. But that
         // would look kinda gross too.
         const storageOptions = {keyPrefix: config.siteId}

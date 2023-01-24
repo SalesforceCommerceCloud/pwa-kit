@@ -10,7 +10,7 @@ export type StorageTypes = 'cookie' | 'local'
 
 export interface BaseStorageOptions {
     keyPrefix?: string
-    keyPrefixSeperator?: string
+    keyPrefixSeparator?: string
 }
 
 export abstract class BaseStorage {
@@ -18,13 +18,13 @@ export abstract class BaseStorage {
 
     constructor(options: BaseStorageOptions = {keyPrefixSeparator: '_'}) {
         this.options = {
-          keyPrefixSeparator: options.keyPrefix ? options.keyPrefixSeparator ?? '_' : ''
-          keyPrefix: options.keyPrefix ?? ''
+            keyPrefixSeparator: options.keyPrefix ? options.keyPrefixSeparator ?? '_' : '',
+            keyPrefix: options.keyPrefix ?? ''
         }
     }
 
     protected getPrefixedKey(key: string): string {
-        return `${this.keyPrefix}${this.keyPrefixSeparator}${key}`
+        return `${this.options.keyPrefix}${this.options.keyPrefixSeparator}${key}`
     }
     abstract set(key: string, value: string, options?: unknown): void
     abstract get(key: string): string

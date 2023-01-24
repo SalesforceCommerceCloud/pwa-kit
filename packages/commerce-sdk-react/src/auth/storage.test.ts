@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {BaseStorage, ServerStorage} from './storage'
+import {BaseStorage, MemoryStorage} from './storage'
 
 const {window} = global
 const key = 'key'
@@ -12,7 +12,7 @@ const value = 'value'
 
 const testCases = [
     {
-        description: 'ServerStorage works without options',
+        description: 'MemoryStorage works without options',
         requiresWindow: false,
         storageOptions: {},
         validate: (storage: BaseStorage) => {
@@ -23,7 +23,7 @@ const testCases = [
         }
     },
     {
-        description: 'ServerStorage works with options',
+        description: 'MemoryStorage works with options',
         requiresWindow: false,
         storageOptions: {
             keyPrefix: 'prefix',
@@ -47,7 +47,7 @@ describe('Storage Classes', () => {
                 // @ts-ignore
                 delete global.window
             }
-            const storage = new ServerStorage(storageOptions)
+            const storage = new MemoryStorage(storageOptions)
             validate(storage)
 
             if (!requiresWindow) {
