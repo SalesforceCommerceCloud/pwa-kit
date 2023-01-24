@@ -25,7 +25,7 @@ afterEach(() => {
     jest.resetAllMocks()
 })
 
-describe('resolveSiteFromUrl', function() {
+describe('resolveSiteFromUrl', function () {
     test('throw an error without an arg', () => {
         expect(() => {
             resolveSiteFromUrl()
@@ -77,7 +77,7 @@ describe('resolveSiteFromUrl', function() {
     })
 })
 
-describe('getDefaultSite', function() {
+describe('getDefaultSite', function () {
     test('returns expected default site when there is only one site in the site list', () => {
         const siteMock = {
             id: 'site-a',
@@ -143,7 +143,7 @@ describe('getDefaultSite', function() {
     })
 })
 
-describe('getSites', function() {
+describe('getSites', function () {
     test('returns site list with alias', () => {
         getConfig.mockImplementation(() => mockConfig)
         const sites = getSites()
