@@ -266,7 +266,7 @@ export default function useCustomerProductLists() {
 
                 // `getProducts` endpoint does not include `setProducts` data
                 // so for each product set, we'll fetch it and append it to existing data
-                const promises = []
+                const productSetFetches = []
                 productDetails.data
                     .filter((product) => product.type.set)
                     .forEach((product) => {
@@ -280,10 +280,10 @@ export default function useCustomerProductLists() {
                                 product.setProducts = data.setProducts
                             })
 
-                        promises.push(promise)
+                        productSetFetches.push(promise)
                     })
 
-                await Promise.allSettled(promises)
+                await Promise.allSettled(productSetFetches)
 
                 const result = self.mergeProductDetailsIntoList(list, productDetails)
 
