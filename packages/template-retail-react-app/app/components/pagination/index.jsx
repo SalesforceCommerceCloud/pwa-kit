@@ -25,11 +25,11 @@ import {
 // Icons
 import {ChevronLeftIcon, ChevronRightIcon} from '../icons'
 
+// Hooks
+import {useIsServer} from '../../hooks/use-is-server'
+
 // Constants
 const SELECT_ID = 'pagination'
-
-// Helpers
-const isServer = typeof window === 'undefined'
 
 /**
  * The pagination component is a simple component allowing you to navigate
@@ -41,6 +41,7 @@ const Pagination = (props) => {
     const styles = useStyleConfig('Pagination')
     const history = useHistory()
     const {urls, currentURL, ...rest} = props
+    const isServer = useIsServer()
 
     const currentIndex = urls.indexOf(currentURL) > 0 ? urls.indexOf(currentURL) : 0
     const prev = urls[currentIndex - 1]

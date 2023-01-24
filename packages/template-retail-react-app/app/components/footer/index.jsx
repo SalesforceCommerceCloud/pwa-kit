@@ -30,6 +30,7 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
+import {useIsServer} from '../../hooks/use-is-server'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
@@ -37,9 +38,10 @@ const Footer = ({...otherProps}) => {
     const [locale, setLocale] = useState(intl.locale)
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
+    const isServer = useIsServer()
 
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
-    const showLocaleSelector = supportedLocaleIds?.length > 1
+    const showLocaleSelector = supportedLocaleIds?.length > 1 && !isServer
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>

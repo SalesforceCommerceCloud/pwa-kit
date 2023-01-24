@@ -7,14 +7,18 @@
 
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
-import {isServer} from '../../../utils/utils'
 // Components
 import {Box, Heading, Flex, Text, Fade} from '@chakra-ui/react'
 
 // Project Components
 import Breadcrumb from '../../../components/breadcrumb'
 
+// Hooks
+import {useIsServer} from '../../../hooks/use-is-server'
+
 const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...otherProps}) => {
+    const isServer = useIsServer()
+
     return (
         <Box {...otherProps} data-testid="sf-product-list-breadcrumb">
             {/* Breadcrumb */}
