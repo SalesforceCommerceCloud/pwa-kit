@@ -6,7 +6,7 @@
  */
 import Cookies from 'js-cookie'
 
-export type StorageType = 'cookie' | 'local'
+export type StorageType = 'cookie' | 'local' | 'memory'
 
 export interface BaseStorageOptions {
     keyPrefix?: string
