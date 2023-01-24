@@ -7,7 +7,7 @@
 import {helpers, ShopperLogin, ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import jwtDecode from 'jwt-decode'
 import {ApiClientConfigParams} from '../hooks/types'
-import {BaseStorage, LocalStorage, CookieStorage, ServerStorage, StorageTypes} from './storage'
+import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageTypes} from './storage'
 
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
@@ -146,8 +146,8 @@ class Auth {
                   local: new LocalStorage(storageOptions)
               }
             : {
-                  cookie: new ServerStorage(storageOptions),
-                  local: new ServerStorage(storageOptions)
+                  cookie: new MemoryStorage(storageOptions),
+                  local: new MemoryStorage(storageOptions)
               }
 
         this.redirectURI = config.redirectURI

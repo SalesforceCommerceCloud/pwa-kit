@@ -98,15 +98,10 @@ export class LocalStorage extends BaseStorage {
     }
 }
 
-export class ServerStorage extends BaseStorage {
-    private map: Map<string, string>
-
+export class MemoryStorage extends BaseStorage {
+    private map = new Map<string, string>()
     constructor(options?: BaseStorageOptions) {
         super(options)
-
-        if (typeof window !== 'undefined') {
-            throw new Error('ServerStorage is not avaliable on the current environment.')
-        }
 
         this.map = new Map()
     }
