@@ -19,7 +19,7 @@ runs:
         node ./scripts/gtime.js monorepo_install npm ci
 
         # Build the PWA
-        npm run lerna -- run analyze-build --scope "retail-react-app"
+        npm run lerna -- run analyze-build --scope "scaffold-pwa"
 
         # Report bundle sizes
         node ./scripts/report-bundle-size.js
