@@ -113,8 +113,7 @@ const PaymentSelection = ({form, hideSubmitButton, onSubmit = () => null}) => {
                                                     ? formatMessage({
                                                           defaultMessage:
                                                               'Please select a payment method.',
-                                                          id:
-                                                              'payment_selection.message.select_payment_method'
+                                                          id: 'payment_selection.message.select_payment_method'
                                                       })
                                                     : false
                                             }}

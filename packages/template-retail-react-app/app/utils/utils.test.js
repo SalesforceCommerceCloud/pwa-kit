@@ -93,7 +93,7 @@ describe('flatten', () => {
     })
 })
 
-describe('shallow', function() {
+describe('shallow', function () {
     test('should return false', () => {
         const a = {a: '123'}
         const b = {a: '123', b: '456'}
@@ -102,7 +102,7 @@ describe('shallow', function() {
     })
 })
 
-describe('getParamsFromPath', function() {
+describe('getParamsFromPath', function () {
     const cases = [
         {path: '/us/en-US/', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
         {path: '/us/en-US', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
@@ -192,7 +192,7 @@ describe('getParamsFromPath', function() {
     })
 })
 
-describe('resolveLocaleFromUrl', function() {
+describe('resolveLocaleFromUrl', function () {
     const cases = [
         {
             path: '/',
