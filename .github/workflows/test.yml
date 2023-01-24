@@ -67,34 +67,6 @@ jobs:
         if: env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/smoke_tests"
 
-      - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true'
-        uses: "./.github/actions/create_mrt"
-        with:
-          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Push Bundle to MRT (Development)
-        if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true' && env.DEVELOP == 'true'
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "./packages/template-retail-react-app"
-          TARGET: staging
-
-      - name: Push Bundle to MRT (Production)
-        if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true' && env.RELEASE == 'true'
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "./packages/template-retail-react-app"
-          TARGET: production
-
-      - name: Push Bundle to MRT (Commerce SDK React)
-        if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true' && env.DEVELOPMENT == 'true'
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "./packages/test-commerce-sdk-react"
-          TARGET: commerce-sdk-react
-
       - name: Check Repository Clean
         if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/check_clean"
