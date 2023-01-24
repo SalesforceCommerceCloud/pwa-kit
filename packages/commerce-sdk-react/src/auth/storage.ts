@@ -6,7 +6,7 @@
  */
 import Cookies from 'js-cookie'
 
-export type StorageTypes = 'cookie' | 'local'
+export type StorageType = 'cookie' | 'local'
 
 export interface BaseStorageOptions {
     keyPrefix?: string
@@ -103,11 +103,6 @@ export class LocalStorage extends BaseStorage {
 
 export class MemoryStorage extends BaseStorage {
     private map = new Map<string, string>()
-    constructor(options?: BaseStorageOptions) {
-        super(options)
-
-        this.map = new Map()
-    }
     set(key: string, value: string) {
         const prefixedKey = this.getPrefixedKey(key)
         this.map.set(prefixedKey, value)

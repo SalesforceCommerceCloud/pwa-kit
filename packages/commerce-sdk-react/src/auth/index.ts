@@ -7,7 +7,7 @@
 import {helpers, ShopperLogin, ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import jwtDecode from 'jwt-decode'
 import {ApiClientConfigParams} from '../hooks/types'
-import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageTypes} from './storage'
+import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
@@ -41,7 +41,7 @@ type AuthDataKeys =
 type AuthDataMap = Record<
     AuthDataKeys,
     {
-        storageType: StorageTypes
+        storageType: StorageType
         key: string
         callback?: (storage: BaseStorage) => void
     }
@@ -120,7 +120,7 @@ class Auth {
     private redirectURI: string
     private pendingToken: Promise<ShopperLoginTypes.TokenResponse> | undefined
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
-    private stores: Record<StorageTypes, BaseStorage>
+    private stores: Record<StorageType, BaseStorage>
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
