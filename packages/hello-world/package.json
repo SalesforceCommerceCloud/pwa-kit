@@ -1,11 +1,11 @@
 {
     "name": "hello-world",
-    "version": "1.5.3",
+    "version": "1.5.4",
     "license": "See license in LICENSE",
     "private": true,
     "dependencies": {
         "aws-serverless-express": "^3.3.6",
-        "express": "^4.17.1"
+        "express": "^4.17.3"
     },
     "devDependencies": {
         "@babel/cli": "^7.14.3",
@@ -21,7 +21,7 @@
         "eslint-plugin-prettier": "3.0.1",
         "eslint-plugin-react": "7.24.0",
         "prettier": "1.18.2",
-        "pwa-kit-react-sdk": "^1.5.3"
+        "pwa-kit-react-sdk": "^1.5.4"
     },
     "scripts": {
         "format": "prettier --write \"**/*.{js,jsx}\"",

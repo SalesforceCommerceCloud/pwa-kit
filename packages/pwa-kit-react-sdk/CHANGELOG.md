@@ -1,3 +1,6 @@
+## v1.5.4 (Jan 25, 2023)
+-   Security update
+
 ## v1.5.3 (Nov 13, 2022)
 
 -   Security update

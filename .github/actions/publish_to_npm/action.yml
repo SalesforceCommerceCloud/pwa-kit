@@ -1,0 +1,21 @@
+name: publish_to_npm
+inputs:
+  NODE_AUTH_TOKEN:
+    description: "Node auth token"
+runs:
+  using: composite
+  steps:
+  # TODO: Figure out a way to specify whether to publish to "latest" or "next" tag
+  - name: Publish to NPM
+    run: |-
+      # Add NPM token to allow publishing
+      echo "//registry.npmjs.org/:_authToken=${{ inputs.NODE_AUTH_TOKEN }}" > ~/.npmrc
+
+      # Publish all changed packages. The "from-package" arg means "look
+      # at the version numbers in each package.json file and if that doesn't
+      # exist on NPM, publish"
+      npm run lerna -- publish from-package --yes --no-verify-access
+
+      # Cleanup
+      rm ~/.npmrc
+    shell: bash

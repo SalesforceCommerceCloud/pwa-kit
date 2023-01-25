@@ -1,3 +1,6 @@
+## v1.5.4 (Jan 25, 2023)
+-   Security update
+
 ## v1.5.2 (Apr 22, 2022)
 
 -   Fixed invalid refresh token. [#527](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/527)
