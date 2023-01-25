@@ -433,16 +433,13 @@ const ProductView = ({
                     </Box>
                 </VStack>
             </Flex>
-            {/*Add to Cart Button for mobile versions*/}
+
+            {/* Sticky call-to-action buttons for mobile and certain product types */}
             <Box
                 position="fixed"
                 bg="white"
                 width="100%"
-                display={
-                    isProductPartOfSet || isProductASet
-                        ? 'none'
-                        : ['block', 'block', 'block', 'none']
-                }
+                display={isProductPartOfSet ? 'none' : ['block', 'block', 'block', 'none']}
                 p={[4, 4, 6]}
                 left={0}
                 bottom={0}
