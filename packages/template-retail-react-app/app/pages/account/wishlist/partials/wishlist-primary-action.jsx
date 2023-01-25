@@ -79,16 +79,22 @@ const WishlistPrimaryAction = () => {
                 id="wishlist_primary_action.button.view_options"
             />
         ),
+        viewFullDetails: (
+            <FormattedMessage
+                defaultMessage="View Full Details"
+                id="wishlist_primary_action.button.view_full_details"
+            />
+        ),
         addToCart: (
             <FormattedMessage
                 defaultMessage="Add to Cart"
                 id="wishlist_primary_action.button.add_to_cart"
             />
         ),
-        addAllToCart: (
+        addSetToCart: (
             <FormattedMessage
-                defaultMessage="Add All to Cart"
-                id="wishlist_primary_action.button.add_all_to_cart"
+                defaultMessage="Add Set to Cart"
+                id="wishlist_primary_action.button.add_set_to_cart"
             />
         )
     }
@@ -102,7 +108,7 @@ const WishlistPrimaryAction = () => {
                     w={'full'}
                     isLoading={isLoading}
                 >
-                    {buttonText.addAllToCart}
+                    {buttonText.addSetToCart}
                 </Button>
             )
         } else {
@@ -114,7 +120,7 @@ const WishlistPrimaryAction = () => {
                     variant={'solid'}
                     _hover={{textDecoration: 'none'}}
                 >
-                    {buttonText.viewOptions}
+                    {buttonText.viewFullDetails}
                 </Button>
             )
         }

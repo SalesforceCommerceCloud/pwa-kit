@@ -3171,16 +3171,22 @@
       "value": "New Password"
     }
   ],
-  "wishlist_primary_action.button.add_all_to_cart": [
+  "wishlist_primary_action.button.add_set_to_cart": [
     {
       "type": 0,
-      "value": "Add All to Cart"
+      "value": "Add Set to Cart"
     }
   ],
   "wishlist_primary_action.button.add_to_cart": [
     {
       "type": 0,
       "value": "Add to Cart"
+    }
+  ],
+  "wishlist_primary_action.button.view_full_details": [
+    {
+      "type": 0,
+      "value": "View Full Details"
     }
   ],
   "wishlist_primary_action.button.view_options": [
