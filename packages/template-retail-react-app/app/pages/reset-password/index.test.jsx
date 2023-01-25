@@ -30,7 +30,6 @@ afterEach(() => {
     jest.resetModules()
     localStorage.clear()
     jest.clearAllMocks()
-    window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 
 test('Allows customer to go to sign in page', async () => {

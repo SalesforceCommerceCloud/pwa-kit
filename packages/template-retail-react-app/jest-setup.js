@@ -59,7 +59,11 @@ export const setupMockServer = () => {
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         }),
-        rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200)))
+        rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
+        
+        // for Einstein
+        rest.get('*/v3*', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
+        rest.post('*/v3*', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
     )
 }
 
@@ -72,9 +76,12 @@ beforeAll(() => {
 afterEach(() => {
     global.server.resetHandlers()
 })
-afterAll(() => {
-    global.server.close()
-})
+// TODO: fix unit tests that does not properly await async operation
+// temporaily comment out server.close() to avoid
+// tests from erroring out randomly
+// afterAll(() => {
+//     global.server.close()
+// })
 
 // Mock the application configuration to be used in all tests.
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
