@@ -3083,7 +3083,6 @@ export const mockCategories = {
     }
 }
 
-
 export const mockProductSearch = {
     limit: 25,
     hits: [

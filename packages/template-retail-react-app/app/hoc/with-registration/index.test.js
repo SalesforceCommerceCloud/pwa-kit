@@ -41,10 +41,6 @@ beforeAll(() => {
     window.history.pushState({}, 'Account', '/en-GB/account')
 })
 
-beforeEach(() => {
-    jest.resetModules()
-})
-
 afterEach(() => {
     jest.resetModules()
 })
