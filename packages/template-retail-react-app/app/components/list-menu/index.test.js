@@ -12,25 +12,28 @@ import {renderWithProviders} from '../../utils/test-utils'
 describe('ListMenu', () => {
     test('ListMenu renders without errors', async () => {
         renderWithProviders(<ListMenu />, {
-            wrapperProps: {initialCategories: {
-                root: {
-                    categories: [
-                        {
-                            id: 'mens',
-                            name: 'Mens',
-                            pageDescription:
-                                "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
-                            pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
-                            pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
-                            parentCategoryId: 'root',
-                            c_showInMenu: true,
-                            image: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
-                        }
-                    ],
-                    id: 'root',
-                    name: 'Storefront Catalog - Non-EN'
+            wrapperProps: {
+                initialCategories: {
+                    root: {
+                        categories: [
+                            {
+                                id: 'mens',
+                                name: 'Mens',
+                                pageDescription:
+                                    "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
+                                pageKeywords:
+                                    'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
+                                pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
+                                parentCategoryId: 'root',
+                                c_showInMenu: true,
+                                image:
+                                    'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
+                            }
+                        ],
+                        id: 'root',
+                        name: 'Storefront Catalog - Non-EN'
+                    }
                 }
-            }
             }
         })
 
