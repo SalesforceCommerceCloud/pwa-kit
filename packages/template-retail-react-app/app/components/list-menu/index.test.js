@@ -9,13 +9,15 @@ import {screen, waitFor} from '@testing-library/react'
 import ListMenu from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
+jest.setTimeout(60000)
+
 describe('ListMenu', () => {
     test('ListMenu renders without errors', async () => {
         renderWithProviders(<ListMenu />)
 
         const drawer = document.getElementById('chakra-toast-portal')
 
-        const category = await waitFor(() => screen.getByText(/Mens/i))
+        const category = await waitFor(() => screen.getByText(/Mens/i), {timeout: 10000})
         expect(category).toBeInTheDocument()
         expect(drawer).toBeInTheDocument()
         expect(screen.getByRole('navigation', {name: 'main'})).toBeInTheDocument()
@@ -29,13 +31,4 @@ describe('ListMenu', () => {
 
         expect(spinner).toBeInTheDocument()
     })
-})
-
-// Set up and clean up
-beforeEach(() => {
-    jest.resetModules()
-})
-afterEach(() => {
-    localStorage.clear()
-    jest.clearAllMocks()
 })

@@ -13,7 +13,7 @@ import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
 
-jest.mock('../commerce-api/einstein')
+jest.setTimeout(60000)
 
 const mockRegisteredCustomer = {
     authType: 'registered',

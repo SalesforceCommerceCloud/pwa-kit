@@ -24,8 +24,12 @@ const MockedComponent = () => {
     )
 }
 
-// Set up and clean up
-beforeAll(() => {
+beforeEach(() => {
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            return res(ctx.json(mockMasterProduct))
+        })
+    )
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/701642811398M')
@@ -35,16 +39,6 @@ afterEach(() => {
 })
 
 test('should render product details page', async () => {
-    global.server.use(
-        // mock fetch product lists
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.json(mockedCustomerProductLists))
-        }),
-        // mock add item to product lists
-        rest.post('*/customers/:customerId/product-lists/:listId/items', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        })
-    )
     renderWithProviders(<MockedComponent />)
     await waitFor(() => {
         const productName = screen.getAllByText(/Checked Silk Tie/)

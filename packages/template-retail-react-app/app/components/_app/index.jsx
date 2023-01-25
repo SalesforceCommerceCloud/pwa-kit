@@ -60,7 +60,7 @@ import {useCategory} from 'commerce-sdk-react-preview'
 const App = (props) => {
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
     const {data: allCategories} = useCategory(
-        {id: DEFAULT_ROOT_CATEGORY, levels: DEFAULT_NAV_DEPTH},
+        {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_DEPTH},
         {
             select: (categories) => {
                 // Note: What is the best to handle special case like this?? Should commerce sdk handles this?
@@ -233,14 +233,18 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
                                                 isOpen={isOpen}
                                                 onClose={onClose}
                                                 onLogoClick={onLogoClick}
-                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
+                                                root={
+                                                    allCategories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                }
                                                 locale={locale}
                                             />
                                         </HideOnDesktop>
 
                                         <HideOnMobile>
                                             <ListMenu
-                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
+                                                root={
+                                                    allCategories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                }
                                                 locale={locale}
                                             />
                                         </HideOnMobile>

@@ -176,7 +176,7 @@ TestProviders.propTypes = {
     children: PropTypes.element,
     initialBasket: PropTypes.object,
     initialCustomer: PropTypes.object,
-    initialCategories: PropTypes.element,
+    initialCategories: PropTypes.object,
     initialProductLists: PropTypes.object,
     messages: PropTypes.object,
     locale: PropTypes.object,
