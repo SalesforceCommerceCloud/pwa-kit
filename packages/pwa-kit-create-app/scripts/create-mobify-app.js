@@ -402,7 +402,7 @@ const main = (opts) => {
         .then((preset) => {
             switch (preset) {
                 case HELLO_WORLD_TEST_PROJECT:
-                    return generateHelloWorld({projectId: 'hello-world'}, opts)
+                    return generateHelloWorld('hello-world', opts)
                 case HELLO_WORLD:
                     return helloWorldPrompts(opts).then((answers) => {
                         const projectId = slugifyName(answers.projectName)
