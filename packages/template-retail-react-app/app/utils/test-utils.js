@@ -85,8 +85,6 @@ export const TestProviders = ({
     appConfig = mockConfig.app,
     siteAlias = DEFAULT_SITE
 }) => {
-    console.log('123')
-    console.log(initialCategories)
     const mounted = useRef()
     // We use this to track mounted state.
     useEffect(() => {
