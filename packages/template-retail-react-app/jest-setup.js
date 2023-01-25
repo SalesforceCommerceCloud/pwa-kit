@@ -62,8 +62,8 @@ export const setupMockServer = () => {
         rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
 
         // for Einstein
-        rest.get('*/v3*', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-        rest.post('*/v3*', (req, res, ctx) => res(ctx.delay(0), ctx.status(200)))
+        rest.get('*/v3*', (req, res, ctx) => res(ctx.delay(0), ctx.status(200), ctx.json({}))),
+        rest.post('*/v3*', (req, res, ctx) => res(ctx.delay(0), ctx.status(200), ctx.json({})))
     )
 }
 
