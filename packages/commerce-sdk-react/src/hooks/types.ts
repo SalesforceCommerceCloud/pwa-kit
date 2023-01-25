@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -68,3 +68,11 @@ export type IQueryFunction<TData = unknown> = (
     context: QueryFunctionContext<QueryKey>,
     apiClients: ApiClients
 ) => Promise<TData>
+
+export type AddParameters<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Fn extends (...args: any[]) => unknown,
+    Extra extends unknown[]
+    // TODO: Remove this after merging in prettier v2 changes
+    // eslint-disable-next-line prettier/prettier
+    > = (...newArgs: [...originalArgs: Parameters<Fn>, ...extra: Extra]) => ReturnType<Fn>
