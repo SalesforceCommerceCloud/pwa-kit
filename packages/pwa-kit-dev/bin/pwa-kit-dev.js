@@ -5,13 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+const chalk = require('chalk')
 const p = require('path')
 const fse = require('fs-extra')
+const WebSocket = require('ws')
 const program = require('commander')
-const isEmail = require('validator/lib/isEmail')
+const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
 const pkg = require('../package.json')
-const chalk = require('chalk')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
 const upload2 = (() => {
@@ -123,7 +124,7 @@ const main = async () => {
             '-u, --user <email>',
             'the e-mail address you used to register with Managed Runtime',
             (val) => {
-                if (!isEmail(val)) {
+                if (!validator.isEmail(val)) {
                     throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
                 } else {
                     return val
@@ -231,7 +232,9 @@ const main = async () => {
             new program.Option(
                 '-m, --message <message>',
                 'a message to include along with the uploaded bundle in Managed Runtime'
-            ).default(undefined, '<git branch>:<git commit hash>')
+            )
+                // The default message is loaded dynamically as part of `uploadBundle(...)`
+                .default(null, '<git branch>:<git commit hash>')
         )
         .addOption(
             new program.Option(
@@ -240,7 +243,7 @@ const main = async () => {
             )
                 // We load the slug from the package.json by default, but we don't want to do that
                 // unless we need to, so it is loaded conditionally in the action implementation
-                .default(undefined, "the 'name' key from the package.json")
+                .default(null, "the 'name' key from the package.json")
         )
         .addOption(
             new program.Option(
@@ -333,7 +336,80 @@ const main = async () => {
             )
         })
 
-    program.option('-v, --version', 'show version number').action(async ({version}) => {
+    managedRuntimeCommand('tail-logs')
+        .description(`continuously stream environment logs`)
+        .addOption(
+            new program.Option('-p, --project <projectSlug>', 'the project slug').default(
+                null,
+                "the 'name' key from package.json"
+            )
+        )
+        .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
+        .action(async ({project, environment, cloudOrigin, credentialsFile}, command) => {
+            if (!project) {
+                project = scriptUtils.readPackageJson('name')
+            }
+
+            let credentials
+            try {
+                credentials = fse.readJsonSync(credentialsFile)
+            } catch (e) {
+                scriptUtils.fail(`Error reading credentials: ${e}`)
+            }
+
+            const token = await scriptUtils.createToken(
+                project,
+                environment,
+                cloudOrigin,
+                credentials.api_key
+            )
+            const url = new URL(cloudOrigin.replace('cloud', 'logs'))
+            url.protocol = 'wss'
+            url.search = new URLSearchParams({
+                project,
+                environment,
+                user: credentials.username,
+                access_token: token
+            })
+
+            const ws = new WebSocket(url)
+            let heartbeat
+
+            ws.on('open', () => {
+                // Send a heartbeat periodically to bypass idle timeout.
+                const idleTimeout = 10 * 60 * 1000
+                heartbeat = setInterval(() => ws.ping(), idleTimeout / 2)
+            })
+
+            ws.on('close', (code) => {
+                clearInterval(heartbeat)
+                console.log('Connection closed with code', code)
+            })
+
+            ws.on('error', (error) => {
+                clearInterval(heartbeat)
+                scriptUtils.fail(`Error tailing logs: ${error.message}`)
+            })
+
+            ws.on('message', (data) => {
+                JSON.parse(data).forEach((log) => {
+                    const {message, shortRequestId, level} = scriptUtils.parseLog(log.message)
+                    const color = chalk[colors[level.toLowerCase()] || 'green']
+                    const paddedLevel = level.padEnd(6)
+                    console.log(
+                        chalk.green(new Date(log.timestamp).toISOString()),
+                        chalk.cyan(shortRequestId),
+                        ['WARN', 'ERROR'].includes(level)
+                            ? color.bold(paddedLevel)
+                            : color(paddedLevel),
+                        message
+                    )
+                })
+            })
+        })
+
+    // Global options
+    program.option('-v, --version', 'show version number').action(({version}) => {
         if (version) {
             console.log(pkg.version)
         } else {

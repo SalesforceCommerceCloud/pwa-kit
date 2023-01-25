@@ -6,6 +6,7 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
+import useConfig from '../useConfig'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 
 type Client = ApiClients['shopperProducts']
@@ -33,8 +34,11 @@ function useProducts(
     options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
 ): UseQueryResult<DataType<Client['getProducts']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const {locale, currency} = useConfig()
+    parameters.locale = parameters.locale || locale
+    parameters.currency = parameters.currency || currency
     return useQuery(
-        ['products', arg],
+        ['/products', arg],
         (_, {shopperProducts}) => {
             return shopperProducts.getProducts({parameters, headers}, rawResponse)
         },
@@ -65,8 +69,11 @@ function useProduct(
     options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
 ): UseQueryResult<DataType<Client['getProduct']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const {locale, currency} = useConfig()
+    parameters.locale = parameters.locale || locale
+    parameters.currency = parameters.currency || currency
     return useQuery(
-        ['product', arg],
+        ['/products', arg],
         (_, {shopperProducts}) => {
             return shopperProducts.getProduct({parameters, headers}, rawResponse)
         },
@@ -100,8 +107,10 @@ function useCategories(
     options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategories']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const {locale} = useConfig()
+    parameters.locale = parameters.locale || locale
     return useQuery(
-        ['categories', arg],
+        ['/categories', arg],
         (_, {shopperProducts}) => {
             return shopperProducts.getCategories({parameters, headers}, rawResponse)
         },
@@ -137,8 +146,10 @@ function useCategory(
     options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
 ): UseQueryResult<DataType<Client['getCategory']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const {locale} = useConfig()
+    parameters.locale = parameters.locale || locale
     return useQuery(
-        ['category', arg],
+        ['/categories', arg],
         (_, {shopperProducts}) => {
             return shopperProducts.getCategory({parameters, headers}, rawResponse)
         },

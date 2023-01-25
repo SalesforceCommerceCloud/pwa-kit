@@ -18,6 +18,12 @@
 <br /><br />
 The PWA Kit is a storefront technology for headless commerce using Salesforce Commerce APIs and React. It provides front-end developers with a more flexible and agile approach to build and maintain modern shopping experiences.
 <br/><br/>
+## ✋ PWA Kit Survey - Fall ’22
+The Salesforce Commerce Developer Experience Team is always looking to improve our products. If you have a few minutes, you can help us out by completing this survey on your PWA Kit experience.
+<br/><br/>[Go to Survey](https://forms.gle/5AVKahTA7PHYB13r8)
+<br/><br/>&bull; We’ll be collecting responses for 2 weeks.
+<br/>&bull; The survey is 10-40 questions long and takes about 20 minutes to complete. Many thanks! 🙏
+<br/><br/>
 <img alt="pwa-kit banner" src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/develop/packages/template-retail-react-app/app/static/img/hero.png" style="width: 700px; height:auto;">
 
 </div>

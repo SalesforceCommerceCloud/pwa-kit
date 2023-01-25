@@ -102,7 +102,7 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewSearch`
         const method = 'POST'
 
-        const products = searchResults.hits.map((product) => {
+        const products = searchResults?.hits?.map((product) => {
             const {productId, sku = '', altId = '', altIdType = ''} = product
             return {
                 id: productId,
@@ -149,7 +149,7 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewCategory`
         const method = 'POST'
 
-        const products = searchResults.hits.map((product) => {
+        const products = searchResults?.hits?.map((product) => {
             const {productId, sku = '', altId = '', altIdType = ''} = product
             return {
                 id: productId,

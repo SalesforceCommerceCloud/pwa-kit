@@ -7,6 +7,7 @@
 import {ApiClients, Argument, DataType} from '../types'
 import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
+import useConfig from '../useConfig'
 
 type Client = ApiClients['shopperSearch']
 
@@ -37,8 +38,11 @@ function useProductSearch(
     options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
 ): UseQueryResult<DataType<Client['productSearch']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const {locale, currency} = useConfig()
+    parameters.locale = parameters.locale || locale
+    parameters.currency = parameters.currency || currency
     return useQuery(
-        ['productSearch', arg],
+        ['/product-search', arg],
         (_, {shopperSearch}) => shopperSearch.productSearch({parameters, headers}, rawResponse),
         options
     )
@@ -72,8 +76,11 @@ function useSearchSuggestions(
     options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
 ): UseQueryResult<DataType<Client['getSearchSuggestions']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
+    const {locale, currency} = useConfig()
+    parameters.locale = parameters.locale || locale
+    parameters.currency = parameters.currency || currency
     return useQuery(
-        ['search-suggestions', arg],
+        ['/search-suggestions', arg],
         (_, {shopperSearch}) =>
             shopperSearch.getSearchSuggestions({parameters, headers}, rawResponse),
         options

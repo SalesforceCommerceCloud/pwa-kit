@@ -321,7 +321,7 @@ const buildAnswers = ({
 const testProjectAnswers = () => {
     const config = {
         projectName: 'retail-react-app',
-        instanceUrl: 'https://zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com',
+        instanceUrl: 'https://zzrf-001.dx.commercecloud.salesforce.com',
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
         siteId: 'RefArch',
         organizationId: 'f_ecom_zzrf_001',
@@ -336,7 +336,7 @@ const testProjectAnswers = () => {
 const demoProjectAnswers = () => {
     const config = {
         projectName: 'demo-storefront',
-        instanceUrl: 'https://zzte-053.sandbox.us02.dx.commercecloud.salesforce.com/',
+        instanceUrl: 'https://zzte-053.dx.commercecloud.salesforce.com',
         clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
         siteId: 'RefArch',
         organizationId: 'f_ecom_zzte_053',

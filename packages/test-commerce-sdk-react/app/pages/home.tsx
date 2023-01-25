@@ -40,10 +40,16 @@ const Home = () => {
                     <Link to="/use-promotions-for-campaign">usePromotionsForCampaign</Link>
                 </li>
                 <li>
+                    <Link to="/customer">useCustomer & useShopperCustomersMutation</Link>
+                </li>
+                <li>
                     <Link to="/slas-helpers">useShopperLoginHelper</Link>
                 </li>
                 <li>
                     <Link to="/basket">useBasket & useShopperBasketsMutation</Link>
+                </li>
+                <li>
+                    <Link to="/orders">useShopperOrders & useShopperOrdersMutation</Link>
                 </li>
             </ul>
 
@@ -51,6 +57,9 @@ const Home = () => {
             <ul>
                 <li>
                     <Link to="/query-errors">Query errors</Link>
+                </li>
+                <li>
+                    <Link to="/customerId">useCustomerId</Link>
                 </li>
             </ul>
         </>
