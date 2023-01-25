@@ -40,7 +40,7 @@ export interface ApiClients {
 /**
  * The first argument of a function.
  */
-export type Argument<T extends (arg: any) => unknown> = Parameters<T>[0]
+export type Argument<T extends (arg: any) => unknown> = NonNullable<Parameters<T>[0]>
 
 /**
  * The data type returned by a commerce-sdk-isomorphic method when the raw response

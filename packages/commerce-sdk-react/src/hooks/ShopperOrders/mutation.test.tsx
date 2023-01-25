@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, salesforce.com, inc.
+ * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -14,7 +14,6 @@ import {
     SHOPPER_ORDERS_NOT_IMPLEMENTED
 } from './mutation'
 import nock from 'nock'
-import {QueryKey} from '@tanstack/react-query'
 import {QueryKeyMap} from '../utils'
 
 jest.mock('../../auth/index.ts', () => {
@@ -25,19 +24,15 @@ jest.mock('../../auth/index.ts', () => {
 
 const BASKET_ID = '12345'
 
-type MutationPayloads = {
-    [key in ShopperOrdersMutationType]?: {body: any; parameters: any}
-}
-
-const mutationPayloads: MutationPayloads = {
+const mutationPayloads = {
     createOrder: {
         body: {basketId: BASKET_ID},
         parameters: {}
     }
-}
+} as const
 
 interface OrderMutationComponentParams {
-    action: ShopperOrdersMutationType
+    action: keyof typeof mutationPayloads
 }
 
 const OrderMutationComponent = ({action}: OrderMutationComponentParams) => {
@@ -54,7 +49,8 @@ const OrderMutationComponent = ({action}: OrderMutationComponentParams) => {
     )
 }
 
-const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map((mutationName) => {
+const keys = Object.keys(mutationPayloads) as Array<keyof typeof mutationPayloads>
+const tests = keys.map((mutationName) => {
     return {
         hook: mutationName,
         cases: [
@@ -69,7 +65,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
 
                     const queryClient = createQueryClient()
 
-                    const mutation: any = shopperOrdersCacheUpdateMatrix[mutationName]
+                    const mutation = shopperOrdersCacheUpdateMatrix[mutationName]
 
                     const {invalidate, update, remove} = mutation(
                         mutationPayloads[mutationName],
@@ -82,12 +78,9 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
                         queryClient.setQueryData(queryKey, {test: true})
                     })
 
-                    renderWithProviders(
-                        <OrderMutationComponent
-                            action={mutationName as ShopperOrdersMutationType}
-                        />,
-                        {queryClient}
-                    )
+                    renderWithProviders(<OrderMutationComponent action={mutationName} />, {
+                        queryClient
+                    })
 
                     await waitFor(() =>
                         screen.getByRole('button', {
@@ -124,11 +117,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
                         })
                         .reply(500)
 
-                    renderWithProviders(
-                        <OrderMutationComponent
-                            action={mutationName as ShopperOrdersMutationType}
-                        />
-                    )
+                    renderWithProviders(<OrderMutationComponent action={mutationName} />)
                     await waitFor(() =>
                         screen.getByRole('button', {
                             name: mutationName

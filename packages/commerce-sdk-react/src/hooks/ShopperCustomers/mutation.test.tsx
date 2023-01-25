@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, salesforce.com, inc.
+ * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -14,7 +14,6 @@ import {
     SHOPPER_CUSTOMERS_NOT_IMPLEMENTED
 } from './mutation'
 import nock from 'nock'
-import {QueryKey} from '@tanstack/react-query'
 import {QueryKeyMap} from '../utils'
 
 jest.mock('../../auth/index.ts', () => {
@@ -30,11 +29,7 @@ const ITEM_ID = 'ITEM_ID'
 const PAYMENT_INSTRUMENT_ID = 'PAYMENT_INSTRUMENT_ID'
 const PRODUCT_ID = 'PRODUCT_ID'
 
-type MutationPayloads = {
-    [key in ShopperCustomersMutationType]?: {body: any; parameters: any}
-}
-
-const mutationPayloads: MutationPayloads = {
+const mutationPayloads = {
     updateCustomer: {
         body: {firstName: `Kobe`},
         parameters: {customerId: CUSTOMER_ID}
@@ -100,7 +95,7 @@ const mutationPayloads: MutationPayloads = {
 }
 
 interface CustomerMutationComponentParams {
-    action: ShopperCustomersMutationType
+    action: keyof typeof mutationPayloads
 }
 const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) => {
     const mutationHook = useShopperCustomersMutation({action})
@@ -121,7 +116,7 @@ const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) =>
     )
 }
 
-const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).map(
+const tests = (Object.keys(mutationPayloads) as Array<keyof typeof mutationPayloads>).map(
     (mutationName) => {
         return {
             hook: mutationName,
@@ -149,26 +144,22 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
 
                         const queryClient = createQueryClient()
 
-                        renderWithProviders(
-                            <CustomerMutationComponent
-                                action={mutationName as ShopperCustomersMutationType}
-                            />,
-                            {
-                                queryClient
-                            }
-                        )
+                        renderWithProviders(<CustomerMutationComponent action={mutationName} />, {
+                            queryClient
+                        })
                         await waitFor(() =>
                             screen.getByRole('button', {
                                 name: mutationName
                             })
                         )
 
-                        const mutation: any = shopperCustomersCacheUpdateMatrix[mutationName]
+                        const mutation = shopperCustomersCacheUpdateMatrix[mutationName]
 
                         // Pre-populate cache with query keys we invalidate/update/remove onSuccess
                         const {invalidate, update, remove} = mutation(
-                            mutationPayloads[mutationName],
-                            {}
+                            // TODO: Fix types
+                            mutationPayloads[mutationName] as any,
+                            {} as any
                         )
 
                         const queryKeys = [
@@ -222,11 +213,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                             })
                             .reply(500, {})
 
-                        renderWithProviders(
-                            <CustomerMutationComponent
-                                action={mutationName as ShopperCustomersMutationType}
-                            />
-                        )
+                        renderWithProviders(<CustomerMutationComponent action={mutationName} />)
                         await waitFor(() =>
                             screen.getByRole('button', {
                                 name: mutationName
