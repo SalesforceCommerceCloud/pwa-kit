@@ -8,6 +8,7 @@ import {helpers, ShopperLogin, ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import jwtDecode from 'jwt-decode'
 import {ApiClientConfigParams} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
+import {onClient} from '../utils'
 
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
@@ -47,11 +48,9 @@ type AuthDataMap = Record<
     }
 >
 
-const onClient = typeof window !== 'undefined'
-
 /**
  * A map of the data that this auth module stores. This maps the name of the property to
- * the storage and the key when stored in that storage. You can also pass in a "callback"
+ * the storage type and the key when stored in that storage. You can also pass in a "callback"
  * function to do extra operation after a property is set.
  */
 const DATA_MAP: AuthDataMap = {
@@ -135,19 +134,23 @@ class Auth {
             fetchOptions: config.fetchOptions
         })
 
-        // NOTE: Not too sure how I feel about this, seems a little confusing. Should
-        // the DATA_MAP instead have definitions for MemoryStorage and clientStorage?
-        // Another idea is to implement a getPrefix function on the storage class. But that
-        // would look kinda gross too.
         const storageOptions = {keyPrefix: config.siteId}
-        this.stores = onClient
+        const serverStorageOptions = {
+            keyPrefix: config.siteId,
+            sharedContext: true // This allows use to reused guest authentication tokens accross lambda runs.
+        }
+
+        this.stores = onClient()
             ? {
                   cookie: new CookieStorage(storageOptions),
-                  local: new LocalStorage(storageOptions)
+                  local: new LocalStorage(storageOptions),
+                  memory: new MemoryStorage(storageOptions)
               }
             : {
-                  cookie: new MemoryStorage(storageOptions),
-                  local: new MemoryStorage(storageOptions)
+                  // Always use MemoryStorage on the server.
+                  cookie: new MemoryStorage(serverStorageOptions),
+                  local: new MemoryStorage(serverStorageOptions),
+                  memory: new MemoryStorage(serverStorageOptions)
               }
 
         this.redirectURI = config.redirectURI

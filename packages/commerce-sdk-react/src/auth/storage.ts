@@ -13,6 +13,9 @@ export interface BaseStorageOptions {
     keyPrefixSeparator?: string
 }
 
+export interface MemoryStorageOptions extends BaseStorageOptions {
+    sharedContext?: boolean
+}
 export abstract class BaseStorage {
     protected options: Required<BaseStorageOptions>
 
@@ -101,8 +104,16 @@ export class LocalStorage extends BaseStorage {
     }
 }
 
+const globalMap = new Map()
+
 export class MemoryStorage extends BaseStorage {
-    private map = new Map<string, string>()
+    // private map = new Map<string, string>()
+    private map: Map<string, string>
+    constructor(options?: MemoryStorageOptions) {
+        super(options)
+
+        this.map = options?.sharedContext ? globalMap : new Map()
+    }
     set(key: string, value: string) {
         const prefixedKey = this.getPrefixedKey(key)
         this.map.set(prefixedKey, value)

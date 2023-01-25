@@ -6,14 +6,12 @@
  */
 import {BaseStorage, MemoryStorage} from './storage'
 
-const {window} = global
 const key = 'key'
 const value = 'value'
 
 const testCases = [
     {
         description: 'MemoryStorage works without options',
-        requiresWindow: false,
         storageOptions: {},
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
@@ -24,35 +22,40 @@ const testCases = [
     },
     {
         description: 'MemoryStorage works with options',
-        requiresWindow: false,
         storageOptions: {
             keyPrefix: 'prefix',
-            keyPrefixSeperator: '$'
+            keyPrefixSeparator: '$'
         },
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
             expect(storage.get(key)).toBe(value)
-            // @ts-ignore
+            // @ts-expect-error private property
             expect([...storage.map.keys()]).toEqual([`prefix$${key}`])
             storage.delete(key)
             expect(storage.get(key)).toBe('')
+        }
+    },
+    {
+        description: 'MemoryStorage works with with shared context',
+        storageOptions: {
+            sharedContext: true
+        },
+        validate: (storage: BaseStorage) => {
+            storage.set(key, value)
+            expect(storage.get(key)).toBe(value)
+            const secondStore = new MemoryStorage({
+                sharedContext: true
+            })
+            expect(secondStore.get(key)).toBe(value)
         }
     }
 ]
 
 describe('Storage Classes', () => {
-    testCases.forEach(({description, requiresWindow, storageOptions, validate}) => {
+    testCases.forEach(({description, storageOptions, validate}) => {
         test(description, () => {
-            if (!requiresWindow) {
-                // @ts-ignore
-                delete global.window
-            }
             const storage = new MemoryStorage(storageOptions)
             validate(storage)
-
-            if (!requiresWindow) {
-                global.window = window
-            }
         })
     })
 })
