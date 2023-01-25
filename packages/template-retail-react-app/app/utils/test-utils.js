@@ -85,6 +85,8 @@ export const TestProviders = ({
     appConfig = mockConfig.app,
     siteAlias = DEFAULT_SITE
 }) => {
+    console.log('123')
+    console.log(initialCategories)
     const mounted = useRef()
     // We use this to track mounted state.
     useEffect(() => {
@@ -145,7 +147,7 @@ export const TestProviders = ({
                             locale={locale.id}
                             redirectURI={`${window.location.origin}/testcallback`}
                         >
-                            <CategoriesProvider categories={initialCategories}>
+                            <CategoriesProvider treeRoot={initialCategories}>
                                 <CurrencyProvider currency={DEFAULT_CURRENCY}>
                                     <CustomerProvider value={{customer, setCustomer}}>
                                         <BasketProvider value={{basket, setBasket}}>

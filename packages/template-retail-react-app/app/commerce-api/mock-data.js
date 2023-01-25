@@ -3053,25 +3053,36 @@ export const mockedCustomerProductListsDetails = {
 }
 
 export const mockCategories = {
-    root: {
-        categories: [
+    'mens-clothing-jackets': {
+        id: 'mens-clothing-suits',
+        image:
+            'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg',
+        name: 'Suits',
+        pageDescription:
+            "Shop Men's suits for business or pleasure. Enjoy from a variety of different styles and cuts at Commerce Cloud.",
+        pageTitle: 'Mens Suits for Business and Casual',
+        parentCategoryId: 'mens-clothing',
+        parentCategoryTree: [
             {
                 id: 'mens',
-                name: 'Mens',
-                pageDescription:
-                    "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
-                pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
-                pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
-                parentCategoryId: 'root',
-                c_showInMenu: true,
-                image:
-                    'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
+                name: 'Mens'
+            },
+            {
+                id: 'mens-clothing',
+                name: 'Clothing'
+            },
+            {
+                id: 'mens-clothing-suits',
+                name: 'Suits'
             }
         ],
-        id: 'root',
-        name: 'Storefront Catalog - Non-EN'
+        c_enableCompare: false,
+        c_showInMenu: true,
+        c_slotBannerImage:
+            'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw2ec92167/images/slot/landing/cat-landing-slotbottom-mens-suits.jpg'
     }
 }
+
 
 export const mockProductSearch = {
     limit: 25,
