@@ -4,26 +4,46 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, DataType, QueryResponse} from '../types'
-import {useAsync} from '../useAsync'
-import useCommerceApi from '../useCommerceApi'
+import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
+import {ApiClients, Argument, DataType} from '../types'
+import {useQuery} from '../useQuery'
+import {hasAllKeys} from '../utils'
 
-type Client = ApiClients['{{name.lowerCamelCase}}']
+{{!~-- Add aliases to @root for brevity/clarity --~}}
+{{~ assign 'clientInstance' name.lowerCamelCase ~}}
+{{~ assign 'clientClass' name.upperCamelCase ~}}
+
+type Client = ApiClients['{{@root.clientInstance}}']
 
 {{#each model.encodes.endPoints}}{{#each operations}}{{#if (is method 'get')~}}
 /**
- * A hook for `{{@root.name.upperCamelCase}}#{{name}}`.
+ * A hook for `{{@root.clientClass}}#{{name}}`.
  * {{{formatForTsDoc description}}}
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/{{@root.name.kebabCase}}?meta={{name~}} } for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/{{lowercase @root.name.lowerCamelCase}}.{{lowercase @root.name.lowerCamelCase}}-1.html#{{lowercase (getValue name)~}} } for more information on the parameters and returned data type.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/{{lowercase @root.clientInstance}}.{{lowercase @root.clientInstance}}-1.html#{{lowercase (getValue name)~}} } for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
 export const use{{#startsWith 'get' (getValue name)~}}
 {{removeFirst (getValue name) 'get'}}
 {{~else~}}
 {{capitalize (getValue name)}}
-{{~/startsWith}} = (arg: Argument<Client['{{name}}']>): QueryResponse<DataType<Client['{{name}}']>> => {
-    const { {{~@root.name.lowerCamelCase}}: client} = useCommerceApi()
-    return useAsync(() => client.{{name}}(arg), [arg])
-}
+{{~/startsWith}} = (
+    apiOptions: Argument<Client['{{name}}']>,
+    queryOptions: UseQueryOptions<DataType<Client['{{name}}']>>
+): UseQueryResult<DataType<Client['{{name}}']>> => {
+    const { parameters = {} } = apiOptions
+    return useQuery(
+        [
+            // Endpoint names are unique per API, so we use both to create a unique key
+            '{{@root.clientClass}}',
+            '{{name}}',
+            apiOptions // maybe only required params?
+        ],
+        (_ctx, { {{@root.clientInstance}} }) =>
+            {{@root.clientInstance}}.{{name}}(apiOptions),
+        {
+            enabled: hasAllKeys(parameters, ['TODO: list of required parameters']),
+            ...queryOptions
+        }
+    )}
 {{/if}}{{/each}}{{/each}}
