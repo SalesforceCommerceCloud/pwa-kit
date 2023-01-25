@@ -1,3 +1,11 @@
+## v2.6.0 (Jan 25, 2023)
+- Mega menu fixes [#875](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/875) and [#910](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/910)
+- Cache SLAS callback using request processor [#884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/884)
+- Fix padding of footer drawer component [#899](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/899)
+- Update createOrder to send SLAS USID [#920](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/920)
+- Fix PropTypes [#924](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/924)
+- Remove unnecessary map statement [#929](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/929)
+
 ## v2.5.0 (Jan 5, 2023)
 - Add instanceType to Einstein activity body [#858](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/858)
 - Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)

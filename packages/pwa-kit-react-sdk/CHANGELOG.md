@@ -1,5 +1,5 @@
-## v2.6.0-alpha.0 (Jan 25, 2023)
-## v2.6.0-dev (Jan 05, 2023)
+## v2.6.0 (Jan 25, 2023)
+
 ## v2.5.0 (Jan 05, 2023)
 - Replace morgan stream to use console.log [#847](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/847)
 - Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
