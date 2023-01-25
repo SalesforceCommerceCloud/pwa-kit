@@ -13,12 +13,12 @@ const onClient = typeof window !== 'undefined'
  * A hook to return customer auth type, either guest or registered user
  *
  */
-const useAuthType = (): string | null => {
+const useCustomerType = (): string | null => {
     if (onClient) {
         return useLocalStorage('auth_type')
     }
     const auth = useAuth()
-    return auth.get('auth_type')
+    return auth.get('customer_type')
 }
 
-export default useAuthType
+export default useCustomerType

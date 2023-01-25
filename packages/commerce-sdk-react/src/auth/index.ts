@@ -38,7 +38,7 @@ type AuthDataKeys =
     | 'token_type'
     | 'usid'
     | 'site_id'
-    | 'auth_type'
+    | 'customer_type'
 type AuthDataMap = Record<
     AuthDataKeys,
     {
@@ -47,6 +47,10 @@ type AuthDataMap = Record<
         callback?: () => void
     }
 >
+
+type AuthData = ShopperLoginTypes.TokenResponse & {
+    customer_type: string
+}
 
 const onClient = typeof window !== 'undefined'
 const localStorage = onClient ? new LocalStorage() : new Map()
@@ -108,9 +112,9 @@ const DATA_MAP: AuthDataMap = {
         storage: cookieStorage,
         key: 'cc-site-id'
     },
-    auth_type: {
+    customer_type: {
         storage: localStorage,
-        key: 'auth_type'
+        key: 'customer_type'
     }
 }
 
@@ -179,7 +183,7 @@ class Auth {
     /**
      * Every method in this class that returns a `TokenResponse` constructs it via this getter.
      */
-    private get data(): ShopperLoginTypes.TokenResponse {
+    private get data(): AuthData {
         return {
             access_token: this.get('access_token'),
             customer_id: this.get('customer_id'),
@@ -190,7 +194,7 @@ class Auth {
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
             usid: this.get('usid'),
-            auth_type: this.get('auth_type')
+            customer_type: this.get('customer_type')
         }
     }
 
@@ -217,7 +221,7 @@ class Auth {
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
         this.set('usid', res.usid)
-        this.set('auth_type', isGuest ? 'guest' : 'registered')
+        this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         this.set(refreshTokenKey, res.refresh_token, {
