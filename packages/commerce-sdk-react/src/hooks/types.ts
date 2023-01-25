@@ -4,17 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBaskets} from 'commerce-sdk-isomorphic'
-import {ShopperContexts} from 'commerce-sdk-isomorphic'
-import {ShopperCustomers} from 'commerce-sdk-isomorphic'
-import {ShopperDiscoverySearch} from 'commerce-sdk-isomorphic'
-import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
-import {ShopperLogin} from 'commerce-sdk-isomorphic'
-import {ShopperOrders} from 'commerce-sdk-isomorphic'
-import {ShopperProducts} from 'commerce-sdk-isomorphic'
-import {ShopperPromotions} from 'commerce-sdk-isomorphic'
-import {ShopperSearch} from 'commerce-sdk-isomorphic'
-import {QueryKey, QueryFunctionContext} from '@tanstack/react-query'
+import {
+    ShopperBaskets,
+    ShopperContexts,
+    ShopperCustomers,
+    ShopperDiscoverySearch,
+    ShopperGiftCertificates,
+    ShopperLogin,
+    ShopperOrders,
+    ShopperProducts,
+    ShopperPromotions,
+    ShopperSearch
+} from 'commerce-sdk-isomorphic'
 
 export type ApiClientConfigParams = {
     clientId: string
@@ -52,14 +53,9 @@ export type DataType<T extends (arg: any) => Promise<unknown>> = T extends (
     : never
 
 /**
- * Modified version of React Query's Mutation Function. Added a second argument
- * API clients.
+ * Adds additional parameters to a function signature. To preserve named parameters
+ * in the returned type, pass a named tuple for the extra parameters.
  */
-export type IMutationFunction<TData = unknown, TVariables = unknown> = (
-    variables: TVariables,
-    apiClients: ApiClients
-) => Promise<TData>
-
 export type AddParameters<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Fn extends (...args: any[]) => unknown,
