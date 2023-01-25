@@ -314,7 +314,7 @@ const Cart = () => {
                                     />
                                 }
                                 recommender={'product-to-product-einstein'}
-                                products={basket?.productItems?.map((item) => item.productId)}
+                                products={basket?.productItems}
                                 shouldFetch={() =>
                                     basket?.basketId && basket.productItems?.length > 0
                                 }

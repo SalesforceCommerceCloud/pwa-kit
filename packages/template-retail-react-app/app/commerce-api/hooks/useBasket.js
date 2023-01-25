@@ -365,6 +365,11 @@ export default function useBasket(opts = {}) {
              */
             async createOrder() {
                 const response = await api.shopperOrders.createOrder({
+                    // We send the SLAS usid via this header. This is required by ECOM to map
+                    // Einstein events sent via the API with the finishOrder event fired by ECOM
+                    // when an Order transitions from Created to New status.
+                    // Without this, various order conversion metrics will not appear on reports and dashboards
+                    headers: {_sfdc_customer_id: api.auth.usid},
                     body: {basketId: basket.basketId}
                 })
 

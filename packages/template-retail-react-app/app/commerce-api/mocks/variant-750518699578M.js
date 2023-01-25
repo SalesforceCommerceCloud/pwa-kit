@@ -14,16 +14,14 @@ export default {
                     alt: 'Black Single Pleat Athletic Fit Wool Suit, Black, large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw68c99706/images/large/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw68c99706/images/large/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw68c99706/images/large/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
                     title: 'Black Single Pleat Athletic Fit Wool Suit, Black'
                 },
                 {
                     alt: 'Black Single Pleat Athletic Fit Wool Suit, Black, large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw45d30402/images/large/PG.52001RUBN4Q.BLACKFB.BZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw45d30402/images/large/PG.52001RUBN4Q.BLACKFB.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw45d30402/images/large/PG.52001RUBN4Q.BLACKFB.BZ.jpg',
                     title: 'Black Single Pleat Athletic Fit Wool Suit, Black'
                 }
             ],
@@ -45,16 +43,14 @@ export default {
                     alt: 'Black Single Pleat Athletic Fit Wool Suit, Black, medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw35242324/images/medium/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw35242324/images/medium/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw35242324/images/medium/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
                     title: 'Black Single Pleat Athletic Fit Wool Suit, Black'
                 },
                 {
                     alt: 'Black Single Pleat Athletic Fit Wool Suit, Black, medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw116e8397/images/medium/PG.52001RUBN4Q.BLACKFB.BZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw116e8397/images/medium/PG.52001RUBN4Q.BLACKFB.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw116e8397/images/medium/PG.52001RUBN4Q.BLACKFB.BZ.jpg',
                     title: 'Black Single Pleat Athletic Fit Wool Suit, Black'
                 }
             ],
@@ -76,16 +72,14 @@ export default {
                     alt: 'Black Single Pleat Athletic Fit Wool Suit, Black, small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw43b167a3/images/small/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw43b167a3/images/small/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw43b167a3/images/small/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
                     title: 'Black Single Pleat Athletic Fit Wool Suit, Black'
                 },
                 {
                     alt: 'Black Single Pleat Athletic Fit Wool Suit, Black, small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdcb6bc41/images/small/PG.52001RUBN4Q.BLACKFB.BZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdcb6bc41/images/small/PG.52001RUBN4Q.BLACKFB.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdcb6bc41/images/small/PG.52001RUBN4Q.BLACKFB.BZ.jpg',
                     title: 'Black Single Pleat Athletic Fit Wool Suit, Black'
                 }
             ],
@@ -107,8 +101,7 @@ export default {
                     alt: 'Black Single Pleat Athletic Fit Wool Suit, Black, swatch',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5c9bc6f6/images/swatch/PG.52001RUBN4Q.BLACKFB.CP.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5c9bc6f6/images/swatch/PG.52001RUBN4Q.BLACKFB.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5c9bc6f6/images/swatch/PG.52001RUBN4Q.BLACKFB.CP.jpg',
                     title: 'Black Single Pleat Athletic Fit Wool Suit, Black'
                 }
             ],

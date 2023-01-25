@@ -7,7 +7,7 @@
 import React from 'react'
 import {configureRoutes} from './routes-utils'
 
-describe('configureRoutes', function() {
+describe('configureRoutes', function () {
     const cases = [
         {
             urlConfig: {
