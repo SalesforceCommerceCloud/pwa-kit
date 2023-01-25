@@ -14,13 +14,15 @@ import {ApiClients} from './types'
  *
  * @internal
  */
-export default function useAuthenticatedClient<Vars, Data>(
-    fn: (variables: Vars, apiClients: ApiClients) => Promise<Data>
+export default function useAuthenticatedClient<Data, Args extends unknown[]>(
+    // TODO: Remove this after merging in prettier v2 changes
+    // eslint-disable-next-line prettier/prettier
+    fn: (...args: [...anything: Args, apiClients: ApiClients]) => Promise<Data>
 ) {
     const auth = useAuth()
     const apiClients = useCommerceApi()
     const clients = Object.values(apiClients)
-    return async (variables: Vars) => {
+    return async (...args: Args) => {
         // TODO: Setting the Authorization header here means we set it every time
         // the hook is called, but we really only need it done once per "ready".
         const {access_token} = await auth.ready()
@@ -30,6 +32,6 @@ export default function useAuthenticatedClient<Vars, Data>(
                 Authorization: `Bearer ${access_token}`
             }
         })
-        return await fn(variables, apiClients)
+        return await fn(...args, apiClients)
     }
 }
