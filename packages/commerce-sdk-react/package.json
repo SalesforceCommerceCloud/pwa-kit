@@ -8,7 +8,7 @@
     "node": "^14.0.0",
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
-  "private": false,
+  "private": true,
   "files": [
     "CHANGELOG.md",
     "LICENSE",
