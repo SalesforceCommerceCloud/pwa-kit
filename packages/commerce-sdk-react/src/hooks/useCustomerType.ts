@@ -15,7 +15,7 @@ const onClient = typeof window !== 'undefined'
  */
 const useCustomerType = (): string | null => {
     if (onClient) {
-        return useLocalStorage('auth_type')
+        return useLocalStorage('customer_type')
     }
     const auth = useAuth()
     return auth.get('customer_type')
