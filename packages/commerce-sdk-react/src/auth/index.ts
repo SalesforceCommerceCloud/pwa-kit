@@ -38,6 +38,7 @@ type AuthDataKeys =
     | 'token_type'
     | 'usid'
     | 'site_id'
+    | 'auth_type'
 type AuthDataMap = Record<
     AuthDataKeys,
     {
@@ -106,6 +107,10 @@ const DATA_MAP: AuthDataMap = {
     site_id: {
         storage: cookieStorage,
         key: 'cc-site-id'
+    },
+    auth_type: {
+        storage: localStorage,
+        key: 'auth_type'
     }
 }
 
@@ -184,7 +189,8 @@ class Auth {
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
-            usid: this.get('usid')
+            usid: this.get('usid'),
+            auth_type: this.get('auth_type')
         }
     }
 
@@ -211,6 +217,7 @@ class Auth {
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
         this.set('usid', res.usid)
+        this.set('auth_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         this.set(refreshTokenKey, res.refresh_token, {

@@ -16,4 +16,5 @@ export * from './ShopperPromotions'
 export * from './ShopperSearch'
 import useCommerceApi from './useCommerceApi'
 import useCustomerId from './useCustomerId'
-export {useCommerceApi, useCustomerId}
+import useAuthType from './useAuthType'
+export {useCommerceApi, useCustomerId, useAuthType}
