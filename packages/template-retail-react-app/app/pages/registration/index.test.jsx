@@ -12,6 +12,8 @@ import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import mockConfig from '../../../config/mocks/default'
+import {rest} from 'msw'
+import { CallTracker } from 'assert'
 
 jest.setTimeout(60000)
 
@@ -28,6 +30,12 @@ const mockRegisteredCustomer = {
 }
 
 const mockLogin = jest.fn()
+const mockPasswordToken = {
+    email: 'foo@test.com',
+    expiresInMinutes: 10,
+    login: 'foo@test.com',
+    resetToken: 'testresettoken'
+}
 
 jest.mock('../../commerce-api/auth', () => {
     return jest.fn().mockImplementation(() => {
@@ -42,26 +50,12 @@ jest.mock('../../commerce-api/auth', () => {
     })
 })
 
+// TODO: Need to mock this API call
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
     return {
         ...sdk,
-        ShopperLogin: class ShopperLoginMock extends sdk.ShopperLogin {
-            async getAccessToken() {
-                return {
-                    access_token: 'accesstoken',
-                    refresh_token: 'refreshtoken',
-                    customer_id: 'customerId'
-                }
-            }
-            authenticateCustomer() {
-                return {url: '/callback'}
-            }
-        },
         ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async registerCustomer() {
-                return mockRegisteredCustomer
-            }
             async getCustomer(args) {
                 if (args.parameters.customerId === 'customerid') {
                     return {
@@ -70,27 +64,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     }
                 }
                 return mockRegisteredCustomer
-            }
-            async authorizeCustomer() {
-                return {
-                    headers: {
-                        get(key) {
-                            return {authorization: 'guestToken'}[key]
-                        }
-                    },
-                    json: async () => ({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                }
-            }
-            async getResetPasswordToken() {
-                return {
-                    email: 'foo@test.com',
-                    expiresInMinutes: 10,
-                    login: 'foo@test.com',
-                    resetToken: 'testresettoken'
-                }
             }
         }
     }
@@ -133,9 +106,22 @@ const MockedComponent = () => {
 }
 
 // Set up and clean up
-// Set up and clean up
 beforeEach(() => {
     jest.useFakeTimers()
+    global.server.use(
+        rest.post('*/customers', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+        }),
+        rest.post('*/customers/action/login', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({
+                authType: 'guest',
+                customerId: 'customerid'
+            }))
+        }),
+        rest.post('*/customers/password/actions/create-reset-token', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockPasswordToken))
+        }),
+    )
 })
 afterEach(() => {
     localStorage.clear()
