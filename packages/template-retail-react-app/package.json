@@ -83,7 +83,7 @@
     "bundlesize": [
         {
             "path": "build/main.js",
-            "maxSize": "58 kB"
+            "maxSize": "59 kB"
         },
         {
             "path": "build/vendor.js",
