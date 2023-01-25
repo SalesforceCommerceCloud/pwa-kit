@@ -159,3 +159,12 @@ export const getQueryParameterTypeMapFromEndpoints = (
 
   return getParameterTypes(parameters);
 };
+
+export function assign(
+  varName: string,
+  varValue: unknown,
+  options: Handlebars.HelperOptions
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-param-reassign
+  options.data.root[varName] = varValue;
+}
