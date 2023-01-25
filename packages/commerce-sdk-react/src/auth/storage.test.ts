@@ -12,7 +12,7 @@ const value = 'value'
 const testCases = [
     {
         description: 'MemoryStorage works without options',
-        storageOptions: {},
+        storageOptions: undefined,
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
             expect(storage.get(key)).toBe(value)
