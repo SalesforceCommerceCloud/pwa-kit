@@ -1014,6 +1014,12 @@
   "product_tile.label.starting_at_price": {
     "defaultMessage": "Starting at"
   },
+  "product_view.button.add_set_to_cart": {
+    "defaultMessage": "Add Set to Cart"
+  },
+  "product_view.button.add_set_to_wishlist": {
+    "defaultMessage": "Add Set to Wishlist"
+  },
   "product_view.button.add_to_cart": {
     "defaultMessage": "Add to Cart"
   },

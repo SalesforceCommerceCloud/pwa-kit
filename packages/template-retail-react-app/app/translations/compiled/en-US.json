@@ -2317,6 +2317,18 @@
       "value": "Starting at"
     }
   ],
+  "product_view.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Add Set to Cart"
+    }
+  ],
+  "product_view.button.add_set_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Add Set to Wishlist"
+    }
+  ],
   "product_view.button.add_to_cart": [
     {
       "type": 0,

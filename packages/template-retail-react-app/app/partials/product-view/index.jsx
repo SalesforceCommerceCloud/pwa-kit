@@ -123,6 +123,28 @@ const ProductView = ({
 
     const renderActionButtons = () => {
         const buttons = []
+        const buttonText = {
+            update: intl.formatMessage({
+                defaultMessage: 'Update',
+                id: 'product_view.button.update'
+            }),
+            addToCart: intl.formatMessage({
+                defaultMessage: 'Add to Cart',
+                id: 'product_view.button.add_to_cart'
+            }),
+            addSetToCart: intl.formatMessage({
+                defaultMessage: 'Add Set to Cart',
+                id: 'product_view.button.add_set_to_cart'
+            }),
+            addToWishlist: intl.formatMessage({
+                defaultMessage: 'Add to Wishlist',
+                id: 'product_view.button.add_to_wishlist'
+            }),
+            addSetToWishlist: intl.formatMessage({
+                defaultMessage: 'Add Set to Wishlist',
+                id: 'product_view.button.add_set_to_wishlist'
+            })
+        }
 
         const handleCartItem = async () => {
             if (!canOrder) {
@@ -158,14 +180,10 @@ const ProductView = ({
                     marginBottom={4}
                 >
                     {updateCart
-                        ? intl.formatMessage({
-                              defaultMessage: 'Update',
-                              id: 'product_view.button.update'
-                          })
-                        : intl.formatMessage({
-                              defaultMessage: 'Add to Cart',
-                              id: 'product_view.button.add_to_cart'
-                          })}
+                        ? buttonText.update
+                        : isProductASet
+                        ? buttonText.addSetToCart
+                        : buttonText.addToCart}
                 </Button>
             )
         }
@@ -182,14 +200,10 @@ const ProductView = ({
                     marginBottom={4}
                 >
                     {updateWishlist
-                        ? intl.formatMessage({
-                              defaultMessage: 'Update',
-                              id: 'product_view.button.update'
-                          })
-                        : intl.formatMessage({
-                              defaultMessage: 'Add to Wishlist',
-                              id: 'product_view.button.add_to_wishlist'
-                          })}
+                        ? buttonText.update
+                        : isProductASet
+                        ? buttonText.addSetToWishlist
+                        : buttonText.addToWishlist}
                 </ButtonWithRegistration>
             )
         }
@@ -315,10 +329,8 @@ const ProductView = ({
                                                             backgroundColor={name.toLowerCase()}
                                                             backgroundImage={
                                                                 image
-                                                                    ? `url(${
-                                                                          image.disBaseLink ||
-                                                                          image.link
-                                                                      })`
+                                                                    ? `url(${image.disBaseLink ||
+                                                                          image.link})`
                                                                     : ''
                                                             }
                                                         />
