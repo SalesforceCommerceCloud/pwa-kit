@@ -1,4 +1,5 @@
 ## v2.6.0 (Jan 25, 2023)
+## v2.6.0 (Jan 25, 2023)
 - Upgrade prettier to v2 [#926](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/926)
 - Security package updates
 

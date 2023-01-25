@@ -1,4 +1,5 @@
 ## v2.6.0 (Jan 25, 2023)
+## v2.6.0 (Jan 25, 2023)
 
 ## v2.5.0 (Jan 05, 2023)
 - Exclude test files in package file to avoid publishing them [#856](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/856)
