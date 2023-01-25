@@ -262,8 +262,7 @@ const ShippingAddressSelection = ({
                                                     <ShippingAddressEditForm
                                                         title={formatMessage({
                                                             defaultMessage: 'Edit Shipping Address',
-                                                            id:
-                                                                'shipping_address_selection.title.edit_shipping'
+                                                            id: 'shipping_address_selection.title.edit_shipping'
                                                         })}
                                                         hasSavedAddresses={hasSavedAddresses}
                                                         toggleAddressEdit={toggleAddressEdit}

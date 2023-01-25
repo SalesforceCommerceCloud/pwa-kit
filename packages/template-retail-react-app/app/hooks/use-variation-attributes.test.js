@@ -27,8 +27,7 @@ const MockProduct = {
                     alt: 'Basic Leg Trousers, , swatch',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6cc11129/images/swatch/90011212_001_sw.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6cc11129/images/swatch/90011212_001_sw.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6cc11129/images/swatch/90011212_001_sw.jpg',
                     title: 'Basic Leg Trousers, '
                 }
             ],
@@ -40,8 +39,7 @@ const MockProduct = {
                     alt: 'Basic Leg Trousers, Black, swatch',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6cc11129/images/swatch/90011212_001_sw.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6cc11129/images/swatch/90011212_001_sw.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6cc11129/images/swatch/90011212_001_sw.jpg',
                     title: 'Basic Leg Trousers, Black'
                 }
             ],

@@ -17,7 +17,7 @@ export const ShopperLoginHelpers = {
     Logout: 'logout'
 } as const
 
-type ShopperLoginHelpersType = typeof ShopperLoginHelpers[keyof typeof ShopperLoginHelpers]
+type ShopperLoginHelpersType = (typeof ShopperLoginHelpers)[keyof typeof ShopperLoginHelpers]
 
 /**
  * A hook for Public Client Shopper Login OAuth helpers.

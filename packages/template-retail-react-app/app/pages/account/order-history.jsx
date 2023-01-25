@@ -37,14 +37,8 @@ const AccountOrderHistory = () => {
     const searchParams = useSearchParams({limit: 10, offset: 0})
     const navigate = useNavigation()
     const customer = useCustomer()
-    const {
-        orderIdsByOffset,
-        ordersById,
-        productsById,
-        isLoading,
-        fetchOrders,
-        paging
-    } = useAccountOrders()
+    const {orderIdsByOffset, ordersById, productsById, isLoading, fetchOrders, paging} =
+        useAccountOrders()
     const pageUrls = usePageUrls({total: paging.total, limit: paging.limit})
 
     const orders =
