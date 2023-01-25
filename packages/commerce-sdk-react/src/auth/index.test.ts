@@ -72,7 +72,6 @@ describe('Auth', () => {
         expect([...auth.stores['cookie'].map.keys()]).toEqual([`siteId_cc-nx-g`])
         // @ts-expect-error private property
         expect([...auth.stores['local'].map.keys()]).toEqual([`siteId_access_token`])
-
     })
     test('set registered refresh token will clear guest refresh token, vise versa', () => {
         const auth = new Auth(config)
@@ -228,7 +227,7 @@ describe('Auth', () => {
         const refreshTokenGuest = 'guest'
 
         // Mock running on the server so shared context storage is used.
-        // @ts-expect-error read-only property 
+        // @ts-expect-error read-only property
         utils.onClient = () => false
 
         // Create a new auth instance and set its guest token.
@@ -248,7 +247,7 @@ describe('Auth', () => {
         expect([...authB.stores['memory'].map.keys()]).toEqual([`siteA_cc-nx-g`, `siteB_cc-nx-g`])
 
         // Set mock value back to expected.
-        // @ts-expect-error read-only property 
+        // @ts-expect-error read-only property
         utils.onClient = () => true
     })
 })
