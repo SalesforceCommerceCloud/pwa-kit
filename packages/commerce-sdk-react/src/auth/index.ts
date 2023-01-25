@@ -48,6 +48,12 @@ type AuthDataMap = Record<
     }
 >
 
+/**
+ * The extended field is not from api response, we manually store the auth type,
+ * so we don't need to make another API call when we already have the data.
+ * Plus, the getCustomer endpoint only works for registered user, it returns a 404 for a guest user,
+ * and it's not easy to grab this info in user land, so we add it into the Auth object, and expose it via a hook
+ */
 type AuthData = ShopperLoginTypes.TokenResponse & {
     customer_type: string
 }
