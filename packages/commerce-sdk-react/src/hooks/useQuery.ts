@@ -4,15 +4,27 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useQuery as useReactQuery, UseQueryOptions, QueryKey} from '@tanstack/react-query'
+import {
+    useQuery as useReactQuery,
+    UseQueryOptions,
+    QueryKey,
+    QueryFunction
+} from '@tanstack/react-query'
 import useAuthenticatedClient from './useAuthenticatedClient'
-import {IQueryFunction} from './types'
+import {AddParameters, ApiClients} from './types'
 
-export const useQuery = <Data>(
-    queryKey: QueryKey,
-    fn: IQueryFunction<Data>,
-    queryOptions?: UseQueryOptions<Data, Error>
+type QueryFunctionWithApiClients<Data, QK extends QueryKey> = AddParameters<
+    QueryFunction<Data, QK>,
+    // TODO: Remove this after merging in prettier v2 changes
+    // eslint-disable-next-line prettier/prettier
+    [apiClients: ApiClients]
+>
+
+export const useQuery = <Data, Err, QK extends QueryKey>(
+    queryKey: QK,
+    fn: QueryFunctionWithApiClients<Data, QK>,
+    queryOptions?: UseQueryOptions<Data, Err, Data, QK>
 ) => {
     const authenticatedFn = useAuthenticatedClient(fn)
-    return useReactQuery(queryKey, authenticatedFn, queryOptions)
+    return useReactQuery<Data, Err, Data, QK>(queryKey, authenticatedFn, queryOptions)
 }

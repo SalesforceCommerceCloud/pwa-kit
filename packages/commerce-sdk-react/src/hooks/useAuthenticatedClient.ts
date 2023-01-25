@@ -17,7 +17,7 @@ import {ApiClients} from './types'
 export default function useAuthenticatedClient<Data, Args extends unknown[]>(
     // TODO: Remove this after merging in prettier v2 changes
     // eslint-disable-next-line prettier/prettier
-    fn: (...args: [...anything: Args, apiClients: ApiClients]) => Promise<Data>
+    fn: (...args: [...anything: Args, apiClients: ApiClients]) => Data | Promise<Data>
 ) {
     const auth = useAuth()
     const apiClients = useCommerceApi()

@@ -60,15 +60,6 @@ export type IMutationFunction<TData = unknown, TVariables = unknown> = (
     apiClients: ApiClients
 ) => Promise<TData>
 
-/**
- * Modified version of React Query's Query Function. Added a second argument
- * API clients.
- */
-export type IQueryFunction<TData = unknown> = (
-    context: QueryFunctionContext<QueryKey>,
-    apiClients: ApiClients
-) => Promise<TData>
-
 export type AddParameters<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Fn extends (...args: any[]) => unknown,
