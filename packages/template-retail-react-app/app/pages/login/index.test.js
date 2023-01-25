@@ -39,42 +39,6 @@ const mockMergedBasket = {
     }
 }
 
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async registerCustomer() {
-                return mockRegisteredCustomer
-            }
-
-            async getCustomer(args) {
-                if (args.parameters.customerId === 'customerid') {
-                    return {
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    }
-                }
-                return mockRegisteredCustomer
-            }
-
-            async authorizeCustomer() {
-                return {
-                    headers: {
-                        get(key) {
-                            return {authorization: 'guestToken'}[key]
-                        }
-                    },
-                    json: async () => ({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                }
-            }
-        }
-    }
-})
-
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -120,6 +84,34 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
+    global.server.use(
+        rest.post('*/customers', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+        }),
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            const {customerId} = req.params
+            if (customerId === 'customerId') {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({
+                    authType: 'guest',
+                    customerId: 'customerid'
+                }))
+            }
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+        }),
+        rest.post('*/customers/action/login', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({
+                headers: {
+                    get(key) {
+                        return {authorization: 'guestToken'}[key]
+                    }
+                },
+                json: async () => ({
+                    authType: 'guest',
+                    customerId: 'customerid'
+                })
+            }))
+        })
+    )
 })
 afterEach(() => {
     localStorage.clear()

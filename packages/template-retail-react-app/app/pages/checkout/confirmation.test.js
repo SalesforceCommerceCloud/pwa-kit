@@ -35,116 +35,80 @@ const mockBasketOrder = {
     baskets: [mockOrder]
 }
 
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async getCustomer() {
-                return {
-                    authType: 'guest',
-                    customerId: 'customerid'
-                }
-            }
+const mockProducts = {
+    data: [
+        {
+            id: 'SimpleProduct',
+            currency: 'USD',
 
-            async authorizeCustomer() {
-                return {
-                    headers: {
-                        get(key) {
-                            return {authorization: 'guestToken'}[key]
-                        }
-                    },
-                    json: async () => ({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                }
-            }
-
-            async getCustomerBaskets() {
-                return mockBasketOrder
-            }
-        },
-        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
-            async getProducts() {
-                return {
-                    data: [
+            imageGroups: [
+                {
+                    images: [
                         {
-                            id: 'SimpleProduct',
-                            currency: 'USD',
+                            alt: 'alttext',
+                            disBaseLink: '/image',
+                            link: '/image',
+                            title: 'simpleproduct'
+                        }
+                    ],
+                    viewType: 'small'
+                }
+            ],
+            name: 'Simple Product',
 
-                            imageGroups: [
-                                {
-                                    images: [
-                                        {
-                                            alt: 'alttext',
-                                            disBaseLink: '/image',
-                                            link: '/image',
-                                            title: 'simpleproduct'
-                                        }
-                                    ],
-                                    viewType: 'small'
-                                }
-                            ],
-                            name: 'Simple Product',
+            price: 46.99,
 
-                            price: 46.99,
-
-                            variationAttributes: [
-                                {
-                                    id: 'color',
-                                    name: 'Color',
-                                    values: [
-                                        {
-                                            name: 'Grey Heather Multi',
-                                            orderable: true,
-                                            value: 'JJ1MCE6'
-                                        },
-                                        {
-                                            name: 'Begonia Multi',
-                                            orderable: true,
-                                            value: 'JJHL3XX'
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: 'size',
-                                    name: 'Size',
-                                    values: [
-                                        {
-                                            name: 'S',
-                                            orderable: true,
-                                            value: '9SM'
-                                        },
-                                        {
-                                            name: 'M',
-                                            orderable: true,
-                                            value: '9MD'
-                                        },
-                                        {
-                                            name: 'L',
-                                            orderable: true,
-                                            value: '9LG'
-                                        },
-                                        {
-                                            name: 'XL',
-                                            orderable: true,
-                                            value: '9XL'
-                                        }
-                                    ]
-                                }
-                            ],
-                            variationValues: {
-                                color: 'JJ1MCE6',
-                                size: '9MD'
-                            }
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Grey Heather Multi',
+                            orderable: true,
+                            value: 'JJ1MCE6'
+                        },
+                        {
+                            name: 'Begonia Multi',
+                            orderable: true,
+                            value: 'JJHL3XX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: 'S',
+                            orderable: true,
+                            value: '9SM'
+                        },
+                        {
+                            name: 'M',
+                            orderable: true,
+                            value: '9MD'
+                        },
+                        {
+                            name: 'L',
+                            orderable: true,
+                            value: '9LG'
+                        },
+                        {
+                            name: 'XL',
+                            orderable: true,
+                            value: '9XL'
                         }
                     ]
                 }
+            ],
+            variationValues: {
+                color: 'JJ1MCE6',
+                size: '9MD'
             }
         }
-    }
-})
+    ]
+}
 
 const WrappedConfirmation = () => {
     useShopper()
@@ -191,6 +155,15 @@ beforeEach(() => {
                 login: 'test3@foo.com'
             }
             return res(ctx.json(successfulAccountCreation))
+        }),
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({
+                authType: 'guest',
+                customerId: 'customerid'
+            }))
+        }),
+        rest.get('*/products', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockProducts))
         })
     )
 })

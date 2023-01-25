@@ -26,23 +26,6 @@ jest.mock('../../commerce-api/einstein')
 
 jest.mock('../../hooks/use-wishlist')
 
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
-            async productSearch() {
-                return {data: [mockProductListSearchResponse]}
-            }
-        },
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async getCustomerProductLists() {
-                return mockedEmptyCustomerProductList
-            }
-        }
-    }
-})
-
 const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
     const customer = useCustomer()
     useEffect(() => {
@@ -93,7 +76,10 @@ beforeEach(() => {
     })
     global.server.use(
         rest.get('*/product-search', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
+            return res(ctx.delay(0), ctx.status(200), ctx.json({data: [mockProductListSearchResponse]}))
+        }),
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedEmptyCustomerProductList))
         }),
         rest.post('*/einstein/v3/personalization/*', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
