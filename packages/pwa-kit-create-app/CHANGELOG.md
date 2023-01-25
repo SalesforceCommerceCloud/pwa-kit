@@ -1,3 +1,5 @@
+## v1.5.4 (Jan 25, 2023)
+
 ## v1.5.1 (Mar 31, 2022)
 -   Fix incorrect site related values when generating without use of a preset [#470](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/470)
 
