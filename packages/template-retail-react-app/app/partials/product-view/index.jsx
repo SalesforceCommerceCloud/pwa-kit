@@ -166,16 +166,13 @@ const ProductView = forwardRef(
             }
 
             if (addToCart || updateCart) {
-                // Make this a pluralizable message.
-                const addToCartMessage = !isProductASet
-                    ? intl.formatMessage({
-                          defaultMessage: 'Add to Cart',
-                          id: 'product_view.button.add_to_cart'
-                      })
-                    : intl.formatMessage({
-                          defaultMessage: 'Add All to Cart',
-                          id: 'product_view.button.add_all_to_cart'
-                      })
+                const addToCartMessage = intl.formatMessage({
+                    defaultMessage: 'Add {quantity, plural, one {} other {All}} to Cart',
+                    id: 'product_view.button.add_to_cart'
+                }, {
+                    quantity: !isProductASet ? 1 : Infinity
+                })
+    
                 buttons.push(
                     <Button
                         key="cart-button"
