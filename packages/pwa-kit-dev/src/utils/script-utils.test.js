@@ -8,18 +8,18 @@
 import {mkdtemp, rmdir, writeFile} from 'fs/promises'
 
 const pkg = require('../../package.json')
-import * as upload2 from './upload2'
+import * as scriptUtils from './script-utils'
 import assert from 'assert'
 import path from 'path'
 import os from 'os'
 
-describe('upload2', () => {
+describe('scriptUtils', () => {
     const originalEnv = process.env
     let tmpDir
 
     beforeEach(async () => {
         process.env = {...originalEnv}
-        tmpDir = await mkdtemp(path.join(os.tmpdir(), 'upload2-tests'))
+        tmpDir = await mkdtemp(path.join(os.tmpdir(), 'scriptUtils-tests'))
     })
 
     afterEach(async () => {
@@ -28,7 +28,7 @@ describe('upload2', () => {
     })
 
     test('glob() with no patterns matches nothing', () => {
-        const matcher = upload2.glob()
+        const matcher = scriptUtils.glob()
         expect(matcher('')).toBe(false)
         expect(matcher('a.js')).toBe(false)
         expect(matcher()).toBe(false)
@@ -37,7 +37,7 @@ describe('upload2', () => {
     describe('glob() filters correctly', () => {
         const patterns = ['ssr.js', '**/*.jpg', '!**/no.jpg', 'abc.{js,jsx}']
 
-        const matcher = upload2.glob(patterns)
+        const matcher = scriptUtils.glob(patterns)
 
         // Paths we expect to match
         const expectToMatch = [
@@ -90,12 +90,12 @@ describe('upload2', () => {
         const expectedAuthHeader = {Authorization: `Basic ${encoded}`}
 
         test('getAuthHeader', async () => {
-            const client = new upload2.CloudAPIClient({credentials: {username, api_key}})
+            const client = new scriptUtils.CloudAPIClient({credentials: {username, api_key}})
             expect(client.getAuthHeader()).toEqual(expectedAuthHeader)
         })
 
         test('getHeaders', async () => {
-            const client = new upload2.CloudAPIClient({credentials: {username, api_key}})
+            const client = new scriptUtils.CloudAPIClient({credentials: {username, api_key}})
             const extra = {extraHeader: 'xyz'}
             expect(await client.getHeaders(extra)).toEqual({
                 'User-Agent': `${pkg.name}@${pkg.version}`,
@@ -106,14 +106,14 @@ describe('upload2', () => {
     })
 
     test('getPkgJSON', async () => {
-        const pkg = await upload2.getPkgJSON()
+        const pkg = await scriptUtils.getPkgJSON()
         expect(pkg.name).toBe('pwa-kit-dev')
     })
 
     describe('defaultMessage', () => {
         test('works', async () => {
             const mockGit = {branch: () => 'branch', short: () => 'short'}
-            expect(upload2.defaultMessage(mockGit)).toEqual('branch: short')
+            expect(scriptUtils.defaultMessage(mockGit)).toEqual('branch: short')
         })
 
         test('works outside of a git repo ', async () => {
@@ -123,7 +123,7 @@ describe('upload2', () => {
                 },
                 short: () => 'short'
             }
-            expect(upload2.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
+            expect(scriptUtils.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
         })
 
         test('works with any other error ', async () => {
@@ -133,21 +133,21 @@ describe('upload2', () => {
                 },
                 short: () => 'short'
             }
-            expect(upload2.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
+            expect(scriptUtils.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
         })
     })
 
     test('getCredentialsFile', async () => {
         const findHomeDir = () => path.resolve('my-fake-home') + path.sep
         expect(
-            upload2.getCredentialsFile('https://example.com', '/path/to/.mobify', undefined)
+            scriptUtils.getCredentialsFile('https://example.com', '/path/to/.mobify', undefined)
         ).toBe('/path/to/.mobify')
-        expect(upload2.getCredentialsFile('https://example.com', undefined, findHomeDir)).toBe(
+        expect(scriptUtils.getCredentialsFile('https://example.com', undefined, findHomeDir)).toBe(
             `${findHomeDir()}.mobify--example.com`
         )
-        expect(upload2.getCredentialsFile('https://cloud.mobify.com', undefined, findHomeDir)).toBe(
-            `${findHomeDir()}.mobify`
-        )
+        expect(
+            scriptUtils.getCredentialsFile('https://cloud.mobify.com', undefined, findHomeDir)
+        ).toBe(`${findHomeDir()}.mobify`)
     })
 
     test('findHomeDir', () => {
@@ -155,9 +155,9 @@ describe('upload2', () => {
         process.env.HOME = '/path/to/fake-home-dir/'
         const forCurrentMachine =
             process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
-        expect(upload2.findHomeDir('win32')).toEqual(process.env.USERPROFILE)
-        expect(upload2.findHomeDir('anything-else')).toEqual(process.env.HOME)
-        expect(upload2.findHomeDir()).toEqual(forCurrentMachine)
+        expect(scriptUtils.findHomeDir('win32')).toEqual(process.env.USERPROFILE)
+        expect(scriptUtils.findHomeDir('anything-else')).toEqual(process.env.HOME)
+        expect(scriptUtils.findHomeDir()).toEqual(forCurrentMachine)
     })
 
     describe('readCredentials', () => {
@@ -165,12 +165,14 @@ describe('upload2', () => {
             const creds = {username: 'alice', api_key: 'xyz'}
             const thePath = path.join(tmpDir, '.mobify.test')
             await writeFile(thePath, JSON.stringify(creds), 'utf8')
-            expect(await upload2.readCredentials(thePath)).toEqual(creds)
+            expect(await scriptUtils.readCredentials(thePath)).toEqual(creds)
         })
 
         test('should throw', async () => {
             const thePath = path.join(tmpDir, '.mobify.test')
-            await expect(async () => await upload2.readCredentials(thePath)).rejects.toThrow(Error)
+            await expect(async () => await scriptUtils.readCredentials(thePath)).rejects.toThrow(
+                Error
+            )
         })
     })
 
@@ -178,7 +180,7 @@ describe('upload2', () => {
         test('should throw if ssr_only and ssr_shared is empty', async () => {
             await expect(
                 async () =>
-                    await upload2.createBundle({
+                    await scriptUtils.createBundle({
                         message: null,
                         ssr_parameters: {},
                         ssr_only: [],
@@ -192,7 +194,7 @@ describe('upload2', () => {
         test('should throw buildDir does not exist', async () => {
             await expect(
                 async () =>
-                    await upload2.createBundle({
+                    await scriptUtils.createBundle({
                         message: null,
                         ssr_parameters: {},
                         ssr_only: ['*.js'],
@@ -205,7 +207,7 @@ describe('upload2', () => {
 
         test('should archive a bundle', async () => {
             const message = 'message'
-            const bundle = await upload2.createBundle({
+            const bundle = await scriptUtils.createBundle({
                 message,
                 ssr_parameters: {},
                 ssr_only: ['*.js'],
@@ -256,7 +258,7 @@ describe('upload2', () => {
             'should push a built bundle and handle status codes (%p)',
             async ({projectSlug, targetSlug, expectedURL, status}) => {
                 const message = 'message'
-                const bundle = await upload2.createBundle({
+                const bundle = await scriptUtils.createBundle({
                     message,
                     ssr_parameters: {},
                     ssr_only: ['*.js'],
@@ -273,7 +275,7 @@ describe('upload2', () => {
                 const responseMock = {status, json: () => Promise.resolve(reponseBodyMock)}
                 const fetchMock = jest.fn(async () => responseMock)
 
-                const client = new upload2.CloudAPIClient({credentials, fetch: fetchMock})
+                const client = new scriptUtils.CloudAPIClient({credentials, fetch: fetchMock})
 
                 const fn = async () => await client.push(bundle, projectSlug, targetSlug)
 
