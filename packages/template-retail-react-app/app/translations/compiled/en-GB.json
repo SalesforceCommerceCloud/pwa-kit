@@ -2372,7 +2372,31 @@
   "product_view.button.add_to_cart": [
     {
       "type": 0,
-      "value": "Add to Cart"
+      "value": "Add "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "All"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " to Cart"
     }
   ],
   "product_view.button.add_to_wishlist": [

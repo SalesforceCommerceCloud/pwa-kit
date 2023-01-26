@@ -1012,7 +1012,7 @@
     "defaultMessage": "Starting at"
   },
   "product_view.button.add_to_cart": {
-    "defaultMessage": "Add to Cart"
+    "defaultMessage": "Add {quantity, plural, one {} other {All}} to Cart"
   },
   "product_view.button.add_to_wishlist": {
     "defaultMessage": "Add to Wishlist"
