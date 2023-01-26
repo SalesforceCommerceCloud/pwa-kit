@@ -75,10 +75,10 @@ const ProductDetail = ({category, product, isLoading}) => {
     /**************** Wishlist ****************/
     const wishlist = useWishlist()
     // TODO: DRY this handler when intl provider is available globally
-    const handleAddToWishlist = async (quantity) => {
+    const handleAddToWishlist = async (product, variant, quantity) => {
         try {
             await wishlist.createListItem({
-                id: product.id,
+                id: variant?.productId || product?.id,
                 quantity
             })
             toast({
@@ -156,7 +156,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                            addToWishlist={(product, variant, quantity) =>
+                                handleAddToWishlist(product, variant, quantity)
+                            }
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
                         />
@@ -164,26 +166,30 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <hr />
 
                         {/* TODO: consider `childProduct.belongsToSet` */}
-                        {// Product Set: render the child products
-                        product.setProducts.map((childProduct) => (
-                            <Fragment key={childProduct.id}>
-                                <ProductView
-                                    product={childProduct}
-                                    isProductPartOfSet={true}
-                                    addToCart={(variant, quantity) =>
-                                        handleAddToCart(variant, quantity)
-                                    }
-                                    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                                    isProductLoading={isLoading}
-                                    isCustomerProductListLoading={!wishlist.isInitialized}
-                                />
-                                <InformationAccordion product={childProduct} />
+                        {
+                            // Product Set: render the child products
+                            product.setProducts.map((childProduct) => (
+                                <Fragment key={childProduct.id}>
+                                    <ProductView
+                                        product={childProduct}
+                                        isProductPartOfSet={true}
+                                        addToCart={(variant, quantity) =>
+                                            handleAddToCart(variant, quantity)
+                                        }
+                                        addToWishlist={(product, variant, quantity) =>
+                                            handleAddToWishlist(product, variant, quantity)
+                                        }
+                                        isProductLoading={isLoading}
+                                        isCustomerProductListLoading={!wishlist.isInitialized}
+                                    />
+                                    <InformationAccordion product={childProduct} />
 
-                                <Box display={['none', 'none', 'none', 'block']}>
-                                    <hr />
-                                </Box>
-                            </Fragment>
-                        ))}
+                                    <Box display={['none', 'none', 'none', 'block']}>
+                                        <hr />
+                                    </Box>
+                                </Fragment>
+                            ))
+                        }
                     </Fragment>
                 ) : (
                     <Fragment>
@@ -191,7 +197,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                            addToWishlist={(product, variant, quantity) =>
+                                handleAddToWishlist(product, variant, quantity)
+                            }
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
                         />

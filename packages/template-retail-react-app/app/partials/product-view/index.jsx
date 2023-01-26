@@ -123,6 +123,28 @@ const ProductView = ({
 
     const renderActionButtons = () => {
         const buttons = []
+        const buttonText = {
+            update: intl.formatMessage({
+                defaultMessage: 'Update',
+                id: 'product_view.button.update'
+            }),
+            addToCart: intl.formatMessage({
+                defaultMessage: 'Add to Cart',
+                id: 'product_view.button.add_to_cart'
+            }),
+            addSetToCart: intl.formatMessage({
+                defaultMessage: 'Add Set to Cart',
+                id: 'product_view.button.add_set_to_cart'
+            }),
+            addToWishlist: intl.formatMessage({
+                defaultMessage: 'Add to Wishlist',
+                id: 'product_view.button.add_to_wishlist'
+            }),
+            addSetToWishlist: intl.formatMessage({
+                defaultMessage: 'Add Set to Wishlist',
+                id: 'product_view.button.add_set_to_wishlist'
+            })
+        }
 
         const handleCartItem = async () => {
             if (!canOrder) {
@@ -141,10 +163,10 @@ const ProductView = ({
         const handleWishlistItem = async () => {
             if (!updateWishlist && !addToWishlist) return null
             if (updateWishlist) {
-                updateWishlist(variant, quantity)
+                updateWishlist(product, variant, quantity)
                 return
             }
-            addToWishlist(variant, quantity)
+            addToWishlist(product, variant, quantity)
         }
 
         if (addToCart || updateCart) {
@@ -158,14 +180,10 @@ const ProductView = ({
                     marginBottom={4}
                 >
                     {updateCart
-                        ? intl.formatMessage({
-                              defaultMessage: 'Update',
-                              id: 'product_view.button.update'
-                          })
-                        : intl.formatMessage({
-                              defaultMessage: 'Add to Cart',
-                              id: 'product_view.button.add_to_cart'
-                          })}
+                        ? buttonText.update
+                        : isProductASet
+                        ? buttonText.addSetToCart
+                        : buttonText.addToCart}
                 </Button>
             )
         }
@@ -182,14 +200,10 @@ const ProductView = ({
                     marginBottom={4}
                 >
                     {updateWishlist
-                        ? intl.formatMessage({
-                              defaultMessage: 'Update',
-                              id: 'product_view.button.update'
-                          })
-                        : intl.formatMessage({
-                              defaultMessage: 'Add to Wishlist',
-                              id: 'product_view.button.add_to_wishlist'
-                          })}
+                        ? buttonText.update
+                        : isProductASet
+                        ? buttonText.addSetToWishlist
+                        : buttonText.addToWishlist}
                 </ButtonWithRegistration>
             )
         }
@@ -411,28 +425,23 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        {!isProductASet && (
-                            <Box
-                                display={
-                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
-                                }
-                            >
-                                {renderActionButtons()}
-                            </Box>
-                        )}
+                        <Box
+                            display={
+                                isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
+                            }
+                        >
+                            {renderActionButtons()}
+                        </Box>
                     </Box>
                 </VStack>
             </Flex>
-            {/*Add to Cart Button for mobile versions*/}
+
+            {/* Sticky call-to-action buttons for mobile and certain product types */}
             <Box
                 position="fixed"
                 bg="white"
                 width="100%"
-                display={
-                    isProductPartOfSet || isProductASet
-                        ? 'none'
-                        : ['block', 'block', 'block', 'none']
-                }
+                display={isProductPartOfSet ? 'none' : ['block', 'block', 'block', 'none']}
                 p={[4, 4, 6]}
                 left={0}
                 bottom={0}
