@@ -152,7 +152,8 @@ const ProductDetail = ({category, product, isLoading}) => {
 
             // Scroll the first unselected product into view.
             ref.scrollIntoView({
-                behavior: 'smooth'
+                behavior: 'smooth',
+                block: 'end'
             })
 
             return false

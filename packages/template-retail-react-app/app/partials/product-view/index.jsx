@@ -461,7 +461,7 @@ const ProductView = forwardRef(
                     bg="white"
                     width="100%"
                     display={
-                        isProductPartOfSet || isProductASet
+                        isProductPartOfSet
                             ? 'none'
                             : ['block', 'block', 'block', 'none']
                     }
