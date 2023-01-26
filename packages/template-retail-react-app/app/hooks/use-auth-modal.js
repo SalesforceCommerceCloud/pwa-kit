@@ -20,7 +20,7 @@ import {
     useDisclosure,
     useToast
 } from '@chakra-ui/react'
-import {ShopperLoginHelpers, useShopperLoginHelper} from 'commerce-sdk-react-preview'
+import {ShopperLoginHelpers, useShopperLoginHelper, useCustomerType, useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 import useCustomer from '../commerce-api/hooks/useCustomer'
 import {BrandLogo} from '../components/icons'
 import LoginForm from '../components/login'
@@ -39,10 +39,17 @@ export const AuthModal = ({
     onLoginSuccess = noop,
     onRegistrationSuccess = noop,
     onPasswordResetSuccess = noop,
+    isOpen,
+    onOpen,
+    onClose,
     ...props
 }) => {
     const {formatMessage} = useIntl()
     const customer = useCustomer()
+    const customerType = useCustomerType()
+    console.log(customerType)
+    console.log(isOpen)
+    const isRegistered = customerType === 'registered'
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
@@ -50,6 +57,21 @@ export const AuthModal = ({
     const toast = useToast()
     const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
 
+//     acceptsMarketing
+// : 
+// false
+// email
+// : 
+// "kev5@test.com"
+// firstName
+// : 
+// "Kevin"
+// lastName
+// : 
+// "He"
+// password
+// : 
+// "Test1234!"
     const submitForm = async (data) => {
         form.clearErrors()
         loginRegisteredUser.reset()
@@ -65,7 +87,10 @@ export const AuthModal = ({
                     : formatMessage(API_ERROR_MESSAGE)
                 form.setError('global', {type: 'manual', message})
             }}),
-            register: handleRegister,
+            register: (data) => {
+                // 
+                console.log(data)
+            },
             password: handleResetPassword
         }[currentView](data)
     }
@@ -93,12 +118,12 @@ export const AuthModal = ({
 
     // Reset form and local state when opening the modal
     useEffect(() => {
-        if (props.isOpen) {
+        if (isOpen) {
             setCurrentView(initialView)
             submittedEmail.current = undefined
             form.reset()
         }
-    }, [props.isOpen])
+    }, [isOpen])
 
     // Auto-focus the first field in each form view
     useEffect(() => {
@@ -120,16 +145,14 @@ export const AuthModal = ({
         // Lets determine if the user has either logged in, or registed.
         const loggingIn = currentView === LOGIN_VIEW
         const registering = currentView === REGISTER_VIEW
-        const {isOpen} = props
-        const isNowRegistered = isOpen && customer.isRegistered && (loggingIn || registering)
-
+        const isNowRegistered = isOpen && isRegistered && (loggingIn || registering)
         // If the customer changed, but it's not because they logged in or registered. Do nothing.
         if (!isNowRegistered) {
             return
         }
 
         // We are done with the modal.
-        props.onClose()
+        onClose()
 
         // Show a toast only for those registed users returning to the site.
         if (loggingIn) {
@@ -161,10 +184,10 @@ export const AuthModal = ({
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
-    }, [customer])
+    }, [isRegistered])
 
     const onBackToSignInClick = () =>
-        initialView === PASSWORD_VIEW ? props.onClose() : setCurrentView(LOGIN_VIEW)
+        initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
     const PasswordResetSuccess = () => (
         <Stack justify="center" align="center" spacing={6}>
@@ -199,7 +222,7 @@ export const AuthModal = ({
     )
 
     return (
-        <Modal size="sm" closeOnOverlayClick={false} data-testid="sf-auth-modal" {...props}>
+        <Modal size="sm" closeOnOverlayClick={false} data-testid="sf-auth-modal" isOpen={isOpen} onOpen={onOpen} onClose={onClose} {...props}>
             <ModalOverlay />
             <ModalContent>
                 <ModalCloseButton />
