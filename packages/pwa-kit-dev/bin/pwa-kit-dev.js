@@ -285,9 +285,16 @@ const main = () => {
                 scriptUtils.fail('ssrEnabled is set, but no ssrOnly or ssrShared files are defined')
             }
             uploadBundle(options).catch((res) => {
-                const warnings = (res.warnings || [])
-                warnings.forEach(logWarning)
-                console.error(res.message || err)
+                if(res.errors){
+                    const errors = (res.errors || [])
+                    errors.forEach(logErrors)
+                    process.exit(1)
+                }
+
+                if(res.warnings){
+                    const warnings = (res.warnings || [])
+                    warnings.forEach(logWarning)
+                }
             })
         })
 
