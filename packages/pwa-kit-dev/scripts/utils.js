@@ -161,7 +161,7 @@ Utils.errorForStatus = (response) => {
 
     let error
     try {
-        const error = JSON.parse(response.body)
+        error = JSON.parse(response.body)
     } catch (err) {
         // We set this to an empty object to resolve issues where response.body
         // is not a JSON or properly-formatted JSON object
