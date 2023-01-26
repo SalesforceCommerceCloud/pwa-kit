@@ -113,7 +113,7 @@ export class CloudAPIClient {
         return await res.json()
     }
 
-    async createLoggingToken(project: string, environment: string) : Promise<string> {
+    async createLoggingToken(project: string, environment: string): Promise<string> {
         const url = new URL(this.opts.origin)
         url.pathname = `/api/projects/${project}/target/${environment}/jwt/`
         const headers = await this.getHeaders({
@@ -277,7 +277,7 @@ export const readCredentials = async (filepath: string): Promise<Credentials> =>
 
 export const parseLog = (log) => {
     const parts = log.trim().split('\t')
-    let requestId, shortRequestId, message, level
+    let requestId, shortRequestId, level
 
     if (
         parts.length >= 3 &&
@@ -295,7 +295,7 @@ export const parseLog = (log) => {
         level = words.shift()
         parts[0] = words.join(' ')
     }
-    message = parts.join('\t')
+    const message = parts.join('\t')
 
     const match = /(?<id>[a-f\d]{8})/.exec(requestId || message)
     if (match) {
