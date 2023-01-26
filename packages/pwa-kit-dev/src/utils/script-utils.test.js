@@ -70,8 +70,7 @@ describe('scriptUtils', () => {
             })
         )
 
-        // Combine the paths into one array and shuffle it
-        const allPaths = expectToMatch.concat(expectNotToMatch).sort(() => Math.random() - 0.5)
+        const allPaths = expectToMatch.concat(expectNotToMatch)
 
         test('glob works with Array.filter', () => {
             const matched = allPaths.filter(matcher)
