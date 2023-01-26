@@ -75,10 +75,10 @@ const ProductDetail = ({category, product, isLoading}) => {
     /**************** Wishlist ****************/
     const wishlist = useWishlist()
     // TODO: DRY this handler when intl provider is available globally
-    const handleAddToWishlist = async (product, quantity) => {
+    const handleAddToWishlist = async (product, variant, quantity) => {
         try {
             await wishlist.createListItem({
-                id: product.id || product.productId,
+                id: variant?.productId || product?.id,
                 quantity
             })
             toast({
@@ -156,8 +156,8 @@ const ProductDetail = ({category, product, isLoading}) => {
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                            addToWishlist={(product, quantity) =>
-                                handleAddToWishlist(product, quantity)
+                            addToWishlist={(product, variant, quantity) =>
+                                handleAddToWishlist(product, variant, quantity)
                             }
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
@@ -176,8 +176,8 @@ const ProductDetail = ({category, product, isLoading}) => {
                                         addToCart={(variant, quantity) =>
                                             handleAddToCart(variant, quantity)
                                         }
-                                        addToWishlist={(product, quantity) =>
-                                            handleAddToWishlist(product, quantity)
+                                        addToWishlist={(product, variant, quantity) =>
+                                            handleAddToWishlist(product, variant, quantity)
                                         }
                                         isProductLoading={isLoading}
                                         isCustomerProductListLoading={!wishlist.isInitialized}
@@ -197,8 +197,8 @@ const ProductDetail = ({category, product, isLoading}) => {
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                            addToWishlist={(product, quantity) =>
-                                handleAddToWishlist(product, quantity)
+                            addToWishlist={(product, variant, quantity) =>
+                                handleAddToWishlist(product, variant, quantity)
                             }
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}

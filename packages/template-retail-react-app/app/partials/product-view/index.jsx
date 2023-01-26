@@ -166,7 +166,7 @@ const ProductView = ({
                 updateWishlist(variant || product, quantity)
                 return
             }
-            addToWishlist(variant || product, quantity)
+            addToWishlist(product, variant, quantity)
         }
 
         if (addToCart || updateCart) {
