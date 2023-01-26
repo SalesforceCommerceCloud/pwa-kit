@@ -166,28 +166,30 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <hr />
 
                         {/* TODO: consider `childProduct.belongsToSet` */}
-                        {// Product Set: render the child products
-                        product.setProducts.map((childProduct) => (
-                            <Fragment key={childProduct.id}>
-                                <ProductView
-                                    product={childProduct}
-                                    isProductPartOfSet={true}
-                                    addToCart={(variant, quantity) =>
-                                        handleAddToCart(variant, quantity)
-                                    }
-                                    addToWishlist={(product, quantity) =>
-                                        handleAddToWishlist(product, quantity)
-                                    }
-                                    isProductLoading={isLoading}
-                                    isCustomerProductListLoading={!wishlist.isInitialized}
-                                />
-                                <InformationAccordion product={childProduct} />
+                        {
+                            // Product Set: render the child products
+                            product.setProducts.map((childProduct) => (
+                                <Fragment key={childProduct.id}>
+                                    <ProductView
+                                        product={childProduct}
+                                        isProductPartOfSet={true}
+                                        addToCart={(variant, quantity) =>
+                                            handleAddToCart(variant, quantity)
+                                        }
+                                        addToWishlist={(product, quantity) =>
+                                            handleAddToWishlist(product, quantity)
+                                        }
+                                        isProductLoading={isLoading}
+                                        isCustomerProductListLoading={!wishlist.isInitialized}
+                                    />
+                                    <InformationAccordion product={childProduct} />
 
-                                <Box display={['none', 'none', 'none', 'block']}>
-                                    <hr />
-                                </Box>
-                            </Fragment>
-                        ))}
+                                    <Box display={['none', 'none', 'none', 'block']}>
+                                        <hr />
+                                    </Box>
+                                </Fragment>
+                            ))
+                        }
                     </Fragment>
                 ) : (
                     <Fragment>
