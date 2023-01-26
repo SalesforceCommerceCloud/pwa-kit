@@ -56,11 +56,7 @@ export const AuthModal = ({
 
         return {
             login: (data) => loginRegisteredUser.mutateAsync({username: data.email, password: data.password}, {onError: (error) => {
-                error.response.json().then((j) => {
-                    console.log(j)
-                })
-                // TODO: fix isomorphic client error handling to gain access to error.message
-                const message = /invalid credentials/i.test(error.message)
+                const message = /Unauthorized/i.test(error.message)
                     ? formatMessage({
                         defaultMessage:
                             "Something's not right with your email or password. Try again.",
