@@ -9,7 +9,6 @@ import {mkdtemp, rmdir, writeFile} from 'fs/promises'
 
 const pkg = require('../../package.json')
 import * as scriptUtils from './script-utils'
-import assert from 'assert'
 import path from 'path'
 import os from 'os'
 
@@ -51,7 +50,7 @@ describe('scriptUtils', () => {
 
         expectToMatch.forEach((path) =>
             test(`Expect path "${path}" to match`, () => {
-                assert.ok(matcher(path), `Expected path "${path}" to be matched`)
+                expect(matcher(path)).toBe(true)
             })
         )
 
@@ -66,7 +65,7 @@ describe('scriptUtils', () => {
 
         expectNotToMatch.forEach((path) =>
             test(`Expect path "${path}" to NOT match`, () => {
-                assert.ok(!matcher(path), `Expected path "${path}" to NOT be matched`)
+                expect(matcher(path)).toBe(false)
             })
         )
 
@@ -74,11 +73,7 @@ describe('scriptUtils', () => {
 
         test('glob works with Array.filter', () => {
             const matched = allPaths.filter(matcher)
-            assert.strictEqual(
-                matched.length,
-                expectToMatch.length,
-                'Expected that all matches would be returned by filter'
-            )
+            expect(matched.length).toStrictEqual(expectToMatch.length)
         })
     })
 
