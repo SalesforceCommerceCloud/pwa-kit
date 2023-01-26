@@ -321,7 +321,7 @@ const main = async () => {
         .command('format')
         .description('automatically re-format all source files')
         .argument('<path>', 'path or glob to format')
-        .action(async ({path}) => {
+        .action(async (path) => {
             const prettier = p.join(require.resolve('prettier'), '..', '..', '.bin', 'prettier')
             execSync(`${prettier} --write "${path}"`)
         })
