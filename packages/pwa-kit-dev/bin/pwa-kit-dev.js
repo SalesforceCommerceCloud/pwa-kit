@@ -382,10 +382,10 @@ const main = async () => {
                 console.log('Connection closed with code', code)
             })
 
-            ws.on('error', (e) => {
+            ws.on('error', (err) => {
                 clearInterval(heartbeat)
-                error(`Error tailing logs: ${e.message}`)
-                throw e
+                error(`Error tailing logs: ${err.message}`)
+                throw err
             })
 
             ws.on('message', (data) => {
