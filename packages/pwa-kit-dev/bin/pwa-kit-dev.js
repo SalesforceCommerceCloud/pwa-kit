@@ -152,7 +152,7 @@ const main = async () => {
             '-k, --key <api-key>',
             `find your API key at https://runtime.commercecloud.com/account/settings`,
             (val) => {
-                if (!(typeof val === 'string') && val.length > 0) {
+                if (typeof val !== 'string' || val === '') {
                     throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
                 } else {
                     return val
