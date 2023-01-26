@@ -122,17 +122,27 @@ const ProductView = forwardRef(
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
 
+        const validateAndShowError = () => {
+            // Validate that all attributes are selected before proceeding.
+            const hasValidSelection = validate(variant, quantity, stockLevel)
+
+            if (!hasValidSelection) {
+                !isProductASet && toggleShowOptionsMessage(true)
+            }
+
+            return hasValidSelection
+        }
+
         const renderActionButtons = () => {
             const buttons = []
 
             const handleCartItem = async () => {
-                // Validate that all attributes are selected before proceeding.
-                const hasValidSelection = validate(variant, quantity, stockLevel)
+                const hasValidSelection = validateAndShowError()
 
                 if (!hasValidSelection) {
-                    !isProductASet && toggleShowOptionsMessage(true)
                     return null
                 }
+
                 if (!addToCart && !updateCart) return null
                 if (updateCart) {
                     await updateCart(variant, quantity)
@@ -209,6 +219,12 @@ const ProductView = forwardRef(
                 )
             }
             return buttons
+        }
+
+        // Bind the reference with our `scope` that includes the internal validate function for this component.
+        // Other values can be added to this scope as required.
+        if (typeof ref === 'function') {
+            ref = ref.bind({validate: validateAndShowError})
         }
 
         useEffect(() => {

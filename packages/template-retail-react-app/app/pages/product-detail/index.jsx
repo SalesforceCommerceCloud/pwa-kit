@@ -136,6 +136,38 @@ const ProductDetail = ({category, product, isLoading}) => {
         return returnVal
     }
 
+    /**************** Product Set Handlers ****************/
+    const handleProductSetValidation = () => {
+        // Scroll to the first product without its options selected.
+        const productSelectionKeys = Object.keys(productSetSelection)
+        const unselected = product.setProducts.find(({id}) => !productSelectionKeys.includes(id))
+
+        // Run "internal" validation on this product to show the error.
+        Object.values(setProductsRefs.current).forEach(({scope}) => {
+            scope.validate()
+        })
+
+        if (unselected) {
+            const {ref} = setProductsRefs.current[unselected.id]
+
+            // Scroll the first unselected product into view.
+            ref.scrollIntoView({
+                behavior: 'smooth'
+            })
+
+            return false
+        }
+
+        return true
+    }
+
+    const handleProductSetAddToCart = () => {
+        // Get all the selected products, and pass them to the addToCart handler which
+        // accepts an array.
+        const productSelectionValues = Object.values(productSetSelection)
+        return handleAddToCart(productSelectionValues)
+    }
+
     /**************** Einstein ****************/
     useEffect(() => {
         if (product) {
@@ -161,30 +193,11 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={() => {
-                                const productSelectionValues = Object.values(productSetSelection)
-
-                                return handleAddToCart(productSelectionValues)
-                            }}
+                            addToCart={handleProductSetAddToCart}
                             addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
-                            validate={() => {
-                                // Scroll to the first product without its options selected.
-                                const productSelectionKeys = Object.keys(productSetSelection)
-                                const unselected = product.setProducts.find(
-                                    ({id}) => !productSelectionKeys.includes(id)
-                                )
-
-                                if (unselected) {
-                                    setProductsRefs.current[unselected.id].scrollIntoView({
-                                        behavior: 'smooth'
-                                    })
-                                    return false
-                                }
-
-                                return true
-                            }}
+                            validate={handleProductSetValidation}
                         />
 
                         <hr />
@@ -194,8 +207,14 @@ const ProductDetail = ({category, product, isLoading}) => {
                         product.setProducts.map((childProduct) => (
                             <Fragment key={childProduct.id}>
                                 <ProductView
-                                    ref={(ref) => {
-                                        setProductsRefs.current[childProduct.id] = ref
+                                    // Do no use an arrow function as we are manipulating the functions scope.
+                                    ref={function(ref) {
+                                        // Assign the "set" scope of the ref, this is how we access the internal
+                                        // validation.
+                                        setProductsRefs.current[childProduct.id] = {
+                                            ref,
+                                            scope: this
+                                        }
                                     }}
                                     product={childProduct}
                                     isProductPartOfSet={true}
