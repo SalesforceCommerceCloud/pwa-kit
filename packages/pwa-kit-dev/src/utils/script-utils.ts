@@ -11,6 +11,7 @@ import _fetch from 'node-fetch'
 import {URL} from 'url'
 import {readFile, stat, mkdtemp, rmdir} from 'fs/promises'
 import {createWriteStream} from 'fs'
+import {readJson} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 import validator from 'validator'
@@ -44,8 +45,7 @@ interface Bundle {
 }
 
 export const getPkgJSON = async () => {
-    const data = await readFile(path.join(__dirname, '..', '..', 'package.json'))
-    return JSON.parse(data.toString('utf-8'))
+    return readJson(path.join(__dirname, '..', '..', 'package.json'))
 }
 
 export class CloudAPIClient {
