@@ -50,7 +50,7 @@ const ProductItem = ({
         quantity,
         setQuantity
     } = useDerivedProduct(product)
-
+    console.log('showLoading', showLoading)
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <ItemVariantProvider variant={product}>
