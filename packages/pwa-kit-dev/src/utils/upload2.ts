@@ -43,6 +43,7 @@ interface Bundle {
     ssr_shared: string[]
 }
 
+
 export const getPkgJSON = async () => {
     const data = await readFile(path.join(__dirname, '..', '..', 'package.json'))
     return JSON.parse(data.toString('utf-8'))
@@ -275,7 +276,13 @@ export const readCredentials = async (filepath: string): Promise<Credentials> =>
     }
 }
 
-export const parseLog = (log) => {
+interface LogRecord {
+    level: string
+    message: string
+    shortRequestId?: string
+}
+
+export const parseLog = (log: string): LogRecord => {
     const parts = log.trim().split('\t')
     let requestId, shortRequestId, level
 
