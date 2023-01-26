@@ -104,7 +104,9 @@ const main = async () => {
                     '-c, --credentialsFile <credentialsFile>',
                     `override the standard credentials file location "${credentialsLocationDisplay()}"`
                 )
-                    .default(undefined) // *must* default to undefined!
+                    // Must default to undefined in order to trigger automatic-lookup
+                    // of a credentials file, based on --cloud-origin.
+                    .default(undefined)
                     .env('PWA_KIT_CREDENTIALS_FILE')
             )
             .hook('preAction', (thisCommand, actionCommand) => {
