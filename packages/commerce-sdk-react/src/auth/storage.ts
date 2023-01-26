@@ -107,7 +107,6 @@ export class LocalStorage extends BaseStorage {
 const globalMap = new Map()
 
 export class MemoryStorage extends BaseStorage {
-    // private map = new Map<string, string>()
     private map: Map<string, string>
     constructor(options?: MemoryStorageOptions) {
         super(options)
