@@ -1,6 +1,5 @@
 ## v2.7.0-dev (Jan 25, 2023)
 ## v2.6.0 (Jan 25, 2023)
-## v2.6.0 (Jan 25, 2023)
 - Security package updates
 
 ## v2.5.0 (Jan 05, 2023)
