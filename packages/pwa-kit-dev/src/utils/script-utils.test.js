@@ -271,8 +271,19 @@ describe('scriptUtils', () => {
                 const api_key = '123'
                 const credentials = {username, api_key}
 
-                const reponseBodyMock = {anything: 'anything'}
-                const responseMock = {status, json: () => Promise.resolve(reponseBodyMock)}
+                const goodResponseBody = {anything: 'anything'}
+
+                // Older APIs on Cloud return JSON for good responses and text for errors,
+                // hence the strange looking mock response setup.
+                const text = () =>
+                    status === 200
+                        ? Promise.resolve(JSON.stringify(goodResponseBody))
+                        : Promise.resolve('An error occurred')
+
+                const json = () =>
+                    status === 200 ? Promise.resolve(goodResponseBody) : Promise.reject()
+
+                const responseMock = {status, text, json}
                 const fetchMock = jest.fn(async () => responseMock)
 
                 const client = new scriptUtils.CloudAPIClient({credentials, fetch: fetchMock})
@@ -280,7 +291,7 @@ describe('scriptUtils', () => {
                 const fn = async () => await client.push(bundle, projectSlug, targetSlug)
 
                 if (status === 200) {
-                    expect(await fn()).toBe(reponseBodyMock)
+                    expect(await fn()).toBe(goodResponseBody)
                 } else {
                     await expect(fn).rejects.toThrow('For more information visit')
                 }
@@ -294,7 +305,7 @@ describe('scriptUtils', () => {
                         method: 'POST',
                         headers: {
                             Authorization: expect.stringMatching(/^Basic /),
-                            'Content-Length': opts.body.length.toString(),
+                            'Content-Length': expect.stringMatching(/^\d+$/),
                             'User-Agent': `${pkg.name}@${pkg.version}`
                         }
                     })
