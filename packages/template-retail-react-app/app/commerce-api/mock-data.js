@@ -724,6 +724,45 @@ export const mockedRegisteredCustomer = {
     previousVisitTime: '2021-04-14T13:38:29.778Z'
 }
 
+export const mockedRegisteredCustomerWithNoAddress = {
+    addresses: [],
+    authType: 'registered',
+    creationDate: '2021-03-31T13:32:42.000Z',
+    customerId: 'customerid',
+    customerNo: '00149004',
+    email: 'customer@test.com',
+    enabled: true,
+    lastLoginTime: '2021-04-14T13:38:29.778Z',
+    lastModified: '2021-04-14T13:38:29.778Z',
+    firstName: 'Testing',
+    lastName: 'Tester',
+    phoneHome: '(727) 555-1234',
+    lastVisitTime: '2021-04-14T13:38:29.778Z',
+    login: 'customer@test.com',
+    paymentInstruments: [
+        {
+            creationDate: '2021-04-01T14:34:56.000Z',
+            lastModified: '2021-04-01T14:34:56.000Z',
+            paymentBankAccount: {},
+            paymentCard: {
+                cardType: 'Master Card',
+                creditCardExpired: false,
+                expirationMonth: 1,
+                expirationYear: 2030,
+                holder: 'Test McTester',
+                maskedNumber: '************5454',
+                numberLastDigits: '5454',
+                validFromMonth: 1,
+                validFromYear: 2020
+            },
+            paymentInstrumentId: 'testcard1',
+            paymentMethodId: 'CREDIT_CARD'
+        }
+    ],
+    previousLoginTime: '2021-04-14T13:38:29.778Z',
+    previousVisitTime: '2021-04-14T13:38:29.778Z'
+}
+
 export const mockedGuestCustomer = {
     authType: 'guest',
     customerId: 'customerid',
@@ -5673,4 +5712,635 @@ export const mockProductSearch = {
     ],
     offset: 0,
     total: 43
+}
+
+export const mockCategory = {
+    id: 'mens-accessories-ties',
+    image:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dwd2ff3ec8/images/slot/sub_banners/cat-banner-mens-ties.jpg',
+    name: 'Ties',
+    pageDescription:
+        "Shop Mens's Ties for all occasions including business or casual at Commerce Cloud",
+    pageTitle: "Men's Casual and Business Ties",
+    parentCategoryId: 'mens-accessories',
+    parentCategoryTree: [
+        {
+            id: 'mens',
+            name: 'Mens'
+        },
+        {
+            id: 'mens-accessories',
+            name: 'Accessories'
+        },
+        {
+            id: 'mens-accessories-ties',
+            name: 'Ties'
+        }
+    ],
+    c_enableCompare: false,
+    c_showInMenu: true
+}
+
+export const mockCustomerBaskets = {
+    baskets: [
+        {
+            adjustedMerchandizeTotalTax: 5.123,
+            adjustedShippingTotalTax: null,
+            agentBasket: false,
+            basketId: '10cf6aa40edba4fcfcc6915594',
+            channelType: 'storefront',
+            creationDate: '2023-01-19T19:12:06.615Z',
+            currency: 'GBP',
+            customerInfo: {
+                customerId: 'abmuc2wupJxeoRxuo3wqYYmbhI'
+            },
+            lastModified: '2023-01-19T19:12:07.718Z',
+            merchandizeTotalTax: 2.93,
+            notes: {},
+            orderTotal: null,
+            productItems: [
+                {
+                    adjustedTax: 2.93,
+                    basePrice: 61.43,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: '4a9af0a24fe46c3f6d8721b371',
+                    itemText: 'Belted Cardigan With Studs',
+                    price: 61.43,
+                    priceAfterItemDiscount: 61.43,
+                    priceAfterOrderDiscount: 61.43,
+                    productId: '701642889830M',
+                    productName: 'Belted Cardigan With Studs',
+                    quantity: 1,
+                    shipmentId: 'me',
+                    tax: 2.93,
+                    taxBasis: 61.43,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
+            ],
+            productSubTotal: 61.43,
+            productTotal: 61.43,
+            shipments: [
+                {
+                    adjustedMerchandizeTotalTax: 2.93,
+                    adjustedShippingTotalTax: null,
+                    gift: false,
+                    merchandizeTotalTax: 2.93,
+                    productSubTotal: 61.43,
+                    productTotal: 61.43,
+                    shipmentId: 'me',
+                    shipmentTotal: null,
+                    shippingStatus: 'not_shipped',
+                    shippingTotal: null,
+                    shippingTotalTax: null,
+                    taxTotal: null
+                }
+            ],
+            shippingItems: [
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    itemId: '6455af8345d031600c8a8ad67c',
+                    itemText: 'Shipping',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: null,
+                    taxRate: 0.05
+                }
+            ],
+            shippingTotal: null,
+            shippingTotalTax: null,
+            taxation: 'gross',
+            taxTotal: null
+        }
+    ],
+    total: 1
+}
+
+export const mockMasterProduct = {
+    currency: 'GBP',
+    id: '25752235M',
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, '
+                },
+                {
+                    alt: 'Checked Silk Tie, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1abd7d2f/images/large/PG.949612424S.COBATSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1abd7d2f/images/large/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, '
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Cobalt, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                },
+                {
+                    alt: 'Checked Silk Tie, Cobalt, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1abd7d2f/images/large/PG.949612424S.COBATSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1abd7d2f/images/large/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'COBATSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Navy, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5170f98a/images/large/PG.949612424S.NAVYSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5170f98a/images/large/PG.949612424S.NAVYSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                },
+                {
+                    alt: 'Checked Silk Tie, Navy, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfdc619bd/images/large/PG.949612424S.NAVYSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfdc619bd/images/large/PG.949612424S.NAVYSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Yellow, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwad4fc053/images/large/PG.949612424S.YELLOSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwad4fc053/images/large/PG.949612424S.YELLOSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                },
+                {
+                    alt: 'Checked Silk Tie, Yellow, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd21598ea/images/large/PG.949612424S.YELLOSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd21598ea/images/large/PG.949612424S.YELLOSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'YELLOSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd5ee689c/images/medium/PG.949612424S.COBATSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd5ee689c/images/medium/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, '
+                },
+                {
+                    alt: 'Checked Silk Tie, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8bae4d60/images/medium/PG.949612424S.COBATSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8bae4d60/images/medium/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, '
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Cobalt, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd5ee689c/images/medium/PG.949612424S.COBATSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd5ee689c/images/medium/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                },
+                {
+                    alt: 'Checked Silk Tie, Cobalt, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8bae4d60/images/medium/PG.949612424S.COBATSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8bae4d60/images/medium/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'COBATSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Navy, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw244298b8/images/medium/PG.949612424S.NAVYSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw244298b8/images/medium/PG.949612424S.NAVYSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                },
+                {
+                    alt: 'Checked Silk Tie, Navy, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb389c00a/images/medium/PG.949612424S.NAVYSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb389c00a/images/medium/PG.949612424S.NAVYSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Yellow, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdce01d71/images/medium/PG.949612424S.YELLOSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdce01d71/images/medium/PG.949612424S.YELLOSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                },
+                {
+                    alt: 'Checked Silk Tie, Yellow, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4a563bde/images/medium/PG.949612424S.YELLOSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4a563bde/images/medium/PG.949612424S.YELLOSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'YELLOSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fad510c/images/small/PG.949612424S.COBATSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fad510c/images/small/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, '
+                },
+                {
+                    alt: 'Checked Silk Tie, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9a08e955/images/small/PG.949612424S.COBATSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9a08e955/images/small/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, '
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Cobalt, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fad510c/images/small/PG.949612424S.COBATSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fad510c/images/small/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                },
+                {
+                    alt: 'Checked Silk Tie, Cobalt, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9a08e955/images/small/PG.949612424S.COBATSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9a08e955/images/small/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'COBATSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Navy, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa94e3279/images/small/PG.949612424S.NAVYSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa94e3279/images/small/PG.949612424S.NAVYSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                },
+                {
+                    alt: 'Checked Silk Tie, Navy, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw73571fe7/images/small/PG.949612424S.NAVYSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw73571fe7/images/small/PG.949612424S.NAVYSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Yellow, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa9639168/images/small/PG.949612424S.YELLOSI.PZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa9639168/images/small/PG.949612424S.YELLOSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                },
+                {
+                    alt: 'Checked Silk Tie, Yellow, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbfa3e4f6/images/small/PG.949612424S.YELLOSI.BZ.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbfa3e4f6/images/small/PG.949612424S.YELLOSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'YELLOSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Cobalt, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9d87f5f6/images/swatch/PG.949612424S.COBATSI.CP.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9d87f5f6/images/swatch/PG.949612424S.COBATSI.CP.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'COBATSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Navy, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa0a33bb5/images/swatch/PG.949612424S.NAVYSI.CP.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa0a33bb5/images/swatch/PG.949612424S.NAVYSI.CP.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Yellow, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw529c07c2/images/swatch/PG.949612424S.YELLOSI.CP.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw529c07c2/images/swatch/PG.949612424S.YELLOSI.CP.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'YELLOSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        }
+    ],
+    inventory: {
+        ats: 274,
+        backorderable: false,
+        id: 'inventory_m',
+        orderable: true,
+        preorderable: false,
+        stockLevel: 274
+    },
+    longDescription:
+        "This silk tie works well with a Commerce Cloud Store dress shirt and suit It's perfect for any occasion. ",
+    master: {
+        masterId: '25752235M',
+        orderable: true,
+        price: 19.19
+    },
+    minOrderQuantity: 1,
+    name: 'Checked Silk Tie',
+    pageDescription:
+        "This silk tie works well with a Commerce Cloud Store dress shirt and suit. It's perfect for any occasion. ",
+    pageTitle: 'Checked Silk Tie',
+    price: 19.19,
+    pricePerUnit: 19.19,
+    primaryCategoryId: 'mens-accessories-ties',
+    recommendations: [
+        {
+            recommendationType: {
+                displayValue: 'Product Detail Page - Cross Sell',
+                value: 1
+            },
+            recommendedItemId: '25604455M'
+        },
+        {
+            recommendationType: {
+                displayValue: 'Product Detail Page - Cross Sell',
+                value: 1
+            },
+            recommendedItemId: '25686571M'
+        },
+        {
+            recommendationType: {
+                displayValue: 'Product Detail Page - Cross Sell',
+                value: 1
+            },
+            recommendedItemId: '25752986M'
+        }
+    ],
+    shortDescription:
+        "This silk tie works well with a Commerce Cloud Store dress shirt and suit. It's perfect for any occasion. ",
+    slugUrl:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArchGlobal/checked-silk-tie/25752235M.html?lang=en_GB',
+    stepQuantity: 1,
+    type: {
+        master: true
+    },
+    validFrom: {
+        default: '2011-02-07T05:00:00.000Z'
+    },
+    variants: [
+        {
+            orderable: true,
+            price: 19.19,
+            productId: '682875090845M',
+            variationValues: {
+                color: 'COBATSI'
+            }
+        },
+        {
+            orderable: true,
+            price: 19.19,
+            productId: '682875719029M',
+            variationValues: {
+                color: 'NAVYSI'
+            }
+        },
+        {
+            orderable: true,
+            price: 19.19,
+            productId: '682875540326M',
+            variationValues: {
+                color: 'YELLOSI'
+            }
+        }
+    ],
+    variationAttributes: [
+        {
+            id: 'color',
+            name: 'Colour',
+            values: [
+                {
+                    name: 'Cobalt',
+                    orderable: true,
+                    value: 'COBATSI'
+                },
+                {
+                    name: 'Navy',
+                    orderable: true,
+                    value: 'NAVYSI'
+                },
+                {
+                    name: 'Yellow',
+                    orderable: true,
+                    value: 'YELLOSI'
+                }
+            ]
+        }
+    ]
 }

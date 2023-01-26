@@ -8,15 +8,13 @@ import React from 'react'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
 import mockConfig from '../../../config/mocks/default'
-
-jest.setTimeout(60000)
 
 jest.mock('../../commerce-api/einstein')
 
@@ -75,28 +73,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
     }
 })
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true),
-        createGetTokenBody: jest.fn().mockReturnValue({
-            grantType: 'test',
-            code: 'test',
-            usid: 'test',
-            codeVerifier: 'test',
-            redirectUri: 'http://localhost/test'
-        })
-    }
-})
-
-jest.mock('../../commerce-api/pkce', () => {
-    return {
-        createCodeVerifier: jest.fn().mockReturnValue('codeverifier'),
-        generateCodeChallenge: jest.fn().mockReturnValue('codechallenge')
-    }
-})
-
 const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
@@ -117,23 +93,13 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer()
-
-// Set up and clean up
-beforeEach(() => {
-    jest.resetModules()
-    server.listen({
-        onUnhandledRequest: 'error'
-    })
-})
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('Allows customer to sign in to their account', async () => {
-    server.use(
+    global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.json({authType: 'registered', email: 'darek@test.com'}))
         ),
@@ -158,7 +124,7 @@ test('Allows customer to sign in to their account', async () => {
 
 test('Renders error when given incorrect log in credentials', async () => {
     // mock failed auth request
-    server.use(
+    global.server.use(
         rest.post('*/oauth2/login', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(401), ctx.json({message: 'Invalid Credentials.'}))
         )

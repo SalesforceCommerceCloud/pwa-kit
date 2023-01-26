@@ -49,7 +49,7 @@ SizeRefinements.propTypes = {
     filter: PropTypes.object,
     selectedFilterValues: PropTypes.object,
     categoryId: PropTypes.string,
-    selectedFilters: PropTypes.array,
+    selectedFilters: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string]),
     toggleFilter: PropTypes.func
 }
 

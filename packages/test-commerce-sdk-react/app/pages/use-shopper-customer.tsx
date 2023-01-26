@@ -107,19 +107,19 @@ function UseCustomer() {
             body: {firstName: `Kobe${RANDOM_STR}`},
             parameters: {customerId: CUSTOMER_ID}
         },
-        {
-            action: 'updateCustomerPassword',
-            body: {currentPassword: 'Test12345!', password: 'Test1234!'},
-            parameters: {customerId: CUSTOMER_ID}
-        },
+        // {
+        //     action: 'updateCustomerPassword',
+        //     body: {currentPassword: 'Test12345!', password: 'Test1234!'},
+        //     parameters: {customerId: CUSTOMER_ID}
+        // },
         // TODO: Not working in PWA Kit Today. Potentially related to the issue scoping tokens
         //  https://pwa-kit.mobify-storefront.com/global/en-GB/reset-password
         //  {"type":"https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized","title":"Unauthorized","detail":"Your access-token is invalid and could not be used to identify the API client."}
-        {
-            action: 'getResetPasswordToken',
-            body: {login: 'kobe@test.com'},
-            parameters: {}
-        },
+        // {
+        //     action: 'getResetPasswordToken',
+        //     body: {login: 'kobe@test.com'},
+        //     parameters: {}
+        // },
         {
             action: 'createCustomerAddress',
             body: {addressId: `TestAddress${RANDOM_STR}`, countryCode: 'CA', lastName: 'Murphy'},

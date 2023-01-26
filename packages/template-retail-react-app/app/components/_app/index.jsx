@@ -48,18 +48,33 @@ import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
+import {useCategory} from 'commerce-sdk-react-preview'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 const DEFAULT_LOCALE = 'en-US'
 
 const App = (props) => {
-    const {
-        children,
-        targetLocale = DEFAULT_LOCALE,
-        messages = {},
-        categories: allCategories = {}
-    } = props
+    const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
+    const {data: allCategories} = useCategory(
+        {id: DEFAULT_ROOT_CATEGORY, levels: DEFAULT_NAV_DEPTH},
+        {
+            select: (categories) => {
+                // Note: What is the best to handle special case like this?? Should commerce sdk handles this?
+                if (categories.isError) {
+                    const message =
+                        categories.title === 'Unsupported Locale'
+                            ? `
+It looks like the locale “${categories.locale}” isn’t set up, yet. The locale settings in your package.json must match what is enabled in your Business Manager instance.
+Learn more with our localization guide. https://sfdc.co/localization-guide
+`
+                            : categories.detail
+                    throw new Error(message)
+                }
+                return flatten(categories, 'categories')
+            }
+        }
+    )
 
     const appOrigin = getAppOrigin()
 
@@ -215,14 +230,14 @@ const App = (props) => {
                                                 isOpen={isOpen}
                                                 onClose={onClose}
                                                 onLogoClick={onLogoClick}
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
                                                 locale={locale}
                                             />
                                         </HideOnDesktop>
 
                                         <HideOnMobile>
                                             <ListMenu
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
                                                 locale={locale}
                                             />
                                         </HideOnMobile>
@@ -305,33 +320,9 @@ App.getProps = async ({api, res}) => {
     // Login as `guest` to get session.
     await api.auth.login()
 
-    // Get the root category, this will be used for things like the navigation.
-    const rootCategory = await api.shopperProducts.getCategory({
-        parameters: {
-            id: DEFAULT_ROOT_CATEGORY,
-            levels: DEFAULT_NAV_DEPTH
-        }
-    })
-
-    if (rootCategory.isError) {
-        const message =
-            rootCategory.title === 'Unsupported Locale'
-                ? `
-It looks like the locale “${rootCategory.locale}” isn’t set up, yet. The locale settings in your package.json must match what is enabled in your Business Manager instance.
-Learn more with our localization guide. https://sfdc.co/localization-guide
-`
-                : rootCategory.detail
-        throw new Error(message)
-    }
-
-    // Flatten the root so we can easily access all the categories throughout
-    // the application.
-    const categories = flatten(rootCategory, 'categories')
-
     return {
         targetLocale,
         messages,
-        categories,
         config: res?.locals?.config
     }
 }

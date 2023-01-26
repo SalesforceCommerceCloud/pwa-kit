@@ -23,7 +23,7 @@ import {
     Stack,
     useBreakpointValue
 } from '@chakra-ui/react'
-import useBasket from '../commerce-api/hooks/useBasket'
+import {useCurrentBasket} from './use-current-basket'
 import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
@@ -56,13 +56,14 @@ export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, quantity} = data || {}
     const intl = useIntl()
-    const basket = useBasket()
+    const {basket = {}, totalItems} = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const variationAttributes = useVariationAttributes(product)
     if (!isOpen) {
         return null
     }
-    const {currency, productItems, productSubTotal, itemAccumulatedCount} = basket
+
+    const {currency, productItems, productSubTotal} = basket
     const {id, variationValues} = product
     const lineItemPrice = productItems?.find((item) => item.productId === id)?.basePrice * quantity
     const image = findImageGroupBy(product.imageGroups, {
@@ -157,7 +158,7 @@ export const AddToCartModal = () => {
                                                 'Cart Subtotal ({itemAccumulatedCount} item)',
                                             id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
-                                        {itemAccumulatedCount}
+                                        {itemAccumulatedCount: totalItems}
                                     )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
