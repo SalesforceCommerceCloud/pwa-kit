@@ -16,6 +16,7 @@ const isObject = (item: unknown) =>
 export interface QueryKeyMap {
     name: string
     key: QueryKey
+    updater?: any
 }
 
 export interface CacheUpdateMatrixElement {
@@ -59,10 +60,10 @@ export const updateCache = <Action extends CombinedMutationTypes>(
         )
 
     // STEP 1. Update data inside query cache for the matching queryKeys
-    cacheUpdateMatrix[action]?.(params, response)?.update?.map(({key: queryKey}) => {
+    cacheUpdateMatrix[action]?.(params, response)?.update?.map(({key: queryKey, updater}) => {
         console.log('update response', response)
         console.log('queryKey111111111', queryKey)
-        queryClient.setQueryData(queryKey, response)
+        queryClient.setQueryData(queryKey, updater)
     })
 
     // STEP 2. Invalidate cache entries with the matching queryKeys
