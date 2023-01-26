@@ -285,17 +285,19 @@ describe('scriptUtils', () => {
                     await expect(fn).rejects.toThrow('For more information visit')
                 }
 
-                expect(fetchMock.mock.calls.length).toBe(1)
+                expect(fetchMock).toHaveBeenCalledTimes(1)
 
-                const url = fetchMock.mock.calls[0][0]
-                const opts = fetchMock.mock.calls[0][1]
-
-                expect(url).toEqual(expectedURL)
-                expect(opts.body).toEqual(expect.anything(Buffer))
-                expect(opts.method).toEqual('POST')
-                expect(opts.headers['Authorization']).toMatch(new RegExp('^Basic '))
-                expect(opts.headers['Content-Length']).toEqual(opts.body.length.toString())
-                expect(opts.headers['User-Agent']).toEqual(`${pkg.name}@${pkg.version}`)
+                expect(fetchMock).toHaveBeenCalledWith(
+                  expectedURL,
+                  expect.objectContaining({
+                    body: expect.anything(Buffer),
+                    method: 'POST',
+                    headers: {
+                      Authorization: expect.stringMatching(/^Basic /),
+                      'Content-Length': opts.body.length.toString(),
+                      'User-Agent': `${pkg.name}@${pkg.version}`
+                    }
+                  })
             }
         )
     })
