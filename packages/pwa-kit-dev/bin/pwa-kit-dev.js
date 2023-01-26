@@ -350,12 +350,15 @@ const main = async () => {
                 project = upload2.getPkgJSON()['name']
             }
 
+            const credentials = await upload2.readCredentials(credentialsFile)
+
             const client = new upload2.CloudAPIClient({
-                credentials: await upload2.readCredentials(credentialsFile),
+                credentials,
                 origin: cloudOrigin
             })
 
-            const token = client.createLoggingToken(project, environment)
+            const token = await client.createLoggingToken(project, environment)
+
             const url = new URL(cloudOrigin.replace('cloud', 'logs'))
             url.protocol = 'wss'
             url.search = new URLSearchParams({
@@ -379,14 +382,15 @@ const main = async () => {
                 console.log('Connection closed with code', code)
             })
 
-            ws.on('error', (error) => {
+            ws.on('error', (e) => {
                 clearInterval(heartbeat)
-                scriptUtils.fail(`Error tailing logs: ${error.message}`)
+                error(`Error tailing logs: ${e.message}`)
+                throw e
             })
 
             ws.on('message', (data) => {
                 JSON.parse(data).forEach((log) => {
-                    const {message, shortRequestId, level} = scriptUtils.parseLog(log.message)
+                    const {message, shortRequestId, level} = upload2.parseLog(log.message)
                     const color = chalk[colors[level.toLowerCase()] || 'green']
                     const paddedLevel = level.padEnd(6)
                     console.log(

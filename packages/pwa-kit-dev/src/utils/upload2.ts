@@ -13,6 +13,7 @@ import {readFile, stat, mkdtemp, rmdir} from 'fs/promises'
 import {createWriteStream} from 'fs'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
+import validator from 'validator'
 
 export const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
 export const DEFAULT_DOCS_URL =
@@ -115,13 +116,16 @@ export class CloudAPIClient {
     async createLoggingToken(project: string, environment: string) : Promise<string> {
         const url = new URL(this.opts.origin)
         url.pathname = `/api/projects/${project}/target/${environment}/jwt/`
-        const headers = await this.getHeaders({})
+        const headers = await this.getHeaders({
+            Authorization: `Bearer ${this.opts.credentials.api_key}`
+        })
         const res = await this.opts.fetch(url.toString(), {
             method: 'POST',
             headers
         })
         await this.throwForStatus(res)
-        return await res.json().token
+        const data = await res.json()
+        return data['token']
     }
 }
 
@@ -269,4 +273,33 @@ export const readCredentials = async (filepath: string): Promise<Credentials> =>
                 'steps on authorizing your computer to push bundles.'
         )
     }
+}
+
+export const parseLog = (log) => {
+    const parts = log.trim().split('\t')
+    let requestId, shortRequestId, message, level
+
+    if (
+        parts.length >= 3 &&
+        validator.isISO8601(parts[0]) &&
+        validator.isUUID(parts[1]) &&
+        validator.isAlpha(parts[2])
+    ) {
+        // An application log
+        parts.shift()
+        requestId = parts.shift()
+        level = parts.shift()
+    } else {
+        // A platform log
+        const words = parts[0].split(' ')
+        level = words.shift()
+        parts[0] = words.join(' ')
+    }
+    message = parts.join('\t')
+
+    const match = /(?<id>[a-f\d]{8})/.exec(requestId || message)
+    if (match) {
+        shortRequestId = match.groups.id
+    }
+    return {level, message, shortRequestId}
 }
