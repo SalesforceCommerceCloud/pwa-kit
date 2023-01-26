@@ -64,6 +64,8 @@ const entryPointExists = (segments) => {
     return false
 }
 
+const noop = () => {}
+
 const findInProjectThenSDK = (pkg) => {
     const projectPath = resolve(projectDir, 'node_modules', pkg)
     return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
@@ -231,7 +233,7 @@ const ruleForBabelLoader = (babelPlugins) => {
     }
 }
 
-const findAndReplace = (array = [], findFn = () => {}, replacement) => {
+const findAndReplace = (array = [], findFn = noop, replacement) => {
     const clone = array.slice(0)
     const index = clone.findIndex(findFn)
     if (index === -1) {

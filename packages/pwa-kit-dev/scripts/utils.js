@@ -161,9 +161,7 @@ Utils.errorForStatus = (response) => {
 
     let error
     try {
-        data = JSON.parse(response.body)
-        errors = data.error || []
-        warnings = data.warnings || []
+        const error = JSON.parse(response.body)
     } catch (err) {
         // We set this to an empty object to resolve issues where response.body
         // is not a JSON or properly-formatted JSON object
@@ -171,11 +169,10 @@ Utils.errorForStatus = (response) => {
         error = {}
     }
 
-    //TODO: Colorize and test
     return new Error(
         [
             `HTTP ${status}`,
-            data.errors || data.warnings || data.message || response.body,
+            error.message || response.body,
             `For more information visit ${error.docs_url || DEFAULT_DOCS_URL}$`
         ].join('\n')
     )

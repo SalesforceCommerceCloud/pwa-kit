@@ -26,7 +26,6 @@ const colors = {
 const fancyLog = (level, msg) => {
     const color = colors[level] || 'green'
     const colorFn = chalk[color]
-    console.log(`FANCY LOG ${colorFn(level)}: ${msg}`)
 }
 
 const logWarning = (msg) => fancyLog('warn', msg)
@@ -143,7 +142,6 @@ const main = () => {
         .action(({user, key, credentialsFile}) => {
             try {
                 fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
-                console.log(".action")
                 console.log(`Saved Managed Runtime credentials to "${credentialsFile}".`)
             } catch (e) {
                 console.error('Failed to save credentials.')
@@ -284,17 +282,9 @@ const main = () => {
             ) {
                 scriptUtils.fail('ssrEnabled is set, but no ssrOnly or ssrShared files are defined')
             }
-            uploadBundle(options).catch((res) => {
-                if(res.errors){
-                    const errors = (res.errors || [])
-                    errors.forEach(logErrors)
-                    process.exit(1)
-                }
-
-                if(res.warnings){
-                    const warnings = (res.warnings || [])
-                    warnings.forEach(logWarning)
-                }
+            uploadBundle(options).catch((err) => {
+                logError(err.message || err)
+                process.exit(1)
             })
         })
 
@@ -341,7 +331,7 @@ const main = () => {
             )
         )
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
-        .action(async ({project, environment, cloudOrigin, credentialsFile}, command) => {
+        .action(async ({project, environment, cloudOrigin, credentialsFile}) => {
             if (!project) {
                 project = scriptUtils.readPackageJson('name')
             }
@@ -379,7 +369,6 @@ const main = () => {
 
             ws.on('close', (code) => {
                 clearInterval(heartbeat)
-                console.log("onClose")
                 console.log('Connection closed with code', code)
             })
 
@@ -393,7 +382,6 @@ const main = () => {
                     const {message, shortRequestId, level} = scriptUtils.parseLog(log.message)
                     const color = chalk[colors[level.toLowerCase()] || 'green']
                     const paddedLevel = level.padEnd(6)
-                    console.log("on message")
                     console.log(
                         chalk.green(new Date(log.timestamp).toISOString()),
                         chalk.cyan(shortRequestId),
@@ -410,8 +398,6 @@ const main = () => {
 
     program.option('-v, --version', 'show version number').action(({version}) => {
         if (version) {
-
-            console.log("pkg.version")
             console.log(pkg.version)
         } else {
             program.help({error: true})
@@ -421,15 +407,9 @@ const main = () => {
     program.parse(process.argv)
 }
 
-
 Promise.resolve()
-    .then(() => {
-        console.log("onMain")
-        main()
-    })
-    .catch((res) => {
-        console.log("onResolve")
-        const errors = (res.errors || [])
-        errors.forEach(logError)
+    .then(() => main())
+    .catch((err) => {
+        logError(err.message || err.toString())
         process.exit(1)
     })
