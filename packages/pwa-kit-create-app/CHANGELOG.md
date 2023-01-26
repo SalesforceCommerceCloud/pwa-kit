@@ -1,3 +1,11 @@
+## v2.5.0 (Jan 5, 2023)
+- Add instanceType to Einstein activity body [#858](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/858)
+- Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
+
+## v2.4.0 (Dec 01, 2022)
+- Update instanceUrl on retail-react-app-demo preset [#799](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/799)
+- Update usages of zzrf-001 ODS instance to the new short URL format [#816](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/816)
+
 ## v2.3.0 (Oct 27, 2022)
 - Fix generated projects missing required fields in the `manifest.json` file. [#729](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/729)
 - Update ODS instance URL for the `retail-react-app-demo` preset. [#799](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/799)

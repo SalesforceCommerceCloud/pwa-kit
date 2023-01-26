@@ -1,4 +1,13 @@
-## v2.4.0-dev (Oct 27, 2022)
+## v2.6.0-dev (Jan 05, 2023)
+## v2.5.0 (Jan 05, 2023)
+- Replace morgan stream to use console.log [#847](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/847)
+- Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
+- Reuse Server Correlation ID when Hydrating Error Pages [#846](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/846)
+
+## v2.4.0 (Dec 01, 2022)
+-   Fix `useServerContext` returning isServerSide=false when on server. [#782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/782)
+-   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793) 
+
 ## v2.3.0 (Oct 27, 2022)
 -   Support `react-query` server-side data fetching. [#724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/724)
 -   Add server-safe default configuration for `queryClientConfig` option. [#734](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/734)

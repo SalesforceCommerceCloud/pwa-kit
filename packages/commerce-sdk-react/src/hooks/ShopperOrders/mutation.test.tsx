@@ -5,25 +5,31 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, queryClient, mockAuthCalls} from '../../test-utils'
+import {renderWithProviders, DEFAULT_TEST_HOST, createQueryClient} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import {ShopperLoginHelpers, useShopperLoginHelper} from '../ShopperLogin'
 import {
     useShopperOrdersMutation,
-    shopperOrdersQueryKeysMatrix,
-    ShopperOrdersMutationType
+    ShopperOrdersMutationType,
+    shopperOrdersCacheUpdateMatrix,
+    SHOPPER_ORDERS_NOT_IMPLEMENTED
 } from './mutation'
 import nock from 'nock'
 import {QueryKey} from '@tanstack/react-query'
+import {QueryKeyMap} from '../utils'
 
-// Valid id of prepared basket
-const BASKET_ID = '753b796f71aaaef79b0adde657'
+jest.mock('../../auth/index.ts', () => {
+    return jest.fn().mockImplementation(() => ({
+        ready: jest.fn().mockResolvedValue({access_token: '123'})
+    }))
+})
 
-type TestActionsArgs = {
-    [key in ShopperOrdersMutationType]: {body: any; parameters: any}
+const BASKET_ID = '12345'
+
+type MutationPayloads = {
+    [key in ShopperOrdersMutationType]?: {body: any; parameters: any}
 }
 
-const testActionsArgs: TestActionsArgs = {
+const mutationPayloads: MutationPayloads = {
     createOrder: {
         body: {basketId: BASKET_ID},
         parameters: {}
@@ -35,85 +41,62 @@ interface OrderMutationComponentParams {
 }
 
 const OrderMutationComponent = ({action}: OrderMutationComponentParams) => {
-    //Log into registered account when the component is mounted
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-
-    React.useEffect(() => {
-        loginRegisteredUser.mutate({
-            username: 'kobe@test.com',
-            password: 'Test1234!'
-        })
-    }, [])
-
-    const mutationHook = useShopperOrdersMutation(action)
+    const mutationHook = useShopperOrdersMutation({action})
 
     return (
-        <>
-            {loginRegisteredUser.isLoading ? (
-                <span>Logging in...</span>
-            ) : (
-                <div>Logged in as {loginRegisteredUser?.variables?.username}</div>
-            )}
-            <div>
-                <button onClick={() => mutationHook.mutate(testActionsArgs[action])}>
-                    {action}
-                </button>
+        <div>
+            <button onClick={() => mutationHook.mutate(mutationPayloads[action])}>{action}</button>
 
-                {mutationHook.error?.message && (
-                    <p style={{color: 'red'}}>Error: {mutationHook.error?.message}</p>
-                )}
-                <hr />
-                {mutationHook.isSuccess && <span>isSuccess</span>}
-            </div>
-        </>
+            {mutationHook.error?.message && <p>Error: {mutationHook.error?.message}</p>}
+            <hr />
+            {mutationHook.isSuccess && <span>isSuccess</span>}
+        </div>
     )
 }
 
-const tests = (Object.keys(testActionsArgs) as ShopperOrdersMutationType[]).map((key) => {
+const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map((mutationName) => {
     return {
-        hook: key,
+        hook: mutationName,
         cases: [
             {
                 name: 'success',
                 assertions: async () => {
-                    mockAuthCalls()
-
-                    // Mocking the server request
-                    nock('http://localhost:3000')
-                        .persist()
+                    nock(DEFAULT_TEST_HOST)
                         .post((uri) => {
                             return uri.includes('/checkout/shopper-orders/')
                         })
                         .reply(200, {})
 
-                    renderWithProviders(
-                        <OrderMutationComponent action={key as ShopperOrdersMutationType} />
-                    )
+                    const queryClient = createQueryClient()
 
-                    await waitFor(() => screen.getByText(/kobe@test.com/))
-                    await waitFor(() =>
-                        screen.getByRole('button', {
-                            name: key
-                        })
-                    )
+                    const mutation: any = shopperOrdersCacheUpdateMatrix[mutationName]
 
-                    const {invalidate, update, remove} = shopperOrdersQueryKeysMatrix[key](
-                        testActionsArgs[key],
+                    const {invalidate, update, remove} = mutation(
+                        mutationPayloads[mutationName],
                         {}
                     )
 
-                    invalidate?.forEach((queryKey: QueryKey) => {
-                        queryClient.setQueryData(queryKey, {})
-                    })
-                    update?.forEach((queryKey: QueryKey) => {
-                        queryClient.setQueryData(queryKey, {})
-                    })
-                    remove?.forEach((queryKey: QueryKey) => {
-                        queryClient.setQueryData(queryKey, {})
+                    const queryKeys = [...(invalidate || []), ...(update || []), ...(remove || [])]
+
+                    queryKeys.forEach(({key: queryKey}: QueryKeyMap) => {
+                        queryClient.setQueryData(queryKey, {test: true})
                     })
 
+                    renderWithProviders(
+                        <OrderMutationComponent
+                            action={mutationName as ShopperOrdersMutationType}
+                        />,
+                        {queryClient}
+                    )
+
+                    await waitFor(() =>
+                        screen.getByRole('button', {
+                            name: mutationName
+                        })
+                    )
+
                     const button = screen.getByRole('button', {
-                        name: key
+                        name: mutationName
                     })
 
                     fireEvent.click(button)
@@ -121,13 +104,13 @@ const tests = (Object.keys(testActionsArgs) as ShopperOrdersMutationType[]).map(
                     expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
 
                     // Assert changes in cache
-                    update?.forEach((queryKey: QueryKey) => {
+                    update?.forEach(({key: queryKey}: QueryKeyMap) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
                     })
-                    invalidate?.forEach((queryKey: QueryKey) => {
+                    invalidate?.forEach(({key: queryKey}: QueryKeyMap) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
                     })
-                    remove?.forEach((queryKey: QueryKey) => {
+                    remove?.forEach(({key: queryKey}: QueryKeyMap) => {
                         expect(queryClient.getQueryState(queryKey)).toBeFalsy()
                     })
                 }
@@ -135,27 +118,25 @@ const tests = (Object.keys(testActionsArgs) as ShopperOrdersMutationType[]).map(
             {
                 name: 'error',
                 assertions: async () => {
-                    mockAuthCalls()
-
-                    // Mocking the server request
-                    nock('http://localhost:3000')
+                    nock(DEFAULT_TEST_HOST)
                         .post((uri) => {
                             return uri.includes('/checkout/shopper-orders/')
                         })
                         .reply(500)
 
                     renderWithProviders(
-                        <OrderMutationComponent action={key as ShopperOrdersMutationType} />
+                        <OrderMutationComponent
+                            action={mutationName as ShopperOrdersMutationType}
+                        />
                     )
-                    await waitFor(() => screen.getByText(/kobe@test.com/))
                     await waitFor(() =>
                         screen.getByRole('button', {
-                            name: key
+                            name: mutationName
                         })
                     )
 
                     const button = screen.getByRole('button', {
-                        name: key
+                        name: mutationName
                     })
                     fireEvent.click(button)
                     await waitFor(() => screen.getByText(/error/i))
@@ -170,10 +151,19 @@ tests.forEach(({hook, cases}) => {
     describe(hook, () => {
         beforeEach(() => {
             jest.clearAllMocks()
-            queryClient.clear()
         })
         cases.forEach(({name, assertions}) => {
             test(name, assertions)
         })
     })
 })
+
+test.each(SHOPPER_ORDERS_NOT_IMPLEMENTED)(
+    '%j - throws error when not implemented',
+    (methodName) => {
+        const action = methodName as ShopperOrdersMutationType
+        expect(() => {
+            useShopperOrdersMutation({action})
+        }).toThrowError('This method is not implemented.')
+    }
+)

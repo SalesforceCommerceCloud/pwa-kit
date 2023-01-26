@@ -53,9 +53,6 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             return
         }
 
-        // Create the expected args object for products when given
-        const args = {products: _products?.map((id) => ({id}))}
-
         // Check if the component should fetch results or not. This is useful
         // when you are still waiting on additional data, like `products`.
         if (typeof shouldFetch === 'function' && !shouldFetch()) {
@@ -65,11 +62,11 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         // Fetch either zone or recommender, but not both. If a zone and recommender
         // name are both provided, `zone` takes precendence.
         if (zone) {
-            getZoneRecommendations(zone, args)
+            getZoneRecommendations(zone, _products)
             return
         }
         if (recommender) {
-            getRecommendations(recommender, args)
+            getRecommendations(recommender, _products)
             return
         }
     }, [zone, recommender, _products, isInitialized])
@@ -200,8 +197,8 @@ RecommendedProducts.propTypes = {
     /* The recommender to request */
     recommender: PropTypes.string,
 
-    /* The product IDs to use for recommendation context */
-    products: PropTypes.arrayOf(PropTypes.string),
+    /* The products to use for recommendation context */
+    products: PropTypes.arrayOf(PropTypes.object),
 
     /* Callback to determine if the component should fetch results */
     shouldFetch: PropTypes.func

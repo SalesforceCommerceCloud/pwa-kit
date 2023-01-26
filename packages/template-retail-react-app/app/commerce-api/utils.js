@@ -52,10 +52,7 @@ const toCamel = (str) => {
         return str
     }
     return str.replace(/([-_][a-z])/gi, ($1) => {
-        return $1
-            .toUpperCase()
-            .replace('-', '')
-            .replace('_', '')
+        return $1.toUpperCase().replace('-', '').replace('_', '')
     })
 }
 
@@ -177,49 +174,44 @@ export const checkRequiredParameters = (listOfPassedParameters, listOfRequiredPa
 }
 
 // This function is used to interact with the OCAPI API
-export const createOcapiFetch = (commerceAPIConfig) => async (
-    endpoint,
-    method,
-    args,
-    methodName,
-    body
-) => {
-    const proxy = `/mobify/proxy/ocapi`
+export const createOcapiFetch =
+    (commerceAPIConfig) => async (endpoint, method, args, methodName, body) => {
+        const proxy = `/mobify/proxy/ocapi`
 
-    // The api config will only have `ocapiHost` during testing to workaround localhost proxy
-    const host = commerceAPIConfig.ocapiHost
-        ? `https://${commerceAPIConfig.ocapiHost}`
-        : `${getAppOrigin()}${proxy}`
+        // The api config will only have `ocapiHost` during testing to workaround localhost proxy
+        const host = commerceAPIConfig.ocapiHost
+            ? `https://${commerceAPIConfig.ocapiHost}`
+            : `${getAppOrigin()}${proxy}`
 
-    const siteId = commerceAPIConfig.parameters.siteId
-    const headers = {
-        ...args[0].headers,
-        'Content-Type': 'application/json',
-        'x-dw-client-id': commerceAPIConfig.parameters.clientId
-    }
+        const siteId = commerceAPIConfig.parameters.siteId
+        const headers = {
+            ...args[0].headers,
+            'Content-Type': 'application/json',
+            'x-dw-client-id': commerceAPIConfig.parameters.clientId
+        }
 
-    let response
-    response = await fetch(`${host}/s/${siteId}/dw/shop/v21_3/${endpoint}`, {
-        method: method,
-        headers: headers,
-        ...(body && {
-            body: JSON.stringify(body)
+        let response
+        response = await fetch(`${host}/s/${siteId}/dw/shop/v21_3/${endpoint}`, {
+            method: method,
+            headers: headers,
+            ...(body && {
+                body: JSON.stringify(body)
+            })
         })
-    })
-    const httpStatus = response.status
+        const httpStatus = response.status
 
-    if (!args[1] && response.json) {
-        response = await response.json()
-    }
+        if (!args[1] && response.json) {
+            response = await response.json()
+        }
 
-    const convertedResponse = keysToCamel(response)
-    if (convertedResponse.fault) {
-        const error = convertOcapiFaultToCapiError(convertedResponse.fault)
-        throw new HTTPError(httpStatus, error.detail)
-    } else {
-        return convertedResponse
+        const convertedResponse = keysToCamel(response)
+        if (convertedResponse.fault) {
+            const error = convertOcapiFaultToCapiError(convertedResponse.fault)
+            throw new HTTPError(httpStatus, error.detail)
+        } else {
+            return convertedResponse
+        }
     }
-}
 
 // This function derrives the SF Tenant Id from the SF OrgId
 export const getTenantId = (orgId) => {

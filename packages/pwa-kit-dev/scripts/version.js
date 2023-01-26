@@ -11,10 +11,7 @@ const path = require('path')
 const os = require('os')
 const fs = require('fs')
 
-const date = new Date()
-    .toString()
-    .split(' ')
-    .slice(1, 4)
+const date = new Date().toString().split(' ').slice(1, 4)
 const heading = `## v${pkg.version} (${date[0]} ${date[1]}, ${date[2]})\n`
 
 const changelog = path.resolve(os.tmpdir(), 'CHANGELOG.md')

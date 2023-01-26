@@ -1,4 +1,9 @@
-## v2.4.0-dev (Oct 27, 2022)
+## v2.6.0-dev (Jan 05, 2023)
+## v2.5.0 (Jan 05, 2023)
+- Logging cid from res header isntead of req in local development [#821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/821)
+- Replace morgan stream to use console.log [#847](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/847)
+
+## v2.4.0 (Dec 01, 2022)
 ## v2.3.0 (Oct 27, 2022)
 - Performance: Skip retries when flushing CloudWatch metrics, prioritize returning a response instead. [720](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/720)
 - Add Correlation ID to SCAPI requests. [#728](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/728)

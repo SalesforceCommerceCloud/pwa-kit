@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {usePaymentMethodsForOrder} from 'commerce-sdk-react'
+import {usePaymentMethodsForOrder} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 import {useParams} from 'react-router-dom'
 

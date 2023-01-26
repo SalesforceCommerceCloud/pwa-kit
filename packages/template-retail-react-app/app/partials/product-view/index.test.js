@@ -10,17 +10,9 @@ import PropTypes from 'prop-types'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import mockProductDetail from '../../commerce-api/mocks/variant-750518699578M'
 import ProductView from './index'
-import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import userEvent from '@testing-library/user-event'
-
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
 
 jest.mock('../../commerce-api/einstein')
 
@@ -51,12 +43,9 @@ MockComponent.propTypes = {
     updateWishlist: PropTypes.func
 }
 
-const server = setupMockServer()
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
@@ -64,9 +53,7 @@ beforeEach(() => {
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('ProductView Component renders properly', () => {
     const addToCart = jest.fn()

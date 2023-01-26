@@ -17,13 +17,7 @@ import {useProductViewModal} from './use-product-view-modal'
 import {DEFAULT_LOCALE} from '../utils/test-utils'
 import {renderWithProviders} from '../utils/test-utils'
 import messages from '../translations/compiled/en-GB.json'
-jest.mock('../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
+
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
     return {

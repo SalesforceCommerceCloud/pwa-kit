@@ -371,18 +371,14 @@ describe('SSRServer operation', () => {
 
         test('should not proxy', () => {
             const app = RemoteServerFactory._createApp(opts())
-            return request(app)
-                .get('/mobify/proxy/base/test/path')
-                .expect(501)
+            return request(app).get('/mobify/proxy/base/test/path').expect(501)
         })
     })
 
     test('SSRServer handles /mobify/ping', () => {
         const app = RemoteServerFactory._createApp(opts())
 
-        return request(app)
-            .get('/mobify/ping')
-            .expect(200)
+        return request(app).get('/mobify/ping').expect(200)
     })
 
     describe('SSRServer worker.js handling', () => {
@@ -431,9 +427,7 @@ describe('SSRServer operation', () => {
                 const app = RemoteServerFactory._createApp(opts({buildDir: tmpDir}))
                 app.get('/worker.js(.map)?', RemoteServerFactory.serveServiceWorker)
 
-                return request(app)
-                    .get(requestPath)
-                    .expect(404)
+                return request(app).get(requestPath).expect(404)
             })
         })
     })
@@ -574,9 +568,7 @@ describe('SSRServer operation', () => {
 
         app.get('/thing', RemoteServerFactory.serveStaticFile('this-does-not-exist.ico'))
 
-        return request(app)
-            .get('/thing')
-            .expect(404)
+        return request(app).get('/thing').expect(404)
     })
 })
 
@@ -882,7 +874,7 @@ describe('generateCacheKey', () => {
             url: '/test?a=1',
             query: {},
             headers: {},
-            get: function(key) {
+            get: function (key) {
                 return this.headers[key]
             },
             ...overrides

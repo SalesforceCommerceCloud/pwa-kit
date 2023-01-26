@@ -6,8 +6,8 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {updateCache, QueryKeysMatrixElement, CombinedMutationTypes, Client} from '../utils'
+import {MutationFunction, useQueryClient, UseMutationResult} from '@tanstack/react-query'
+import {updateCache, CacheUpdateMatrixElement, Client, NotImplementedError} from '../utils'
 
 export const ShopperCustomersMutations = {
     /**
@@ -17,99 +17,57 @@ export const ShopperCustomersMutations = {
      */
     RegisterCustomer: 'registerCustomer',
     /**
-   * **DEPRECATION NOTICE**
-
-To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
-
----
-
-Log the user out.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=invalidateCustomerAuth} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#invalidatecustomerauth} for more information on the parameters and returned data type.
-   */
+     * WARNING: This method is not implemented.
+     *
+     * **DEPRECATION NOTICE**
+     * To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
+     * ---
+     * Log the user out.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=invalidateCustomerAuth} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#invalidatecustomerauth} for more information on the parameters and returned data type.
+     */
     InvalidateCustomerAuth: 'invalidateCustomerAuth',
     /**
-   * **DEPRECATION NOTICE**
-
-To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
-
----
-
-Obtains a new JSON Web Token (JWT)for a guest or registered
-customer. Tokens are returned as an HTTP Authorization:Bearer response
-header entry. These kinds of request are supported, as specified by the
-type:
-
-Type guest - creates a guest (non-authenticated) customer
-and returns a token for the customer.
-Request Body for guest : \{\"type\": \"guest\"\}
-Type credentials - authenticates credentials passed in the
-HTTP Authorization:Basic request header, returning a token for a
-successfully authenticated customer, otherwise it throws an
-AuthenticationFailedException.
-Request Body for guest : \{\"type\": \"credentials\"\}
-Type refresh - examines the token passed in the HTTP
-Authorization:Bearer request header and when valid returns a new token
-with an updated expiry time.
-Request Body for guest : \{\"type\": \"refresh\"\}
-
-For a request of type credentials:
-
-Updates profile attributes for the customer (for example,
-\"last-visited\").
-Handles the maximum number of failed login attempts.
-
-About JWT The token contains 3 sections:
-
-The header section (specifies token type and algorithm used),
-the payload section (contains customer information, client ID,
-issue, and expiration time),
-finally the signature section records the token signature.
-
-A token is created and returned to the client whenever a registered
-customer logs in (type \"credentials\") or a guest customer requests it (type
-\"guest\"). The token is returned in the response header as
-Authorization: Bearer --token--
-
-The client has to include the token in the request header as
-Authorization: Bearer --token--
-in any follow-up request. The server declines any follow-up requests
-without a token or which cannot be verified based on the token signature
-or expiration time. A token nearing its expiration time should be
-exchanged for a new one (type \"refresh\").
-
-See \"API Usage \> JWT\" for more details on using JWT as an authentication
-mechanism.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=authorizeCustomer} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#authorizecustomer} for more information on the parameters and returned data type.
-   */
+     * WARNING: This method is not implemented.
+     *
+     * **DEPRECATION NOTICE**
+     * To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
+     * ---
+     * Obtains a new JSON Web Token (JWT)for a guest or registered customer.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=authorizeCustomer} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#authorizecustomer} for more information on the parameters and returned data type.
+     */
     AuthorizeCustomer: 'authorizeCustomer',
     /**
-   * **DEPRECATION NOTICE**
-
-To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
-
----
-
-Obtain the JSON Web Token (JWT) for registered customers whose credentials are stored using a third party system. Accepts loginId and
-clientId, returns a customer object in the response body and the JWT generated against the clientId in the response header.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=authorizeTrustedSystem} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#authorizetrustedsystem} for more information on the parameters and returned data type.
-   */
+     * WARNING: This method is not implemented.
+     *
+     * **DEPRECATION NOTICE**
+     * To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
+     * ---
+     * Obtain the JSON Web Token (JWT) for registered customers whose credentials are stored using a third party system.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=authorizeTrustedSystem} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#authorizetrustedsystem} for more information on the parameters and returned data type.
+     */
     AuthorizeTrustedSystem: 'authorizeTrustedSystem',
     /**
+     * WARNING: This method is not implemented.
+     *
      * Reset customer password, after obtaining a reset token. This is the second step in the reset customer password flow, where a customer password is reset by providing the new credentials along with a reset token. This call should be preceded by a call to the /create-reset-token endpoint.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=resetPassword} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#resetpassword} for more information on the parameters and returned data type.
      */
     ResetPassword: 'resetPassword',
     /**
+     * WARNING: This method is not implemented.
+     *
      * Get reset password token. This is the first step in the reset customer password flow, where a password reset token is requested for future use to reset a customer password. This call should be followed by a call to the /reset endpoint.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getResetPasswordToken} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getresetpasswordtoken} for more information on the parameters and returned data type.
      */
     GetResetPasswordToken: 'getResetPasswordToken',
     /**
+     * WARNING: This method is not implemented.
+     *
      * Registers a new external profile for a customer. This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=registerExternalProfile} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#registerexternalprofile} for more information on the parameters and returned data type.
@@ -140,6 +98,8 @@ clientId, returns a customer object in the response body and the JWT generated a
      */
     UpdateCustomerAddress: 'updateCustomerAddress',
     /**
+     * WARNING: This method is not implemented.
+     *
      * Updates the customer's password.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomerPassword} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomerpassword} for more information on the parameters and returned data type.
@@ -164,37 +124,26 @@ clientId, returns a customer object in the response body and the JWT generated a
      */
     CreateCustomerProductList: 'createCustomerProductList',
     /**
+     * WARNING: This method is not implemented.
+     *
      * Deletes a customer product list.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=deleteCustomerProductList} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#deletecustomerproductlist} for more information on the parameters and returned data type.
      */
     DeleteCustomerProductList: 'deleteCustomerProductList',
     /**
+     * WARNING: This method is not implemented.
+     *
      * Changes a product list. Changeable properties are the name, description, and if the list is public.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomerProductList} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomerproductlist} for more information on the parameters and returned data type.
      */
     UpdateCustomerProductList: 'updateCustomerProductList',
     /**
-   * Adds an item to the customer's product list. Considered values from the request body are:
-
-type: A valid type, mandatory. This is the type of the item to be added to the customer's product.
-list.
-priority: This is the priority of the item to be added to the customer's product list.
-public: This is the flag whether the item to be added to the customer's product list is public.
-product_id: A valid product ID, used for product item type only. This is the ID (SKU)
-of the product related to the item to be added to the customer's product list. It is mandatory for
-product item type, and it must be a valid product id, otherwise
-ProductListProductIdMissingException or ProductListProductNotFoundException
-will be thrown.
-quantity: Used for product item type only. This is the quantity of the item to be
-added to the customer's product list.
-custom properties in the form c_\<CUSTOM_NAME\>: The custom property must correspond to a custom
-attribute (\<CUSTOM_NAME\>) defined for ProductListItem. The value of this property must be valid for the
-type of custom attribute defined for ProductListItem.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=createCustomerProductListItem} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#createcustomerproductlistitem} for more information on the parameters and returned data type.
-   */
+     * Adds an item to the customer's product list. Considered values from the request body are:
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=createCustomerProductListItem} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#createcustomerproductlistitem} for more information on the parameters and returned data type.
+     */
     CreateCustomerProductListItem: 'createCustomerProductListItem',
     /**
      * Removes an item from a customer product list.
@@ -203,96 +152,88 @@ type of custom attribute defined for ProductListItem.
      */
     DeleteCustomerProductListItem: 'deleteCustomerProductListItem',
     /**
-   * Updates an item of a customer's product list.
-Considered values from the request body are:
-
-priority: This is the priority of the customer's product list item.
-public: This is the flag whether the customer's product list item is public.
-quantity: This is the quantity of
-the customer's product list item. Used for product item type only.
-custom properties in the form c_\<CUSTOM_NAME\>: The custom property
-must correspond to a custom attribute (\<CUSTOM_NAME\>) defined for ProductListItem.
-The value of this property must be valid for the type of custom attribute defined for ProductListItem.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomerProductListItem} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomerproductlistitem} for more information on the parameters and returned data type.
-   */
+     * Updates an item of a customer's product list.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=updateCustomerProductListItem} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#updatecustomerproductlistitem} for more information on the parameters and returned data type.
+     */
     UpdateCustomerProductListItem: 'updateCustomerProductListItem'
 } as const
 
-export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
-
-export const shopperCustomersQueryKeysMatrix = {
+export const shopperCustomersCacheUpdateMatrix = {
     authorizeCustomer: (
         params: Argument<Client['authorizeCustomer']>,
         response: DataType<Client['authorizeCustomer']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     authorizeTrustedSystem: (
         params: Argument<Client['authorizeTrustedSystem']>,
         response: DataType<Client['authorizeTrustedSystem']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     deleteCustomerProductList: (
         params: Argument<Client['deleteCustomerProductList']>,
         response: DataType<Client['deleteCustomerProductList']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     getResetPasswordToken: (
         params: Argument<Client['getResetPasswordToken']>,
         response: DataType<Client['getResetPasswordToken']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     invalidateCustomerAuth: (
         params: Argument<Client['invalidateCustomerAuth']>,
         response: DataType<Client['invalidateCustomerAuth']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     registerCustomer: (
         params: Argument<Client['registerCustomer']>,
         response: DataType<Client['registerCustomer']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     registerExternalProfile: (
         params: Argument<Client['registerExternalProfile']>,
         response: DataType<Client['registerExternalProfile']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     resetPassword: (
         params: Argument<Client['resetPassword']>,
         response: DataType<Client['resetPassword']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     updateCustomerPassword: (
         params: Argument<Client['updateCustomerPassword']>,
         response: DataType<Client['updateCustomerPassword']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     updateCustomerProductList: (
         params: Argument<Client['updateCustomerProductList']>,
         response: DataType<Client['updateCustomerProductList']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     updateCustomer: (
         params: Argument<Client['updateCustomer']>,
         response: DataType<Client['updateCustomer']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         const {customerId} = params.parameters
         return {
-            update: [['/customers', customerId, {customerId}]],
+            update: [{name: 'customer', key: ['/customers', customerId, {customerId}]}],
             invalidate: [
-                ['/customers', customerId, '/payment-instruments'],
-                ['/customers', customerId, '/addresses'],
-                ['/customers', '/external-profile']
+                {
+                    name: 'customerPaymentInstrument',
+                    key: ['/customers', customerId, '/payment-instruments']
+                },
+                {name: 'customerAddress', key: ['/customers', customerId, '/addresses']},
+                {name: 'externalProfile', key: ['/customers', '/external-profile']}
             ]
         }
     },
@@ -300,80 +241,101 @@ export const shopperCustomersQueryKeysMatrix = {
     updateCustomerAddress: (
         params: Argument<Client['updateCustomerAddress']>,
         response: DataType<Client['updateCustomerAddress']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         const {customerId, addressName} = params.parameters
         return {
-            update: [['/customers', customerId, '/addresses', {addressName, customerId}]],
-            invalidate: [['/customers', customerId, {customerId}]]
+            update: [
+                {
+                    name: 'customerAddress',
+                    key: ['/customers', customerId, '/addresses', {addressName, customerId}]
+                }
+            ],
+            invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}]
         }
     },
 
     createCustomerAddress: (
         params: Argument<Client['createCustomerAddress']>,
         response: DataType<Client['createCustomerAddress']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         const {customerId} = params.parameters
         const {addressId} = params.body
         return {
             update: [
-                ['/customers', customerId, '/addresses', {addressName: addressId, customerId}]
+                {
+                    name: 'customerAddress',
+                    key: [
+                        '/customers',
+                        customerId,
+                        '/addresses',
+                        {addressName: addressId, customerId}
+                    ]
+                }
             ],
-            invalidate: [['/customers', customerId, {customerId}]]
+            invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}]
         }
     },
 
     removeCustomerAddress: (
         params: Argument<Client['removeCustomerAddress']>,
         response: DataType<Client['removeCustomerAddress']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
         //  The required parameters become optional accidentally
         // @ts-ignore
         const {customerId, addressName} = params.parameters
         return {
-            invalidate: [['/customers', customerId, {customerId}]],
-            remove: [['/customers', customerId, '/addresses', {addressName, customerId}]]
+            invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}],
+            remove: [
+                {
+                    name: 'customerAddress',
+                    key: ['/customers', customerId, '/addresses', {addressName, customerId}]
+                }
+            ]
         }
     },
 
     createCustomerPaymentInstrument: (
         params: Argument<Client['createCustomerPaymentInstrument']>,
         response: DataType<Client['createCustomerPaymentInstrument']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         const {customerId} = params.parameters
         return {
             update: [
-                [
-                    '/customers',
-                    customerId,
-                    '/payment-instruments',
-                    {
+                {
+                    name: 'customerPaymentInstrument',
+                    key: [
+                        '/customers',
                         customerId,
-                        paymentInstrumentId: response?.paymentInstrumentId
-                    }
-                ]
+                        '/payment-instruments',
+                        {customerId, paymentInstrumentId: response?.paymentInstrumentId}
+                    ]
+                }
             ],
-            invalidate: [['/customers', customerId, {customerId}]]
+            invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}]
         }
     },
 
     deleteCustomerPaymentInstrument: (
         params: Argument<Client['deleteCustomerPaymentInstrument']>,
         response: DataType<Client['deleteCustomerPaymentInstrument']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
         //  The required parameters become optional accidentally
         // @ts-ignore
         const {customerId, paymentInstrumentId} = params.parameters
         return {
-            invalidate: [['/customers', customerId, {customerId}]],
+            invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}],
             remove: [
-                [
-                    '/customers',
-                    customerId,
-                    '/payment-instruments',
-                    {customerId, paymentInstrumentId}
-                ]
+                {
+                    name: 'customerPaymentInstrument',
+                    key: [
+                        '/customers',
+                        customerId,
+                        '/payment-instruments',
+                        {customerId, paymentInstrumentId}
+                    ]
+                }
             ]
         }
     },
@@ -381,11 +343,19 @@ export const shopperCustomersQueryKeysMatrix = {
     createCustomerProductList: (
         params: Argument<Client['createCustomerProductList']>,
         response: DataType<Client['createCustomerProductList']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         const {customerId} = params.parameters
         return {
             update: [
-                ['/customers', customerId, '/product-list', {customerId, listId: response?.id}]
+                {
+                    name: 'customerProductList',
+                    key: [
+                        '/customers',
+                        customerId,
+                        '/product-list',
+                        {customerId, listId: response?.id}
+                    ]
+                }
             ]
         }
     },
@@ -393,57 +363,131 @@ export const shopperCustomersQueryKeysMatrix = {
     createCustomerProductListItem: (
         params: Argument<Client['createCustomerProductListItem']>,
         response: DataType<Client['createCustomerProductListItem']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         const {customerId, listId} = params.parameters
         return {
-            update: [['/customers', customerId, '/product-list', listId, {itemId: response?.id}]],
-            invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]]
+            update: [
+                {
+                    name: 'customerProductListItem',
+                    key: ['/customers', customerId, '/product-list', listId, {itemId: response?.id}]
+                }
+            ],
+            invalidate: [
+                {
+                    name: 'customerProductList',
+                    key: ['/customers', customerId, '/product-list', {customerId, listId}]
+                }
+            ]
         }
     },
 
     updateCustomerProductListItem: (
         params: Argument<Client['updateCustomerProductListItem']>,
         response: DataType<Client['updateCustomerProductListItem']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         const {customerId, listId, itemId} = params.parameters
         return {
-            update: [['/customers', customerId, '/product-list', listId, {itemId}]],
-            invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]]
+            update: [
+                {
+                    name: 'customerProductListItem',
+                    key: ['/customers', customerId, '/product-list', listId, {itemId}]
+                }
+            ],
+            invalidate: [
+                {
+                    name: 'customerProductList',
+                    key: ['/customers', customerId, '/product-list', {customerId, listId}]
+                }
+            ]
         }
     },
+
     deleteCustomerProductListItem: (
         params: Argument<Client['deleteCustomerProductListItem']>,
         response: DataType<Client['deleteCustomerProductListItem']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
         //  The required parameters become optional accidentally
         // @ts-ignore
         const {customerId, listId, itemId} = params.parameters
         return {
-            invalidate: [['/customers', customerId, '/product-list', {customerId, listId}]],
-            remove: [['/customers', customerId, '/product-list', listId, {itemId}]]
+            invalidate: [
+                {
+                    name: 'customerProductList',
+                    key: ['/customers', customerId, '/product-list', {customerId, listId}]
+                }
+            ],
+            remove: [
+                {
+                    name: 'customerProductListItem',
+                    key: ['/customers', customerId, '/product-list', listId, {itemId}]
+                }
+            ]
         }
     }
 }
 
+export const SHOPPER_CUSTOMERS_NOT_IMPLEMENTED = [
+    'authorizeCustomer',
+    'authorizeTrustedSystem',
+    'deleteCustomerProductList',
+    'getResetPasswordToken',
+    'invalidateCustomerAuth',
+    'registerExternalProfile',
+    'resetPassword',
+    'updateCustomerPassword',
+    'updateCustomerProductList'
+]
+
+export type ShopperCustomersMutationType =
+    (typeof ShopperCustomersMutations)[keyof typeof ShopperCustomersMutations]
+
+type UseShopperCustomersMutationHeaders = NonNullable<
+    Argument<Client['registerCustomer']>
+>['headers']
+type UseShopperCustomersMutationArg = {
+    headers?: UseShopperCustomersMutationHeaders
+    rawResponse?: boolean
+    action: ShopperCustomersMutationType
+}
+
+type ShopperCustomersClient = ApiClients['shopperCustomers']
+
 /**
  * A hook for performing mutations with the Shopper Customers API.
  */
-export function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
-    action: Action
-) {
-    type Params = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
+function useShopperCustomersMutation<Action extends ShopperCustomersMutationType>(
+    arg: UseShopperCustomersMutationArg
+): UseMutationResult<
+    DataType<ShopperCustomersClient[Action]> | Response,
+    Error,
+    Argument<ShopperCustomersClient[Action]>
+> {
+    const {headers, rawResponse, action} = arg
+
+    if (SHOPPER_CUSTOMERS_NOT_IMPLEMENTED.includes(action)) {
+        NotImplementedError()
+    }
+    type Params = Argument<ShopperCustomersClient[Action]>
+    type Data = DataType<ShopperCustomersClient[Action]>
     const queryClient = useQueryClient()
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
-            return method.call(apiClients['shopperCustomers'], params)
+            return (
+                method.call as (
+                    apiClient: ShopperCustomersClient,
+                    params: Params,
+                    rawResponse: boolean | undefined
+                ) => any
+            )(apiClients['shopperCustomers'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {
-                updateCache(queryClient, action, shopperCustomersQueryKeysMatrix, data, params)
+                updateCache(queryClient, action, shopperCustomersCacheUpdateMatrix, data, params)
             }
         }
     )
 }
+
+export {useShopperCustomersMutation}

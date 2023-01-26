@@ -359,7 +359,7 @@ jest.mock('@loadable/server', () => {
         // Tests aren't being run through webpack, therefore no chunks or `loadable-stats.json`
         // file is being created. ChunkExtractor causes a file read exception. For this
         // reason, we mock the implementation to do nothing.
-        ChunkExtractor: function() {
+        ChunkExtractor: function () {
             return {
                 collectChunks: jest.fn().mockImplementation((x) => x),
                 getScriptElements: jest.fn().mockReturnValue([])
@@ -716,8 +716,9 @@ describe('The Node SSR Environment', () => {
             assertions: (res) => {
                 expect(res.statusCode).toBe(404)
 
-                // Because of the prepass step we'll expect that this method is called twice.
-                expect(console.log).toHaveBeenCalledTimes(2)
+                // we'll expect that this method is called three times,
+                // twice for rendering pipeline because of the prepass step and one for http request logging
+                expect(console.log).toHaveBeenCalledTimes(3)
             }
         }
     ]

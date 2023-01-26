@@ -1,3 +1,18 @@
+## v2.5.0 (Jan 5, 2023)
+- Add instanceType to Einstein activity body [#858](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/858)
+- Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
+- Einstein handle variants [#867](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/867)
+- Fix cc exp year [#874](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/874)
+
+## v2.4.0 (Dec 1, 2022)
+- Dynamic footer Copyright date [#741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/741)
+- Footer copyright: remove the remaining hardcoded year [#760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/760)
+- ImageGallery uses image.link when DIS is not set [#786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/786)
+- Use default locale as target if none is specified [#788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/788)
+- Password change bug fix [#803](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/803)
+- pwa-kit-dev command for tailing logs [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
+- Update usages of zzrf-001 ODS instance to the new short URL format [#816](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/816)
+
 ## v2.3.0 (Oct 27, 2022)
 - Fix locale `alias` by including `locale` object inside the MultiSite Context.  [#716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/716)
 - Updated translations. [#725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/725)

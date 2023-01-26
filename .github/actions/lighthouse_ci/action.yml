@@ -1,0 +1,7 @@
+name: lighthouse_ci
+runs:
+  using: composite
+  steps:
+  - name: Run Lighthouse CI on the PWA
+    run: npm run test:lighthouse --prefix packages/template-retail-react-app
+    shell: bash
