@@ -57,7 +57,7 @@ export const AddToCartModal = () => {
     if (!isOpen) {
         return null
     }
-    const {product, itemsAdded} = data || []
+    const {product, itemsAdded = []} = data || {}
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
