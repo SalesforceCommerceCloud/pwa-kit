@@ -111,6 +111,18 @@ export class CloudAPIClient {
         await this.throwForStatus(res)
         return await res.json()
     }
+
+    async createLoggingToken(project: string, environment: string) : Promise<string> {
+        const url = new URL(this.opts.origin)
+        url.pathname = `/api/projects/${project}/target/${environment}/jwt/`
+        const headers = await this.getHeaders({})
+        const res = await this.opts.fetch(url.toString(), {
+            method: 'POST',
+            headers
+        })
+        await this.throwForStatus(res)
+        return await res.json().token
+    }
 }
 
 export const defaultMessage = (gitInstance: git = git): string => {

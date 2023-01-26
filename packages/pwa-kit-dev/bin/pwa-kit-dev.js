@@ -345,24 +345,17 @@ const main = async () => {
             )
         )
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
-        .action(async ({project, environment, cloudOrigin, credentialsFile}, command) => {
+        .action(async ({project, environment, cloudOrigin, credentialsFile}) => {
             if (!project) {
-                project = scriptUtils.readPackageJson('name')
+                project = upload2.getPkgJSON()['name']
             }
 
-            let credentials
-            try {
-                credentials = fse.readJsonSync(credentialsFile)
-            } catch (e) {
-                scriptUtils.fail(`Error reading credentials: ${e}`)
-            }
+            const client = new upload2.CloudAPIClient({
+                credentials: await upload2.readCredentials(credentialsFile),
+                origin: cloudOrigin
+            })
 
-            const token = await scriptUtils.createToken(
-                project,
-                environment,
-                cloudOrigin,
-                credentials.api_key
-            )
+            const token = client.createLoggingToken(project, environment)
             const url = new URL(cloudOrigin.replace('cloud', 'logs'))
             url.protocol = 'wss'
             url.search = new URLSearchParams({
