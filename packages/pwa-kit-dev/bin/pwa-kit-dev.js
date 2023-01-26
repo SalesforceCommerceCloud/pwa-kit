@@ -15,11 +15,11 @@ const {execSync: _execSync} = require('child_process')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
-const upload2 = (() => {
+const scriptUtils = (() => {
     try {
-        return require('../dist/utils/upload2')
+        return require('../dist/utils/script-utils')
     } catch {
-        return require('../utils/upload2')
+        return require('../utils/script-utils')
     }
 })()
 
@@ -96,7 +96,7 @@ const main = async () => {
             .command(name)
             .addOption(
                 new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
-                    .default(upload2.DEFAULT_CLOUD_ORIGIN)
+                    .default(scriptUtils.DEFAULT_CLOUD_ORIGIN)
                     .env('CLOUD_API_BASE')
             )
             .addOption(
@@ -113,7 +113,7 @@ const main = async () => {
                 const {cloudOrigin, credentialsFile} = actionCommand.opts()
                 actionCommand.setOptionValue(
                     'credentialsFile',
-                    upload2.getCredentialsFile(cloudOrigin, credentialsFile)
+                    scriptUtils.getCredentialsFile(cloudOrigin, credentialsFile)
                 )
             })
     }
@@ -264,7 +264,7 @@ const main = async () => {
                 // get the correct configuration object.
                 process.env.DEPLOY_TARGET = target
 
-                const credentials = await upload2.readCredentials(credentialsFile)
+                const credentials = await scriptUtils.readCredentials(credentialsFile)
 
                 const mobify = getConfig() || {}
 
@@ -281,7 +281,7 @@ const main = async () => {
                     }
                 }
 
-                const bundle = await upload2.createBundle({
+                const bundle = await scriptUtils.createBundle({
                     message,
                     ssr_parameters: mobify.ssrParameters,
                     ssr_only: mobify.ssrOnly,
@@ -289,7 +289,7 @@ const main = async () => {
                     buildDirectory,
                     projectSlug
                 })
-                const client = new upload2.CloudAPIClient({
+                const client = new scriptUtils.CloudAPIClient({
                     credentials,
                     origin: cloudOrigin
                 })
@@ -347,12 +347,12 @@ const main = async () => {
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
         .action(async ({project, environment, cloudOrigin, credentialsFile}) => {
             if (!project) {
-                project = upload2.getPkgJSON()['name']
+                project = scriptUtils.getPkgJSON()['name']
             }
 
-            const credentials = await upload2.readCredentials(credentialsFile)
+            const credentials = await scriptUtils.readCredentials(credentialsFile)
 
-            const client = new upload2.CloudAPIClient({
+            const client = new scriptUtils.CloudAPIClient({
                 credentials,
                 origin: cloudOrigin
             })
@@ -390,7 +390,7 @@ const main = async () => {
 
             ws.on('message', (data) => {
                 JSON.parse(data).forEach((log) => {
-                    const {message, shortRequestId, level} = upload2.parseLog(log.message)
+                    const {message, shortRequestId, level} = scriptUtils.parseLog(log.message)
                     const color = chalk[colors[level.toLowerCase()] || 'green']
                     const paddedLevel = level.padEnd(6)
                     console.log(
