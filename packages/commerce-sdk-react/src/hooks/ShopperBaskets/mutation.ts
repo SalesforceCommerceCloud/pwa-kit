@@ -458,6 +458,7 @@ export function useShopperBasketsMutation<Action extends ShopperBasketsMutationT
         },
         {
             onSuccess: (data, params) => {
+                console.log('action', action)
                 updateCache(queryClient, action, cacheUpdateMatrix, data, params)
             }
         }

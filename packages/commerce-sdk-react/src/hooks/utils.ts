@@ -60,13 +60,19 @@ export const updateCache = <Action extends CombinedMutationTypes>(
 
     // STEP 1. Update data inside query cache for the matching queryKeys
     cacheUpdateMatrix[action]?.(params, response)?.update?.map(({key: queryKey}) => {
+        console.log('update response', response)
+        console.log('queryKey111111111', queryKey)
         queryClient.setQueryData(queryKey, response)
     })
 
     // STEP 2. Invalidate cache entries with the matching queryKeys
     cacheUpdateMatrix[action]?.(params, response)?.invalidate?.map(({key: queryKey}) => {
+        console.log('invalidate-------------- queryKey', queryKey)
         queryClient.invalidateQueries({
-            predicate: (cacheQuery: any) => isMatchingKey(cacheQuery, queryKey)
+            predicate: (cacheQuery: any) => {
+                console.log('cacheQuery', cacheQuery)
+                return isMatchingKey(cacheQuery, queryKey)
+            }
         })
     })
 
