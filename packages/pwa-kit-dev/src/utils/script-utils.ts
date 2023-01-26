@@ -75,14 +75,15 @@ export class CloudAPIClient {
         }
     }
 
-    private async throwForStatus(res) {
+    private async throwForStatus(res: _fetch.Response) {
         if (res.status < 400) {
             return
         }
 
+        const body = await res.text()
         let error
         try {
-            error = await res.json()
+            error = JSON.parse(body)
         } catch (err) {
             error = {} // Cloud doesn't always return JSON
         }
@@ -90,7 +91,7 @@ export class CloudAPIClient {
         throw new Error(
             [
                 `HTTP ${res.status}`,
-                error.message || res.body,
+                error.message || body,
                 `For more information visit ${error.docs_url || DEFAULT_DOCS_URL}`
             ].join('\n')
         )
