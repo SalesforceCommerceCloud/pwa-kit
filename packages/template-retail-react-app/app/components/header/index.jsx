@@ -257,7 +257,9 @@ const Header = ({
                         icon={
                             <>
                                 <BasketIcon />
-                                {basket && <Badge variant="notification">{totalItems}</Badge>}
+                                {basket && totalItems > 0 && (
+                                    <Badge variant="notification">{totalItems}</Badge>
+                                )}
                             </>
                         }
                         variant="unstyled"
