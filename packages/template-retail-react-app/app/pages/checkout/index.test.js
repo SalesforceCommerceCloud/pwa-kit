@@ -27,11 +27,6 @@ import mockConfig from '../../../config/mocks/default'
 
 jest.mock('../../commerce-api/einstein')
 
-// Make sure fetch is defined in test env
-Object.defineProperty(window, 'fetch', {
-    value: require('cross-fetch')
-})
-
 const {keysToCamel} = jest.requireActual('../../commerce-api/utils')
 
 // This is our wrapped component for testing. It handles initialization of the customer
@@ -54,7 +49,6 @@ const WrappedCheckout = () => {
 // Set up and clean up
 beforeEach(() => {
     global.server.use(
-        // mock empty guest basket
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
             return res(
                 ctx.json({
@@ -220,7 +214,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Verify cart products display
     user.click(screen.getByText(/2 items in cart/i))
-    expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument
+    expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument()
 
     // Provide customer email and submit
     const emailInput = screen.getByLabelText(/email/i)
