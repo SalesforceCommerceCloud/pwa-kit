@@ -26,6 +26,7 @@ const colors = {
 const fancyLog = (level, msg) => {
     const color = colors[level] || 'green'
     const colorFn = chalk[color]
+    console.log(`${colorFn(level)}: ${msg}`)
 }
 
 const logWarning = (msg) => fancyLog('warn', msg)
