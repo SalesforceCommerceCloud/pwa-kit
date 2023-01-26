@@ -92,7 +92,7 @@ describe('scriptUtils', () => {
             const client = new scriptUtils.CloudAPIClient({credentials: {username, api_key}})
             expect(await client.getHeaders()).toEqual({
                 'User-Agent': `${pkg.name}@${pkg.version}`,
-                ...expectedAuthHeader,
+                ...expectedAuthHeader
             })
         })
     })
@@ -130,15 +130,13 @@ describe('scriptUtils', () => {
     })
 
     test('getCredentialsFile', async () => {
-        expect(
-            scriptUtils.getCredentialsFile('https://example.com', '/path/to/.mobify')
-        ).toBe('/path/to/.mobify')
+        expect(scriptUtils.getCredentialsFile('https://example.com', '/path/to/.mobify')).toBe(
+            '/path/to/.mobify'
+        )
         expect(scriptUtils.getCredentialsFile('https://example.com', undefined)).toBe(
             path.join(os.homedir(), '.mobify--example.com')
         )
-        expect(
-            scriptUtils.getCredentialsFile('https://cloud.mobify.com', undefined)
-        ).toBe(
+        expect(scriptUtils.getCredentialsFile('https://cloud.mobify.com', undefined)).toBe(
             path.join(os.homedir(), '.mobify')
         )
     })

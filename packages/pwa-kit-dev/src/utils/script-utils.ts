@@ -69,7 +69,7 @@ export class CloudAPIClient {
         const pkg = await getPkgJSON()
         return {
             'User-Agent': `${pkg.name}@${pkg.version}`,
-            ...this.getAuthHeader(),
+            ...this.getAuthHeader()
         }
     }
 
@@ -103,7 +103,7 @@ export class CloudAPIClient {
 
         const body = Buffer.from(JSON.stringify(bundle))
         const headers = {
-            ...await this.getHeaders(),
+            ...(await this.getHeaders()),
             'Content-Length': body.length.toString()
         }
 
@@ -120,7 +120,7 @@ export class CloudAPIClient {
         const url = new URL(this.opts.origin)
         url.pathname = `/api/projects/${project}/target/${environment}/jwt/`
         const headers = {
-            ...await this.getHeaders(),
+            ...(await this.getHeaders()),
             // Annoyingly, the new logging endpoint only accepts an
             // Authorization header that is inconsistent with our older APIs!
             Authorization: `Bearer ${this.opts.credentials.api_key}`
@@ -246,10 +246,7 @@ export const glob = (patterns?: string[]): MatchFn => {
     }
 }
 
-export const getCredentialsFile = (
-    cloudOrigin: string,
-    credentialsFile?: string,
-): string => {
+export const getCredentialsFile = (cloudOrigin: string, credentialsFile?: string): string => {
     if (credentialsFile) {
         return credentialsFile
     } else {
