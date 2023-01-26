@@ -288,16 +288,17 @@ describe('scriptUtils', () => {
                 expect(fetchMock).toHaveBeenCalledTimes(1)
 
                 expect(fetchMock).toHaveBeenCalledWith(
-                  expectedURL,
-                  expect.objectContaining({
-                    body: expect.anything(Buffer),
-                    method: 'POST',
-                    headers: {
-                      Authorization: expect.stringMatching(/^Basic /),
-                      'Content-Length': opts.body.length.toString(),
-                      'User-Agent': `${pkg.name}@${pkg.version}`
-                    }
-                  })
+                    expectedURL,
+                    expect.objectContaining({
+                        body: expect.anything(Buffer),
+                        method: 'POST',
+                        headers: {
+                            Authorization: expect.stringMatching(/^Basic /),
+                            'Content-Length': opts.body.length.toString(),
+                            'User-Agent': `${pkg.name}@${pkg.version}`
+                        }
+                    })
+                )
             }
         )
     })
