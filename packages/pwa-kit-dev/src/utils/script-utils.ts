@@ -180,7 +180,7 @@ export const createBundle = async ({
         .catch((e) => {
             const fullPath = path.join(process.cwd(), buildDirectory)
             throw new Error(
-                `[Error: Build directory at path "${fullPath}" not found.]\n` +
+                `Build directory at path "${fullPath}" not found.\n` +
                     'Run `pwa-kit-dev build` first!'
             )
         })
