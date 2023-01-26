@@ -65,12 +65,11 @@ export class CloudAPIClient {
         return {Authorization: `Basic ${encoded}`}
     }
 
-    private async getHeaders(extras: StringMap): Promise<StringMap> {
+    private async getHeaders(): Promise<StringMap> {
         const pkg = await getPkgJSON()
         return {
             'User-Agent': `${pkg.name}@${pkg.version}`,
             ...this.getAuthHeader(),
-            ...extras
         }
     }
 
@@ -103,7 +102,10 @@ export class CloudAPIClient {
         url.pathname = pathname
 
         const body = Buffer.from(JSON.stringify(bundle))
-        const headers = await this.getHeaders({'Content-Length': body.length.toString()})
+        const headers = {
+            ...await this.getHeaders(),
+            'Content-Length': body.length.toString()
+        }
 
         const res = await this.opts.fetch(url.toString(), {
             body,
@@ -117,9 +119,12 @@ export class CloudAPIClient {
     async createLoggingToken(project: string, environment: string): Promise<string> {
         const url = new URL(this.opts.origin)
         url.pathname = `/api/projects/${project}/target/${environment}/jwt/`
-        const headers = await this.getHeaders({
+        const headers = {
+            ...await this.getHeaders(),
+            // Annoyingly, the new logging endpoint only accepts an
+            // Authorization header that is inconsistent with our older APIs!
             Authorization: `Bearer ${this.opts.credentials.api_key}`
-        })
+        }
         const res = await this.opts.fetch(url.toString(), {
             method: 'POST',
             headers

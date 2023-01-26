@@ -90,11 +90,9 @@ describe('scriptUtils', () => {
 
         test('getHeaders', async () => {
             const client = new scriptUtils.CloudAPIClient({credentials: {username, api_key}})
-            const extra = {extraHeader: 'xyz'}
-            expect(await client.getHeaders(extra)).toEqual({
+            expect(await client.getHeaders()).toEqual({
                 'User-Agent': `${pkg.name}@${pkg.version}`,
                 ...expectedAuthHeader,
-                ...extra
             })
         })
     })
