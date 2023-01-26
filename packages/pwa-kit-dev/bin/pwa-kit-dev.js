@@ -23,6 +23,15 @@ const colors = {
     error: 'red'
 }
 
+const fancyLog = (level, msg) => {
+    const color = colors[level] || 'green'
+    const colorFn = chalk[color]
+    console.log(`FANCY LOG ${colorFn(level)}: ${msg}`)
+}
+
+const logWarning = (msg) => fancyLog('warn', msg)
+const logError = (msg) => fancyLog('error', msg)
+
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
@@ -134,6 +143,7 @@ const main = () => {
         .action(({user, key, credentialsFile}) => {
             try {
                 fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
+                console.log(".action")
                 console.log(`Saved Managed Runtime credentials to "${credentialsFile}".`)
             } catch (e) {
                 console.error('Failed to save credentials.')
@@ -274,8 +284,10 @@ const main = () => {
             ) {
                 scriptUtils.fail('ssrEnabled is set, but no ssrOnly or ssrShared files are defined')
             }
-            uploadBundle(options).catch((err) => {
-                console.error(err.message || err)
+            uploadBundle(options).catch((res) => {
+                const warnings = (res.warnings || [])
+                warnings.forEach(logWarning)
+                console.error(res.message || err)
             })
         })
 
@@ -360,6 +372,7 @@ const main = () => {
 
             ws.on('close', (code) => {
                 clearInterval(heartbeat)
+                console.log("onClose")
                 console.log('Connection closed with code', code)
             })
 
@@ -373,6 +386,7 @@ const main = () => {
                     const {message, shortRequestId, level} = scriptUtils.parseLog(log.message)
                     const color = chalk[colors[level.toLowerCase()] || 'green']
                     const paddedLevel = level.padEnd(6)
+                    console.log("on message")
                     console.log(
                         chalk.green(new Date(log.timestamp).toISOString()),
                         chalk.cyan(shortRequestId),
@@ -389,6 +403,8 @@ const main = () => {
 
     program.option('-v, --version', 'show version number').action(({version}) => {
         if (version) {
+
+            console.log("pkg.version")
             console.log(pkg.version)
         } else {
             program.help({error: true})
@@ -398,9 +414,15 @@ const main = () => {
     program.parse(process.argv)
 }
 
+
 Promise.resolve()
-    .then(() => main())
-    .catch((err) => {
-        console.error(err.message)
+    .then(() => {
+        console.log("onMain")
+        main()
+    })
+    .catch((res) => {
+        console.log("onResolve")
+        const errors = (res.errors || [])
+        errors.forEach(logError)
         process.exit(1)
     })

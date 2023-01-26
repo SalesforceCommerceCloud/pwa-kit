@@ -169,6 +169,7 @@ Utils.errorForStatus = (response) => {
         error = {}
     }
 
+    //TODO: Colorize and test
     return new Error(
         [
             `HTTP ${status}`,

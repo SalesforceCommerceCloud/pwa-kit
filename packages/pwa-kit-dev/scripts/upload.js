@@ -43,10 +43,9 @@ const upload = (options) => {
                 target: options.target
             }
 
-            console.log(`Beginning upload to ${options.origin}`)
             return buildRequest(requestOptions, dataBuffer)
         })
-        .then(() => {
+        .then((res) => {
             console.log('Bundle Uploaded!')
         })
 }
