@@ -81,6 +81,14 @@ const main = async () => {
         ].join('\n')
     )
 
+    /**
+     * Return a platform-specific representation of the default credentials
+     * location *for documentation purposes only*.
+     *
+     * It's easier to recognize the intention behind `(default "~/.mobify")` in
+     * docs than it is `(default "/Users/xyz/.mobify")`. In the second case,
+     * you have to actually remember that this is your home dir!
+     */
     const credentialsLocationDisplay = () => {
         const dir = process.platform === 'win32' ? '%USERPROFILE%' : '~'
         return p.join(dir, '.mobify')
