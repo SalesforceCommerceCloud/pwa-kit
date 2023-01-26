@@ -130,26 +130,17 @@ describe('scriptUtils', () => {
     })
 
     test('getCredentialsFile', async () => {
-        const findHomeDir = () => path.resolve('my-fake-home') + path.sep
         expect(
-            scriptUtils.getCredentialsFile('https://example.com', '/path/to/.mobify', undefined)
+            scriptUtils.getCredentialsFile('https://example.com', '/path/to/.mobify')
         ).toBe('/path/to/.mobify')
-        expect(scriptUtils.getCredentialsFile('https://example.com', undefined, findHomeDir)).toBe(
-            `${findHomeDir()}.mobify--example.com`
+        expect(scriptUtils.getCredentialsFile('https://example.com', undefined)).toBe(
+            path.join(os.homedir(), '.mobify--example.com')
         )
         expect(
-            scriptUtils.getCredentialsFile('https://cloud.mobify.com', undefined, findHomeDir)
-        ).toBe(`${findHomeDir()}.mobify`)
-    })
-
-    test('findHomeDir', () => {
-        process.env.USERPROFILE = '/path/to/fake-user-profile-dir/'
-        process.env.HOME = '/path/to/fake-home-dir/'
-        const forCurrentMachine =
-            process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
-        expect(scriptUtils.findHomeDir('win32')).toEqual(process.env.USERPROFILE)
-        expect(scriptUtils.findHomeDir('anything-else')).toEqual(process.env.HOME)
-        expect(scriptUtils.findHomeDir()).toEqual(forCurrentMachine)
+            scriptUtils.getCredentialsFile('https://cloud.mobify.com', undefined)
+        ).toBe(
+            path.join(os.homedir(), '.mobify')
+        )
     })
 
     describe('readCredentials', () => {
@@ -194,7 +185,7 @@ describe('scriptUtils', () => {
                         buildDirectory: path.join(tmpDir, 'does-not-exist'),
                         projectSlug: 'slug'
                     })
-            ).rejects.toThrow('Error: Build directory at path')
+            ).rejects.toThrow('Build directory at path')
         })
 
         test('should archive a bundle', async () => {

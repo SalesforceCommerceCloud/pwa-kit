@@ -246,13 +246,9 @@ export const glob = (patterns?: string[]): MatchFn => {
     }
 }
 
-export const findHomeDir = (platform: string = process.platform) =>
-    platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
-
 export const getCredentialsFile = (
     cloudOrigin: string,
     credentialsFile?: string,
-    doFindHomeDir: () => string = findHomeDir
 ): string => {
     if (credentialsFile) {
         return credentialsFile
@@ -260,14 +256,13 @@ export const getCredentialsFile = (
         const url = new URL(cloudOrigin)
         const host = url.host
         const suffix = host === 'cloud.mobify.com' ? '' : `--${host}`
-        return path.join(doFindHomeDir(), `.mobify${suffix}`)
+        return path.join(os.homedir(), `.mobify${suffix}`)
     }
 }
 
 export const readCredentials = async (filepath: string): Promise<Credentials> => {
     try {
-        const content = await readFile(filepath)
-        const data = JSON.parse(content.toString('utf-8'))
+        const data = await readJson(filepath)
         return {
             username: data.username,
             api_key: data.api_key
