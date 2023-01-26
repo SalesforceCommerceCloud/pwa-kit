@@ -76,7 +76,11 @@ beforeEach(() => {
     })
     global.server.use(
         rest.get('*/product-search', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json({data: [mockProductListSearchResponse]}))
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({data: [mockProductListSearchResponse]})
+            )
         }),
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedEmptyCustomerProductList))

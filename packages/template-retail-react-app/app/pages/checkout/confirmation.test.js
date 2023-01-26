@@ -157,10 +157,14 @@ beforeEach(() => {
             return res(ctx.json(successfulAccountCreation))
         }),
         rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json({
-                authType: 'guest',
-                customerId: 'customerid'
-            }))
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    authType: 'guest',
+                    customerId: 'customerid'
+                })
+            )
         }),
         rest.get('*/products', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockProducts))

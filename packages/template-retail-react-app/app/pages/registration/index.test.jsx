@@ -13,7 +13,6 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import mockConfig from '../../../config/mocks/default'
 import {rest} from 'msw'
-import { CallTracker } from 'assert'
 
 jest.setTimeout(60000)
 
@@ -113,14 +112,18 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
         }),
         rest.post('*/customers/action/login', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json({
-                authType: 'guest',
-                customerId: 'customerid'
-            }))
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    authType: 'guest',
+                    customerId: 'customerid'
+                })
+            )
         }),
         rest.post('*/customers/password/actions/create-reset-token', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockPasswordToken))
-        }),
+        })
     )
 })
 afterEach(() => {
