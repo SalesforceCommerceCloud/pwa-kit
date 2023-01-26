@@ -44,10 +44,17 @@ const upload = (options) => {
             }
 
             console.log(`Beginning upload to ${options.origin}`)
+
+            // Returns a Promise
             return buildRequest(requestOptions, dataBuffer)
         })
-        .then(() => {
+        .then((response) => {
+            // Display success message
             console.log('Bundle Uploaded!')
+            // Display warnings, if any
+            if (response.warnings) {
+                console.log(response.warnings)
+            }
         })
 }
 

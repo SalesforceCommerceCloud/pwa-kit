@@ -29,6 +29,7 @@ module.exports = {
     rules: {
         'prettier/prettier': ['error'],
         'no-console': 'off',
-        'no-unused-vars': ['error', {ignoreRestSiblings: true}]
+        'no-unused-vars': ['error', {ignoreRestSiblings: true}],
+        'no-var-requires': 'off'
     }
 }

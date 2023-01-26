@@ -23,6 +23,15 @@ const colors = {
     error: 'red'
 }
 
+const fancyLog = (level, msg) => {
+    const color = colors[level] || 'green'
+    const colorFn = chalk[color]
+    console.log(`${colorFn(level)}: ${msg}`)
+}
+
+const logWarning = (msg) => fancyLog('warn', msg)
+const logError = (msg) => fancyLog('error', msg)
+
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
@@ -275,7 +284,8 @@ const main = () => {
                 scriptUtils.fail('ssrEnabled is set, but no ssrOnly or ssrShared files are defined')
             }
             uploadBundle(options).catch((err) => {
-                console.error(err.message || err)
+                logError(err.message || err)
+                process.exit(1)
             })
         })
 
@@ -322,7 +332,7 @@ const main = () => {
             )
         )
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
-        .action(async ({project, environment, cloudOrigin, credentialsFile}, command) => {
+        .action(async ({project, environment, cloudOrigin, credentialsFile}) => {
             if (!project) {
                 project = scriptUtils.readPackageJson('name')
             }
@@ -401,6 +411,6 @@ const main = () => {
 Promise.resolve()
     .then(() => main())
     .catch((err) => {
-        console.error(err.message)
+        logError(err.message || err.toString())
         process.exit(1)
     })
