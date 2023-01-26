@@ -15,7 +15,6 @@ const {execSync: _execSync} = require('child_process')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
-
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled
 // code.

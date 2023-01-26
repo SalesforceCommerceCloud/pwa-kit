@@ -43,7 +43,6 @@ interface Bundle {
     ssr_shared: string[]
 }
 
-
 export const getPkgJSON = async () => {
     const data = await readFile(path.join(__dirname, '..', '..', 'package.json'))
     return JSON.parse(data.toString('utf-8'))
