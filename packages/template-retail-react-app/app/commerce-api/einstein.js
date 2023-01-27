@@ -357,7 +357,7 @@ class EinsteinAPI {
         }
 
         // Fetch the recommendations
-        const reco = await this.einsteinFetch(endpoint, method, body) || {}
+        const reco = (await this.einsteinFetch(endpoint, method, body)) || {}
 
         reco.recommenderName = recommenderName
 
@@ -378,7 +378,7 @@ class EinsteinAPI {
         }
 
         // Fetch the recommendations
-        const reco = await this.einsteinFetch(endpoint, method, body) || {}
+        const reco = (await this.einsteinFetch(endpoint, method, body)) || {}
 
         return this.fetchRecProductDetails(reco)
     }
