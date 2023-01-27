@@ -49,7 +49,7 @@ const ProductDetail = ({category, product, isLoading}) => {
     const navigate = useNavigation()
     const [primaryCategory, setPrimaryCategory] = useState(category)
     const [productSetSelection, setProductSetSelection] = useState({})
-    const setProductsRefs = React.useRef({})
+    const childProductRefs = React.useRef({})
 
     const isProductASet = product?.type.set
 
@@ -143,12 +143,12 @@ const ProductDetail = ({category, product, isLoading}) => {
         const unselected = product.setProducts.find(({id}) => !productSelectionKeys.includes(id))
 
         // Run "internal" validation on this product to show the error.
-        Object.values(setProductsRefs.current).forEach(({scope}) => {
+        Object.values(childProductRefs.current).forEach(({scope}) => {
             scope.validateAttributeSelection()
         })
 
         if (unselected) {
-            const {ref} = setProductsRefs.current[unselected.id]
+            const {ref} = childProductRefs.current[unselected.id]
 
             // Scroll the first unselected product into view.
             ref.scrollIntoView({
@@ -212,7 +212,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                                     ref={function(ref) {
                                         // Assign the "set" scope of the ref, this is how we access the internal
                                         // validation.
-                                        setProductsRefs.current[childProduct.id] = {
+                                        childProductRefs.current[childProduct.id] = {
                                             ref,
                                             scope: this
                                         }
