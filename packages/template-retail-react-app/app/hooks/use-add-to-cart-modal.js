@@ -94,8 +94,6 @@ export const AddToCartModal = () => {
                             flex="1"
                             paddingRight={{lg: '4', xl: '8'}}
                             paddingY={{base: '4', lg: '0'}}
-                            maxHeight="280px"
-                            overflowY="scroll"
                             // divider style
                             borderRightWidth={{lg: '1px'}}
                             borderBottomWidth={{base: '1px', lg: '0px'}}
