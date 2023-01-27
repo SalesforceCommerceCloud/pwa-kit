@@ -60,3 +60,11 @@ describe.each([[true], [false]])('Utils remote/local tests (isRemote: %p)', (isR
         })
     })
 })
+
+describe('catchAndLog', () => {
+    test('error', () => {
+        const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+        utils.catchAndLog()
+        expect(error.mock.calls).toEqual([['Uncaught exception: ', '(no error)']])
+    })
+})
