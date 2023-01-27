@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useState} from 'react'
+import React, {forwardRef, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
@@ -121,6 +121,7 @@ const ProductView = forwardRef(
         } = useProduct(product, isProductPartOfSet)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
+        const errorContainerRef = useRef(null)
 
         const validateAndShowError = () => {
             // Validate that all attributes are selected before proceeding.
@@ -128,6 +129,11 @@ const ProductView = forwardRef(
 
             if (!isProductASet && !hasValidSelection) {
                 toggleShowOptionsMessage(true)
+
+                errorContainerRef.current.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                })
             }
 
             return hasValidSelection
@@ -423,7 +429,7 @@ const ProductView = forwardRef(
                                     />
                                 </VStack>
                             )}
-                            <Box>
+                            <Box ref={errorContainerRef}>
                                 {!showLoading && showOptionsMessage && (
                                     <Fade in={true}>
                                         <Text color="orange.600" fontWeight={600} marginBottom={8}>
