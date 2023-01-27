@@ -45,7 +45,7 @@ interface Bundle {
 }
 
 export const getPkgJSON = async () => {
-    return readJson(path.join(__dirname, '..', '..', 'package.json'))
+    return readJson(path.join(__dirname, '..', 'package.json'))
 }
 
 export class CloudAPIClient {
