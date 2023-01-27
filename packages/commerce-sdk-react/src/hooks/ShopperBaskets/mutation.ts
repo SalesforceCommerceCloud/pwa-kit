@@ -301,7 +301,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             response: DataType<Client['createBasket']>
         ): CacheUpdateMatrixElement => {
             return {
-                // invalidate customer baskets query would re-fetch baskets data
+                // we want to re-fetch basket data in this case to get the basket total and other baskets data
                 ...invalidateCustomerBasketsQuery(customerId)
             }
         },
@@ -320,10 +320,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             params: Argument<Client['mergeBasket']>,
             response: DataType<Client['mergeBasket']>
         ): CacheUpdateMatrixElement => {
-            const basketId = response.basketId
-
             return {
-                ...updateBasketQuery(basketId, response),
                 ...invalidateCustomerBasketsQuery(customerId)
             }
         },
