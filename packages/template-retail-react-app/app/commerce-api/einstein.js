@@ -127,7 +127,13 @@ class EinsteinAPI {
             ...(body && {
                 body: JSON.stringify(body)
             })
+        }).catch(() => {
+            console.warn('Einstein request failed')
         })
+
+        if (!response?.ok) {
+            return
+        }
 
         const responseJson = await response.json()
 
