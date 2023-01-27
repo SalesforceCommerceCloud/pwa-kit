@@ -10,6 +10,9 @@ const app = require('./ssr')
 describe('server', () => {
     afterAll(() => app.server.close())
     test('responds with HTML', () => {
-        return request(app.server).get('/').expect(200).expect('Content-Type', /html/)
+        return request(app.server)
+            .get('/')
+            .expect(200)
+            .expect('Content-Type', /html/)
     })
 })

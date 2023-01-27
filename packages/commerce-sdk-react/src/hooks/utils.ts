@@ -49,7 +49,9 @@ export const updateCache = <Action extends CombinedMutationTypes>(
     const isMatchingKey = (cacheQuery: {queryKey: {[x: string]: any}}, queryKey: QueryKey) =>
         queryKey.every((item, index) =>
             isObject(item) && isObject(cacheQuery.queryKey[index])
-                ? Object.entries(cacheQuery.queryKey[index]).sort().toString() ===
+                ? Object.entries(cacheQuery.queryKey[index])
+                      .sort()
+                      .toString() ===
                   Object.entries(item as Record<string, unknown>)
                       .sort()
                       .toString()

@@ -439,8 +439,7 @@ export const SHOPPER_CUSTOMERS_NOT_IMPLEMENTED = [
     'updateCustomerProductList'
 ]
 
-export type ShopperCustomersMutationType =
-    (typeof ShopperCustomersMutations)[keyof typeof ShopperCustomersMutations]
+export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
 
 type UseShopperCustomersMutationHeaders = NonNullable<
     Argument<Client['registerCustomer']>
@@ -474,13 +473,11 @@ function useShopperCustomersMutation<Action extends ShopperCustomersMutationType
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
-            return (
-                method.call as (
-                    apiClient: ShopperCustomersClient,
-                    params: Params,
-                    rawResponse: boolean | undefined
-                ) => any
-            )(apiClients['shopperCustomers'], {...params, headers}, rawResponse)
+            return (method.call as (
+                apiClient: ShopperCustomersClient,
+                params: Params,
+                rawResponse: boolean | undefined
+            ) => any)(apiClients['shopperCustomers'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {

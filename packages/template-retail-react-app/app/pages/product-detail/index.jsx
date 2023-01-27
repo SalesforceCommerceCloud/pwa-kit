@@ -202,49 +202,50 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <hr />
 
                         {/* TODO: consider `childProduct.belongsToSet` */}
-                        {// Product Set: render the child products
-                        product.setProducts.map((childProduct) => (
-                            <Fragment key={childProduct.id}>
-                                <ProductView
-                                    // Do no use an arrow function as we are manipulating the functions scope.
-                                    ref={function(ref) {
-                                        // Assign the "set" scope of the ref, this is how we access the internal
-                                        // validation.
-                                        childProductRefs.current[childProduct.id] = {
-                                            ref,
-                                            scope: this
+                        {
+                            // Product Set: render the child products
+                            product.setProducts.map((childProduct) => (
+                                <Fragment key={childProduct.id}>
+                                    <ProductView
+                                        // Do no use an arrow function as we are manipulating the functions scope.
+                                        ref={function (ref) {
+                                            // Assign the "set" scope of the ref, this is how we access the internal
+                                            // validation.
+                                            childProductRefs.current[childProduct.id] = {
+                                                ref,
+                                                scope: this
+                                            }
+                                        }}
+                                        product={childProduct}
+                                        isProductPartOfSet={true}
+                                        addToCart={(variant, quantity) =>
+                                            handleAddToCart([
+                                                {product: childProduct, variant, quantity}
+                                            ])
                                         }
-                                    }}
-                                    product={childProduct}
-                                    isProductPartOfSet={true}
-                                    addToCart={(variant, quantity) =>
-                                        handleAddToCart([
-                                            {product: childProduct, variant, quantity}
-                                        ])
-                                    }
-                                    addToWishlist={(product, variant, quantity) =>
-                                        handleAddToWishlist(product, variant, quantity)
-                                    }
-                                    onVariantSelected={(product, variant, quantity) => {
-                                        if (quantity) {
-                                            setProductSetSelection((previousState) => ({
-                                                ...previousState,
-                                                [product.id]: {
-                                                    product,
-                                                    variant,
-                                                    quantity
-                                                }
-                                            }))
-                                        } else {
-                                            const selections = {...productSetSelection}
-                                            delete selections[product.id]
-                                            setProductSetSelection(selections)
+                                        addToWishlist={(product, variant, quantity) =>
+                                            handleAddToWishlist(product, variant, quantity)
                                         }
-                                    }}
-                                    isProductLoading={isLoading}
-                                    isCustomerProductListLoading={!wishlist.isInitialized}
-                                />
-                                <InformationAccordion product={childProduct} />
+                                        onVariantSelected={(product, variant, quantity) => {
+                                            if (quantity) {
+                                                setProductSetSelection((previousState) => ({
+                                                    ...previousState,
+                                                    [product.id]: {
+                                                        product,
+                                                        variant,
+                                                        quantity
+                                                    }
+                                                }))
+                                            } else {
+                                                const selections = {...productSetSelection}
+                                                delete selections[product.id]
+                                                setProductSetSelection(selections)
+                                            }
+                                        }}
+                                        isProductLoading={isLoading}
+                                        isCustomerProductListLoading={!wishlist.isInitialized}
+                                    />
+                                    <InformationAccordion product={childProduct} />
 
                                     <Box display={['none', 'none', 'none', 'block']}>
                                         <hr />
