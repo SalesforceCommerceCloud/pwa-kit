@@ -90,9 +90,9 @@ const ProductView = forwardRef(
             updateWishlist,
             isProductLoading,
             isProductPartOfSet = false,
-            variantSelected = () => {},
-            validate = (variant, quantity, stockLevel) =>
-                variant?.orderable && quantity > 0 && quantity <= stockLevel
+            onVariantSelected = () => {},
+            validateAttributeSelection = (variant, quantity, stockLevel) =>
+                !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
         },
         ref
     ) => {
@@ -124,10 +124,10 @@ const ProductView = forwardRef(
 
         const validateAndShowError = () => {
             // Validate that all attributes are selected before proceeding.
-            const hasValidSelection = validate(variant, quantity, stockLevel)
+            const hasValidSelection = validateAttributeSelection(variant, quantity, stockLevel)
 
-            if (!hasValidSelection) {
-                !isProductASet && toggleShowOptionsMessage(true)
+            if (!isProductASet && !hasValidSelection) {
+                toggleShowOptionsMessage(true)
             }
 
             return hasValidSelection
@@ -166,13 +166,16 @@ const ProductView = forwardRef(
             }
 
             if (addToCart || updateCart) {
-                const addToCartMessage = intl.formatMessage({
-                    defaultMessage: 'Add {quantity, plural, one {} other {All}} to Cart',
-                    id: 'product_view.button.add_to_cart'
-                }, {
-                    quantity: !isProductASet ? 1 : Infinity
-                })
-    
+                const addToCartMessage = intl.formatMessage(
+                    {
+                        defaultMessage: 'Add {quantity, plural, one {} other {All}} to Cart',
+                        id: 'product_view.button.add_to_cart'
+                    },
+                    {
+                        quantity: !isProductASet ? 1 : Infinity
+                    }
+                )
+
                 buttons.push(
                     <Button
                         key="cart-button"
@@ -221,7 +224,7 @@ const ProductView = forwardRef(
         // Bind the reference with our `scope` that includes the internal validate function for this component.
         // Other values can be added to this scope as required.
         if (typeof ref === 'function') {
-            ref = ref.bind({validate: validateAndShowError})
+            ref = ref.bind({validateAttributeSelection: validateAndShowError})
         }
 
         useEffect(() => {
@@ -231,14 +234,14 @@ const ProductView = forwardRef(
         }, [location.pathname])
 
         useEffect(() => {
-            if (!isProductASet && validate(variant, quantity, stockLevel)) {
+            if (!isProductASet && validateAttributeSelection(variant, quantity, stockLevel)) {
                 toggleShowOptionsMessage(false)
             }
         }, [variationParams])
 
         useEffect(() => {
             if (variant) {
-                variantSelected(product, variant, quantity)
+                onVariantSelected(product, variant, quantity)
             }
         }, [variant?.productId, quantity])
 
@@ -460,11 +463,7 @@ const ProductView = forwardRef(
                     position="fixed"
                     bg="white"
                     width="100%"
-                    display={
-                        isProductPartOfSet
-                            ? 'none'
-                            : ['block', 'block', 'block', 'none']
-                    }
+                    display={isProductPartOfSet ? 'none' : ['block', 'block', 'block', 'none']}
                     p={[4, 4, 6]}
                     left={0}
                     bottom={0}
@@ -492,8 +491,8 @@ ProductView.propTypes = {
     updateWishlist: PropTypes.func,
     showFullLink: PropTypes.bool,
     imageSize: PropTypes.oneOf(['sm', 'md']),
-    variantSelected: PropTypes.func,
-    validate: PropTypes.func
+    onVariantSelected: PropTypes.func,
+    validateAttributeSelection: PropTypes.func
 }
 
 export default ProductView

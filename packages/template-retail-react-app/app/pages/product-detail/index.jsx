@@ -144,7 +144,7 @@ const ProductDetail = ({category, product, isLoading}) => {
 
         // Run "internal" validation on this product to show the error.
         Object.values(setProductsRefs.current).forEach(({scope}) => {
-            scope.validate()
+            scope.validateAttributeSelection()
         })
 
         if (unselected) {
@@ -198,7 +198,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                             addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
-                            validate={handleProductSetValidation}
+                            validateAttributeSelection={handleProductSetValidation}
                         />
 
                         <hr />
@@ -225,7 +225,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                                         ])
                                     }
                                     addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                                    variantSelected={(product, variant, quantity) => {
+                                    onVariantSelected={(product, variant, quantity) => {
                                         if (quantity) {
                                             setProductSetSelection((previousState) => ({
                                                 ...previousState,
