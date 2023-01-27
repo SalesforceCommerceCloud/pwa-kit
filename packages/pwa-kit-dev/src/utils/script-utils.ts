@@ -44,8 +44,41 @@ interface Bundle {
     ssr_shared: string[]
 }
 
-export const getPkgJSON = async () => {
-    return readJson(path.join(__dirname, '..', '..', 'package.json'))
+interface Pkg {
+    name: string
+    version: string
+}
+
+/**
+ * Get the package info for pwa-kit-dev.
+ */
+export const getPkgJSON = async (): Promise<Pkg> => {
+    const candidates = [
+        path.join(__dirname, '..', 'package.json'),
+        path.join(__dirname, '..', '..', 'package.json')
+    ]
+    for (const candidate of candidates) {
+        try {
+            const data = await readJson(candidate)
+            return data as Pkg
+        } catch {
+            // Keep looking
+        }
+    }
+    return {name: 'pwa-kit-dev', version: 'unknown'}
+}
+
+/**
+ * Get the package info for the current project.
+ */
+export const getProjectPkg = async (): Promise<Pkg> => {
+    const p = path.join(process.cwd(), 'package.json')
+    try {
+        const data = await readJson(p)
+        return data as Pkg
+    } catch {
+        throw new Error(`Could not read project package at "${p}"`)
+    }
 }
 
 export class CloudAPIClient {
