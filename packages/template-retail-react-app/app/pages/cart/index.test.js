@@ -289,7 +289,10 @@ test('Can apply and remove product-level coupon code with promotion', async () =
     userEvent.click(screen.getByText('Do you have a promo code?'))
     userEvent.type(screen.getByLabelText('Promo Code'), 'MENSSUITS')
     userEvent.click(screen.getByText('Apply'))
-    expect(await screen.findByText(/MENSSUITS/i)).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.findAllByText('Promotion applied')).toBeTruthy()
+        expect(screen.findByText(/MENSSUITS/i)).toBeTruthy()
+    } )
 
     const cartItem = await screen.findByTestId('sf-cart-item-750518699578M')
     expect(await within(cartItem).findByText(/^-([A-Z]{2})?\$30\.00$/)).toBeInTheDocument()
