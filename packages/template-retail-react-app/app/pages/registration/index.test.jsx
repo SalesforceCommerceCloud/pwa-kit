@@ -36,38 +36,6 @@ const mockPasswordToken = {
     resetToken: 'testresettoken'
 }
 
-jest.mock('../../commerce-api/auth', () => {
-    return jest.fn().mockImplementation(() => {
-        return {
-            login: mockLogin.mockImplementation(async () => {
-                throw new Error('invalid credentials')
-            }),
-            getLoggedInToken: jest.fn().mockImplementation(async () => {
-                return {customer_id: 'mockcustomerid'}
-            })
-        }
-    })
-})
-
-// TODO: Need to mock this API call
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async getCustomer(args) {
-                if (args.parameters.customerId === 'customerid') {
-                    return {
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    }
-                }
-                return mockRegisteredCustomer
-            }
-        }
-    }
-})
-
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -111,6 +79,9 @@ beforeEach(() => {
         rest.post('*/customers', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
         }),
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+        }),
         rest.post('*/customers/action/login', (req, res, ctx) => {
             return res(
                 ctx.delay(0),
@@ -135,7 +106,7 @@ afterEach(() => {
 
 test('Allows customer to create an account', async () => {
     mockLogin.mockImplementationOnce(async () => {
-        return {url: '/callback'}
+        return {url: '/callback', customerId: 'registeredCustomerId'}
     })
 
     // render our test component
@@ -154,6 +125,7 @@ test('Allows customer to create an account', async () => {
 
     // wait for success state to appear
     await waitFor(() => {
+        screen.logTestingPlaygroundURL()
         expect(screen.getAllByText(/My Account/).length).toEqual(2)
     })
 })
