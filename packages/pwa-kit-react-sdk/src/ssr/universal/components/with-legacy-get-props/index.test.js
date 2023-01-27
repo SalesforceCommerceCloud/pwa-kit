@@ -8,7 +8,7 @@ import {withLegacyGetProps} from './index'
 import {shallow} from 'enzyme'
 import React from 'react'
 
-describe('withLegacyGetProps', function() {
+describe('withLegacyGetProps', function () {
     test('Renders correctly', () => {
         const Wrapped = () => <p>Hello world</p>
         const Component = withLegacyGetProps(Wrapped)
