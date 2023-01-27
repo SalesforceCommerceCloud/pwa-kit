@@ -39,9 +39,7 @@ jest.useFakeTimers()
 jest.mock('../commerce-api/auth', () => {
     return jest.fn().mockImplementation(() => {
         return {
-            login: mockLogin.mockImplementation(async () => {
-                throw new Error('invalid credentials')
-            }),
+            login: mockLogin,
             getLoggedInToken: jest.fn().mockImplementation(async () => {
                 return {customer_id: 'mockcustomerid'}
             })
@@ -133,7 +131,6 @@ test('Allows customer to sign in to their account', async () => {
     mockLogin.mockImplementationOnce(async () => {
         return {url: '/callback', customerId: 'registeredCustomerId'}
     })
-
     // render our test component
     renderWithProviders(<MockedComponent />)
 
@@ -153,6 +150,10 @@ test('Allows customer to sign in to their account', async () => {
 })
 
 test('Renders error when given incorrect log in credentials', async () => {
+    mockLogin.mockImplementationOnce(async () => {
+        throw new Error('invalid credentials')
+    })
+
     // render our test component
     renderWithProviders(<MockedComponent />)
 
@@ -216,7 +217,6 @@ test('Allows customer to create an account', async () => {
     mockLogin.mockImplementationOnce(async () => {
         return {url: '/callback', customerId: 'registeredCustomerId'}
     })
-
     // render our test component
     renderWithProviders(<MockedComponent />)
 
