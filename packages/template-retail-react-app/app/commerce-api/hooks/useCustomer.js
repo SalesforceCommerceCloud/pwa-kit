@@ -63,7 +63,6 @@ export default function useCustomer() {
              */
             async login(credentials) {
                 const skeletonCustomer = await api.auth.login(credentials)
-                console.log('~skeletonCustomer', skeletonCustomer)
                 if (skeletonCustomer.authType === 'guest') {
                     setCustomer(skeletonCustomer)
                 } else {
@@ -119,7 +118,6 @@ export default function useCustomer() {
                 }
 
                 const response = await api.shopperCustomers.registerCustomer({body})
-                console.log('~response', JSON.stringify(response))
                 // Check for error json response
                 if (response.detail && response.title && response.type) {
                     throw new Error(response.detail)

@@ -12,8 +12,16 @@ import {renderWithProviders, createPathWithDefaults} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
+import {rest} from 'msw'
 
 jest.mock('../commerce-api/einstein')
+
+const mockPasswordToken = {
+    email: 'foo@test.com',
+    expiresInMinutes: 10,
+    login: 'foo@test.com',
+    resetToken: 'testresettoken'
+}
 
 const mockRegisteredCustomer = {
     authType: 'registered',
@@ -39,60 +47,6 @@ jest.mock('../commerce-api/auth', () => {
             })
         }
     })
-})
-
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperLogin: class ShopperLoginMock extends sdk.ShopperLogin {
-            async getAccessToken() {
-                return {
-                    access_token: 'accesstoken',
-                    refresh_token: 'refreshtoken',
-                    customer_id: 'customerId'
-                }
-            }
-            authenticateCustomer() {
-                return {url: '/callback'}
-            }
-        },
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async registerCustomer() {
-                return mockRegisteredCustomer
-            }
-            async getCustomer(args) {
-                if (args.parameters.customerId === 'customerid') {
-                    return {
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    }
-                }
-                return mockRegisteredCustomer
-            }
-            async authorizeCustomer() {
-                return {
-                    headers: {
-                        get(key) {
-                            return {authorization: 'guestToken'}[key]
-                        }
-                    },
-                    json: async () => ({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                }
-            }
-            async getResetPasswordToken() {
-                return {
-                    email: 'foo@test.com',
-                    expiresInMinutes: 10,
-                    login: 'foo@test.com',
-                    resetToken: 'testresettoken'
-                }
-            }
-        }
-    }
 })
 
 jest.mock('../commerce-api/utils', () => {
@@ -142,6 +96,27 @@ MockedComponent.propTypes = {
 beforeEach(() => {
     authModal = undefined
     jest.useFakeTimers()
+    global.server.use(
+        rest.post('*/customers', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+        }),
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+        }),
+        rest.post('*/customers/action/login', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    authType: 'guest',
+                    customerId: 'customerid'
+                })
+            )
+        }),
+        rest.post('*/customers/password/actions/create-reset-token', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockPasswordToken))
+        })
+    )
 })
 afterEach(() => {
     localStorage.clear()
@@ -166,7 +141,7 @@ test('Renders login modal by default', async () => {
 
 test('Allows customer to sign in to their account', async () => {
     mockLogin.mockImplementationOnce(async () => {
-        return {url: '/callback'}
+        return {url: '/callback', customerId: 'registeredCustomerId'}
     })
 
     // render our test component
@@ -223,7 +198,7 @@ test('Allows customer to generate password token', async () => {
 
     // wait for success state
     expect(await screen.findByText(/password reset/i)).toBeInTheDocument()
-    expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+    expect(await screen.getByText(/foo@test.com/i)).toBeInTheDocument()
 })
 
 test('Allows customer to open generate password token modal from everywhere', () => {
@@ -249,7 +224,7 @@ test('Allows customer to open generate password token modal from everywhere', ()
 
 test('Allows customer to create an account', async () => {
     mockLogin.mockImplementationOnce(async () => {
-        return {url: '/callback'}
+        return {url: '/callback', customerId: 'registeredCustomerId'}
     })
 
     // render our test component

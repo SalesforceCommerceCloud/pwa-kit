@@ -28,13 +28,20 @@ const mockRegisteredCustomer = {
     login: 'darek@test.com'
 }
 
-const mockLogin = jest.fn()
 const mockPasswordToken = {
     email: 'foo@test.com',
     expiresInMinutes: 10,
     login: 'foo@test.com',
     resetToken: 'testresettoken'
 }
+
+jest.mock('../../commerce-api/auth', () => {
+    return class AuthMock {
+        login() {
+            return mockRegisteredCustomer
+        }
+    }
+})
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -105,10 +112,6 @@ afterEach(() => {
 })
 
 test('Allows customer to create an account', async () => {
-    mockLogin.mockImplementationOnce(async () => {
-        return {url: '/callback', customerId: 'registeredCustomerId'}
-    })
-
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
