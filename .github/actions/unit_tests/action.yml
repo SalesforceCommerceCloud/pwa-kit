@@ -1,0 +1,27 @@
+name: unit_tests
+inputs:
+  cwd:
+    required: false
+    default: "${PWD}"
+description: "Run tests action description"
+runs:
+  using: composite
+  steps:
+  - name: Run tests step
+    # TODO: The pilefile policy is a legacy of CircleCI. Is it still needed?
+    run: |-
+      # Explicitly set pipefile policy. This is the default for non-windows, but seems
+      # that is needs to be set on windows to fail immediately.
+      set -eo pipefail
+
+      cd ${{ inputs.cwd }}
+
+      # Note: Each of these test commands need to be exposed on the monorepo
+      # root and *also* on the PWA package. This section is run on both.
+
+      # Ensure bundlesize is in check
+      npm run test:max-file-size
+
+      # Always run fast unit tests
+      npm run test
+    shell: bash

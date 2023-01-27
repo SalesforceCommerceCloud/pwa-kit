@@ -10,7 +10,7 @@ import React from 'react'
 
 import {SERVER_RETRY_WARNING} from '.'
 
-describe('withReactQuery', function() {
+describe('withReactQuery', function () {
     let windowSpy
 
     beforeEach(() => {

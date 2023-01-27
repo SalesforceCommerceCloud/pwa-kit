@@ -10,7 +10,7 @@ import {helpers} from 'commerce-sdk-isomorphic'
 
 jest.mock('./storage', () => {
     return {
-        CookieStorage: jest.fn(function() {
+        CookieStorage: jest.fn(function () {
             const map = new Map()
             return {
                 set(key: string, value: string) {
@@ -24,7 +24,7 @@ jest.mock('./storage', () => {
                 }
             }
         }),
-        LocalStorage: jest.fn(function() {
+        LocalStorage: jest.fn(function () {
             const map = new Map()
             return {
                 set(key: string, value: string) {

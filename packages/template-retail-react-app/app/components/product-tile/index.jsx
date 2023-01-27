@@ -86,16 +86,18 @@ const ProductTile = (props) => {
             {...rest}
         >
             <Box {...styles.imageWrapper}>
-                <AspectRatio {...styles.image}>
-                    <DynamicImage
-                        src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
-                        widths={dynamicImageProps?.widths}
-                        imageProps={{
-                            alt: image.alt,
-                            ...dynamicImageProps?.imageProps
-                        }}
-                    />
-                </AspectRatio>
+                {image && (
+                    <AspectRatio {...styles.image}>
+                        <DynamicImage
+                            src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
+                            widths={dynamicImageProps?.widths}
+                            imageProps={{
+                                alt: image.alt,
+                                ...dynamicImageProps?.imageProps
+                            }}
+                        />
+                    </AspectRatio>
+                )}
 
                 {enableFavourite && (
                     <Box

@@ -9,19 +9,11 @@ import {Route, Switch} from 'react-router-dom'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {mockOrderHistory, mockOrderProducts} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
-
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
 
 const MockedComponent = () => {
     const customer = useCustomer()
@@ -45,28 +37,24 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer(
-    rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.json(mockOrderHistory))
-    ),
-    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts)))
-)
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-
-    server.listen({onUnhandledRequest: 'error'})
-
     window.history.pushState({}, 'Account', createPathWithDefaults('/account/orders'))
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('Renders order history and details', async () => {
+    global.server.use(
+        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockOrderHistory))
+        }),
+        rest.get('*/products', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockOrderProducts))
+        })
+    )
     renderWithProviders(<MockedComponent history={history} />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })

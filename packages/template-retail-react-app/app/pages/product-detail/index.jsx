@@ -77,10 +77,10 @@ const ProductDetail = ({category, product, isLoading}) => {
     /**************** Wishlist ****************/
     const wishlist = useWishlist()
     // TODO: DRY this handler when intl provider is available globally
-    const handleAddToWishlist = async (quantity) => {
+    const handleAddToWishlist = async (product, variant, quantity) => {
         try {
             await wishlist.createListItem({
-                id: product.id,
+                id: variant?.productId || product?.id,
                 quantity
             })
             toast({
@@ -191,7 +191,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={handleProductSetAddToCart}
-                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                            addToWishlist={(product, variant, quantity) =>
+                                handleAddToWishlist(product, variant, quantity)
+                            }
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
                             validateAttributeSelection={handleProductSetValidation}
@@ -220,7 +222,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                                             {product: childProduct, variant, quantity}
                                         ])
                                     }
-                                    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                                    addToWishlist={(product, variant, quantity) =>
+                                        handleAddToWishlist(product, variant, quantity)
+                                    }
                                     onVariantSelected={(product, variant, quantity) => {
                                         if (quantity) {
                                             setProductSetSelection((previousState) => ({
@@ -242,11 +246,12 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 />
                                 <InformationAccordion product={childProduct} />
 
-                                <Box display={['none', 'none', 'none', 'block']}>
-                                    <hr />
-                                </Box>
-                            </Fragment>
-                        ))}
+                                    <Box display={['none', 'none', 'none', 'block']}>
+                                        <hr />
+                                    </Box>
+                                </Fragment>
+                            ))
+                        }
                     </Fragment>
                 ) : (
                     <Fragment>
@@ -256,7 +261,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                             addToCart={(variant, quantity) =>
                                 handleAddToCart([{product, variant, quantity}])
                             }
-                            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                            addToWishlist={(product, variant, quantity) =>
+                                handleAddToWishlist(product, variant, quantity)
+                            }
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
                         />
@@ -274,7 +281,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                             />
                         }
                         recommender={'complete-the-set'}
-                        products={product}
+                        products={[product]}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />
@@ -287,7 +294,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                             />
                         }
                         recommender={'pdp-similar-items'}
-                        products={product}
+                        products={[product]}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />
