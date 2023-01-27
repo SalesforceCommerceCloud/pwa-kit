@@ -12,7 +12,6 @@ const WebSocket = require('ws')
 const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
-const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
 // Scripts in ./bin have never gone through babel, so we
@@ -51,6 +50,14 @@ const execSync = (cmd, opts) => {
     return _execSync(cmd, {...defaults, ...opts})
 }
 
+const getProjectName = async () => {
+    const projectPkg = await scriptUtils.getProjectPkg()
+    if (!projectPkg.name) {
+        throw new Error(`Missing "name" field in "package.json"`)
+    }
+    return projectPkg.name
+}
+
 const main = async () => {
     const pkgRoot = p.join(__dirname, '..')
     process.env.CONTEXT = process.cwd()
@@ -71,7 +78,7 @@ const main = async () => {
             ``,
             `Usage inside NPM scripts:`,
             ``,
-            `  The PWA Kit Developer Tools is used in NPM scripts so you can conveniently`,
+            `  The PWA Kit Developer Tools are used in NPM scripts so you can conveniently`,
             `  run eg. 'npm run push' to push a bundle from a project.`,
             ``,
             `  To pass args to pwa-kit-dev when wrapped in an NPM script, separate them`,
@@ -286,16 +293,7 @@ const main = async () => {
                 const mobify = getConfig() || {}
 
                 if (!projectSlug) {
-                    try {
-                        const projectPkg = p.join(process.cwd(), 'package.json')
-                        const {name} = fse.readJsonSync(projectPkg)
-                        if (!name) throw new Error(`Missing "name" field in ${projectPkg}`)
-                        projectSlug = name
-                    } catch (err) {
-                        throw new Error(
-                            `Could not detect project slug from "name" field in package.json: ${err.message}`
-                        )
-                    }
+                    projectSlug = await getProjectName()
                 }
 
                 const bundle = await scriptUtils.createBundle({
@@ -364,7 +362,7 @@ const main = async () => {
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
         .action(async ({project, environment, cloudOrigin, credentialsFile}) => {
             if (!project) {
-                project = scriptUtils.getPkgJSON()['name']
+                project = await getProjectName()
             }
 
             const credentials = await scriptUtils.readCredentials(credentialsFile)
@@ -423,8 +421,9 @@ const main = async () => {
         })
 
     // Global options
-    program.option('-v, --version', 'show version number').action(({version}) => {
+    program.option('-v, --version', 'show version number').action(async ({version}) => {
         if (version) {
+            const pkg = await scriptUtils.getPkgJSON()
             console.log(pkg.version)
         } else {
             program.help({error: true})
