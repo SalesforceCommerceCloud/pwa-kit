@@ -115,8 +115,6 @@ const ProductDetail = ({category, product, isLoading}) => {
     }
 
     const handleAddToCart = async (productSelectionValues) => {
-        let returnVal
-
         try {
             const productItems = productSelectionValues.map(({variant, quantity}) => ({
                 productId: variant.productId,
@@ -128,12 +126,10 @@ const ProductDetail = ({category, product, isLoading}) => {
 
             // If the items were sucessfully added, set the return value to be used
             // by the add to cart modal.
-            returnVal = productSelectionValues
+            return productSelectionValues
         } catch (error) {
             showError(error)
         }
-
-        return returnVal
     }
 
     /**************** Product Set Handlers ****************/
