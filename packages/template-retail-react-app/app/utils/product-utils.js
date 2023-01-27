@@ -13,6 +13,13 @@
  * @param {Object} variationAttributes - The products variation attributes.
  * @param {Object} values - The variations selected attribute values.
  * @returns {Object} - A key value map of the display name and display value.
+ *
+ * @example
+ * const displayValues = getDisplayVariationValues(
+ *     [{id: 'size', name: 'Size', values: [{name: "md", value: "Medium"}]}],
+ *     {size: 'md'}
+ * )
+ * // returns {Size: "Medium"}
  */
 export const getDisplayVariationValues = (variationAttributes, values = {}) => {
     const returnVal = Object.entries(values).reduce((acc, [id, value]) => {
