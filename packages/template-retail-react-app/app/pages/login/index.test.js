@@ -101,23 +101,6 @@ beforeEach(() => {
                 )
             }
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
-        }),
-        rest.post('*/customers/action/login', (req, res, ctx) => {
-            return res(
-                ctx.delay(0),
-                ctx.status(200),
-                ctx.json({
-                    headers: {
-                        get(key) {
-                            return {authorization: 'guestToken'}[key]
-                        }
-                    },
-                    json: async () => ({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                })
-            )
         })
     )
 })
