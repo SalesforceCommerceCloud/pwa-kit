@@ -14,7 +14,7 @@
  * @param {Object} values - The variations selected attribute values.
  * @returns {Object} - A key value map of the display name and display value.
  */
-export const findVariationAttributeValuesBy = (variationAttributes, values = {}) => {
+export const getDisplayVariationValues = (variationAttributes, values = {}) => {
     const returnVal = Object.entries(values).reduce((acc, [id, value]) => {
         const attribute = variationAttributes.find(({id: attributeId}) => attributeId === id)
         const attributeValue = attribute.values.find(

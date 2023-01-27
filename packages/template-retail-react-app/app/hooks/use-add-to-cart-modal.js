@@ -28,7 +28,7 @@ import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
 import {findImageGroupBy} from '../utils/image-groups-utils'
-import {findVariationAttributeValuesBy} from '../utils/product-utils'
+import {getDisplayVariationValues} from '../utils/product-utils'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -109,7 +109,7 @@ export const AddToCartModal = () => {
                                     productItems?.find(
                                         (item) => item.productId === variant.productId
                                     )?.basePrice * quantity
-                                const variationAttributeValues = findVariationAttributeValuesBy(
+                                const variationAttributeValues = getDisplayVariationValues(
                                     product.variationAttributes,
                                     variant.variationValues
                                 )
