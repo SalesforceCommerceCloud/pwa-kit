@@ -134,19 +134,21 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     /**************** Product Set Handlers ****************/
     const handleProductSetValidation = () => {
-        // Scroll to the first product without its options selected.
-        const productSelectionKeys = Object.keys(productSetSelection)
-        const unselected = product.setProducts.find(({id}) => !productSelectionKeys.includes(id))
-
-        // Run "internal" validation on this product to show the error.
+        // Run validation for all child products. This will ensure the error
+        // messages are shown.
         Object.values(childProductRefs.current).forEach(({scope}) => {
             scope.validateAttributeSelection()
         })
 
-        if (unselected) {
-            const {ref} = childProductRefs.current[unselected.id]
+        // Using ot state for which child products are selected, scroll to the first 
+        // one that isn't selected.
+        const selectedProductIds = Object.keys(productSetSelection)
+        const firstUnselectedProduct = product.setProducts.find(({id}) => !selectedProductIds.includes(id))
 
-            // Scroll the first unselected product into view.
+        if (firstUnselectedProduct) {
+            // Get the reference to the product view and scroll to it.
+            const {ref} = childProductRefs.current[firstUnselectedProduct.id]
+            
             ref.scrollIntoView({
                 behavior: 'smooth',
                 block: 'end'
