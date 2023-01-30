@@ -22,7 +22,7 @@ const useCustomerType = (): null | 'guest' | 'registered' => {
         value = auth.get('customer_type')
     }
 
-    if (value !== null || value !== 'guest' || value !== 'registered') {
+    if (value !== null && value !== 'guest' && value !== 'registered') {
         console.warn('Unrecognized customer type found in storage.')
         return null
     }
