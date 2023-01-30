@@ -10,12 +10,6 @@ import {ShopperCustomersMutationType} from './ShopperCustomers'
 import {ShopperOrdersMutationType} from './ShopperOrders'
 import {ShopperBasketsMutationType} from './ShopperBaskets'
 
-export type QueryFnData =
-    | DataType<Client[ShopperBasketsMutationType]>
-    | undefined
-    | ((
-          data: DataType<Client[ShopperBasketsMutationType]>
-      ) => DataType<Client[ShopperBasketsMutationType]>)
 const isObject = (item: unknown) =>
     typeof item === 'object' && !Array.isArray(item) && item !== null
 
@@ -23,7 +17,9 @@ const isObject = (item: unknown) =>
 export interface QueryKeyMap {
     name: string
     key: QueryKey
-    updater?: QueryFnData
+    updater?: (
+        data: DataType<Client[ShopperBasketsMutationType]>
+    ) => DataType<Client[ShopperBasketsMutationType]>
 }
 
 export interface CacheUpdateMatrixElement {
