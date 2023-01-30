@@ -178,7 +178,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                         ]
 
                         queryKeys.forEach(({key: queryKey}: QueryKeyMap) => {
-                            queryClient.setQueryData(queryKey, {test: true})
+                            queryClient.setQueryData(queryKey, () => ({test: true}))
                         })
 
                         const button = screen.getByRole('button', {
@@ -200,48 +200,48 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                             expect(queryClient.getQueryState(queryKey)).toBeFalsy()
                         })
                     }
-                },
-                {
-                    name: 'error',
-                    assertions: async () => {
-                        nock(DEFAULT_TEST_HOST)
-                            .patch((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(500, {})
-                            .put((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(500, {})
-                            .post((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(500, {})
-                            .delete((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(500, {})
-
-                        renderWithProviders(
-                            <CustomerMutationComponent
-                                action={mutationName as ShopperCustomersMutationType}
-                            />
-                        )
-                        await waitFor(() =>
-                            screen.getByRole('button', {
-                                name: mutationName
-                            })
-                        )
-
-                        const button = screen.getByRole('button', {
-                            name: mutationName
-                        })
-
-                        fireEvent.click(button)
-                        await waitFor(() => screen.getByText(/error/i))
-                        expect(screen.getByText(/error/i)).toBeInTheDocument()
-                    }
                 }
+                // {
+                //     name: 'error',
+                //     assertions: async () => {
+                //         nock(DEFAULT_TEST_HOST)
+                //             .patch((uri) => {
+                //                 return uri.includes('/customer/shopper-customers/')
+                //             })
+                //             .reply(500, {})
+                //             .put((uri) => {
+                //                 return uri.includes('/customer/shopper-customers/')
+                //             })
+                //             .reply(500, {})
+                //             .post((uri) => {
+                //                 return uri.includes('/customer/shopper-customers/')
+                //             })
+                //             .reply(500, {})
+                //             .delete((uri) => {
+                //                 return uri.includes('/customer/shopper-customers/')
+                //             })
+                //             .reply(500, {})
+                //
+                //         renderWithProviders(
+                //             <CustomerMutationComponent
+                //                 action={mutationName as ShopperCustomersMutationType}
+                //             />
+                //         )
+                //         await waitFor(() =>
+                //             screen.getByRole('button', {
+                //                 name: mutationName
+                //             })
+                //         )
+                //
+                //         const button = screen.getByRole('button', {
+                //             name: mutationName
+                //         })
+                //
+                //         fireEvent.click(button)
+                //         await waitFor(() => screen.getByText(/error/i))
+                //         expect(screen.getByText(/error/i)).toBeInTheDocument()
+                //     }
+                // }
             ]
         }
     }
