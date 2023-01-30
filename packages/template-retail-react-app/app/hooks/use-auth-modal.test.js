@@ -34,7 +34,6 @@ const mockRegisteredCustomer = {
 }
 
 const mockLogin = jest.fn()
-jest.useFakeTimers()
 
 jest.mock('../commerce-api/auth', () => {
     return jest.fn().mockImplementation(() => {
@@ -93,7 +92,6 @@ MockedComponent.propTypes = {
 // Set up and clean up
 beforeEach(() => {
     authModal = undefined
-    jest.useFakeTimers()
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
@@ -109,8 +107,6 @@ beforeEach(() => {
 afterEach(() => {
     localStorage.clear()
     jest.resetModules()
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
 })
 
 test('Renders login modal by default', async () => {
@@ -142,6 +138,7 @@ test('Allows customer to sign in to their account', async () => {
     user.type(screen.getByLabelText('Email'), 'customer@test.com')
     user.type(screen.getByLabelText('Password'), 'Password!1')
     user.click(screen.getByText(/sign in/i))
+
     // wait for successful toast to appear
     await waitFor(() => {
         expect(screen.getByText(/Welcome Tester/i)).toBeInTheDocument()
@@ -174,22 +171,24 @@ test('Renders error when given incorrect log in credentials', async () => {
 
 test('Allows customer to generate password token', async () => {
     // render our test component
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent initialView="password" />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
     user.click(trigger)
-
-    // switch to 'reset password' view
-    user.click(screen.getByText(/forgot password/i))
+    expect(authModal.isOpen).toBe(true)
 
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'foo@test.com')
-    user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
+    user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
+    user.click(withinForm.getByText(/reset password/i))
 
+    screen.logTestingPlaygroundURL()
     // wait for success state
-    expect(await screen.findByText(/password reset/i)).toBeInTheDocument()
-    expect(await screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByText(/password reset/i)).toBeInTheDocument()
+        expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+    })
 })
 
 test('Allows customer to open generate password token modal from everywhere', () => {
