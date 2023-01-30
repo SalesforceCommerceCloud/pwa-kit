@@ -37,39 +37,25 @@ const mockMergedBasket = {
     }
 }
 
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
+jest.mock('../../commerce-api/utils', () => {
+    const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
-        ...sdk,
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async registerCustomer() {
-                return mockRegisteredCustomer
-            }
+        ...originalModule,
+        isTokenValid: jest.fn().mockReturnValue(true),
+        createGetTokenBody: jest.fn().mockReturnValue({
+            grantType: 'test',
+            code: 'test',
+            usid: 'test',
+            codeVerifier: 'test',
+            redirectUri: 'http://localhost/test'
+        })
+    }
+})
 
-            async getCustomer(args) {
-                if (args.parameters.customerId === 'customerid') {
-                    return {
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    }
-                }
-                return mockRegisteredCustomer
-            }
-
-            async authorizeCustomer() {
-                return {
-                    headers: {
-                        get(key) {
-                            return {authorization: 'guestToken'}[key]
-                        }
-                    },
-                    json: async () => ({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                }
-            }
-        }
+jest.mock('../../commerce-api/pkce', () => {
+    return {
+        createCodeVerifier: jest.fn().mockReturnValue('codeverifier'),
+        generateCodeChallenge: jest.fn().mockReturnValue('codechallenge')
     }
 })
 
@@ -93,6 +79,29 @@ const MockedComponent = () => {
     )
 }
 
+// Set up and clean up
+beforeEach(() => {
+    jest.resetModules()
+    global.server.use(
+        rest.post('*/customers', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+        }),
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            const {customerId} = req.params
+            if (customerId === 'customerId') {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({
+                        authType: 'guest',
+                        customerId: 'customerid'
+                    })
+                )
+            }
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+        })
+    )
+})
 afterEach(() => {
     jest.resetModules()
     localStorage.clear()

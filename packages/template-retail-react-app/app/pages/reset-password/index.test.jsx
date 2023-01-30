@@ -25,6 +25,25 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
+    global.server.use(
+        rest.post('*/customers', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+        }),
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            const {customerId} = req.params
+            if (customerId === 'customerId') {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({
+                        authType: 'guest',
+                        customerId: 'customerid'
+                    })
+                )
+            }
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+        })
+    )
 })
 afterEach(() => {
     jest.resetModules()

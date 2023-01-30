@@ -82,8 +82,7 @@ test('vw widths', () => {
     // 50vw of 2xl => 48em => 768px
     expect(props).toStrictEqual({
         src: disImageURL.withoutOptionalParams,
-        sizes:
-            '(min-width: 96em) 50vw, (min-width: 80em) 100vw, (min-width: 62em) 100vw, (min-width: 48em) 100vw, (min-width: 30em) 100vw, 100vw',
+        sizes: '(min-width: 96em) 50vw, (min-width: 80em) 100vw, (min-width: 62em) 100vw, (min-width: 48em) 100vw, (min-width: 30em) 100vw, 100vw',
         srcSet: buildSrcSet([480, 768, 992, 1280, 1536, 768])
     })
 })

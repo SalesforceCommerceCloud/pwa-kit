@@ -38,12 +38,21 @@ const MockedComponent = () => {
 
 beforeEach(() => {
     global.server.use(
-        rest.post('*/customers/:customerId/addresses*', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200))
-        ),
-        rest.delete('*/customers/:customerId/addresses*', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200))
-        )
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockCustomer))
+        }),
+        rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
+            mockCustomer.addresses = [req.body]
+            return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
+        }),
+        rest.patch('*/customers/:customerId/addresses/:addressName', (req, res, ctx) => {
+            mockCustomer.addresses[0] = req.body
+            return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
+        }),
+        rest.delete('*/customers/:customerId/addresses/:addressName', (req, res, ctx) => {
+            mockCustomer.addresses = undefined
+            return res(ctx.delay(0), ctx.status(200))
+        })
     )
 })
 
