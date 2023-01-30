@@ -91,7 +91,7 @@ const ProductView = forwardRef(
             isProductLoading,
             isProductPartOfSet = false,
             onVariantSelected = () => {},
-            validateAttributeSelection = (variant, quantity, stockLevel) =>
+            validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
         },
         ref
@@ -123,17 +123,20 @@ const ProductView = forwardRef(
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)
 
-        const validateAndShowError = () => {
+        const validateAndShowError = (opts = {}) => {
+            const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
-            const hasValidSelection = validateAttributeSelection(variant, quantity, stockLevel)
+            const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
 
             if (!isProductASet && !hasValidSelection) {
                 toggleShowOptionsMessage(true)
 
-                errorContainerRef.current.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                })
+                if (scrollErrorIntoView) {
+                    errorContainerRef.current.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    })
+                }
             }
 
             return hasValidSelection
@@ -238,7 +241,7 @@ const ProductView = forwardRef(
         // Bind the reference with our `scope` that includes the internal validate function for this component.
         // Other values can be added to this scope as required.
         if (typeof ref === 'function') {
-            ref = ref.bind({validateAttributeSelection: validateAndShowError})
+            ref = ref.bind({validateOrderability: validateAndShowError})
         }
 
         useEffect(() => {
@@ -248,7 +251,7 @@ const ProductView = forwardRef(
         }, [location.pathname])
 
         useEffect(() => {
-            if (!isProductASet && validateAttributeSelection(variant, quantity, stockLevel)) {
+            if (!isProductASet && validateOrderability(variant, quantity, stockLevel)) {
                 toggleShowOptionsMessage(false)
             }
         }, [variationParams])
@@ -507,7 +510,7 @@ ProductView.propTypes = {
     showFullLink: PropTypes.bool,
     imageSize: PropTypes.oneOf(['sm', 'md']),
     onVariantSelected: PropTypes.func,
-    validateAttributeSelection: PropTypes.func
+    validateOrderability: PropTypes.func
 }
 
 export default ProductView
