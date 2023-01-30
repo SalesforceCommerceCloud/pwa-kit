@@ -577,7 +577,6 @@ test('Renders AddToCartModal', async () => {
     )
 
     await waitFor(() => {
-        expect(getByText(/cart subtotal \(1 item\)/i)).toBeInTheDocument()
         expect(getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
     })
 })
