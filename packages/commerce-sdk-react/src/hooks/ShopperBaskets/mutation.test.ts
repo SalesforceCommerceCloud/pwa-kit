@@ -25,7 +25,7 @@ import {useCustomerBaskets} from '../ShopperCustomers'
 import {CacheUpdateMatrixElement} from '../utils'
 
 const CUSTOMER_ID = 'CUSTOMER_ID'
-const BASKET_ID = 'BASKET_ID_1'
+const BASKET_ID = 'BASKET_ID'
 const COUPON_ID = 'COUPON_ID'
 const PRODUCT_ID = 'PRODUCT_ID'
 const ITEM_ID = 'ITEM_ID'
