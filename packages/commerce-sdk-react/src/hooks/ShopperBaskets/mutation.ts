@@ -195,6 +195,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
     ) => {
         // TODO: we're missing headers, rawResponse -> not only {basketId}
         const arg = {basketId}
+
         return basketId
             ? {
                   update: [
@@ -210,6 +211,14 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
                           updater: (
                               oldData: NonNullable<DataType<CustomerClient['getCustomerBaskets']>>
                           ) => {
+                              // do not update if responded basket does not exist inside existing customer baskets
+                              if (
+                                  !oldData?.baskets?.some(
+                                      (basket) => basket.basketId === response?.basketId
+                                  )
+                              ) {
+                                  return undefined
+                              }
                               const updatedBaskets = oldData.baskets?.map(
                                   (basket: DataType<Client[ShopperBasketsMutationType]>) => {
                                       return basket?.basketId === basketId ? response : basket
@@ -382,6 +391,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
 
             return {
                 ...updateBasketQuery(basketId, response)
+                // ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         updatePaymentInstrumentInBasket: (
@@ -450,6 +460,7 @@ export function useShopperBasketsMutation<Action extends ShopperBasketsMutationT
     }
     const queryClient = useQueryClient()
     const customerId = useCustomerId()
+
     const cacheUpdateMatrix = getCacheUpdateMatrix(customerId)
 
     return useMutation<Data, Error, Params>(
