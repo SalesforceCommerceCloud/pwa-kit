@@ -133,37 +133,34 @@ const ProductDetail = ({category, product, isLoading}) => {
     }
 
     /**************** Product Set Handlers ****************/
-    const handleProductSetValidation = useCallback(
-        () => {
-            // Run validation for all child products. This will ensure the error
-            // messages are shown.
-            Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
-                validateOrderability({scrollErrorIntoView: false})
+    const handleProductSetValidation = useCallback(() => {
+        // Run validation for all child products. This will ensure the error
+        // messages are shown.
+        Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
+            validateOrderability({scrollErrorIntoView: false})
+        })
+
+        // Using ot state for which child products are selected, scroll to the first
+        // one that isn't selected.
+        const selectedProductIds = Object.keys(productSetSelection)
+        const firstUnselectedProduct = product.setProducts.find(
+            ({id}) => !selectedProductIds.includes(id)
+        )
+
+        if (firstUnselectedProduct) {
+            // Get the reference to the product view and scroll to it.
+            const {ref} = childProductRefs.current[firstUnselectedProduct.id]
+
+            ref.scrollIntoView({
+                behavior: 'smooth',
+                block: 'end'
             })
 
-            // Using ot state for which child products are selected, scroll to the first
-            // one that isn't selected.
-            const selectedProductIds = Object.keys(productSetSelection)
-            const firstUnselectedProduct = product.setProducts.find(
-                ({id}) => !selectedProductIds.includes(id)
-            )
+            return false
+        }
 
-            if (firstUnselectedProduct) {
-                // Get the reference to the product view and scroll to it.
-                const {ref} = childProductRefs.current[firstUnselectedProduct.id]
-
-                ref.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'end'
-                })
-
-                return false
-            }
-
-            return true
-        },
-        [product, productSetSelection]
-    )
+        return true
+    }, [product, productSetSelection])
 
     const handleProductSetAddToCart = () => {
         // Get all the selected products, and pass them to the addToCart handler which
