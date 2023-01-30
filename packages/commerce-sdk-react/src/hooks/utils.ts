@@ -17,9 +17,7 @@ const isObject = (item: unknown) =>
 export interface QueryKeyMap {
     name: string
     key: QueryKey
-    updater?: (
-        data: DataType<Client[ShopperBasketsMutationType]>
-    ) => DataType<Client[ShopperBasketsMutationType]>
+    updater?: (data: any) => DataType<Client[CombinedMutationTypes]> | undefined
 }
 
 export interface CacheUpdateMatrixElement {
