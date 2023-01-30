@@ -24,24 +24,6 @@ jest.mock('../../commerce-api/einstein')
 
 jest.mock('../../hooks/use-wishlist')
 
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
-            async productSearch() {
-                return {data: [mockProductListSearchResponse]}
-            }
-        },
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async getCustomerProductLists() {
-                return mockedEmptyCustomerProductList
-            }
-        }
-    }
-})
-
-const MockedComponent = ({isLoading, isLoggedIn = false}) => {
 const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
     const customer = useCustomer()
     useEffect(() => {
@@ -59,7 +41,12 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
                 render={(props) => (
                     <div>
                         <div>{customer.customerId}</div>
-                        <ProductList {...props} isLoading={isLoading} />
+                        <ProductList
+                            {...props}
+                            isLoading={isLoading}
+                            searchQuery={searchQuery}
+                            productSearchResult={mockProductListSearchResponse}
+                        />
                     </div>
                 )}
             />
@@ -69,7 +56,8 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
 
 MockedComponent.propTypes = {
     isLoading: PropTypes.bool,
-    isLoggedIn: PropTypes.bool
+    isLoggedIn: PropTypes.bool,
+    searchQuery: PropTypes.string
 }
 
 const MockedEmptyPage = () => {

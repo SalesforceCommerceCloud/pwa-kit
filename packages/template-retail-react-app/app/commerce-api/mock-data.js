@@ -3040,8 +3040,7 @@ export const mockCategory = {
 export const mockCategories = {
     'mens-clothing-jackets': {
         id: 'mens-clothing-suits',
-        image:
-            'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg',
+        image: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg',
         name: 'Suits',
         pageDescription:
             "Shop Men's suits for business or pleasure. Enjoy from a variety of different styles and cuts at Commerce Cloud.",

@@ -130,7 +130,11 @@ const ProductList = (props) => {
     })
 
     /**************** Query Actions ****************/
-    const {isLoading, isFetching, data: productSearchResult} = useProductSearch(
+    const {
+        isLoading,
+        isFetching,
+        data: productSearchResult
+    } = useProductSearch(
         {
             ...searchParams,
             refine: searchParams._refine

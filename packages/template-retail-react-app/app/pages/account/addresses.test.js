@@ -16,6 +16,8 @@ import {
     mockedRegisteredCustomerWithNoAddress
 } from '../../commerce-api/mock-data'
 
+let mockCustomer = {}
+
 const mockToastSpy = jest.fn()
 jest.mock('@chakra-ui/toast', () => {
     return {

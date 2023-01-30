@@ -14,6 +14,16 @@ import mockConfig from '../../../config/mocks/default'
 
 jest.mock('../../commerce-api/einstein')
 
+const mockRegisteredCustomer = {
+    authType: 'registered',
+    customerId: 'registeredCustomerId',
+    customerNo: 'testno',
+    email: 'darek@test.com',
+    firstName: 'Tester',
+    lastName: 'Testing',
+    login: 'darek@test.com'
+}
+
 const MockedComponent = () => {
     return (
         <div>
@@ -24,6 +34,7 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
+    jest.resetModules()
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
