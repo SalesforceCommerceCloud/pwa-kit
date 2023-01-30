@@ -27,9 +27,13 @@ import {
     useDisclosure,
     useMediaQuery
 } from '@chakra-ui/react'
+import {
+    ShopperLoginHelpers,
+    useShopperLoginHelper,
+    useCustomerType
+} from 'commerce-sdk-react-preview'
 
 import {useCurrentBasket} from '../../hooks/use-current-basket'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 import Link from '../link'
 import Search from '../search'
@@ -80,7 +84,8 @@ const Header = ({
 }) => {
     const intl = useIntl()
     const {totalItems, basket} = useCurrentBasket()
-    const customer = useCustomer()
+    const customerType = useCustomerType()
+    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
     const navigate = useNavigation()
 
     const {isOpen, onClose, onOpen} = useDisclosure()
@@ -95,7 +100,7 @@ const Header = ({
 
     const onSignoutClick = async () => {
         setShowLoading(true)
-        await customer.logout()
+        await logout.mutateAsync()
         navigate('/login')
         setShowLoading(false)
     }
@@ -162,7 +167,7 @@ const Header = ({
                         })}
                     />
 
-                    {customer?.authType === 'registered' && (
+                    {customerType === 'registered' && (
                         <Popover
                             isLazy
                             arrowSize={15}

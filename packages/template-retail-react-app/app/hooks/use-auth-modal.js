@@ -20,8 +20,13 @@ import {
     useDisclosure,
     useToast
 } from '@chakra-ui/react'
-import {ShopperLoginHelpers, useShopperLoginHelper, useCustomerType, useShopperCustomersMutation} from 'commerce-sdk-react-preview'
-import useCustomer from '../commerce-api/hooks/useCustomer'
+import {
+    ShopperLoginHelpers,
+    useShopperLoginHelper,
+    useCustomer,
+    useCustomerId,
+    useCustomerType
+} from 'commerce-sdk-react-preview'
 import {BrandLogo} from '../components/icons'
 import LoginForm from '../components/login'
 import ResetPasswordForm from '../components/reset-password'
@@ -45,75 +50,76 @@ export const AuthModal = ({
     ...props
 }) => {
     const {formatMessage} = useIntl()
-    const customer = useCustomer()
+    const customerId = useCustomerId()
     const customerType = useCustomerType()
-    console.log(customerType)
-    console.log(isOpen)
+    const customer = useCustomer(
+        {customerId},
+        {enabled: !!customerId && customerType === 'registered'}
+    )
     const isRegistered = customerType === 'registered'
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
     const submittedEmail = useRef()
     const toast = useToast()
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const register = useShopperLoginHelper(ShopperLoginHelpers.Register)
 
-//     acceptsMarketing
-// : 
-// false
-// email
-// : 
-// "kev5@test.com"
-// firstName
-// : 
-// "Kevin"
-// lastName
-// : 
-// "He"
-// password
-// : 
-// "Test1234!"
     const submitForm = async (data) => {
         form.clearErrors()
-        loginRegisteredUser.reset()
+
+        // mutation is cached by default?
+        // TODO: should we disable mutation cache by default?
+        login.reset()
+        register.reset()
+
+        const onLoginSuccess = () => {
+            navigate('/account')
+        }
 
         return {
-            login: (data) => loginRegisteredUser.mutateAsync({username: data.email, password: data.password}, {onError: (error) => {
-                const message = /Unauthorized/i.test(error.message)
-                    ? formatMessage({
-                        defaultMessage:
-                            "Something's not right with your email or password. Try again.",
-                        id: 'auth_modal.error.incorrect_email_or_password'
-                    })
-                    : formatMessage(API_ERROR_MESSAGE)
-                form.setError('global', {type: 'manual', message})
-            }}),
+            login: (data) =>
+                login.mutateAsync(
+                    {username: data.email, password: data.password},
+                    {
+                        onSuccess: onLoginSuccess,
+                        onError: (error) => {
+                            const message = /Unauthorized/i.test(error.message)
+                                ? formatMessage({
+                                      defaultMessage:
+                                          "Something's not right with your email or password. Try again.",
+                                      id: 'auth_modal.error.incorrect_email_or_password'
+                                  })
+                                : formatMessage(API_ERROR_MESSAGE)
+                            form.setError('global', {type: 'manual', message})
+                        }
+                    }
+                ),
             register: (data) => {
-                // 
-                console.log(data)
+                const body = {
+                    customer: {
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        email: data.email,
+                        login: data.email
+                    },
+                    password: data.password
+                }
+
+                return register.mutateAsync(body, {
+                    onSuccess: onLoginSuccess,
+                    onError: () => {
+                        form.setError('global', {
+                            type: 'manual',
+                            message: formatMessage(API_ERROR_MESSAGE)
+                        })
+                    }
+                })
             },
-            password: handleResetPassword
+            password: () => {
+                throw new Error('Not implemented')
+            }
         }[currentView](data)
-    }
-
-    const handleRegister = async (data) => {
-        console.log(data)
-        try {
-            await customer.registerCustomer(data)
-            navigate('/account')
-        } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
-        }
-    }
-
-    const handleResetPassword = async ({email}) => {
-        try {
-            await customer.getResetPasswordToken(email)
-            // Execute action to be perfromed on successful passoword reset
-            await onPasswordResetSuccess()
-            submittedEmail.current = email
-        } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
-        }
     }
 
     // Reset form and local state when opening the modal
@@ -164,7 +170,7 @@ export const AuthModal = ({
                         id: 'auth_modal.info.welcome_user'
                     },
                     {
-                        name: customer?.firstName
+                        name: customer.data?.firstName || ''
                     }
                 )}`,
                 description: `${formatMessage({
@@ -222,7 +228,15 @@ export const AuthModal = ({
     )
 
     return (
-        <Modal size="sm" closeOnOverlayClick={false} data-testid="sf-auth-modal" isOpen={isOpen} onOpen={onOpen} onClose={onClose} {...props}>
+        <Modal
+            size="sm"
+            closeOnOverlayClick={false}
+            data-testid="sf-auth-modal"
+            isOpen={isOpen}
+            onOpen={onOpen}
+            onClose={onClose}
+            {...props}
+        >
             <ModalOverlay />
             <ModalContent>
                 <ModalCloseButton />

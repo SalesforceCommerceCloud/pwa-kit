@@ -13,12 +13,21 @@ const onClient = typeof window !== 'undefined'
  * A hook to return customer auth type, either guest or registered user
  *
  */
-const useCustomerType = (): string | null => {
+const useCustomerType = (): null | 'guest' | 'registered' => {
+    let value = null
     if (onClient) {
-        return useLocalStorage('customer_type')
+        value = useLocalStorage('customer_type')
+    } else {
+        const auth = useAuth()
+        value = auth.get('customer_type')
     }
-    const auth = useAuth()
-    return auth.get('customer_type')
+
+    if (value !== null || value !== 'guest' || value !== 'registered') {
+        console.warn('Unrecognized customer type found in storage.')
+        return null
+    }
+
+    return value
 }
 
 export default useCustomerType

@@ -9,48 +9,59 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {
+    ShopperLoginHelpers,
+    useShopperLoginHelper,
+    useCustomerType
+} from 'commerce-sdk-react-preview'
 import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
-
 import LoginForm from '../../components/login'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 const Login = () => {
     const {formatMessage} = useIntl()
-
     const navigate = useNavigation()
-    const customer = useCustomer()
     const form = useForm()
     const location = useLocation()
     const einstein = useEinstein()
+    const customerType = useCustomerType()
+    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
 
     const submitForm = async (data) => {
-        try {
-            await customer.login(data)
-        } catch (error) {
-            const message = /invalid credentials/i.test(error.message)
-                ? formatMessage({
-                      defaultMessage: 'Incorrect username or password, please try again.',
-                      id: 'login_page.error.incorrect_username_or_password'
-                  })
-                : error.message
-            form.setError('global', {type: 'manual', message})
-        }
+        return login.mutateAsync(
+            {username: data.email, password: data.password},
+            {
+                onSuccess: () => {
+                    if (location?.state?.directedFrom) {
+                        navigate(location.state.directedFrom)
+                    } else {
+                        navigate('/account')
+                    }
+                },
+                onError: (error) => {
+                    const message = /Unauthorized/i.test(error.message)
+                        ? formatMessage({
+                              defaultMessage:
+                                  "Something's not right with your email or password. Try again.",
+                              id: 'auth_modal.error.incorrect_email_or_password'
+                          })
+                        : formatMessage(API_ERROR_MESSAGE)
+                    form.setError('global', {type: 'manual', message})
+                }
+            }
+        )
     }
 
     // If customer is registered push to account page
     useEffect(() => {
-        if (customer.authType != null && customer.isRegistered) {
-            if (location?.state?.directedFrom) {
-                navigate(location.state.directedFrom)
-            } else {
-                navigate('/account')
-            }
+        if (customerType === 'registered') {
+            navigate('/account')
         }
-    }, [customer])
+    }, [])
 
     /**************** Einstein ****************/
     useEffect(() => {

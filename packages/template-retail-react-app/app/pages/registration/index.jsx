@@ -7,36 +7,55 @@
 
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
+import {useIntl} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
-import Seo from '../../components/seo'
+import {
+    ShopperLoginHelpers,
+    useShopperLoginHelper,
+    useCustomerType
+} from 'commerce-sdk-react-preview'
 import {useForm} from 'react-hook-form'
+import {useLocation} from 'react-router-dom'
+import Seo from '../../components/seo'
 import RegisterForm from '../../components/register'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
-import {useLocation} from 'react-router-dom'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 const Registration = () => {
+    const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const customer = useCustomer()
+    const customerType = useCustomerType()
     const form = useForm()
     const einstein = useEinstein()
     const {pathname} = useLocation()
+    const register = useShopperLoginHelper(ShopperLoginHelpers.Register)
 
-    const submitForm = async (data) => {
-        try {
-            await customer.registerCustomer(data)
-        } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
+    const submitForm = (data) => {
+        const body = {
+            customer: {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                login: data.email
+            },
+            password: data.password
         }
+
+        return register.mutateAsync(body, {
+            onSuccess: () => navigate('/account'),
+            onError: () => {
+                form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+            }
+        })
     }
 
     // If customer is registered push to account page
     useEffect(() => {
-        if (customer.authType != null && customer.isRegistered) {
+        if (customerType === 'registered') {
             navigate('/account')
         }
-    }, [customer])
+    }, [])
 
     /**************** Einstein ****************/
     useEffect(() => {
