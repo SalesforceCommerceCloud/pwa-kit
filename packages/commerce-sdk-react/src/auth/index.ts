@@ -347,7 +347,7 @@ class Auth {
      *
      */
     async register(
-        body: Argument<ShopperCustomers<ApiClientConfigParams>['registerCustomer']>['body']
+        body: ShopperCustomersTypes.CustomerRegistration
     ) {
         const {
             customer: {email},
