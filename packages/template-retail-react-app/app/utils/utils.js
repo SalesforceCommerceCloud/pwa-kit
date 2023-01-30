@@ -136,13 +136,20 @@ export const clearSessionJSONItem = (key) => {
 }
 
 /**
+ * escapes special regex characters
+ * @param {string} str
+ * @returns escaped string
+ */
+export const escapeRegexChars = (str) => str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
+
+/**
  * bolds a substring of a string by adding <b> tags
  * @param {string} str
  * @param {string} substr
  * @returns stringified HTML Node
  */
 export const boldString = (str, substr) => {
-    return str.replace(RegExp(substr, 'g'), `<b>${substr}</b>`)
+    return str.replace(RegExp(escapeRegexChars(substr.trim()), 'gi'), '<b>$&</b>')
 }
 
 /**
