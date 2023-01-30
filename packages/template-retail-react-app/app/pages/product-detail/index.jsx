@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useEffect, useState} from 'react'
+import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -133,34 +133,37 @@ const ProductDetail = ({category, product, isLoading}) => {
     }
 
     /**************** Product Set Handlers ****************/
-    const handleProductSetValidation = () => {
-        // Run validation for all child products. This will ensure the error
-        // messages are shown.
-        Object.values(childProductRefs.current).forEach(({scope}) => {
-            scope.validateOrderability({scrollErrorIntoView: false})
-        })
-
-        // Using ot state for which child products are selected, scroll to the first
-        // one that isn't selected.
-        const selectedProductIds = Object.keys(productSetSelection)
-        const firstUnselectedProduct = product.setProducts.find(
-            ({id}) => !selectedProductIds.includes(id)
-        )
-
-        if (firstUnselectedProduct) {
-            // Get the reference to the product view and scroll to it.
-            const {ref} = childProductRefs.current[firstUnselectedProduct.id]
-
-            ref.scrollIntoView({
-                behavior: 'smooth',
-                block: 'end'
+    const handleProductSetValidation = useCallback(
+        () => {
+            // Run validation for all child products. This will ensure the error
+            // messages are shown.
+            Object.values(childProductRefs.current).forEach(({scope}) => {
+                scope.validateOrderability({scrollErrorIntoView: false})
             })
 
-            return false
-        }
+            // Using ot state for which child products are selected, scroll to the first
+            // one that isn't selected.
+            const selectedProductIds = Object.keys(productSetSelection)
+            const firstUnselectedProduct = product.setProducts.find(
+                ({id}) => !selectedProductIds.includes(id)
+            )
 
-        return true
-    }
+            if (firstUnselectedProduct) {
+                // Get the reference to the product view and scroll to it.
+                const {ref} = childProductRefs.current[firstUnselectedProduct.id]
+
+                ref.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end'
+                })
+
+                return false
+            }
+
+            return true
+        },
+        [product, productSetSelection]
+    )
 
     const handleProductSetAddToCart = () => {
         // Get all the selected products, and pass them to the addToCart handler which
