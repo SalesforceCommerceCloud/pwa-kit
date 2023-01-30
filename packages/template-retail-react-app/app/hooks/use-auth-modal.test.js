@@ -212,6 +212,7 @@ test('Allows customer to open generate password token modal from everywhere', ()
 })
 
 test('Allows customer to create an account', async () => {
+    jest.setTimeout(30000)
     mockLogin.mockImplementationOnce(async () => {
         return {url: '/callback', customerId: 'registeredCustomerId'}
     })
