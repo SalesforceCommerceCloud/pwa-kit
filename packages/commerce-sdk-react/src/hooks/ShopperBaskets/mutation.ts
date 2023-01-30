@@ -205,7 +205,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
                           updater: () => response
                       },
                       {
-                          // Since we use baskets from custom basket query, we need to update it for any basket mutation
+                          // Since we use baskets from customer basket query, we need to update it for any basket mutation
                           name: 'customerBaskets',
                           key: ['/customers', customerId, '/baskets', {customerId}],
                           updater: (
