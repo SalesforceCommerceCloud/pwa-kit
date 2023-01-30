@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {helpers, ShopperLogin, ShopperCustomers, ShopperLoginTypes} from 'commerce-sdk-isomorphic'
+import {helpers, ShopperLogin, ShopperCustomers, ShopperLoginTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import jwtDecode from 'jwt-decode'
 import {ApiClientConfigParams, Argument} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage} from './storage'
+import {CustomerType} from '../hooks/useCustomerType'
 
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
@@ -54,7 +55,6 @@ type AuthDataMap = Record<
  * Plus, the getCustomer endpoint only works for registered user, it returns a 404 for a guest user,
  * and it's not easy to grab this info in user land, so we add it into the Auth object, and expose it via a hook
  */
-type CustomerType = 'guest' | 'registered'
 type AuthData = ShopperLoginTypes.TokenResponse & {
     customer_type: CustomerType
 }

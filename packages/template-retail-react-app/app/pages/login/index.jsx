@@ -28,7 +28,7 @@ const Login = () => {
     const form = useForm()
     const location = useLocation()
     const einstein = useEinstein()
-    const customerType = useCustomerType()
+    const {isRegistered} = useCustomerType()
     const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
 
     const submitForm = async (data) => {
@@ -58,7 +58,7 @@ const Login = () => {
 
     // If customer is registered push to account page
     useEffect(() => {
-        if (customerType === 'registered') {
+        if (isRegistered) {
             navigate('/account')
         }
     }, [])

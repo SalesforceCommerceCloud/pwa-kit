@@ -84,7 +84,7 @@ const Header = ({
 }) => {
     const intl = useIntl()
     const {totalItems, basket} = useCurrentBasket()
-    const customerType = useCustomerType()
+    const {isRegistered} = useCustomerType()
     const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
     const navigate = useNavigation()
 
@@ -167,7 +167,7 @@ const Header = ({
                         })}
                     />
 
-                    {customerType === 'registered' && (
+                    {isRegistered && (
                         <Popover
                             isLazy
                             arrowSize={15}

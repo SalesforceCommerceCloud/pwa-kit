@@ -83,7 +83,7 @@ const STORE_LOCATOR_HREF = '/store-locator'
  */
 const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
     const intl = useIntl()
-    const customerType = useCustomerType()
+    const {isRegistered} = useCustomerType()
     const navigate = useNavigation()
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
@@ -168,7 +168,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                         {/* Application Actions */}
                         <VStack align="stretch" spacing={0} {...styles.actions} px={0}>
                             <Box {...styles.actionsItem}>
-                                {customerType === 'registered' ? (
+                                {isRegistered ? (
                                     <NestedAccordion
                                         urlBuilder={(item, locale) =>
                                             `/${locale}/account${item.path}`

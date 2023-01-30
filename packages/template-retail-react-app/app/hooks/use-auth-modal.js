@@ -51,12 +51,11 @@ export const AuthModal = ({
 }) => {
     const {formatMessage} = useIntl()
     const customerId = useCustomerId()
-    const customerType = useCustomerType()
+    const {isRegistered} = useCustomerType()
     const customer = useCustomer(
         {customerId},
-        {enabled: !!customerId && customerType === 'registered'}
+        {enabled: !!customerId && isRegistered}
     )
-    const isRegistered = customerType === 'registered'
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()

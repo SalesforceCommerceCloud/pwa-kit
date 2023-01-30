@@ -25,7 +25,7 @@ import {API_ERROR_MESSAGE} from '../../constants'
 const Registration = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const customerType = useCustomerType()
+    const {isRegistered} = useCustomerType()
     const form = useForm()
     const einstein = useEinstein()
     const {pathname} = useLocation()
@@ -52,7 +52,7 @@ const Registration = () => {
 
     // If customer is registered push to account page
     useEffect(() => {
-        if (customerType === 'registered') {
+        if (isRegistered) {
             navigate('/account')
         }
     }, [])
