@@ -65,6 +65,6 @@ describe('catchAndLog', () => {
     test('error', () => {
         const error = jest.spyOn(console, 'error').mockImplementation(() => {})
         utils.catchAndLog()
-        expect(error.mock.calls).toEqual([['Uncaught exception: ', '(no error)']])
+        expect(error).toHaveBeenCalledWith('Uncaught exception: ', '(no error)')
     })
 })
