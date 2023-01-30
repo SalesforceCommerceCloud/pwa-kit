@@ -183,7 +183,6 @@ test('Allows customer to generate password token', async () => {
     user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
     user.click(withinForm.getByText(/reset password/i))
 
-    screen.logTestingPlaygroundURL()
     // wait for success state
     await waitFor(() => {
         expect(screen.getByText(/password reset/i)).toBeInTheDocument()
@@ -236,6 +235,9 @@ test('Allows customer to create an account', async () => {
     user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
     user.click(withinForm.getByText(/create account/i))
 
-    // wait for redirecting to account page
-    expect(await screen.findByText(/welcome tester/i, {}, {timeout: 30000})).toBeInTheDocument()
+    screen.logTestingPlaygroundURL()
+
+    await waitFor(() => {
+        expect(screen.getAllByText(/welcome tester/i).length).toEqual(2)
+    })
 })
