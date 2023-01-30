@@ -127,16 +127,15 @@ const ProductView = forwardRef(
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
             const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
+            const showError = !isProductASet && !hasValidSelection
 
-            if (!isProductASet && !hasValidSelection) {
-                toggleShowOptionsMessage(true)
+            toggleShowOptionsMessage(showError)
 
-                if (scrollErrorIntoView) {
-                    errorContainerRef.current.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    })
-                }
+            if (showError && scrollErrorIntoView) {
+                errorContainerRef.current.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                })
             }
 
             return hasValidSelection
