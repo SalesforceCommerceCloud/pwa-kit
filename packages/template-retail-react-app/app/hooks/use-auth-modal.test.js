@@ -38,10 +38,7 @@ const mockLogin = jest.fn()
 jest.mock('../commerce-api/auth', () => {
     return jest.fn().mockImplementation(() => {
         return {
-            login: mockLogin,
-            getLoggedInToken: jest.fn().mockImplementation(async () => {
-                return {customer_id: 'mockcustomerid'}
-            })
+            login: mockLogin
         }
     })
 })
@@ -235,8 +232,6 @@ test('Allows customer to create an account', async () => {
     user.paste(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
     user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
     user.click(withinForm.getByText(/create account/i))
-
-    screen.logTestingPlaygroundURL()
 
     await waitFor(() => {
         expect(screen.getAllByText(/welcome tester/i).length).toEqual(2)
