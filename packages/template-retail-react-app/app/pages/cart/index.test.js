@@ -17,11 +17,39 @@ import mockBasketWithSuit from '../../commerce-api/mocks/basket-with-suit'
 import mockVariant from '../../commerce-api/mocks/variant-750518699578M'
 import mockEmptyBasket from '../../commerce-api/mocks/empty-basket'
 import {keysToCamel} from '../../commerce-api/utils'
+import {rest} from 'msw'
 
 jest.setTimeout(60000)
 
 let mockedBasketResponse = keysToCamel(mockBasketWithSuit)
 let mockedShippingMethodsResponse = keysToCamel(mockShippingMethods)
+
+const mockProduct = {
+    ...mockVariant,
+    id: '750518699660M',
+    variationValues: {
+        color: 'BLACKFB',
+        size: '050',
+        width: 'V'
+    },
+    c_color: 'BLACKFB',
+    c_isNew: true,
+    c_refinementColor: 'black',
+    c_size: '050',
+    c_width: 'V'
+}
+const mockPromotions = {
+    count: 1,
+    data: [
+        {
+            calloutMsg: "10% off men's suits with coupon",
+            details: 'exceptions apply',
+            id: '10offsuits',
+            name: "10% off men's suits"
+        }
+    ],
+    total: 1
+}
 
 jest.mock('../../commerce-api/auth', () => {
     return class AuthMock {
@@ -56,63 +84,28 @@ jest.mock('../../commerce-api/ocapi-shopper-baskets', () => {
     }
 })
 
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async getCustomerBaskets() {
-                return {baskets: [mockedBasketResponse]}
-            }
-        },
-        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
-            async getProducts() {
-                return {data: [mockVariant]}
-            }
-            async getProduct() {
-                return {
-                    ...mockVariant,
-                    id: '750518699660M',
-                    variationValues: {
-                        color: 'BLACKFB',
-                        size: '050',
-                        width: 'V'
-                    },
-                    c_color: 'BLACKFB',
-                    c_isNew: true,
-                    c_refinementColor: 'black',
-                    c_size: '050',
-                    c_width: 'V'
-                }
-            }
-        },
-        ShopperPromotions: class ShopperPromotionsMock extends sdk.ShopperPromotions {
-            async getPromotions() {
-                return {
-                    count: 1,
-                    data: [
-                        {
-                            calloutMsg: "10% off men's suits with coupon",
-                            details: 'exceptions apply',
-                            id: '10offsuits',
-                            name: "10% off men's suits"
-                        }
-                    ],
-                    total: 1
-                }
-            }
-        }
-    }
-})
-
 const WrappedCart = () => {
     useShopper()
     return <Cart />
 }
 
 // Set up and clean up
-beforeAll(() => {
+beforeEach(() => {
     jest.resetModules()
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockProduct))
+        }),
+        rest.get('*/products', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json({data: [mockVariant]}))
+        }),
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json({baskets: [mockedBasketResponse]}))
+        }),
+        rest.get('*/promotions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockPromotions))
+        })
+    )
 })
 afterEach(() => {
     mockedBasketResponse = keysToCamel(mockBasketWithSuit)
@@ -296,6 +289,8 @@ test('Can apply and remove product-level coupon code with promotion', async () =
     userEvent.click(screen.getByText('Do you have a promo code?'))
     userEvent.type(screen.getByLabelText('Promo Code'), 'MENSSUITS')
     userEvent.click(screen.getByText('Apply'))
+
+    expect(await screen.findByText('Promotion applied')).toBeInTheDocument()
     expect(await screen.findByText(/MENSSUITS/i)).toBeInTheDocument()
 
     const cartItem = await screen.findByTestId('sf-cart-item-750518699578M')

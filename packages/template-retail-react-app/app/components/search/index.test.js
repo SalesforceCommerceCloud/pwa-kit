@@ -13,21 +13,15 @@ import Suggestions from './partials/suggestions'
 import {noop} from '../../utils/utils'
 import mockSearchResults from '../../commerce-api/mocks/searchResults'
 import mockConfig from '../../../config/mocks/default'
-
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperSearch: class ShopperSearchMock extends sdk.ShopperSearch {
-            async getSearchSuggestions() {
-                return mockSearchResults
-            }
-        }
-    }
-})
+import {rest} from 'msw'
 
 beforeEach(() => {
     jest.resetModules()
+    global.server.use(
+        rest.get('*/search-suggestions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockSearchResults))
+        })
+    )
 })
 
 test('renders SearchInput', () => {
