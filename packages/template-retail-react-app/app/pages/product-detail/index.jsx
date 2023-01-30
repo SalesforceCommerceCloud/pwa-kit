@@ -137,8 +137,8 @@ const ProductDetail = ({category, product, isLoading}) => {
         () => {
             // Run validation for all child products. This will ensure the error
             // messages are shown.
-            Object.values(childProductRefs.current).forEach(({scope}) => {
-                scope.validateOrderability({scrollErrorIntoView: false})
+            Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
+                validateOrderability({scrollErrorIntoView: false})
             })
 
             // Using ot state for which child products are selected, scroll to the first
@@ -220,7 +220,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                                             // validation.
                                             childProductRefs.current[childProduct.id] = {
                                                 ref,
-                                                scope: this
+                                                validateOrderability: this.validateOrderability
                                             }
                                         }}
                                         product={childProduct}
