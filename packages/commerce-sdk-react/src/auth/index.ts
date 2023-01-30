@@ -359,7 +359,7 @@ class Auth {
         // type CustomerRegistration
         // here we had to guard it to avoid ts error
         if (!email) {
-            throw new Error('Missing email')
+            throw new Error('Customer registration is missing email address.')
         }
 
         return this.queueRequest(async () => {
