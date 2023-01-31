@@ -55,7 +55,7 @@ const Cart = () => {
     const updateItemInBasketAction = useShopperBasketsMutation({action: 'updateItemInBasket'})
     const removeItemFromBasketAction = useShopperBasketsMutation({action: 'removeItemFromBasket'})
     const updateShippingMethodForShipmentsAction = useShopperBasketsMutation({
-        action: 'updateShippingMethodForShipments'
+        action: 'updateShippingMethodForShipment'
     })
     const customerType = useCustomerType()
     const {products} = productItemDetail
@@ -67,7 +67,11 @@ const Cart = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const modalProps = useDisclosure()
-    const {data: shipmentMethods} = useShippingMethodsForShipment(
+
+    /******************* Shipping Methods for basket shipment *******************/
+    // do this action only if the basket shipping method is not defined
+    // we need to fetch the shippment methods to get the default value before we can add it to the basket
+    useShippingMethodsForShipment(
         {
             basketId: basket?.basketId,
             shipmentId: 'me'
@@ -80,8 +84,13 @@ const Cart = () => {
                 !basket.shipments[0].shippingMethod,
             onSuccess: (data) => {
                 updateShippingMethodForShipmentsAction.mutate({
-                    basketId: basket?.basketId,
-                    shipmentId: data.defaultShippingMethodId
+                    parameters: {
+                        basketId: basket?.basketId,
+                        shipmentId: 'me'
+                    },
+                    body: {
+                        id: data.defaultShippingMethodId
+                    }
                 })
             }
         }
@@ -125,20 +134,6 @@ const Cart = () => {
     }
     /**************** Wishlist ****************/
 
-    // useEffect(() => {
-    //     // Set the default shipping method if none is already selected
-    //     if (
-    //         _basket.basketId &&
-    //         _basket.shipments.length > 0 &&
-    //         !_basket.shipments[0].shippingMethod
-    //     ) {
-    //         ;(async () => {
-    //             const shippingMethods = await _basket.getShippingMethods()
-    //             _basket.setShippingMethod(shippingMethods.defaultShippingMethodId)
-    //         })()
-    //     }
-    // }, [_basket.basketId])
-
     /***************************** Update Cart **************************/
     const handleUpdateCart = async (variant, quantity) => {
         // close the modal before handle the change
@@ -180,7 +175,6 @@ const Cart = () => {
 
     /***************************** Update quantity **************************/
     const changeItemQuantity = debounce(async (quantity, product) => {
-        console.log('quantity', quantity)
         // This local state allows the dropdown to show the desired quantity
         // while the API call to update it is happening.
         const previousQuantity = localQuantity[product.itemId]
@@ -244,8 +238,8 @@ const Cart = () => {
         return true
     }
     /***************************** Update quantity **************************/
-    /***************************** Remove Item **************************/
 
+    /***************************** Remove Item **************************/
     const handleRemoveItem = async (product) => {
         setSelectedItem(product)
         setCartItemLoading(true)
