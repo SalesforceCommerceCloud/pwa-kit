@@ -392,7 +392,6 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
 
             return {
                 ...updateBasketQuery(basketId, response)
-                // ...invalidateCustomerBasketsQuery(customerId)
             }
         },
         updatePaymentInstrumentInBasket: (
