@@ -40,7 +40,11 @@ import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from './partials/cart-secon
 // Utilities
 import debounce from 'lodash/debounce'
 import {useCurrentBasket} from '../../hooks/use-current-basket'
-import {useCustomerType, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {
+    useCustomerType,
+    useShopperBasketsMutation,
+    useShippingMethodsForShipment
+} from 'commerce-sdk-react-preview'
 
 const Cart = () => {
     const _basket = useBasket()
@@ -50,6 +54,9 @@ const Cart = () => {
 
     const updateItemInBasketAction = useShopperBasketsMutation({action: 'updateItemInBasket'})
     const removeItemFromBasketAction = useShopperBasketsMutation({action: 'removeItemFromBasket'})
+    const updateShippingMethodForShipmentsAction = useShopperBasketsMutation({
+        action: 'updateShippingMethodForShipments'
+    })
     const customerType = useCustomerType()
     const {products} = productItemDetail
     const [selectedItem, setSelectedItem] = useState(undefined)
@@ -60,12 +67,34 @@ const Cart = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const modalProps = useDisclosure()
+    const {data: shipmentMethods} = useShippingMethodsForShipment(
+        {
+            basketId: basket?.basketId,
+            shipmentId: 'me'
+        },
+        {
+            // only fetch if basket is has no shipping method in the first shipment
+            enabled:
+                !!basket?.basketId &&
+                basket.shipments.length > 0 &&
+                !basket.shipments[0].shippingMethod,
+            onSuccess: (data) => {
+                updateShippingMethodForShipmentsAction.mutate({
+                    basketId: basket?.basketId,
+                    shipmentId: data.defaultShippingMethodId
+                })
+            }
+        }
+    )
+
+    /************************* Error handling ***********************/
     const showError = () => {
         toast({
             title: formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }
+    /************************* Error handling ***********************/
 
     /**************** Wishlist ****************/
     const wishlist = useWishlist()
@@ -94,29 +123,23 @@ const Cart = () => {
             showError()
         }
     }
+    /**************** Wishlist ****************/
 
-    useEffect(() => {
-        // Set the default shipping method if none is already selected
-        if (
-            _basket.basketId &&
-            _basket.shipments.length > 0 &&
-            !_basket.shipments[0].shippingMethod
-        ) {
-            ;(async () => {
-                const shippingMethods = await _basket.getShippingMethods()
-                _basket.setShippingMethod(shippingMethods.defaultShippingMethodId)
-            })()
-        }
-    }, [_basket.basketId])
+    // useEffect(() => {
+    //     // Set the default shipping method if none is already selected
+    //     if (
+    //         _basket.basketId &&
+    //         _basket.shipments.length > 0 &&
+    //         !_basket.shipments[0].shippingMethod
+    //     ) {
+    //         ;(async () => {
+    //             const shippingMethods = await _basket.getShippingMethods()
+    //             _basket.setShippingMethod(shippingMethods.defaultShippingMethodId)
+    //         })()
+    //     }
+    // }, [_basket.basketId])
 
-    if (!basket?.basketId) {
-        return <CartSkeleton />
-    }
-
-    if (!basket?.productItems) {
-        return <EmptyCart isRegistered={customerType === 'registered'} />
-    }
-
+    /***************************** Update Cart **************************/
     const handleUpdateCart = async (variant, quantity) => {
         // close the modal before handle the change
         onClose()
@@ -153,11 +176,14 @@ const Cart = () => {
             setSelectedItem(undefined)
         }
     }
+    /***************************** Update Cart **************************/
 
+    /***************************** Update quantity **************************/
     const changeItemQuantity = debounce(async (quantity, product) => {
         console.log('quantity', quantity)
         // This local state allows the dropdown to show the desired quantity
         // while the API call to update it is happening.
+        const previousQuantity = localQuantity[product.itemId]
         setLocalQuantity({...localQuantity, [product.itemId]: quantity})
         setCartItemLoading(true)
         setSelectedItem(product)
@@ -172,43 +198,18 @@ const Cart = () => {
             },
             {
                 onSuccess: () => {
-                    console.log('localQuantity', localQuantity)
                     // reset the state
                     setCartItemLoading(false)
                     setSelectedItem(undefined)
                     setLocalQuantity({...localQuantity, [product.itemId]: undefined})
                 },
                 onError: () => {
+                    // reset the quantity to the previous value
+                    setLocalQuantity({...localQuantity, [product.itemId]: previousQuantity})
                     showError()
                 }
             }
         )
-
-        // debugger
-        // try {
-        //     await updateItemInBasketAction.mutate({
-        //         parameters: {basketId: basket?.basketId, itemId: product.itemId },
-        //         body: {
-        //             productId: product.id,
-        //             quantity: parseInt(quantity)
-        //         }
-        //     }, {
-        //         onSuccess: () => {
-        //             // reset the state
-        //             setCartItemLoading(false)
-        //             setSelectedItem(undefined)
-        //             setLocalQuantity({...localQuantity, [product.itemId]: undefined})
-        //         }
-        //     })
-        //     // await _basket.updateItemInBasket(item, product.itemId)
-        // } catch {
-        //     showError()
-        // } finally {
-        //     // reset the state
-        //     setCartItemLoading(false)
-        //     setSelectedItem(undefined)
-        //     setLocalQuantity({...localQuantity, [product.itemId]: undefined})
-        // }
     }, 750)
 
     const handleChangeItemQuantity = async (product, value) => {
@@ -242,6 +243,9 @@ const Cart = () => {
 
         return true
     }
+    /***************************** Update quantity **************************/
+    /***************************** Remove Item **************************/
+
     const handleRemoveItem = async (product) => {
         setSelectedItem(product)
         setCartItemLoading(true)
@@ -267,25 +271,17 @@ const Cart = () => {
                 }
             }
         )
-
-        // try {
-        //     await _basket.removeItemFromBasket(product.itemId)
-        //     toast({
-        //         title: formatMessage({
-        //             defaultMessage: 'Item removed from cart',
-        //             id: 'cart.info.removed_from_cart'
-        //         }),
-        //         status: 'success'
-        //     })
-        // } catch {
-        //     showError()
-        // } finally {
-        //
-        // }
     }
-    console.log('=======================================================')
-    console.log('selectedItem?.itemId', selectedItem?.itemId)
-    console.log('localQuantity', localQuantity)
+    /***************************** Remove Item **************************/
+
+    /********* Rendering  UI **********/
+    if (!basket?.basketId) {
+        return <CartSkeleton />
+    }
+
+    if (!basket?.productItems) {
+        return <EmptyCart isRegistered={customerType === 'registered'} />
+    }
     return (
         <Box background="gray.50" flex="1" data-testid="sf-cart-container">
             <Container
@@ -305,14 +301,6 @@ const Cart = () => {
                             <GridItem>
                                 <Stack spacing={4}>
                                     {basket.productItems.map((productItem, idx) => {
-                                        console.log('isCartLoading', isCartItemLoading)
-                                        console.log(
-                                            'loading state',
-                                            updateItemInBasketAction.isLoading,
-                                            selectedItem?.itemId === productItem.itemId
-                                        )
-                                        console.log('product', productItem.quantity)
-
                                         return (
                                             <ProductItem
                                                 key={productItem.productId}
@@ -341,8 +329,7 @@ const Cart = () => {
                                                     productItem
                                                 )}
                                                 showLoading={
-                                                    (removeItemFromBasketAction.isLoading ||
-                                                        updateItemInBasketAction.isLoading) &&
+                                                    isCartItemLoading &&
                                                     selectedItem?.itemId === productItem.itemId
                                                 }
                                                 handleRemoveItem={handleRemoveItem}
