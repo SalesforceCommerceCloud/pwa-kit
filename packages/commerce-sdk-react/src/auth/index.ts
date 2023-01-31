@@ -59,10 +59,6 @@ type AuthData = ShopperLoginTypes.TokenResponse & {
     customer_type: string
 }
 
-const onClient = typeof window !== 'undefined'
-const localStorage = onClient ? new LocalStorage() : new Map()
-const cookieStorage = onClient ? new CookieStorage() : new Map()
-
 /**
  * A map of the data that this auth module stores. This maps the name of the property to
  * the storage type and the key when stored in that storage. You can also pass in a "callback"
@@ -120,7 +116,7 @@ const DATA_MAP: AuthDataMap = {
         key: 'cc-site-id'
     },
     customer_type: {
-        storage: localStorage,
+        storageType: 'local',
         key: 'customer_type'
     }
 }
