@@ -4,27 +4,39 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {
-    useQuery as useReactQuery,
-    UseQueryOptions,
-    QueryKey,
-    QueryFunction
-} from '@tanstack/react-query'
-import useAuthenticatedClient from './useAuthenticatedClient'
-import {AddParameters, ApiClients} from './types'
+import {useQuery as useReactQuery, UseQueryOptions, QueryKey} from '@tanstack/react-query'
+import {useAuthorizationHeader} from './useAuthorizationHeader'
+import {ApiClients} from './types'
+import {hasAllKeys} from './utils'
 
-type QueryFunctionWithApiClients<Data, QK extends QueryKey> = AddParameters<
-    QueryFunction<Data, QK>,
-    // TODO: Remove this after merging in prettier v2 changes
-    // eslint-disable-next-line prettier/prettier
-    [apiClients: ApiClients]
->
-
-export const useQuery = <Data, Err, QK extends QueryKey>(
-    queryKey: QK,
-    fn: QueryFunctionWithApiClients<Data, QK>,
-    queryOptions?: UseQueryOptions<Data, Err, Data, QK>
+export const useQuery = <
+    ApiArg extends {headers?: Record<string, string>; parameters?: Record<string, unknown>},
+    Client extends ApiClients[keyof ApiClients],
+    Data,
+    Err,
+    QK extends QueryKey
+>(
+    apiOptions: ApiArg,
+    queryOptions: UseQueryOptions<Data, Err, Data, QK> & {queryKey: QK},
+    hookConfig: {
+        client: Client
+        method: (arg: ApiArg) => Promise<Data>
+        requiredParameters: ReadonlyArray<keyof ApiArg['parameters']>
+        enabled?: boolean
+    }
 ) => {
-    const authenticatedFn = useAuthenticatedClient(fn)
-    return useReactQuery<Data, Err, Data, QK>(queryKey, authenticatedFn, queryOptions)
+    const parameters = {
+        ...hookConfig.client.clientConfig.parameters,
+        ...apiOptions.parameters
+    }
+    return useReactQuery<Data, Err, Data, QK>(
+        queryOptions.queryKey,
+        useAuthorizationHeader(hookConfig.method, apiOptions),
+        {
+            enabled:
+                hookConfig.enabled !== false &&
+                hasAllKeys(parameters, hookConfig.requiredParameters),
+            ...queryOptions
+        }
+    )
 }
