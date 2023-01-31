@@ -57,7 +57,6 @@ export default {
                 textDecoration: 'none'
             }
         },
-        listMenuTriggerLinkWithIcon: {marginRight: 3},
         listMenuTriggerLinkActive: {
             textDecoration: 'none',
             _before: {
