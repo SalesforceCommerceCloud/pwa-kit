@@ -37,7 +37,7 @@ export function useShopperLoginHelper<Action extends ShopperLoginHelpersType>(
     ShopperLoginTypes.TokenResponse,
     Error,
     // TODO: what's the better way for declaring the types?
-    void | Argument<Auth['loginRegisteredUserB2C']> | Argument<Auth['register']>
+    any
 > {
     const auth = useAuth()
     if (action === ShopperLoginHelpers.LoginGuestUser) {
@@ -47,17 +47,10 @@ export function useShopperLoginHelper<Action extends ShopperLoginHelpersType>(
         return useMutation(() => auth.logout())
     }
     if (action === ShopperLoginHelpers.Register) {
-        // @ts-ignore
         return useMutation((body) => auth.register(body))
     }
     if (action === ShopperLoginHelpers.LoginRegisteredUserB2C) {
-        return useMutation((credentials) => {
-            if (!credentials) {
-                throw new Error('Missing registered user credentials.')
-            }
-            // @ts-ignore
-            return auth.loginRegisteredUserB2C(credentials)
-        })
+        return useMutation((credentials) => auth.loginRegisteredUserB2C(credentials))
     }
 
     throw new Error('Unknown ShopperLogin helper.')
