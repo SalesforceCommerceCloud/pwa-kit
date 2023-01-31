@@ -94,9 +94,12 @@ const icon = (name, passProps) => {
         const theme = useTheme()
         const baseStyle = theme?.components?.Icon?.baseStyle
         return (
-            <Icon ref={ref} {...baseStyle} {...passProps} {...props}>
-                <use role="presentation" xlinkHref={`#${name}`} />
-            </Icon>
+            // <Icon ref={ref} {...baseStyle} {...passProps} {...props}>
+            //     <use role="presentation" xlinkHref={`#${name}`} />
+            // </Icon>
+            // TODO: for demo, this can show overrides, but highlight
+            // that imports within the project don't respect them
+            <>z🎉</>
         )
     })
     component.displayName = `${displayName}Icon`

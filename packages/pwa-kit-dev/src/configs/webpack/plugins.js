@@ -42,14 +42,6 @@ const getOverridePath = (path) => {
     return generatedProjectOverride?.length ? generatedProjectOverride?.[0] : null
 }
 
-/**
- * Allows users to override special SDK components by placing override
- * files in certain magic locations in a project.
- *
- * @param {string} projectDir - absolute path to the project root.
- * @returns {webpack.NormalModuleReplacementPlugin}
- */
-
 const makeRegExp = (str, sep = path.sep) => {
     // Replace unix paths with windows if needed and build a RegExp
     if (sep === '\\') {
@@ -57,6 +49,14 @@ const makeRegExp = (str, sep = path.sep) => {
     }
     return new RegExp(str)
 }
+
+/**
+ * Allows users to override special SDK components by placing override
+ * files in certain magic locations in a project.
+ *
+ * @param {string} projectDir - absolute path to the project root.
+ * @returns {webpack.NormalModuleReplacementPlugin}
+ */
 
 export const sdkReplacementPlugin = (projectDir) => {
     const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
@@ -98,37 +98,73 @@ export const sdkReplacementPlugin = (projectDir) => {
         ]
 
         const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))
-
         if (requestedFromSDK && replacement) {
+            console.log('~======= ', replacement.newPath)
             resource.request = replacement.newPath
         }
     })
 }
 
 const templateAppPathRegex = makeRegExp(
-    `${projectDir + pkg?.mobify?.overridesDir}|node_modules${pkg?.mobify?.extends}`
+    `((.*)${pkg?.mobify?.overridesDir}(.*)|(.*)/${pkg?.mobify?.extends}(.*))`
 )
 
 export const extendedTemplateReplacementPlugin = (projectDir) => {
-    const extendPath = `${projectDir}/node_modules/${pkg?.mobify?.extends}`
+    console.log('~templateAppPathRegex', templateAppPathRegex)
     const globPattern = `${pkg?.mobify?.overridesDir?.replace(/\//, '')}/**/*.+(js|jsx|ts|tsx)`
-    const overridesMap = glob.sync(globPattern)
-    console.log('~overridesMap', overridesMap)
-
-    return new webpack.NormalModuleReplacementPlugin(templateAppPathRegex, (resource) => {
-        const requestedFile = path.resolve(resource.context, resource.request)
-        console.log('~requestedFile', requestedFile)
-        const found = overridesMap?.filter((override) => {
-            return requestedFile?.match?.(override)?.length
+    const overrides = glob.sync(globPattern)
+    const overridesMap = [
+        ...overrides,
+        ...overrides?.map((item) => {
+            item = item?.replace?.(pkg?.mobify?.overridesDir?.replace(/^\//, '') + '/', '')
+            return item
         })
-        if (!found?.length) {
-            const relativePath = requestedFile?.split?.(pkg?.mobify?.overridesDir)?.[1]
-            if (!relativePath) return
-            const newPath = extendPath + relativePath
-            resource.request = newPath
+    ]
+    console.log('~overridesMap', overridesMap)
+    const overridesRegex = makeRegExp(
+        `(${overridesMap?.map((override) => override?.replace?.(/^\//))?.join('|')})`
+    )
+    console.log('~overridesRegex', overridesRegex)
+    return new webpack.NormalModuleReplacementPlugin(overridesRegex, (resource) => {
+        const requestedFile = path.resolve(resource.context, resource.request)
+        console.log('~requestedFile context:', resource.context)
+        console.log('~requestedFile request:', resource.request)
+        console.log('~requestedFile full path:', requestedFile)
+
+        // from this context:
+        // ~requestedFile context: /Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app/components/icons
+        // ~requestedFile request: @babel/runtime/helpers/extends
+
+        // // if (overridables?.filter((override) => resource?.context?.match?.(override))?.length) {
+        // //     console.log('~overr')
+        // //     return
+        // // }
+        // const found = overridesMap?.filter((override) => {
+        //     return requestedFile?.match?.(override)?.length
+        // })
+        // TODO: we need to drop `template-` for this to work
+        if (
+            requestedFile?.match?.(`/template-${pkg?.mobify?.extends}`) ||
+            requestedFile?.match?.(`/${pkg?.mobify?.extends}`)
+        ) {
+            // TODO: rewrite this to the pkg.mobify.extends /node_modules
+            // currently yielding this:
+            // '/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/node_modules/retail-react-app/app/retail-react-app/app/pages/product-detail'
+            const newContext = projectDir + pkg?.mobify?.overridesDir
+            const newRequest = requestedFile?.split?.(`/template-${pkg?.mobify?.extends}/`)?.[1]
+            console.log('~!!! OVERRIDING', requestedFile)
+            console.log('~!!! newContext', newContext)
+            console.log('~!!! newRequest', newRequest)
+            if (newContext && newRequest) {
+                // resource.context = newContext
+                // const newreq = path.resolve(newContext, newRequest, 'index.jsx')
+                const newreq =
+                    '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/app/components/icons/index.jsx'
+                console.log('~newreq', newreq)
+                resource.request = newreq
+                console.log('new full path:', path.resolve(resource.context, resource.request))
+            }
             return
-        } else {
-            console.log('~FOUND requestedFile', requestedFile)
         }
     })
 }
