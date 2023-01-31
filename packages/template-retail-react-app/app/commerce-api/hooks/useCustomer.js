@@ -118,7 +118,6 @@ export default function useCustomer() {
                 }
 
                 const response = await api.shopperCustomers.registerCustomer({body})
-
                 // Check for error json response
                 if (response.detail && response.title && response.type) {
                     throw new Error(response.detail)

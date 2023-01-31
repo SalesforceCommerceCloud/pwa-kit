@@ -671,7 +671,7 @@ describe('SSRServer persistent caching', () => {
                 'x-rendered': 'true',
                 'content-type': 'text/html; charset=utf-8'
             },
-            expectToBeCached: true,
+            expectToBeCached: false,
             expectRenderCallCount: 1
         },
         {
@@ -682,7 +682,7 @@ describe('SSRServer persistent caching', () => {
                 'x-mobify-from-cache': 'false',
                 'content-type': 'image/png'
             },
-            expectToBeCached: true,
+            expectToBeCached: false,
             expectRenderCallCount: 1
         },
         {
@@ -713,18 +713,17 @@ describe('SSRServer persistent caching', () => {
             url: '/cacheme/?type=html',
             expectOk: true,
             expectHeaders: {
-                'x-precached': 'true',
-                'x-mobify-from-cache': 'true',
+                'x-mobify-from-cache': 'false',
                 'content-type': 'text/html; charset=utf-8'
             },
-            expectToBeCached: true,
-            expectRenderCallCount: 0,
+            expectToBeCached: false,
+            expectRenderCallCount: 1,
             preCache: {
                 data: Buffer.from('<html>456</html>'),
                 metadata: {
                     status: 200,
                     headers: {
-                        'x-precached': 'true',
+                        'x-precached': 'false',
                         'content-type': 'text/html; charset=utf-8'
                     }
                 }
@@ -735,10 +734,10 @@ describe('SSRServer persistent caching', () => {
             url: '/cacheme/?type=html',
             expectOk: true,
             expectHeaders: {
-                'x-mobify-from-cache': 'true'
+                'x-mobify-from-cache': 'false'
             },
-            expectToBeCached: true,
-            expectRenderCallCount: 0,
+            expectToBeCached: false,
+            expectRenderCallCount: 1,
             preCache: {
                 data: Buffer.from('<html>123</html>')
             }
@@ -748,11 +747,10 @@ describe('SSRServer persistent caching', () => {
             url: '/cacheme/?type=none',
             expectOk: true,
             expectHeaders: {
-                'x-precached': 'true',
-                'x-mobify-from-cache': 'true'
+                'x-mobify-from-cache': 'false'
             },
-            expectToBeCached: true,
-            expectRenderCallCount: 0,
+            expectToBeCached: false,
+            expectRenderCallCount: 1,
             preCache: {
                 data: undefined,
                 metadata: {
@@ -1027,5 +1025,38 @@ describe('getRuntime', () => {
         const mockDevRuntime = getRuntime()
         const func = mockDevRuntime.returnMyName
         expect(func()).toBe(MockDevServerFactory.name)
+    })
+})
+
+describe('DevServer middleware', () => {
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+    test('_validateConfiguration protocol', () => {
+        let protocol = 'ftp'
+        let error = `Invalid local development server protocol ${protocol}. Valid protocols are http and https.`
+        expect(() => {
+            RemoteServerFactory._validateConfiguration(opts({protocol}))
+        }).toThrow(error)
+    })
+
+    test('_validateConfiguration sslFilePath', () => {
+        let sslFilePath = './does/not/exist'
+        let error =
+            'The sslFilePath option passed to the SSR server constructor ' +
+            'must be a path to an SSL certificate file ' +
+            'in PEM format, whose name ends with ".pem". ' +
+            'See the "cert" and "key" options on ' +
+            'https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options'
+        expect(() => {
+            RemoteServerFactory._validateConfiguration(opts({sslFilePath}))
+        }).toThrow(error)
+    })
+    test('_validateConfiguration strictSSL', () => {
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+        RemoteServerFactory._validateConfiguration(opts({strictSSL: false}))
+        expect(warn.mock.calls).toEqual([
+            ['The SSR Server has _strictSSL turned off for https requests']
+        ])
     })
 })

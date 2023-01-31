@@ -49,7 +49,13 @@ export const shopperOrdersCacheUpdateMatrix = {
     ): CacheUpdateMatrixElement => {
         const customerId = response?.customerInfo?.customerId
         return {
-            update: [{name: 'order', key: ['/orders', {orderNo: response.orderNo}]}],
+            update: [
+                {
+                    name: 'order',
+                    key: ['/orders', {orderNo: response.orderNo}],
+                    updater: () => response
+                }
+            ],
             invalidate: [{name: 'customerBaskets', key: ['/customers', customerId, '/baskets']}]
         }
     },
