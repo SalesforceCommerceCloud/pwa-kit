@@ -325,7 +325,8 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
 
     // Flatten the root so we can easily access all the categories throughout
     // the application.
-    const categories = flatten(rootCategory, 'categories')
+    const categories = {root: flatten(rootCategory, 'categories').root}
+    console.log('?????????getprops', categories)
 
     return {
         targetLocale,
