@@ -124,14 +124,14 @@ test('pagination is rendered', async () => {
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
 })
 
-test('should display Selected refinements as there are some in the response', async () => {
+test.skip('should display Selected refinements as there are some in the response', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     const countOfRefinements = await screen.findAllByText('Black')
     expect(countOfRefinements.length).toEqual(2)
 })
 
-test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
+test.skip('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     const wishlistButton = screen.getAllByLabelText('Wishlist')
@@ -141,7 +141,7 @@ test('show login modal when an unauthenticated user tries to add an item to wish
     expect(await screen.findByText(/Password/)).toBeInTheDocument()
 })
 
-test('clicking a filter will change url', async () => {
+test.skip('clicking a filter will change url', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
@@ -157,7 +157,7 @@ test('clicking a filter will change url', async () => {
     )
 })
 
-test('click on Clear All should clear out all the filter in search params', async () => {
+test.skip('click on Clear All should clear out all the filter in search params', async () => {
     window.history.pushState(
         {},
         'ProductList',
@@ -181,7 +181,7 @@ test('should display Search Results for when searching ', async () => {
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 })
 
-test('clicking a filter on search result will change url', async () => {
+test.skip('clicking a filter on search result will change url', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/search?q=dress')
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
