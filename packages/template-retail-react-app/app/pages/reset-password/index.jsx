@@ -9,9 +9,12 @@ import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Container, Stack, Text} from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
-import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
+import {
+    useShopperCustomersMutation,
+    ShopperCustomersMutations
+} from 'commerce-sdk-react-preview'
+import Seo from '../../components/seo'
 import ResetPasswordForm from '../../components/reset-password'
 import {BrandLogo} from '../../components/icons'
 import useNavigation from '../../hooks/use-navigation'
@@ -19,17 +22,21 @@ import useEinstein from '../../commerce-api/hooks/useEinstein'
 import {useLocation} from 'react-router-dom'
 
 const ResetPassword = () => {
-    const customer = useCustomer()
     const form = useForm()
     const navigate = useNavigation()
     const [submittedEmail, setSubmittedEmail] = useState('')
     const [showSubmittedSuccess, setShowSubmittedSuccess] = useState(false)
     const einstein = useEinstein()
     const {pathname} = useLocation()
+    // TODO: simplify the args to remove action
+    const getResetPasswordToken = useShopperCustomersMutation({action: ShopperCustomersMutations.GetResetPasswordToken})
 
     const submitForm = async ({email}) => {
+        const body = {
+            login: email
+        }
         try {
-            await customer.getResetPasswordToken(email)
+            await getResetPasswordToken.mutateAsync({body})
             setSubmittedEmail(email)
             setShowSubmittedSuccess(!showSubmittedSuccess)
         } catch (error) {

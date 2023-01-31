@@ -25,7 +25,9 @@ import {
     useShopperLoginHelper,
     useCustomer,
     useCustomerId,
-    useCustomerType
+    useCustomerType,
+    useShopperCustomersMutation,
+    ShopperCustomersMutations
 } from 'commerce-sdk-react-preview'
 import {BrandLogo} from '../components/icons'
 import LoginForm from '../components/login'
@@ -63,6 +65,9 @@ export const AuthModal = ({
     const toast = useToast()
     const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
     const register = useShopperLoginHelper(ShopperLoginHelpers.Register)
+    
+    // TODO: simplify the args to remove action
+    const getResetPasswordToken = useShopperCustomersMutation({action: ShopperCustomersMutations.GetResetPasswordToken})
 
     const submitForm = async (data) => {
         form.clearErrors()
@@ -115,8 +120,18 @@ export const AuthModal = ({
                     }
                 })
             },
-            password: () => {
-                throw new Error('Not implemented')
+            password: (data) => {
+                const body = {
+                    login: data.email
+                }
+                return getResetPasswordToken.mutateAsync({body}, {
+                    onError: () => {
+                        form.setError('global', {
+                            type: 'manual',
+                            message: formatMessage(API_ERROR_MESSAGE)
+                        })
+                    }
+                })
             }
         }[currentView](data)
     }
