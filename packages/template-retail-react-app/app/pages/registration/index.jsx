@@ -43,19 +43,17 @@ const Registration = () => {
         }
 
         return register.mutateAsync(body, {
-            onSuccess: () => navigate('/account'),
             onError: () => {
                 form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
             }
         })
     }
 
-    // If customer is registered push to account page
     useEffect(() => {
         if (isRegistered) {
             navigate('/account')
         }
-    }, [])
+    }, [isRegistered])
 
     /**************** Einstein ****************/
     useEffect(() => {

@@ -21,6 +21,7 @@ import {useLocation} from 'react-router-dom'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 import LoginForm from '../../components/login'
 import {API_ERROR_MESSAGE} from '../../constants'
+import { CustomerProductListsProvider } from '../../commerce-api/contexts'
 
 const Login = () => {
     const {formatMessage} = useIntl()
@@ -35,13 +36,6 @@ const Login = () => {
         return login.mutateAsync(
             {username: data.email, password: data.password},
             {
-                onSuccess: () => {
-                    if (location?.state?.directedFrom) {
-                        navigate(location.state.directedFrom)
-                    } else {
-                        navigate('/account')
-                    }
-                },
                 onError: (error) => {
                     const message = /Unauthorized/i.test(error.message)
                         ? formatMessage({
@@ -59,9 +53,13 @@ const Login = () => {
     // If customer is registered push to account page
     useEffect(() => {
         if (isRegistered) {
-            navigate('/account')
+            if (location?.state?.directedFrom) {
+                navigate(location.state.directedFrom)
+            } else {
+                navigate('/account')
+            }
         }
-    }, [])
+    }, [isRegistered])
 
     /**************** Einstein ****************/
     useEffect(() => {
