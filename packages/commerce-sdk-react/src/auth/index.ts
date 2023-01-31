@@ -39,6 +39,7 @@ type AuthDataKeys =
     | 'token_type'
     | 'usid'
     | 'site_id'
+    | 'customer_type'
 type AuthDataMap = Record<
     AuthDataKeys,
     {
@@ -47,6 +48,20 @@ type AuthDataMap = Record<
         callback?: (storage: BaseStorage) => void
     }
 >
+
+/**
+ * The extended field is not from api response, we manually store the auth type,
+ * so we don't need to make another API call when we already have the data.
+ * Plus, the getCustomer endpoint only works for registered user, it returns a 404 for a guest user,
+ * and it's not easy to grab this info in user land, so we add it into the Auth object, and expose it via a hook
+ */
+type AuthData = ShopperLoginTypes.TokenResponse & {
+    customer_type: string
+}
+
+const onClient = typeof window !== 'undefined'
+const localStorage = onClient ? new LocalStorage() : new Map()
+const cookieStorage = onClient ? new CookieStorage() : new Map()
 
 /**
  * A map of the data that this auth module stores. This maps the name of the property to
@@ -103,6 +118,10 @@ const DATA_MAP: AuthDataMap = {
     site_id: {
         storageType: 'cookie',
         key: 'cc-site-id'
+    },
+    customer_type: {
+        storage: localStorage,
+        key: 'customer_type'
     }
 }
 
@@ -172,7 +191,7 @@ class Auth {
     /**
      * Every method in this class that returns a `TokenResponse` constructs it via this getter.
      */
-    private get data(): ShopperLoginTypes.TokenResponse {
+    private get data(): AuthData {
         return {
             access_token: this.get('access_token'),
             customer_id: this.get('customer_id'),
@@ -182,7 +201,8 @@ class Auth {
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
-            usid: this.get('usid')
+            usid: this.get('usid'),
+            customer_type: this.get('customer_type')
         }
     }
 
@@ -209,6 +229,7 @@ class Auth {
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
         this.set('usid', res.usid)
+        this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         this.set(refreshTokenKey, res.refresh_token, {
