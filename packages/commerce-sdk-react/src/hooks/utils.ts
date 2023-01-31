@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {QueryClient, QueryKey} from '@tanstack/react-query'
+import {QueryClient, QueryKey, Updater} from '@tanstack/react-query'
 import {ApiClients, Argument, DataType} from './types'
 import {ShopperCustomersMutationType} from './ShopperCustomers'
 import {ShopperOrdersMutationType} from './ShopperOrders'
@@ -17,7 +17,10 @@ const isObject = (item: unknown) =>
 export interface QueryKeyMap {
     name: string
     key: QueryKey
-    updater?: (data: any) => DataType<Client[CombinedMutationTypes]> | undefined
+    updater?: Updater<
+        DataType<Client[CombinedMutationTypes]> | undefined,
+        DataType<Client[CombinedMutationTypes]> | undefined
+    >
 }
 
 export interface CacheUpdateMatrixElement {
