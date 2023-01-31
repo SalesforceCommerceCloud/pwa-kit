@@ -13,8 +13,6 @@ import {
     assertUpdateQuery,
     DEFAULT_TEST_HOST,
     mockMutationEndpoints,
-    NEW_DATA,
-    OLD_DATA,
     renderHookWithProviders
 } from '../../test-utils'
 import {
@@ -23,7 +21,7 @@ import {
     useShopperBasketsMutation
 } from './mutation'
 import {useBasket} from './query'
-import {useCustomerBaskets} from '../ShopperCustomers/query'
+import {useCustomerBaskets} from '../ShopperCustomers'
 import {CacheUpdateMatrixElement} from '../utils'
 
 const CUSTOMER_ID = 'CUSTOMER_ID'
@@ -113,7 +111,25 @@ const mutationPayloads: MutationPayloads = {
         body: {id: '001'}
     }
 }
+const oldCustomerBaskets = {
+    total: 1,
+    baskets: [{basketId: BASKET_ID, hello: 'world'}]
+}
 
+const newCustomerBaskets = {
+    total: 1,
+    baskets: [{basketId: BASKET_ID, hello: 'world_modified'}]
+}
+
+const oldBasket = {
+    basketId: BASKET_ID,
+    hello: 'world'
+}
+
+const newBasket = {
+    basketId: BASKET_ID,
+    hello: 'world_modified'
+}
 const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).map(
     (mutationName) => {
         const payload = mutationPayloads[mutationName]
@@ -124,7 +140,11 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
                 {
                     name: 'success',
                     assertions: async () => {
-                        mockMutationEndpoints('/checkout/shopper-baskets/')
+                        mockMutationEndpoints(
+                            '/checkout/shopper-baskets/',
+                            {errorResponse: 200},
+                            newBasket
+                        )
                         mockRelatedQueries()
 
                         const {result} = renderHookWithProviders(() => {
@@ -158,21 +178,24 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
                         })
 
                         expect(result.current.mutation.isSuccess).toBe(true)
-
                         // On successful mutation, the query cache gets updated too. Let's assert it.
                         const cacheUpdateMatrix = getCacheUpdateMatrix(CUSTOMER_ID)
                         // @ts-ignore
                         const matrixElement = cacheUpdateMatrix[mutationName](payload, {})
                         const {invalidate, update, remove}: CacheUpdateMatrixElement = matrixElement
 
+                        const assertionData = {
+                            basket: newBasket,
+                            customerBaskets: newCustomerBaskets
+                        }
                         update?.forEach(({name}) => {
                             // @ts-ignore
-                            assertUpdateQuery(result.current.queries[name], NEW_DATA)
+                            assertUpdateQuery(result.current.queries[name], assertionData[name])
                         })
 
                         invalidate?.forEach(({name}) => {
                             // @ts-ignore
-                            assertInvalidateQuery(result.current.queries[name], OLD_DATA)
+                            assertInvalidateQuery(result.current.queries[name], oldCustomerBaskets)
                         })
 
                         remove?.forEach(({name}) => {
@@ -231,24 +254,24 @@ const mockRelatedQueries = () => {
         .get((uri) => {
             return uri.includes(basketEndpoint)
         })
-        .reply(200, OLD_DATA)
+        .reply(200, oldBasket)
     nock(DEFAULT_TEST_HOST)
         .persist()
         .get((uri) => {
             return uri.includes(basketEndpoint)
         })
-        .reply(200, NEW_DATA)
+        .reply(200, newBasket)
 
     // For get customer basket
     nock(DEFAULT_TEST_HOST)
         .get((uri) => {
             return uri.includes(customerEndpoint)
         })
-        .reply(200, OLD_DATA)
+        .reply(200, oldCustomerBaskets)
     nock(DEFAULT_TEST_HOST)
         .persist()
         .get((uri) => {
             return uri.includes(customerEndpoint)
         })
-        .reply(200, NEW_DATA)
+        .reply(200, newCustomerBaskets)
 }

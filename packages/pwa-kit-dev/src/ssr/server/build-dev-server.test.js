@@ -556,7 +556,7 @@ describe('DevServer persistent caching support', () => {
         route = null
     })
 
-    test('Caching of compressed responses', () => {
+    test('No caching of compressed responses', () => {
         // ADN-118 reported that a cached response was correctly sent
         // the first time, but was corrupted the second time. This
         // test is specific to that issue.
@@ -578,12 +578,12 @@ describe('DevServer persistent caching support', () => {
                     namespace
                 })
             )
-            .then((entry) => expect(entry.found).toBe(true))
+            .then((entry) => expect(entry.found).toBe(false))
             .then(() => request(app).get(url))
             .then((res) => app._requestMonitor._waitForResponses().then(() => res))
             .then((res) => {
                 expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('true')
+                expect(res.headers['x-mobify-from-cache']).toEqual('false')
                 expect(res.headers['content-encoding']).toEqual('gzip')
                 expect(res.text).toEqual(expected)
             })
@@ -599,20 +599,15 @@ describe('DevServer persistent caching support', () => {
                 expect(res.status).toEqual(200)
                 expect(res.headers['x-mobify-from-cache']).toEqual('false')
                 expect(res.headers['content-encoding']).toEqual('gzip')
-                return res
             })
-            .then((res) =>
-                app.applicationCache
-                    .get({
-                        key: keyFromURL(url),
-                        namespace
-                    })
-                    .then((entry) => ({res, entry}))
+            .then(() =>
+                app.applicationCache.get({
+                    key: keyFromURL(url),
+                    namespace
+                })
             )
-            .then(({res, entry}) => {
-                expect(entry.found).toBe(true)
-                const uncompressed = zlib.gunzipSync(entry.data)
-                expect(uncompressed.toString()).toEqual(res.text)
+            .then((entry) => {
+                expect(entry.found).toBe(false)
             })
     })
 })

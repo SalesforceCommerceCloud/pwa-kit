@@ -56,10 +56,22 @@ describe('WatchOnlineStatus', () => {
     })
 })
 
+describe('escapeRegexChars', () => {
+    test('escapes special characters', () => {
+        const escapedString = utils.escapeRegexChars('{}()*+?.,\\^$|#')
+        expect(escapedString).toEqual('\\{\\}\\(\\)\\*\\+\\?\\.\\,\\\\\\^\\$\\|\\#')
+    })
+})
+
 describe('boldString & Capitalize test', () => {
     test('boldString returns provided part of string bolded html', () => {
         const boldedString = utils.boldString('boldedString', 'bolded')
         expect(boldedString).toEqual('<b>bolded</b>String')
+    })
+
+    test('boldString handles special regex characters', () => {
+        const boldedString = utils.boldString('some (*special!) chars', '(*special!)')
+        expect(boldedString).toEqual('some <b>(*special!)</b> chars')
     })
 
     test('capitalize capitalizes a string', () => {

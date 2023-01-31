@@ -345,14 +345,7 @@ export const RemoteServerFactory = {
 
             get applicationCache() {
                 if (!this._applicationCache) {
-                    const bucket = process.env.CACHE_BUCKET_NAME
-                    const useLocalCache = !(isRemote() || bucket)
-                    this._applicationCache = new PersistentCache({
-                        useLocalCache,
-                        bucket,
-                        prefix: process.env.CACHE_BUCKET_PREFIX,
-                        sendMetric: app.sendMetric.bind(app)
-                    })
+                    this._applicationCache = new PersistentCache()
                 }
                 return this._applicationCache
             }

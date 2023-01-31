@@ -87,29 +87,30 @@ export function renderHookWithProviders<TProps extends {children?: React.ReactNo
     })
 }
 
-export const NEW_DATA = {test: 'new data'}
-export const OLD_DATA = {test: 'old data'}
-
-export const mockMutationEndpoints = (matchingPath: string, options?: {errorResponse: number}) => {
+export const mockMutationEndpoints = (
+    matchingPath: string,
+    options?: {errorResponse: number},
+    response = {}
+) => {
     const responseStatus = options?.errorResponse ? options.errorResponse : 200
 
     nock(DEFAULT_TEST_HOST)
         .patch((uri) => {
             return uri.includes(matchingPath)
         })
-        .reply(responseStatus, NEW_DATA)
+        .reply(responseStatus, response)
         .put((uri) => {
             return uri.includes(matchingPath)
         })
-        .reply(responseStatus, NEW_DATA)
+        .reply(responseStatus, response)
         .post((uri) => {
             return uri.includes(matchingPath)
         })
-        .reply(responseStatus, NEW_DATA)
+        .reply(responseStatus, response)
         .delete((uri) => {
             return uri.includes(matchingPath)
         })
-        .reply(responseStatus, NEW_DATA)
+        .reply(responseStatus, response)
 }
 
 export const assertUpdateQuery = (
