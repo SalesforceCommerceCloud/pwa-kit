@@ -327,9 +327,33 @@ App.getProps = async ({api, res}) => {
     // Login as `guest` to get session.
     await api.auth.login()
 
+    // Get the root category, this will be used for things like the navigation.
+    const rootCategory = await api.shopperProducts.getCategory({
+        parameters: {
+            id: CAT_MENU_DEFAULT_ROOT_CATEGORY,
+            levels: CAT_MENU_DEFAULT_NAV_DEPTH
+        }
+    })
+
+    if (rootCategory.isError) {
+        const message =
+            rootCategory.title === 'Unsupported Locale'
+                ? `
+It looks like the locale “${rootCategory.locale}” isn’t set up, yet. The locale settings in your package.json must match what is enabled in your Business Manager instance.
+Learn more with our localization guide. https://sfdc.co/localization-guide
+`
+                : rootCategory.detail
+        throw new Error(message)
+    }
+
+    // Flatten the root so we can easily access all the categories throughout
+    // the application.
+    const categories = {root: flatten(rootCategory, 'categories').root}
+
     return {
         targetLocale,
         messages,
+        categories,
         config: res?.locals?.config
     }
 }
