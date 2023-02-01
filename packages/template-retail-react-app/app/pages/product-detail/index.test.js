@@ -38,7 +38,7 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test.skip('should render product details page', async () => {
+test('should render product details page', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => {
         const productName = screen.getAllByText(/Checked Silk Tie/)

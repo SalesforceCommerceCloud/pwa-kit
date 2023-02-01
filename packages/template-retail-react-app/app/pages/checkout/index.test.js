@@ -214,7 +214,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Verify cart products display
     user.click(screen.getByText(/2 items in cart/i))
-    expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument()
+    await waitFor(() => expect(screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument())
 
     // Provide customer email and submit
     const emailInput = screen.getByLabelText(/email/i)
@@ -304,7 +304,7 @@ test('Can proceed through checkout steps as guest', async () => {
     user.click(placeOrderBtn)
 
     // Should now be on our mocked confirmation route/page
-    expect(await screen.findByText(/success/i)).toBeInTheDocument()
+    await waitFor(() => expect(screen.findByText(/success/i)).toBeInTheDocument())
 })
 
 test('Can proceed through checkout as registered customer', async () => {
