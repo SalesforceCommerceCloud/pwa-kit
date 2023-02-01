@@ -40,8 +40,8 @@ const Login = () => {
                     const message = /Unauthorized/i.test(error.message)
                         ? formatMessage({
                               defaultMessage:
-                                  "Something's not right with your email or password. Try again.",
-                              id: 'auth_modal.error.incorrect_email_or_password'
+                                  "Incorrect username or password, please try again.",
+                              id: 'login_page.error.incorrect_username_or_password'
                           })
                         : formatMessage(API_ERROR_MESSAGE)
                     form.setError('global', {type: 'manual', message})
