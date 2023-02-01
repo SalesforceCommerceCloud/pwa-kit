@@ -83,8 +83,10 @@ const ProductView = ({
     const intl = useIntl()
     const history = useHistory()
     const location = useLocation()
-    const {isOpen: isAddToCartModalOpen, onClose: onAddToCartModalClose} =
-        useAddToCartModalContext()
+    const {
+        isOpen: isAddToCartModalOpen,
+        onClose: onAddToCartModalClose
+    } = useAddToCartModalContext()
     const theme = useTheme()
     const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
     const {
@@ -298,10 +300,8 @@ const ProductView = ({
                                                             backgroundColor={name.toLowerCase()}
                                                             backgroundImage={
                                                                 image
-                                                                    ? `url(${
-                                                                          image.disBaseLink ||
-                                                                          image.link
-                                                                      })`
+                                                                    ? `url(${image.disBaseLink ||
+                                                                          image.link})`
                                                                     : ''
                                                             }
                                                         />

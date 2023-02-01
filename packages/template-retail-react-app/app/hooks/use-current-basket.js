@@ -30,11 +30,7 @@ export const useCurrentBasket = ({id = '', shouldFetchProductDetail = false} = {
     const basket =
         basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {
-        data: products,
-        isLoading: isProductsLoading,
-        error: productsError
-    } = useProducts(
+    const {data: products, isLoading: isProductsLoading, error: productsError} = useProducts(
         {
             ids: productIds,
             allImages: true

@@ -119,8 +119,13 @@ ShippingAddressForm.propTypes = {
 
 const AccountAddresses = () => {
     const {formatMessage} = useIntl()
-    const {isRegistered, addresses, addSavedAddress, updateSavedAddress, removeSavedAddress} =
-        useCustomer()
+    const {
+        isRegistered,
+        addresses,
+        addSavedAddress,
+        updateSavedAddress,
+        removeSavedAddress
+    } = useCustomer()
     const [isEditing, setIsEditing] = useState(false)
     const [selectedAddressId, setSelectedAddressId] = useState(false)
     const toast = useToast()
@@ -290,11 +295,13 @@ const AccountAddresses = () => {
                             icon={<LocationIcon boxSize={8} />}
                             heading={formatMessage({
                                 defaultMessage: 'No Saved Addresses',
-                                id: 'account_addresses.page_action_placeholder.heading.no_saved_addresses'
+                                id:
+                                    'account_addresses.page_action_placeholder.heading.no_saved_addresses'
                             })}
                             text={formatMessage({
                                 defaultMessage: 'Add a new address method for faster checkout.',
-                                id: 'account_addresses.page_action_placeholder.message.add_new_address'
+                                id:
+                                    'account_addresses.page_action_placeholder.message.add_new_address'
                             })}
                             buttonText={formatMessage({
                                 defaultMessage: 'Add Address',

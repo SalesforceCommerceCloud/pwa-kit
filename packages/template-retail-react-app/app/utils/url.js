@@ -59,7 +59,10 @@ export const rebuildPathWithParams = (url, extraParams) => {
     })
 
     // Clean up any trailing `=` for params without values.
-    const paramStr = params.toString().replace(/=&/g, '&').replace(/=$/, '')
+    const paramStr = params
+        .toString()
+        .replace(/=&/g, '&')
+        .replace(/=$/, '')
 
     // Generate the newly updated url.
     return `${pathname}${Array.from(paramStr).length > 0 ? `?${paramStr}` : ''}`
@@ -254,7 +257,10 @@ export const removeQueryParamsFromPath = (path, keys) => {
     })
 
     // Clean up any trailing `=` for params without values.
-    const paramStr = params.toString().replace(/=&/g, '&').replace(/=$/, '')
+    const paramStr = params
+        .toString()
+        .replace(/=&/g, '&')
+        .replace(/=$/, '')
 
     return `${pathname}${paramStr && '?'}${paramStr}`
 }

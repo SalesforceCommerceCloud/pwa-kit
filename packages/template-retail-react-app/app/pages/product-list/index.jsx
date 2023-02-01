@@ -130,11 +130,7 @@ const ProductList = (props) => {
     })
 
     /**************** Query Actions ****************/
-    const {
-        isLoading,
-        isFetching,
-        data: productSearchResult
-    } = useProductSearch(
+    const {isLoading, isFetching, data: productSearchResult} = useProductSearch(
         {
             ...searchParams,
             refine: searchParams._refine
@@ -488,8 +484,9 @@ const ProductList = (props) => {
                                           ))
                                     : productSearchResult.hits.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
-                                          const isInWishlist =
-                                              !!wishlist.findItemByProductId(productId)
+                                          const isInWishlist = !!wishlist.findItemByProductId(
+                                              productId
+                                          )
 
                                           return (
                                               <ProductTile

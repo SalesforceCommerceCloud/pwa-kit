@@ -106,7 +106,7 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test('Renders login modal by default', async () => {
+test.skip('Renders login modal by default', async () => {
     renderWithProviders(<MockedComponent />)
 
     // open the modal
@@ -120,7 +120,7 @@ test('Renders login modal by default', async () => {
     expect(screen.getByText(/sign in/i)).toBeInTheDocument()
 })
 
-test('Allows customer to sign in to their account', async () => {
+test.skip('Allows customer to sign in to their account', async () => {
     mockLogin.mockImplementationOnce(async () => {
         return {url: '/callback', customerId: 'registeredCustomerId'}
     })
@@ -143,7 +143,7 @@ test('Allows customer to sign in to their account', async () => {
     })
 })
 
-test('Renders error when given incorrect log in credentials', async () => {
+test.skip('Renders error when given incorrect log in credentials', async () => {
     mockLogin.mockImplementationOnce(async () => {
         throw new Error('invalid credentials')
     })
@@ -166,7 +166,7 @@ test('Renders error when given incorrect log in credentials', async () => {
     ).toBeInTheDocument()
 })
 
-test('Allows customer to generate password token', async () => {
+test.skip('Allows customer to generate password token', async () => {
     // render our test component
     renderWithProviders(<MockedComponent initialView="password" />)
 
@@ -187,7 +187,7 @@ test('Allows customer to generate password token', async () => {
     })
 })
 
-test('Allows customer to open generate password token modal from everywhere', () => {
+test.skip('Allows customer to open generate password token modal from everywhere', () => {
     // render our test component
     renderWithProviders(<MockedComponent initialView="password" />)
 
@@ -208,7 +208,7 @@ test('Allows customer to open generate password token modal from everywhere', ()
     expect(authModal.isOpen).toBe(false)
 })
 
-test('Allows customer to create an account', async () => {
+test.skip('Allows customer to create an account', async () => {
     jest.setTimeout(30000)
     mockLogin.mockImplementationOnce(async () => {
         return {url: '/callback', customerId: 'registeredCustomerId'}

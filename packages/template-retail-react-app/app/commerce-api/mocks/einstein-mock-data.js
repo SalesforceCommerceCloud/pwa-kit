@@ -50,7 +50,8 @@ export const mockGetZoneRecommendationsResponse = {
 
 export const mockCategory = {
     id: 'mens-accessories-ties',
-    image: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dwd2ff3ec8/images/slot/sub_banners/cat-banner-mens-ties.jpg',
+    image:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dwd2ff3ec8/images/slot/sub_banners/cat-banner-mens-ties.jpg',
     name: 'Ties',
     pageDescription:
         "Shop Mens's Ties for all occasions including business or casual at Commerce Cloud",
@@ -84,7 +85,8 @@ export const mockSearchResults = {
                 alt: 'Striped Silk Tie, , large',
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
-                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                link:
+                    'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
                 title: 'Striped Silk Tie, '
             },
             orderable: true,
@@ -131,7 +133,8 @@ export const mockSearchResults = {
                 alt: 'Checked Silk Tie, , large',
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
-                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                link:
+                    'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
                 title: 'Checked Silk Tie, '
             },
             orderable: true,
@@ -186,7 +189,8 @@ export const mockSearchResults = {
                 alt: 'Solid Silk Tie, , large',
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c618527/images/large/PG.949432114S.NAVYSI.PZ.jpg',
-                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c618527/images/large/PG.949432114S.NAVYSI.PZ.jpg',
+                link:
+                    'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c618527/images/large/PG.949432114S.NAVYSI.PZ.jpg',
                 title: 'Solid Silk Tie, '
             },
             orderable: true,
@@ -241,7 +245,8 @@ export const mockSearchResults = {
                 alt: 'Striped Silk Tie, , large',
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4982cf11/images/large/PG.949034314S.TAUPESI.PZ.jpg',
-                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4982cf11/images/large/PG.949034314S.TAUPESI.PZ.jpg',
+                link:
+                    'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4982cf11/images/large/PG.949034314S.TAUPESI.PZ.jpg',
                 title: 'Striped Silk Tie, '
             },
             orderable: true,
@@ -547,35 +552,40 @@ export const mockProduct = {
                     alt: 'Straight Fit Shorts With Button Closure, , large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfb7ce066/images/large/B0574220_CP1_0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfb7ce066/images/large/B0574220_CP1_0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfb7ce066/images/large/B0574220_CP1_0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwee33fb7b/images/large/B0574220_CP1_B0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwee33fb7b/images/large/B0574220_CP1_B0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwee33fb7b/images/large/B0574220_CP1_B0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4a2fbc7b/images/large/B0574220_CP1_L1.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4a2fbc7b/images/large/B0574220_CP1_L1.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4a2fbc7b/images/large/B0574220_CP1_L1.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw308eba53/images/large/B0574220_CP1_L2.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw308eba53/images/large/B0574220_CP1_L2.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw308eba53/images/large/B0574220_CP1_L2.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwecea3cdd/images/large/B0574220_CP1_L3.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwecea3cdd/images/large/B0574220_CP1_L3.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwecea3cdd/images/large/B0574220_CP1_L3.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 }
             ],
@@ -587,35 +597,40 @@ export const mockProduct = {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfb7ce066/images/large/B0574220_CP1_0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfb7ce066/images/large/B0574220_CP1_0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfb7ce066/images/large/B0574220_CP1_0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwee33fb7b/images/large/B0574220_CP1_B0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwee33fb7b/images/large/B0574220_CP1_B0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwee33fb7b/images/large/B0574220_CP1_B0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4a2fbc7b/images/large/B0574220_CP1_L1.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4a2fbc7b/images/large/B0574220_CP1_L1.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4a2fbc7b/images/large/B0574220_CP1_L1.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw308eba53/images/large/B0574220_CP1_L2.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw308eba53/images/large/B0574220_CP1_L2.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw308eba53/images/large/B0574220_CP1_L2.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwecea3cdd/images/large/B0574220_CP1_L3.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwecea3cdd/images/large/B0574220_CP1_L3.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwecea3cdd/images/large/B0574220_CP1_L3.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 }
             ],
@@ -628,35 +643,40 @@ export const mockProduct = {
                     alt: 'Straight Fit Shorts With Button Closure, , medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9bbe03cd/images/medium/B0574220_CP1_0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9bbe03cd/images/medium/B0574220_CP1_0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9bbe03cd/images/medium/B0574220_CP1_0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd3a75400/images/medium/B0574220_CP1_B0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd3a75400/images/medium/B0574220_CP1_B0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd3a75400/images/medium/B0574220_CP1_B0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed372d31/images/medium/B0574220_CP1_L1.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed372d31/images/medium/B0574220_CP1_L1.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed372d31/images/medium/B0574220_CP1_L1.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw32d43910/images/medium/B0574220_CP1_L2.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw32d43910/images/medium/B0574220_CP1_L2.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw32d43910/images/medium/B0574220_CP1_L2.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6aa00910/images/medium/B0574220_CP1_L3.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6aa00910/images/medium/B0574220_CP1_L3.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6aa00910/images/medium/B0574220_CP1_L3.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 }
             ],
@@ -668,35 +688,40 @@ export const mockProduct = {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9bbe03cd/images/medium/B0574220_CP1_0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9bbe03cd/images/medium/B0574220_CP1_0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9bbe03cd/images/medium/B0574220_CP1_0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd3a75400/images/medium/B0574220_CP1_B0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd3a75400/images/medium/B0574220_CP1_B0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd3a75400/images/medium/B0574220_CP1_B0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed372d31/images/medium/B0574220_CP1_L1.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed372d31/images/medium/B0574220_CP1_L1.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed372d31/images/medium/B0574220_CP1_L1.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw32d43910/images/medium/B0574220_CP1_L2.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw32d43910/images/medium/B0574220_CP1_L2.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw32d43910/images/medium/B0574220_CP1_L2.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6aa00910/images/medium/B0574220_CP1_L3.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6aa00910/images/medium/B0574220_CP1_L3.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6aa00910/images/medium/B0574220_CP1_L3.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 }
             ],
@@ -709,35 +734,40 @@ export const mockProduct = {
                     alt: 'Straight Fit Shorts With Button Closure, , small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed10427e/images/small/B0574220_CP1_0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed10427e/images/small/B0574220_CP1_0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed10427e/images/small/B0574220_CP1_0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw999b0356/images/small/B0574220_CP1_B0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw999b0356/images/small/B0574220_CP1_B0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw999b0356/images/small/B0574220_CP1_B0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3805c600/images/small/B0574220_CP1_L1.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3805c600/images/small/B0574220_CP1_L1.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3805c600/images/small/B0574220_CP1_L1.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1a024d50/images/small/B0574220_CP1_L2.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1a024d50/images/small/B0574220_CP1_L2.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1a024d50/images/small/B0574220_CP1_L2.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, , small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcafa0be3/images/small/B0574220_CP1_L3.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcafa0be3/images/small/B0574220_CP1_L3.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcafa0be3/images/small/B0574220_CP1_L3.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 }
             ],
@@ -749,35 +779,40 @@ export const mockProduct = {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed10427e/images/small/B0574220_CP1_0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed10427e/images/small/B0574220_CP1_0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed10427e/images/small/B0574220_CP1_0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw999b0356/images/small/B0574220_CP1_B0.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw999b0356/images/small/B0574220_CP1_B0.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw999b0356/images/small/B0574220_CP1_B0.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3805c600/images/small/B0574220_CP1_L1.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3805c600/images/small/B0574220_CP1_L1.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3805c600/images/small/B0574220_CP1_L1.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1a024d50/images/small/B0574220_CP1_L2.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1a024d50/images/small/B0574220_CP1_L2.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1a024d50/images/small/B0574220_CP1_L2.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 },
                 {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcafa0be3/images/small/B0574220_CP1_L3.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcafa0be3/images/small/B0574220_CP1_L3.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcafa0be3/images/small/B0574220_CP1_L3.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 }
             ],
@@ -790,7 +825,8 @@ export const mockProduct = {
                     alt: 'Straight Fit Shorts With Button Closure, , swatch',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa2168062/images/swatch/B0574220_CP1_sw.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa2168062/images/swatch/B0574220_CP1_sw.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa2168062/images/swatch/B0574220_CP1_sw.jpg',
                     title: 'Straight Fit Shorts With Button Closure, '
                 }
             ],
@@ -802,7 +838,8 @@ export const mockProduct = {
                     alt: 'Straight Fit Shorts With Button Closure, Gray, swatch',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa2168062/images/swatch/B0574220_CP1_sw.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa2168062/images/swatch/B0574220_CP1_sw.jpg',
+                    link:
+                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa2168062/images/swatch/B0574220_CP1_sw.jpg',
                     title: 'Straight Fit Shorts With Button Closure, Gray'
                 }
             ],

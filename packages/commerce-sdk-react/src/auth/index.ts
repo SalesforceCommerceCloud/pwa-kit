@@ -4,7 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {helpers, ShopperLogin, ShopperCustomers, ShopperLoginTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {
+    helpers,
+    ShopperLogin,
+    ShopperCustomers,
+    ShopperLoginTypes,
+    ShopperCustomersTypes
+} from 'commerce-sdk-isomorphic'
 import jwtDecode from 'jwt-decode'
 import {ApiClientConfigParams} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
@@ -333,9 +339,7 @@ class Auth {
      * This is a wrapper method for ShopperCustomer API registerCustomer endpoint.
      *
      */
-    async register(
-        body: ShopperCustomersTypes.CustomerRegistration
-    ) {
+    async register(body: ShopperCustomersTypes.CustomerRegistration) {
         const {
             customer: {email},
             password

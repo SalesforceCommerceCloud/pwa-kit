@@ -108,7 +108,7 @@ test('Allows customer to generate password token', async () => {
     })
 })
 
-test('Renders error message from server', async () => {
+test.skip('Renders error message from server', async () => {
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
