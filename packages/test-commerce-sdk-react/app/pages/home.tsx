@@ -25,6 +25,9 @@ const Home = () => {
                     <Link to="/products">useShopperProducts</Link>
                 </li>
                 <li>
+                    <Link to="/experience">UseShopperExperience</Link>
+                </li>
+                <li>
                     <Link to="/categories">useCategories</Link>
                 </li>
                 <li>
