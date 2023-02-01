@@ -270,17 +270,6 @@ class Auth {
     }
 
     /**
-     * Clears the queue. The next queueRequest call will start immediately.
-     * This is used when you call queueRequest recursively to avoid running
-     * into a deadlock.
-     *
-     * @Internal
-     */
-    clearQueue() {
-        this.pendingToken = undefined
-    }
-
-    /**
      * The ready function returns a promise that resolves with valid ShopperLogin
      * token response.
      *
@@ -353,7 +342,6 @@ class Auth {
             customer: {email},
             password
         } = body
-        const isGuest = false
 
         // email is optional field from isomorphic library
         // type CustomerRegistration
@@ -362,16 +350,14 @@ class Auth {
             throw new Error('Customer registration is missing email address.')
         }
 
-        return this.queueRequest(async () => {
-            await this.shopperCustomersClient.registerCustomer({
-                headers: {
-                    authorization: `Bearer ${this.get('access_token')}`
-                },
-                body
-            })
-            this.clearQueue()
-            return this.loginRegisteredUserB2C({username: email, password})
-        }, isGuest)
+        const res = await this.shopperCustomersClient.registerCustomer({
+            headers: {
+                authorization: `Bearer ${this.get('access_token')}`
+            },
+            body
+        })
+        await this.loginRegisteredUserB2C({username: email, password})
+        return res
     }
 
     /**
@@ -382,14 +368,12 @@ class Auth {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const isGuest = false
-        return this.queueRequest(
-            () =>
-                helpers.loginRegisteredUserB2C(this.client, credentials, {
-                    redirectURI,
-                    ...(usid && {usid})
-                }),
-            isGuest
-        )
+        const token = await helpers.loginRegisteredUserB2C(this.client, credentials, {
+            redirectURI,
+            ...(usid && {usid})
+        })
+        this.handleTokenResponse(token, isGuest)
+        return token
     }
 
     /**
@@ -397,16 +381,10 @@ class Auth {
      *
      */
     async logout() {
-        const isGuest = true
-        return this.queueRequest(
-            () =>
-                // TODO: are we missing a call to /logout?
-                // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
-                helpers.loginGuestUser(this.client, {
-                    redirectURI: this.redirectURI
-                }),
-            isGuest
-        )
+        // TODO: are we missing a call to /logout?
+        // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
+        this.clearStorage()
+        return this.loginGuestUser()
     }
 }
 

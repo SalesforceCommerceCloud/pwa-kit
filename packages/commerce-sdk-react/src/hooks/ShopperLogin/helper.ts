@@ -34,9 +34,9 @@ type ShopperLoginHelpersType = typeof ShopperLoginHelpers[keyof typeof ShopperLo
 export function useShopperLoginHelper<Action extends ShopperLoginHelpersType>(
     action: Action
 ): UseMutationResult<
-    ShopperLoginTypes.TokenResponse,
-    Error,
     // TODO: what's the better way for declaring the types?
+    any,
+    Error,
     any
 > {
     const auth = useAuth()
