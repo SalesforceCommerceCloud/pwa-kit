@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useEffect, useState} from 'react'
+import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -48,6 +48,8 @@ const ProductDetail = ({category, product, isLoading}) => {
     const toast = useToast()
     const navigate = useNavigation()
     const [primaryCategory, setPrimaryCategory] = useState(category)
+    const [productSetSelection, setProductSetSelection] = useState({})
+    const childProductRefs = React.useRef({})
 
     const isProductASet = product?.type.set
 
@@ -111,23 +113,60 @@ const ProductDetail = ({category, product, isLoading}) => {
             status: 'error'
         })
     }
-    const handleAddToCart = async (variant, quantity) => {
+
+    const handleAddToCart = async (productSelectionValues) => {
         try {
-            if (!variant?.orderable || !quantity) return
-            // The basket accepts an array of `ProductItems`, so lets create a single
-            // item array to add to the basket.
-            const productItems = [
-                {
-                    productId: variant.productId,
-                    quantity,
-                    price: variant.price
-                }
-            ]
+            const productItems = productSelectionValues.map(({variant, quantity}) => ({
+                productId: variant.productId,
+                price: variant.price,
+                quantity
+            }))
 
             await basket.addItemToBasket(productItems)
+
+            // If the items were sucessfully added, set the return value to be used
+            // by the add to cart modal.
+            return productSelectionValues
         } catch (error) {
             showError(error)
         }
+    }
+
+    /**************** Product Set Handlers ****************/
+    const handleProductSetValidation = useCallback(() => {
+        // Run validation for all child products. This will ensure the error
+        // messages are shown.
+        Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
+            validateOrderability({scrollErrorIntoView: false})
+        })
+
+        // Using ot state for which child products are selected, scroll to the first
+        // one that isn't selected.
+        const selectedProductIds = Object.keys(productSetSelection)
+        const firstUnselectedProduct = product.setProducts.find(
+            ({id}) => !selectedProductIds.includes(id)
+        )
+
+        if (firstUnselectedProduct) {
+            // Get the reference to the product view and scroll to it.
+            const {ref} = childProductRefs.current[firstUnselectedProduct.id]
+
+            ref.scrollIntoView({
+                behavior: 'smooth',
+                block: 'end'
+            })
+
+            return false
+        }
+
+        return true
+    }, [product, productSetSelection])
+
+    const handleProductSetAddToCart = () => {
+        // Get all the selected products, and pass them to the addToCart handler which
+        // accepts an array.
+        const productSelectionValues = Object.values(productSetSelection)
+        return handleAddToCart(productSelectionValues)
     }
 
     /**************** Einstein ****************/
@@ -155,12 +194,13 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            addToCart={handleProductSetAddToCart}
                             addToWishlist={(product, variant, quantity) =>
                                 handleAddToWishlist(product, variant, quantity)
                             }
                             isProductLoading={isLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
+                            validateOrderability={handleProductSetValidation}
                         />
 
                         <hr />
@@ -171,14 +211,41 @@ const ProductDetail = ({category, product, isLoading}) => {
                             product.setProducts.map((childProduct) => (
                                 <Fragment key={childProduct.id}>
                                     <ProductView
+                                        // Do no use an arrow function as we are manipulating the functions scope.
+                                        ref={function (ref) {
+                                            // Assign the "set" scope of the ref, this is how we access the internal
+                                            // validation.
+                                            childProductRefs.current[childProduct.id] = {
+                                                ref,
+                                                validateOrderability: this.validateOrderability
+                                            }
+                                        }}
                                         product={childProduct}
                                         isProductPartOfSet={true}
                                         addToCart={(variant, quantity) =>
-                                            handleAddToCart(variant, quantity)
+                                            handleAddToCart([
+                                                {product: childProduct, variant, quantity}
+                                            ])
                                         }
                                         addToWishlist={(product, variant, quantity) =>
                                             handleAddToWishlist(product, variant, quantity)
                                         }
+                                        onVariantSelected={(product, variant, quantity) => {
+                                            if (quantity) {
+                                                setProductSetSelection((previousState) => ({
+                                                    ...previousState,
+                                                    [product.id]: {
+                                                        product,
+                                                        variant,
+                                                        quantity
+                                                    }
+                                                }))
+                                            } else {
+                                                const selections = {...productSetSelection}
+                                                delete selections[product.id]
+                                                setProductSetSelection(selections)
+                                            }
+                                        }}
                                         isProductLoading={isLoading}
                                         isCustomerProductListLoading={!wishlist.isInitialized}
                                     />
@@ -196,7 +263,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            addToCart={(variant, quantity) =>
+                                handleAddToCart([{product, variant, quantity}])
+                            }
                             addToWishlist={(product, variant, quantity) =>
                                 handleAddToWishlist(product, variant, quantity)
                             }

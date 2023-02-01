@@ -561,14 +561,21 @@ const MOCK_PRODUCT = {
 }
 
 test('Renders AddToCartModal', () => {
+    const MOCK_DATA = {
+        product: MOCK_PRODUCT,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 22
+            }
+        ]
+    }
     const {getByText} = renderWithProviders(
         <AddToCartModalContext.Provider
             value={{
                 isOpen: true,
-                data: {
-                    product: MOCK_PRODUCT,
-                    quantity: 22
-                }
+                data: MOCK_DATA
             }}
         >
             <AddToCartModal />
