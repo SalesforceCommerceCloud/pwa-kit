@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {useCustomerType} from 'commerce-sdk-react-preview'
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
@@ -85,6 +86,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
+    const {isRegistered} = useCustomerType()
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
@@ -148,7 +150,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
 
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
-        if (customer.isRegistered) {
+        if (isRegistered) {
             const path = buildUrl('/account')
             history.push(path)
         } else {

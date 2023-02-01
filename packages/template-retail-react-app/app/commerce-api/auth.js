@@ -195,6 +195,7 @@ class Auth {
      * @returns {Promise}
      */
     async login(credentials) {
+        console.warn('@TODO: old login method is still being used.')
         // Calling login while its already pending will return a reference
         // to the existing promise.
         if (this._pendingLogin) {
