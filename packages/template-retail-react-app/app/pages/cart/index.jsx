@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -27,7 +27,6 @@ import RecommendedProducts from '../../components/recommended-products'
 import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
-import useBasket from '../../commerce-api/hooks/useBasket'
 
 // Constants
 import {
@@ -47,21 +46,24 @@ import {
 } from 'commerce-sdk-react-preview'
 
 const Cart = () => {
-    const _basket = useBasket()
     const {basket, productItemDetail = {}} = useCurrentBasket({
         shouldFetchProductDetail: true
     })
+    const {products = {}} = productItemDetail
+    const customerType = useCustomerType()
 
+    /*****************Basket Mutation************************/
     const updateItemInBasketAction = useShopperBasketsMutation({action: 'updateItemInBasket'})
     const removeItemFromBasketAction = useShopperBasketsMutation({action: 'removeItemFromBasket'})
     const updateShippingMethodForShipmentsAction = useShopperBasketsMutation({
         action: 'updateShippingMethodForShipment'
     })
-    const customerType = useCustomerType()
-    const {products} = productItemDetail
+    /*****************Basket Mutation************************/
+
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
+
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const toast = useToast()
@@ -136,11 +138,15 @@ const Cart = () => {
 
     /***************************** Update Cart **************************/
     const handleUpdateCart = async (variant, quantity) => {
+        console.log('variant, quantity', variant, quantity)
+
         // close the modal before handle the change
         onClose()
+        // using try-catch is better than using onError callback since we have many mutation calls logic here
         try {
             setCartItemLoading(true)
-            const productIds = _basket.productItems.map(({productId}) => productId)
+            const productIds = basket.productItems.map(({productId}) => productId)
+
             // The user is selecting different variant, and it has not existed in basket
             if (selectedItem.id !== variant.productId && !productIds.includes(variant.productId)) {
                 const item = {
@@ -148,23 +154,38 @@ const Cart = () => {
                     quantity,
                     price: variant.price
                 }
-                return await _basket.updateItemInBasket(item, selectedItem.itemId)
+                await updateItemInBasketAction.mutate({
+                    parameters: {
+                        basketId: basket.basketId,
+                        itemId: selectedItem.itemId
+                    },
+                    body: item
+                })
             }
+
             // The user is selecting different variant, and it has existed in basket
             // remove this item in the basket, change the quantity for the new selected variant in the basket
             if (selectedItem.id !== variant.productId && productIds.includes(variant.productId)) {
-                await _basket.removeItemFromBasket(selectedItem.itemId)
-                const basketItem = _basket.productItems.find(
+                await removeItemFromBasketAction.mutate({
+                    parameters: {
+                        basketId: basket.basketId,
+                        itemId: selectedItem.itemId
+                    }
+                })
+                const basketItem = basket.productItems.find(
                     ({productId}) => productId === variant.productId
                 )
                 const newQuantity = quantity + basketItem.quantity
+                debugger
                 return await changeItemQuantity(newQuantity, basketItem)
             }
+
             // the user only changes quantity of the same variant
             if (selectedItem.quantity !== quantity) {
                 return await changeItemQuantity(quantity, selectedItem)
             }
-        } catch {
+        } catch (e) {
+            console.log('e', e)
             showError()
         } finally {
             setCartItemLoading(false)
@@ -239,7 +260,7 @@ const Cart = () => {
     }
     /***************************** Update quantity **************************/
 
-    /***************************** Remove Item **************************/
+    /***************************** Remove Item from basket **************************/
     const handleRemoveItem = async (product) => {
         setSelectedItem(product)
         setCartItemLoading(true)

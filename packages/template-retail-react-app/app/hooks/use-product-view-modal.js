@@ -8,28 +8,49 @@
 import {useEffect, useState} from 'react'
 import {rebuildPathWithParams, removeQueryParamsFromPath} from '../utils/url'
 import {useHistory, useLocation} from 'react-router-dom'
-import {useCommerceAPI} from '../commerce-api/contexts'
-import {isError} from '../commerce-api/utils'
 import {useVariant} from './use-variant'
 import {useToast} from './use-toast'
 import {useIntl} from 'react-intl'
 import {API_ERROR_MESSAGE} from '../constants'
+import {useProduct} from 'commerce-sdk-react-preview'
 
 /**
- * This hooks is responsible for fetching a product detail based on the variation selection
+ * This hook is responsible for fetching a product detail based on the variation selection
  * and managing the variation params on the url when the modal is open/close
  * @param initialProduct - the initial product when the modal is first open
  * @returns object
  */
 export const useProductViewModal = (initialProduct) => {
     const location = useLocation()
-    const api = useCommerceAPI()
     const history = useHistory()
     const intl = useIntl()
     const [product, setProduct] = useState(initialProduct)
+    const variant = useVariant(product)
     const [isFetching, setIsFetching] = useState(false)
     const toast = useToast()
-    const variant = useVariant(product)
+
+    // use commerce-sdk-react-preview useProduct to fetch new product detail whenever variant changes
+    useProduct(
+        {id: variant?.productId},
+        {
+            // Show initialTodos immediately, but won't refetch until another interaction event is encountered after 1000 ms
+            initialData: initialProduct,
+            staleTime: 1000,
+            onSuccess: (data) => {
+                console.log('data.productId', data)
+                setProduct(data)
+                setIsFetching(false)
+            },
+            onError: () => {
+                setIsFetching(false)
+                toast({
+                    title: intl.formatMessage(API_ERROR_MESSAGE),
+                    status: 'error'
+                })
+            }
+        }
+    )
+
     const cleanUpVariantParams = () => {
         const paramToRemove = [...product.variationAttributes.map(({id}) => id), 'pid']
         const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
@@ -47,30 +68,8 @@ export const useProductViewModal = (initialProduct) => {
     }, [])
 
     useEffect(() => {
-        // getting product detail based on variant selection for stockLevel
-        const getProductDetailByVariant = async () => {
-            // Fetch the product detail when the user select different variant
-            if (variant && variant.productId !== product?.id) {
-                setIsFetching(true)
-                const res = await api.shopperProducts.getProduct({
-                    parameters: {
-                        id: variant.productId,
-                        allImages: true
-                    }
-                })
-                if (isError(res)) {
-                    setIsFetching(false)
-                    toast({
-                        title: intl.formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
-                    })
-                    throw new Error(res)
-                }
-                setProduct(res)
-                setIsFetching(false)
-            }
-        }
         if (variant) {
+            // console.log('variant change')
             const {variationValues} = variant
             // update the url with the new product id and variation values when the variant changes
             const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
@@ -79,7 +78,6 @@ export const useProductViewModal = (initialProduct) => {
             })
             history.replace(updatedUrl)
         }
-        getProductDetailByVariant()
     }, [variant])
 
     return {
