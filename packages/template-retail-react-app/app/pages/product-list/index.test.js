@@ -8,7 +8,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
-import {mockProductSearch, mockedEmptyCustomerProductList} from '../../commerce-api/mock-data'
+import {mockProductSearch, mockedEmptyCustomerProductList, mockCategory} from '../../commerce-api/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
@@ -24,7 +24,7 @@ jest.mock('../../commerce-api/einstein')
 
 jest.mock('../../hooks/use-wishlist')
 
-const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
+const MockedComponent = ({isLoading, isLoggedIn = false}) => {
     const customer = useCustomer()
     useEffect(() => {
         if (isLoggedIn) {
@@ -44,8 +44,6 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
                         <ProductList
                             {...props}
                             isLoading={isLoading}
-                            searchQuery={searchQuery}
-                            productSearchResult={mockProductListSearchResponse}
                         />
                     </div>
                 )}
@@ -56,8 +54,7 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
 
 MockedComponent.propTypes = {
     isLoading: PropTypes.bool,
-    isLoggedIn: PropTypes.bool,
-    searchQuery: PropTypes.string
+    isLoggedIn: PropTypes.bool
 }
 
 const MockedEmptyPage = () => {
@@ -76,7 +73,7 @@ beforeEach(() => {
             return res(
                 ctx.delay(0),
                 ctx.status(200),
-                ctx.json({data: [mockProductListSearchResponse]})
+                ctx.json(mockProductListSearchResponse)
             )
         }),
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
@@ -124,24 +121,25 @@ test('pagination is rendered', async () => {
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
 })
 
-test.skip('should display Selected refinements as there are some in the response', async () => {
+test('should display Selected refinements as there are some in the response', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     const countOfRefinements = await screen.findAllByText('Black')
     expect(countOfRefinements.length).toEqual(2)
 })
 
-test.skip('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
+test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
-    const wishlistButton = screen.getAllByLabelText('Wishlist')
+    expect(await screen.findAllByText('Black'))
+    const wishlistButton = await screen.getAllByLabelText('Wishlist')
     expect(wishlistButton.length).toBe(25)
     user.click(wishlistButton[0])
     expect(await screen.findByText(/Email/)).toBeInTheDocument()
     expect(await screen.findByText(/Password/)).toBeInTheDocument()
 })
 
-test.skip('clicking a filter will change url', async () => {
+test('clicking a filter will change url', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
@@ -157,7 +155,7 @@ test.skip('clicking a filter will change url', async () => {
     )
 })
 
-test.skip('click on Clear All should clear out all the filter in search params', async () => {
+test('click on Clear All should clear out all the filter in search params', async () => {
     window.history.pushState(
         {},
         'ProductList',
@@ -181,7 +179,7 @@ test('should display Search Results for when searching ', async () => {
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 })
 
-test.skip('clicking a filter on search result will change url', async () => {
+test('clicking a filter on search result will change url', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/search?q=dress')
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
