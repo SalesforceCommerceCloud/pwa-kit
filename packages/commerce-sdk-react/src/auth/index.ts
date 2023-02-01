@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {helpers, ShopperLogin, ShopperLoginTypes} from 'commerce-sdk-isomorphic'
+import {helpers, ShopperLogin, ShopperCustomers, ShopperLoginTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import jwtDecode from 'jwt-decode'
-import {ApiClientConfigParams} from '../hooks/types'
+import {ApiClientConfigParams, Argument} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage} from './storage'
+import {CustomerType} from '../hooks/useCustomerType'
 
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
@@ -55,7 +56,7 @@ type AuthDataMap = Record<
  * and it's not easy to grab this info in user land, so we add it into the Auth object, and expose it via a hook
  */
 type AuthData = ShopperLoginTypes.TokenResponse & {
-    customer_type: string
+    customer_type: CustomerType
 }
 
 const onClient = typeof window !== 'undefined'
@@ -134,12 +135,24 @@ const DATA_MAP: AuthDataMap = {
  */
 class Auth {
     private client: ShopperLogin<ApiClientConfigParams>
+    private shopperCustomersClient: ShopperCustomers<ApiClientConfigParams>
     private redirectURI: string
     private pendingToken: Promise<ShopperLoginTypes.TokenResponse> | undefined
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
+            proxy: config.proxy,
+            parameters: {
+                clientId: config.clientId,
+                organizationId: config.organizationId,
+                shortCode: config.shortCode,
+                siteId: config.siteId
+            },
+            throwOnBadResponse: true,
+            fetchOptions: config.fetchOptions
+        })
+        this.shopperCustomersClient = new ShopperCustomers({
             proxy: config.proxy,
             parameters: {
                 clientId: config.clientId,
@@ -200,7 +213,7 @@ class Auth {
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
             usid: this.get('usid'),
-            customer_type: this.get('customer_type')
+            customer_type: this.get('customer_type') as CustomerType
         }
     }
 
@@ -319,6 +332,35 @@ class Auth {
     }
 
     /**
+     * This is a wrapper method for ShopperCustomer API registerCustomer endpoint.
+     *
+     */
+    async register(
+        body: ShopperCustomersTypes.CustomerRegistration
+    ) {
+        const {
+            customer: {email},
+            password
+        } = body
+
+        // email is optional field from isomorphic library
+        // type CustomerRegistration
+        // here we had to guard it to avoid ts error
+        if (!email) {
+            throw new Error('Customer registration is missing email address.')
+        }
+
+        const res = await this.shopperCustomersClient.registerCustomer({
+            headers: {
+                authorization: `Bearer ${this.get('access_token')}`
+            },
+            body
+        })
+        await this.loginRegisteredUserB2C({username: email, password})
+        return res
+    }
+
+    /**
      * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
      *
      */
@@ -326,14 +368,12 @@ class Auth {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const isGuest = false
-        return this.queueRequest(
-            () =>
-                helpers.loginRegisteredUserB2C(this.client, credentials, {
-                    redirectURI,
-                    ...(usid && {usid})
-                }),
-            isGuest
-        )
+        const token = await helpers.loginRegisteredUserB2C(this.client, credentials, {
+            redirectURI,
+            ...(usid && {usid})
+        })
+        this.handleTokenResponse(token, isGuest)
+        return token
     }
 
     /**
@@ -341,39 +381,11 @@ class Auth {
      *
      */
     async logout() {
-        const isGuest = true
-        return this.queueRequest(
-            () =>
-                // TODO: are we missing a call to /logout?
-                // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
-                helpers.loginGuestUser(this.client, {
-                    redirectURI: this.redirectURI
-                }),
-            isGuest
-        )
+        // TODO: are we missing a call to /logout?
+        // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
+        this.clearStorage()
+        return this.loginGuestUser()
     }
 }
 
 export default Auth
-
-/**
- * A ultility function to inject access token into a headers object.
- *
- * @Internal
- */
-export const injectAccessToken = (
-    headers:
-        | {
-              [key: string]: string
-          }
-        | undefined,
-    accessToken: string
-) => {
-    const _headers = headers
-        ? {
-              ...headers,
-              Authorization: `Bearer ${accessToken}`
-          }
-        : {Authorization: `Bearer ${accessToken}`}
-    return _headers
-}
