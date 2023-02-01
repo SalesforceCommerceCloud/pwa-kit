@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+// Your buyer account credentials
 module.exports = {
-    username: 'alex.vuong@salesforce.com',
-    password: 'Test1234!'
+    username: 'username@gmail.com',
+    password: 'password'
 }
