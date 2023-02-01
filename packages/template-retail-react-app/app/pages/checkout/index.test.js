@@ -289,7 +289,7 @@ test('Can proceed through checkout steps as guest', async () => {
     // Move to final review step
     user.click(screen.getByText(/review order/i))
 
-    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn')
+    const placeOrderBtn = await waitFor(() => screen.findByTestId('sf-checkout-place-order-btn'))
 
     // Verify applied payment and billing address
     expect(step3Content.getByText('Visa')).toBeInTheDocument()
@@ -486,7 +486,7 @@ test('Can proceed through checkout as registered customer', async () => {
     // Move to final review step
     user.click(screen.getByText(/review order/i))
 
-    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn')
+    const placeOrderBtn = await waitFor(() => screen.findByTestId('sf-checkout-place-order-btn'))
 
     // Verify applied payment and billing address
     expect(step3Content.getByText('Master Card')).toBeInTheDocument()
