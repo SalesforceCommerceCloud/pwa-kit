@@ -6,8 +6,8 @@
  */
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, Argument, DataType} from '../types'
+import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {hasAllKeys} from '../utils'
 
 {{!~-- Add aliases to @root for brevity/clarity --~}}
 {{~ assign 'clientInstance' name.lowerCamelCase ~}}
@@ -31,19 +31,29 @@ export const use{{#startsWith 'get' (getValue name)~}}
     apiOptions: Argument<Client['{{name}}']>,
     queryOptions: UseQueryOptions<DataType<Client['{{name}}']>>
 ): UseQueryResult<DataType<Client['{{name}}']>> => {
-    const { parameters = {} } = apiOptions
+    const { {{~@root.clientInstance}}: client} = useCommerceApi()
+    const method = (arg: Argument<Client['{{name}}']>) => client.{{name}}(arg)
+    const requiredParameters = [
+        {{#each ../parameters}}'{{name}}',{{/each}}
+        {{#each request.queryParameters}}{{#if (is required "true")}}'{{name}}',{{/if}}{{/each}}
+    ] as const
+    // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
+    // hook, so we use a callback here that receives that merged object.
+    const getQueryKey = <T extends Record<string, unknown>>(parameters: T) => [
+        {{{createQueryKeyFragment (append (getBaseUriFromDocument @root.model) (getValue ../path)) request.queryParameters 'parameters'}}},
+        // Full parameters last for easy lookup
+        parameters
+    ] as const
+    
     return useQuery(
-        [
-            // Endpoint names are unique per API, so we use both to create a unique key
-            '{{@root.clientClass}}',
-            '{{name}}',
-            apiOptions // maybe only required params?
-        ],
-        (_ctx, { {{@root.clientInstance}} }) =>
-            {{@root.clientInstance}}.{{name}}(apiOptions),
+        apiOptions,
+        queryOptions,
         {
-            enabled: hasAllKeys(parameters, ['TODO: list of required parameters']),
-            ...queryOptions
+            client,
+            method,
+            requiredParameters,
+            getQueryKey,
         }
-    )}
+    )
+}
 {{/if}}{{/each}}{{/each}}

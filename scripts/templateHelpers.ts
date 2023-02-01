@@ -5,7 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {amf} from '@commerce-apps/raml-toolkit';
-import {getTypeFromParameter} from '@commerce-apps/raml-toolkit/lib/generate/handlebarsAmfHelpers';
+import {
+  getBaseUriFromDocument,
+  getTypeFromParameter,
+} from '@commerce-apps/raml-toolkit/lib/generate/handlebarsAmfHelpers';
 
 /**
  * Given an individual type or an array of types in the format Array\<Foo | Baa\>
@@ -168,3 +171,21 @@ export function assign(
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-param-reassign
   options.data.root[varName] = varValue;
 }
+
+export const createQueryKeyFragment = (
+  url: string,
+  parameters: amf.model.domain.Parameter[],
+  variable: string
+): string => {
+  // If the URL ends with a {template} fragment, we end up with a `, ''` that we don't need
+  const base = `'${url.replace(/\{(\w+)\}/g, `', ${variable}.$1, '`)}'`.replace(
+    ", ''",
+    ''
+  );
+  if (!parameters || parameters.length === 0) return base;
+  const extra = parameters.map(p => {
+    const name = p.name.value();
+    return `'${name}', ${variable}.${name}`;
+  });
+  return `${base}, '?', ${extra.join(', ')}`;
+};
