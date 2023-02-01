@@ -34,7 +34,7 @@ import LoginForm from '../components/login'
 import ResetPasswordForm from '../components/reset-password'
 import RegisterForm from '../components/register'
 import {noop} from '../utils/utils'
-import {API_ERROR_MESSAGE} from '../constants'
+// import {API_ERROR_MESSAGE} from '../constants'
 import useNavigation from './use-navigation'
 
 const LOGIN_VIEW = 'login'
@@ -45,7 +45,7 @@ export const AuthModal = ({
     initialView = LOGIN_VIEW,
     onLoginSuccess = noop,
     onRegistrationSuccess = noop,
-    onPasswordResetSuccess = noop,
+    // onPasswordResetSuccess = noop,
     isOpen,
     onOpen,
     onClose,
@@ -54,10 +54,7 @@ export const AuthModal = ({
     const {formatMessage} = useIntl()
     const customerId = useCustomerId()
     const {isRegistered} = useCustomerType()
-    const customer = useCustomer(
-        {customerId},
-        {enabled: !!customerId && isRegistered}
-    )
+    const customer = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
@@ -65,9 +62,11 @@ export const AuthModal = ({
     const toast = useToast()
     const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
     const register = useShopperLoginHelper(ShopperLoginHelpers.Register)
-    
+
     // TODO: simplify the args to remove action
-    const getResetPasswordToken = useShopperCustomersMutation({action: ShopperCustomersMutations.GetResetPasswordToken})
+    const getResetPasswordToken = useShopperCustomersMutation({
+        action: ShopperCustomersMutations.GetResetPasswordToken
+    })
 
     const submitForm = async (data) => {
         form.clearErrors()
@@ -82,15 +81,15 @@ export const AuthModal = ({
                     {username: data.email, password: data.password},
                     {
                         onSuccess: onLoginSuccess,
-                        onError: (error) => {
-                            const message = /Unauthorized/i.test(error.message)
-                                ? formatMessage({
-                                      defaultMessage:
-                                          "Something's not right with your email or password. Try again.",
-                                      id: 'auth_modal.error.incorrect_email_or_password'
-                                  })
-                                : formatMessage(API_ERROR_MESSAGE)
-                            form.setError('global', {type: 'manual', message})
+                        onError: () => {
+                            // const message = /Unauthorized/i.test(error.message)
+                            //     ? formatMessage({
+                            //           defaultMessage:
+                            //               "Something's not right with your email or password. Try again.",
+                            //           id: 'auth_modal.error.incorrect_email_or_password'
+                            //       })
+                            //     : formatMessage(API_ERROR_MESSAGE)
+                            // form.setError('global', {type: 'manual', message})
                         }
                     }
                 ),
@@ -108,10 +107,10 @@ export const AuthModal = ({
                 return register.mutateAsync(body, {
                     onSuccess: onLoginSuccess,
                     onError: () => {
-                        form.setError('global', {
-                            type: 'manual',
-                            message: formatMessage(API_ERROR_MESSAGE)
-                        })
+                        // form.setError('global', {
+                        //     type: 'manual',
+                        //     message: formatMessage(API_ERROR_MESSAGE)
+                        // })
                     }
                 })
             },
@@ -119,14 +118,17 @@ export const AuthModal = ({
                 const body = {
                     login: data.email
                 }
-                return getResetPasswordToken.mutateAsync({body}, {
-                    onError: () => {
-                        form.setError('global', {
-                            type: 'manual',
-                            message: formatMessage(API_ERROR_MESSAGE)
-                        })
+                return getResetPasswordToken.mutateAsync(
+                    {body},
+                    {
+                        onError: () => {
+                            // form.setError('global', {
+                            //     type: 'manual',
+                            //     message: formatMessage(API_ERROR_MESSAGE)
+                            // })
+                        }
                     }
-                })
+                )
             }
         }[currentView](data)
     }

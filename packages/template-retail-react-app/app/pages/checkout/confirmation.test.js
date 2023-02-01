@@ -216,7 +216,8 @@ test('Create Account form - renders error message', async () => {
         rest.post('*/customers', (_, res, ctx) => {
             const failedAccountCreation = {
                 title: 'Login Already In Use',
-                type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/login-already-in-use',
+                type:
+                    'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/login-already-in-use',
                 detail: 'The login is already in use.'
             }
             return res(ctx.json(failedAccountCreation))

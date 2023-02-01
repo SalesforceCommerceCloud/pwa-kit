@@ -8,7 +8,8 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
+// import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
+import {Route, Switch, useRouteMatch} from 'react-router'
 import {
     Accordion,
     AccordionButton,
@@ -37,7 +38,7 @@ import {useLocation} from 'react-router-dom'
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-import useMultiSite from '../../hooks/use-multi-site'
+// import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 const Account = () => {
@@ -52,7 +53,7 @@ const Account = () => {
 
     const einstein = useEinstein()
 
-    const {buildUrl} = useMultiSite()
+    // const {buildUrl} = useMultiSite()
 
     /**************** Einstein ****************/
     useEffect(() => {

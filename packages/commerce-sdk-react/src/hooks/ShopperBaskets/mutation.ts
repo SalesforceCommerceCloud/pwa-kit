@@ -183,8 +183,7 @@ type UseShopperBasketsMutationArg = {
 }
 
 type ShopperBasketsClient = ApiClients['shopperBaskets']
-export type ShopperBasketsMutationType =
-    (typeof ShopperBasketsMutations)[keyof typeof ShopperBasketsMutations]
+export type ShopperBasketsMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
 /**
  * @private
@@ -466,13 +465,11 @@ export function useShopperBasketsMutation<Action extends ShopperBasketsMutationT
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
-            return (
-                method.call as (
-                    apiClient: ShopperBasketsClient,
-                    params: Params,
-                    rawResponse: boolean | undefined
-                ) => any
-            )(apiClients['shopperBaskets'], {...params, headers}, rawResponse)
+            return (method.call as (
+                apiClient: ShopperBasketsClient,
+                params: Params,
+                rawResponse: boolean | undefined
+            ) => any)(apiClients['shopperBaskets'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {

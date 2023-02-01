@@ -10,10 +10,7 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Container, Stack, Text} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {
-    useShopperCustomersMutation,
-    ShopperCustomersMutations
-} from 'commerce-sdk-react-preview'
+import {useShopperCustomersMutation, ShopperCustomersMutations} from 'commerce-sdk-react-preview'
 import Seo from '../../components/seo'
 import ResetPasswordForm from '../../components/reset-password'
 import {BrandLogo} from '../../components/icons'
@@ -29,7 +26,9 @@ const ResetPassword = () => {
     const einstein = useEinstein()
     const {pathname} = useLocation()
     // TODO: simplify the args to remove action
-    const getResetPasswordToken = useShopperCustomersMutation({action: ShopperCustomersMutations.GetResetPasswordToken})
+    const getResetPasswordToken = useShopperCustomersMutation({
+        action: ShopperCustomersMutations.GetResetPasswordToken
+    })
 
     const submitForm = async ({email}) => {
         const body = {

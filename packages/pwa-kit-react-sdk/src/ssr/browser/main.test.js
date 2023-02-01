@@ -14,7 +14,7 @@ import AppErrorBoundary from '../universal/components/app-error-boundary'
 import {uuidv4} from '../../utils/uuidv4.client'
 
 jest.mock('../../utils/uuidv4.client')
-describe('main', function () {
+describe('main', function() {
     test('OuterApp renders without error', () => {
         uuidv4.mockReturnValueOnce('7f21aea5-6962-4162-8204-9da85c802022')
         const oldPreloadedState = window.__PRELOADED_STATE__

@@ -17,12 +17,12 @@ type useCustomerType = {
 
 /**
  * A hook to return customer auth type.
- * 
+ *
  * Customer type can have 3 values:
  * - null
  * - guest
  * - registered
- * 
+ *
  * During initialization, type is null. And it is possible that
  * isGuest and isRegistered to both be false.
  *

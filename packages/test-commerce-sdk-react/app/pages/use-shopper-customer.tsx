@@ -24,7 +24,9 @@ const LIST_ID = 'bcd08be6f883120b4960ca8a0b'
 const ITEM_ID = '60ee899e9305de0df5b0fcade5'
 const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
 const PRODUCT_ID = '25518823M'
-const RANDOM_STR = Math.random().toString(36).slice(2, 7)
+const RANDOM_STR = Math.random()
+    .toString(36)
+    .slice(2, 7)
 
 const renderQueryHook = (name: string, {data, isLoading, error}: any) => {
     if (isLoading) {
