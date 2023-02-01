@@ -35,8 +35,8 @@ async function generate() {
   // Add templates to render
   apis.children.forEach(api => {
     api.addTemplate(
-      path.join(TEMPLATE_DIR, 'action.ts.hbs'),
-      path.join(OUTPUT_DIR, api.name.upperCamelCase, `action.ts`)
+      path.join(TEMPLATE_DIR, 'mutation.ts.hbs'),
+      path.join(OUTPUT_DIR, api.name.upperCamelCase, `mutation.ts`)
     );
     api.addTemplate(
       path.join(TEMPLATE_DIR, 'query.ts.hbs'),
