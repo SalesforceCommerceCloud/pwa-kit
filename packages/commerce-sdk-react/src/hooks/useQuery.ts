@@ -17,10 +17,11 @@ export const useQuery = <
     QK extends QueryKey
 >(
     apiOptions: ApiArg,
-    queryOptions: UseQueryOptions<Data, Err, Data, QK> & {queryKey: QK},
+    queryOptions: UseQueryOptions<Data, Err, Data, QK>,
     hookConfig: {
         client: Client
         method: (arg: ApiArg) => Promise<Data>
+        getQueryKey: (parameters: ApiArg['parameters']) => QK
         requiredParameters: ReadonlyArray<keyof ApiArg['parameters']>
         enabled?: boolean
     }
@@ -30,7 +31,8 @@ export const useQuery = <
         ...apiOptions.parameters
     }
     return useReactQuery<Data, Err, Data, QK>(
-        queryOptions.queryKey,
+        // End user can override query Key if they really want to...
+        queryOptions.queryKey ?? hookConfig.getQueryKey(parameters),
         useAuthorizationHeader(hookConfig.method, apiOptions),
         {
             enabled:

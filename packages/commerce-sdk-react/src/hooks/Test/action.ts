@@ -11,7 +11,7 @@ import useCommerceApi from '../useCommerceApi'
 type Client = ApiClients['shopperBaskets']
 
 export enum ShopperBasketsActions {
-  /**
+    /**
    * Creates a new basket.
 
 The created basket is initialized with default values. Data provided in the body document is populated into the created basket. It can be updated with API endpoints listed below.
@@ -59,8 +59,8 @@ attribute.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=createBasket} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#createbasket} for more information on the parameters and returned data type.
    */
-  CreateBasket = 'createBasket',
-  /**
+    CreateBasket = 'createBasket',
+    /**
    * Transfer the previous shopper's basket to the current shopper by updating the basket's owner. No other values change. You must obtain the shopper authorization token via SLAS and you must provide the ‘guest usid‘ in both the ‘/oauth2/login‘ and ‘/oauth2/token‘ calls while fetching the registered user JWT token.
 
 A success response contains the transferred basket.
@@ -72,8 +72,8 @@ If the current shopper has an active basket, and the `overrideExisting` request 
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=transferBasket} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#transferbasket} for more information on the parameters and returned data type.
    */
-  TransferBasket = 'transferBasket',
-  /**
+    TransferBasket = 'transferBasket',
+    /**
    * Merge data from the previous shopper's basket into the current shopper's active basket and delete the previous shopper's basket. This endpoint doesn't merge Personally Identifiable Information (PII). You must obtain the shopper authorization token via SLAS and you must provide the ‘guest usid‘ in both the ‘/oauth2/login‘ and ‘/oauth2/token‘ calls while fetching the registered user JWT token. After the merge, all basket amounts are recalculated and totaled, including lookups for prices, taxes, shipping, and promotions.
 
 The following information is merged:
@@ -116,63 +116,63 @@ If the current shopper doesn't have an active basket, and the createDestinationB
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=mergeBasket} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#mergebasket} for more information on the parameters and returned data type.
    */
-  MergeBasket = 'mergeBasket',
-  /**
-   * Removes a basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=deleteBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#deletebasket} for more information on the parameters and returned data type.
-   */
-  DeleteBasket = 'deleteBasket',
-  /**
+    MergeBasket = 'mergeBasket',
+    /**
+     * Removes a basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=deleteBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#deletebasket} for more information on the parameters and returned data type.
+     */
+    DeleteBasket = 'deleteBasket',
+    /**
    * Updates a basket. Only the currency of the basket, source code, the custom
 properties of the basket, and the shipping items will be considered.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateBasket} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatebasket} for more information on the parameters and returned data type.
    */
-  UpdateBasket = 'updateBasket',
-  /**
-   * Sets the billing address of a basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateBillingAddressForBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatebillingaddressforbasket} for more information on the parameters and returned data type.
-   */
-  UpdateBillingAddressForBasket = 'updateBillingAddressForBasket',
-  /**
-   * Adds a coupon to an existing basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addCouponToBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addcoupontobasket} for more information on the parameters and returned data type.
-   */
-  AddCouponToBasket = 'addCouponToBasket',
-  /**
-   * Removes a coupon from the basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeCouponFromBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removecouponfrombasket} for more information on the parameters and returned data type.
-   */
-  RemoveCouponFromBasket = 'removeCouponFromBasket',
-  /**
-   * Sets customer information for an existing basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateCustomerForBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatecustomerforbasket} for more information on the parameters and returned data type.
-   */
-  UpdateCustomerForBasket = 'updateCustomerForBasket',
-  /**
-   * Adds a gift certificate item to an existing basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addGiftCertificateItemToBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addgiftcertificateitemtobasket} for more information on the parameters and returned data type.
-   */
-  AddGiftCertificateItemToBasket = 'addGiftCertificateItemToBasket',
-  /**
-   * Deletes a gift certificate item from an existing basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeGiftCertificateItemFromBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removegiftcertificateitemfrombasket} for more information on the parameters and returned data type.
-   */
-  RemoveGiftCertificateItemFromBasket = 'removeGiftCertificateItemFromBasket',
-  /**
-   * Updates a gift certificate item of an existing basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateGiftCertificateItemInBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updategiftcertificateiteminbasket} for more information on the parameters and returned data type.
-   */
-  UpdateGiftCertificateItemInBasket = 'updateGiftCertificateItemInBasket',
-  /**
+    UpdateBasket = 'updateBasket',
+    /**
+     * Sets the billing address of a basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateBillingAddressForBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatebillingaddressforbasket} for more information on the parameters and returned data type.
+     */
+    UpdateBillingAddressForBasket = 'updateBillingAddressForBasket',
+    /**
+     * Adds a coupon to an existing basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addCouponToBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addcoupontobasket} for more information on the parameters and returned data type.
+     */
+    AddCouponToBasket = 'addCouponToBasket',
+    /**
+     * Removes a coupon from the basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeCouponFromBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removecouponfrombasket} for more information on the parameters and returned data type.
+     */
+    RemoveCouponFromBasket = 'removeCouponFromBasket',
+    /**
+     * Sets customer information for an existing basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateCustomerForBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatecustomerforbasket} for more information on the parameters and returned data type.
+     */
+    UpdateCustomerForBasket = 'updateCustomerForBasket',
+    /**
+     * Adds a gift certificate item to an existing basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addGiftCertificateItemToBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addgiftcertificateitemtobasket} for more information on the parameters and returned data type.
+     */
+    AddGiftCertificateItemToBasket = 'addGiftCertificateItemToBasket',
+    /**
+     * Deletes a gift certificate item from an existing basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeGiftCertificateItemFromBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removegiftcertificateitemfrombasket} for more information on the parameters and returned data type.
+     */
+    RemoveGiftCertificateItemFromBasket = 'removeGiftCertificateItemFromBasket',
+    /**
+     * Updates a gift certificate item of an existing basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateGiftCertificateItemInBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updategiftcertificateiteminbasket} for more information on the parameters and returned data type.
+     */
+    UpdateGiftCertificateItemInBasket = 'updateGiftCertificateItemInBasket',
+    /**
    * Adds new items to a basket. The added items are associated with the
 specified shipment. If no shipment id is specified, the added items are associated with the default shipment.
 Considered values from the request body, for each item are:
@@ -202,14 +202,14 @@ type of custom attribute defined for ProductLineItem.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addItemToBasket} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#additemtobasket} for more information on the parameters and returned data type.
    */
-  AddItemToBasket = 'addItemToBasket',
-  /**
-   * Removes a product item from the basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeItemFromBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removeitemfrombasket} for more information on the parameters and returned data type.
-   */
-  RemoveItemFromBasket = 'removeItemFromBasket',
-  /**
+    AddItemToBasket = 'addItemToBasket',
+    /**
+     * Removes a product item from the basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeItemFromBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removeitemfrombasket} for more information on the parameters and returned data type.
+     */
+    RemoveItemFromBasket = 'removeItemFromBasket',
+    /**
    * Updates an item in a basket. The
 following values in the request body are considered by the server:
 
@@ -239,38 +239,38 @@ ProductLineItem.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateItemInBasket} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updateiteminbasket} for more information on the parameters and returned data type.
    */
-  UpdateItemInBasket = 'updateItemInBasket',
-  /**
-   * This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for a specific taxable line item. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasketItem} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasketitem} for more information on the parameters and returned data type.
-   */
-  AddTaxesForBasketItem = 'addTaxesForBasketItem',
-  /**
-   * Adds a payment instrument to a basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addPaymentInstrumentToBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addpaymentinstrumenttobasket} for more information on the parameters and returned data type.
-   */
-  AddPaymentInstrumentToBasket = 'addPaymentInstrumentToBasket',
-  /**
-   * Removes a payment instrument of a basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removePaymentInstrumentFromBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removepaymentinstrumentfrombasket} for more information on the parameters and returned data type.
-   */
-  RemovePaymentInstrumentFromBasket = 'removePaymentInstrumentFromBasket',
-  /**
-   * Updates payment instrument of an existing basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updatePaymentInstrumentInBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatepaymentinstrumentinbasket} for more information on the parameters and returned data type.
-   */
-  UpdatePaymentInstrumentInBasket = 'updatePaymentInstrumentInBasket',
-  /**
-   * This method allows you to put an array of priceBookIds to an existing basket, which will be used for basket calculation.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addPriceBooksToBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addpricebookstobasket} for more information on the parameters and returned data type.
-   */
-  AddPriceBooksToBasket = 'addPriceBooksToBasket',
-  /**
+    UpdateItemInBasket = 'updateItemInBasket',
+    /**
+     * This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for a specific taxable line item. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasketItem} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasketitem} for more information on the parameters and returned data type.
+     */
+    AddTaxesForBasketItem = 'addTaxesForBasketItem',
+    /**
+     * Adds a payment instrument to a basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addPaymentInstrumentToBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addpaymentinstrumenttobasket} for more information on the parameters and returned data type.
+     */
+    AddPaymentInstrumentToBasket = 'addPaymentInstrumentToBasket',
+    /**
+     * Removes a payment instrument of a basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removePaymentInstrumentFromBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removepaymentinstrumentfrombasket} for more information on the parameters and returned data type.
+     */
+    RemovePaymentInstrumentFromBasket = 'removePaymentInstrumentFromBasket',
+    /**
+     * Updates payment instrument of an existing basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updatePaymentInstrumentInBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatepaymentinstrumentinbasket} for more information on the parameters and returned data type.
+     */
+    UpdatePaymentInstrumentInBasket = 'updatePaymentInstrumentInBasket',
+    /**
+     * This method allows you to put an array of priceBookIds to an existing basket, which will be used for basket calculation.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addPriceBooksToBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addpricebookstobasket} for more information on the parameters and returned data type.
+     */
+    AddPriceBooksToBasket = 'addPriceBooksToBasket',
+    /**
    * Creates a new shipment for a basket.
 
 The created shipment is initialized with values provided in the body
@@ -286,16 +286,16 @@ the body are the following properties if specified:
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=createShipmentForBasket} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#createshipmentforbasket} for more information on the parameters and returned data type.
    */
-  CreateShipmentForBasket = 'createShipmentForBasket',
-  /**
+    CreateShipmentForBasket = 'createShipmentForBasket',
+    /**
    * Removes a specified shipment and all associated product, gift certificate,
 shipping, and price adjustment line items from a basket.
 It is not allowed to remove the default shipment.
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeShipmentFromBasket} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removeshipmentfrombasket} for more information on the parameters and returned data type.
    */
-  RemoveShipmentFromBasket = 'removeShipmentFromBasket',
-  /**
+    RemoveShipmentFromBasket = 'removeShipmentFromBasket',
+    /**
    * Updates a shipment for a basket.
 
 The shipment is initialized with values provided in the body
@@ -310,25 +310,25 @@ the body are the following properties if specified:
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateShipmentForBasket} for more information about the API endpoint.
    * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updateshipmentforbasket} for more information on the parameters and returned data type.
    */
-  UpdateShipmentForBasket = 'updateShipmentForBasket',
-  /**
-   * Sets a shipping address of a specific shipment of a basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateShippingAddressForShipment} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updateshippingaddressforshipment} for more information on the parameters and returned data type.
-   */
-  UpdateShippingAddressForShipment = 'updateShippingAddressForShipment',
-  /**
-   * Sets a shipping method to a specific shipment of a basket.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateShippingMethodForShipment} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updateshippingmethodforshipment} for more information on the parameters and returned data type.
-   */
-  UpdateShippingMethodForShipment = 'updateShippingMethodForShipment',
-  /**
-   * This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for all taxable line items. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasket} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasket} for more information on the parameters and returned data type.
-   */
-  AddTaxesForBasket = 'addTaxesForBasket',
+    UpdateShipmentForBasket = 'updateShipmentForBasket',
+    /**
+     * Sets a shipping address of a specific shipment of a basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateShippingAddressForShipment} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updateshippingaddressforshipment} for more information on the parameters and returned data type.
+     */
+    UpdateShippingAddressForShipment = 'updateShippingAddressForShipment',
+    /**
+     * Sets a shipping method to a specific shipment of a basket.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateShippingMethodForShipment} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updateshippingmethodforshipment} for more information on the parameters and returned data type.
+     */
+    UpdateShippingMethodForShipment = 'updateShippingMethodForShipment',
+    /**
+     * This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for all taxable line items. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasket} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasket} for more information on the parameters and returned data type.
+     */
+    AddTaxesForBasket = 'addTaxesForBasket'
 }
 
 /**
@@ -361,4 +361,3 @@ export function useShopperBasketsAction<Action extends `${ShopperBasketsActions}
     const namedAction = {[action]: hook.execute} as Record<Action, typeof hook.execute>
     return {...hook, ...namedAction}
 }
-
