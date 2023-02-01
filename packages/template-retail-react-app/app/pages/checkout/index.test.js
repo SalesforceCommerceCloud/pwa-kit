@@ -210,7 +210,7 @@ test('Can proceed through checkout steps as guest', async () => {
     })
 
     // Wait for checkout to load and display first step
-    await screen.findByText(/checkout as guest/i)
+    await waitFor(() => screen.findByText(/checkout as guest/i))
 
     // Verify cart products display
     user.click(screen.getByText(/2 items in cart/i))
