@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import Auth, {injectAccessToken} from './'
+import Auth from './'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 
@@ -53,11 +53,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
             logout: jest.fn().mockResolvedValue('')
         }
     }
-})
-
-test('injectAccessToken', () => {
-    expect(injectAccessToken({}, 'test')).toEqual({Authorization: 'Bearer test'})
-    expect(injectAccessToken(undefined, 'test')).toEqual({Authorization: 'Bearer test'})
 })
 
 const config = {

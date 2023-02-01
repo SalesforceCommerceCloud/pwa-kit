@@ -93,13 +93,14 @@ const Account = () => {
         </>
     )
 
+    // TODO: hook integration WIP
     // If we have customer data and they are not registered, push to login page
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
-    if (customer.authType != null && !customer.isRegistered) {
-        const path = buildUrl('/login')
-        return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
-    }
+    // if (customer.authType != null && !customer.isRegistered) {
+    //     const path = buildUrl('/login')
+    //     return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
+    // }
 
     return (
         <Box

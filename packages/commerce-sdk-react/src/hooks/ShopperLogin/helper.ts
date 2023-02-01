@@ -14,6 +14,7 @@ import {UseMutationResult} from '@tanstack/react-query'
 export const ShopperLoginHelpers = {
     LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
+    Register: 'register',
     Logout: 'logout'
 } as const
 
@@ -27,14 +28,16 @@ type ShopperLoginHelpersType = typeof ShopperLoginHelpers[keyof typeof ShopperLo
  * Avaliable helpers:
  * - loginRegisteredUserB2C
  * - loginGuestUser
+ * - register
  * - logout
  */
 export function useShopperLoginHelper<Action extends ShopperLoginHelpersType>(
     action: Action
 ): UseMutationResult<
-    ShopperLoginTypes.TokenResponse,
+    // TODO: what's the better way for declaring the types?
+    any,
     Error,
-    void | Argument<Auth['loginRegisteredUserB2C']>
+    any
 > {
     const auth = useAuth()
     if (action === ShopperLoginHelpers.LoginGuestUser) {
@@ -43,13 +46,11 @@ export function useShopperLoginHelper<Action extends ShopperLoginHelpersType>(
     if (action === ShopperLoginHelpers.Logout) {
         return useMutation(() => auth.logout())
     }
+    if (action === ShopperLoginHelpers.Register) {
+        return useMutation((body) => auth.register(body))
+    }
     if (action === ShopperLoginHelpers.LoginRegisteredUserB2C) {
-        return useMutation((credentials) => {
-            if (!credentials) {
-                throw new Error('Missing registered user credentials.')
-            }
-            return auth.loginRegisteredUserB2C(credentials)
-        })
+        return useMutation((credentials) => auth.loginRegisteredUserB2C(credentials))
     }
 
     throw new Error('Unknown ShopperLogin helper.')
