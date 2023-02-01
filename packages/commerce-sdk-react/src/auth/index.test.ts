@@ -94,6 +94,7 @@ describe('Auth', () => {
             refresh_token_guest: 'refresh_token_guest',
             access_token: 'access_token',
             customer_id: 'customer_id',
+            customer_type: '',
             enc_user_id: 'enc_user_id',
             expires_in: 1800,
             id_token: 'id_token',
@@ -120,6 +121,17 @@ describe('Auth', () => {
         expect(auth.isTokenExpired(JWTExpired)).toBe(true)
         // @ts-expect-error private method
         expect(() => auth.isTokenExpired()).toThrow()
+    })
+    test('site switch clears auth storage', () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token', '123')
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', '456')
+        const switchSiteConfig = {...config, siteId: 'another site'}
+        const newAuth = new Auth(switchSiteConfig)
+        expect(newAuth.get('access_token')).not.toBe('123')
+        expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
     test('isTokenExpired', () => {
         const auth = new Auth(config)
@@ -157,6 +169,7 @@ describe('Auth', () => {
             refresh_token_guest: 'refresh_token_guest',
             access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret'),
             customer_id: 'customer_id',
+            customer_type: '',
             enc_user_id: 'enc_user_id',
             expires_in: 1800,
             id_token: 'id_token',
