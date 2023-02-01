@@ -72,11 +72,6 @@ export const AuthModal = ({
     const submitForm = async (data) => {
         form.clearErrors()
 
-        // mutation is cached by default?
-        // TODO: should we disable mutation cache by default?
-        login.reset()
-        register.reset()
-
         const onLoginSuccess = () => {
             navigate('/account')
         }
