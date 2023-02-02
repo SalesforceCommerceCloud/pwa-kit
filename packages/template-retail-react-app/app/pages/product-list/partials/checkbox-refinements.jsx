@@ -15,17 +15,14 @@ const CheckboxRefinements = ({filter, toggleFilter, selectedFilters}) => {
             {filter.values
                 ?.filter((refinementValue) => refinementValue.hitCount > 0)
                 .map((value) => {
+                    const isChecked = selectedFilters.includes(value.value)
+
                     return (
                         <Box key={value.value}>
                             <Checkbox
-                                isChecked={!!selectedFilters}
+                                isChecked={isChecked}
                                 onChange={() =>
-                                    toggleFilter(
-                                        value,
-                                        filter.attributeId,
-                                        !!selectedFilters,
-                                        false
-                                    )
+                                    toggleFilter(value, filter.attributeId, isChecked, false)
                                 }
                             >
                                 {value.label}
