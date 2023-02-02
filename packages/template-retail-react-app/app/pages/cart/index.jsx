@@ -176,7 +176,6 @@ const Cart = () => {
                     ({productId}) => productId === variant.productId
                 )
                 const newQuantity = quantity + basketItem.quantity
-                debugger
                 return await changeItemQuantity(newQuantity, basketItem)
             }
 
@@ -185,7 +184,6 @@ const Cart = () => {
                 return await changeItemQuantity(quantity, selectedItem)
             }
         } catch (e) {
-            console.log('e', e)
             showError()
         } finally {
             setCartItemLoading(false)
