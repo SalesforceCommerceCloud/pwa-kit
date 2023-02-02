@@ -20,7 +20,7 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {sdkReplacementPlugin, extendedTemplateReplacementPlugin} from './plugins'
+import {sdkReplacementPlugin, extendedTemplateReplacementPlugin, allFiles} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
@@ -92,6 +92,30 @@ const findInProjectThenExtendsThenSDK = (pkg) => {
     }
     return resolve(sdkDir, 'node_modules', pkg)
 }
+
+// const makeRegExp = (str, sep = path.sep) => {
+//     // Replace unix paths with windows if needed and build a RegExp
+//     if (sep === '\\') {
+//         str = str.replace(/\//g, '\\\\')
+//     }
+//     return new RegExp(str)
+// }
+
+// const templateAppPathRegex = makeRegExp(
+//     `((.*)${pkg?.mobify?.overridesDir}(.*)|(.*)/${pkg?.mobify?.extends}(.*))`
+// )
+
+// console.log('~templateAppPathRegex', templateAppPathRegex)
+// const globPattern = `${pkg?.mobify?.overridesDir?.replace(/\//, '')}/**/*.+(js|jsx|ts|tsx)`
+// const overrides = glob.sync(globPattern)
+// const overridesMap = [
+//     ...overrides,
+//     ...overrides?.map((item) => {
+//         item = item?.replace?.(pkg?.mobify?.overridesDir?.replace(/^\//, '') + '/', '')
+//         return item
+//     })
+// ]
+// console.log('~overridesMap', overridesMap)
 
 const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
@@ -165,6 +189,12 @@ const baseConfig = (target) => {
                         ),
                         '@emotion/react': findInProjectThenExtendsThenSDK('@emotion/react'),
                         '@emotion/styled': findInProjectThenExtendsThenSDK('@emotion/styled')
+                        // ...overridesMap?.map?.((override) => {
+                        //     return [${override?.split?.('.')?.[0]?.replace(
+                        //         pkg?.mobify?.overridesDir,
+                        //         pkg?.mobify?.extends
+                        //     )}] :
+                        // })
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -185,6 +215,7 @@ const baseConfig = (target) => {
                         ? extendedTemplateReplacementPlugin(projectDir)
                         : () => null,
 
+                    allFiles(),
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
                 ].filter(Boolean),

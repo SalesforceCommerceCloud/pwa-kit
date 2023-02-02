@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
 import webpack from 'webpack'
 import path, {resolve} from 'path'
 import fs from 'fs'
@@ -12,6 +11,7 @@ import glob from 'glob'
 
 const projectDir = process.cwd()
 const pkg = require(resolve(projectDir, 'package.json'))
+var minimatch = require('minimatch')
 
 const getOverridePath = (path) => {
     const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
@@ -109,18 +109,45 @@ const templateAppPathRegex = makeRegExp(
     `((.*)${pkg?.mobify?.overridesDir}(.*)|(.*)/${pkg?.mobify?.extends}(.*))`
 )
 
+export const allFiles = (projectDir) => {
+    return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
+        const resolved = path.resolve(resource.context, resource.request)
+        if (resolved.match(/icons/)) {
+            console.log('~resolved', resolved)
+        }
+    })
+}
+
 export const extendedTemplateReplacementPlugin = (projectDir) => {
-    console.log('~templateAppPathRegex', templateAppPathRegex)
+    console.log('~templateAppPtsxathRegex', templateAppPathRegex)
     const globPattern = `${pkg?.mobify?.overridesDir?.replace(/\//, '')}/**/*.+(js|jsx|ts|tsx)`
     const overrides = glob.sync(globPattern)
     const overridesMap = [
         ...overrides,
-        ...overrides?.map((item) => {
-            item = item?.replace?.(pkg?.mobify?.overridesDir?.replace(/^\//, '') + '/', '')
-            return item
+        ...overrides?.flatMap((item) => {
+            item = item.split('.')?.[0]
+            var stripped = minimatch.makeRe(item + `*.+(js|jsx|ts|tsx)`)
+            const wIndex = minimatch.makeRe(
+                item.replace(/(\/index)\.*$/, '$1') + `*.+(js|jsx|ts|tsx)`
+            )
+            console.log('~stripped', stripped)
+            console.log('~wIndex', wIndex)
+            // var wIndex =
+            //     item?.replace?.(pkg?.mobify?.overridesDir?.replace(/^\//, ''), '')
+            // if (wIndex?.match(/(.*)\/$/)) {
+            //     wIndex = wIndex.substring(0, wIndex.length - 1)
+            // }
+            // const sansIndex =
+            //     item?.replace?.(pkg?.mobify?.overridesDir?.replace(/^\//, ''), '') + '$'
+            // console.log('~flatMap', [wIndex, sansIndex])
+
+            // return 'app/components/_app-config(/index).jsx'
+
+            return [stripped, wIndex]
         })
     ]
     console.log('~overridesMap', overridesMap)
+    // TODO: manually push a false positive e.g. chakra-ui/whatever/icons to make sure we don't override that
     const overridesRegex = makeRegExp(
         `(${overridesMap?.map((override) => override?.replace?.(/^\//))?.join('|')})`
     )
@@ -155,6 +182,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             console.log('~!!! OVERRIDING', requestedFile)
             console.log('~!!! newContext', newContext)
             console.log('~!!! newRequest', newRequest)
+            // if (requestedFile.match(makeRegExp('app/components/icons'))) {
             if (newContext && newRequest) {
                 // resource.context = newContext
                 // const newreq = path.resolve(newContext, newRequest, 'index.jsx')
