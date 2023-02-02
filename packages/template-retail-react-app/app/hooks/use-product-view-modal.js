@@ -36,8 +36,8 @@ export const useProductViewModal = (initialProduct) => {
             // when the modal is first mounted, don't need to fetch current product detail since it is available
             enabled: !!pid,
             onSuccess: (data) => {
-                console.log('data.productId', data.id)
-                // if the product id is the same as the initial product id, then merge the data with the initial product
+                // if the product id is the same as the initial product id,
+                // then merge the data with the initial product to be able to show correct quantity in the modal
                 if (data.id === initialProduct.productId) {
                     return {
                         ...initialProduct,
