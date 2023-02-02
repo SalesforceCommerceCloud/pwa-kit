@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect, useState} from 'react'
+import {useEffect} from 'react'
 import {rebuildPathWithParams, removeQueryParamsFromPath} from '../utils/url'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useVariant} from './use-variant'
@@ -24,25 +24,28 @@ export const useProductViewModal = (initialProduct) => {
     const location = useLocation()
     const history = useHistory()
     const intl = useIntl()
-    const [product, setProduct] = useState(initialProduct)
-    const variant = useVariant(product)
-    const [isFetching, setIsFetching] = useState(false)
     const toast = useToast()
-
+    const urlParams = new URLSearchParams(location.search)
+    const pid = urlParams.get('pid')
     // use commerce-sdk-react-preview useProduct to fetch new product detail whenever variant changes
-    useProduct(
-        {id: variant?.productId},
+    const {data: product, isFetching} = useProduct(
+        {id: pid},
         {
             // Show initialTodos immediately, but won't refetch until another interaction event is encountered after 1000 ms
             initialData: initialProduct,
-            staleTime: 1000,
+            // when the modal is first mounted, don't need to fetch current product detail since it is available
+            enabled: !!pid,
             onSuccess: (data) => {
-                console.log('data.productId', data)
-                setProduct(data)
-                setIsFetching(false)
+                console.log('data.productId', data.id)
+                // if the product id is the same as the initial product id, then merge the data with the initial product
+                if (data.id === initialProduct.productId) {
+                    return {
+                        ...initialProduct,
+                        ...data
+                    }
+                }
             },
             onError: () => {
-                setIsFetching(false)
                 toast({
                     title: intl.formatMessage(API_ERROR_MESSAGE),
                     status: 'error'
@@ -50,7 +53,7 @@ export const useProductViewModal = (initialProduct) => {
             }
         }
     )
-
+    const variant = useVariant(product)
     const cleanUpVariantParams = () => {
         const paramToRemove = [...product.variationAttributes.map(({id}) => id), 'pid']
         const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
