@@ -35,7 +35,6 @@ export const useProductViewModal = (initialProduct) => {
             // when the modal is first mounted, don't need to fetch current product detail since it is available
             enabled: !!pid,
             select: (data) => {
-                console.log('select data', data)
                 // if the product id is the same as the initial product id,
                 // then merge the data with the initial product to be able to show correct quantity in the modal
                 if (data.id === initialProduct.productId) {
@@ -46,7 +45,7 @@ export const useProductViewModal = (initialProduct) => {
                 }
                 return data
             },
-            onError: (e) => {
+            onError: () => {
                 toast({
                     title: intl.formatMessage(API_ERROR_MESSAGE),
                     status: 'error'
@@ -80,7 +79,6 @@ export const useProductViewModal = (initialProduct) => {
                 ...variationValues,
                 pid: variant.productId
             })
-            setPid(variant.productId)
             history.replace(updatedUrl)
         }
     }, [variant])
