@@ -165,10 +165,8 @@ class Auth {
     }
 
     private clearStorage() {
-        Object.keys(DATA_MAP).forEach((key) => {
-            type Key = keyof AuthDataMap
-            DATA_MAP[key as Key].storage.delete(DATA_MAP[key as Key].key)
-        })
+        const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
+        keys.forEach((key) => DATA_MAP[key].storage.delete(DATA_MAP[key].key))
     }
 
     /**
