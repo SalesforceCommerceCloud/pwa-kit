@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -13,6 +13,8 @@ import {
     assertUpdateQuery,
     DEFAULT_TEST_HOST,
     mockMutationEndpoints,
+    NEW_DATA,
+    OLD_DATA,
     renderHookWithProviders
 } from '../../test-utils'
 import {
@@ -21,7 +23,7 @@ import {
     useShopperBasketsMutation
 } from './mutation'
 import {useBasket} from './query'
-import {useCustomerBaskets} from '../ShopperCustomers'
+import {useCustomerBaskets} from '../ShopperCustomers/query'
 import {CacheUpdateMatrixElement} from '../utils'
 
 const CUSTOMER_ID = 'CUSTOMER_ID'
@@ -42,10 +44,7 @@ jest.mock('../useCustomerId.ts', () => {
     return jest.fn().mockReturnValue(CUSTOMER_ID)
 })
 
-type MutationPayloads = {
-    [key in ShopperBasketsMutationType]?: {body: any; parameters: any}
-}
-const mutationPayloads: MutationPayloads = {
+const mutationPayloads = {
     updateBasket: {
         parameters: {basketId: BASKET_ID},
         body: {}
@@ -110,27 +109,9 @@ const mutationPayloads: MutationPayloads = {
         parameters: {basketId: BASKET_ID, shipmentId: SHIPMENT_ID},
         body: {id: '001'}
     }
-}
-const oldCustomerBaskets = {
-    total: 1,
-    baskets: [{basketId: BASKET_ID, hello: 'world'}]
-}
+} as const
 
-const newCustomerBaskets = {
-    total: 1,
-    baskets: [{basketId: BASKET_ID, hello: 'world_modified'}]
-}
-
-const oldBasket = {
-    basketId: BASKET_ID,
-    hello: 'world'
-}
-
-const newBasket = {
-    basketId: BASKET_ID,
-    hello: 'world_modified'
-}
-const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).map(
+const tests = (Object.keys(mutationPayloads) as Array<keyof typeof mutationPayloads>).map(
     (mutationName) => {
         const payload = mutationPayloads[mutationName]
 
@@ -140,11 +121,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
                 {
                     name: 'success',
                     assertions: async () => {
-                        mockMutationEndpoints(
-                            '/checkout/shopper-baskets/',
-                            {errorResponse: 200},
-                            newBasket
-                        )
+                        mockMutationEndpoints('/checkout/shopper-baskets/')
                         mockRelatedQueries()
 
                         const {result, waitForValueToChange} = renderHookWithProviders(() => {
@@ -171,24 +148,21 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
 
                         await waitForValueToChange(() => result.current.mutation.isSuccess)
                         expect(result.current.mutation.isSuccess).toBe(true)
+
                         // On successful mutation, the query cache gets updated too. Let's assert it.
                         const cacheUpdateMatrix = getCacheUpdateMatrix(CUSTOMER_ID)
                         // @ts-ignore
                         const matrixElement = cacheUpdateMatrix[mutationName](payload, {})
                         const {invalidate, update, remove}: CacheUpdateMatrixElement = matrixElement
 
-                        const assertionData = {
-                            basket: newBasket,
-                            customerBaskets: newCustomerBaskets
-                        }
                         update?.forEach(({name}) => {
                             // @ts-ignore
-                            assertUpdateQuery(result.current.queries[name], assertionData[name])
+                            assertUpdateQuery(result.current.queries[name], NEW_DATA)
                         })
 
                         invalidate?.forEach(({name}) => {
                             // @ts-ignore
-                            assertInvalidateQuery(result.current.queries[name], oldCustomerBaskets)
+                            assertInvalidateQuery(result.current.queries[name], OLD_DATA)
                         })
 
                         remove?.forEach(({name}) => {
@@ -244,24 +218,24 @@ const mockRelatedQueries = () => {
         .get((uri) => {
             return uri.includes(basketEndpoint)
         })
-        .reply(200, oldBasket)
+        .reply(200, OLD_DATA)
     nock(DEFAULT_TEST_HOST)
         .persist()
         .get((uri) => {
             return uri.includes(basketEndpoint)
         })
-        .reply(200, newBasket)
+        .reply(200, NEW_DATA)
 
     // For get customer basket
     nock(DEFAULT_TEST_HOST)
         .get((uri) => {
             return uri.includes(customerEndpoint)
         })
-        .reply(200, oldCustomerBaskets)
+        .reply(200, OLD_DATA)
     nock(DEFAULT_TEST_HOST)
         .persist()
         .get((uri) => {
             return uri.includes(customerEndpoint)
         })
-        .reply(200, newCustomerBaskets)
+        .reply(200, NEW_DATA)
 }

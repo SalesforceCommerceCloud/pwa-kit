@@ -56,9 +56,9 @@ export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutatio
     // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
     // confident, though, that it is safe, because it seems like we're mostly re-defining what we
     // already have.
-    const method = (options: Argument<Client[Mutation]>) =>
+    const method = (opts: Argument<Client[Mutation]>) =>
         (client[mutation] as ApiMethod<Argument<Client[Mutation]>, DataType<Client[Mutation]>>)(
-            options
+            opts
         )
 
     return useMutation({method, getCacheUpdates})

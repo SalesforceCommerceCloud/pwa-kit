@@ -1,20 +1,24 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBaskets} from 'commerce-sdk-isomorphic'
-import {ShopperContexts} from 'commerce-sdk-isomorphic'
-import {ShopperCustomers} from 'commerce-sdk-isomorphic'
-import {ShopperDiscoverySearch} from 'commerce-sdk-isomorphic'
-import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
-import {ShopperLogin} from 'commerce-sdk-isomorphic'
-import {ShopperOrders} from 'commerce-sdk-isomorphic'
-import {ShopperProducts} from 'commerce-sdk-isomorphic'
-import {ShopperPromotions} from 'commerce-sdk-isomorphic'
-import {ShopperSearch} from 'commerce-sdk-isomorphic'
-import {QueryKey, QueryFunctionContext} from '@tanstack/react-query'
+import {QueryKey} from '@tanstack/react-query'
+import {
+    ShopperBaskets,
+    ShopperContexts,
+    ShopperCustomers,
+    ShopperDiscoverySearch,
+    ShopperGiftCertificates,
+    ShopperLogin,
+    ShopperOrders,
+    ShopperProducts,
+    ShopperPromotions,
+    ShopperSearch
+} from 'commerce-sdk-isomorphic'
+
+// --- API CLIENTS --- //
 
 export type ApiClientConfigParams = {
     clientId: string
@@ -36,35 +40,64 @@ export interface ApiClients {
     shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
+export type ApiClient = ApiClients[keyof ApiClients]
+
+// --- API HELPERS --- //
+
+/**
+ * Generic signature of the options objects used by commerce-sdk-isomorphic
+ */
+export type ApiOptions<
+    Parameters extends Record<string, unknown> = Record<string, unknown>,
+    Headers extends Record<string, string> = Record<string, string>,
+    Body extends Record<string, unknown> = Record<string, unknown>
+> = {
+    parameters?: Parameters
+    headers?: Headers
+    body?: Body
+}
+
+/**
+ * Generic signature of API methods exported by commerce-sdk-isomorphic
+ */
+export type ApiMethod<Options extends ApiOptions, Data> = {
+    (options: Options): Promise<Data>
+}
+
 /**
  * The first argument of a function.
  */
-export type Argument<T extends (arg: any) => unknown> = Parameters<T>[0]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Argument<T extends (arg: any) => unknown> = NonNullable<Parameters<T>[0]>
 
 /**
  * The data type returned by a commerce-sdk-isomorphic method when the raw response
  * flag is not set.
  */
-export type DataType<T extends (arg: any) => Promise<unknown>> = T extends (
-    arg: any
-) => Promise<Response | infer R>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DataType<T extends ApiMethod<any, any>> = T extends ApiMethod<any, Response | infer R>
     ? R
     : never
 
-/**
- * Modified version of React Query's Mutation Function. Added a second argument
- * API clients.
- */
-export type IMutationFunction<TData = unknown, TVariables = unknown> = (
-    variables: TVariables,
-    apiClients: ApiClients
-) => Promise<TData>
+// --- CACHE HELPERS --- //
 
-/**
- * Modified version of React Query's Query Function. Added a second argument
- * API clients.
- */
-export type IQueryFunction<TData = unknown> = (
-    context: QueryFunctionContext<QueryKey>,
-    apiClients: ApiClients
-) => Promise<TData>
+export interface CacheUpdate {
+    update?: Array<QueryKey>
+    invalidate?: Array<QueryKey>
+    remove?: Array<QueryKey>
+}
+
+export type CacheUpdateGetter<Options, Data> = (
+    customerId: string | null,
+    params: Options,
+    response: Data
+) => CacheUpdate
+
+export type CacheUpdateMatrix<Client> = {
+    // It feels like we should be able to do <infer Arg, infer Data>, but that
+    // results in some methods being `never`, so we just use Argument<> later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [Method in keyof Client]?: Client[Method] extends ApiMethod<any, Response | infer Data>
+        ? CacheUpdateGetter<Argument<Client[Method]>, Data>
+        : never
+}
