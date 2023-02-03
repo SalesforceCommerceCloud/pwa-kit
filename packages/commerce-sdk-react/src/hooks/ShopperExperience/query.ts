@@ -68,7 +68,7 @@ function usePage(
     options?: UseQueryOptions<DataType<Client['getPage']> | Response, Error>
 ): UseQueryResult<DataType<Client['getPage']> | Response, Error> {
     const {headers, rawResponse, ...parameters} = arg
-    const {locale, currency} = useConfig()
+    const {locale} = useConfig()
     parameters.locale = parameters.locale || locale
     return useQuery(
         ['/pages', arg],

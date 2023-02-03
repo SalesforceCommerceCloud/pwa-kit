@@ -42,20 +42,20 @@ const UseShopperExperience = () => {
         {
             name: 'usePage',
             hook: usePage({pageId: PAGE_ID})
-        }
+        },
         // TODO: API endpoint currently not working
         //  Response: 400 error Bad request {
         //   "detail" : "No business object identifier was provided. You must provide exactly one.",
         //   "title" : "Business Object ID Invalid",
         //   "type" : "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/business-object-id-invalid"
         //  }
-        // {
-        //     name: 'usePages',
-        //     hook: usePages({
-        //         ids: PAGE_IDS,
-        //         aspectTypeId: ASPECT_TYPE_ID
-        //     })
-        // }
+        {
+            name: 'usePages',
+            hook: usePages({
+                ids: PAGE_IDS,
+                aspectTypeId: ASPECT_TYPE_ID
+            })
+        }
     ]
     return (
         <>
