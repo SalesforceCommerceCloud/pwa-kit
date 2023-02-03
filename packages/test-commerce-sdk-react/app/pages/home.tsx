@@ -25,7 +25,7 @@ const Home = () => {
                     <Link to="/products">useShopperProducts</Link>
                 </li>
                 <li>
-                    <Link to="/experience">UseShopperExperience</Link>
+                    <Link to="/experience">useShopperExperience</Link>
                 </li>
                 <li>
                     <Link to="/categories">useCategories</Link>

@@ -71,7 +71,7 @@ function usePage(
     const {locale, currency} = useConfig()
     parameters.locale = parameters.locale || locale
     return useQuery(
-        ['/page', arg],
+        ['/pages', arg],
         (_, {shopperExperience}) => {
             return shopperExperience.getPage({parameters, headers}, rawResponse)
         },
