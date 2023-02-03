@@ -1,0 +1,52 @@
+/*
+ * Copyright (c) 2023, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {ApiClients, Argument, DataType, ApiMethod} from '../types'
+import {useMutation} from '../useMutation'
+import {UseMutationResult} from '@tanstack/react-query'
+import {NotImplementedError} from '../utils'
+import useCommerceApi from '../useCommerceApi'
+import {cacheUpdateMatrix} from './config'
+
+
+{{!~-- Add aliases to @root for brevity/clarity --~}}
+{{~ assign 'clientInstance' name.lowerCamelCase ~}}
+{{~ assign 'clientClass' name.upperCamelCase ~}}
+
+type Client = ApiClients['{{@root.clientInstance}}']
+
+export const {{@root.clientClass}}Mutations = {
+  {{~#each model.encodes.endPoints}}{{#each operations}}{{#if (not (is (getValue method) 'get'))}}
+  {{!-- /**
+   * {{{formatForTsDoc description}}}
+   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/{{@root.name.kebabCase}}?meta={{name~}} } for more information about the API endpoint.
+   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/{{lowercase @root.name.lowerCamelCase}}.{{lowercase @root.name.lowerCamelCase}}-1.html#{{lowercase (getValue name)~}} } for more information on the parameters and returned data type.
+   */ --}}
+  {{capitalize (getValue name)}}: '{{name}}',
+  {{~/if}}{{/each}}{{/each}}
+} as const
+
+export type {{@root.clientClass}}Mutation = typeof {{@root.clientClass}}Mutations[keyof typeof {{@root.clientClass}}Mutations]
+
+export function use{{@root.clientClass}}Mutation<Mutation extends {{@root.clientClass}}Mutation>(
+    mutation: Mutation
+): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {
+    const getCacheUpdates = cacheUpdateMatrix[mutation]
+    // TODO: Remove this check when all mutations are implemented.
+    if (!getCacheUpdates) throw new NotImplementedError(`The '${mutation}' mutation`)
+
+    const { {{~@root.clientInstance}}: client} = useCommerceApi()
+    // Directly calling `client[mutation(options)` doesn't work, because the methods don't fully
+    // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
+    // confident, though, that it is safe, because it seems like we're mostly re-defining what we
+    // already have.
+    const method = (options: Argument<Client[Mutation]>) =>
+        (client[mutation] as ApiMethod<Argument<Client[Mutation]>, DataType<Client[Mutation]>>)(
+            options
+        )
+
+    return useMutation({method, getCacheUpdates})
+}
