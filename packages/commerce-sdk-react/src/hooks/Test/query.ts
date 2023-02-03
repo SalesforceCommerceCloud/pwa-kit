@@ -62,7 +62,10 @@ export const useBasket = (
  */
 export const usePaymentMethodsForBasket = (
     apiOptions: Argument<Client['getPaymentMethodsForBasket']>,
-    queryOptions: UseQueryOptions<DataType<Client['getPaymentMethodsForBasket']>>
+    queryOptions: Omit<
+        UseQueryOptions<DataType<Client['getPaymentMethodsForBasket']>>,
+        'queryFn'
+    > = {}
 ): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']>> => {
     const {shopperBaskets: client} = useCommerceApi()
     const method = (arg: Argument<Client['getPaymentMethodsForBasket']>) =>
@@ -106,7 +109,7 @@ export const usePaymentMethodsForBasket = (
  */
 export const usePriceBooksForBasket = (
     apiOptions: Argument<Client['getPriceBooksForBasket']>,
-    queryOptions: UseQueryOptions<DataType<Client['getPriceBooksForBasket']>>
+    queryOptions: Omit<UseQueryOptions<DataType<Client['getPriceBooksForBasket']>>, 'queryFn'> = {}
 ): UseQueryResult<DataType<Client['getPriceBooksForBasket']>> => {
     const {shopperBaskets: client} = useCommerceApi()
     const method = (arg: Argument<Client['getPriceBooksForBasket']>) =>
@@ -148,7 +151,10 @@ export const usePriceBooksForBasket = (
  */
 export const useShippingMethodsForShipment = (
     apiOptions: Argument<Client['getShippingMethodsForShipment']>,
-    queryOptions: UseQueryOptions<DataType<Client['getShippingMethodsForShipment']>>
+    queryOptions: Omit<
+        UseQueryOptions<DataType<Client['getShippingMethodsForShipment']>>,
+        'queryFn'
+    > = {}
 ): UseQueryResult<DataType<Client['getShippingMethodsForShipment']>> => {
     const {shopperBaskets: client} = useCommerceApi()
     const method = (arg: Argument<Client['getShippingMethodsForShipment']>) =>
@@ -194,7 +200,7 @@ export const useShippingMethodsForShipment = (
  */
 export const useTaxesFromBasket = (
     apiOptions: Argument<Client['getTaxesFromBasket']>,
-    queryOptions: UseQueryOptions<DataType<Client['getTaxesFromBasket']>>
+    queryOptions: Omit<UseQueryOptions<DataType<Client['getTaxesFromBasket']>>, 'queryFn'> = {}
 ): UseQueryResult<DataType<Client['getTaxesFromBasket']>> => {
     const {shopperBaskets: client} = useCommerceApi()
     const method = (arg: Argument<Client['getTaxesFromBasket']>) => client.getTaxesFromBasket(arg)

@@ -52,10 +52,14 @@ export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutatio
     if (!getCacheUpdates) throw new NotImplementedError(`The '${mutation}' mutation`)
 
     const {shopperBaskets: client} = useCommerceApi()
-    // I think that this type assertion is necessary because there are too many mutation types
-    // and they don't sufficiently overlap.
-    const method = (arg: Argument<Client[Mutation]>) =>
-        (client[mutation] as ApiMethod<Argument<Client[Mutation]>, DataType<Client[Mutation]>>)(arg)
+    // Directly calling `client[mutation(options)` doesn't work, because the methods don't fully
+    // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
+    // confident, though, that it is safe, because it seems like we're mostly re-defining what we
+    // already have.
+    const method = (opts: Argument<Client[Mutation]>) =>
+        (client[mutation] as ApiMethod<Argument<Client[Mutation]>, DataType<Client[Mutation]>>)(
+            opts
+        )
 
     return useMutation({method, getCacheUpdates})
 }
