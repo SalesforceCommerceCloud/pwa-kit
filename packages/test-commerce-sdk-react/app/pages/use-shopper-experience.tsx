@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, salesforce.com, inc.
+ * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -13,7 +13,6 @@ const ASPECT_TYPE_ID_PDP = 'pdp'
 const ASPECT_TYPE_ID_PLP = 'plp'
 const PRODUCT_ID = '69309284M'
 const CATEGORY_ID = 'mens'
-// TODO: Investigate 500 error due to dobule encoding when using `encodeURIComponent()`
 const ASPECT_ATTRIBUTES = JSON.stringify({
     category: 'mens'
 })
