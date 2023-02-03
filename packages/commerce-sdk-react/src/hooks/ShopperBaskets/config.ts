@@ -6,9 +6,9 @@
  */
 import {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
 import {ApiClients, CacheUpdateMatrix} from '../types'
-import {CacheUpdateMatrixElement} from '../utils'
+import {CacheUpdate} from '../types'
 
-const updateBasketQuery = (basketId?: string): CacheUpdateMatrixElement => {
+const updateBasketQuery = (basketId?: string): CacheUpdate => {
     // TODO: we're missing headers, rawResponse -> not only {basketId}
     const arg = {basketId}
     return basketId
@@ -18,7 +18,7 @@ const updateBasketQuery = (basketId?: string): CacheUpdateMatrixElement => {
         : {}
 }
 
-const removeBasketQuery = (basketId?: string): CacheUpdateMatrixElement => {
+const removeBasketQuery = (basketId?: string): CacheUpdate => {
     const arg = {basketId}
     return basketId
         ? {
@@ -27,7 +27,7 @@ const removeBasketQuery = (basketId?: string): CacheUpdateMatrixElement => {
         : {}
 }
 
-const invalidateCustomerBasketsQuery = (customerId: string | null): CacheUpdateMatrixElement => {
+const invalidateCustomerBasketsQuery = (customerId: string | null): CacheUpdate => {
     // TODO: should we use arg here or not? The invalidate method does not need exact query key.
     const arg = {customerId}
     return customerId
@@ -42,7 +42,7 @@ const updateBasketFromRequest = (
     params: {
         parameters: ShopperBasketsTypes.Basket
     }
-): CacheUpdateMatrixElement => ({
+): CacheUpdate => ({
     ...updateBasketQuery(params.parameters.basketId),
     ...invalidateCustomerBasketsQuery(customerId)
 })
@@ -51,7 +51,7 @@ const updateBasketFromResponse = (
     customerId: string | null,
     params: unknown, // not used,
     response: ShopperBasketsTypes.Basket
-): CacheUpdateMatrixElement => ({
+): CacheUpdate => ({
     ...updateBasketQuery(response.basketId),
     ...invalidateCustomerBasketsQuery(customerId)
 })
@@ -62,7 +62,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<ApiClients['shopperBaskets']> 
     removeItemFromBasket: updateBasketFromRequest,
     addPaymentInstrumentToBasket: updateBasketFromRequest,
     createBasket: updateBasketFromResponse, // Response!
-    deleteBasket: (customerId, params): CacheUpdateMatrixElement => ({
+    deleteBasket: (customerId, params): CacheUpdate => ({
         ...invalidateCustomerBasketsQuery(customerId),
         ...removeBasketQuery(params.parameters.basketId)
     }),
