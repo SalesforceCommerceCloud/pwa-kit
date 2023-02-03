@@ -183,7 +183,7 @@ const Cart = () => {
             if (selectedItem.quantity !== quantity) {
                 return await changeItemQuantity(quantity, selectedItem)
             }
-        } catch (e) {
+        } catch {
             showError()
         } finally {
             setCartItemLoading(false)
@@ -280,6 +280,9 @@ const Cart = () => {
                     })
                 },
                 onError: () => {
+                    // reset the state
+                    setCartItemLoading(false)
+                    setSelectedItem(undefined)
                     showError()
                 }
             }

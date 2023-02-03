@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect} from 'react'
+import {useEffect, useState, useRef} from 'react'
 import {rebuildPathWithParams, removeQueryParamsFromPath} from '../utils/url'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useVariant} from './use-variant'
@@ -26,16 +26,16 @@ export const useProductViewModal = (initialProduct) => {
     const intl = useIntl()
     const toast = useToast()
     const urlParams = new URLSearchParams(location.search)
+
     const pid = urlParams.get('pid')
-    // use commerce-sdk-react-preview useProduct to fetch new product detail whenever variant changes
     const {data: product, isFetching} = useProduct(
         {id: pid},
         {
-            // Show initialTodos immediately, but won't refetch until another interaction event is encountered after 1000 ms
-            initialData: initialProduct,
+            placeholderData: initialProduct,
             // when the modal is first mounted, don't need to fetch current product detail since it is available
             enabled: !!pid,
-            onSuccess: (data) => {
+            select: (data) => {
+                console.log('select data', data)
                 // if the product id is the same as the initial product id,
                 // then merge the data with the initial product to be able to show correct quantity in the modal
                 if (data.id === initialProduct.productId) {
@@ -44,8 +44,9 @@ export const useProductViewModal = (initialProduct) => {
                         ...data
                     }
                 }
+                return data
             },
-            onError: () => {
+            onError: (e) => {
                 toast({
                     title: intl.formatMessage(API_ERROR_MESSAGE),
                     status: 'error'
@@ -55,7 +56,7 @@ export const useProductViewModal = (initialProduct) => {
     )
     const variant = useVariant(product)
     const cleanUpVariantParams = () => {
-        const paramToRemove = [...product.variationAttributes.map(({id}) => id), 'pid']
+        const paramToRemove = [...product?.variationAttributes?.map(({id}) => id), 'pid']
         const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
 
         history.replace({search: updatedParams})
@@ -79,10 +80,10 @@ export const useProductViewModal = (initialProduct) => {
                 ...variationValues,
                 pid: variant.productId
             })
+            setPid(variant.productId)
             history.replace(updatedUrl)
         }
     }, [variant])
-
     return {
         product,
         variant,
