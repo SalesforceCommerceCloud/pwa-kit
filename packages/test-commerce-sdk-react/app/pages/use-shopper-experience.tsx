@@ -9,10 +9,16 @@ import {usePage, usePages} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 
 const PAGE_ID = 'homepage-example'
-const PAGE_IDS = 'homepage-example,campaign-example'
-const ASPECT_TYPE_ID = 'pdp'
+const ASPECT_TYPE_ID_PDP = 'pdp'
+const ASPECT_TYPE_ID_PLP = 'plp'
+const PRODUCT_ID = '69309284M'
+const CATEGORY_ID = 'mens'
+// TODO: Investigate 500 error due to dobule encoding when using `encodeURIComponent()`
+const ASPECT_ATTRIBUTES = JSON.stringify({
+    category: 'mens'
+})
 
-const renderQueryHook = (name: string, {data, isLoading, error}: any) => {
+const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any) => {
     if (isLoading) {
         return (
             <div key={name}>
@@ -31,6 +37,9 @@ const renderQueryHook = (name: string, {data, isLoading, error}: any) => {
         <div key={name}>
             <h2 id={name}>{name}</h2>
             <h3>{data?.name}</h3>
+            <h3>
+                <Json data={{arg}} />
+            </h3>
             <hr />
             <h3>Returning data</h3>
             <Json data={{isLoading, error, data}} />
@@ -41,20 +50,29 @@ const UseShopperExperience = () => {
     const queryHooks = [
         {
             name: 'usePage',
+            arg: {pageId: PAGE_ID},
             hook: usePage({pageId: PAGE_ID})
         },
-        // TODO: API endpoint currently not working
-        //  Response: 400 error Bad request {
-        //   "detail" : "No business object identifier was provided. You must provide exactly one.",
-        //   "title" : "Business Object ID Invalid",
-        //   "type" : "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/business-object-id-invalid"
-        //  }
         {
             name: 'usePages',
-            hook: usePages({
-                ids: PAGE_IDS,
-                aspectTypeId: ASPECT_TYPE_ID
-            })
+            arg: {
+                aspectTypeId: ASPECT_TYPE_ID_PDP,
+                productId: PRODUCT_ID
+            },
+            get hook() {
+                return usePages(this.arg)
+            }
+        },
+        {
+            name: 'usePages',
+            arg: {
+                aspectTypeId: ASPECT_TYPE_ID_PLP,
+                categoryId: CATEGORY_ID,
+                aspectAttributes: ASPECT_ATTRIBUTES
+            },
+            get hook() {
+                return usePages(this.arg)
+            }
         }
     ]
     return (
@@ -64,8 +82,8 @@ const UseShopperExperience = () => {
             <>
                 <div>
                     <h1>Query hooks</h1>
-                    {queryHooks.map(({name, hook}) => {
-                        return renderQueryHook(name, {...hook})
+                    {queryHooks.map(({name, arg, hook}) => {
+                        return renderQueryHook(name, arg, {...hook})
                     })}
                 </div>
             </>

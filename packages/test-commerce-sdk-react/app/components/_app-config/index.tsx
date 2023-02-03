@@ -30,6 +30,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     return (
         <CommerceApiProvider
             siteId={siteId}
+            // TODO: On Feb 08 restore zzrf_001 details
             shortCode="sandbox-001"
             clientId="06bb7d20-93fa-4707-ade6-2ecd858331bd"
             organizationId="f_ecom_bjnl_dev"
