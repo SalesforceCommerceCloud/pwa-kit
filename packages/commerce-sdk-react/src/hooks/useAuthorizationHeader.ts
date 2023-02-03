@@ -4,20 +4,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {ApiOptions, ApiMethod} from './types'
 import useAuth from './useAuth'
 
-// This feels like a bad name
-export const useAuthorizationHeader = <Arg extends {headers?: Record<string, string>}, Ret>(
-    fn: (arg: Arg) => Promise<Ret>,
-    original: Arg
-) => {
+export const useAuthorizationHeader = <Opts extends ApiOptions, Ret>(
+    fn: ApiMethod<Opts, Ret>
+): ApiMethod<Opts, Ret> => {
     const auth = useAuth()
-    return async function(): Promise<Ret> {
+    return async (options: Opts) => {
         const {access_token} = await auth.ready()
-        return fn({
-            ...original,
+        return await fn({
+            ...options,
             headers: {
-                ...original.headers,
+                ...options.headers,
                 Authorization: `Bearer ${access_token}`
             }
         })

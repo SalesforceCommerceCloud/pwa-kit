@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {QueryKey} from '@tanstack/react-query'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -16,6 +17,8 @@ import {
     ShopperPromotions,
     ShopperSearch
 } from 'commerce-sdk-isomorphic'
+
+// --- API CLIENTS --- //
 
 export type ApiClientConfigParams = {
     clientId: string
@@ -37,29 +40,77 @@ export interface ApiClients {
     shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
+export type ApiClient = ApiClients[keyof ApiClients]
+
+// --- API HELPERS --- //
+
+/**
+ * Generic signature of the options objects used by commerce-sdk-isomorphic
+ */
+export type ApiOptions<
+    Parameters extends Record<string, unknown> = Record<string, unknown>,
+    Headers extends Record<string, string> = Record<string, string>,
+    Body extends Record<string, unknown> = Record<string, unknown>
+> = {
+    parameters?: Parameters
+    headers?: Headers
+    body?: Body
+}
+
+/**
+ * Generic signature of API methods exported by commerce-sdk-isomorphic
+ */
+export type ApiMethod<Options extends ApiOptions, Data> = {
+    (options: Options): Promise<Data>
+}
+
+/**
+ * The full signature of an API method, including `rawResponse` flag. Only used as a helper
+ * in this file when we need to `infer Data`, so it doesn't need to be exported.
+ */
+interface FullApiMethod<Options extends ApiOptions, Data> extends ApiMethod<Options, Data> {
+    // This second signature is necessary to omit Response when inferring Data
+    (options: Options): Promise<Data>
+    (options: Options, rawResponse?: boolean): Promise<Data | Response>
+}
+
 /**
  * The first argument of a function.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Argument<T extends (arg: any) => unknown> = NonNullable<Parameters<T>[0]>
 
 /**
  * The data type returned by a commerce-sdk-isomorphic method when the raw response
  * flag is not set.
  */
-export type DataType<T extends (arg: any) => Promise<unknown>> = T extends (
-    arg: any
-) => Promise<Response | infer R>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DataType<T extends FullApiMethod<any, unknown>> = T extends FullApiMethod<
+    ApiOptions,
+    infer R
+>
     ? R
     : never
 
-/**
- * Adds additional parameters to a function signature. To preserve named parameters
- * in the returned type, pass a named tuple for the extra parameters.
- */
-export type AddParameters<
+// --- CACHE HELPERS --- //
+
+export interface CacheUpdate {
+    update?: Array<QueryKey>
+    invalidate?: Array<QueryKey>
+    remove?: Array<QueryKey>
+}
+
+export type CacheUpdateGetter<Options, Data> = (
+    customerId: string | null,
+    params: Options,
+    response: Data
+) => CacheUpdate
+
+export type CacheUpdateMatrix<Client> = {
+    // It feels like we should be able to do <infer Arg, infer Data>, but that
+    // results in some methods being `never`, so we just use Argument<> later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Fn extends (...args: any[]) => unknown,
-    Extra extends unknown[]
-    // TODO: Remove this after merging in prettier v2 changes
-    // eslint-disable-next-line prettier/prettier
-    > = (...newArgs: [...originalArgs: Parameters<Fn>, ...extra: Extra]) => ReturnType<Fn>
+    [Method in keyof Client]?: Client[Method] extends FullApiMethod<any, infer Data>
+        ? CacheUpdateGetter<Argument<Client[Method]>, Data>
+        : never
+}
