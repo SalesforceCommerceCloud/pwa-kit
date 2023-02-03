@@ -25,15 +25,14 @@ export const useProductViewModal = (initialProduct) => {
     const history = useHistory()
     const intl = useIntl()
     const toast = useToast()
-    const urlParams = new URLSearchParams(location.search)
+    const [product, setProduct] = useState(initialProduct)
+    const variant = useVariant(product)
 
-    const pid = urlParams.get('pid')
-    const {data: product, isFetching} = useProduct(
-        {id: pid},
+    const {isFetching} = useProduct(
+        {id: variant?.productId},
         {
             placeholderData: initialProduct,
-            // when the modal is first mounted, don't need to fetch current product detail since it is available
-            enabled: !!pid,
+            enabled: !!variant?.productId,
             select: (data) => {
                 // if the product id is the same as the initial product id,
                 // then merge the data with the initial product to be able to show correct quantity in the modal
@@ -45,6 +44,9 @@ export const useProductViewModal = (initialProduct) => {
                 }
                 return data
             },
+            onSuccess: (data) => {
+                setProduct(data)
+            },
             onError: () => {
                 toast({
                     title: intl.formatMessage(API_ERROR_MESSAGE),
@@ -53,7 +55,6 @@ export const useProductViewModal = (initialProduct) => {
             }
         }
     )
-    const variant = useVariant(product)
     const cleanUpVariantParams = () => {
         const paramToRemove = [...product?.variationAttributes?.map(({id}) => id), 'pid']
         const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
