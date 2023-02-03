@@ -29,7 +29,7 @@ export const use{{#startsWith 'get' (getValue name)~}}
 {{capitalize (getValue name)}}
 {{~/startsWith}} = (
     apiOptions: Argument<Client['{{name}}']>,
-    queryOptions: UseQueryOptions<DataType<Client['{{name}}']>>
+    queryOptions: Omit<UseQueryOptions<DataType<Client['{{name}}']>>, 'queryFn'> = {}
 ): UseQueryResult<DataType<Client['{{name}}']>> => {
     const { {{~@root.clientInstance}}: client} = useCommerceApi()
     const method = (arg: Argument<Client['{{name}}']>) => client.{{name}}(arg)
