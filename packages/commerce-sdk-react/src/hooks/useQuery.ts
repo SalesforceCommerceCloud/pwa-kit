@@ -6,7 +6,7 @@
  */
 import {useQuery as useReactQuery, UseQueryOptions, QueryKey} from '@tanstack/react-query'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
-import {ApiClient, ApiOptions} from './types'
+import {ApiClient, ApiMethod, ApiOptions} from './types'
 import {hasAllKeys} from './utils'
 
 export const useQuery = <
@@ -20,7 +20,7 @@ export const useQuery = <
     queryOptions: UseQueryOptions<Data, Err, Data, QK>,
     hookConfig: {
         client: Client
-        method: (options: Options) => Promise<Data>
+        method: ApiMethod<Options, Data>
         getQueryKey: (parameters: Options['parameters']) => QK
         requiredParameters: ReadonlyArray<keyof Options['parameters']>
         enabled?: boolean

@@ -20,7 +20,7 @@ type Client = ApiClients['shopperBaskets']
  */
 export const useBasket = (
     apiOptions: Argument<Client['getBasket']>,
-    queryOptions: UseQueryOptions<DataType<Client['getBasket']>>
+    queryOptions: Omit<UseQueryOptions<DataType<Client['getBasket']>>, 'queryFn'> = {}
 ): UseQueryResult<DataType<Client['getBasket']>> => {
     const {shopperBaskets: client} = useCommerceApi()
     const method = (arg: Argument<Client['getBasket']>) => client.getBasket(arg)

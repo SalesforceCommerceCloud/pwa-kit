@@ -65,16 +65,6 @@ export type ApiMethod<Options extends ApiOptions, Data> = {
 }
 
 /**
- * The full signature of an API method, including `rawResponse` flag. Only used as a helper
- * in this file when we need to `infer Data`, so it doesn't need to be exported.
- */
-interface FullApiMethod<Options extends ApiOptions, Data> extends ApiMethod<Options, Data> {
-    // This second signature is necessary to omit Response when inferring Data
-    (options: Options): Promise<Data>
-    (options: Options, rawResponse?: boolean): Promise<Data | Response>
-}
-
-/**
  * The first argument of a function.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,10 +75,7 @@ export type Argument<T extends (arg: any) => unknown> = NonNullable<Parameters<T
  * flag is not set.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type DataType<T extends FullApiMethod<any, unknown>> = T extends FullApiMethod<
-    ApiOptions,
-    infer R
->
+export type DataType<T extends ApiMethod<any, any>> = T extends ApiMethod<any, Response | infer R>
     ? R
     : never
 
@@ -110,7 +97,7 @@ export type CacheUpdateMatrix<Client> = {
     // It feels like we should be able to do <infer Arg, infer Data>, but that
     // results in some methods being `never`, so we just use Argument<> later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [Method in keyof Client]?: Client[Method] extends FullApiMethod<any, infer Data>
+    [Method in keyof Client]?: Client[Method] extends ApiMethod<any, Response | infer Data>
         ? CacheUpdateGetter<Argument<Client[Method]>, Data>
         : never
 }
