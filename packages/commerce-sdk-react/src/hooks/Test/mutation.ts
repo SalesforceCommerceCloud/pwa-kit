@@ -42,9 +42,9 @@ export const ShopperBasketsMutations = {
     AddTaxesForBasket: 'addTaxesForBasket'
 } as const
 
-export type ShopperBasketsMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
+export type ShopperBasketsMutation = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
 
-export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutationType>(
+export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutation>(
     mutation: Mutation
 ): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {
     const getCacheUpdates = cacheUpdateMatrix[mutation]
