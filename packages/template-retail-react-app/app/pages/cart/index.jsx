@@ -138,8 +138,6 @@ const Cart = () => {
 
     /***************************** Update Cart **************************/
     const handleUpdateCart = async (variant, quantity) => {
-        console.log('variant, quantity', variant, quantity)
-
         // close the modal before handle the change
         onClose()
         // using try-catch is better than using onError callback since we have many mutation calls logic here
@@ -154,7 +152,7 @@ const Cart = () => {
                     quantity,
                     price: variant.price
                 }
-                await updateItemInBasketAction.mutate({
+                return await updateItemInBasketAction.mutate({
                     parameters: {
                         basketId: basket.basketId,
                         itemId: selectedItem.itemId
@@ -289,9 +287,8 @@ const Cart = () => {
         )
     }
     /***************************** Remove Item **************************/
-
     /********* Rendering  UI **********/
-    if (!basket?.basketId) {
+    if (!basket?.basketId && products) {
         return <CartSkeleton />
     }
 
@@ -378,31 +375,31 @@ const Cart = () => {
                         </Grid>
 
                         {/* Product Recommendations */}
-                        <Stack spacing={16}>
-                            <RecommendedProducts
-                                title={
-                                    <FormattedMessage
-                                        defaultMessage="Recently Viewed"
-                                        id="cart.recommended_products.title.recently_viewed"
-                                    />
-                                }
-                                recommender={'viewed-recently-einstein'}
-                                mx={{base: -4, sm: -6, lg: 0}}
-                            />
+                        {/*<Stack spacing={16}>*/}
+                        {/*    <RecommendedProducts*/}
+                        {/*        title={*/}
+                        {/*            <FormattedMessage*/}
+                        {/*                defaultMessage="Recently Viewed"*/}
+                        {/*                id="cart.recommended_products.title.recently_viewed"*/}
+                        {/*            />*/}
+                        {/*        }*/}
+                        {/*        recommender={'viewed-recently-einstein'}*/}
+                        {/*        mx={{base: -4, sm: -6, lg: 0}}*/}
+                        {/*    />*/}
 
-                            <RecommendedProducts
-                                title={
-                                    <FormattedMessage
-                                        defaultMessage="You May Also Like"
-                                        id="cart.recommended_products.title.may_also_like"
-                                    />
-                                }
-                                recommender={'product-to-product-einstein'}
-                                products={basket?.productItems?.map((item) => item.productId)}
-                                shouldFetch={() => basket?.basketId && products?.length > 0}
-                                mx={{base: -4, sm: -6, lg: 0}}
-                            />
-                        </Stack>
+                        {/*    <RecommendedProducts*/}
+                        {/*        title={*/}
+                        {/*            <FormattedMessage*/}
+                        {/*                defaultMessage="You May Also Like"*/}
+                        {/*                id="cart.recommended_products.title.may_also_like"*/}
+                        {/*            />*/}
+                        {/*        }*/}
+                        {/*        recommender={'product-to-product-einstein'}*/}
+                        {/*        products={basket?.productItems?.map((item) => item.productId)}*/}
+                        {/*        shouldFetch={() => basket?.basketId && products?.length > 0}*/}
+                        {/*        mx={{base: -4, sm: -6, lg: 0}}*/}
+                        {/*    />*/}
+                        {/*</Stack>*/}
                     </Stack>
                 </Stack>
             </Container>
