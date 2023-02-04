@@ -59,7 +59,6 @@ MockedComponent.propTypes = {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
@@ -127,15 +126,15 @@ test.each(testBaskets)('does not render cart badge when basket not loaded', (ini
     expect(badge).toBeNull()
 })
 
-test('renders cart badge when basket is loaded', () => {
+test('renders cart badge when basket is loaded', async () => {
     const initialBasket = {basketId: 'valid_id'}
-
     renderWithProviders(<Header />, {wrapperProps: {initialBasket}})
 
-    // Look for badge.
-    const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
-
-    expect(badge).toBeInTheDocument()
+    await waitFor(() => {
+        // Look for badge.
+        const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
+        expect(badge).toBeInTheDocument()
+    })
 })
 
 test('route to account page when an authenticated users click on account icon', async () => {

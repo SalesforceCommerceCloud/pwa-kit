@@ -27,9 +27,13 @@ import {
     useDisclosure,
     useMediaQuery
 } from '@chakra-ui/react'
+import {
+    ShopperLoginHelpers,
+    useShopperLoginHelper,
+    useCustomerType
+} from 'commerce-sdk-react-preview'
 
-import useBasket from '../../commerce-api/hooks/useBasket'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 
 import Link from '../link'
 import Search from '../search'
@@ -79,8 +83,9 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
-    const basket = useBasket()
-    const customer = useCustomer()
+    const {totalItems, basket} = useCurrentBasket()
+    const {isRegistered} = useCustomerType()
+    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
     const navigate = useNavigation()
 
     const {isOpen, onClose, onOpen} = useDisclosure()
@@ -95,7 +100,7 @@ const Header = ({
 
     const onSignoutClick = async () => {
         setShowLoading(true)
-        await customer.logout()
+        await logout.mutateAsync()
         navigate('/login')
         setShowLoading(false)
     }
@@ -162,7 +167,7 @@ const Header = ({
                         })}
                     />
 
-                    {customer.isRegistered && (
+                    {isRegistered && (
                         <Popover
                             isLazy
                             arrowSize={15}
@@ -257,11 +262,7 @@ const Header = ({
                         icon={
                             <>
                                 <BasketIcon />
-                                {basket?.loaded && (
-                                    <Badge variant="notification">
-                                        {basket.itemAccumulatedCount}
-                                    </Badge>
-                                )}
+                                {basket && <Badge variant="notification">{totalItems}</Badge>}
                             </>
                         }
                         variant="unstyled"

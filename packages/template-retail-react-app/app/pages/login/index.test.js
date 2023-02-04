@@ -16,8 +16,6 @@ import Registration from '../registration'
 import ResetPassword from '../reset-password'
 import mockConfig from '../../../config/mocks/default'
 
-jest.setTimeout(60000)
-
 jest.mock('../../commerce-api/einstein')
 
 const mockRegisteredCustomer = {
@@ -105,6 +103,7 @@ beforeEach(() => {
     )
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
 })
 

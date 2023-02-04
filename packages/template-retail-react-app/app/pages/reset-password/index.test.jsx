@@ -14,16 +14,6 @@ import mockConfig from '../../../config/mocks/default'
 
 jest.mock('../../commerce-api/einstein')
 
-const mockRegisteredCustomer = {
-    authType: 'registered',
-    customerId: 'registeredCustomerId',
-    customerNo: 'testno',
-    email: 'darek@test.com',
-    firstName: 'Tester',
-    lastName: 'Testing',
-    login: 'darek@test.com'
-}
-
 const MockedComponent = () => {
     return (
         <div>
@@ -34,7 +24,6 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
@@ -57,9 +46,8 @@ beforeEach(() => {
     )
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
-    jest.clearAllMocks()
-    window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 
 test('Allows customer to go to sign in page', async () => {
@@ -75,6 +63,7 @@ test('Allows customer to go to sign in page', async () => {
 })
 
 test('Allows customer to generate password token', async () => {
+    // mock reset password request
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(

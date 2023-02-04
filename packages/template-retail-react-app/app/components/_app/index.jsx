@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {useCustomerType} from 'commerce-sdk-react-preview'
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
@@ -55,14 +56,29 @@ import {
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
+import {useCategory} from 'commerce-sdk-react-preview'
 
 const App = (props) => {
-    const {
-        children,
-        targetLocale = DEFAULT_LOCALE,
-        messages = {},
-        categories: allCategories = {}
-    } = props
+    const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
+    const {data: allCategories} = useCategory(
+        {id: DEFAULT_ROOT_CATEGORY, levels: DEFAULT_NAV_DEPTH},
+        {
+            select: (categories) => {
+                // Note: What is the best to handle special case like this?? Should commerce sdk handles this?
+                if (categories.isError) {
+                    const message =
+                        categories.title === 'Unsupported Locale'
+                            ? `
+It looks like the locale “${categories.locale}” isn’t set up, yet. The locale settings in your package.json must match what is enabled in your Business Manager instance.
+Learn more with our localization guide. https://sfdc.co/localization-guide
+`
+                            : categories.detail
+                    throw new Error(message)
+                }
+                return flatten(categories, 'categories')
+            }
+        }
+    )
 
     const appOrigin = getAppOrigin()
 
@@ -70,6 +86,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
+    const {isRegistered} = useCustomerType()
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
@@ -133,7 +150,7 @@ const App = (props) => {
 
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
-        if (customer.isRegistered) {
+        if (isRegistered) {
             const path = buildUrl('/account')
             history.push(path)
         } else {
@@ -218,12 +235,16 @@ const App = (props) => {
                                                 isOpen={isOpen}
                                                 onClose={onClose}
                                                 onLogoClick={onLogoClick}
+                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
                                                 locale={locale}
                                             />
                                         </HideOnDesktop>
 
                                         <HideOnMobile>
-                                            <ListMenu locale={locale} />
+                                            <ListMenu
+                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
+                                                locale={locale}
+                                            />
                                         </HideOnMobile>
                                     </Header>
                                 ) : (
@@ -304,33 +325,9 @@ App.getProps = async ({api, res}) => {
     // Login as `guest` to get session.
     await api.auth.login()
 
-    // Get the root category, this will be used for things like the navigation.
-    const rootCategory = await api.shopperProducts.getCategory({
-        parameters: {
-            id: CAT_MENU_DEFAULT_ROOT_CATEGORY,
-            levels: CAT_MENU_DEFAULT_NAV_DEPTH
-        }
-    })
-
-    if (rootCategory.isError) {
-        const message =
-            rootCategory.title === 'Unsupported Locale'
-                ? `
-It looks like the locale “${rootCategory.locale}” isn’t set up, yet. The locale settings in your package.json must match what is enabled in your Business Manager instance.
-Learn more with our localization guide. https://sfdc.co/localization-guide
-`
-                : rootCategory.detail
-        throw new Error(message)
-    }
-
-    // Flatten the root so we can easily access all the categories throughout
-    // the application.
-    const categories = {root: flatten(rootCategory, 'categories').root}
-
     return {
         targetLocale,
         messages,
-        categories,
         config: res?.locals?.config
     }
 }

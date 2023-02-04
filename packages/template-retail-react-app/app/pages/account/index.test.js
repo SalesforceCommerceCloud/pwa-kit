@@ -43,13 +43,19 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
+    global.server.use(
+        rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
+        rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.json(mockOrderHistory))
+        )
+    )
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
 })
 
@@ -151,11 +157,7 @@ test('Allows customer to edit profile details', async () => {
 })
 
 test('Allows customer to update password', async () => {
-    global.server.use(
-        rest.put('*/password', (req, res, ctx) => {
-            return res(ctx.json())
-        })
-    )
+    global.server.use(rest.put('*/password', (req, res, ctx) => res(ctx.json())))
 
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('account-page')).toBeInTheDocument()

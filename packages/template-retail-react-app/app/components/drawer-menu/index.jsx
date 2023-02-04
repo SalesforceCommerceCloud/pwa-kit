@@ -41,6 +41,11 @@ import {
     useBreakpointValue,
     useMultiStyleConfig
 } from '@chakra-ui/react'
+import {
+    ShopperLoginHelpers,
+    useShopperLoginHelper,
+    useCustomerType
+} from 'commerce-sdk-react-preview'
 import Link from '../../components/link'
 // Icons
 import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from '../icons'
@@ -48,7 +53,6 @@ import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from '../icons'
 // Others
 import {noop} from '../../utils/utils'
 import {getPathWithLocale, categoryUrlBuilder} from '../../utils/url'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
@@ -81,7 +85,7 @@ const STORE_LOCATOR_HREF = '/store-locator'
 const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
     const {root, itemsKey} = useCategories()
     const intl = useIntl()
-    const customer = useCustomer()
+    const {isRegistered} = useCustomerType()
     const navigate = useNavigation()
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
@@ -90,9 +94,10 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
     const {l10n} = site
     const [showLoading, setShowLoading] = useState(false)
     const [ariaBusy, setAriaBusy] = useState('true')
+    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
     const onSignoutClick = async () => {
         setShowLoading(true)
-        await customer.logout()
+        await logout.mutateAsync()
         navigate('/login')
         setShowLoading(false)
     }
@@ -177,7 +182,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
                         {/* Application Actions */}
                         <VStack align="stretch" spacing={0} {...styles.actions} px={0}>
                             <Box {...styles.actionsItem}>
-                                {customer.isRegistered ? (
+                                {isRegistered ? (
                                     <NestedAccordion
                                         urlBuilder={(item, locale) =>
                                             `/${locale}/account${item.path}`

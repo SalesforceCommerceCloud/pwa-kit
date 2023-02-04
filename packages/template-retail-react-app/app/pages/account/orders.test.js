@@ -39,10 +39,17 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
+    global.server.use(
+        rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.json(mockOrderHistory))
+        ),
+        rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts)))
+    )
+
     window.history.pushState({}, 'Account', createPathWithDefaults('/account/orders'))
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
 })
 

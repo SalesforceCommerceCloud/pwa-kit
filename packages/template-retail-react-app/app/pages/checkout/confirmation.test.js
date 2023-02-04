@@ -121,13 +121,6 @@ const WrappedConfirmation = () => {
 }
 
 // Set up and clean up
-beforeAll(() => {
-    jest.resetModules()
-
-    // Since we're testing some navigation logic, we are using a simple Router
-    // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
-})
 beforeEach(() => {
     global.server.use(
         rest.get('*/baskets*', (_, res, ctx) => {
@@ -155,26 +148,17 @@ beforeEach(() => {
                 login: 'test3@foo.com'
             }
             return res(ctx.json(successfulAccountCreation))
-        }),
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(
-                ctx.delay(0),
-                ctx.status(200),
-                ctx.json({
-                    authType: 'guest',
-                    customerId: 'customerid'
-                })
-            )
-        }),
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockProducts))
         })
     )
+
+    // Since we're testing some navigation logic, we are using a simple Router
+    // around our component. We need to initialize the default route/path here.
+    window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
     sessionStorage.clear()
-    window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 
 test('Navigates to homepage when no order present', async () => {

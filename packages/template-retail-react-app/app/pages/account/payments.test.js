@@ -35,10 +35,8 @@ const MockedComponent = () => {
 }
 
 // Set up and clean up
-beforeEach(() => {
-    jest.resetModules()
-})
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
 })
 

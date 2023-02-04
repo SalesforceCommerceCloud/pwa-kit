@@ -11,7 +11,7 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 
 import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
-import {useProduct} from '../../hooks'
+import {useDerivedProduct} from '../../hooks'
 import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
 // project components
@@ -85,7 +85,6 @@ const ProductView = ({
     const location = useLocation()
     const {
         isOpen: isAddToCartModalOpen,
-        onOpen: onAddToCartModalOpen,
         onClose: onAddToCartModalClose
     } = useAddToCartModalContext()
     const theme = useTheme()
@@ -102,7 +101,7 @@ const ProductView = ({
         variationAttributes,
         stockLevel,
         stepQuantity
-    } = useProduct(product)
+    } = useDerivedProduct(product)
     const canAddToWishlist = !isProductLoading
     const canOrder =
         !isProductLoading &&
@@ -124,7 +123,6 @@ const ProductView = ({
                 return
             }
             await addToCart(variant, quantity)
-            onAddToCartModalOpen({product, quantity})
         }
 
         const handleWishlistItem = async () => {
