@@ -265,10 +265,12 @@ const Cart = () => {
                 parameters: {basketId: basket.basketId, itemId: product.itemId}
             },
             {
-                onSuccess: () => {
+                onSettled: () => {
                     // reset the state
                     setCartItemLoading(false)
                     setSelectedItem(undefined)
+                },
+                onSuccess: () => {
                     toast({
                         title: formatMessage({
                             defaultMessage: 'Item removed from cart',
@@ -278,9 +280,6 @@ const Cart = () => {
                     })
                 },
                 onError: () => {
-                    // reset the state
-                    setCartItemLoading(false)
-                    setSelectedItem(undefined)
                     showError()
                 }
             }
@@ -375,31 +374,31 @@ const Cart = () => {
                         </Grid>
 
                         {/* Product Recommendations */}
-                        {/*<Stack spacing={16}>*/}
-                        {/*    <RecommendedProducts*/}
-                        {/*        title={*/}
-                        {/*            <FormattedMessage*/}
-                        {/*                defaultMessage="Recently Viewed"*/}
-                        {/*                id="cart.recommended_products.title.recently_viewed"*/}
-                        {/*            />*/}
-                        {/*        }*/}
-                        {/*        recommender={'viewed-recently-einstein'}*/}
-                        {/*        mx={{base: -4, sm: -6, lg: 0}}*/}
-                        {/*    />*/}
+                        <Stack spacing={16}>
+                            <RecommendedProducts
+                                title={
+                                    <FormattedMessage
+                                        defaultMessage="Recently Viewed"
+                                        id="cart.recommended_products.title.recently_viewed"
+                                    />
+                                }
+                                recommender={'viewed-recently-einstein'}
+                                mx={{base: -4, sm: -6, lg: 0}}
+                            />
 
-                        {/*    <RecommendedProducts*/}
-                        {/*        title={*/}
-                        {/*            <FormattedMessage*/}
-                        {/*                defaultMessage="You May Also Like"*/}
-                        {/*                id="cart.recommended_products.title.may_also_like"*/}
-                        {/*            />*/}
-                        {/*        }*/}
-                        {/*        recommender={'product-to-product-einstein'}*/}
-                        {/*        products={basket?.productItems?.map((item) => item.productId)}*/}
-                        {/*        shouldFetch={() => basket?.basketId && products?.length > 0}*/}
-                        {/*        mx={{base: -4, sm: -6, lg: 0}}*/}
-                        {/*    />*/}
-                        {/*</Stack>*/}
+                            <RecommendedProducts
+                                title={
+                                    <FormattedMessage
+                                        defaultMessage="You May Also Like"
+                                        id="cart.recommended_products.title.may_also_like"
+                                    />
+                                }
+                                recommender={'product-to-product-einstein'}
+                                products={basket?.productItems?.map((item) => item.productId)}
+                                shouldFetch={() => basket?.basketId && products?.length > 0}
+                                mx={{base: -4, sm: -6, lg: 0}}
+                            />
+                        </Stack>
                     </Stack>
                 </Stack>
             </Container>
