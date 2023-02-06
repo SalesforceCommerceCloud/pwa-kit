@@ -3024,19 +3024,6 @@ export const mockedCustomerProductListsDetails = {
     total: 1
 }
 
-export const mockCategory = {
-    id: 'mens',
-    name: 'Mens',
-    pageDescription:
-        "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
-    pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
-    pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
-    parentCategoryId: 'root',
-    c_showInMenu: true,
-    loaded: true,
-    image: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
-}
-
 export const mockCategories = {
     root: {
         categories: [
