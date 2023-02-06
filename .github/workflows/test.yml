@@ -68,7 +68,7 @@ jobs:
         uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true' && env.DEVELOP == 'true'
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
@@ -206,7 +206,7 @@ jobs:
           TOTAL_PACKAGES: $TOTAL_PACKAGES
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true' && env.DEVELOP == 'true'
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
