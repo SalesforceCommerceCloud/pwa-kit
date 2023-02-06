@@ -9,7 +9,7 @@ import {Page as PageType} from '../types'
 import {Region} from '../Region'
 
 type ComponentMap = {
-    [key: string]: React.ComponentType
+    [typeId: string]: React.ComponentType
 }
 type PageProps = {
     page: PageType
