@@ -13,7 +13,8 @@ type ComponentMap = {
 }
 type PageProps = {
     page: PageType
-    components: ComponentMap
+    components: ComponentMap,
+    className?: string
 }
 type PageContextValue = {
     components: ComponentMap
@@ -33,7 +34,7 @@ export const usePageContext = () => useContext(PageContext)
  * @param PageProps
  * @returns JSX.Element
  */
-export const Page = ({page, components}: PageProps) => {
+export const Page = ({className, components, page}: PageProps) => {
     const [contextValue, setContextValue] = useState({components} as PageContextValue)
     const {id, regions} = page || {}
 
@@ -48,7 +49,7 @@ export const Page = ({page, components}: PageProps) => {
 
     return (
         <PageContext.Provider value={contextValue}>
-            <div id={id} className="storepage">
+            <div id={id} className={`page ${className}`}>
                 <div className="container">
                     {regions?.map((region) => (
                         <div key={region.id} className="row">

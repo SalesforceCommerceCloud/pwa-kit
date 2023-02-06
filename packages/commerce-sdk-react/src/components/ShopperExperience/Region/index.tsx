@@ -9,7 +9,8 @@ import {Region as RegionType} from '../types'
 import {Component} from '../Component'
 
 type RegionProps = {
-    region: RegionType
+    region: RegionType,
+    className?: string
 }
 
 /**
@@ -18,11 +19,11 @@ type RegionProps = {
  * @param Region
  * @returns JSX.Element
  */
-export const Region = ({region}: RegionProps) => {
+export const Region = ({className, region}: RegionProps) => {
     const {id, components} = region
 
     return (
-        <div id={id} className="region">
+        <div id={id} className={`region ${className}`}>
             <div className="container">
                 {components?.map((component) => (
                     <Component key={component.id} component={component} />
