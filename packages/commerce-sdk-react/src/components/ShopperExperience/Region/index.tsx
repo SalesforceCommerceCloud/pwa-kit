@@ -9,7 +9,7 @@ import {Region as RegionType} from '../types'
 import {Component} from '../Component'
 
 type RegionProps = {
-    region: RegionType,
+    region: RegionType
     className?: string
 }
 

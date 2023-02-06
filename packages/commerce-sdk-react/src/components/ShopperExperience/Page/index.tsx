@@ -13,7 +13,7 @@ type ComponentMap = {
 }
 type PageProps = {
     page: PageType
-    components: ComponentMap,
+    components: ComponentMap
     className?: string
 }
 type PageContextValue = {

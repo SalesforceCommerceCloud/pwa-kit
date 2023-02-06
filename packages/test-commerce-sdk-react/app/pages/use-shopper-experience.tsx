@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {usePage, usePages} from 'commerce-sdk-react-preview'
-import {Page, Component, Region} from 'commerce-sdk-react-preview/components'
+import {Page, Region} from 'commerce-sdk-react-preview/components'
 import Json from '../components/Json'
 
 const PAGE_ID = 'homepage-example'
@@ -18,25 +18,23 @@ const ASPECT_ATTRIBUTES = JSON.stringify({
     category: 'mens'
 })
 
-const componentMapProxy = new Proxy({}, {
-    get(_target, prop) {
-        return (props: any) => (
-            <div style={{marginBottom: '10px'}}>
-                <b>{prop}</b>
-                {
-                    props?.regions && 
-                        props.regions[0]?.components?.map(
-                            (component: any, index: any) => (
-                                <div className="tile" style={{margin: '0px 0px 5px 20px'}} key={component.id}>
-                                    <Component key={component.id} component={component} />
-                                </div>
-                            )
-                        )
-                }
-            </div>
-        )
+const componentMapProxy = new Proxy(
+    {},
+    {
+        get(_target, prop) {
+            return (props: any) => (
+                <div style={{marginBottom: '10px'}}>
+                    <b>{prop}</b>
+                    {props?.regions?.map((region: any) => (
+                        <div className="tile" style={{margin: '0px 0px 5px 20px'}} key={region.id}>
+                            <Region region={region} />
+                        </div>
+                    ))}
+                </div>
+            )
+        }
     }
-})
+)
 
 const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any, index: number) => {
     if (isLoading) {
@@ -67,9 +65,10 @@ const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any, 
             <Json data={{isLoading, error, data}} />
             <h3>Rendering Data</h3>
             <div>
-                {pages && pages?.map((page: any) => (
-                    <Page key={index} page={page} components={componentMapProxy}/>
-                ))}
+                {pages &&
+                    pages?.map((page: any) => (
+                        <Page key={index} page={page} components={componentMapProxy} />
+                    ))}
             </div>
         </div>
     )
