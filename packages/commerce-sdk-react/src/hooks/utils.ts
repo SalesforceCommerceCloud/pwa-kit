@@ -29,25 +29,21 @@ const deepEqual = (a: unknown, b: unknown): boolean => {
 const isMatchingKey = (cacheQueryKey: QueryKey, lookupQueryKey: QueryKey): boolean =>
     lookupQueryKey.every((item, index) => deepEqual(item, cacheQueryKey[index]))
 
-export const updateCache = (
-    queryClient: QueryClient,
-    cacheUpdates: CacheUpdate,
-    response: unknown
-) => {
+export const updateCache = <Data>(queryClient: QueryClient, cacheUpdates: CacheUpdate<Data>) => {
     // STEP 1. Update data inside query cache for the matching queryKeys
-    cacheUpdates.update?.forEach((queryKey) => {
-        queryClient.setQueryData(queryKey, response)
+    cacheUpdates.update?.forEach(({queryKey, updater}) => {
+        queryClient.setQueryData(queryKey, updater)
     })
 
     // STEP 2. Invalidate cache entries with the matching queryKeys
-    cacheUpdates.invalidate?.forEach((queryKey) => {
+    cacheUpdates.invalidate?.forEach(({queryKey}) => {
         queryClient.invalidateQueries({
             predicate: (cacheQuery) => isMatchingKey(cacheQuery.queryKey, queryKey)
         })
     })
 
     // STEP 3. Remove cache entries with the matching queryKeys
-    cacheUpdates.remove?.forEach((queryKey) => {
+    cacheUpdates.remove?.forEach(({queryKey}) => {
         queryClient.removeQueries({
             predicate: (cacheQuery) => isMatchingKey(cacheQuery.queryKey, queryKey)
         })
@@ -56,7 +52,7 @@ export const updateCache = (
 
 export class NotImplementedError extends Error {
     constructor(method = 'This method') {
-        super(`${method} is not yet implemented.`)
+        super(`${method} is not implemented.`)
     }
 }
 

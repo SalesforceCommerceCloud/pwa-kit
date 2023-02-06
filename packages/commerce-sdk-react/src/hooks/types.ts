@@ -81,17 +81,25 @@ export type DataType<T extends ApiMethod<any, any>> = T extends ApiMethod<any, R
 
 // --- CACHE HELPERS --- //
 
-export interface CacheUpdate {
-    update?: Array<QueryKey>
-    invalidate?: Array<QueryKey>
-    remove?: Array<QueryKey>
+export type CacheUpdateBase = {
+    queryKey: QueryKey // TODO: Can we do [...string, object]?
+}
+
+export type CacheUpdateUpdate<Data> = CacheUpdateBase & {
+    updater: (data: Data | undefined) => Data | undefined
+}
+
+export type CacheUpdate<Data> = {
+    update?: CacheUpdateUpdate<Data>[]
+    invalidate?: CacheUpdateBase[]
+    remove?: CacheUpdateBase[]
 }
 
 export type CacheUpdateGetter<Options, Data> = (
     customerId: string | null,
     params: Options,
     response: Data
-) => CacheUpdate
+) => CacheUpdate<Data>
 
 export type CacheUpdateMatrix<Client> = {
     // It feels like we should be able to do <infer Arg, infer Data>, but that

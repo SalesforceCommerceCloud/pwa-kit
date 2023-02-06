@@ -21,7 +21,8 @@ export const useMutation = <Options extends ApiOptions, Data>(hookConfig: {
     return useReactQueryMutation(authenticatedMethod, {
         onSuccess: (data, options) => {
             const cacheUpdates = hookConfig.getCacheUpdates(customerId, options, data)
-            updateCache(queryClient, cacheUpdates, data)
+            cacheUpdates.update?.forEach(({updater}) => updater)
+            updateCache(queryClient, cacheUpdates)
         }
     })
 }
