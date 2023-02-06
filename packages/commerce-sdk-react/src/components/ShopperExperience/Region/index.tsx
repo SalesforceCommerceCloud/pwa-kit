@@ -5,11 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Region as RegionTYpe} from '../types'
+import {Region as RegionType} from '../types'
 import {Component} from '../Component'
 
 type RegionProps = {
-    region: RegionTYpe
+    region: RegionType
 }
 
 /**

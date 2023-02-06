@@ -30,7 +30,7 @@ export const usePageContext = () => useContext(PageContext)
 /**
  * This component will render a page designer page given its serialized data object.
  *
- * @param Page
+ * @param PageProps
  * @returns JSX.Element
  */
 export const Page = ({page, components}: PageProps) => {
