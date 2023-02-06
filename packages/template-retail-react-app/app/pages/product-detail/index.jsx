@@ -176,7 +176,7 @@ const ProductDetail = ({category, product, isLoading}) => {
             const childrenProducts = product.setProducts
             childrenProducts.map((child) => {
                 einstein.sendViewProduct(child)
-            }) 
+            })
         } else if (product) {
             einstein.sendViewProduct(product)
         }
