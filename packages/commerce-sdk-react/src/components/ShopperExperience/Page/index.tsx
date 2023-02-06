@@ -5,14 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useContext, useEffect, useState} from 'react'
-import {PageDef} from '../types'
+import {Page as PageType} from '../types'
 import {Region} from '../Region'
 
 type ComponentMap = {
     [key: string]: React.ComponentType
 }
 type PageProps = {
-    page: PageDef
+    page: PageType
     components: ComponentMap
 }
 type PageContextValue = {
@@ -25,10 +25,7 @@ export const PageContext = React.createContext({components: {}} as PageContextVa
 // This hook allows sub-components to use the page context. In our case we use it
 // so that the generic <Component /> can use the component map to know which react component
 // to render.
-export const usePageContext = () => {
-    const value = useContext(PageContext)
-    return value
-}
+export const usePageContext = () => useContext(PageContext)
 
 /**
  * This component will render a page designer page given its serialized data object.
@@ -40,8 +37,8 @@ export const Page = ({page, components}: PageProps) => {
     const [contextValue, setContextValue] = useState({components} as PageContextValue)
     const {id, regions} = page || {}
 
-    // NOTE: Probably not required as the list of components is known at compile time, 
-    // but we might need this ability if we are to lazy load components.
+    // NOTE: This probably is not required as the list of components is known at compile time,
+    // but we might need this ability in the future if we are to lazy load components.
     useEffect(() => {
         setContextValue({
             ...contextValue,
@@ -51,13 +48,13 @@ export const Page = ({page, components}: PageProps) => {
 
     return (
         <PageContext.Provider value={contextValue}>
-            <div className="storepage" id={id}>
+            <div id={id} className="storepage">
                 <div className="container">
-                    <div className="row">
-                        {regions?.map((region) => (
-                            <Region key={region.id} region={region} />
-                        ))}
-                    </div>
+                    {regions?.map((region) => (
+                        <div key={region.id} className="row">
+                            <Region region={region} />
+                        </div>
+                    ))}
                 </div>
             </div>
         </PageContext.Provider>

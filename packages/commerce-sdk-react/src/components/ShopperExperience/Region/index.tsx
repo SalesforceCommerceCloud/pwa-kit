@@ -5,11 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {RegionDef} from '../types'
+import {Region as RegionTYpe} from '../types'
 import {Component} from '../Component'
 
 type RegionProps = {
-    region: RegionDef
+    region: RegionTYpe
 }
 
 /**
@@ -22,7 +22,7 @@ export const Region = ({region}: RegionProps) => {
     const {id, components} = region
 
     return (
-        <div className="region col-12" id={id}>
+        <div id={id} className="region">
             <div className="container">
                 {components?.map((component) => (
                     <Component key={component.id} component={component} />

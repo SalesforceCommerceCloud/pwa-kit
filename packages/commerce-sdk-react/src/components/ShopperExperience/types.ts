@@ -11,8 +11,8 @@ type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number]
 
 type Client = ApiClients['shopperExperience']
 
-export type PageDef = DataType<Client['getPage']>
+export type Page = DataType<Client['getPage']>
 
-export type RegionDef = ArrayElement<NonNullable<DataType<Client['getPage']>['regions']>>
+export type Region = ArrayElement<NonNullable<DataType<Client['getPage']>['regions']>>
 
-export type ComponentDef = ArrayElement<NonNullable<RegionDef['components']>>
+export type Component = ArrayElement<NonNullable<Region['components']>>

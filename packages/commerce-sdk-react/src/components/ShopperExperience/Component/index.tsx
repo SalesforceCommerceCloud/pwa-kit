@@ -5,11 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {ComponentDef} from '../types'
+import {Component as ComponentType} from '../types'
 import {usePageContext} from '../Page'
 
 type ComponentProps = {
-    component: ComponentDef
+    component: ComponentType
 }
 
 /**
@@ -22,7 +22,7 @@ export const Component = ({component}: ComponentProps) => {
     const pageContext = usePageContext()
     const ComponentClass =
         pageContext?.components[component.typeId] ||
-        ((props: any) => <div>Component Not Found: ${props.typeId}</div>)
+        (() => <div>{`Component type '${component.typeId}' not found!`}</div>)
 
     return <ComponentClass key={component.id} {...component} />
 }
