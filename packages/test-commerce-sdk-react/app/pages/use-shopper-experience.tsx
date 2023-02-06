@@ -6,6 +6,7 @@
  */
 import React from 'react'
 import {usePage, usePages} from 'commerce-sdk-react-preview'
+import {Page, Component, Region} from 'commerce-sdk-react-preview/components'
 import Json from '../components/Json'
 
 const PAGE_ID = 'homepage-example'
@@ -17,7 +18,27 @@ const ASPECT_ATTRIBUTES = JSON.stringify({
     category: 'mens'
 })
 
-const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any) => {
+const componentMapProxy = new Proxy({}, {
+    get(_target, prop) {
+        return (props: any) => (
+            <div style={{marginBottom: '10px'}}>
+                <b>{prop}</b>
+                {
+                    props?.regions && 
+                        props.regions[0]?.components?.map(
+                            (component: any, index: any) => (
+                                <div className="tile" style={{margin: '0px 0px 5px 20px'}} key={component.id}>
+                                    <Component key={component.id} component={component} />
+                                </div>
+                            )
+                        )
+                }
+            </div>
+        )
+    }
+})
+
+const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any, index: number) => {
     if (isLoading) {
         return (
             <div key={name}>
@@ -32,8 +53,10 @@ const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any) 
         return <h1 style={{color: 'red'}}>Something is wrong</h1>
     }
 
+    const pages = name === 'usePage' ? [data] : data.data
+
     return (
-        <div key={name}>
+        <div key={index}>
             <h2 id={name}>{name}</h2>
             <h3>{data?.name}</h3>
             <h3>
@@ -42,6 +65,12 @@ const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any) 
             <hr />
             <h3>Returning data</h3>
             <Json data={{isLoading, error, data}} />
+            <h3>Rendering Data</h3>
+            <div>
+                {pages && pages?.map((page: any) => (
+                    <Page key={index} page={page} components={componentMapProxy}/>
+                ))}
+            </div>
         </div>
     )
 }
@@ -81,8 +110,8 @@ const UseShopperExperience = () => {
             <>
                 <div>
                     <h1>Query hooks</h1>
-                    {queryHooks.map(({name, arg, hook}) => {
-                        return renderQueryHook(name, arg, {...hook})
+                    {queryHooks.map(({name, arg, hook}, index) => {
+                        return renderQueryHook(name, arg, {...hook}, index)
                     })}
                 </div>
             </>
