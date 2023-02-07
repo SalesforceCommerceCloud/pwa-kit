@@ -8,12 +8,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {AspectRatio, Image} from '@chakra-ui/react'
 
-/***
+/**
  * This is a simple Image Tile component that can be used inside any Layout component
  *
  * @param imageProps
  * @param ratio
- * @param props
  * @returns {JSX.Element}
  */
 const ImageTile = ({imageProps, ratio = 1, ...rest}) => {
