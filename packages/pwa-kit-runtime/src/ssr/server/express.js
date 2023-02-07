@@ -306,14 +306,10 @@ export const cacheResponseWhenDone = ({
         // We know that all the data has been written, so we
         // can now store the response in the cache and call
         // end() on it.
-        const timer = res.locals.timer
         req.app.applicationCache._cacheDeletePromise
             .then(() => {
                 localDevLog(`Req ${locals.requestId}: caching response for ${req.url}`)
-                timer.start('cache-response')
-                return storeResponseInCache(req, res).then(() => {
-                    timer.end('cache-response')
-                })
+                return storeResponseInCache(req, res)
             })
             .finally(() => {
                 originalEnd.call(res, callback)
@@ -390,11 +386,7 @@ export const getResponseFromCache = ({req, res, namespace, key}) => {
     locals.responseCaching.cacheKey = workingKey
 
     // Return a Promise that handles the asynchronous cache lookup
-    const timer = res.locals.timer
-    timer.start('check-response-cache')
     return req.app.applicationCache.get({key: workingKey, namespace}).then((entry) => {
-        timer.end('check-response-cache')
-
         localDevLog(
             `Req ${locals.requestId}: ${
                 entry.found ? 'Found' : 'Did not find'
