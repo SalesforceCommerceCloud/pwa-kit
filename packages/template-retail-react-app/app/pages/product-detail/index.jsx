@@ -281,19 +281,6 @@ const ProductDetail = ({category, product, isLoading}) => {
                     <RecommendedProducts
                         title={
                             <FormattedMessage
-                                defaultMessage="Complete the Set"
-                                id="product_detail.recommended_products.title.complete_set"
-                            />
-                        }
-                        recommender={'complete-the-set'}
-                        products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
                                 defaultMessage="You might also like"
                                 id="product_detail.recommended_products.title.might_also_like"
                             />
