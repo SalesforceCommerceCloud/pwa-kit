@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {Box, Container} from '@chakra-ui/react'
-import ImageAndText from '../../components/experience/image-and-text'
+import ImageTile from '../../components/experience/image-tile'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 const Experience = () => {
@@ -22,13 +22,11 @@ const Experience = () => {
                 marginBottom={8}
                 borderRadius="base"
             >
-                <ImageAndText
+                <ImageTile
                     imageProps={{
                         alt: 'alt-text',
-                        disBaseLink: getAssetUrl('static/img/hero.png'),
-                        link: ''
+                        src: {mobile: getAssetUrl('static/img/hero.png')}
                     }}
-                    caption={'caption-text'}
                 />
             </Container>
         </Box>
