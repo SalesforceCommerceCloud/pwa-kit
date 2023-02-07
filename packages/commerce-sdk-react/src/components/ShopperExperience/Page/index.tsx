@@ -72,9 +72,7 @@ export const Page = (props: PageProps) => {
             <div id={id} className={`page ${className}`} {...rest}>
                 <div className="container">
                     {regions?.map((region) => (
-                        <div key={region.id} className="row">
-                            <Region region={region} />
-                        </div>
+                        <Region key={region.id} region={region} />
                     ))}
                 </div>
             </div>
