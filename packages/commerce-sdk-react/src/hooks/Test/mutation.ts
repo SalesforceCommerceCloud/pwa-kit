@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, DataType, ApiMethod, CacheUpdateGetter} from '../types'
+import {ApiClients, ApiMethod, Argument, CacheUpdateGetter, DataType} from '../types'
 import {useMutation} from '../useMutation'
 import {UseMutationResult} from '@tanstack/react-query'
 import {NotImplementedError} from '../utils'
