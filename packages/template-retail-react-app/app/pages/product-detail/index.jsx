@@ -171,7 +171,13 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     /**************** Einstein ****************/
     useEffect(() => {
-        if (product) {
+        if (product && product.type.set) {
+            einstein.sendViewProduct(product)
+            const childrenProducts = product.setProducts
+            childrenProducts.map((child) => {
+                einstein.sendViewProduct(child)
+            })
+        } else if (product) {
             einstein.sendViewProduct(product)
         }
     }, [product])
