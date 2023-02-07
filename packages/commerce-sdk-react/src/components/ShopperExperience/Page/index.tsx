@@ -11,11 +11,12 @@ import {Region} from '../Region'
 type ComponentMap = {
     [typeId: string]: React.ComponentType
 }
-type PageProps = {
+
+interface PageProps extends React.ComponentProps<'div'> {
     page: PageType
     components: ComponentMap
-    className?: string
 }
+
 type PageContextValue = {
     components: ComponentMap
 }
@@ -34,7 +35,8 @@ export const usePageContext = () => useContext(PageContext)
  * @param PageProps
  * @returns JSX.Element
  */
-export const Page = ({className, components, page}: PageProps) => {
+export const Page = (props: PageProps) => {
+    const {page, components, className = '', ...rest} = props
     const [contextValue, setContextValue] = useState({components} as PageContextValue)
     const {id, regions} = page || {}
 
@@ -49,7 +51,7 @@ export const Page = ({className, components, page}: PageProps) => {
 
     return (
         <PageContext.Provider value={contextValue}>
-            <div id={id} className={`page ${className}`}>
+            <div id={id} className={`page ${className}`} {...rest}>
                 <div className="container">
                     {regions?.map((region) => (
                         <div key={region.id} className="row">
