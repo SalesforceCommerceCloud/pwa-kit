@@ -67,14 +67,6 @@ class EinsteinAPI {
                 altId: '',
                 altIdType: ''
             }
-        } else if (product.type && product.type.set) {
-            // handle sets for viewProduct
-            return {
-                id: product.id,
-                sku: product.id,
-                altId: '',
-                altIdType: ''
-            }
         } else if (
             product.productType &&
             (product.productType.master || product.productType.variant || product.productType.set)
