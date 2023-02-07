@@ -13,6 +13,6 @@ type Client = ApiClients['shopperExperience']
 
 export type Page = DataType<Client['getPage']>
 
-export type Region = ArrayElement<NonNullable<DataType<Client['getPage']>['regions']>>
+export type Region = ArrayElement<NonNullable<Page['regions']>>
 
 export type Component = ArrayElement<NonNullable<Region['components']>>
