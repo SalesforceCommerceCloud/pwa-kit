@@ -35,6 +35,7 @@ const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('./pages/product-list'), {fallback})
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
+const Experience = loadable(() => import('./pages/experience'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 const routes = [
@@ -97,6 +98,10 @@ const routes = [
     {
         path: '/account/wishlist',
         component: Wishlist
+    },
+    {
+        path: '/experience',
+        component: Experience
     },
     {
         path: '*',
