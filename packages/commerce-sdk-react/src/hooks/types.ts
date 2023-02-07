@@ -8,6 +8,7 @@ import {ShopperBaskets} from 'commerce-sdk-isomorphic'
 import {ShopperContexts} from 'commerce-sdk-isomorphic'
 import {ShopperCustomers} from 'commerce-sdk-isomorphic'
 import {ShopperDiscoverySearch} from 'commerce-sdk-isomorphic'
+import {ShopperExperience} from 'commerce-sdk-isomorphic'
 import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
 import {ShopperLogin} from 'commerce-sdk-isomorphic'
 import {ShopperOrders} from 'commerce-sdk-isomorphic'
@@ -28,6 +29,7 @@ export interface ApiClients {
     shopperContexts: ShopperContexts<ApiClientConfigParams>
     shopperCustomers: ShopperCustomers<ApiClientConfigParams>
     shopperDiscoverySearch: ShopperDiscoverySearch<ApiClientConfigParams>
+    shopperExperience: ShopperExperience<ApiClientConfigParams>
     shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
     shopperLogin: ShopperLogin<ApiClientConfigParams>
     shopperOrders: ShopperOrders<ApiClientConfigParams>
