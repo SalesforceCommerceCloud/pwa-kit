@@ -19,6 +19,7 @@ import {
     ModalBody,
     ModalCloseButton,
     ModalContent,
+    ModalFooter,
     ModalOverlay,
     Stack,
     useBreakpointValue
@@ -168,6 +169,7 @@ export const AddToCartModal = () => {
                             })}
                         </Box>
                         <Box
+                            display={['none', 'none', 'none', 'block']}
                             flex="1"
                             paddingLeft={{lg: '4', xl: '8'}}
                             paddingY={{base: '4', lg: '0'}}
@@ -229,6 +231,55 @@ export const AddToCartModal = () => {
                         shouldFetch={() => product?.id}
                     />
                 </Box>
+                <ModalFooter
+                    position="fixed"
+                    bg="white"
+                    width="100%"
+                    display={['block', 'block', 'block', 'none']}
+                    p={[4, 4, 6]}
+                    left={0}
+                    bottom={0}
+                >
+                    <Flex justifyContent="space-between" marginBottom="8">
+                        <Text fontWeight="700">
+                            {intl.formatMessage(
+                                {
+                                    defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)',
+                                    id: 'add_to_cart_modal.label.cart_subtotal'
+                                },
+                                {itemAccumulatedCount}
+                            )}
+                        </Text>
+                        <Text alignSelf="flex-end" fontWeight="600">
+                            {productSubTotal &&
+                                intl.formatNumber(productSubTotal, {
+                                    style: 'currency',
+                                    currency: currency
+                                })}
+                        </Text>
+                    </Flex>
+                    <Stack spacing="4">
+                        <Button as={Link} to="/cart" width="100%" variant="solid">
+                            {intl.formatMessage({
+                                defaultMessage: 'View Cart',
+                                id: 'add_to_cart_modal.link.view_cart'
+                            })}
+                        </Button>
+
+                        <Button
+                            as={Link}
+                            to="/checkout"
+                            width="100%"
+                            variant="outline"
+                            rightIcon={<LockIcon />}
+                        >
+                            {intl.formatMessage({
+                                defaultMessage: 'Proceed to Checkout',
+                                id: 'add_to_cart_modal.link.checkout'
+                            })}
+                        </Button>
+                    </Stack>
+                </ModalFooter>
             </ModalContent>
         </Modal>
     )
