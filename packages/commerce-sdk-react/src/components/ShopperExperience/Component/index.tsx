@@ -12,6 +12,9 @@ type ComponentProps = {
     component: ComponentType
 }
 
+const ComponentNotFound = ({typeId}: ComponentType) => (
+    <div>{`Component type '${typeId}' not found!`}</div>
+)
 /**
  * This component will render a page designer page given its serialized data object.
  *
@@ -20,11 +23,15 @@ type ComponentProps = {
  */
 export const Component = ({component}: ComponentProps) => {
     const pageContext = usePageContext()
-    const ComponentClass =
-        pageContext?.components[component.typeId] ||
-        (() => <div>{`Component type '${component.typeId}' not found!`}</div>)
+    const ComponentClass = pageContext?.components[component.typeId] || ComponentNotFound
 
-    return <ComponentClass key={component.id} {...component} />
+    return (
+        <div className="component">
+            <div className="container">
+                <ComponentClass key={component.id} {...component} />
+            </div>
+        </div>
+    )
 }
 
 Component.displayName = 'Component'
