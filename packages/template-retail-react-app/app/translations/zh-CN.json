@@ -972,9 +972,6 @@
   "product_detail.accordion.message.coming_soon": {
     "defaultMessage": "即将到货"
   },
-  "product_detail.recommended_products.title.complete_set": {
-    "defaultMessage": "Complete the Set（完成组合）"
-  },
   "product_detail.recommended_products.title.might_also_like": {
     "defaultMessage": "您可能还喜欢"
   },
