@@ -23,7 +23,7 @@ module.exports = {
     plugins: ['header', 'react', 'prettier'],
     settings: {
         react: {
-            version: '16.8'
+            version: 'detect'
         }
     },
     rules: {
