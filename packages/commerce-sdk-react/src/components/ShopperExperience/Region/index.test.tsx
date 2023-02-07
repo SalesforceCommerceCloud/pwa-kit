@@ -7,6 +7,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import Region from './index'
+import {PageContext} from '../Page'
 
 const SAMPLE_REGION = {
     id: 'regionB',
@@ -37,8 +38,20 @@ const SAMPLE_REGION = {
     ]
 }
 
+test('Region throws if used outside of a Page component', () => {
+    expect(() => render(<Region region={SAMPLE_REGION} />)).toThrow()
+})
+
 test('Region renders without errors', () => {
-    const {container} = render(<Region region={SAMPLE_REGION} />)
+    // const {container} = render(<Region region={SAMPLE_REGION} />)
+    const component = <Region region={SAMPLE_REGION} />
+
+    const {container} = render(component, {
+        // eslint-disable-next-line react/display-name
+        wrapper: () => (
+            <PageContext.Provider value={{components: {}}}>{component}</PageContext.Provider>
+        )
+    })
 
     // Regions are in document.
     expect(container.querySelectorAll('.region')?.length).toEqual(1)

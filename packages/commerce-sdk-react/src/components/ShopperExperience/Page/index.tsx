@@ -17,17 +17,27 @@ interface PageProps extends React.ComponentProps<'div'> {
     components: ComponentMap
 }
 
-type PageContextValue = {
-    components: ComponentMap
-}
+type PageContextValue =
+    | {
+          components: ComponentMap
+      }
+    | undefined
 
 // This context will hold the component map as well as any other future context.
-export const PageContext = React.createContext({components: {}} as PageContextValue)
+export const PageContext = React.createContext(undefined as PageContextValue)
 
 // This hook allows sub-components to use the page context. In our case we use it
 // so that the generic <Component /> can use the component map to know which react component
 // to render.
-export const usePageContext = () => useContext(PageContext)
+export const usePageContext = () => {
+    const value = useContext(PageContext)
+
+    if (!value) {
+        throw new Error('"usePageContext" cannot be used outside of a page component.')
+    }
+
+    return value
+}
 
 /**
  * This component will render a page designer page given its serialized data object.

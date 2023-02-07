@@ -37,11 +37,8 @@ const TEST_COMPONENTS = {
     ['commerce_assets.carousel']: () => <div className="carousel">Carousel</div>
 }
 
-test('Page renders without errors', () => {
-    const {container} = render(<Component component={SAMPLE_COMPONENT} />)
-
-    // Component is in document.
-    expect(container.querySelectorAll('.component')?.length).toEqual(1)
+test('Page throws if used outside of a Page component', () => {
+    expect(() => render(<Component component={SAMPLE_COMPONENT} />)).toThrow()
 })
 
 test('Page renders correct component', () => {
@@ -56,11 +53,10 @@ test('Page renders correct component', () => {
         )
     })
 
-    // Regions are in document.
+    // Component are in document.
     expect(container.querySelectorAll('.component')?.length).toEqual(1)
 
-    // Components are in document. (Note: Sub-regions/components aren't rendered because that is
+    // Prodived components are in document. (Note: Sub-regions/components aren't rendered because that is
     // the responsibility of the component definition.)
-    expect(container.querySelectorAll('.component')?.length).toEqual(1)
     expect(container.querySelectorAll('.carousel')?.length).toEqual(1)
 })
