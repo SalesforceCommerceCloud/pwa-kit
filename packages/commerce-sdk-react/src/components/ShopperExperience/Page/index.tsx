@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useContext, useEffect, useState} from 'react'
+import {Helmet} from 'react-helmet'
 import {Page as PageType} from '../types'
 import {Region} from '../Region'
 
@@ -48,7 +49,7 @@ export const usePageContext = () => {
 export const Page = (props: PageProps) => {
     const {page, components, className = '', ...rest} = props
     const [contextValue, setContextValue] = useState({components} as PageContextValue)
-    const {id, regions} = page || {}
+    const {id, regions, pageDescription, pageKeywords, pageTitle} = page || {}
 
     // NOTE: This probably is not required as the list of components is known at compile time,
     // but we might need this ability in the future if we are to lazy load components.
@@ -61,6 +62,11 @@ export const Page = (props: PageProps) => {
 
     return (
         <PageContext.Provider value={contextValue}>
+            <Helmet>
+                {pageTitle && <title>{pageTitle}</title>}
+                {pageDescription && <meta name="description" content={pageDescription} />}
+                {pageKeywords && <meta name="keywords" content={pageKeywords} />}
+            </Helmet>
             <div id={id} className={`page ${className}`} {...rest}>
                 <div className="container">
                     {regions?.map((region) => (

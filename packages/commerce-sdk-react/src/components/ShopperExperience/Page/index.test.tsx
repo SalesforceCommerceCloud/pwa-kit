@@ -7,6 +7,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import Page from './index'
+import {Helmet} from 'react-helmet'
 
 const SAMPLE_PAGE = {
     id: 'samplepage',
@@ -14,9 +15,9 @@ const SAMPLE_PAGE = {
     aspectTypeId: 'pdpAspect',
     name: 'Sample Page',
     description: 'Sample page of the storefront.',
-    pageTitle: 'Samplepage - My Shop',
-    pageDescription: 'Sample page description',
-    pageKeywords: 'testing, react, typescript',
+    pageTitle: 'title',
+    pageDescription: 'description',
+    pageKeywords: 'keywords',
     regions: [
         {
             id: 'regionA',
@@ -71,6 +72,18 @@ test('Page renders without errors', () => {
 
     // Page is in document.
     expect(container.querySelector('[id=samplepage]')).toBeInTheDocument()
+
+    // Meta data and title are set
+    const helmet = Helmet.peek()
+    expect(helmet.title).toEqual('title')
+    expect(
+        helmet.metaTags.find(
+            ({name, content}) => name === 'description' && content === 'description'
+        )
+    ).toBeTruthy()
+    expect(
+        helmet.metaTags.find(({name, content}) => name === 'keywords' && content === 'keywords')
+    ).toBeTruthy()
 
     // Regions are in document.
     expect(container.querySelectorAll('.region')?.length).toEqual(3)
