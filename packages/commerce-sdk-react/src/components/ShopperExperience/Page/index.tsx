@@ -43,8 +43,10 @@ export const usePageContext = () => {
 /**
  * This component will render a page designer page given its serialized data object.
  *
- * @param PageProps
- * @returns JSX.Element
+ * @param {PageProps} props
+ * @param {Page} props.region - The page designer page data representation.
+ * @param {ComponentMap} props.components - A mapping of typeId's to react components representing the type.
+ * @returns {React.ReactElement} - Page component.
  */
 export const Page = (props: PageProps) => {
     const {page, components, className = '', ...rest} = props

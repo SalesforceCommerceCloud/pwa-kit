@@ -18,8 +18,9 @@ const ComponentNotFound = ({typeId}: ComponentType) => (
 /**
  * This component will render a page designer page given its serialized data object.
  *
- * @param Region
- * @returns JSX.Element
+ * @param {PageProps} props
+ * @param {Component} props.component - The page designer component data representation.
+ * @returns {React.ReactElement} - Experience component.
  */
 export const Component = ({component}: ComponentProps) => {
     const pageContext = usePageContext()

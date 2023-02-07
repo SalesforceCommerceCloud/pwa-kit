@@ -15,8 +15,9 @@ interface RegionProps extends React.ComponentProps<'div'> {
 /**
  * This component will render a page designer region given its serialized data object.
  *
- * @param Region
- * @returns JSX.Element
+ * @param {RegionProps} props
+ * @param {Region} props.region - The page designer region data representation.
+ * @returns {React.ReactElement} - Region component.
  */
 export const Region = (props: RegionProps) => {
     const {region, className = '', ...rest} = props
