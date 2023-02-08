@@ -208,7 +208,7 @@ class Auth {
             type Key = keyof AuthDataMap
             const {key, storageType} = DATA_MAP[keyName as Key]
             const store = this.stores[storageType]
-            store.delete(DATA_MAP[key as Key].key)
+            store.delete(key)
         })
     }
 
