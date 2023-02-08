@@ -74,7 +74,7 @@ export const AddToCartModal = () => {
                 borderRadius={{base: 'none', md: 'base'}}
                 bgColor="gray.50"
             >
-                <ModalHeader paddingTop="8" bgColor="white" fontSize="2xl" fontWeight="700">
+                <ModalHeader paddingY="8" bgColor="white" fontSize="2xl" fontWeight="700">
                     {intl.formatMessage(
                         {
                             defaultMessage:
@@ -85,19 +85,18 @@ export const AddToCartModal = () => {
                     )}
                 </ModalHeader>
                 <ModalCloseButton />
-                <ModalBody bgColor="white" paddingTop="4" paddingBottom="0" paddingX="0" flex="none">
+                <ModalBody bgColor="white" padding="0" flex="none">
                     <Flex
                         flexDirection={{base: 'column', lg: 'row'}}
                         justifyContent="space-between"
-                        paddingBottom="8"
+                        paddingBottom={{base: '0', lg: '8'}}
+                        paddingX="4"
                     >
                         <Box
                             flex="1"
                             paddingX={{lg: '4', xl: '8'}}
-                            paddingY={{base: '4', lg: '0'}}
                             // divider style
                             borderRightWidth={{lg: '1px'}}
-                            borderBottomWidth={{base: '1px', lg: '0px'}}
                             borderColor="gray.200"
                             borderStyle="solid"
                         >
@@ -120,6 +119,10 @@ export const AddToCartModal = () => {
                                         key={variant.productId}
                                         justifyContent="space-between"
                                         marginBottom={index < itemsAdded - 1 ? 0 : 4}
+                                        paddingBottom={4}
+                                        borderBottomWidth={{base: '1px', lg: '0px'}}
+                                        borderColor="gray.200"
+                                        borderStyle="solid"
                                     >
                                         <Flex gridGap="4">
                                             <Box w="24" flex="none">
