@@ -82,7 +82,7 @@ describe('Auth', () => {
         auth.set('refresh_token_guest', refreshTokenGuest)
         expect(auth.get('refresh_token_registered')).toBe('')
     })
-    test.only('this.data returns the storage value', () => {
+    test('this.data returns the storage value', () => {
         const auth = new Auth(config)
 
         const sample = {
