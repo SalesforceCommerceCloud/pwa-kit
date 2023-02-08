@@ -127,7 +127,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
                             aria-busy={ariaBusy}
                             aria-atomic="true"
                         >
-                            {showLoading && <LoadingSpinner opacity="0" />}
+                            {showLoading && <LoadingSpinner />}
 
                             {/* Category Navigation */}
                             {root?.[itemsKey] ? (
@@ -167,7 +167,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
                                 </Fade>
                             ) : (
                                 <Center p="8">
-                                    <Spinner opacity="0" size="xl" />
+                                    <Spinner size="xl" />
                                 </Center>
                             )}
                         </div>

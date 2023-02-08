@@ -11,6 +11,7 @@ const UseProducts = loadable(() => import('./pages/use-shopper-products'))
 const UseProduct = loadable(() => import('./pages/use-shopper-product'))
 const UseCategories = loadable(() => import('./pages/use-shopper-categories'))
 const UseCategory = loadable(() => import('./pages/use-shopper-category'))
+const UseShopperExperience = loadable(() => import('./pages/use-shopper-experience'))
 const UseProductSearch = loadable(() => import('./pages/use-product-search'))
 const UseCustomer = loadable(() => import('./pages/use-shopper-customer'))
 const UsePromotions = loadable(() => import('./pages/use-promotions'))
@@ -37,6 +38,10 @@ const routes = [
     {
         path: '/products',
         component: UseProducts
+    },
+    {
+        path: '/experience',
+        component: UseShopperExperience
     },
     {
         path: '/categories/:categoryId',
