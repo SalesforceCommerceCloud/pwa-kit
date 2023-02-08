@@ -150,7 +150,8 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
         // @ts-expect-error private method
         auth.pendingToken = Promise.resolve(data)
@@ -169,7 +170,8 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
         const {refresh_token_guest, ...result} = {...data, refresh_token: 'refresh_token_guest'}
 
@@ -192,7 +194,8 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
         const {refresh_token_guest, ...result} = {...data, refresh_token: 'refresh_token_guest'}
 
