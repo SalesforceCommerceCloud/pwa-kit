@@ -1,41 +1,25 @@
-# Express Minimal
+# template-mrt-reference-app
 
-A bare-bones project template for apps running on
-Managed Runtime.
+This is the reference app that the Managed Runtime Team uses to test
+features in the platform (eg. TLS versions, successful deploys, proxy
+behaviour).
 
-You can use the template as a starting point to:
+This app is intended to be a thin layer over the bare minimum SDKs
+that we expect/require all MRT users to use.
 
--   Build simple Express apps.
--   Develop APIs.
--   Run different frameworks (other than React) on Managed Runtime.
+Although MRT started life primarily as a hosting environment for
+React apps, we're expanding that to support other technologies –
+this app lets us test those platform features that are universal
+across all apps, regardless of framework choice.
 
-## Setup
 
-```bash
-npm ci
-npm start
-```
+## Usage in CI/CD tests ⛅️
 
-## Deploy
+This app is deployed to several pre-existing test Targets as part 
+of a "smoke-test" of the MRT platform. To see the Targets in use
+take a look at the CI config in
 
-```bash
-npm run push
-```
+https://git.soma.salesforce.com/cc-mobify/ssr-infrastructure/blob/sfci-main/Jenkinsfile#L176
 
-## Documentation
-
-The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.
-
-### Useful Links:
-
--   [Get Started](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html)
--   [Skills for Success](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/skills-for-success.html)
--   [Set Up API Access](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/setting-up-api-access.html)
--   [Configuration Options](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options.html)
--   [Proxy Requests](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html)
--   [Push and Deploy Bundles](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html)
--   [The Retail React App](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html)
--   [Rendering](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/rendering.html)
--   [Routing](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html)
--   [Phased Headless Rollouts](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/phased-headless-rollouts.html)
--   [Launch Your Storefront](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/launching-your-storefront.html)
+These smoke-tests are triggered by merges to the main development 
+branch of the above repository.

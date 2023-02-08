@@ -4,6 +4,42 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+/**
+ * Notes on this test app 🧠
+ *
+ * HTTP requests to **all** paths except those listed below will return
+ * a JSON response containing useful diagnostic values from the request
+ * and the context in which the request is handled. Values are **whitelisted**,
+ * so if you want to view a new header or environment variable you will need
+ * to add it to the appropriate whitelist. Do **NOT** expose any values that
+ * contain potentially sensitive information (such as API keys or AWS
+ * credentials), especially from the environment. The deployed server is
+ * globally accessible.
+ *
+ * -   `/exception`: Throws a custom error whose textual representation (visible in the HTTP response) is the same diagnostic information described above.
+ * -   `/cache`: Returns the same diagnostic data, but will store it (as text) in an S3 object in the application cache, then retrieve it and return it. This tests access to the application cache.
+ * -   `/auth/<anything>`: Requires HTTP basic authentication with the username `mobify` and the password `supersecret`
+ * -   `/auth/logout`: Returns a 401 response that will remove any existing authentication data for a target
+ *
+ * The app will normally use the 'context.succeed' callback to return a
+ * response to the Lambda integration code. If the query parameter `directcallback`
+ * is set to any non-empty value, it will use the callback passed to the Lambda
+ * entry point instead. This allows testing of different SDK or code methods
+ * of generating responses.
+ *
+ * A `Cache-Control: no-cache` header is added to **all** responses, so CloudFront
+ * will never cache any of the responses from this test server. You therefore
+ * don't need to add cachebreakers when running tests.
+ *
+ * The server has a proxy configured to [HTTPBin](https://httpbin.org/). To send
+ * a test request to it, use the path `/mobify/proxy/httpbin/` - for example,
+ * `/mobify/proxy/httpbin/get`
+ *
+ * A test bundle file is available at `/mobify/bundle/<BUNDLE_NUMBER>/assets/mobify.png`
+ * where BUNDLE_NUMBER is the most recently published bundle number.
+ */
+
 const path = require('path')
 const {getRuntime} = require('pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
