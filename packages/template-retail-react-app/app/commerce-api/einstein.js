@@ -129,7 +129,7 @@ class EinsteinAPI {
                     body: JSON.stringify(body)
                 })
             })
-        } catch (error) {
+        } catch {
             console.warn('Einstein request failed')
         }
 
