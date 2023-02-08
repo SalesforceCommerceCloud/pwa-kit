@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import Auth, {injectAccessToken} from './'
+import Auth from './'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
@@ -38,11 +38,6 @@ jest.mock('../utils', () => ({
     __esModule: true,
     onClient: () => true
 }))
-
-test('injectAccessToken', () => {
-    expect(injectAccessToken({}, 'test')).toEqual({Authorization: 'Bearer test'})
-    expect(injectAccessToken(undefined, 'test')).toEqual({Authorization: 'Bearer test'})
-})
 
 const config = {
     clientId: 'clientId',
@@ -99,7 +94,8 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
         const {refresh_token_guest, ...result} = {...sample, refresh_token: 'refresh_token_guest'}
 
@@ -120,6 +116,17 @@ describe('Auth', () => {
         expect(auth.isTokenExpired(JWTExpired)).toBe(true)
         // @ts-expect-error private method
         expect(() => auth.isTokenExpired()).toThrow()
+    })
+    test('site switch clears auth storage', () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token', '123')
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', '456')
+        const switchSiteConfig = {...config, siteId: 'another site'}
+        const newAuth = new Auth(switchSiteConfig)
+        expect(newAuth.get('access_token')).not.toBe('123')
+        expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
     test('isTokenExpired', () => {
         const auth = new Auth(config)
@@ -143,7 +150,8 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
         // @ts-expect-error private method
         auth.pendingToken = Promise.resolve(data)
@@ -162,7 +170,8 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
         const {refresh_token_guest, ...result} = {...data, refresh_token: 'refresh_token_guest'}
 
@@ -185,7 +194,8 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
         const {refresh_token_guest, ...result} = {...data, refresh_token: 'refresh_token_guest'}
 
