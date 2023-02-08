@@ -25,7 +25,7 @@ jest.mock('../../commerce-api/einstein')
 
 jest.mock('../../hooks/use-wishlist')
 
-const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
+const MockedComponent = ({isLoading, isLoggedIn = false}) => {
     const customer = useCustomer()
     useEffect(() => {
         if (isLoggedIn) {

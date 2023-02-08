@@ -21,7 +21,6 @@ import {useLocation} from 'react-router-dom'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 import LoginForm from '../../components/login'
 import {API_ERROR_MESSAGE} from '../../constants'
-import { CustomerProductListsProvider } from '../../commerce-api/contexts'
 
 const Login = () => {
     const {formatMessage} = useIntl()
@@ -39,8 +38,7 @@ const Login = () => {
                 onError: (error) => {
                     const message = /Unauthorized/i.test(error.message)
                         ? formatMessage({
-                              defaultMessage:
-                                  "Incorrect username or password, please try again.",
+                              defaultMessage: 'Incorrect username or password, please try again.',
                               id: 'login_page.error.incorrect_username_or_password'
                           })
                         : formatMessage(API_ERROR_MESSAGE)

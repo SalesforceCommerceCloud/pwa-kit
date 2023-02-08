@@ -46,9 +46,9 @@ afterEach(() => {
 test('should render product details page', async () => {
     global.server.use(
         // mock fetch product lists
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.json(mockedCustomerProductLists))
-        }),
+        // rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+        //     return res(ctx.json(mockedCustomerProductLists))
+        // }),
         // mock add item to product lists
         rest.post('*/customers/:customerId/product-lists/:listId/items', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200))

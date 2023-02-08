@@ -11,6 +11,7 @@ import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 import mockConfig from '../../../config/mocks/default'
+import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 
 jest.mock('../../commerce-api/einstein')
 
@@ -27,7 +28,7 @@ beforeEach(() => {
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         }),
         rest.get('*/customers/:customerId', (req, res, ctx) => {
             const {customerId} = req.params
@@ -41,7 +42,7 @@ beforeEach(() => {
                     })
                 )
             }
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         })
     )
 })

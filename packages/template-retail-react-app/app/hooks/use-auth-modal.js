@@ -45,7 +45,6 @@ export const AuthModal = ({
     initialView = LOGIN_VIEW,
     onLoginSuccess = noop,
     onRegistrationSuccess = noop,
-    onPasswordResetSuccess = noop,
     isOpen,
     onOpen,
     onClose,
@@ -54,10 +53,7 @@ export const AuthModal = ({
     const {formatMessage} = useIntl()
     const customerId = useCustomerId()
     const {isRegistered} = useCustomerType()
-    const customer = useCustomer(
-        {customerId},
-        {enabled: !!customerId && isRegistered}
-    )
+    const customer = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
@@ -65,9 +61,11 @@ export const AuthModal = ({
     const toast = useToast()
     const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
     const register = useShopperLoginHelper(ShopperLoginHelpers.Register)
-    
+
     // TODO: simplify the args to remove action
-    const getResetPasswordToken = useShopperCustomersMutation({action: ShopperCustomersMutations.GetResetPasswordToken})
+    const getResetPasswordToken = useShopperCustomersMutation({
+        action: ShopperCustomersMutations.GetResetPasswordToken
+    })
 
     const submitForm = async (data) => {
         form.clearErrors()
@@ -83,13 +81,7 @@ export const AuthModal = ({
                     {
                         onSuccess: onLoginSuccess,
                         onError: (error) => {
-                            const message = /Unauthorized/i.test(error.message)
-                                ? formatMessage({
-                                      defaultMessage:
-                                          "Something's not right with your email or password. Try again.",
-                                      id: 'auth_modal.error.incorrect_email_or_password'
-                                  })
-                                : formatMessage(API_ERROR_MESSAGE)
+                            const message = /Unauthorized/i.test(error.message) ? 'fdsf' : 'fds'
                             form.setError('global', {type: 'manual', message})
                         }
                     }
@@ -119,14 +111,17 @@ export const AuthModal = ({
                 const body = {
                     login: data.email
                 }
-                return getResetPasswordToken.mutateAsync({body}, {
-                    onError: () => {
-                        form.setError('global', {
-                            type: 'manual',
-                            message: formatMessage(API_ERROR_MESSAGE)
-                        })
+                return getResetPasswordToken.mutateAsync(
+                    {body},
+                    {
+                        onError: () => {
+                            form.setError('global', {
+                                type: 'manual',
+                                message: formatMessage(API_ERROR_MESSAGE)
+                            })
+                        }
                     }
-                })
+                )
             }
         }[currentView](data)
     }
@@ -287,8 +282,7 @@ AuthModal.propTypes = {
     onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onLoginSuccess: PropTypes.func,
-    onRegistrationSuccess: PropTypes.func,
-    onPasswordResetSuccess: PropTypes.func
+    onRegistrationSuccess: PropTypes.func
 }
 
 /**
