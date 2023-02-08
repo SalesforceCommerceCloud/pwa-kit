@@ -6,11 +6,11 @@
  */
 import React, {useContext, useEffect, useState} from 'react'
 import {Helmet} from 'react-helmet'
-import {Page as PageType} from '../types'
+import {Component as ComponentType, Region as RegionType, Page as PageType} from '../types'
 import {Region} from '../Region'
 
 type ComponentMap = {
-    [typeId: string]: React.ComponentType
+    [typeId: string]: React.ComponentType<ComponentType & unknown>
 }
 
 interface PageProps extends React.ComponentProps<'div'> {

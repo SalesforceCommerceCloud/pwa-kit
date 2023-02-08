@@ -25,11 +25,11 @@ const ComponentNotFound = ({typeId}: ComponentType) => (
 export const Component = ({component}: ComponentProps) => {
     const pageContext = usePageContext()
     const ComponentClass = pageContext?.components[component.typeId] || ComponentNotFound
-
+    const {data, ...rest} = component
     return (
-        <div className="component">
+        <div id={component.id} className="component">
             <div className="container">
-                <ComponentClass key={component.id} {...component} />
+                <ComponentClass {...rest} {...data} />
             </div>
         </div>
     )

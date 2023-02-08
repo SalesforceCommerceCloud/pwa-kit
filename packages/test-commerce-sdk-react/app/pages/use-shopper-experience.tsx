@@ -24,7 +24,7 @@ const componentMapProxy = new Proxy(
         get(_target, prop) {
             return (props: any) => (
                 <div style={{marginBottom: '10px'}}>
-                    <b>{prop}</b>
+                    <b>{props.typeId}</b>
                     {props?.regions?.map((region: any) => (
                         <Region
                             style={{margin: '0px 0px 5px 20px'}}
@@ -41,7 +41,7 @@ const componentMapProxy = new Proxy(
 const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any, index: number) => {
     if (isLoading) {
         return (
-            <div key={name}>
+            <div key={`${name}_${index}_loading`}>
                 <h1 id={name}>{name}</h1>
                 <hr />
                 <h2 style={{background: 'aqua'}}>Loading...</h2>
@@ -56,7 +56,7 @@ const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any, 
     const pages = name === 'usePage' ? [data] : data.data
 
     return (
-        <div key={index}>
+        <div key={`${name}_${index}`}>
             <h2 id={name}>{name}</h2>
             <h3>{data?.name}</h3>
             <h3>
