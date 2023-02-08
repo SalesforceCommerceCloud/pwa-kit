@@ -4,12 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {helpers, ShopperLogin, ShopperCustomers, ShopperLoginTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {
+    helpers,
+    ShopperLogin,
+    ShopperCustomers,
+    ShopperLoginTypes,
+    ShopperCustomersTypes
+} from 'commerce-sdk-isomorphic'
 import jwtDecode from 'jwt-decode'
-import {ApiClientConfigParams} from '../hooks/types'
+import {ApiClientConfigParams, Argument} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
-import {onClient} from '../utils'
 import {CustomerType} from '../hooks/useCustomerType'
+import {onClient} from '../utils'
 
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
@@ -197,6 +203,15 @@ class Auth {
         DATA_MAP[name].callback?.(storage)
     }
 
+    private clearStorage() {
+        Object.keys(DATA_MAP).forEach((keyName) => {
+            type Key = keyof AuthDataMap
+            const {key, storageType} = DATA_MAP[keyName as Key]
+            const store = this.stores[storageType]
+            store.delete(key)
+        })
+    }
+
     /**
      * Every method in this class that returns a `TokenResponse` constructs it via this getter.
      */
@@ -333,9 +348,7 @@ class Auth {
      * This is a wrapper method for ShopperCustomer API registerCustomer endpoint.
      *
      */
-    async register(
-        body: ShopperCustomersTypes.CustomerRegistration
-    ) {
+    async register(body: ShopperCustomersTypes.CustomerRegistration) {
         const {
             customer: {email},
             password
@@ -381,6 +394,7 @@ class Auth {
     async logout() {
         // TODO: are we missing a call to /logout?
         // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
+        this.clearStorage()
         return this.loginGuestUser()
     }
 }

@@ -1,5 +1,7 @@
 ## v2.7.0-dev (Jan 25, 2023)
 - Namespace `Auth` storage keys with site identifier to allow multi-site support [#911](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/911)
+- Add Shopper Experience `usePage` and `usePages` hooks[#958](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/958)
+
 ## v2.6.0 (Jan 25, 2023)
 
 ## v2.5.0 (Jan 05, 2023)
