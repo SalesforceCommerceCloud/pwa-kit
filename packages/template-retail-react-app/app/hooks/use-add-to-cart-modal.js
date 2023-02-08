@@ -70,7 +70,7 @@ export const AddToCartModal = () => {
             <ModalOverlay />
             <ModalContent
                 margin="0"
-                marginTop={{md: '8', lg: '200px'}}
+                marginY={{md: '50px', lg: '50px'}}
                 overflow="hidden"
                 borderRadius={{base: 'none', md: 'base'}}
                 bgColor="gray.50"
