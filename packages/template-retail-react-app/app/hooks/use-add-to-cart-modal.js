@@ -85,7 +85,7 @@ export const AddToCartModal = () => {
                     )}
                 </ModalHeader>
                 <ModalCloseButton />
-                <ModalBody bgColor="white" padding="0" flex="none">
+                <ModalBody bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}} flex="none">
                     <Flex
                         flexDirection={{base: 'column', lg: 'row'}}
                         justifyContent="space-between"
