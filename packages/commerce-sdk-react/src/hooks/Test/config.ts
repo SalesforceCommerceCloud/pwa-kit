@@ -5,59 +5,49 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
-import {ApiClients, CacheUpdate, CacheUpdateMatrix} from '../types'
+import {ApiClients, ApiOptions, CacheUpdate, CacheUpdateMatrix} from '../types'
 
 type Basket = ShopperBasketsTypes.Basket
 
 const updateBasketQuery = (basketId?: string): Pick<CacheUpdate, 'update'> => {
-    // TODO: we're missing headers, rawResponse -> not only {basketId}
-    const arg = {basketId}
-    return basketId
-        ? {
-              update: [
-                  {
-                      queryKey: ['/baskets', basketId, arg],
-                      updater: (basket) => basket // TODO
-                  }
-              ]
-          }
-        : {}
+    if (!basketId) return {}
+    return {
+        update: [
+            {
+                queryKey: ['/baskets', basketId, {basketId}],
+                updater: (basket) => basket // TODO
+            }
+        ]
+    }
 }
 
 const removeBasketQuery = (basketId?: string): Pick<CacheUpdate, 'remove'> => {
-    const arg = {basketId}
-    return basketId
-        ? {
-              remove: [{queryKey: ['/baskets', basketId, arg]}]
-          }
-        : {}
+    if (!basketId) return {}
+    return {
+        remove: [{queryKey: ['/baskets', basketId, {basketId}]}]
+    }
 }
 
 const invalidateCustomerBasketsQuery = (
     customerId: string | null
 ): Pick<CacheUpdate, 'invalidate'> => {
-    // TODO: should we use arg here or not? The invalidate method does not need exact query key.
-    const arg = {customerId}
-    return customerId
-        ? {
-              invalidate: [{queryKey: ['/customers', customerId, '/baskets', arg]}]
-          }
-        : {}
+    if (!customerId) return {}
+    return {
+        invalidate: [{queryKey: ['/customers', customerId, '/baskets', {customerId}]}]
+    }
 }
 
 const updateBasketFromRequest = (
     customerId: string | null,
-    params: {
-        parameters: Basket
-    }
+    options: ApiOptions<Basket>
 ): CacheUpdate => ({
-    ...updateBasketQuery(params.parameters.basketId),
+    ...updateBasketQuery(options.parameters?.basketId),
     ...invalidateCustomerBasketsQuery(customerId)
 })
 
 const updateBasketFromResponse = (
     customerId: string | null,
-    params: unknown, // not used,
+    options: ApiOptions<Basket>, // not used,
     response: Basket
 ): CacheUpdate => ({
     ...updateBasketQuery(response.basketId),
@@ -70,9 +60,9 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<ApiClients['shopperBaskets']> 
     removeItemFromBasket: updateBasketFromRequest,
     addPaymentInstrumentToBasket: updateBasketFromRequest,
     createBasket: updateBasketFromResponse, // Response!
-    deleteBasket: (customerId, params): CacheUpdate => ({
+    deleteBasket: (customerId, options): CacheUpdate => ({
         ...invalidateCustomerBasketsQuery(customerId),
-        ...removeBasketQuery(params.parameters.basketId)
+        ...removeBasketQuery(options.parameters.basketId)
     }),
     mergeBasket: updateBasketFromResponse, // Response!
     removeCouponFromBasket: updateBasketFromRequest,

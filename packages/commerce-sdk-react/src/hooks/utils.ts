@@ -26,7 +26,7 @@ const deepEqual = (a: unknown, b: unknown): boolean => {
  * @param lookupQueryKey partial query key to validate match against
  * @returns boolean
  */
-const isMatchingKey = (cacheQueryKey: QueryKey, lookupQueryKey: QueryKey): boolean =>
+const isMatchingKey = (cacheQueryKey: QueryKey, lookupQueryKey: ApiQueryKey): boolean =>
     lookupQueryKey.every((item, index) => deepEqual(item, cacheQueryKey[index]))
 
 export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate) => {

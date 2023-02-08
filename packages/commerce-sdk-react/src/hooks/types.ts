@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {QueryKey} from '@tanstack/react-query'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -50,7 +49,7 @@ export type ApiClient = ApiClients[keyof ApiClients]
 export type ApiOptions<
     Parameters extends Record<string, unknown> = Record<string, unknown>,
     Headers extends Record<string, string> = Record<string, string>,
-    Body extends Record<string, unknown> = Record<string, unknown>
+    Body extends Record<string, unknown> | unknown[] = Record<string, unknown> | unknown[]
 > = {
     parameters?: Parameters
     headers?: Headers
@@ -79,8 +78,12 @@ export type DataType<T> = T extends ApiMethod<any, Response | infer R> ? R : nev
 
 // --- CACHE HELPERS --- //
 
+export type ApiQueryKey =
+    // | readonly string[] // TODO: Is this needed?
+    readonly [...path: string[], parameters: Record<string, unknown>]
+
 export type CacheUpdateBase = {
-    queryKey: QueryKey // TODO: Can we do [...string, object]?
+    queryKey: ApiQueryKey
 }
 
 export type CacheUpdateUpdate = CacheUpdateBase & {
@@ -107,5 +110,3 @@ export type CacheUpdateMatrix<Client> = {
         ? CacheUpdateGetter<Argument<Client[Method]>, Data>
         : never
 }
-
-export type ApiQueryKey = readonly [...path: string[], parameters: Record<string, unknown>]
