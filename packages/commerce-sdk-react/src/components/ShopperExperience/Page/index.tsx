@@ -18,14 +18,12 @@ interface PageProps extends React.ComponentProps<'div'> {
     components: ComponentMap
 }
 
-type PageContextValue =
-    | {
-          components: ComponentMap
-      }
-    | undefined
+type PageContextValue = {
+    components: ComponentMap
+}
 
 // This context will hold the component map as well as any other future context.
-export const PageContext = React.createContext(undefined as PageContextValue)
+export const PageContext = React.createContext<PageContextValue | undefined>(undefined)
 
 // This hook allows sub-components to use the page context. In our case we use it
 // so that the generic <Component /> can use the component map to know which react component
