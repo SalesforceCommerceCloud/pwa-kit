@@ -25,7 +25,7 @@ const main = () => {
         'template-retail-react-app',
         'template-express-minimal',
         'template-typescript-minimal',
-        'template-mrt-reference-app',
+        'template-mrt-reference-app'
     ]
 
     if (!sh.test('-d', templatesDir)) {
