@@ -43,7 +43,6 @@ test('Region throws if used outside of a Page component', () => {
 })
 
 test('Region renders without errors', () => {
-    // const {container} = render(<Region region={SAMPLE_REGION} />)
     const component = <Region region={SAMPLE_REGION} />
 
     const {container} = render(component, {
