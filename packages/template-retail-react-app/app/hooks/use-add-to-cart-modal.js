@@ -66,12 +66,11 @@ export const AddToCartModal = () => {
     const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     return (
-        <Modal size={size} isOpen={isOpen} onClose={onClose}>
+        <Modal size={size} isOpen={isOpen} onClose={onClose} height="90vh">
             <ModalOverlay />
             <ModalContent
                 margin="0"
                 marginY={{md: '50px', lg: '50px'}}
-                overflow="hidden"
                 borderRadius={{base: 'none', md: 'base'}}
                 bgColor="gray.50"
             >
@@ -86,14 +85,15 @@ export const AddToCartModal = () => {
                     )}
                 </ModalHeader>
                 <ModalCloseButton />
-                <ModalBody bgColor="white" paddingTop="4" paddingBottom="8" flex="none">
+                <ModalBody bgColor="white" paddingTop="4" paddingBottom="0" paddingX="0" flex="none">
                     <Flex
                         flexDirection={{base: 'column', lg: 'row'}}
                         justifyContent="space-between"
+                        paddingBottom="8"
                     >
                         <Box
                             flex="1"
-                            paddingRight={{lg: '4', xl: '8'}}
+                            paddingX={{lg: '4', xl: '8'}}
                             paddingY={{base: '4', lg: '0'}}
                             // divider style
                             borderRightWidth={{lg: '1px'}}
@@ -171,7 +171,7 @@ export const AddToCartModal = () => {
                         <Box
                             display={['none', 'none', 'none', 'block']}
                             flex="1"
-                            paddingLeft={{lg: '4', xl: '8'}}
+                            paddingX={{lg: '4', xl: '8'}}
                             paddingY={{base: '4', lg: '0'}}
                         >
                             <Flex justifyContent="space-between" marginBottom="8">
@@ -216,21 +216,21 @@ export const AddToCartModal = () => {
                             </Stack>
                         </Box>
                     </Flex>
+                    <Box padding="8" bgColor="gray.50">
+                        <RecommendedProducts
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="You Might Also Like"
+                                    id="add_to_cart_modal.recommended_products.title.might_also_like"
+                                />
+                            }
+                            recommender={'pdp-similar-items'}
+                            products={[product]}
+                            mx={{base: -4, md: -8, lg: 0}}
+                            shouldFetch={() => product?.id}
+                        />
+                    </Box>
                 </ModalBody>
-                <Box padding="8">
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="You Might Also Like"
-                                id="add_to_cart_modal.recommended_products.title.might_also_like"
-                            />
-                        }
-                        recommender={'pdp-similar-items'}
-                        products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-                </Box>
                 <ModalFooter
                     position="fixed"
                     bg="white"
@@ -240,7 +240,7 @@ export const AddToCartModal = () => {
                     left={0}
                     bottom={0}
                 >
-                    <Flex justifyContent="space-between" marginBottom="8">
+                    <Flex justifyContent="space-between" marginBottom="4">
                         <Text fontWeight="700">
                             {intl.formatMessage(
                                 {
