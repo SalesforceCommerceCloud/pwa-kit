@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {QueryClient, QueryKey} from '@tanstack/react-query'
-import {CacheUpdate} from './types'
+import {ApiQueryKey, CacheUpdate} from './types'
 
 const isObject = (item: unknown): item is object => typeof item === 'object' && item !== null
 
@@ -29,7 +29,7 @@ const deepEqual = (a: unknown, b: unknown): boolean => {
 const isMatchingKey = (cacheQueryKey: QueryKey, lookupQueryKey: QueryKey): boolean =>
     lookupQueryKey.every((item, index) => deepEqual(item, cacheQueryKey[index]))
 
-export const updateCache = <Data>(queryClient: QueryClient, cacheUpdates: CacheUpdate<Data>) => {
+export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate) => {
     // STEP 1. Update data inside query cache for the matching queryKeys
     cacheUpdates.update?.forEach(({queryKey, updater}) => {
         queryClient.setQueryData(queryKey, updater)
@@ -58,3 +58,27 @@ export class NotImplementedError extends Error {
 
 export const hasAllKeys = <T>(object: T, keys: ReadonlyArray<keyof T>): boolean =>
     keys.every((key) => object[key] !== undefined)
+
+export const startsWith =
+    (search: readonly string[]) =>
+    (queryKey: ApiQueryKey): boolean =>
+        queryKey.length >= search.length && search.every((lookup, idx) => queryKey[idx] === lookup)
+
+export const endMatches =
+    (search: Record<string, unknown>) =>
+    (queryKey: ApiQueryKey): boolean => {
+        const parameters = queryKey[queryKey.length - 1]
+        if (typeof parameters !== 'object') return false
+        const searchEntries = Object.entries(search)
+        // Can't be a match if we're looking for more values than we have
+        if (searchEntries.length > Object.keys(parameters).length) return false
+        for (const [key, lookup] of searchEntries) {
+            if (parameters[key] !== lookup) return false
+        }
+        return true
+    }
+
+export const and =
+    <Args extends unknown[]>(...funcs: Array<(...args: Args) => boolean>) =>
+    (...args: Args) =>
+        funcs.every((fn) => fn(...args))

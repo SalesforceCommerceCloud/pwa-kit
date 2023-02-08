@@ -75,9 +75,7 @@ export type Argument<T extends (arg: any) => unknown> = NonNullable<Parameters<T
  * flag is not set.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type DataType<T extends ApiMethod<any, any>> = T extends ApiMethod<any, Response | infer R>
-    ? R
-    : never
+export type DataType<T> = T extends ApiMethod<any, Response | infer R> ? R : never
 
 // --- CACHE HELPERS --- //
 
@@ -85,12 +83,12 @@ export type CacheUpdateBase = {
     queryKey: QueryKey // TODO: Can we do [...string, object]?
 }
 
-export type CacheUpdateUpdate<Data> = CacheUpdateBase & {
-    updater: (data: Data | undefined) => Data | undefined
+export type CacheUpdateUpdate = CacheUpdateBase & {
+    updater: <T>(oldData: T) => T
 }
 
-export type CacheUpdate<Data> = {
-    update?: CacheUpdateUpdate<Data>[]
+export type CacheUpdate = {
+    update?: CacheUpdateUpdate[]
     invalidate?: CacheUpdateBase[]
     remove?: CacheUpdateBase[]
 }
@@ -99,7 +97,7 @@ export type CacheUpdateGetter<Options, Data> = (
     customerId: string | null,
     params: Options,
     response: Data
-) => CacheUpdate<Data>
+) => CacheUpdate
 
 export type CacheUpdateMatrix<Client> = {
     // It feels like we should be able to do <infer Arg, infer Data>, but that
@@ -109,3 +107,5 @@ export type CacheUpdateMatrix<Client> = {
         ? CacheUpdateGetter<Argument<Client[Method]>, Data>
         : never
 }
+
+export type ApiQueryKey = readonly [...path: string[], parameters: Record<string, unknown>]
