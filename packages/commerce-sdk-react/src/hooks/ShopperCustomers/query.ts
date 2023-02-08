@@ -130,7 +130,10 @@ function useCustomerBaskets(
         (_, {shopperCustomers}) => {
             return shopperCustomers.getCustomerBaskets({parameters, headers}, rawResponse)
         },
-        options
+        {
+            enabled: !!parameters.customerId,
+            ...options
+        }
     )
 }
 
