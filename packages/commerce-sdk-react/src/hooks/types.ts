@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {Query, Updater} from '@tanstack/react-query'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -82,18 +83,19 @@ export type ApiQueryKey =
     // | readonly string[] // TODO: Is this needed?
     readonly [...path: string[], parameters: Record<string, unknown>]
 
-export type CacheUpdateBase = {
+export type CacheUpdateUpdate<T> = {
     queryKey: ApiQueryKey
+    updater: Updater<T | undefined, T | undefined>
 }
 
-export type CacheUpdateUpdate = CacheUpdateBase & {
-    updater: <T>(oldData: T) => T
-}
+export type CacheUpdateInvalidate = (query: Query) => boolean
+
+export type CacheUpdateRemove = (query: Query) => boolean
 
 export type CacheUpdate = {
-    update?: CacheUpdateUpdate[]
-    invalidate?: CacheUpdateBase[]
-    remove?: CacheUpdateBase[]
+    update?: CacheUpdateUpdate<unknown>[]
+    invalidate?: CacheUpdateInvalidate[]
+    remove?: CacheUpdateRemove[]
 }
 
 export type CacheUpdateGetter<Options, Data> = (
