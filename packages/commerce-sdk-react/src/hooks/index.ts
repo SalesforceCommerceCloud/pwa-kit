@@ -7,6 +7,7 @@
 export * from './ShopperBaskets'
 export * from './ShopperContexts'
 export * from './ShopperCustomers'
+export * from './ShopperExperience'
 export * from './ShopperDiscoverySearch'
 export * from './ShopperGiftCertificates'
 export * from './ShopperLogin'

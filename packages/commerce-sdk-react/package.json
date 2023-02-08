@@ -74,7 +74,7 @@
     "react": "^17"
   },
   "dependencies": {
-    "commerce-sdk-isomorphic": "^1.8.0",
+    "commerce-sdk-isomorphic": "^1.9.0",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^3.1.2"
   }
