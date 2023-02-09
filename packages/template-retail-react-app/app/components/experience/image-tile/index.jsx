@@ -16,12 +16,13 @@ import {Image} from '@chakra-ui/react'
  */
 const ImageTile = ({image, ...rest}) => {
     return (
-        <figure data-testid="image-tile" className={'image-tile-figure'}>
+        <figure className={'image-tile-figure'}>
             <picture>
                 <source srcSet={rest.src?.tablet} media="(min-width: 48em)" />
                 <source srcSet={rest.src?.desktop} media="(min-width: 64em)" />
                 <Image
                     className={'image-tile-image'}
+                    data-testid={'image-tile-image'}
                     src={rest.src?.mobile ? rest.src?.mobile : image?.url}
                     ignoreFallback={true}
                     alt={rest?.alt}

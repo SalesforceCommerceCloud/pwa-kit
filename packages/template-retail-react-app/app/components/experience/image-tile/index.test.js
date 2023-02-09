@@ -24,5 +24,7 @@ test('ImageTile renders without errors', () => {
         />
     )
 
-    expect(getByTestId('image-tile')).toBeTruthy()
+    const image = getByTestId('image-tile-image')
+
+    expect(image).toHaveAttribute('src', `${getAssetUrl('static/img/hero.png')}`)
 })
