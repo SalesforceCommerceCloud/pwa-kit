@@ -30,7 +30,7 @@ jobs:
   pwa-kit:
     strategy:
       matrix:
-        node: [14]
+        node: [14, 16, 18]
         npm: [6, 7, 8]
     runs-on: ubuntu-latest
     env:
