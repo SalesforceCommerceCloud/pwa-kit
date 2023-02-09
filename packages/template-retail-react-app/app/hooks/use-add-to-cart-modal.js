@@ -66,7 +66,7 @@ export const AddToCartModal = () => {
     const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     return (
-        <Modal size={size} isOpen={isOpen} onClose={onClose} height="90vh">
+        <Modal size={size} isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent
                 margin="0"
