@@ -56,6 +56,9 @@ import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
 
+import './style.css'
+import './style2.css'
+
 const App = (props) => {
     const {
         children,
@@ -197,6 +200,12 @@ const App = (props) => {
                             />
                             {/* A wider fallback for user locales that the app does not support */}
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
+
+                            <link
+                                rel="stylesheet"
+                                type="text/css"
+                                href={getAssetUrl('global.css')}
+                            />
                         </Seo>
 
                         <ScrollToTop />
