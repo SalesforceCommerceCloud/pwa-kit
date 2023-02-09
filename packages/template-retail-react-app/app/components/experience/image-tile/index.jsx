@@ -6,40 +6,44 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {AspectRatio, Image} from '@chakra-ui/react'
+import {Image} from '@chakra-ui/react'
 
 /**
  * This is a simple Image Tile component that can be used inside any Layout component
- *
- * @param imageProps
- * @param ratio
+ * @param image Object containing the _type and focalPoint.
+ * @param url The URL to the image file.
+ * @param rest The rest of the potential parameters.
  * @returns {JSX.Element}
  */
-const ImageTile = ({imageProps, ratio = 1, ...rest}) => {
+const ImageTile = ({image, ...rest}) => {
     return (
-        <AspectRatio ratio={ratio}>
-            <figure className={'photo-tile-figure'}>
-                <picture>
-                    <source srcSet={imageProps.src?.tablet} media="(min-width: 48em)" />
-                    <source srcSet={imageProps.src?.desktop} media="(min-width: 64em)" />
-                    <Image
-                        className={'photo-tile-image image-fluid'}
-                        src={imageProps.src?.mobile ? imageProps.src?.mobile : imageProps.src}
-                        ignoreFallback={true}
-                        alt={imageProps.alt}
-                        title={imageProps.title}
-                        {...rest}
-                    />
-                </picture>
-            </figure>
-        </AspectRatio>
+        <figure data-testid="image-tile" className={'image-tile-figure'}>
+            <picture>
+                <source srcSet={rest.src?.tablet} media="(min-width: 48em)" />
+                <source srcSet={rest.src?.desktop} media="(min-width: 64em)" />
+                <Image
+                    className={'image-tile-image'}
+                    src={rest.src?.mobile ? rest.src?.mobile : image?.url}
+                    ignoreFallback={true}
+                    alt={rest?.alt}
+                    title={rest?.title}
+                    {...rest}
+                />
+            </picture>
+        </figure>
     )
 }
 
 ImageTile.propTypes = {
-    imageProps: PropTypes.object,
-    ratio: PropTypes.number,
-    caption: PropTypes.string
+    image: PropTypes.shape({
+        _type: PropTypes.string,
+        focalPoint: PropTypes.shape({
+            _type: PropTypes.string,
+            x: PropTypes.number,
+            y: PropTypes.number
+        }),
+        url: PropTypes.string
+    })
 }
 
 export default ImageTile

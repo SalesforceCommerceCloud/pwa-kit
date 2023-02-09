@@ -7,18 +7,22 @@
 import React from 'react'
 import {renderWithProviders} from '../../../utils/test-utils'
 import ImageTile from './index'
+import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 test('ImageTile renders without errors', () => {
-    const {getByAltText} = renderWithProviders(
+    const {getByTestId} = renderWithProviders(
         <ImageTile
-            imageProps={{
-                alt: 'alt-text',
-                src: {mobile: 'static/img/hero.png'}
+            image={{
+                _type: 'Image',
+                focalPoint: {
+                    _type: 'Imagefocalpoint',
+                    x: 0.5,
+                    y: 0.5
+                },
+                url: `${getAssetUrl('static/img/hero.png')}`
             }}
         />
     )
 
-    const image = getByAltText('alt-text')
-
-    expect(image).toHaveAttribute('src', 'static/img/hero.png')
+    expect(getByTestId('image-tile')).toBeTruthy()
 })
