@@ -6,7 +6,7 @@
  */
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
     Button,
@@ -40,6 +40,11 @@ import useNavigation from './use-navigation'
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
 const PASSWORD_VIEW = 'password'
+
+const LOGIN_ERROR = defineMessage({
+    defaultMessage: "Something's not right with your email or password. Try again.",
+    id: 'auth_modal.error.incorrect_email_or_password'
+})
 
 export const AuthModal = ({
     initialView = LOGIN_VIEW,
@@ -81,7 +86,9 @@ export const AuthModal = ({
                     {
                         onSuccess: onLoginSuccess,
                         onError: (error) => {
-                            const message = /Unauthorized/i.test(error.message) ? 'fdsf' : 'fds'
+                            const message = /Unauthorized/i.test(error.message)
+                                ? formatMessage(LOGIN_ERROR)
+                                : formatMessage(API_ERROR_MESSAGE)
                             form.setError('global', {type: 'manual', message})
                         }
                     }

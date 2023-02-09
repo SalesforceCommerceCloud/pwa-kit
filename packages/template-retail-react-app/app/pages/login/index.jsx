@@ -7,7 +7,7 @@
 
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
+import {useIntl, defineMessage} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
 import {
     ShopperLoginHelpers,
@@ -21,7 +21,10 @@ import {useLocation} from 'react-router-dom'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 import LoginForm from '../../components/login'
 import {API_ERROR_MESSAGE} from '../../constants'
-
+const LOGIN_ERROR_MESSAGE = defineMessage({
+    defaultMessage: 'Incorrect username or password, please try again.',
+    id: 'login_page.error.incorrect_username_or_password'
+})
 const Login = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
@@ -37,10 +40,7 @@ const Login = () => {
             {
                 onError: (error) => {
                     const message = /Unauthorized/i.test(error.message)
-                        ? formatMessage({
-                              defaultMessage: 'Incorrect username or password, please try again.',
-                              id: 'login_page.error.incorrect_username_or_password'
-                          })
+                        ? formatMessage(LOGIN_ERROR_MESSAGE)
                         : formatMessage(API_ERROR_MESSAGE)
                     form.setError('global', {type: 'manual', message})
                 }
@@ -51,6 +51,7 @@ const Login = () => {
     // If customer is registered push to account page
     useEffect(() => {
         if (isRegistered) {
+            console.log('isRegistered', isRegistered)
             if (location?.state?.directedFrom) {
                 navigate(location.state.directedFrom)
             } else {
