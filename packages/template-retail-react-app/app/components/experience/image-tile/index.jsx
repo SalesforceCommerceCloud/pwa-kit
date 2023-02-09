@@ -10,9 +10,8 @@ import {Image} from '@chakra-ui/react'
 
 /**
  * This is a simple Image Tile component that can be used inside any Layout component
- * @param image Object containing the _type and focalPoint.
- * @param url The URL to the image file.
- * @param rest The rest of the potential parameters.
+ * @param image Object containing the image url, _type and focalPoint.
+ * @param rest The rest of the potential image parameters.
  * @returns {JSX.Element}
  */
 const ImageTile = ({image, ...rest}) => {
