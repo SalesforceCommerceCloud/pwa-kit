@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {Query, QueryClient} from '@tanstack/react-query'
-import {CacheUpdate} from './types'
+import {ApiClient, ApiOptions, CacheUpdate, MergedOptions} from './types'
 
 export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate) => {
     cacheUpdates.update?.forEach(({queryKey, updater}) =>
@@ -50,3 +50,24 @@ export const and =
     <Args extends unknown[]>(...funcs: Array<(...args: Args) => boolean>) =>
     (...args: Args) =>
         funcs.every((fn) => fn(...args))
+
+/**
+ * Merges headers and parameters from client config into the options, mimicking the behavior
+ * of commerce-sdk-isomorphic.
+ */
+export const mergeOptions = <Client extends ApiClient, Options extends ApiOptions>(
+    client: Client,
+    options: Options
+): MergedOptions<Client, Options> => {
+    return {
+        ...options,
+        headers: {
+            ...client.clientConfig.headers,
+            ...options.headers
+        },
+        parameters: {
+            ...client.clientConfig.parameters,
+            ...options.parameters
+        }
+    }
+}

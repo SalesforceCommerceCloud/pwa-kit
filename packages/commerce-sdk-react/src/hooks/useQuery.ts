@@ -7,7 +7,7 @@
 import {useQuery as useReactQuery, UseQueryOptions, QueryKey} from '@tanstack/react-query'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import {ApiClient, ApiMethod, ApiOptions} from './types'
-import {hasAllKeys} from './utils'
+import {hasAllKeys, mergeOptions} from './utils'
 
 export const useQuery = <
     Options extends Omit<ApiOptions, 'body'>,
@@ -26,10 +26,7 @@ export const useQuery = <
         enabled?: boolean
     }
 ) => {
-    const parameters = {
-        ...hookConfig.client.clientConfig.parameters,
-        ...apiOptions.parameters
-    }
+    const {parameters} = mergeOptions(hookConfig.client, apiOptions)
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
     return useReactQuery(
         // End user can override queryKey if they really want to...

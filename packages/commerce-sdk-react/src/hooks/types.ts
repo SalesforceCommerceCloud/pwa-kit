@@ -50,9 +50,9 @@ export type ApiClient = ApiClients[keyof ApiClients]
  * Generic signature of the options objects used by commerce-sdk-isomorphic
  */
 export type ApiOptions<
-    Parameters extends Record<string, unknown> = Record<string, unknown>,
+    Parameters extends object = Record<string, unknown>,
     Headers extends Record<string, string> = Record<string, string>,
-    Body extends Record<string, unknown> | unknown[] = Record<string, unknown> | unknown[]
+    Body extends object | unknown[] | undefined = Record<string, unknown> | unknown[] | undefined
 > = {
     parameters?: Parameters
     headers?: Headers
@@ -114,3 +114,9 @@ export type CacheUpdateMatrix<Client> = {
         ? CacheUpdateGetter<Argument<Client[Method]>, Data>
         : never
 }
+
+export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> = ApiOptions<
+    Client['clientConfig']['parameters'] & Options['parameters'],
+    Client['clientConfig']['headers'] & Options['headers'],
+    Options['body']
+>

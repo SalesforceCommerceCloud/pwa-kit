@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, ApiMethod, Argument, CacheUpdateGetter, DataType} from '../types'
+import {ApiClients, ApiMethod, Argument, CacheUpdateGetter, DataType, MergedOptions} from '../types'
 import {useMutation} from '../useMutation'
 import {UseMutationResult} from '@tanstack/react-query'
 import {NotImplementedError} from '../utils'
@@ -61,7 +61,8 @@ export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutatio
     type Options = Argument<Client[Mutation]>
     type Data = DataType<Client[Mutation]>
     return useMutation({
+        client,
         method: (opts: Options) => (client[mutation] as ApiMethod<Options, Data>)(opts),
-        getCacheUpdates: getCacheUpdates as CacheUpdateGetter<Options, Data>
+        getCacheUpdates: getCacheUpdates as CacheUpdateGetter<MergedOptions<Client, Options>, Data>
     })
 }

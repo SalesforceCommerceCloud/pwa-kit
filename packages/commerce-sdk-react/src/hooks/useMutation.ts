@@ -5,14 +5,19 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useMutation as useReactQueryMutation, useQueryClient} from '@tanstack/react-query'
-import {CacheUpdateGetter, ApiOptions, ApiMethod} from './types'
+import {CacheUpdateGetter, ApiOptions, ApiMethod, ApiClient, MergedOptions} from './types'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useCustomerId from './useCustomerId'
-import {updateCache} from './utils'
+import {mergeOptions, updateCache} from './utils'
 
-export const useMutation = <Options extends ApiOptions, Data>(hookConfig: {
+export const useMutation = <
+    Client extends ApiClient,
+    Options extends ApiOptions,
+    Data
+>(hookConfig: {
+    client: Client
     method: ApiMethod<Options, Data>
-    getCacheUpdates: CacheUpdateGetter<Options, Data>
+    getCacheUpdates: CacheUpdateGetter<MergedOptions<Client, Options>, Data>
 }) => {
     const queryClient = useQueryClient()
     const customerId = useCustomerId()
@@ -20,7 +25,10 @@ export const useMutation = <Options extends ApiOptions, Data>(hookConfig: {
 
     return useReactQueryMutation(authenticatedMethod, {
         onSuccess: (data, options) => {
-            const cacheUpdates = hookConfig.getCacheUpdates(customerId, options, data)
+            // commerce-sdk-isomorphic merges `clientConfig` and `options` under the hood,
+            // so we also need to do that to get the "net" options that are actually sent to SCAPI.
+            const netOptions = mergeOptions(hookConfig.client, options)
+            const cacheUpdates = hookConfig.getCacheUpdates(customerId, netOptions, data)
             cacheUpdates.update?.forEach(({updater}) => updater)
             updateCache(queryClient, cacheUpdates)
         }
