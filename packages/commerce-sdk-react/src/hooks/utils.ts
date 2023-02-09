@@ -27,12 +27,12 @@ export const isObject = (obj: unknown): obj is Record<string, unknown> =>
 export const hasAllKeys = <T>(object: T, keys: ReadonlyArray<keyof T>): boolean =>
     keys.every((key) => object[key] !== undefined)
 
-export const startsWith =
+export const pathStartsWith =
     (search: readonly string[]) =>
     ({queryKey}: Query): boolean =>
         queryKey.length >= search.length && search.every((lookup, idx) => queryKey[idx] === lookup)
 
-export const endMatches =
+export const matchParametersStrict =
     (search: Record<string, unknown>) =>
     ({queryKey}: Query): boolean => {
         const parameters = queryKey[queryKey.length - 1]
@@ -41,9 +41,31 @@ export const endMatches =
         return (
             // Can't be a match if we're looking for more values than we have
             searchEntries.length > Object.keys(parameters).length &&
+            // TODO: Support arrays - parameters can also be string | number
             searchEntries.every(([key, lookup]) => parameters[key] === lookup)
         )
     }
+
+const matchParameters = (parameters: Record<string, unknown>, keys = Object.keys(parameters)) => {
+    const search: Record<string, unknown> = {}
+    for (const key of keys) {
+        if (parameters[key] !== undefined) search[key] = parameters[key]
+    }
+    return matchParametersStrict(search)
+}
+
+export const matchesApiConfig = (parameters: Record<string, unknown>) =>
+    matchParameters(parameters, [
+        'clientId',
+        'currency', // TODO: maybe?
+        'locale', // TODO: maybe?
+        'organizationId',
+        'shortCode',
+        'siteId',
+        // Version is never used directly by us, but is set on the client config
+        // in `commerce-sdk-isomorphic`, so we include it here for completeness
+        'version'
+    ])
 
 export const and =
     <Args extends unknown[]>(...funcs: Array<(...args: Args) => boolean>) =>
@@ -58,7 +80,7 @@ export const mergeOptions = <Client extends ApiClient, Options extends ApiOption
     client: Client,
     options: Options
 ): MergedOptions<Client, Options> => {
-    return {
+    const merged = {
         ...options,
         headers: {
             ...client.clientConfig.headers,
@@ -69,4 +91,9 @@ export const mergeOptions = <Client extends ApiClient, Options extends ApiOption
             ...options.parameters
         }
     }
+    // I don't know why TypeScript complains if we don't include `body`, but this type assertion
+    // fixes it. The type error can also be fixed by adding `body: undefined` before `...options`,
+    // and then deleting `merged.body` if `options` doesn't have `body`. That's the same as just not
+    // including it in the first place, so I don't know what difference it makes to TypeScript...
+    return merged as typeof merged & {body?: undefined}
 }

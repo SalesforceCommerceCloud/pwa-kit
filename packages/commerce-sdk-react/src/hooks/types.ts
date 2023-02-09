@@ -95,7 +95,10 @@ export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> 
     ApiOptions<
         NonNullable<Client['clientConfig']['parameters'] & Options['parameters']>,
         NonNullable<Client['clientConfig']['headers'] & Options['headers']>,
-        Options['body']
+        // `body` may not exist on `Options`, in which case it is `unknown` here. Due to the type
+        // constraint in `ApiOptions`, that is not a valid value. We must replace it with `never`
+        // to indicate that the result type does not have a `body`.
+        unknown extends Options['body'] ? never : Options['body']
     >,
     'parameters' | 'headers'
 >
@@ -123,15 +126,15 @@ export type CacheUpdate = {
 
 export type CacheUpdateGetter<Options, Data> = (
     customerId: string | null,
-    params: Options,
+    options: Options,
     response: Data
 ) => CacheUpdate
 
-export type CacheUpdateMatrix<Client> = {
+export type CacheUpdateMatrix<Client extends ApiClient> = {
     // It feels like we should be able to do <infer Arg, infer Data>, but that
     // results in some methods being `never`, so we just use Argument<> later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [Method in keyof Client]?: Client[Method] extends ApiMethod<any, Response | infer Data>
-        ? CacheUpdateGetter<Argument<Client[Method]>, Data>
+        ? CacheUpdateGetter<MergedOptions<Client, Argument<Client[Method]>>, Data>
         : never
 }
