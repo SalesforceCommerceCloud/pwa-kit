@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {Image} from '@chakra-ui/react'
 
 /**
- * This is a simple Image Tile component that can be used inside any Layout component
+ * Simple Image tile component that can be used inside any Layout component
  * @param image Object containing the image url, _type and focalPoint.
  * @param rest The rest of the potential image parameters.
  * @returns {JSX.Element}
@@ -18,15 +18,15 @@ const ImageTile = ({image, ...rest}) => {
     return (
         <figure className={'image-tile-figure'}>
             <picture>
-                <source srcSet={rest.src?.tablet} media="(min-width: 48em)" />
-                <source srcSet={rest.src?.desktop} media="(min-width: 64em)" />
+                <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
+                <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
                 <Image
                     className={'image-tile-image'}
                     data-testid={'image-tile-image'}
-                    src={rest.src?.mobile ? rest.src?.mobile : image?.url}
+                    src={image?.src?.mobile ? image?.src?.mobile : image?.url}
                     ignoreFallback={true}
-                    alt={rest?.alt}
-                    title={rest?.title}
+                    alt={image?.alt}
+                    title={image?.alt}
                     {...rest}
                 />
             </picture>
@@ -42,7 +42,9 @@ ImageTile.propTypes = {
             x: PropTypes.number,
             y: PropTypes.number
         }),
-        url: PropTypes.string
+        url: PropTypes.string,
+        alt: PropTypes.string,
+        src: PropTypes.string || PropTypes.object
     })
 }
 
