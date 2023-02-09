@@ -17,6 +17,7 @@ import fs from 'fs'
  * @returns {webpack.NormalModuleReplacementPlugin}
  */
 export const createModuleReplacementPlugin = (projectDir) => {
+    // Helper function to create a RegExp object from a string
     const makeRegExp = (str, sep = path.sep) => {
         // Replace unix paths with windows if needed and build a RegExp
         if (sep === '\\') {
@@ -24,6 +25,10 @@ export const createModuleReplacementPlugin = (projectDir) => {
         }
         return new RegExp(str)
     }
+
+    // List of overridable paths
+    // path: The RegExp that matches the path to the overridable component
+    // newPath: The path to the component in the project directory
     const overridables = [
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app-config$'),
@@ -48,6 +53,7 @@ export const createModuleReplacementPlugin = (projectDir) => {
     ]
     const extensions = ['.ts', '.tsx', '.js', '.jsx']
 
+    // Find the replacement for each overridable path by checking if the file exists
     const replacements = []
     overridables.forEach(({path, newPath}) => {
         extensions.forEach((ext) => {
@@ -58,20 +64,30 @@ export const createModuleReplacementPlugin = (projectDir) => {
         })
     })
 
+    // Return a new `webpack.NormalModuleReplacementPlugin` instance
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
-        const resolved = path.resolve(resource.context, resource.request)
+        // We only want to replace resources that are requested from the SDK
+        if (resource.context.includes('pwa-kit-react-sdk')) {
+            // Resolve the full path of the resource
+            const resolved = path.resolve(resource.context, resource.request)
 
-        const replacement = replacements.find(({path}) => resolved.match(path))
+            // Find the replacement for the resolved path from the overridables list
+            const replacement = replacements.find(({path}) => resolved.match(path))
 
-        const sdkPaths = [
-            path.join('packages', 'pwa-kit-react-sdk'),
-            path.join('node_modules', 'pwa-kit-react-sdk')
-        ]
+            if (replacement) {
+                // Check if the resource was requested from 'packages/pwa-kit-react-sdk' or 'node_modules/pwa-kit-react-sdk'
+                const sdkPaths = [
+                    path.join('packages', 'pwa-kit-react-sdk'),
+                    path.join('node_modules', 'pwa-kit-react-sdk')
+                ]
 
-        const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))
+                const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))
 
-        if (requestedFromSDK && replacement) {
-            resource.request = replacement.newPath
+                // If the resource was requested from SDK, replace the resource request with the replacement path
+                if (requestedFromSDK) {
+                    resource.request = replacement.newPath
+                }
+            }
         }
     })
 }
