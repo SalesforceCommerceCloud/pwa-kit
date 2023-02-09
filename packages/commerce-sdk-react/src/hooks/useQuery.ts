@@ -6,7 +6,7 @@
  */
 import {useQuery as useReactQuery, UseQueryOptions, QueryKey} from '@tanstack/react-query'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
-import {ApiClient, ApiMethod, ApiOptions} from './types'
+import {ApiClient, ApiMethod, ApiOptions, MergedOptions} from './types'
 import {hasAllKeys, mergeOptions} from './utils'
 
 export const useQuery = <
@@ -21,21 +21,21 @@ export const useQuery = <
     hookConfig: {
         client: Client
         method: ApiMethod<Options, Data>
-        getQueryKey: (parameters: Options['parameters']) => QK
+        getQueryKey: (options: MergedOptions<Client, Options>) => QK
         requiredParameters: ReadonlyArray<keyof Options['parameters']>
         enabled?: boolean
     }
 ) => {
-    const {parameters} = mergeOptions(hookConfig.client, apiOptions)
+    const netOptions = mergeOptions(hookConfig.client, apiOptions)
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
     return useReactQuery(
         // End user can override queryKey if they really want to...
-        queryOptions.queryKey ?? hookConfig.getQueryKey(parameters),
+        queryOptions.queryKey ?? hookConfig.getQueryKey(netOptions),
         () => authenticatedMethod(apiOptions),
         {
             enabled:
                 hookConfig.enabled !== false &&
-                hasAllKeys(parameters, hookConfig.requiredParameters),
+                hasAllKeys(netOptions.parameters, hookConfig.requiredParameters),
             ...queryOptions
         }
     )

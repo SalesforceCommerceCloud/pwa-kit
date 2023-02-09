@@ -19,6 +19,14 @@ import {
     ShopperSearch
 } from 'commerce-sdk-isomorphic'
 
+// --- GENERAL UTILITIES --- //
+
+/**
+ * Marks the given keys as required.
+ */
+// The outer Pick<...> is used to prettify the result type
+type RequireKeys<T, K extends keyof T> = Pick<T & Required<Pick<T, K>>, keyof T>
+
 // --- API CLIENTS --- //
 
 export type ApiClientConfigParams = {
@@ -79,6 +87,19 @@ export type Argument<T extends (arg: any) => unknown> = NonNullable<Parameters<T
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type DataType<T> = T extends ApiMethod<any, Response | infer R> ? R : never
 
+/**
+ * Merged headers and parameters from client config and options, mimicking the behavior
+ * of commerce-sdk-isomorphic.
+ */
+export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> = RequireKeys<
+    ApiOptions<
+        NonNullable<Client['clientConfig']['parameters'] & Options['parameters']>,
+        NonNullable<Client['clientConfig']['headers'] & Options['headers']>,
+        Options['body']
+    >,
+    'parameters' | 'headers'
+>
+
 // --- CACHE HELPERS --- //
 
 export type ApiQueryKey =
@@ -114,9 +135,3 @@ export type CacheUpdateMatrix<Client> = {
         ? CacheUpdateGetter<Argument<Client[Method]>, Data>
         : never
 }
-
-export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> = ApiOptions<
-    Client['clientConfig']['parameters'] & Options['parameters'],
-    Client['clientConfig']['headers'] & Options['headers'],
-    Options['body']
->
