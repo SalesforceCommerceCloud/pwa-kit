@@ -63,7 +63,7 @@ Skeleton.propTypes = {
  * The image gallery displays a hero image and thumbnails below it. You can control which
  * image groups that are use by passing in the current selected variation values.
  */
-const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}) => {
+const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size, lazy = false}) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
     const styles = useMultiStyleConfig('ImageGallery', {size})
     const location = useLocation()
@@ -97,6 +97,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
 
     const heroImage = heroImageGroup?.images?.[selectedIndex]
     const thumbnailImages = thumbnailImageGroup?.images || []
+    const isLazyLoad = lazy ? 'lazy' : 'eager'
 
     const heroImageMaxWidth = styles.heroImage.maxWidth[3] // in px
 
@@ -112,7 +113,8 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
                                 lg: heroImageMaxWidth
                             }}
                             imageProps={{
-                                alt: heroImage.alt
+                                alt: heroImage.alt,
+                                loading: isLazyLoad
                             }}
                         />
                     </AspectRatio>
@@ -138,7 +140,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
                             borderWidth={`${selected ? '1px' : 0}`}
                         >
                             <AspectRatio ratio={1}>
-                                <Img alt={image.alt} src={image.disBaseLink || image.link} />
+                                <Img alt={image.alt} src={image.disBaseLink || image.link} loading={isLazyLoad}/>
                             </AspectRatio>
                         </ListItem>
                     )
