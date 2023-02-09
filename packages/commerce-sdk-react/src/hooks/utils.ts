@@ -38,12 +38,11 @@ export const endMatches =
         const parameters = queryKey[queryKey.length - 1]
         if (!isObject(parameters)) return false
         const searchEntries = Object.entries(search)
-        // Can't be a match if we're looking for more values than we have
-        if (searchEntries.length > Object.keys(parameters).length) return false
-        for (const [key, lookup] of searchEntries) {
-            if (parameters[key] !== lookup) return false
-        }
-        return true
+        return (
+            // Can't be a match if we're looking for more values than we have
+            searchEntries.length > Object.keys(parameters).length &&
+            searchEntries.every(([key, lookup]) => parameters[key] === lookup)
+        )
     }
 
 export const and =
