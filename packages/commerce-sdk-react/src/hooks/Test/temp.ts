@@ -21,7 +21,12 @@ const queryData = query.data
 const updates = cacheUpdateMatrix.removeItemFromBasket?.(
     'customerId',
     {
+        headers: {},
         parameters: {
+            shortCode: 'shortCode',
+            clientId: 'clientId',
+            siteId: 'siteId',
+            organizationId: 'organizationId',
             basketId: 'basketId',
             itemId: 'itemId'
         }
