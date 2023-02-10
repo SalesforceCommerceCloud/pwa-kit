@@ -268,8 +268,7 @@ describe('rewriteProxyResponseHeaders tests', () => {
                 'set-cookie': [
                     {
                         key: 'Set-Cookie',
-                        value:
-                            'origin_dc=war; expires=Mon, 01-Oct-2018 00:13:20 GMT; path=/; domain=.www.customer.com'
+                        value: 'origin_dc=war; expires=Mon, 01-Oct-2018 00:13:20 GMT; path=/; domain=.www.customer.com'
                     }
                 ]
             },
@@ -277,8 +276,7 @@ describe('rewriteProxyResponseHeaders tests', () => {
                 'set-cookie': [
                     {
                         key: 'Set-Cookie',
-                        value:
-                            'origin_dc=war; Path=/; Expires=Mon, 01 Oct 2018 00:13:20 GMT; Domain=apphost.mobify.com'
+                        value: 'origin_dc=war; Path=/; Expires=Mon, 01 Oct 2018 00:13:20 GMT; Domain=apphost.mobify.com'
                     }
                 ]
             }

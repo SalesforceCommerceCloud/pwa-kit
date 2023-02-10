@@ -174,8 +174,7 @@ const AccountOrderDetail = () => {
                                             {trackingNumber ||
                                                 formatMessage({
                                                     defaultMessage: 'Pending',
-                                                    id:
-                                                        'account_order_detail.label.pending_tracking_number'
+                                                    id: 'account_order_detail.label.pending_tracking_number'
                                                 })}
                                         </Text>
                                     </Box>

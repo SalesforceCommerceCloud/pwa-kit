@@ -17,37 +17,23 @@ import {useProductViewModal} from './use-product-view-modal'
 import {DEFAULT_LOCALE} from '../utils/test-utils'
 import {renderWithProviders} from '../utils/test-utils'
 import messages from '../translations/compiled/en-GB.json'
-jest.mock('../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
-            async getProduct() {
-                return {
-                    ...mockProductDetail,
-                    id: '750518699660M',
-                    variationValues: {
-                        color: 'BLACKFB',
-                        size: '050',
-                        width: 'V'
-                    },
-                    c_color: 'BLACKFB',
-                    c_isNew: true,
-                    c_refinementColor: 'black',
-                    c_size: '050',
-                    c_width: 'V'
-                }
-            }
-        }
-    }
-})
+import {rest} from 'msw'
+
+const mockProduct = {
+    ...mockProductDetail,
+    id: '750518699660M',
+    variationValues: {
+        color: 'BLACKFB',
+        size: '050',
+        width: 'V'
+    },
+    c_color: 'BLACKFB',
+    c_isNew: true,
+    c_refinementColor: 'black',
+    c_size: '050',
+    c_width: 'V'
+}
+
 const MockComponent = ({product}) => {
     const productViewModalData = useProductViewModal(product)
     const [isShown, setIsShown] = React.useState(false)
@@ -69,6 +55,14 @@ const MockComponent = ({product}) => {
 MockComponent.propTypes = {
     product: PropTypes.object
 }
+
+beforeEach(() => {
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockProduct))
+        })
+    )
+})
 
 describe('useProductViewModal hook', () => {
     test('return proper data', () => {

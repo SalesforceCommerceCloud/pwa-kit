@@ -43,13 +43,8 @@ const ProductItem = ({
     onItemQuantityChange = noop,
     showLoading = false
 }) => {
-    const {
-        stepQuantity,
-        showInventoryMessage,
-        inventoryMessage,
-        quantity,
-        setQuantity
-    } = useProduct(product)
+    const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
+        useProduct(product)
 
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>

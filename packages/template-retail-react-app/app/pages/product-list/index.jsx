@@ -55,7 +55,6 @@ import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hoo
 import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
-import {useCategories} from '../../hooks/use-categories'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Others
@@ -86,6 +85,7 @@ const ProductList = (props) => {
     const {
         searchQuery,
         productSearchResult,
+        category,
         // eslint-disable-next-line react/prop-types
         staticContext,
         location,
@@ -93,22 +93,14 @@ const ProductList = (props) => {
         ...rest
     } = props
     const {total, sortingOptions} = productSearchResult || {}
-
     const {isOpen, onOpen, onClose} = useDisclosure()
     const [sortOpen, setSortOpen] = useState(false)
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const history = useHistory()
     const params = useParams()
-    const {categories} = useCategories()
     const toast = useToast()
     const einstein = useEinstein()
-
-    // Get the current category from global state.
-    let category = undefined
-    if (!searchQuery) {
-        category = categories[params.categoryId]
-    }
 
     const basePath = `${location.pathname}${location.search}`
     // Reset scroll position when `isLoaded` becomes `true`.
@@ -392,9 +384,8 @@ const ProductList = (props) => {
                                           ))
                                     : productSearchResult.hits.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
-                                          const isInWishlist = !!wishlist.findItemByProductId(
-                                              productId
-                                          )
+                                          const isInWishlist =
+                                              !!wishlist.findItemByProductId(productId)
 
                                           return (
                                               <ProductTile
@@ -630,7 +621,7 @@ ProductList.getProps = async ({res, params, location, api}) => {
         throw new HTTPNotFound(category.detail)
     }
 
-    return {searchQuery: searchQuery, productSearchResult}
+    return {searchQuery: searchQuery, productSearchResult, category}
 }
 
 ProductList.propTypes = {
@@ -654,7 +645,8 @@ ProductList.propTypes = {
     location: PropTypes.object,
     searchQuery: PropTypes.string,
     onAddToWishlistClick: PropTypes.func,
-    onRemoveWishlistClick: PropTypes.func
+    onRemoveWishlistClick: PropTypes.func,
+    category: PropTypes.object
 }
 
 export default ProductList
