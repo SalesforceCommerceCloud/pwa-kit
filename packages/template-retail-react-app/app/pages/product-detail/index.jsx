@@ -278,7 +278,7 @@ const ProductDetail = ({category, product, isLoading}) => {
 
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
-                    {isProductASet ? null : (
+                    {!isProductASet && (
                         <RecommendedProducts
                             title={
                                 <FormattedMessage
