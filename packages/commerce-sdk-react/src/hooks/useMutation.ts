@@ -10,6 +10,11 @@ import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useCustomerId from './useCustomerId'
 import {mergeOptions, updateCache} from './utils'
 
+/**
+ * Helper for mutation hooks, contains most of the logic in order to keep individual hooks small.
+ * @param hookConfig - Config values that vary per API endpoint
+ * @internal
+ */
 export const useMutation = <
     Client extends ApiClient,
     Options extends ApiOptions,
@@ -29,7 +34,6 @@ export const useMutation = <
             // so we also need to do that to get the "net" options that are actually sent to SCAPI.
             const netOptions = mergeOptions(hookConfig.client, options)
             const cacheUpdates = hookConfig.getCacheUpdates(customerId, netOptions, data)
-            cacheUpdates.update?.forEach(({updater}) => updater)
             updateCache(queryClient, cacheUpdates)
         }
     })

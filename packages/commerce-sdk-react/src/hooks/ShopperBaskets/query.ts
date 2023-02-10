@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import {ApiClients, Argument, DataType, MergedOptions} from '../types'
+import {ApiClients, Argument, DataType} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 
@@ -27,12 +27,21 @@ export const useBasket = (
     const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
     // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({parameters}: MergedOptions<Client, Argument<Client['getBasket']>>) =>
+    const getQueryKey = <T extends Record<string, unknown>>(parameters: T) =>
         [
+            'https://',
+            parameters.shortCode,
+            '.api.commercecloud.salesforce.com/checkout/shopper-baskets/',
+            parameters.version,
             '/organizations/',
             parameters.organizationId,
             '/baskets/',
             parameters.basketId,
+            '?',
+            'siteId',
+            parameters.siteId,
+            'locale',
+            parameters.locale,
             // Full parameters last for easy lookup
             parameters
         ] as const
@@ -64,15 +73,22 @@ export const usePaymentMethodsForBasket = (
     const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
     // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({
-        parameters
-    }: MergedOptions<Client, Argument<Client['getPaymentMethodsForBasket']>>) =>
+    const getQueryKey = <T extends Record<string, unknown>>(parameters: T) =>
         [
+            'https://',
+            parameters.shortCode,
+            '.api.commercecloud.salesforce.com/checkout/shopper-baskets/',
+            parameters.version,
             '/organizations/',
             parameters.organizationId,
             '/baskets/',
             parameters.basketId,
             '/payment-methods',
+            '?',
+            'siteId',
+            parameters.siteId,
+            'locale',
+            parameters.locale,
             // Full parameters last for easy lookup
             parameters
         ] as const
@@ -101,15 +117,20 @@ export const usePriceBooksForBasket = (
     const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
     // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({
-        parameters
-    }: MergedOptions<Client, Argument<Client['getPriceBooksForBasket']>>) =>
+    const getQueryKey = <T extends Record<string, unknown>>(parameters: T) =>
         [
+            'https://',
+            parameters.shortCode,
+            '.api.commercecloud.salesforce.com/checkout/shopper-baskets/',
+            parameters.version,
             '/organizations/',
             parameters.organizationId,
             '/baskets/',
             parameters.basketId,
             '/price-books',
+            '?',
+            'siteId',
+            parameters.siteId,
             // Full parameters last for easy lookup
             parameters
         ] as const
@@ -141,10 +162,12 @@ export const useShippingMethodsForShipment = (
     const requiredParameters = ['organizationId', 'basketId', 'shipmentId', 'siteId'] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
     // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({
-        parameters
-    }: MergedOptions<Client, Argument<Client['getShippingMethodsForShipment']>>) =>
+    const getQueryKey = <T extends Record<string, unknown>>(parameters: T) =>
         [
+            'https://',
+            parameters.shortCode,
+            '.api.commercecloud.salesforce.com/checkout/shopper-baskets/',
+            parameters.version,
             '/organizations/',
             parameters.organizationId,
             '/baskets/',
@@ -152,6 +175,11 @@ export const useShippingMethodsForShipment = (
             '/shipments/',
             parameters.shipmentId,
             '/shipping-methods',
+            '?',
+            'siteId',
+            parameters.siteId,
+            'locale',
+            parameters.locale,
             // Full parameters last for easy lookup
             parameters
         ] as const
@@ -179,15 +207,20 @@ export const useTaxesFromBasket = (
     const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
     // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({
-        parameters
-    }: MergedOptions<Client, Argument<Client['getTaxesFromBasket']>>) =>
+    const getQueryKey = <T extends Record<string, unknown>>(parameters: T) =>
         [
+            'https://',
+            parameters.shortCode,
+            '.api.commercecloud.salesforce.com/checkout/shopper-baskets/',
+            parameters.version,
             '/organizations/',
             parameters.organizationId,
             '/baskets/',
             parameters.basketId,
             '/taxes',
+            '?',
+            'siteId',
+            parameters.siteId,
             // Full parameters last for easy lookup
             parameters
         ] as const
