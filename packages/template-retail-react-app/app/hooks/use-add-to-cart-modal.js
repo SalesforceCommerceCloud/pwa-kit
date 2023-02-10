@@ -66,13 +66,13 @@ export const AddToCartModal = () => {
     const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     return (
-        <Modal size={size} isOpen={isOpen} onClose={onClose}>
+        <Modal size={size} isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered>
             <ModalOverlay />
             <ModalContent
                 margin="0"
-                marginY={{md: '50px', lg: '50px'}}
                 borderRadius={{base: 'none', md: 'base'}}
                 bgColor="gray.50"
+                dialogProps={{maxHeight: '90vh'}}
             >
                 <ModalHeader paddingY="8" bgColor="white" fontSize="2xl" fontWeight="700">
                     {intl.formatMessage(
@@ -85,7 +85,7 @@ export const AddToCartModal = () => {
                     )}
                 </ModalHeader>
                 <ModalCloseButton />
-                <ModalBody bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}} flex="none">
+                <ModalBody bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}}>
                     <Flex
                         flexDirection={{base: 'column', lg: 'row'}}
                         justifyContent="space-between"
