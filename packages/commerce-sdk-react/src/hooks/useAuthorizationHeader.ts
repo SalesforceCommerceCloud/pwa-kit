@@ -7,13 +7,13 @@
 import {ApiOptions, ApiMethod} from './types'
 import useAuth from './useAuth'
 
-export const useAuthorizationHeader = <Opts extends ApiOptions, Ret>(
-    fn: ApiMethod<Opts, Ret>
-): ApiMethod<Opts, Ret> => {
+export const useAuthorizationHeader = <Options extends ApiOptions, Data>(
+    method: ApiMethod<Options, Data>
+): ApiMethod<Options, Data> => {
     const auth = useAuth()
-    return async (options: Opts) => {
+    return async (options) => {
         const {access_token} = await auth.ready()
-        return await fn({
+        return await method({
             ...options,
             headers: {
                 ...options.headers,
