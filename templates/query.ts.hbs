@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import {ApiClients, Argument, DataType} from '../types'
+import {ApiClients, Argument, DataType, MergedOptions} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 
@@ -39,8 +39,8 @@ export const use{{#startsWith 'get' (getValue name)~}}
     ] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
     // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = <T extends Record<string, unknown>>(parameters: T) => [
-        {{{createQueryKeyFragment (append (getBaseUriFromDocument @root.model) (getValue ../path)) request.queryParameters 'parameters'}}},
+    const getQueryKey = ({parameters}: MergedOptions<Client, Argument<Client['{{name}}']>>) => [
+        {{{createQueryKeyFragment (getValue ../path) 'parameters'}}},
         // Full parameters last for easy lookup
         parameters
     ] as const

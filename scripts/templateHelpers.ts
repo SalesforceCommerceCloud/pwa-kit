@@ -172,20 +172,6 @@ export function assign(
   options.data.root[varName] = varValue;
 }
 
-export const createQueryKeyFragment = (
-  url: string,
-  parameters: amf.model.domain.Parameter[],
-  variable: string
-): string => {
+export const createQueryKeyFragment = (url: string, variable: string): string =>
   // If the URL ends with a {template} fragment, we end up with a `, ''` that we don't need
-  const base = `'${url.replace(/\{(\w+)\}/g, `', ${variable}.$1, '`)}'`.replace(
-    ", ''",
-    ''
-  );
-  if (!parameters || parameters.length === 0) return base;
-  const extra = parameters.map(p => {
-    const name = p.name.value();
-    return `'${name}', ${variable}.${name}`;
-  });
-  return `${base}, '?', ${extra.join(', ')}`;
-};
+  `'${url.replace(/\{(\w+)\}/g, `', ${variable}.$1, '`)}'`.replace(", ''", '');
