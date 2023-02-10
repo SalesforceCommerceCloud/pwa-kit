@@ -1,21 +1,33 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBaskets} from 'commerce-sdk-isomorphic'
-import {ShopperContexts} from 'commerce-sdk-isomorphic'
-import {ShopperCustomers} from 'commerce-sdk-isomorphic'
-import {ShopperDiscoverySearch} from 'commerce-sdk-isomorphic'
-import {ShopperExperience} from 'commerce-sdk-isomorphic'
-import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
-import {ShopperLogin} from 'commerce-sdk-isomorphic'
-import {ShopperOrders} from 'commerce-sdk-isomorphic'
-import {ShopperProducts} from 'commerce-sdk-isomorphic'
-import {ShopperPromotions} from 'commerce-sdk-isomorphic'
-import {ShopperSearch} from 'commerce-sdk-isomorphic'
-import {QueryKey, QueryFunctionContext} from '@tanstack/react-query'
+import {Query, Updater} from '@tanstack/react-query'
+import {
+    ShopperBaskets,
+    ShopperContexts,
+    ShopperCustomers,
+    ShopperDiscoverySearch,
+    ShopperExperience,
+    ShopperGiftCertificates,
+    ShopperLogin,
+    ShopperOrders,
+    ShopperProducts,
+    ShopperPromotions,
+    ShopperSearch
+} from 'commerce-sdk-isomorphic'
+
+// --- GENERAL UTILITIES --- //
+
+/**
+ * Marks the given keys as required.
+ */
+// The outer Pick<...> is used to prettify the result type
+type RequireKeys<T, K extends keyof T> = Pick<T & Required<Pick<T, K>>, keyof T>
+
+// --- API CLIENTS --- //
 
 export type ApiClientConfigParams = {
     clientId: string
@@ -38,35 +50,91 @@ export interface ApiClients {
     shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
+export type ApiClient = ApiClients[keyof ApiClients]
+
+// --- API HELPERS --- //
+
+/**
+ * Generic signature of the options objects used by commerce-sdk-isomorphic
+ */
+export type ApiOptions<
+    Parameters extends object = Record<string, unknown>,
+    Headers extends Record<string, string> = Record<string, string>,
+    Body extends object | unknown[] | undefined = Record<string, unknown> | unknown[] | undefined
+> = {
+    parameters?: Parameters
+    headers?: Headers
+    body?: Body
+}
+
+/**
+ * Generic signature of API methods exported by commerce-sdk-isomorphic
+ */
+export type ApiMethod<Options extends ApiOptions, Data> = {
+    (options: Options): Promise<Data>
+}
+
 /**
  * The first argument of a function.
  */
-export type Argument<T extends (arg: any) => unknown> = Parameters<T>[0]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Argument<T extends (arg: any) => unknown> = NonNullable<Parameters<T>[0]>
 
 /**
  * The data type returned by a commerce-sdk-isomorphic method when the raw response
  * flag is not set.
  */
-export type DataType<T extends (arg: any) => Promise<unknown>> = T extends (
-    arg: any
-) => Promise<Response | infer R>
-    ? R
-    : never
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DataType<T> = T extends ApiMethod<any, Response | infer R> ? R : never
 
 /**
- * Modified version of React Query's Mutation Function. Added a second argument
- * API clients.
+ * Merged headers and parameters from client config and options, mimicking the behavior
+ * of commerce-sdk-isomorphic.
  */
-export type IMutationFunction<TData = unknown, TVariables = unknown> = (
-    variables: TVariables,
-    apiClients: ApiClients
-) => Promise<TData>
+export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> = RequireKeys<
+    ApiOptions<
+        NonNullable<Client['clientConfig']['parameters'] & Options['parameters']>,
+        NonNullable<Client['clientConfig']['headers'] & Options['headers']>,
+        // `body` may not exist on `Options`, in which case it is `unknown` here. Due to the type
+        // constraint in `ApiOptions`, that is not a valid value. We must replace it with `never`
+        // to indicate that the result type does not have a `body`.
+        unknown extends Options['body'] ? never : Options['body']
+    >,
+    'parameters' | 'headers'
+>
 
-/**
- * Modified version of React Query's Query Function. Added a second argument
- * API clients.
- */
-export type IQueryFunction<TData = unknown> = (
-    context: QueryFunctionContext<QueryKey>,
-    apiClients: ApiClients
-) => Promise<TData>
+// --- CACHE HELPERS --- //
+
+export type ApiQueryKey =
+    // | readonly string[] // TODO: Is this needed?
+    readonly [...path: string[], parameters: Record<string, unknown>]
+
+export type CacheUpdateUpdate<T> = {
+    queryKey: ApiQueryKey
+    updater: Updater<T | undefined, T | undefined>
+}
+
+export type CacheUpdateInvalidate = (query: Query) => boolean
+
+export type CacheUpdateRemove = (query: Query) => boolean
+
+export type CacheUpdate = {
+    update?: CacheUpdateUpdate<unknown>[]
+    invalidate?: CacheUpdateInvalidate[]
+    remove?: CacheUpdateRemove[]
+}
+
+export type CacheUpdateGetter<Options, Data> = (
+    customerId: string | null,
+    options: Options,
+    response: Data
+) => CacheUpdate
+
+export type CacheUpdateMatrix<Client extends ApiClient> = {
+    // It feels like we should be able to do <infer Arg, infer Data>, but that
+    // results in some methods being `never`, so we just use Argument<> later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [Method in keyof Client]?: Client[Method] extends ApiMethod<any, Response | infer Data>
+        ? CacheUpdateGetter<MergedOptions<Client, Argument<Client[Method]>>, Data>
+        : never
+}
