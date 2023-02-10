@@ -1,22 +1,16 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, DataType} from '../types'
-import {useQuery} from '../useQuery'
 import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import useConfig from '../useConfig'
+import {ApiClients, Argument, DataType, MergedOptions} from '../types'
+import useCommerceApi from '../useCommerceApi'
+import {useQuery} from '../useQuery'
 
 type Client = ApiClients['shopperSearch']
 
-type UseProductSearchParameters = NonNullable<Argument<Client['productSearch']>>['parameters']
-type UseProductSearchHeaders = NonNullable<Argument<Client['productSearch']>>['headers']
-type UseProductSearchArg = {
-    headers?: UseProductSearchHeaders
-    rawResponse?: boolean
-} & UseProductSearchParameters
 /**
  * A hook for `ShopperSearch#productSearch`.
  * Provides keyword and refinement search functionality for products. Only returns the product ID, link, and name in
@@ -25,37 +19,31 @@ the product search hit. The search result contains only products that are online
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppersearch.shoppersearch-1.html#productsearch} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function useProductSearch(
-    arg: Omit<UseProductSearchArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
-): UseQueryResult<DataType<Client['productSearch']>, Error>
-function useProductSearch(
-    arg: Omit<UseProductSearchArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
-): UseQueryResult<Response, Error>
-function useProductSearch(
-    arg: UseProductSearchArg,
-    options?: UseQueryOptions<DataType<Client['productSearch']> | Response, Error>
-): UseQueryResult<DataType<Client['productSearch']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const {locale, currency} = useConfig()
-    parameters.locale = parameters.locale || locale
-    parameters.currency = parameters.currency || currency
-    return useQuery(
-        ['/product-search', arg],
-        (_, {shopperSearch}) => shopperSearch.productSearch({parameters, headers}, rawResponse),
-        options
-    )
-}
+export const useProductSearch = (
+    apiOptions: Argument<Client['productSearch']>,
+    queryOptions: Omit<UseQueryOptions<DataType<Client['productSearch']>>, 'queryFn'> = {}
+): UseQueryResult<DataType<Client['productSearch']>> => {
+    const {shopperSearch: client} = useCommerceApi()
+    const method = (arg: Argument<Client['productSearch']>) => client.productSearch(arg)
+    const requiredParameters = ['organizationId', 'siteId'] as const
+    // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
+    // hook, so we use a callback here that receives that merged object.
+    const getQueryKey = ({parameters}: MergedOptions<Client, Argument<Client['productSearch']>>) =>
+        [
+            '/organizations/',
+            parameters.organizationId,
+            '/product-search',
+            // Full parameters last for easy lookup
+            parameters
+        ] as const
 
-type UseSearchSuggestionsParameters = NonNullable<
-    Argument<Client['getSearchSuggestions']>
->['parameters']
-type UseSearchSuggestionsHeaders = NonNullable<Argument<Client['getSearchSuggestions']>>['headers']
-type UseSearchSuggestionsArg = {
-    headers?: UseSearchSuggestionsHeaders
-    rawResponse?: boolean
-} & UseSearchSuggestionsParameters
+    return useQuery(apiOptions, queryOptions, {
+        client,
+        method,
+        requiredParameters,
+        getQueryKey
+    })
+}
 /**
  * A hook for `ShopperSearch#getSearchSuggestions`.
  * Provides keyword search functionality for products, categories, and brands suggestions. Returns suggested products, suggested categories, and suggested brands for the given search phrase.
@@ -63,28 +51,31 @@ type UseSearchSuggestionsArg = {
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppersearch.shoppersearch-1.html#getsearchsuggestions} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-function useSearchSuggestions(
-    arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
-): UseQueryResult<DataType<Client['getSearchSuggestions']>, Error>
-function useSearchSuggestions(
-    arg: Omit<UseSearchSuggestionsArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
-): UseQueryResult<Response, Error>
-function useSearchSuggestions(
-    arg: UseSearchSuggestionsArg,
-    options?: UseQueryOptions<DataType<Client['getSearchSuggestions']> | Response, Error>
-): UseQueryResult<DataType<Client['getSearchSuggestions']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const {locale, currency} = useConfig()
-    parameters.locale = parameters.locale || locale
-    parameters.currency = parameters.currency || currency
-    return useQuery(
-        ['/search-suggestions', arg],
-        (_, {shopperSearch}) =>
-            shopperSearch.getSearchSuggestions({parameters, headers}, rawResponse),
-        options
-    )
-}
+export const useSearchSuggestions = (
+    apiOptions: Argument<Client['getSearchSuggestions']>,
+    queryOptions: Omit<UseQueryOptions<DataType<Client['getSearchSuggestions']>>, 'queryFn'> = {}
+): UseQueryResult<DataType<Client['getSearchSuggestions']>> => {
+    const {shopperSearch: client} = useCommerceApi()
+    const method = (arg: Argument<Client['getSearchSuggestions']>) =>
+        client.getSearchSuggestions(arg)
+    const requiredParameters = ['organizationId', 'siteId', 'q'] as const
+    // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
+    // hook, so we use a callback here that receives that merged object.
+    const getQueryKey = ({
+        parameters
+    }: MergedOptions<Client, Argument<Client['getSearchSuggestions']>>) =>
+        [
+            '/organizations/',
+            parameters.organizationId,
+            '/search-suggestions',
+            // Full parameters last for easy lookup
+            parameters
+        ] as const
 
-export {useProductSearch, useSearchSuggestions}
+    return useQuery(apiOptions, queryOptions, {
+        client,
+        method,
+        requiredParameters,
+        getQueryKey
+    })
+}
