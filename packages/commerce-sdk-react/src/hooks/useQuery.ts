@@ -10,8 +10,8 @@ import {ApiClient, ApiMethod, ApiOptions, MergedOptions} from './types'
 import {hasAllKeys, mergeOptions} from './utils'
 
 export const useQuery = <
-    Options extends Omit<ApiOptions, 'body'>,
     Client extends ApiClient,
+    Options extends Omit<ApiOptions, 'body'>,
     Data,
     Err,
     QK extends QueryKey
