@@ -41,8 +41,11 @@ export const useQuery = <
         () => authenticatedMethod(apiOptions),
         {
             enabled:
+                // Individual hooks can provide `enabled` checks that are done in ADDITION to
+                // the required parameter check
                 hookConfig.enabled !== false &&
                 hasAllKeys(netOptions.parameters, hookConfig.requiredParameters),
+            // End users can always completely OVERRIDE the default `enabled` check
             ...queryOptions
         }
     )
