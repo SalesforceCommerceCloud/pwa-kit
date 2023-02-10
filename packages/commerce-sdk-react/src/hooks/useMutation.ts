@@ -29,7 +29,6 @@ export const useMutation = <
             // so we also need to do that to get the "net" options that are actually sent to SCAPI.
             const netOptions = mergeOptions(hookConfig.client, options)
             const cacheUpdates = hookConfig.getCacheUpdates(customerId, netOptions, data)
-            cacheUpdates.update?.forEach(({updater}) => updater)
             updateCache(queryClient, cacheUpdates)
         }
     })
