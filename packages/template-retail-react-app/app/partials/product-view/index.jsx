@@ -498,6 +498,8 @@ const ProductView = forwardRef(
     }
 )
 
+ProductView.displayName = 'ProductView'
+
 ProductView.propTypes = {
     product: PropTypes.object,
     isProductPartOfSet: PropTypes.bool,

@@ -140,7 +140,11 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                             borderWidth={`${selected ? '1px' : 0}`}
                         >
                             <AspectRatio ratio={1}>
-                                <Img alt={image.alt} src={image.disBaseLink || image.link} loading={loadingStrategy}/>
+                                <Img
+                                    alt={image.alt}
+                                    src={image.disBaseLink || image.link}
+                                    loading={loadingStrategy}
+                                />
                             </AspectRatio>
                         </ListItem>
                     )
@@ -162,7 +166,11 @@ ImageGallery.propTypes = {
     /**
      * Size of the Image gallery, this will be used to determined the max width from styles
      */
-    size: PropTypes.string
+    size: PropTypes.string,
+    /**
+     * Determines whether the image will be lazy loaded or not
+     */
+    lazy: PropTypes.bool
 }
 
 export default ImageGallery
