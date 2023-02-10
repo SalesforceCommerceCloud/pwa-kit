@@ -4,67 +4,109 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
-import {ApiClients, CacheUpdateMatrix} from '../types'
-import {CacheUpdate} from '../types'
+import {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {
+    ApiClients,
+    ApiOptions,
+    CacheUpdate,
+    CacheUpdateMatrix,
+    CacheUpdateUpdate,
+    MergedOptions
+} from '../types'
+import {and, matchesApiConfig, pathStartsWith} from '../utils'
 
-const updateBasketQuery = (basketId?: string): CacheUpdate => {
-    // TODO: we're missing headers, rawResponse -> not only {basketId}
-    const arg = {basketId}
-    return basketId
-        ? {
-              update: [['/baskets', basketId, arg]]
-          }
-        : {}
+type Client = ApiClients['shopperBaskets']
+type Basket = ShopperBasketsTypes.Basket
+type CustomerBasketsResult = ShopperCustomersTypes.BasketsResult
+type BasketOptions = MergedOptions<Client, ApiOptions<Basket>>
+
+const updateBasketQuery = (
+    customerId: string | null,
+    basketId: string | undefined,
+    newBasket: Basket
+): Pick<CacheUpdate, 'update'> => {
+    if (!basketId) return {}
+    const update: Array<CacheUpdateUpdate<Basket> | CacheUpdateUpdate<CustomerBasketsResult>> = [
+        {
+            queryKey: ['/baskets', basketId, {basketId}],
+            updater: newBasket
+        }
+    ]
+    if (customerId) {
+        const updateCustomerBaskets: CacheUpdateUpdate<CustomerBasketsResult> = {
+            // Since we use baskets from customer basket query, we need to update it for any basket mutation
+            queryKey: ['/customers', customerId, '/baskets', {customerId}],
+            updater: (oldData) => {
+                // do not update if response basket is not part of existing customer baskets
+                if (!oldData?.baskets?.some((basket) => basket.basketId === basketId)) {
+                    return undefined
+                }
+                const updatedBaskets = oldData.baskets.map((basket) => {
+                    return basket.basketId === basketId ? newBasket : basket
+                })
+                return {
+                    ...oldData,
+                    // TODO: Remove type assertion when RAML specs match
+                    baskets: updatedBaskets as CustomerBasketsResult['baskets']
+                }
+            }
+        }
+        update.push(updateCustomerBaskets)
+    }
+    // TODO: This type assertion is so that we "forget" what type the updater uses.
+    // Is there a way to avoid the assertion?
+    return {update} as CacheUpdate
 }
 
-const removeBasketQuery = (basketId?: string): CacheUpdate => {
-    const arg = {basketId}
-    return basketId
-        ? {
-              remove: [['/baskets', basketId, arg]]
-          }
-        : {}
+const removeBasketQuery = (
+    options: BasketOptions,
+    basketId?: string
+): Pick<CacheUpdate, 'remove'> => {
+    if (!basketId) return {}
+    return {
+        remove: [and(matchesApiConfig(options), pathStartsWith(['/baskets', basketId]))]
+    }
 }
 
-const invalidateCustomerBasketsQuery = (customerId: string | null): CacheUpdate => {
-    // TODO: should we use arg here or not? The invalidate method does not need exact query key.
-    const arg = {customerId}
-    return customerId
-        ? {
-              invalidate: [['/customers', customerId, '/baskets', arg]]
-          }
-        : {}
+const invalidateCustomerBasketsQuery = (
+    customerId: string | null,
+    options: BasketOptions
+): Pick<CacheUpdate, 'invalidate'> => {
+    if (!customerId) return {}
+    return {
+        invalidate: [
+            and(matchesApiConfig(options), pathStartsWith(['/customers', customerId, '/baskets']))
+        ]
+    }
 }
 
 const updateBasketFromRequest = (
     customerId: string | null,
-    params: {
-        parameters: ShopperBasketsTypes.Basket
-    }
+    options: BasketOptions,
+    response: Basket
 ): CacheUpdate => ({
-    ...updateBasketQuery(params.parameters.basketId),
-    ...invalidateCustomerBasketsQuery(customerId)
+    ...updateBasketQuery(customerId, options.parameters?.basketId, response),
+    ...invalidateCustomerBasketsQuery(customerId, options)
 })
 
 const updateBasketFromResponse = (
     customerId: string | null,
-    params: unknown, // not used,
-    response: ShopperBasketsTypes.Basket
+    options: BasketOptions,
+    response: Basket
 ): CacheUpdate => ({
-    ...updateBasketQuery(response.basketId),
-    ...invalidateCustomerBasketsQuery(customerId)
+    ...updateBasketQuery(customerId, response.basketId, response),
+    ...invalidateCustomerBasketsQuery(customerId, options)
 })
 
-export const cacheUpdateMatrix: CacheUpdateMatrix<ApiClients['shopperBaskets']> = {
+export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     addCouponToBasket: updateBasketFromRequest,
     addItemToBasket: updateBasketFromRequest,
     removeItemFromBasket: updateBasketFromRequest,
     addPaymentInstrumentToBasket: updateBasketFromRequest,
     createBasket: updateBasketFromResponse, // Response!
-    deleteBasket: (customerId, params): CacheUpdate => ({
-        ...invalidateCustomerBasketsQuery(customerId),
-        ...removeBasketQuery(params.parameters.basketId)
+    deleteBasket: (customerId, options): CacheUpdate => ({
+        ...invalidateCustomerBasketsQuery(customerId, options),
+        ...removeBasketQuery(options)
     }),
     mergeBasket: updateBasketFromResponse, // Response!
     removeCouponFromBasket: updateBasketFromRequest,
