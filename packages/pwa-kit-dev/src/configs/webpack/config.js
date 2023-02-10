@@ -37,6 +37,7 @@ const mode = process.env.NODE_ENV === production ? production : development
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
+const isMonoRepo = process.env.MONOREPO === 'true'
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -64,9 +65,30 @@ const entryPointExists = (segments) => {
     return false
 }
 
-const findInProjectThenSDK = (pkg) => {
+/**
+ * Find the path to a dependency
+ * First check the project's node_modules, then the SDK's node_modules, then the monorepo's node_modules
+ * @param {string} pkg - name of the dependency
+ * @returns {string} path to the dependency
+ */
+const findDependency = (pkg) => {
     const projectPath = resolve(projectDir, 'node_modules', pkg)
-    return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
+    if (fs.existsSync(projectPath)) {
+        return projectPath
+    }
+    const sdkPath = resolve(sdkDir, 'node_modules', pkg)
+    if (fs.existsSync(sdkPath)) {
+        return sdkPath
+    }
+    if (isMonoRepo) {
+        // This logic assumes that the mono-repository packages are one level above the monorepo root
+        // This should be the case for lerna and nx monorepos with the default settings
+        const monoRepoPath = resolve(projectDir, '..', '..', 'node_modules', pkg)
+        if (fs.existsSync(monoRepoPath)) {
+            return monoRepoPath
+        }
+    }
+    throw new Error(`Could not find dependency ${pkg}`)
 }
 
 const baseConfig = (target) => {
@@ -117,19 +139,17 @@ const baseConfig = (target) => {
                 resolve: {
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        'babel-runtime': findInProjectThenSDK('babel-runtime'),
-                        '@tanstack/react-query': findInProjectThenSDK('@tanstack/react-query'),
-                        '@loadable/component': findInProjectThenSDK('@loadable/component'),
-                        '@loadable/server': findInProjectThenSDK('@loadable/server'),
-                        '@loadable/webpack-plugin': findInProjectThenSDK(
-                            '@loadable/webpack-plugin'
-                        ),
-                        'svg-sprite-loader': findInProjectThenSDK('svg-sprite-loader'),
-                        react: findInProjectThenSDK('react'),
-                        'react-router-dom': findInProjectThenSDK('react-router-dom'),
-                        'react-dom': findInProjectThenSDK('react-dom'),
-                        'react-helmet': findInProjectThenSDK('react-helmet'),
-                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware')
+                        'babel-runtime': findDependency('babel-runtime'),
+                        '@tanstack/react-query': findDependency('@tanstack/react-query'),
+                        '@loadable/component': findDependency('@loadable/component'),
+                        '@loadable/server': findDependency('@loadable/server'),
+                        '@loadable/webpack-plugin': findDependency('@loadable/webpack-plugin'),
+                        'svg-sprite-loader': findDependency('svg-sprite-loader'),
+                        react: findDependency('react'),
+                        'react-router-dom': findDependency('react-router-dom'),
+                        'react-dom': findDependency('react-dom'),
+                        'react-helmet': findDependency('react-helmet'),
+                        'webpack-hot-middleware': findDependency('webpack-hot-middleware')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -155,17 +175,17 @@ const baseConfig = (target) => {
                         ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('svg-sprite-loader')
+                            loader: findDependency('svg-sprite-loader')
                         },
                         target === 'web' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('ignore-loader')
+                            loader: findDependency('ignore-loader')
                         },
                         {
                             test: /\.html$/,
                             exclude: /node_modules/,
                             use: {
-                                loader: findInProjectThenSDK('html-loader')
+                                loader: findDependency('html-loader')
                             }
                         }
                     ].filter(Boolean)
@@ -220,7 +240,7 @@ const ruleForBabelLoader = (babelPlugins) => {
         exclude: /node_modules/,
         use: [
             {
-                loader: findInProjectThenSDK('babel-loader'),
+                loader: findDependency('babel-loader'),
                 options: {
                     rootMode: 'upward',
                     cacheDirectory: true,
