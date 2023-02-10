@@ -2221,6 +2221,12 @@
       "value": "Em breve"
     }
   ],
+  "product_detail.recommended_products.title.complete_set": [
+    {
+      "type": 0,
+      "value": "Completar o conjunto"
+    }
+  ],
   "product_detail.recommended_products.title.might_also_like": [
     {
       "type": 0,

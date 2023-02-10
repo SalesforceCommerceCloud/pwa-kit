@@ -972,6 +972,9 @@
   "product_detail.accordion.message.coming_soon": {
     "defaultMessage": "In arrivo"
   },
+  "product_detail.recommended_products.title.complete_set": {
+    "defaultMessage": "Completamento del set"
+  },
   "product_detail.recommended_products.title.might_also_like": {
     "defaultMessage": "Potrebbe interessarti anche"
   },
