@@ -9,6 +9,13 @@ import {useAuthorizationHeader} from './useAuthorizationHeader'
 import {ApiClient, ApiMethod, ApiOptions, MergedOptions} from './types'
 import {hasAllKeys, mergeOptions} from './utils'
 
+/**
+ * Helper for query hooks, contains most of the logic in order to keep individual hooks small.
+ * @param apiOptions - Options passed through to commerce-sdk-isomorphic
+ * @param queryOptions - Options passed through to @tanstack/react-query
+ * @param hookConfig - Config values that vary per API endpoint
+ * @internal
+ */
 export const useQuery = <
     Client extends ApiClient,
     Options extends Omit<ApiOptions, 'body'>,

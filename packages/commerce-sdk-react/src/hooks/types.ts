@@ -105,31 +105,44 @@ export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> 
 
 // --- CACHE HELPERS --- //
 
+/**
+ * Query key interface used by API query hooks.
+ */
 export type ApiQueryKey =
     // | readonly string[] // TODO: Is this needed?
     readonly [...path: string[], parameters: Record<string, unknown>]
 
+/**
+ * Interface to update a cached API response.
+ * @property queryKey - The query key to update
+ * @property updater - Either the new data or a function that accepts old data and returns new data
+ */
 export type CacheUpdateUpdate<T> = {
     queryKey: ApiQueryKey
     updater: Updater<T | undefined, T | undefined>
 }
 
+/** Query predicate for queries to invalidate */
 export type CacheUpdateInvalidate = (query: Query) => boolean
 
+/** Query predicate for queries to remove */
 export type CacheUpdateRemove = (query: Query) => boolean
 
+/** Collection of updates to make to the cache when a request completes. */
 export type CacheUpdate = {
     update?: CacheUpdateUpdate<unknown>[]
     invalidate?: CacheUpdateInvalidate[]
     remove?: CacheUpdateRemove[]
 }
 
+/** Generates a collection of cache updates to make for a given request. */
 export type CacheUpdateGetter<Options, Data> = (
     customerId: string | null,
     options: Options,
     response: Data
 ) => CacheUpdate
 
+/** Collection of cache update getters for each method of an API client. */
 export type CacheUpdateMatrix<Client extends ApiClient> = {
     // It feels like we should be able to do <infer Arg, infer Data>, but that
     // results in some methods being `never`, so we just use Argument<> later

@@ -7,6 +7,7 @@
 import {Query, QueryClient} from '@tanstack/react-query'
 import {ApiClient, ApiOptions, CacheUpdate, MergedOptions} from './types'
 
+/** Applies the set of cache updates to the query client. */
 export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate) => {
     cacheUpdates.update?.forEach(({queryKey, updater}) =>
         queryClient.setQueryData(queryKey, updater)
@@ -15,23 +16,31 @@ export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate)
     cacheUpdates.remove?.forEach((predicate) => queryClient.removeQueries({predicate}))
 }
 
+/** Error thrown when a method is not implemented. */
 export class NotImplementedError extends Error {
     constructor(method = 'This method') {
         super(`${method} is not implemented.`)
     }
 }
 
+/** Determines whether a value is an object. */
 export const isObject = (obj: unknown): obj is Record<string, unknown> =>
     typeof obj === 'object' && obj !== null
 
+/** Determines whether a value has all of the given keys. */
 export const hasAllKeys = <T>(object: T, keys: ReadonlyArray<keyof T>): boolean =>
     keys.every((key) => object[key] !== undefined)
 
+/** Creates a query predicate that determines whether a query key starts with the given path segments. */
 export const pathStartsWith =
     (search: readonly string[]) =>
     ({queryKey}: Query): boolean =>
         queryKey.length >= search.length && search.every((lookup, idx) => queryKey[idx] === lookup)
 
+/**
+ * Creates a query predicate that determines whether the parameters of the query key exactly match
+ * the search object.
+ */
 export const matchParametersStrict =
     (search: Record<string, unknown>) =>
     ({queryKey}: Query): boolean => {
@@ -46,6 +55,10 @@ export const matchParametersStrict =
         )
     }
 
+/**
+ * Creates a query predicate that determines whether the parameters of the query key match the
+ * search object, for the subset of given keys present on the search object.
+ */
 const matchParameters = (parameters: Record<string, unknown>, keys = Object.keys(parameters)) => {
     const search: Record<string, unknown> = {}
     for (const key of keys) {
@@ -54,6 +67,7 @@ const matchParameters = (parameters: Record<string, unknown>, keys = Object.keys
     return matchParametersStrict(search)
 }
 
+/** Creates a query predicate that matches against common API config parameters. */
 export const matchesApiConfig = (parameters: Record<string, unknown>) =>
     matchParameters(parameters, [
         'clientId',
@@ -67,6 +81,7 @@ export const matchesApiConfig = (parameters: Record<string, unknown>) =>
         'version'
     ])
 
+/** Creates a query predicate that returns true if all of the given predicates return true. */
 export const and =
     <Args extends unknown[]>(...funcs: Array<(...args: Args) => boolean>) =>
     (...args: Args) =>
