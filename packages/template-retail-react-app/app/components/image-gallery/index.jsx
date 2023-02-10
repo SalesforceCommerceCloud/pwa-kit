@@ -97,7 +97,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
 
     const heroImage = heroImageGroup?.images?.[selectedIndex]
     const thumbnailImages = thumbnailImageGroup?.images || []
-    const isLazyLoad = lazy ? 'lazy' : 'eager'
+    const loadingStrategy = lazy ? 'lazy' : 'eager'
 
     const heroImageMaxWidth = styles.heroImage.maxWidth[3] // in px
 
@@ -114,7 +114,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                             }}
                             imageProps={{
                                 alt: heroImage.alt,
-                                loading: isLazyLoad
+                                loading: loadingStrategy
                             }}
                         />
                     </AspectRatio>
@@ -140,7 +140,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                             borderWidth={`${selected ? '1px' : 0}`}
                         >
                             <AspectRatio ratio={1}>
-                                <Img alt={image.alt} src={image.disBaseLink || image.link} loading={isLazyLoad}/>
+                                <Img alt={image.alt} src={image.disBaseLink || image.link} loading={loadingStrategy}/>
                             </AspectRatio>
                         </ListItem>
                     )
