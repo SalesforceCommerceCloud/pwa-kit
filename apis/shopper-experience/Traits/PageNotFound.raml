@@ -1,0 +1,15 @@
+#%RAML 1.0 Trait
+description: 404 response when a page is not found, i.e. does not exist or isn't visible.
+responses:
+  404:
+      description: |
+                Requested Page Not Found
+      body:
+        application/problem+json:
+          type: ErrorResponse
+          example: 
+            {
+            "title": "Page Not Found",
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/page-not-found",
+            "detail": "No visible page with ID 'homepage' was found in site 'RefArch'."
+            }

@@ -1,0 +1,248 @@
+#%RAML 1.0
+title: Shopper Experience
+version: v1
+mediaType: application/json
+protocols: HTTPS
+baseUri: https://{shortCode}.api.commercecloud.salesforce.com/experience/shopper-experience/{version}
+baseUriParameters:
+  shortCode:
+    description: A region-specific merchant identifier.
+    example: 0dnz6oep
+    pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
+
+description: !include shopper-experience-description.md
+
+uses:
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.15/api-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.24/commerce-cloud-standards.raml
+  ExperienceTraits: Experience-traits-library.raml
+
+types:
+  PageResult:
+    properties:
+      data:
+        description: List of pages.
+        type: Page[]
+        displayName: Data
+        required: true
+  Page:
+    properties:
+      id:
+        description: Page identifier.
+        type: string
+        displayName: ID
+        required: true
+        example: homepage
+      typeId:
+        description: Page type identifier.
+        type: string
+        displayName: Page Type ID
+        required: true
+        example: storePage
+      aspectTypeId:
+        description: The aspect type assigned to the page.
+        type: string
+        displayName: Aspect Type ID
+        required: false
+        example: pdpAspect
+      name:
+        description: Display name of the page.
+        type: string
+        displayName: Page Name
+        required: false
+        example: Homepage
+      description:
+        description: Description of the page.
+        type: string
+        displayName: Page Description
+        required: false
+        example: Home page of the storefront.
+      pageTitle:
+        description: The SEO title of the page.
+        type: string
+        displayName: SEO Title
+        required: false
+        example: Homepage - My Shop
+      pageDescription:
+        description: The SEO description of the page.
+        type: string
+        displayName: SEO Description
+        required: false
+        example: Get started shopping
+      pageKeywords:
+        description: The SEO keywords of the page.
+        type: string
+        displayName: SEO Keywords
+        required: false
+        example: fashion, my shop
+      data:
+        description: The configuration data assigned to the page.
+        type: object
+        displayName: Page Data
+        required: false
+        example: { "thumbnail": "myshop.jpg" }
+      custom:
+        description: Any custom data added by the custom code for the page type.
+        type: object
+        displayName: Custom Page Data
+        required: false
+        example: { "thumbnail_full": "http://static.myshop.com/myshop.jpg" }
+      regions:
+        description: The regions (and their assigned components) for the page.
+        type: Region[]
+        displayName: Regions
+        required: false
+        example: !include Examples/storepage-regions-example.raml
+  Region:
+    properties:
+      id:
+        description: Region identifier.
+        type: string
+        displayName: ID
+        required: true
+        example: "header"
+      components:
+        description: The components in the region.
+        type: Component[]
+        displayName: Components
+        required: false
+        example: !include Examples/header-components-example.raml
+  Component:
+    properties:
+      id:
+        description: Component identifier.
+        type: string
+        displayName: ID
+        required: true
+        example: "rfdvj4ojtltljw3"
+      typeId:
+        description: Component type identifier.
+        type: string
+        displayName: Component Type ID
+        required: true
+        example: "commerce_assets.carousel"
+      data:
+        description: The configuration data assigned to the component.
+        type: object
+        displayName: Component Data
+        required: false
+        example: { "title": "Topseller", "category": "topseller" }
+      custom:
+        description: Any custom data added by the custom code for this component.
+        type: object
+        displayName: Custom Component Data
+        required: false
+        example: { "detailUrl": "www.myshop.com/topseller" }
+      regions:
+        description: The regions (and their assigned components) for the component.
+        type: Region[]
+        displayName: Regions
+        required: false
+        example: !include Examples/carousel-regions-example.raml
+
+/organizations/{organizationId}:
+  type: CommerceCloudStandards.Organization
+  /pages:
+    get:
+      displayName: getPages
+      description: |-
+        Get Page Designer pages. The results will apply the visibility rules for each page's components, such as personalization or scheduled visibility.
+
+        Either `categoryId` or `productId` must be given in addition to `aspectTypeId`. Because only a single page-to-product and page-to-category assignment per aspect type can be authored today, the returned results contains one element at most.
+
+        **Important**: Because this resource uses the GET method, you must not pass sensitive data (payment card information, for example) and must not perform any transactional processes within the server-side scripts that are run for the page and components.
+      is:
+        - CommerceCloudStandards.SiteSpecific:
+        - ExperienceTraits.LocaleSpecific:
+        - ExperienceTraits.AspectAttributeInvalid
+        - ExperienceTraits.BusinessObjectIdInvalid
+        - ExperienceTraits.AspectTypeNotFound
+      responses:
+        "200":
+          description: Success.
+          body:
+            application/json:
+              type: PageResult
+      queryParameters:
+        categoryId:
+          description: Category identifier that is used for searching the page assignment. Must be provided if no `productId` is provided.
+          maxLength: 256
+          type: string
+          required: false
+          example: home-clearance
+        productId:
+          description: Product identifier that is used for searching the page assignment. Must be provided if no `categoryId` is provided.
+          maxLength: 256
+          type: string
+          required: false
+          example: iphone11
+        aspectTypeId:
+          description: Aspect type identifier that is used for searching the page assignment in conjunction with either the `productId` or `categoryId`.
+          maxLength: 256
+          type: string
+          required: true
+          example: pdp
+        aspectAttributes:
+          description: |-
+            A JSON respresentation of aspect attributes. Each aspect attribute is a key/value pair. Aspect attributes serve as a runtime parameter contract between caller (for example, this API or the DWScript API) and callee (the page). This parameter must not contain more than 256 characters after URL decoding.
+          type: string
+          required: false
+          example: |-
+            {
+              "product" : "iphone11",
+              "breadcrumbCategory" : "home-clearance"
+            }
+        parameters:
+          description: |-
+            A free-form definition of parameters that influences the page rendering according to its implementation. This parameter must not contain more than 256 characters after URL decoding.
+          type: string
+          required: false
+          maxLength: 256
+          example: "refine=color,size;currency=USD;showNavigation=false"
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-experience] }
+    uriParameters:
+  /pages/{pageId}:
+    get:
+      displayName: getPage
+      description: |-
+        Get a Page Designer page based on a single page ID. The results will apply the visibility rules for the page's components, such as personalization or scheduled visibility.
+
+        **Important**: Because this resource uses the GET method, you must not pass sensitive data (payment card information, for example) and must not perform any transactional processes within the server-side scripts that are run for the page and components.
+      is:
+        - CommerceCloudStandards.SiteSpecific:
+        - ExperienceTraits.LocaleSpecific:
+        - ExperienceTraits.AspectAttributeInvalid
+        - ExperienceTraits.PageNotFound
+      responses:
+        "200":
+          description: Success.
+          body:
+            application/json:
+              type: Page
+      queryParameters:
+        aspectAttributes:
+          description: |-
+            A JSON respresentation of aspect attributes. Each aspect attribute is a key/value pair. Aspect attributes serve as a runtime parameter contract between caller (for example, this API or the DWScript API) and callee (the page). This parameter must not contain more than 256 characters after URL decoding.
+          type: string
+          required: false
+          example: |-
+            {
+              "product" : "iphone11",
+              "breadcrumbCategory" : "home-clearance"
+            }
+        parameters:
+          description: |-
+            A free-form definition of parameters that influences the page rendering according to its implementation. This parameter must not contain more than 256 characters after URL decoding.
+          type: string
+          required: false
+          maxLength: 256
+          example: "refine=color,size;currency=USD;showNavigation=false"
+      securedBy:
+        - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-experience] }
+    uriParameters:
+      pageId:
+        description: Identifier for the requested page.
+        maxLength: 256
+        type: string
+        example: homepage

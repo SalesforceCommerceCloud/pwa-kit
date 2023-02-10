@@ -1,0 +1,15 @@
+#%RAML 1.0 Trait
+description: 400 response when an aspect attribute does not suffice its definition.
+responses:
+  400:
+      description: |
+                Provided Aspect Attribute Invalid
+      body:
+        application/problem+json:
+          type: ErrorResponse
+          example: 
+            {
+            "title": "Aspect Attribute Invalid",
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/aspect-attribute-invalid",
+            "detail": "Aspect attribute value '5555' does not fulfill its respective definition {\"id\" : \"foobar\", \"type\" : \"string\",\"required\" : false\"}"
+            }

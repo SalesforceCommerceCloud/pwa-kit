@@ -1,0 +1,21 @@
+{
+  "filteredQuery": {
+    "query": {
+      "textQuery": { 
+        "fields": [
+          "couponId"
+        ],
+        "searchPhrase": "disabled"
+      }
+    },
+    "filter": {
+      "termFilter": {
+        "field": "enabled",
+        "operator": "is",
+        "values": [
+          false
+          ]
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+#%RAML 1.0 NamedExample
+value: 
+  [ 
+    {
+      "id" : "header",
+      "components" : [
+        {
+          "id" : "iofwj38fhw3f", 
+          "typeId" : "commerce_assets.banner", 
+          "data" : {
+            "title" : "Products On Sale", 
+            "bannerImage" : "sale/topsellerPromo.jpg"
+          }, 
+          "custom" : {
+            "thumbnail_full" : "http://static.myshop.com/sale/topsellerPromo.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "id" : "main",
+      "components" : [
+        {
+          "id" : "rfdvj4ojtltljw3",
+          "typeId" : "commerce_assets.carousel",
+          "data" : {
+            "title" : "Topseller",
+            "category" : "topseller"
+          },
+          "custom" : {
+            "detailUrl" : "www.myshop.com/topseller"
+          },
+          "regions" : [
+            {
+              "id" : "tiles", 
+              "components" : [
+                {
+                  "id" : "w3reö9wsjf3",
+                  "typeId" : "commerce_assets.productTile",
+                  "data" : {
+                    "product" : "iphone6"
+                  }
+                },
+                {
+                  "id" : "cgn8d4ngdl4n",
+                  "typeId" : "commerce_assets.productTile",
+                  "data" : {
+                    "product" : "iphone7"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id" : "footer",
+      "components" : []
+    }
+  ]

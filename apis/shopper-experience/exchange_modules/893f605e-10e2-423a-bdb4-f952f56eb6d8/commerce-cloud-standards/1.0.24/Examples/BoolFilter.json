@@ -1,0 +1,23 @@
+{
+  "operator": "and",
+  "filters": [
+    {
+      "termFilter": {
+        "field": "id",
+        "operator": "is",
+        "values": [
+          "myId"
+        ]
+      }
+    },
+    {
+      "termFilter": {
+        "field": "couponId",
+        "operator": "is",
+        "values": [
+          "couponOne"
+        ]
+      }
+    }
+  ]
+}

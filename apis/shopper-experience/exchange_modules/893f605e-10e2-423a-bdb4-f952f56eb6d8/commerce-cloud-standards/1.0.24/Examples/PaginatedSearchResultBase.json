@@ -1,0 +1,35 @@
+{
+  "limit" : 1,
+  "hits" :  [
+    {
+      "couponId": "MyCoupon",
+      "creationDate": "2019-10-20T12:00:00Z",
+      "description": "This coupon is used to give 10% off stuff.",
+      "enabled": false,
+      "exportedCodeCount": 0,
+      "lastModified": "2019-10-30T04:23:59Z",
+      "redemptionCount": 3,
+      "redemptionLimits": {
+        "limitPerCode": 1,
+        "limitPerCustomer": 1,
+        "limitPerTimeFrame": {
+          "limit": 2,
+          "redemptionTimeFrame": 24
+        }
+      },
+      "singleCode": "MyCode",
+      "systemCodesConfig": {
+        "codePrefix": "SG",
+        "numberOfCodes": 500000
+      },
+      "totalCodesCount": 50,
+      "type": "single_code"
+    }
+  ],
+  "query" : { "textQuery": { "fields": ["id", "description"], "searchPhrase": "stuff" } },
+  "sorts" : [
+    { "field": "couponId", "sortOrder": "desc" }
+  ],
+  "offset" : 2,
+  "total" : 8
+}

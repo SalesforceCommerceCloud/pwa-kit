@@ -1,0 +1,35 @@
+#%RAML 1.0 Trait
+
+usage: |
+  DEPRECATED: Use rate-limited multiple times:
+        - conventions.RateLimited:
+            responseStatus: 201
+        - conventions.RateLimited:
+            responseStatus: 404
+
+
+
+  To be applied on endpoints that use rate limiting as 
+  described in [rate limiting](https://confluence.internal.salesforce.com/display/ENG/RESTful+APIs+Conventions+and+Standards+v1.1).
+  Parameters:
+    - `responseStatus` (integer): |
+      The status #1 this endpoint will return.
+    - `responseStatus2` (integer): |
+      The status #2 this endpoint will return.
+    - `responseStatus3` (integer): |
+      The status #3 this endpoint will return.
+    - `responseStatus4` (integer): |
+      The status #4 this endpoint will return.
+
+responses: 
+  <<responseStatus>>:
+    !include private/rate-limited-include-headers.raml
+  <<responseStatus2>>:
+    !include private/rate-limited-include-headers.raml
+  <<responseStatus3>>:
+    !include private/rate-limited-include-headers.raml
+  <<responseStatus4>>:
+    !include private/rate-limited-include-headers.raml
+
+  429:
+    !include private/rate-limited-include-429.raml

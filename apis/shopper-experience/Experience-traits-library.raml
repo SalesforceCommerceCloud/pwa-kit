@@ -1,0 +1,16 @@
+#%RAML 1.0 Library
+usage: Use the following traits for the request and response status information.
+
+uses:
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.15/api-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.24/commerce-cloud-standards.raml
+
+types: 
+  ErrorResponse: ApiStandards.ErrorResponse
+  
+traits:
+  LocaleSpecific: !include Traits/LocaleSpecific.raml
+  AspectAttributeInvalid: !include Traits/AspectAttributesInvalid.raml
+  BusinessObjectIdInvalid: !include Traits/BusinessObjectIdInvalid.raml
+  AspectTypeNotFound: !include Traits/AspectTypeNotFound.raml
+  PageNotFound: !include Traits/PageNotFound.raml

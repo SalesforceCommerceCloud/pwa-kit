@@ -1,0 +1,38 @@
+#%RAML 1.0 Library
+usage: Library for types that act as building blocks for other types.
+
+types:
+  ChangeControlledDataType:
+    displayName: ChangeControlled
+    description: |-
+      A type extending this type will provide metadata regarding changes
+      to its data for each record. This information can be used to build
+      a change history of the records in this data type. 
+
+      With the exception of APIs that query such history, these fields 
+      should never appear in API input, and possibly not in API output; 
+      their values should be derived by the context in which the API is 
+      called from. For example, the `creationDate` property should come 
+      from the system time as opposed to being user provided.
+    properties:
+      creationDate:
+        type: datetime
+        #default: sysdate
+        description: The timestamp of when this record was first created.
+        required: false
+      modificationDate:
+        type: datetime
+        #default: sysdate
+        description: The timestamp of when this record was most recently modified.
+        required: false
+      createdBy:
+        type: string
+        description: The user id of the user who created this record.
+        required: false
+        pattern: /.+/
+      lastModifiedBy:
+        type: string
+        description: The user id of the user who most recently modified this record.
+        required: false
+        pattern: /.+/
+      

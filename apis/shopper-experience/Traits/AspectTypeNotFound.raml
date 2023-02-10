@@ -1,0 +1,15 @@
+#%RAML 1.0 Trait
+description: 404 response when an aspect type is not found.
+responses:
+  404:
+      description: |
+                Requested Aspect Type Not Found
+      body:
+        application/problem+json:
+          type: ErrorResponse
+          example: 
+            {
+            "title": "Aspect Type Not Found",
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/aspect-type-not-found",
+            "detail": "No aspect type with ID 'pdp' was found in site 'RefArch'."
+            }

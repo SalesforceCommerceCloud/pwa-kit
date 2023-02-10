@@ -1,0 +1,14 @@
+#%RAML 1.0 Trait
+usage: This trait should be used whenever a resource uses the context of a locale associated with its request. This will add a locale query parameter.
+queryParameters:
+  locale?:
+    type: CommerceCloudStandards.LocaleCode
+    description: |-
+      A descriptor to provide locale context for a geographical region by both a language and/or country code. The locale pattern in the query param follows the ISO 639-1 for the language code (e.g. en, de, fr) and ISO 3166-1 for the country code (e.g. US, DE, AT). The param can be a combination of language code and country code or can just refer to the language code.
+      Below are some valid examples:
+      - en-US
+      - de-AT
+      - de
+      - default
+    example:
+      en-US

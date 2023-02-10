@@ -1,0 +1,15 @@
+#%RAML 1.0 Trait
+description: 400 response when no proper business object id was provided.
+responses:
+  400:
+      description: |
+                Business Object ID Invalid
+      body:
+        application/problem+json:
+          type: ErrorResponse
+          example: 
+            {
+            "title": "Business Object ID Invalid",
+            "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/business-object-id-invalid",
+            "detail": "At least one provided business object identifier was invalid. This means either none was provided at all or exclusiveness of multiple identifiers wasn't honored or the referenced business object didn't exist."
+            }
