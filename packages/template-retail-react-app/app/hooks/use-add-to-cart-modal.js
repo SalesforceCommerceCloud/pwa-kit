@@ -72,7 +72,6 @@ export const AddToCartModal = () => {
                 margin="0"
                 borderRadius={{base: 'none', md: 'base'}}
                 bgColor="gray.50"
-                dialogProps={{maxHeight: '90vh'}}
             >
                 <ModalHeader paddingY="8" bgColor="white" fontSize="2xl" fontWeight="700">
                     {intl.formatMessage(
