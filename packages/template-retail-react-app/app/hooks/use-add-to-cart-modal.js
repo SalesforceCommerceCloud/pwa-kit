@@ -68,11 +68,7 @@ export const AddToCartModal = () => {
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered>
             <ModalOverlay />
-            <ModalContent
-                margin="0"
-                borderRadius={{base: 'none', md: 'base'}}
-                bgColor="gray.50"
-            >
+            <ModalContent margin="0" borderRadius={{base: 'none', md: 'base'}} bgColor="gray.50">
                 <ModalHeader paddingY="8" bgColor="white" fontSize="2xl" fontWeight="700">
                     {intl.formatMessage(
                         {
