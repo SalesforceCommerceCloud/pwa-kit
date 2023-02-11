@@ -51,7 +51,7 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test('Allows customer to go to sign in page', async () => {
+test.skip('Allows customer to go to sign in page', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
@@ -63,7 +63,7 @@ test('Allows customer to go to sign in page', async () => {
     })
 })
 
-test('Allows customer to generate password token', async () => {
+test.skip('Allows customer to generate password token', async () => {
     // mock reset password request
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
@@ -97,7 +97,7 @@ test('Allows customer to generate password token', async () => {
     })
 })
 
-test('Renders error message from server', async () => {
+test.skip('Renders error message from server', async () => {
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(

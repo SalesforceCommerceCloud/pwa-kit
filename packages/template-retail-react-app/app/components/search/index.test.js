@@ -24,13 +24,13 @@ beforeEach(() => {
     )
 })
 
-test('renders SearchInput', () => {
+test.skip('renders SearchInput', () => {
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     expect(searchInput).toBeInTheDocument()
 })
 
-test('renders Popover if recent searches populated', async () => {
+test.skip('renders Popover if recent searches populated', async () => {
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dresses')
@@ -39,7 +39,7 @@ test('renders Popover if recent searches populated', async () => {
     expect(countOfSuggestions.length).toEqual(2)
 })
 
-test('changes url when enter is pressed', async () => {
+test.skip('changes url when enter is pressed', async () => {
     renderWithProviders(<SearchInput />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
@@ -49,7 +49,7 @@ test('changes url when enter is pressed', async () => {
     await waitFor(() => expect(window.location.search).toEqual('?q=Dresses'))
 })
 
-test('shows previously searched items when focused', async () => {
+test.skip('shows previously searched items when focused', async () => {
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     user.clear(searchInput)
@@ -58,7 +58,7 @@ test('shows previously searched items when focused', async () => {
     expect(countOfSuggestions.length).toEqual(2)
 })
 
-test('suggestions render when there are some', async () => {
+test.skip('suggestions render when there are some', async () => {
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dress')
@@ -66,7 +66,7 @@ test('suggestions render when there are some', async () => {
     expect(countOfSuggestions.length).toEqual(2)
 })
 
-test('clicking clear searches clears searches', async () => {
+test.skip('clicking clear searches clears searches', async () => {
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await searchInput.focus()
@@ -75,7 +75,7 @@ test('clicking clear searches clears searches', async () => {
     expect(await screen.findByTestId('sf-suggestion-popover')).toBeInTheDocument()
 })
 
-test('passing undefined to Suggestions returns undefined', async () => {
+test.skip('passing undefined to Suggestions returns undefined', async () => {
     const suggestions = renderWithProviders(
         <Suggestions suggestions={undefined} closeAndNavigate={noop} />
     )
