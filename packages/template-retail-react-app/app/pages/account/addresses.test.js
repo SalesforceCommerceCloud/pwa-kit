@@ -11,6 +11,10 @@ import {renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountAddresses from './addresses'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {
+    mockedRegisteredCustomerWithNoAddress,
+    mockedRegisteredCustomer
+} from '../../commerce-api/mock-data'
 
 let mockCustomer = {}
 

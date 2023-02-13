@@ -65,9 +65,8 @@ export const setupMockServer = () => {
     )
 }
 
-
 beforeAll(() => {
-global.server = setupMockServer()
+    global.server = setupMockServer()
     global.server.listen()
 })
 afterEach(() => {
