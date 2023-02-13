@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import userEvent from '@testing-library/user-event'
 import {fireEvent, screen, waitFor, act} from '@testing-library/react'
