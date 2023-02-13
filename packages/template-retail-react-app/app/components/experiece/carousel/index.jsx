@@ -4,29 +4,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef} from 'react'
+import React, {Fragment, useCallback, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {
-    AspectRatio,
-    Box,
-    Heading,
-    IconButton,
-    Stack
-} from '@chakra-ui/react'
+import {AspectRatio, Box, Heading, IconButton, Stack, useBreakpoint} from '@chakra-ui/react'
 import {Component} from 'commerce-sdk-react-preview/components'
 import {ChevronLeftIcon, ChevronRightIcon} from '../../icons'
 
 const Carousel = (props = {}) => {
     const scrollRef = useRef()
+    const breakpoint = useBreakpoint()
 
     const {
         textHeadline,
         regions,
-        // eslint-disable-next-line no-unused-vars
         xsCarouselIndicators = false,
-        // eslint-disable-next-line no-unused-vars
         smCarouselIndicators = false,
-        // eslint-disable-next-line no-unused-vars
         mdCarouselIndicators = false,
         xsCarouselControls = false,
         smCarouselControls = false,
@@ -36,7 +28,7 @@ const Carousel = (props = {}) => {
     } = props
 
     const controlDisplay = {
-        base: 'none',
+        base: xsCarouselControls ? 'block' : 'none',
         sm: xsCarouselControls ? 'block' : 'none',
         md: smCarouselControls ? 'block' : 'none',
         lg: 'block'
@@ -48,33 +40,43 @@ const Carousel = (props = {}) => {
         md: `calc(${100 / mdCarouselSlidesToDisplay}%)`
     }
 
-    // Scroll the container left or right by 100%. Passing no args or `1`
-    // scrolls to the right, and passing `-1` scrolls left.
-    const scroll = (direction = 1) => {
-        scrollRef.current?.scrollBy({
-            top: 0,
-            left: (direction * window.innerWidth) / regions[0].components.length,
-            behavior: 'smooth'
-        })
+    const overflowXScroll = {
+        base: xsCarouselIndicators ? 'block' : 'none',
+        sm: xsCarouselIndicators ? 'block' : 'none',
+        md: smCarouselIndicators ? 'block' : 'none',
+        lg: mdCarouselIndicators ? 'block' : 'none'
     }
 
-    const css = `
-        ::-webkit-scrollbar {
-            -webkit-appearance: none;
-            width: 7px;
-        }
+    const components = regions[0]?.components || []
+    const itemCount = components.length
 
-        ::-webkit-scrollbar-thumb {
-            border-radius: 4px;
-            background-color: rgba(0,0,0,.5);
-            -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+    // Scroll the container left or right by 100%. Passing no args or `1`
+    // scrolls to the right, and passing `-1` scrolls left.
+    const scroll = useCallback((direction = 1) => {
+        scrollRef.current?.scrollBy({
+            top: 0,
+            left: (direction * window.innerWidth) / itemCount,
+            behavior: 'smooth'
+        })
+    })
+
+    // Our indicator implementation uses the scrollbar to show the context of the current
+    // item selected. Because MacOS hides scroll bars after they come to rest we need to 
+    // force them to show.
+    const css = `
+        .indicator-scroller::-webkit-scrollbar {
+            display:${overflowXScroll[breakpoint] || 'block'};
+            -webkit-appearance: none;
+            height: 8px;
+        }
+        .indicator-scroller::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.5);
         }
     `
+
     return (
         <Box position="relative" data-testid="experience-carousel">
-            <style>
-                {css}
-            </style>
+            <style>{css}</style>
             <Stack spacing={6}>
                 {textHeadline && (
                     <Heading as="h2" fontSize="xl" textAlign="center">
@@ -84,6 +86,7 @@ const Carousel = (props = {}) => {
 
                 <Stack
                     ref={scrollRef}
+                    className='indicator-scroller'
                     direction="row"
                     spacing={0}
                     wrap="nowrap"
@@ -94,12 +97,12 @@ const Carousel = (props = {}) => {
                         WebkitOverflowScrolling: 'touch'
                     }}
                 >
-                    {regions[0].components.map((component, index) => (
+                    {components.map((component, index) => (
                         <Box
                             key={component?.id || index}
                             flex="0 0 auto"
                             width={itemWidth}
-                            style={{scrollSnapAlign: 'start', border: '1px solid black'}}
+                            style={{scrollSnapAlign: 'start'}}
                         >
                             <AspectRatio ratio={1}>
                                 <Component component={{...component, index}} />
@@ -109,22 +112,8 @@ const Carousel = (props = {}) => {
                 </Stack>
             </Stack>
 
-            <>
-                <Box 
-                    id="dots"
-                    position="absolute"
-                    bottom="10px"
-                    left="50%"
-                    transform="translateX(-50%)"
-                    style={{borderRadius: '10px', height: '30px', lineHeight: '20px', background: 'rgba(0, 0, 0, 0.5)'}}
-                >
-                    {regions[0].components.map((component, index) => (
-                        <a style={{fontSize: "50px", color: "white", opacity: "0.5"}} onClick={() => scroll(-1)}>&#x2022;</a>
-                    ))}
-                </Box>
-            </>
-
-            <>
+            {/* Button Controls */}
+            <Fragment>
                 <Box
                     display={controlDisplay}
                     position="absolute"
@@ -158,7 +147,7 @@ const Carousel = (props = {}) => {
                         onClick={() => scroll(1)}
                     />
                 </Box>
-            </>
+            </Fragment>
         </Box>
     )
 }

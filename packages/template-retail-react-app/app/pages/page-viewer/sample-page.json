@@ -146,15 +146,15 @@
         {
             "data": {
             "xsCarouselIndicators": false,
-            "smCarouselControls": true,
-            "mdCarouselIndicators": false,
+            "smCarouselIndicators": true,
+            "mdCarouselIndicators": true,
             "xsCarouselControls": true,
-            "smCarouselIndicators": false,
+            "smCarouselControls": true,
             "mdCarouselControls": true,
             "xsCarouselSlidesToDisplay": 1,
+            "smCarouselSlidesToDisplay": 3,
             "mdCarouselSlidesToDisplay": 5,
-            "textHeadline": "You May Also Like",
-            "smCarouselSlidesToDisplay": 3
+            "textHeadline": "You May Also Like"
             },
             "id": "604a71c075ebac37052361ac28",
             "regions": [
