@@ -12,15 +12,12 @@ import {
     Heading,
     IconButton,
     Stack
-    // Skeleton,
-    // useBreakpoint
 } from '@chakra-ui/react'
 import {Component} from 'commerce-sdk-react-preview/components'
 import {ChevronLeftIcon, ChevronRightIcon} from '../../icons'
 
 const Carousel = (props = {}) => {
     const scrollRef = useRef()
-    // const breakpoint = useBreakpoint()
 
     const {
         textHeadline,
@@ -46,9 +43,9 @@ const Carousel = (props = {}) => {
     }
 
     const itemWidth = {
-        base: `calc(${100 / xsCarouselSlidesToDisplay}% - 10px)`,
-        sm: `calc(${100 / smCarouselSlidesToDisplay}% - 10px)`,
-        md: `calc(${100 / mdCarouselSlidesToDisplay}% - 10px)`
+        base: `calc(${100 / xsCarouselSlidesToDisplay}%)`,
+        sm: `calc(${100 / smCarouselSlidesToDisplay}%)`,
+        md: `calc(${100 / mdCarouselSlidesToDisplay}%)`
     }
 
     // Scroll the container left or right by 100%. Passing no args or `1`
@@ -56,13 +53,28 @@ const Carousel = (props = {}) => {
     const scroll = (direction = 1) => {
         scrollRef.current?.scrollBy({
             top: 0,
-            left: direction * window.innerWidth,
+            left: (direction * window.innerWidth) / regions[0].components.length,
             behavior: 'smooth'
         })
     }
 
+    const css = `
+        ::-webkit-scrollbar {
+            -webkit-appearance: none;
+            width: 7px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 4px;
+            background-color: rgba(0,0,0,.5);
+            -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+        }
+    `
     return (
         <Box position="relative" data-testid="experience-carousel">
+            <style>
+                {css}
+            </style>
             <Stack spacing={6}>
                 {textHeadline && (
                     <Heading as="h2" fontSize="xl" textAlign="center">
@@ -73,12 +85,11 @@ const Carousel = (props = {}) => {
                 <Stack
                     ref={scrollRef}
                     direction="row"
-                    spacing={4}
+                    spacing={0}
                     wrap="nowrap"
                     overflowX="scroll"
-                    px={{base: 4, md: 8, lg: 0}}
                     sx={{
-                        scrollPadding: {base: 16, md: 32, lg: 0},
+                        scrollPadding: 0,
                         scrollSnapType: 'x mandatory',
                         WebkitOverflowScrolling: 'touch'
                     }}
@@ -88,7 +99,7 @@ const Carousel = (props = {}) => {
                             key={component?.id || index}
                             flex="0 0 auto"
                             width={itemWidth}
-                            style={{scrollSnapAlign: 'start'}}
+                            style={{scrollSnapAlign: 'start', border: '1px solid black'}}
                         >
                             <AspectRatio ratio={1}>
                                 <Component component={{...component, index}} />
@@ -97,6 +108,21 @@ const Carousel = (props = {}) => {
                     ))}
                 </Stack>
             </Stack>
+
+            <>
+                <Box 
+                    id="dots"
+                    position="absolute"
+                    bottom="10px"
+                    left="50%"
+                    transform="translateX(-50%)"
+                    style={{borderRadius: '10px', height: '30px', lineHeight: '20px', background: 'rgba(0, 0, 0, 0.5)'}}
+                >
+                    {regions[0].components.map((component, index) => (
+                        <a style={{fontSize: "50px", color: "white", opacity: "0.5"}} onClick={() => scroll(-1)}>&#x2022;</a>
+                    ))}
+                </Box>
+            </>
 
             <>
                 <Box
