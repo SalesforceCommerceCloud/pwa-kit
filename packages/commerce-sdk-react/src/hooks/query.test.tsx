@@ -15,7 +15,6 @@ import {
 } from './ShopperBaskets/query'
 import {useProductSearch, useSearchSuggestions} from './ShopperSearch/query'
 import {useShopperContext} from './ShopperContexts/query'
-import {useSuggestions} from './ShopperDiscoverySearch/query'
 import {
     useExternalProfile,
     useCustomer,
@@ -204,13 +203,6 @@ const QUERY_TESTS = [
         name: 'useSearchSuggestions',
         hook: () => useSearchSuggestions({q: 'test'}),
         endpoint: /\/search-suggestions$/
-    },
-    // ShopperDiscoverySearch
-    {
-        name: 'useSuggestions',
-        hook: () => useSuggestions(),
-        endpoint: new RegExp(''),
-        notImplemented: true
     }
 ]
 

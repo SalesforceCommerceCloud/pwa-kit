@@ -9,7 +9,6 @@ import {
     ShopperBaskets,
     ShopperContexts,
     ShopperCustomers,
-    ShopperDiscoverySearch,
     ShopperExperience,
     ShopperGiftCertificates,
     ShopperLogin,
@@ -40,7 +39,6 @@ export interface ApiClients {
     shopperBaskets: ShopperBaskets<ApiClientConfigParams>
     shopperContexts: ShopperContexts<ApiClientConfigParams>
     shopperCustomers: ShopperCustomers<ApiClientConfigParams>
-    shopperDiscoverySearch: ShopperDiscoverySearch<ApiClientConfigParams>
     shopperExperience: ShopperExperience<ApiClientConfigParams>
     shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
     shopperLogin: ShopperLogin<ApiClientConfigParams>
