@@ -192,7 +192,7 @@ jobs:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
 
       # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.
-      # TODO: Update the SNYK_TOKEN stored in GitHub to a token generated from the proper Snyk org.
+      # TODO: Update the SNYK_TOKEN stored in GitHub with a token generated from the proper Snyk org.
       #      - name: Audit Generated Project
       #        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true' && env.DEVELOP == 'true'
       #        uses: "./.github/actions/snyk"
