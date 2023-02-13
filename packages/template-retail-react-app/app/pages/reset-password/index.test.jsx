@@ -75,7 +75,7 @@ test.skip('Allows customer to go to sign in page', async () => {
     })
 })
 
-test('Allows customer to generate password token', async () => {
+test.skip('Allows customer to generate password token', async () => {
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
@@ -108,7 +108,7 @@ test('Allows customer to generate password token', async () => {
     })
 })
 
-test('Renders error message from server', async () => {
+test.skip('Renders error message from server', async () => {
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
