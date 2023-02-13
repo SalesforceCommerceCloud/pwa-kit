@@ -14,23 +14,24 @@ import {Image} from '@chakra-ui/react'
  * @param rest The rest of the potential image parameters.
  * @returns {JSX.Element}
  */
-const ImageTile = ({image, ...rest}) => {
+const ImageTile = ({image}) => {
     return (
-        <figure className={'image-tile-figure'}>
-            <picture>
-                <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
-                <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
-                <Image
-                    className={'image-tile-image'}
-                    data-testid={'image-tile-image'}
-                    src={image?.src?.mobile ? image?.src?.mobile : image?.url}
-                    ignoreFallback={true}
-                    alt={image?.alt}
-                    title={image?.alt}
-                    {...rest}
-                />
-            </picture>
-        </figure>
+        <div className={'image-tile'}>
+            <figure className={'image-tile-figure'}>
+                <picture>
+                    <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
+                    <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
+                    <Image
+                        className={'image-tile-image'}
+                        data-testid={'image-tile-image'}
+                        src={image?.src?.mobile ? image?.src?.mobile : image?.url}
+                        ignoreFallback={true}
+                        alt={image?.alt}
+                        title={image?.alt}
+                    />
+                </picture>
+            </figure>
+        </div>
     )
 }
 
