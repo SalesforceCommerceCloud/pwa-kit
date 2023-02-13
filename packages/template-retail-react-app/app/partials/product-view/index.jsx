@@ -282,6 +282,7 @@ const ProductView = forwardRef(
                                     size={imageSize}
                                     imageGroups={product.imageGroups}
                                     selectedVariationAttributes={variationParams}
+                                    lazy={isProductPartOfSet}
                                 />
                                 <HideOnMobile>
                                     {showFullLink && product && (
@@ -496,6 +497,8 @@ const ProductView = forwardRef(
         )
     }
 )
+
+ProductView.displayName = 'ProductView'
 
 ProductView.propTypes = {
     product: PropTypes.object,

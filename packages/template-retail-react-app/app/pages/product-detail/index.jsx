@@ -284,19 +284,20 @@ const ProductDetail = ({category, product, isLoading}) => {
 
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Complete the Set"
-                                id="product_detail.recommended_products.title.complete_set"
-                            />
-                        }
-                        recommender={'complete-the-set'}
-                        products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-
+                    {!isProductASet && (
+                        <RecommendedProducts
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="Complete the Set"
+                                    id="product_detail.recommended_products.title.complete_set"
+                                />
+                            }
+                            recommender={'complete-the-set'}
+                            products={[product]}
+                            mx={{base: -4, md: -8, lg: 0}}
+                            shouldFetch={() => product?.id}
+                        />
+                    )}
                     <RecommendedProducts
                         title={
                             <FormattedMessage

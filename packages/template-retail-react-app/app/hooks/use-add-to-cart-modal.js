@@ -19,6 +19,7 @@ import {
     ModalBody,
     ModalCloseButton,
     ModalContent,
+    ModalFooter,
     ModalOverlay,
     Stack,
     useBreakpointValue
@@ -65,16 +66,10 @@ export const AddToCartModal = () => {
     const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     return (
-        <Modal size={size} isOpen={isOpen} onClose={onClose}>
+        <Modal size={size} isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered>
             <ModalOverlay />
-            <ModalContent
-                margin="0"
-                marginTop={{md: '8', lg: '200px'}}
-                overflow="hidden"
-                borderRadius={{base: 'none', md: 'base'}}
-                bgColor="gray.50"
-            >
-                <ModalHeader paddingTop="8" bgColor="white" fontSize="2xl" fontWeight="700">
+            <ModalContent margin="0" borderRadius={{base: 'none', md: 'base'}} bgColor="gray.50">
+                <ModalHeader paddingY="8" bgColor="white" fontSize="2xl" fontWeight="700">
                     {intl.formatMessage(
                         {
                             defaultMessage:
@@ -85,18 +80,18 @@ export const AddToCartModal = () => {
                     )}
                 </ModalHeader>
                 <ModalCloseButton />
-                <ModalBody bgColor="white" paddingTop="4" paddingBottom="8" flex="none">
+                <ModalBody bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}}>
                     <Flex
                         flexDirection={{base: 'column', lg: 'row'}}
                         justifyContent="space-between"
+                        paddingBottom={{base: '0', lg: '8'}}
+                        paddingX="4"
                     >
                         <Box
                             flex="1"
-                            paddingRight={{lg: '4', xl: '8'}}
-                            paddingY={{base: '4', lg: '0'}}
+                            paddingX={{lg: '4', xl: '8'}}
                             // divider style
                             borderRightWidth={{lg: '1px'}}
-                            borderBottomWidth={{base: '1px', lg: '0px'}}
                             borderColor="gray.200"
                             borderStyle="solid"
                         >
@@ -119,6 +114,10 @@ export const AddToCartModal = () => {
                                         key={variant.productId}
                                         justifyContent="space-between"
                                         marginBottom={index < itemsAdded - 1 ? 0 : 4}
+                                        paddingBottom={4}
+                                        borderBottomWidth={{base: '1px', lg: '0px'}}
+                                        borderColor="gray.200"
+                                        borderStyle="solid"
                                     >
                                         <Flex gridGap="4">
                                             <Box w="24" flex="none">
@@ -168,8 +167,9 @@ export const AddToCartModal = () => {
                             })}
                         </Box>
                         <Box
+                            display={['none', 'none', 'none', 'block']}
                             flex="1"
-                            paddingLeft={{lg: '4', xl: '8'}}
+                            paddingX={{lg: '4', xl: '8'}}
                             paddingY={{base: '4', lg: '0'}}
                         >
                             <Flex justifyContent="space-between" marginBottom="8">
@@ -214,21 +214,70 @@ export const AddToCartModal = () => {
                             </Stack>
                         </Box>
                     </Flex>
+                    <Box padding="8" bgColor="gray.50">
+                        <RecommendedProducts
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="You Might Also Like"
+                                    id="add_to_cart_modal.recommended_products.title.might_also_like"
+                                />
+                            }
+                            recommender={'pdp-similar-items'}
+                            products={[product]}
+                            mx={{base: -4, md: -8, lg: 0}}
+                            shouldFetch={() => product?.id}
+                        />
+                    </Box>
                 </ModalBody>
-                <Box padding="8">
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="You Might Also Like"
-                                id="add_to_cart_modal.recommended_products.title.might_also_like"
-                            />
-                        }
-                        recommender={'pdp-similar-items'}
-                        products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-                </Box>
+                <ModalFooter
+                    position="fixed"
+                    bg="white"
+                    width="100%"
+                    display={['block', 'block', 'block', 'none']}
+                    p={[4, 4, 6]}
+                    left={0}
+                    bottom={0}
+                >
+                    <Flex justifyContent="space-between" marginBottom="4">
+                        <Text fontWeight="700">
+                            {intl.formatMessage(
+                                {
+                                    defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)',
+                                    id: 'add_to_cart_modal.label.cart_subtotal'
+                                },
+                                {itemAccumulatedCount}
+                            )}
+                        </Text>
+                        <Text alignSelf="flex-end" fontWeight="600">
+                            {productSubTotal &&
+                                intl.formatNumber(productSubTotal, {
+                                    style: 'currency',
+                                    currency: currency
+                                })}
+                        </Text>
+                    </Flex>
+                    <Stack spacing="4">
+                        <Button as={Link} to="/cart" width="100%" variant="solid">
+                            {intl.formatMessage({
+                                defaultMessage: 'View Cart',
+                                id: 'add_to_cart_modal.link.view_cart'
+                            })}
+                        </Button>
+
+                        <Button
+                            as={Link}
+                            to="/checkout"
+                            width="100%"
+                            variant="outline"
+                            rightIcon={<LockIcon />}
+                        >
+                            {intl.formatMessage({
+                                defaultMessage: 'Proceed to Checkout',
+                                id: 'add_to_cart_modal.link.checkout'
+                            })}
+                        </Button>
+                    </Stack>
+                </ModalFooter>
             </ModalContent>
         </Modal>
     )
