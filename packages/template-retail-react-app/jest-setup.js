@@ -4,14 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {mockCustomerBaskets} from './app/commerce-api/mock-data'
-
 const path = require('path')
 const mockConfig = require(path.join(__dirname, 'config/mocks/default.js'))
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
 const {Crypto} = require('@peculiar/webcrypto')
-
 const {setupServer} = require('msw/node')
 const {rest} = require('msw')
 const {
@@ -19,10 +16,6 @@ const {
     mockedRegisteredCustomer,
     exampleTokenReponse
 } = require('./app/commerce-api/mock-data')
-
-const AJwtThatNeverExpires =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjF9.BDAp9G8nmArdBqAbsE5GUWZ3fiv2LwQKClEFDCGIyy8'
-
 /**
  * Set up an API mocking server for testing purposes.
  * This mock server includes the basic oauth flow endpoints.
@@ -37,8 +30,18 @@ export const setupMockServer = () => {
         rest.get('*/oauth2/logout', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
         ),
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        ),
+        rest.post('*/customers/action/login', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    authType: 'guest',
+                    customerId: 'customerid'
+                })
+            )
         }),
         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
         rest.post('*/oauth2/token', (req, res, ctx) =>
@@ -46,7 +49,7 @@ export const setupMockServer = () => {
                 ctx.delay(0),
                 ctx.json({
                     customer_id: 'test',
-                    access_token: AJwtThatNeverExpires,
+                    access_token: 'testtoken',
                     refresh_token: 'testrefeshtoken',
                     usid: 'testusid',
                     enc_user_id: 'testEncUserId',
@@ -57,18 +60,13 @@ export const setupMockServer = () => {
         rest.get('*/categories/:categoryId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
         ),
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
-        }),
         rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200)))
     )
 }
 
-global.server = setupMockServer()
 beforeAll(() => {
-    global.server.listen({
-        onUnhandledRequest: 'error'
-    })
+    global.server = setupMockServer()
+    global.server.listen()
 })
 afterEach(() => {
     global.server.resetHandlers()
@@ -81,6 +79,15 @@ afterAll(() => {
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {
         getConfig: () => mockConfig
+    }
+})
+
+// Mock isTokenValid globally
+jest.mock('./app/commerce-api/utils', () => {
+    const originalModule = jest.requireActual('./app/commerce-api/utils')
+    return {
+        ...originalModule,
+        isTokenValid: jest.fn().mockReturnValue(true)
     }
 })
 

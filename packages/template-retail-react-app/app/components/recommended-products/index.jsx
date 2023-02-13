@@ -197,8 +197,8 @@ RecommendedProducts.propTypes = {
     /* The recommender to request */
     recommender: PropTypes.string,
 
-    /* The product IDs to use for recommendation context */
-    products: PropTypes.arrayOf(PropTypes.string),
+    /* The products to use for recommendation context */
+    products: PropTypes.arrayOf(PropTypes.object),
 
     /* Callback to determine if the component should fetch results */
     shouldFetch: PropTypes.func

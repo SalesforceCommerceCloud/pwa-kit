@@ -54,14 +54,14 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
+    if (!isOpen) {
+        return null
+    }
     const {product, quantity} = data || {}
     const intl = useIntl()
     const {basket = {}, totalItems} = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const variationAttributes = useVariationAttributes(product)
-    if (!isOpen) {
-        return null
-    }
 
     const {currency, productItems, productSubTotal} = basket
     const {id, variationValues} = product
@@ -202,7 +202,7 @@ export const AddToCartModal = () => {
                             />
                         }
                         recommender={'pdp-similar-items'}
-                        products={product}
+                        products={[product]}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
                     />
@@ -247,6 +247,7 @@ export const useAddToCartModal = () => {
         isOpen: state.isOpen,
         data: state.data,
         onOpen: (data) => {
+            console.log('onOpen data', data)
             setState({
                 isOpen: true,
                 data

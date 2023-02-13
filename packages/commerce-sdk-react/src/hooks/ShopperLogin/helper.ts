@@ -4,11 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
-import {Argument} from '../types'
 import {useMutation} from '../useMutation'
 import useAuth from '../useAuth'
-import Auth from '../../auth'
 import {UseMutationResult} from '@tanstack/react-query'
 
 export const ShopperLoginHelpers = {
@@ -18,7 +15,7 @@ export const ShopperLoginHelpers = {
     Logout: 'logout'
 } as const
 
-type ShopperLoginHelpersType = typeof ShopperLoginHelpers[keyof typeof ShopperLoginHelpers]
+type ShopperLoginHelpersType = (typeof ShopperLoginHelpers)[keyof typeof ShopperLoginHelpers]
 
 /**
  * A hook for Public Client Shopper Login OAuth helpers.

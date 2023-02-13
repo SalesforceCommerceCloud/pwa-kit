@@ -49,7 +49,13 @@ export const shopperOrdersCacheUpdateMatrix = {
     ): CacheUpdateMatrixElement => {
         const customerId = response?.customerInfo?.customerId
         return {
-            update: [{name: 'order', key: ['/orders', {orderNo: response.orderNo}]}],
+            update: [
+                {
+                    name: 'order',
+                    key: ['/orders', {orderNo: response.orderNo}],
+                    updater: () => response
+                }
+            ],
             invalidate: [{name: 'customerBaskets', key: ['/customers', customerId, '/baskets']}]
         }
     },
@@ -79,7 +85,8 @@ export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
     'UpdatePaymentInstrumentForOrder'
 ]
 
-export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
+export type ShopperOrdersMutationType =
+    (typeof ShopperOrdersMutations)[keyof typeof ShopperOrdersMutations]
 
 type UseShopperOrdersMutationHeaders = NonNullable<Argument<Client['createOrder']>>['headers']
 type UseShopperOrdersMutationArg = {
@@ -113,11 +120,13 @@ function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperOrders'][action] as MutationFunction<Data, Params>
-            return (method.call as (
-                apiClient: ShopperOrdersClient,
-                params: Params,
-                rawResponse: boolean | undefined
-            ) => any)(apiClients['shopperOrders'], {...params, headers}, rawResponse)
+            return (
+                method.call as (
+                    apiClient: ShopperOrdersClient,
+                    params: Params,
+                    rawResponse: boolean | undefined
+                ) => any
+            )(apiClients['shopperOrders'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {

@@ -7,8 +7,19 @@
 import React from 'react'
 import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
-import {waitFor} from '@testing-library/react'
-
+import {waitFor, screen, act} from '@testing-library/react'
+import {rest} from 'msw'
+import {mockCustomerBaskets} from '../commerce-api/mock-data'
+jest.mock('commerce-sdk-react-preview', () => {
+    const originModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originModule,
+        useCustomerId: jest.fn().mockReturnValue('customer_id'),
+        useCustomerType: jest
+            .fn()
+            .mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
+    }
+})
 const MOCK_PRODUCT = {
     currency: 'USD',
     id: '701642811398M',
@@ -19,16 +30,14 @@ const MOCK_PRODUCT = {
                     alt: 'Long Sleeve Crew Neck, Fire Red, large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3ce02e8b/images/large/PG.10219685.JJ825XX.PZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 },
                 {
                     alt: 'Long Sleeve Crew Neck, Fire Red, large',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdc28ed23/images/large/PG.10219685.JJ825XX.BZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 }
             ],
@@ -50,16 +59,14 @@ const MOCK_PRODUCT = {
                     alt: 'Long Sleeve Crew Neck, Fire Red, medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8434410d/images/medium/PG.10219685.JJ825XX.PZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 },
                 {
                     alt: 'Long Sleeve Crew Neck, Fire Red, medium',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc50f7b16/images/medium/PG.10219685.JJ825XX.BZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 }
             ],
@@ -81,16 +88,14 @@ const MOCK_PRODUCT = {
                     alt: 'Long Sleeve Crew Neck, Fire Red, small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8173d41b/images/small/PG.10219685.JJ825XX.PZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 },
                 {
                     alt: 'Long Sleeve Crew Neck, Fire Red, small',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw426088e2/images/small/PG.10219685.JJ825XX.BZ.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 }
             ],
@@ -112,8 +117,7 @@ const MOCK_PRODUCT = {
                     alt: 'Long Sleeve Crew Neck, Fire Red, swatch',
                     disBaseLink:
                         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
-                    link:
-                        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcbc8a4ed/images/swatch/PG.10219685.JJ825XX.CP.jpg',
                     title: 'Long Sleeve Crew Neck, Fire Red'
                 }
             ],
@@ -567,38 +571,47 @@ const MOCK_PRODUCT = {
     c_size: '9LG',
     c_width: 'Z'
 }
+beforeEach(() => {
+    jest.resetModules()
+    global.server.use(
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
+        })
+    )
+})
 
 test('Renders AddToCartModal', async () => {
-    const {getByText} = renderWithProviders(
-        <AddToCartModalContext.Provider
-            value={{
-                isOpen: true,
-                data: {
-                    product: MOCK_PRODUCT,
-                    quantity: 22
-                }
-            }}
-        >
-            <AddToCartModal />
-        </AddToCartModalContext.Provider>
-    )
-
-    await waitFor(() => {
-        expect(getByText(/cart subtotal \(1 item\)/i)).toBeInTheDocument()
-        expect(getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+    await act(async () => {
+        renderWithProviders(
+            <AddToCartModalContext.Provider
+                value={{
+                    isOpen: true,
+                    data: {
+                        product: MOCK_PRODUCT,
+                        quantity: 2
+                    }
+                }}
+            >
+                <AddToCartModal />
+            </AddToCartModalContext.Provider>
+        )
+        await waitFor(() => {
+            expect(screen.getByText(/cart subtotal \(1 item\)/i)).toBeInTheDocument()
+            expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+        })
     })
 })
 
-test('Do not render when isOpen is false', () => {
-    const {queryByText} = renderWithProviders(
+test('Do not render when isOpen is false', async () => {
+    renderWithProviders(
         <AddToCartModalContext.Provider
             value={{
-                isOpen: false
+                isOpen: false,
+                data: null
             }}
         >
             <AddToCartModal />
         </AddToCartModalContext.Provider>
     )
-
-    expect(queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
+    expect(screen.queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
 })

@@ -226,7 +226,13 @@ export const shopperCustomersCacheUpdateMatrix = {
     ): CacheUpdateMatrixElement => {
         const {customerId} = params.parameters
         return {
-            update: [{name: 'customer', key: ['/customers', customerId, {customerId}]}],
+            update: [
+                {
+                    name: 'customer',
+                    key: ['/customers', customerId, {customerId}],
+                    updater: () => response
+                }
+            ],
             invalidate: [
                 {
                     name: 'customerPaymentInstrument',
@@ -247,7 +253,8 @@ export const shopperCustomersCacheUpdateMatrix = {
             update: [
                 {
                     name: 'customerAddress',
-                    key: ['/customers', customerId, '/addresses', {addressName, customerId}]
+                    key: ['/customers', customerId, '/addresses', {addressName, customerId}],
+                    updater: () => response
                 }
             ],
             invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}]
@@ -269,7 +276,8 @@ export const shopperCustomersCacheUpdateMatrix = {
                         customerId,
                         '/addresses',
                         {addressName: addressId, customerId}
-                    ]
+                    ],
+                    updater: () => response
                 }
             ],
             invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}]
@@ -309,7 +317,8 @@ export const shopperCustomersCacheUpdateMatrix = {
                         customerId,
                         '/payment-instruments',
                         {customerId, paymentInstrumentId: response?.paymentInstrumentId}
-                    ]
+                    ],
+                    updater: () => response
                 }
             ],
             invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}]
@@ -354,7 +363,8 @@ export const shopperCustomersCacheUpdateMatrix = {
                         customerId,
                         '/product-list',
                         {customerId, listId: response?.id}
-                    ]
+                    ],
+                    updater: () => response
                 }
             ]
         }
@@ -369,7 +379,14 @@ export const shopperCustomersCacheUpdateMatrix = {
             update: [
                 {
                     name: 'customerProductListItem',
-                    key: ['/customers', customerId, '/product-list', listId, {itemId: response?.id}]
+                    key: [
+                        '/customers',
+                        customerId,
+                        '/product-list',
+                        listId,
+                        {itemId: response?.id}
+                    ],
+                    updater: () => response
                 }
             ],
             invalidate: [
@@ -390,7 +407,8 @@ export const shopperCustomersCacheUpdateMatrix = {
             update: [
                 {
                     name: 'customerProductListItem',
-                    key: ['/customers', customerId, '/product-list', listId, {itemId}]
+                    key: ['/customers', customerId, '/product-list', listId, {itemId}],
+                    updater: () => response
                 }
             ],
             invalidate: [
@@ -438,7 +456,8 @@ export const SHOPPER_CUSTOMERS_NOT_IMPLEMENTED = [
     'updateCustomerProductList'
 ]
 
-export type ShopperCustomersMutationType = typeof ShopperCustomersMutations[keyof typeof ShopperCustomersMutations]
+export type ShopperCustomersMutationType =
+    (typeof ShopperCustomersMutations)[keyof typeof ShopperCustomersMutations]
 
 type UseShopperCustomersMutationHeaders = NonNullable<
     Argument<Client['registerCustomer']>
@@ -472,11 +491,13 @@ function useShopperCustomersMutation<Action extends ShopperCustomersMutationType
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperCustomers'][action] as MutationFunction<Data, Params>
-            return (method.call as (
-                apiClient: ShopperCustomersClient,
-                params: Params,
-                rawResponse: boolean | undefined
-            ) => any)(apiClients['shopperCustomers'], {...params, headers}, rawResponse)
+            return (
+                method.call as (
+                    apiClient: ShopperCustomersClient,
+                    params: Params,
+                    rawResponse: boolean | undefined
+                ) => any
+            )(apiClients['shopperCustomers'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {
