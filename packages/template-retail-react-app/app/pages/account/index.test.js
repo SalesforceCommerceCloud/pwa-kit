@@ -43,6 +43,7 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
+    jest.resetModules()
     global.server.use(
         rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
         rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
@@ -55,13 +56,11 @@ beforeEach(() => {
     window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterEach(() => {
-    jest.resetModules()
     localStorage.clear()
 })
 
 const expectedBasePath = '/uk/en-GB'
-//TODO Hook Integration WIP
-test.skip('Redirects to login page if the customer is not logged in', async () => {
+test('Redirects to login page if the customer is not logged in', async () => {
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
@@ -158,7 +157,11 @@ test('Allows customer to edit profile details', async () => {
 })
 
 test('Allows customer to update password', async () => {
-    global.server.use(rest.put('*/password', (req, res, ctx) => res(ctx.json())))
+    global.server.use(
+        rest.put('*/password', (req, res, ctx) => {
+            return res(ctx.json())
+        })
+    )
 
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('account-page')).toBeInTheDocument()

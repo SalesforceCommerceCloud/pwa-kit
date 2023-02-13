@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
@@ -57,7 +57,6 @@ import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
 import useMultiSite from '../../hooks/use-multi-site'
-import {useEffect} from 'react'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign

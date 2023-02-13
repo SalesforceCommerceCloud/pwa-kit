@@ -30,9 +30,10 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     return (
         <CommerceApiProvider
             siteId={siteId}
-            shortCode="8o7m175y"
-            clientId="c9c45bfd-0ed3-4aa2-9971-40f88962b836"
-            organizationId="f_ecom_zzrf_001"
+            // TODO: On Feb 08 restore zzrf_001 details
+            shortCode="sandbox-001"
+            clientId="06bb7d20-93fa-4707-ade6-2ecd858331bd"
+            organizationId="f_ecom_bjnl_dev"
             redirectURI="http://localhost:3000/callback"
             proxy="http://localhost:3000/mobify/proxy/api"
             locale={locale}

@@ -16,6 +16,7 @@ const {
     mockedRegisteredCustomer,
     exampleTokenReponse
 } = require('./app/commerce-api/mock-data')
+
 /**
  * Set up an API mocking server for testing purposes.
  * This mock server includes the basic oauth flow endpoints.
@@ -64,8 +65,9 @@ export const setupMockServer = () => {
     )
 }
 
+
 beforeAll(() => {
-    global.server = setupMockServer()
+global.server = setupMockServer()
     global.server.listen()
 })
 afterEach(() => {

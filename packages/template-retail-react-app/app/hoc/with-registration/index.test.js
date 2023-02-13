@@ -15,6 +15,9 @@ import {rest} from 'msw'
 import {mockedGuestCustomer} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
+jest.setTimeout(60000)
+jest.useFakeTimers()
+
 const ButtonWithRegistration = withRegistration(Button)
 
 const MockedComponent = (props) => {
@@ -39,6 +42,10 @@ beforeAll(() => {
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', '/en-GB/account')
+})
+
+beforeEach(() => {
+    jest.resetModules()
 })
 
 afterEach(() => {

@@ -30,6 +30,7 @@ const MockedComponent = () => {
 }
 
 beforeEach(() => {
+    jest.resetModules()
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
             return res(ctx.json(mockMasterProduct))
@@ -39,6 +40,7 @@ beforeEach(() => {
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/701642811398M')
 })
+
 afterEach(() => {
     jest.resetModules()
 })

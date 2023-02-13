@@ -119,7 +119,6 @@ test.skip('Allows customer to create an account', async () => {
 
     // wait for success state to appear
     await waitFor(() => {
-        screen.logTestingPlaygroundURL()
         expect(screen.getAllByText(/My Account/).length).toEqual(2)
     })
 })
