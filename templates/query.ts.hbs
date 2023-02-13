@@ -15,7 +15,7 @@ import {useQuery} from '../useQuery'
 
 type Client = ApiClients['{{@root.clientInstance}}']
 
-{{#each model.encodes.endPoints}}{{#each operations}}{{#if (is method 'get')~}}
+{{#each model.encodes.endPoints}}{{#each operations}}{{#if (isQuery @root.clientClass this)~}}
 /**
  * A hook for `{{@root.clientClass}}#{{name}}`.
  * {{{formatForTsDoc description}}}
@@ -26,8 +26,11 @@ type Client = ApiClients['{{@root.clientInstance}}']
 export const use{{#startsWith 'get' (getValue name)~}}
 {{removeFirst (getValue name) 'get'}}
 {{~else~}}
+{{~#startsWith 'retrieve' (getValue name)~}}
+{{removeFirst (getValue name) 'retrieve'}}
+{{~else~}}
 {{capitalize (getValue name)}}
-{{~/startsWith}} = (
+{{~/startsWith}}{{/startsWith}} = (
     apiOptions: Argument<Client['{{name}}']>,
     queryOptions: Omit<UseQueryOptions<DataType<Client['{{name}}']>>, 'queryFn'> = {}
 ): UseQueryResult<DataType<Client['{{name}}']>> => {

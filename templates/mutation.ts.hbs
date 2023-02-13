@@ -19,7 +19,7 @@ import {cacheUpdateMatrix} from './config'
 type Client = ApiClients['{{@root.clientInstance}}']
 
 export const {{@root.clientClass}}Mutations = {
-  {{~#each model.encodes.endPoints}}{{#each operations}}{{#if (not (is (getValue method) 'get'))}}
+  {{~#each model.encodes.endPoints}}{{#each operations}}{{#if (not (isQuery @root.clientClass this))}}
   {{!-- /**
    * {{{formatForTsDoc description}}}
    * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/{{@root.name.kebabCase}}?meta={{name~}} } for more information about the API endpoint.

@@ -175,3 +175,25 @@ export function assign(
 export const createQueryKeyFragment = (url: string, variable: string): string =>
   // If the URL ends with a {template} fragment, we end up with a `, ''` that we don't need
   `'${url.replace(/\{(\w+)\}/g, `', ${variable}.$1, '`)}'`.replace(", ''", '');
+
+export const isQuery = (
+  apiName: string,
+  operation: amf.model.domain.Operation
+): boolean => {
+  const isGet = operation.method.value() === 'get';
+  const name = operation.name.value();
+  if (apiName === 'ShopperLogin') {
+    // logoutCustomer is GET, but changes state, so it is not a query
+    return isGet && name !== 'logoutCustomer';
+  }
+  if (apiName === 'ShopperCustomers') {
+    // authorizeCustomer is GET, but changes state, so it is not a query
+    return isGet && name !== 'authorizeCustomer';
+  }
+  if (apiName === 'ShopperGiftCertificates') {
+    // getGiftCertificate is POST, does not change state, so it is a query
+    // (It is POST, rather than GET, because gift certificate code is a secret)
+    return isGet || name === 'getGiftCertificate';
+  }
+  return isGet;
+};
