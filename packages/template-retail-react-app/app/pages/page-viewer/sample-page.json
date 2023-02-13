@@ -145,16 +145,15 @@
         },
         {
             "data": {
-            "xsCarouselIndicators": false,
-            "smCarouselIndicators": true,
-            "mdCarouselIndicators": true,
-            "xsCarouselControls": true,
-            "smCarouselControls": true,
-            "mdCarouselControls": true,
+            "xsCarouselIndicators": true,
+            "smCarouselIndicators": false,
+            "mdCarouselIndicators": false,
+            "xsCarouselControls": false,
+            "smCarouselControls": false,
             "xsCarouselSlidesToDisplay": 1,
             "smCarouselSlidesToDisplay": 3,
             "mdCarouselSlidesToDisplay": 5,
-            "textHeadline": "You May Also Like"
+            "textHeadline": "You May Also Like!"
             },
             "id": "604a71c075ebac37052361ac28",
             "regions": [
@@ -238,6 +237,38 @@
                     "displayRatings": false
                     },
                     "id": "c2c4fca566b40c84b7a0c368fe",
+                    "typeId": "commerce_assets.productTile"
+                },
+                {
+                    "data": {
+                    "product": "25778945M",
+                    "displayRatings": false
+                    },
+                    "id": "12c4fca566b40c84b7a0c368fe",
+                    "typeId": "commerce_assets.productTile"
+                },
+                {
+                    "data": {
+                    "product": "25778945M",
+                    "displayRatings": false
+                    },
+                    "id": "22c4fca566b40c84b7a0c368fe",
+                    "typeId": "commerce_assets.productTile"
+                },
+                {
+                    "data": {
+                    "product": "25778945M",
+                    "displayRatings": false
+                    },
+                    "id": "32c4fca566b40c84b7a0c368fe",
+                    "typeId": "commerce_assets.productTile"
+                },
+                {
+                    "data": {
+                    "product": "25778945M",
+                    "displayRatings": false
+                    },
+                    "id": "42c4fca566b40c84b7a0c368fe",
                     "typeId": "commerce_assets.productTile"
                 }
                 ],

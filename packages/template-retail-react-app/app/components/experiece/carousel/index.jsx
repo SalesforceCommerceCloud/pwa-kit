@@ -6,13 +6,19 @@
  */
 import React, {Fragment, useCallback, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {AspectRatio, Box, Heading, IconButton, Stack, useBreakpoint} from '@chakra-ui/react'
+import {AspectRatio, Box, Heading, IconButton, Stack, useBreakpointValue} from '@chakra-ui/react'
 import {Component} from 'commerce-sdk-react-preview/components'
 import {ChevronLeftIcon, ChevronRightIcon} from '../../icons'
 
+/**
+ * Display child components in a carousel slider manner. Configurations include the number of
+ * children to display in view as well as whether or not to show controls and position indicators.
+ *
+ * @param {*} props
+ * @returns
+ */
 const Carousel = (props = {}) => {
     const scrollRef = useRef()
-    const breakpoint = useBreakpoint()
 
     const {
         textHeadline,
@@ -36,8 +42,9 @@ const Carousel = (props = {}) => {
 
     const itemWidth = {
         base: `calc(${100 / xsCarouselSlidesToDisplay}%)`,
-        sm: `calc(${100 / smCarouselSlidesToDisplay}%)`,
-        md: `calc(${100 / mdCarouselSlidesToDisplay}%)`
+        sm: `calc(${100 / xsCarouselSlidesToDisplay}%)`,
+        md: `calc(${100 / smCarouselSlidesToDisplay}%)`,
+        lg: `calc(${100 / mdCarouselSlidesToDisplay}%)`
     }
 
     const overflowXScroll = {
@@ -46,6 +53,7 @@ const Carousel = (props = {}) => {
         md: smCarouselIndicators ? 'block' : 'none',
         lg: mdCarouselIndicators ? 'block' : 'none'
     }
+    const overflowXScrollValue = useBreakpointValue(overflowXScroll)
 
     const components = regions[0]?.components || []
     const itemCount = components.length
@@ -61,11 +69,11 @@ const Carousel = (props = {}) => {
     })
 
     // Our indicator implementation uses the scrollbar to show the context of the current
-    // item selected. Because MacOS hides scroll bars after they come to rest we need to 
+    // item selected. Because MacOS hides scroll bars after they come to rest we need to
     // force them to show.
     const css = `
         .indicator-scroller::-webkit-scrollbar {
-            display:${overflowXScroll[breakpoint] || 'block'};
+            display:${overflowXScrollValue};
             -webkit-appearance: none;
             height: 8px;
         }
@@ -75,7 +83,7 @@ const Carousel = (props = {}) => {
     `
 
     return (
-        <Box position="relative" data-testid="experience-carousel">
+        <Box className={'carousel'} position="relative" data-testid="experience-carousel">
             <style>{css}</style>
             <Stack spacing={6}>
                 {textHeadline && (
@@ -86,7 +94,7 @@ const Carousel = (props = {}) => {
 
                 <Stack
                     ref={scrollRef}
-                    className='indicator-scroller'
+                    className="indicator-scroller"
                     direction="row"
                     spacing={0}
                     wrap="nowrap"
@@ -160,9 +168,9 @@ Carousel.propTypes = {
     mdCarouselIndicators: PropTypes.bool,
     xsCarouselControls: PropTypes.bool,
     smCarouselIndicators: PropTypes.bool,
-    xsCarouselSlidesToDisplay: PropTypes.number,
-    mdCarouselSlidesToDisplay: PropTypes.number,
-    smCarouselSlidesToDisplay: PropTypes.number
+    xsCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)],
+    mdCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)],
+    smCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)]
 }
 
 export default Carousel
