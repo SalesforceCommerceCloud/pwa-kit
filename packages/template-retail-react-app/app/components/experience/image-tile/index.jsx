@@ -9,9 +9,8 @@ import PropTypes from 'prop-types'
 import {Image} from '@chakra-ui/react'
 
 /**
- * Simple Image tile component that can be used inside any Layout component
+ * Simple ImageTile component that can be used inside any Layout component.
  * @param image Object containing the image url, _type and focalPoint.
- * @param rest The rest of the potential image parameters.
  * @returns {JSX.Element}
  */
 const ImageTile = ({image}) => {
