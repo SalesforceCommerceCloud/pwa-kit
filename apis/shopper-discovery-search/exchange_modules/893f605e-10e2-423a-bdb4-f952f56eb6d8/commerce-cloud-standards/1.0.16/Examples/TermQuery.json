@@ -1,9 +1,0 @@
-{
-  "fields": [
-    "enabled"
-  ],
-  "operator": "is",
-  "values": [
-    false
-  ]
-}
