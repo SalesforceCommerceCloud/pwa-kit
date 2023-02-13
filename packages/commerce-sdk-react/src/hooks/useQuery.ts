@@ -29,7 +29,7 @@ export const useQuery = <
         client: Client
         method: ApiMethod<Options, Data>
         getQueryKey: (options: MergedOptions<Client, Options>) => QK
-        requiredParameters: ReadonlyArray<keyof Options['parameters']>
+        requiredParameters: ReadonlyArray<keyof MergedOptions<Client, Options>['parameters']>
         enabled?: boolean
     }
 ) => {
