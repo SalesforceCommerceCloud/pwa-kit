@@ -18,7 +18,7 @@ type Client = ApiClients['shopperLogin']
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperlogin.shopperlogin-1.html#retrievecredqualityuserinfo} for more information on the parameters and returned data type.
  * @returns An object describing the state of the request.
  */
-export const useRetrieveCredQualityUserInfo = (
+export const useCredQualityUserInfo = (
     apiOptions: Argument<Client['retrieveCredQualityUserInfo']>,
     queryOptions: Omit<
         UseQueryOptions<DataType<Client['retrieveCredQualityUserInfo']>>,
@@ -38,42 +38,6 @@ export const useRetrieveCredQualityUserInfo = (
             '/organizations/',
             parameters.organizationId,
             '/cred-qual/user',
-            // Full parameters last for easy lookup
-            parameters
-        ] as const
-
-    return useQuery(apiOptions, queryOptions, {
-        client,
-        method,
-        requiredParameters,
-        getQueryKey
-    })
-}
-/**
- * A hook for `ShopperLogin#logoutCustomer`.
- * Log out a shopper. The shopper's access token and refresh token are revoked. If the shopper authenticated with a B2C Commerce (ECOM) instance, the OCAPI JWT is also revoked. This should be called for Registered users that have logged in using SLAS. his should be called for registered users that have logged in using SLAS. This endpoint is not for use with guest users.
-
-Required header: Authorization header bearer token of the Shopper access token to logout.
-
-Required parameters: `refresh token`, `channel_id`, and `client`.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-login?meta=logoutCustomer} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperlogin.shopperlogin-1.html#logoutcustomer} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
- */
-export const useLogoutCustomer = (
-    apiOptions: Argument<Client['logoutCustomer']>,
-    queryOptions: Omit<UseQueryOptions<DataType<Client['logoutCustomer']>>, 'queryFn'> = {}
-): UseQueryResult<DataType<Client['logoutCustomer']>> => {
-    const {shopperLogin: client} = useCommerceApi()
-    const method = (arg: Argument<Client['logoutCustomer']>) => client.logoutCustomer(arg)
-    const requiredParameters = ['organizationId', 'client_id', 'refresh_token'] as const
-    // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
-    // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({parameters}: MergedOptions<Client, Argument<Client['logoutCustomer']>>) =>
-        [
-            '/organizations/',
-            parameters.organizationId,
-            '/oauth2/logout',
             // Full parameters last for easy lookup
             parameters
         ] as const

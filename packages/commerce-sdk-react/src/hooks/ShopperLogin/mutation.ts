@@ -16,6 +16,7 @@ type Client = ApiClients['shopperLogin']
 export const ShopperLoginMutations = {
     AuthenticateCustomer: 'authenticateCustomer',
     AuthorizePasswordlessCustomer: 'authorizePasswordlessCustomer',
+    LogoutCustomer: 'logoutCustomer',
     GetAccessToken: 'getAccessToken',
     GetSessionBridgeAccessToken: 'getSessionBridgeAccessToken',
     GetTrustedSystemAccessToken: 'getTrustedSystemAccessToken',
