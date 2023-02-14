@@ -145,10 +145,10 @@
         },
         {
             "data": {
-            "xsCarouselIndicators": true,
+            "xsCarouselIndicators": false,
             "smCarouselIndicators": false,
             "mdCarouselIndicators": false,
-            "xsCarouselControls": false,
+            "xsCarouselControls": true,
             "smCarouselControls": false,
             "xsCarouselSlidesToDisplay": 1,
             "smCarouselSlidesToDisplay": 3,

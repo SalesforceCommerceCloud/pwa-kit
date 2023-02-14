@@ -164,13 +164,13 @@ Carousel.propTypes = {
     textHeadline: PropTypes.string,
     regions: PropTypes.array,
     xsCarouselIndicators: PropTypes.bool,
-    smCarouselControls: PropTypes.bool,
+    smCarouselIndicators: PropTypes.bool,
     mdCarouselIndicators: PropTypes.bool,
     xsCarouselControls: PropTypes.bool,
-    smCarouselIndicators: PropTypes.bool,
+    smCarouselControls: PropTypes.bool,
     xsCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)],
-    mdCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)],
-    smCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)]
+    smCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)],
+    mdCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)]
 }
 
 export default Carousel
