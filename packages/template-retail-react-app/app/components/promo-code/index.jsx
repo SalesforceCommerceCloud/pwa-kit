@@ -17,62 +17,83 @@ import {
     useToast
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {ChevronDownIcon, ChevronUpIcon} from '../../components/icons'
-import useBasket from '../../commerce-api/hooks/useBasket'
+import {ChevronDownIcon, ChevronUpIcon} from '../icons'
 import PromoCodeFields from '../../components/forms/promo-code-fields'
 import {API_ERROR_MESSAGE} from '../../constants'
+import {useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 
 export const usePromoCode = () => {
     const {formatMessage} = useIntl()
-    const basket = useBasket()
+    const {basket} = useCurrentBasket()
     const form = useForm()
     const toast = useToast()
 
+    const applyPromoCodeAction = useShopperBasketsMutation({action: 'addCouponToBasket'})
+    const removePromoCodeAction = useShopperBasketsMutation({action: 'removeCouponFromBasket'})
+
     const submitPromoCode = async ({code}) => {
-        try {
-            await basket.applyPromoCode(code)
-            form.reset({code: ''})
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'Promotion applied',
-                    id: 'use_promocode.info.promo_applied'
-                }),
-                status: 'success',
-                position: 'top-right',
-                isClosable: true
-            })
-        } catch (err) {
-            form.setError('code', {
-                type: 'manual',
-                message: formatMessage({
-                    defaultMessage:
-                        'Check the code and try again, it may already be applied or the promo has expired.',
-                    id: 'use_promocode.error.check_the_code'
-                })
-            })
-        }
+        applyPromoCodeAction.mutate(
+            {
+                parameters: {basketId: basket?.basketId},
+                body: {
+                    code
+                }
+            },
+            {
+                onSuccess: () => {
+                    form.reset({code: ''})
+                    toast({
+                        title: formatMessage({
+                            defaultMessage: 'Promotion applied',
+                            id: 'use_promocode.info.promo_applied'
+                        }),
+                        status: 'success',
+                        position: 'top-right',
+                        isClosable: true
+                    })
+                },
+                onError: () => {
+                    form.setError('code', {
+                        type: 'manual',
+                        message: formatMessage({
+                            defaultMessage:
+                                'Check the code and try again, it may already be applied or the promo has expired.',
+                            id: 'use_promocode.error.check_the_code'
+                        })
+                    })
+                }
+            }
+        )
     }
 
     const removePromoCode = async (couponItemId) => {
-        try {
-            await basket.removePromoCode(couponItemId)
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'Promotion removed',
-                    id: 'use_promocode.info.promo_removed'
-                }),
-                status: 'success',
-                position: 'top-right',
-                isClosable: true
-            })
-        } catch (err) {
-            toast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error',
-                position: 'top-right',
-                isClosable: true
-            })
-        }
+        removePromoCodeAction.mutate(
+            {
+                parameters: {basketId: basket?.basketId, couponItemId}
+            },
+            {
+                onSuccess: () => {
+                    toast({
+                        title: formatMessage({
+                            defaultMessage: 'Promotion removed',
+                            id: 'use_promocode.info.promo_removed'
+                        }),
+                        status: 'success',
+                        position: 'top-right',
+                        isClosable: true
+                    })
+                },
+                onError: () => {
+                    toast({
+                        title: formatMessage(API_ERROR_MESSAGE),
+                        status: 'error',
+                        position: 'top-right',
+                        isClosable: true
+                    })
+                }
+            }
+        )
     }
 
     return {form, submitPromoCode, removePromoCode}
