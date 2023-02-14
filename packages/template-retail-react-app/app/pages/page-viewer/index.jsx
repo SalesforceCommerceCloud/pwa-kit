@@ -7,7 +7,7 @@
 import React from 'react'
 import {Page, Region} from 'commerce-sdk-react-preview/components'
 import SamplePage from './sample-page.json'
-import Carousel from '../../components/experiece/carousel'
+import Carousel from '../../components/experience/carousel'
 
 const componentMapProxy = new Proxy(
     {},
