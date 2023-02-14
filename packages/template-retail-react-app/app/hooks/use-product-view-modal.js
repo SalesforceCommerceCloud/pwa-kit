@@ -73,7 +73,6 @@ export const useProductViewModal = (initialProduct) => {
 
     useEffect(() => {
         if (variant) {
-            // console.log('variant change')
             const {variationValues} = variant
             // update the url with the new product id and variation values when the variant changes
             const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
