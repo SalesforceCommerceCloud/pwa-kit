@@ -33,7 +33,7 @@ const Component = () => {
     const {correlationId} = useCorrelationId()
     return <div className={'correlation-id'}>{correlationId}</div>
 }
-describe('CorrelationIdProvider', function() {
+describe('CorrelationIdProvider', function () {
     test('Renders without errors', () => {
         const history = createMemoryHistory()
         const id = crypto.randomUUID()

@@ -178,7 +178,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).
                         ]
 
                         queryKeys.forEach(({key: queryKey}: QueryKeyMap) => {
-                            queryClient.setQueryData(queryKey, {test: true})
+                            queryClient.setQueryData(queryKey, () => ({test: true}))
                         })
 
                         const button = screen.getByRole('button', {

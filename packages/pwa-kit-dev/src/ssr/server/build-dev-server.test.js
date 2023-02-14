@@ -360,7 +360,7 @@ describe('DevServer proxying', () => {
             .get(targetPath)
             .reply(
                 200,
-                function() {
+                function () {
                     requestHeaders.push(this.req.headers)
                 },
                 responseHeaders
@@ -414,9 +414,7 @@ describe('DevServer proxying', () => {
     test('restricts methods', () => {
         // Use nock to mock out a host to which we proxy, though we
         // do not expect the request to be made.
-        const nockResponse = nock('https://test.proxy.com')
-            .get('/test/path3')
-            .reply(200, 'OK')
+        const nockResponse = nock('https://test.proxy.com').get('/test/path3').reply(200, 'OK')
 
         const app = NoWebpackDevServerFactory._createApp(opts())
         const path = '/mobify/caching/base3/test/path3'
@@ -434,7 +432,7 @@ describe('DevServer proxying', () => {
         // Use nock to mock out a host to which we proxy
         const nockResponse = nock('https://test.proxy.com')
             .get('/test/path3')
-            .reply(200, function() {
+            .reply(200, function () {
                 const headers = this.req.headers
                 expect('x-mobify-access-key' in headers).toBe(false)
                 expect('cache-control' in headers).toBe(false)
@@ -474,9 +472,7 @@ describe('DevServer proxying', () => {
     test('handles error', () => {
         const app = NoWebpackDevServerFactory._createApp(opts())
 
-        return request(app)
-            .get('/mobify/proxy/base2/test/path')
-            .expect(500)
+        return request(app).get('/mobify/proxy/base2/test/path').expect(500)
     })
 })
 
@@ -560,7 +556,7 @@ describe('DevServer persistent caching support', () => {
         route = null
     })
 
-    test('Caching of compressed responses', () => {
+    test('No caching of compressed responses', () => {
         // ADN-118 reported that a cached response was correctly sent
         // the first time, but was corrupted the second time. This
         // test is specific to that issue.
@@ -582,12 +578,12 @@ describe('DevServer persistent caching support', () => {
                     namespace
                 })
             )
-            .then((entry) => expect(entry.found).toBe(true))
+            .then((entry) => expect(entry.found).toBe(false))
             .then(() => request(app).get(url))
             .then((res) => app._requestMonitor._waitForResponses().then(() => res))
             .then((res) => {
                 expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('true')
+                expect(res.headers['x-mobify-from-cache']).toEqual('false')
                 expect(res.headers['content-encoding']).toEqual('gzip')
                 expect(res.text).toEqual(expected)
             })
@@ -603,20 +599,15 @@ describe('DevServer persistent caching support', () => {
                 expect(res.status).toEqual(200)
                 expect(res.headers['x-mobify-from-cache']).toEqual('false')
                 expect(res.headers['content-encoding']).toEqual('gzip')
-                return res
             })
-            .then((res) =>
-                app.applicationCache
-                    .get({
-                        key: keyFromURL(url),
-                        namespace
-                    })
-                    .then((entry) => ({res, entry}))
+            .then(() =>
+                app.applicationCache.get({
+                    key: keyFromURL(url),
+                    namespace
+                })
             )
-            .then(({res, entry}) => {
-                expect(entry.found).toBe(true)
-                const uncompressed = zlib.gunzipSync(entry.data)
-                expect(uncompressed.toString()).toEqual(res.text)
+            .then((entry) => {
+                expect(entry.found).toBe(false)
             })
     })
 })
@@ -748,9 +739,7 @@ describe('DevServer service worker', () => {
         test(`${name} (and handle 404s correctly)`, () => {
             const app = createApp()
 
-            return request(app)
-                .get(requestPath)
-                .expect(404)
+            return request(app).get(requestPath).expect(404)
         })
     })
 })
@@ -795,9 +784,7 @@ describe('DevServer serveStaticFile', () => {
         const app = NoWebpackDevServerFactory._createApp(options)
         app.__devMiddleware = MockWebpackDevMiddleware
         app.use('/test', NoWebpackDevServerFactory.serveStaticFile('static/favicon.ico'))
-        return request(app)
-            .get('/test')
-            .expect(200)
+        return request(app).get('/test').expect(200)
     })
 
     test('should return 404 if static file does not exist', async () => {
@@ -805,8 +792,6 @@ describe('DevServer serveStaticFile', () => {
         const app = NoWebpackDevServerFactory._createApp(options)
         app.__devMiddleware = MockWebpackDevMiddleware
         app.use('/test', NoWebpackDevServerFactory.serveStaticFile('static/IDoNotExist.ico'))
-        return request(app)
-            .get('/test')
-            .expect(404)
+        return request(app).get('/test').expect(404)
     })
 })

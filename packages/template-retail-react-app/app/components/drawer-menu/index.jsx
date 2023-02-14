@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
@@ -13,7 +13,7 @@ import {useIntl} from 'react-intl'
 import LocaleSelector from '../locale-selector'
 import NestedAccordion from '../nested-accordion'
 import SocialIcons from '../social-icons'
-
+import {useCategories} from '../../hooks/use-categories'
 // Components
 import {
     Box,
@@ -81,7 +81,8 @@ const STORE_LOCATOR_HREF = '/store-locator'
  * main usage is to navigate from one category to the next, but also homes links to
  * support, log in and out actions, as support links.
  */
-const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
+const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
+    const {root, itemsKey} = useCategories()
     const intl = useIntl()
     const {isRegistered} = useCustomerType()
     const navigate = useNavigation()
@@ -91,6 +92,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
     const [showLoading, setShowLoading] = useState(false)
+    const [ariaBusy, setAriaBusy] = useState('true')
     const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -101,6 +103,10 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
 
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
+
+    useEffect(() => {
+        setAriaBusy('false')
+    }, [])
 
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
@@ -119,49 +125,56 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
 
                     {/* Main Content */}
                     <DrawerBody>
-                        {showLoading && <LoadingSpinner />}
+                        <div
+                            id="category-nav"
+                            aria-live="polite"
+                            aria-busy={ariaBusy}
+                            aria-atomic="true"
+                        >
+                            {showLoading && <LoadingSpinner />}
 
-                        {/* Category Navigation */}
-                        {root ? (
-                            <Fade in={true}>
-                                <NestedAccordion
-                                    allowMultiple={true}
-                                    item={root}
-                                    itemsKey="categories"
-                                    itemsFilter="c_showInMenu"
-                                    fontSizes={FONT_SIZES}
-                                    fontWeights={FONT_WEIGHTS}
-                                    itemsBefore={({depth, item}) =>
-                                        depth > 0 ? (
-                                            [
-                                                <AccordionItem border="none" key="show-all">
-                                                    <AccordionButton
-                                                        paddingLeft={8}
-                                                        as={Link}
-                                                        to={categoryUrlBuilder(item)}
-                                                        fontSize={FONT_SIZES[depth]}
-                                                        fontWeight={FONT_WEIGHTS[depth]}
-                                                        color="black"
-                                                    >
-                                                        {intl.formatMessage({
-                                                            id: 'drawer_menu.link.shop_all',
-                                                            defaultMessage: 'Shop All'
-                                                        })}
-                                                    </AccordionButton>
-                                                </AccordionItem>
-                                            ]
-                                        ) : (
-                                            <></>
-                                        )
-                                    }
-                                    urlBuilder={categoryUrlBuilder}
-                                />
-                            </Fade>
-                        ) : (
-                            <Center p="8">
-                                <Spinner size="xl" />
-                            </Center>
-                        )}
+                            {/* Category Navigation */}
+                            {root?.[itemsKey] ? (
+                                <Fade in={true}>
+                                    <NestedAccordion
+                                        allowMultiple={true}
+                                        item={root}
+                                        itemsKey={itemsKey}
+                                        itemsFilter="c_showInMenu"
+                                        fontSizes={FONT_SIZES}
+                                        fontWeights={FONT_WEIGHTS}
+                                        itemsBefore={({depth, item}) =>
+                                            depth > 0 ? (
+                                                [
+                                                    <AccordionItem border="none" key="show-all">
+                                                        <AccordionButton
+                                                            paddingLeft={8}
+                                                            as={Link}
+                                                            to={categoryUrlBuilder(item)}
+                                                            fontSize={FONT_SIZES[depth]}
+                                                            fontWeight={FONT_WEIGHTS[depth]}
+                                                            color="black"
+                                                        >
+                                                            {intl.formatMessage({
+                                                                id: 'drawer_menu.link.shop_all',
+                                                                defaultMessage: 'Shop All'
+                                                            })}
+                                                        </AccordionButton>
+                                                    </AccordionItem>
+                                                ]
+                                            ) : (
+                                                <></>
+                                            )
+                                        }
+                                        urlBuilder={categoryUrlBuilder}
+                                    />
+                                </Fade>
+                            ) : (
+                                <Center p="8">
+                                    <Spinner size="xl" />
+                                </Center>
+                            )}
+                        </div>
 
                         <DrawerSeparator />
 
@@ -206,8 +219,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                                             id: 'profile',
                                                             path: '',
                                                             name: intl.formatMessage({
-                                                                id:
-                                                                    'drawer_menu.button.account_details',
+                                                                id: 'drawer_menu.button.account_details',
                                                                 defaultMessage: 'Account Details'
                                                             })
                                                         },
@@ -215,8 +227,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                                             id: 'orders',
                                                             path: '/orders',
                                                             name: intl.formatMessage({
-                                                                id:
-                                                                    'drawer_menu.button.order_history',
+                                                                id: 'drawer_menu.button.order_history',
                                                                 defaultMessage: 'Order History'
                                                             })
                                                         },
@@ -232,8 +243,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                                             id: 'payments',
                                                             path: '/payments',
                                                             name: intl.formatMessage({
-                                                                id:
-                                                                    'drawer_menu.button.payment_methods',
+                                                                id: 'drawer_menu.button.payment_methods',
                                                                 defaultMessage: 'Payment Methods'
                                                             })
                                                         }
@@ -303,16 +313,14 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                             {
                                                 id: 'contactus',
                                                 name: intl.formatMessage({
-                                                    id:
-                                                        'drawer_menu.link.customer_support.contact_us',
+                                                    id: 'drawer_menu.link.customer_support.contact_us',
                                                     defaultMessage: 'Contact Us'
                                                 })
                                             },
                                             {
                                                 id: 'shippingandreturns',
                                                 name: intl.formatMessage({
-                                                    id:
-                                                        'drawer_menu.link.customer_support.shipping_and_returns',
+                                                    id: 'drawer_menu.link.customer_support.shipping_and_returns',
                                                     defaultMessage: 'Shipping & Returns'
                                                 })
                                             }
@@ -387,10 +395,6 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
 DrawerMenu.displayName = 'DrawerMenu'
 
 DrawerMenu.propTypes = {
-    /**
-     * The root category in your commerce cloud back-end.
-     */
-    root: PropTypes.object,
     /**
      * The opened state of the drawer.
      */

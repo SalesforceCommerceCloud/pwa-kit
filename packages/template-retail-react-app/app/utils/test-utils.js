@@ -145,7 +145,7 @@ export const TestProviders = ({
                             locale={locale.id}
                             redirectURI={`${window.location.origin}/testcallback`}
                         >
-                            <CategoriesProvider categories={initialCategories}>
+                            <CategoriesProvider treeRoot={initialCategories}>
                                 <CurrencyProvider currency={DEFAULT_CURRENCY}>
                                     <CustomerProvider value={{customer, setCustomer}}>
                                         <BasketProvider value={{basket, setBasket}}>

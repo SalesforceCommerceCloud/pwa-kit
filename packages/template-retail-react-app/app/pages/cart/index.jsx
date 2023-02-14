@@ -394,8 +394,10 @@ const Cart = () => {
                                     />
                                 }
                                 recommender={'product-to-product-einstein'}
-                                products={basket?.productItems?.map((item) => item.productId)}
-                                shouldFetch={() => basket?.basketId && products?.length > 0}
+                                products={basket?.productItems}
+                                shouldFetch={() =>
+                                    basket?.basketId && basket.productItems?.length > 0
+                                }
                                 mx={{base: -4, sm: -6, lg: 0}}
                             />
                         </Stack>

@@ -20,7 +20,7 @@ import {
 jest.mock('cross-fetch', () => {
     return {
         __esModule: true,
-        default: jest.fn(() => ({json: jest.fn()}))
+        default: jest.fn(() => ({json: jest.fn(), ok: true}))
     }
 })
 
@@ -57,8 +57,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"product":{"id":"56736828M","sku":"56736828M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"product":{"id":"56736828M","sku":"56736828M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -74,8 +73,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"searchText":"tie","products":[{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},{"id":"25752235M","sku":"25752235M","altId":"","altIdType":""},{"id":"25752218M","sku":"25752218M","altId":"","altIdType":""},{"id":"25752981M","sku":"25752981M","altId":"","altIdType":""}],"showProducts":true,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"searchText":"tie","products":[{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},{"id":"25752235M","sku":"25752235M","altId":"","altIdType":""},{"id":"25752218M","sku":"25752218M","altId":"","altIdType":""},{"id":"25752981M","sku":"25752981M","altId":"","altIdType":""}],"showProducts":true,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -90,8 +88,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"category":{"id":"mens-accessories-ties"},"products":[{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},{"id":"25752235M","sku":"25752235M","altId":"","altIdType":""},{"id":"25752218M","sku":"25752218M","altId":"","altIdType":""},{"id":"25752981M","sku":"25752981M","altId":"","altIdType":""}],"showProducts":true,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"category":{"id":"mens-accessories-ties"},"products":[{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},{"id":"25752235M","sku":"25752235M","altId":"","altIdType":""},{"id":"25752218M","sku":"25752218M","altId":"","altIdType":""},{"id":"25752981M","sku":"25752981M","altId":"","altIdType":""}],"showProducts":true,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -108,8 +105,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"searchText":"tie","product":{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"searchText":"tie","product":{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -125,8 +121,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"category":{"id":"mens-accessories-ties"},"product":{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"category":{"id":"mens-accessories-ties"},"product":{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -142,8 +137,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"currentLocation":"/","cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"currentLocation":"/","cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -158,8 +152,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"products":[{"id":"682875719029M","sku":"","price":29.99,"quantity":1}],"amount":29.99,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"products":[{"id":"682875719029M","sku":"","price":29.99,"quantity":1}],"amount":29.99,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -176,8 +169,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"stepName":"CheckoutStep","stepNumber":0,"basketId":"f6bbeee30fb93c2f94213f60f8","cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"stepName":"CheckoutStep","stepNumber":0,"basketId":"f6bbeee30fb93c2f94213f60f8","cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -192,8 +184,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"products":[{"id":"883360544021M","sku":"","price":155,"quantity":1}],"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"products":[{"id":"883360544021M","sku":"","price":155,"quantity":1}],"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -208,8 +199,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"56736828M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"56736828M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -224,8 +214,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body:
-                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","products":{"id":"test-reco"},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","products":{"id":"test-reco"},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -235,7 +224,8 @@ describe('EinsteinAPI', () => {
             return {
                 json: async () => {
                     return mockGetZoneRecommendationsResponse
-                }
+                },
+                ok: true
             }
         })
 
@@ -288,7 +278,8 @@ describe('EinsteinAPI', () => {
             return {
                 json: async () => {
                     return mockRecommendationsResponse
-                }
+                },
+                ok: true
             }
         })
 

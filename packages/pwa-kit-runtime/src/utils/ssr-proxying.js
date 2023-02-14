@@ -603,9 +603,8 @@ export const rewriteProxyResponseHeaders = ({
         // Even though API Gateway has a header value limit of
         // 10240 bytes, we choose to limit the length of the header
         // value to 8192 bytes.
-        const fullRequestUrl = (requestUrl.startsWith('/')
-            ? `${targetOrigin}${requestUrl}`
-            : requestUrl
+        const fullRequestUrl = (
+            requestUrl.startsWith('/') ? `${targetOrigin}${requestUrl}` : requestUrl
         ).slice(0, MAX_URL_LENGTH_BYTES)
         logging &&
             console.log(

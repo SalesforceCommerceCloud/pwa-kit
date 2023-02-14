@@ -11,6 +11,7 @@ import {CacheUpdateMatrixElement, NotImplementedError, updateCache} from '../uti
 import useCustomerId from '../useCustomerId'
 
 type Client = ApiClients['shopperBaskets']
+type CustomerClient = ApiClients['shopperCustomers']
 
 export const ShopperBasketsMutations = {
     /**
@@ -182,21 +183,53 @@ type UseShopperBasketsMutationArg = {
 }
 
 type ShopperBasketsClient = ApiClients['shopperBaskets']
-export type ShopperBasketsMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
+export type ShopperBasketsMutationType =
+    (typeof ShopperBasketsMutations)[keyof typeof ShopperBasketsMutations]
 
 /**
  * @private
  */
 export const getCacheUpdateMatrix = (customerId: string | null) => {
-    const updateBasketQuery = (basketId?: string) => {
+    const updateBasketQuery = (
+        basketId?: string,
+        response?: DataType<Client[ShopperBasketsMutationType]>
+    ) => {
         // TODO: we're missing headers, rawResponse -> not only {basketId}
         const arg = {basketId}
+
         return basketId
             ? {
                   update: [
                       {
                           name: 'basket',
-                          key: ['/baskets', basketId, arg]
+                          key: ['/baskets', basketId, arg],
+                          updater: () => response
+                      },
+                      {
+                          // Since we use baskets from customer basket query, we need to update it for any basket mutation
+                          name: 'customerBaskets',
+                          key: ['/customers', customerId, '/baskets', {customerId}],
+                          updater: (
+                              oldData: NonNullable<DataType<CustomerClient['getCustomerBaskets']>>
+                          ) => {
+                              // do not update if responded basket does not exist inside existing customer baskets
+                              if (
+                                  !oldData?.baskets?.some(
+                                      (basket) => basket.basketId === response?.basketId
+                                  )
+                              ) {
+                                  return undefined
+                              }
+                              const updatedBaskets = oldData.baskets?.map(
+                                  (basket: DataType<Client[ShopperBasketsMutationType]>) => {
+                                      return basket?.basketId === basketId ? response : basket
+                                  }
+                              )
+                              return {
+                                  ...oldData,
+                                  baskets: updatedBaskets
+                              }
+                          }
                       }
                   ]
               }
@@ -240,8 +273,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         addItemToBasket: (
@@ -251,8 +283,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         removeItemFromBasket: (
@@ -262,8 +293,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params?.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         addPaymentInstrumentToBasket: (
@@ -273,18 +303,15 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         createBasket: (
             params: Argument<Client['createBasket']>,
             response: DataType<Client['createBasket']>
         ): CacheUpdateMatrixElement => {
-            const basketId = response.basketId
-
             return {
-                ...updateBasketQuery(basketId),
+                // we want to re-fetch basket data in this case to get the basket total and other baskets data
                 ...invalidateCustomerBasketsQuery(customerId)
             }
         },
@@ -303,10 +330,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             params: Argument<Client['mergeBasket']>,
             response: DataType<Client['mergeBasket']>
         ): CacheUpdateMatrixElement => {
-            const basketId = response.basketId
-
             return {
-                ...updateBasketQuery(basketId),
                 ...invalidateCustomerBasketsQuery(customerId)
             }
         },
@@ -317,8 +341,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params?.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         removePaymentInstrumentFromBasket: (
@@ -328,8 +351,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params?.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         updateBasket: (
@@ -339,8 +361,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         updateBillingAddressForBasket: (
@@ -350,8 +371,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         updateCustomerForBasket: (
@@ -361,8 +381,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         updateItemInBasket: (
@@ -372,8 +391,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         updatePaymentInstrumentInBasket: (
@@ -383,8 +401,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         updateShippingAddressForShipment: (
@@ -394,8 +411,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         },
         updateShippingMethodForShipment: (
@@ -405,8 +421,7 @@ export const getCacheUpdateMatrix = (customerId: string | null) => {
             const basketId = params.parameters.basketId
 
             return {
-                ...updateBasketQuery(basketId),
-                ...invalidateCustomerBasketsQuery(customerId)
+                ...updateBasketQuery(basketId, response)
             }
         }
     }
@@ -445,16 +460,19 @@ export function useShopperBasketsMutation<Action extends ShopperBasketsMutationT
     }
     const queryClient = useQueryClient()
     const customerId = useCustomerId()
+
     const cacheUpdateMatrix = getCacheUpdateMatrix(customerId)
 
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
-            return (method.call as (
-                apiClient: ShopperBasketsClient,
-                params: Params,
-                rawResponse: boolean | undefined
-            ) => any)(apiClients['shopperBaskets'], {...params, headers}, rawResponse)
+            return (
+                method.call as (
+                    apiClient: ShopperBasketsClient,
+                    params: Params,
+                    rawResponse: boolean | undefined
+                ) => any
+            )(apiClients['shopperBaskets'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {

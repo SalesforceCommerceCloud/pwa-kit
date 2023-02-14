@@ -19,6 +19,13 @@ const createJwt = (secondsToExp) => {
     return token.compact()
 }
 
+jest.mock('./utils', () => {
+    const originalModule = jest.requireActual('./utils')
+    return {
+        ...originalModule
+    }
+})
+
 describe('isTokenValid', () => {
     test('returns false when no token given', () => {
         expect(isTokenValid()).toBe(false)

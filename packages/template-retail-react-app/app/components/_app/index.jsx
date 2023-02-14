@@ -10,7 +10,6 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {useCustomerType} from 'commerce-sdk-react-preview'
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
@@ -44,21 +43,24 @@ import {IntlProvider} from 'react-intl'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
-import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
+import {
+    DEFAULT_SITE_TITLE,
+    HOME_HREF,
+    THEME_COLOR,
+    CAT_MENU_DEFAULT_NAV_DEPTH,
+    CAT_MENU_DEFAULT_ROOT_CATEGORY,
+    DEFAULT_LOCALE
+} from '../../constants'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
-import {useCategory} from 'commerce-sdk-react-preview'
-
-const DEFAULT_NAV_DEPTH = 3
-const DEFAULT_ROOT_CATEGORY = 'root'
-const DEFAULT_LOCALE = 'en-US'
+import {useCategory, useCustomerType} from 'commerce-sdk-react-preview'
 
 const App = (props) => {
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
     const {data: allCategories} = useCategory(
-        {id: DEFAULT_ROOT_CATEGORY, levels: DEFAULT_NAV_DEPTH},
+        {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_DEPTH},
         {
             select: (categories) => {
                 // Note: What is the best to handle special case like this?? Should commerce sdk handles this?
@@ -182,7 +184,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
                 // - "compile-translations:pseudo"
                 defaultLocale={DEFAULT_LOCALE}
             >
-                <CategoriesProvider categories={allCategories}>
+                <CategoriesProvider treeRoot={allCategories} locale={targetLocale}>
                     <CurrencyProvider currency={currency}>
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
@@ -232,14 +234,18 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
                                                 isOpen={isOpen}
                                                 onClose={onClose}
                                                 onLogoClick={onLogoClick}
-                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
+                                                root={
+                                                    allCategories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                }
                                                 locale={locale}
                                             />
                                         </HideOnDesktop>
 
                                         <HideOnMobile>
                                             <ListMenu
-                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
+                                                root={
+                                                    allCategories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                }
                                                 locale={locale}
                                             />
                                         </HideOnMobile>

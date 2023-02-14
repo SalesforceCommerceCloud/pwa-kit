@@ -12,23 +12,53 @@ const WebSocket = require('ws')
 const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
-const scriptUtils = require('../scripts/utils')
-const uploadBundle = require('../scripts/upload.js')
-const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
+// Scripts in ./bin have never gone through babel, so we
+// don't have a good pattern for mixing compiled/un-compiled
+// code.
+//
+// This conditional import lets us gradually migrate portions
+// of this script to Typescript, until internal-lib-build
+// has a decent pattern for ./bin scripts!
+const scriptUtils = (() => {
+    try {
+        return require('../dist/utils/script-utils')
+    } catch {
+        return require('../utils/script-utils')
+    }
+})()
+
 const colors = {
-    info: 'green',
     warn: 'yellow',
-    error: 'red'
+    error: 'red',
+    success: 'cyan'
 }
+
+const fancyLog = (level, msg) => {
+    const color = colors[level] || 'green'
+    const colorFn = chalk[color]
+    console.log(`${colorFn(level)}: ${msg}`)
+}
+const info = (msg) => fancyLog('info', msg)
+const success = (msg) => fancyLog('success', msg)
+const warn = (msg) => fancyLog('warn', msg)
+const error = (msg) => fancyLog('error', msg)
 
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
 }
 
-const main = () => {
+const getProjectName = async () => {
+    const projectPkg = await scriptUtils.getProjectPkg()
+    if (!projectPkg.name) {
+        throw new Error(`Missing "name" field in "package.json"`)
+    }
+    return projectPkg.name
+}
+
+const main = async () => {
     const pkgRoot = p.join(__dirname, '..')
     process.env.CONTEXT = process.cwd()
 
@@ -48,7 +78,7 @@ const main = () => {
             ``,
             `Usage inside NPM scripts:`,
             ``,
-            `  The PWA Kit Developer Tools is used in NPM scripts so you can conveniently`,
+            `  The PWA Kit Developer Tools are used in NPM scripts so you can conveniently`,
             `  run eg. 'npm run push' to push a bundle from a project.`,
             ``,
             `  To pass args to pwa-kit-dev when wrapped in an NPM script, separate them`,
@@ -66,6 +96,19 @@ const main = () => {
     )
 
     /**
+     * Return a platform-specific representation of the default credentials
+     * location *for documentation purposes only*.
+     *
+     * It's easier to recognize the intention behind `(default "~/.mobify")` in
+     * docs than it is `(default "/Users/xyz/.mobify")`. In the second case,
+     * you have to actually remember that this is your home dir!
+     */
+    const credentialsLocationDisplay = () => {
+        const dir = process.platform === 'win32' ? '%USERPROFILE%' : '~'
+        return p.join(dir, '.mobify')
+    }
+
+    /**
      * All Managed Runtime commands take common opts like --cloud-origin
      * and --credentialsFile. These are set to be split out from the SDK
      * commands here in the near future.
@@ -75,36 +118,28 @@ const main = () => {
             .command(name)
             .addOption(
                 new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
-                    .default('https://cloud.mobify.com')
+                    .default(scriptUtils.DEFAULT_CLOUD_ORIGIN)
                     .env('CLOUD_API_BASE')
-                    .argParser((val) => {
-                        try {
-                            const url = new URL(val)
-                            const labels = url.host.split('.')
-                            if (
-                                labels.length !== 3 ||
-                                !labels[0].startsWith('cloud') ||
-                                !labels[1].startsWith('mobify') ||
-                                labels[2] !== 'com'
-                            ) {
-                                throw new Error()
-                            }
-                        } catch {
-                            throw new program.InvalidArgumentError(
-                                `'${val}' is not a valid Cloud origin`
-                            )
-                        }
-                        return val
-                    })
             )
             .addOption(
                 new program.Option(
                     '-c, --credentialsFile <credentialsFile>',
-                    'override the standard credentials file location'
+                    `override the standard credentials file location "${credentialsLocationDisplay()}"`
                 )
-                    .default(scriptUtils.getCredentialsFile())
+                    // Must default to undefined in order to trigger automatic-lookup
+                    // of a credentials file, based on --cloud-origin.
+                    .default(undefined)
                     .env('PWA_KIT_CREDENTIALS_FILE')
             )
+            .hook('preAction', (thisCommand, actionCommand) => {
+                // The final credentialsFile path depends on both cloudOrigin and credentialsFile opts.
+                // Pre-process before passing to the command.
+                const {cloudOrigin, credentialsFile} = actionCommand.opts()
+                actionCommand.setOptionValue(
+                    'credentialsFile',
+                    scriptUtils.getCredentialsFile(cloudOrigin, credentialsFile)
+                )
+            })
     }
 
     managedRuntimeCommand('save-credentials')
@@ -124,21 +159,20 @@ const main = () => {
             '-k, --key <api-key>',
             `find your API key at https://runtime.commercecloud.com/account/settings`,
             (val) => {
-                if (!(typeof val === 'string' && val.length > 0)) {
-                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
+                if (typeof val !== 'string' || val === '') {
+                    throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
                 } else {
                     return val
                 }
             }
         )
-        .action(({user, key, credentialsFile}) => {
+        .action(async ({user, key, credentialsFile}) => {
             try {
                 fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
-                console.log(`Saved Managed Runtime credentials to "${credentialsFile}".`)
+                success(`Saved Managed Runtime credentials to "${chalk.cyan(credentialsFile)}".`)
             } catch (e) {
-                console.error('Failed to save credentials.')
-                console.error(e)
-                process.exit(1)
+                error('Failed to save credentials.')
+                throw e
             }
         })
 
@@ -149,7 +183,7 @@ const main = () => {
             new program.Option('--inspect', 'enable debugging with --inspect on the node process')
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
-        .action(({inspect, noHMR}) => {
+        .action(async ({inspect, noHMR}) => {
             execSync(
                 `node${inspect ? ' --inspect' : ''} ${p.join(process.cwd(), 'app', 'ssr.js')}`,
                 {
@@ -172,7 +206,7 @@ const main = () => {
                 .env('PWA_KIT_BUILD_DIR')
         )
         .description(`build your app for production`)
-        .action(({buildDirectory}) => {
+        .action(async ({buildDirectory}) => {
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
             const projectWebpack = p.join(process.cwd(), 'webpack.config.js')
             const webpackConf = fse.pathExistsSync(projectWebpack)
@@ -241,50 +275,54 @@ const main = () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .action(({buildDirectory, message, projectSlug, target, cloudOrigin, credentialsFile}) => {
-            // Set the deployment target env var, this is required to ensure we
-            // get the correct configuration object.
-            process.env.DEPLOY_TARGET = target
-            const mobify = getConfig() || {}
-
-            if (!projectSlug) {
-                projectSlug = scriptUtils.readPackageJson('name')
-            }
-
-            const options = {
+        .action(
+            async ({
                 buildDirectory,
-                // Avoid setting message if it's blank, so that it doesn't override the default
-                ...(message ? {message} : undefined),
+                message,
                 projectSlug,
                 target,
-                credentialsFile,
-                // Note: Cloud expects snake_case, but package.json uses camelCase.
-                ssr_parameters: mobify.ssrParameters,
-                ssr_only: mobify.ssrOnly,
-                ssr_shared: mobify.ssrShared,
-                set_ssr_values: true,
-                origin: cloudOrigin
-            }
+                cloudOrigin,
+                credentialsFile
+            }) => {
+                // Set the deployment target env var, this is required to ensure we
+                // get the correct configuration object.
+                process.env.DEPLOY_TARGET = target
 
-            if (
-                !Array.isArray(options.ssr_only) ||
-                options.ssr_only.length === 0 ||
-                !Array.isArray(options.ssr_shared) ||
-                options.ssr_shared.length === 0
-            ) {
-                scriptUtils.fail('ssrEnabled is set, but no ssrOnly or ssrShared files are defined')
+                const credentials = await scriptUtils.readCredentials(credentialsFile)
+
+                const mobify = getConfig() || {}
+
+                if (!projectSlug) {
+                    projectSlug = await getProjectName()
+                }
+
+                const bundle = await scriptUtils.createBundle({
+                    message,
+                    ssr_parameters: mobify.ssrParameters,
+                    ssr_only: mobify.ssrOnly,
+                    ssr_shared: mobify.ssrShared,
+                    buildDirectory,
+                    projectSlug
+                })
+                const client = new scriptUtils.CloudAPIClient({
+                    credentials,
+                    origin: cloudOrigin
+                })
+
+                info(`Beginning upload to ${cloudOrigin}`)
+                const data = await client.push(bundle, projectSlug, target)
+                const warnings = data.warnings || []
+                warnings.forEach(warn)
+                success('Bundle Uploaded')
             }
-            uploadBundle(options).catch((err) => {
-                console.error(err.message || err)
-            })
-        })
+        )
 
     program
         .command('lint')
         .description('lint all source files')
         .argument('<path>', 'path or glob to lint')
         .option('--fix', 'Try and fix errors (default: false)')
-        .action((path, {fix}) => {
+        .action(async (path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
             const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
             execSync(
@@ -298,7 +336,7 @@ const main = () => {
         .command('format')
         .description('automatically re-format all source files')
         .argument('<path>', 'path or glob to format')
-        .action((path) => {
+        .action(async (path) => {
             const prettier = p.join(require.resolve('prettier'), '..', '..', '.bin', 'prettier')
             execSync(`${prettier} --write "${path}"`)
         })
@@ -306,7 +344,7 @@ const main = () => {
     program
         .command('test')
         .description('test the project')
-        .action((_, {args}) => {
+        .action(async (_, {args}) => {
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
             execSync(
                 `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
@@ -322,24 +360,20 @@ const main = () => {
             )
         )
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
-        .action(async ({project, environment, cloudOrigin, credentialsFile}, command) => {
+        .action(async ({project, environment, cloudOrigin, credentialsFile}) => {
             if (!project) {
-                project = scriptUtils.readPackageJson('name')
+                project = await getProjectName()
             }
 
-            let credentials
-            try {
-                credentials = fse.readJsonSync(credentialsFile)
-            } catch (e) {
-                scriptUtils.fail(`Error reading credentials: ${e}`)
-            }
+            const credentials = await scriptUtils.readCredentials(credentialsFile)
 
-            const token = await scriptUtils.createToken(
-                project,
-                environment,
-                cloudOrigin,
-                credentials.api_key
-            )
+            const client = new scriptUtils.CloudAPIClient({
+                credentials,
+                origin: cloudOrigin
+            })
+
+            const token = await client.createLoggingToken(project, environment)
+
             const url = new URL(cloudOrigin.replace('cloud', 'logs'))
             url.protocol = 'wss'
             url.search = new URLSearchParams({
@@ -363,9 +397,10 @@ const main = () => {
                 console.log('Connection closed with code', code)
             })
 
-            ws.on('error', (error) => {
+            ws.on('error', (err) => {
                 clearInterval(heartbeat)
-                scriptUtils.fail(`Error tailing logs: ${error.message}`)
+                error(`Error tailing logs: ${err.message}`)
+                throw err
             })
 
             ws.on('message', (data) => {
@@ -386,21 +421,23 @@ const main = () => {
         })
 
     // Global options
-
-    program.option('-v, --version', 'show version number').action(({version}) => {
+    program.option('-v, --version', 'show version number').action(async ({version}) => {
         if (version) {
+            const pkg = await scriptUtils.getPkgJSON()
             console.log(pkg.version)
         } else {
             program.help({error: true})
         }
     })
 
-    program.parse(process.argv)
+    await program.parseAsync(process.argv)
 }
 
-Promise.resolve()
-    .then(() => main())
-    .catch((err) => {
-        console.error(err.message)
+Promise.resolve().then(async () => {
+    try {
+        await main()
+    } catch (err) {
+        error(err.message || err.toString())
         process.exit(1)
-    })
+    }
+})

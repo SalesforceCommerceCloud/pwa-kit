@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {QueryClient, QueryKey} from '@tanstack/react-query'
+import {QueryClient, QueryKey, Updater} from '@tanstack/react-query'
 import {ApiClients, Argument, DataType} from './types'
 import {ShopperCustomersMutationType} from './ShopperCustomers'
 import {ShopperOrdersMutationType} from './ShopperOrders'
@@ -13,9 +13,14 @@ import {ShopperBasketsMutationType} from './ShopperBaskets'
 const isObject = (item: unknown) =>
     typeof item === 'object' && !Array.isArray(item) && item !== null
 
+//TODO: update data type for updater when needed
 export interface QueryKeyMap {
     name: string
     key: QueryKey
+    updater?: Updater<
+        DataType<Client[CombinedMutationTypes]> | undefined,
+        DataType<Client[CombinedMutationTypes]> | undefined
+    >
 }
 
 export interface CacheUpdateMatrixElement {
@@ -49,18 +54,16 @@ export const updateCache = <Action extends CombinedMutationTypes>(
     const isMatchingKey = (cacheQuery: {queryKey: {[x: string]: any}}, queryKey: QueryKey) =>
         queryKey.every((item, index) =>
             isObject(item) && isObject(cacheQuery.queryKey[index])
-                ? Object.entries(cacheQuery.queryKey[index])
-                      .sort()
-                      .toString() ===
+                ? Object.entries(cacheQuery.queryKey[index]).sort().toString() ===
                   Object.entries(item as Record<string, unknown>)
                       .sort()
                       .toString()
                 : item === cacheQuery.queryKey[index]
         )
 
-    // STEP 1. Update data inside query cache for the matching queryKeys
-    cacheUpdateMatrix[action]?.(params, response)?.update?.map(({key: queryKey}) => {
-        queryClient.setQueryData(queryKey, response)
+    // STEP 1. Update data inside query cache for the matching queryKeys, and updater
+    cacheUpdateMatrix[action]?.(params, response)?.update?.map(({key: queryKey, updater}) => {
+        queryClient.setQueryData(queryKey, updater)
     })
 
     // STEP 2. Invalidate cache entries with the matching queryKeys

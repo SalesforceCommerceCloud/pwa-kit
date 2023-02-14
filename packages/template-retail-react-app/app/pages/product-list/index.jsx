@@ -61,6 +61,7 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
 import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
+// import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Others
@@ -130,7 +131,11 @@ const ProductList = (props) => {
     })
 
     /**************** Query Actions ****************/
-    const {isLoading, isFetching, data: productSearchResult} = useProductSearch(
+    const {
+        isLoading,
+        isFetching,
+        data: productSearchResult
+    } = useProductSearch(
         {
             ...searchParams,
             refine: searchParams._refine
@@ -484,9 +489,8 @@ const ProductList = (props) => {
                                           ))
                                     : productSearchResult.hits.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
-                                          const isInWishlist = !!wishlist.findItemByProductId(
-                                              productId
-                                          )
+                                          const isInWishlist =
+                                              !!wishlist.findItemByProductId(productId)
 
                                           return (
                                               <ProductTile
@@ -668,7 +672,8 @@ ProductList.getTemplateName = () => 'product-list'
 
 ProductList.propTypes = {
     onAddToWishlistClick: PropTypes.func,
-    onRemoveWishlistClick: PropTypes.func
+    onRemoveWishlistClick: PropTypes.func,
+    category: PropTypes.object
 }
 
 export default ProductList
