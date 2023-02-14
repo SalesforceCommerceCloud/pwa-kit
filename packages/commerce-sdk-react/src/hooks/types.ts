@@ -20,11 +20,28 @@ import {
 
 // --- GENERAL UTILITIES --- //
 
-/**
- * Marks the given keys as required.
- */
+/** Makes a type easier to read. */
+export type Prettify<T extends object> = NonNullable<Pick<T, keyof T>>
+
+/** Marks the given keys as required. */
 // The outer Pick<...> is used to prettify the result type
 type RequireKeys<T, K extends keyof T> = Pick<T & Required<Pick<T, K>>, keyof T>
+
+/** Removes keys whose value is `never`. */
+type RemoveNeverValues<T> = {
+    [K in keyof T as T[K] extends never ? never : K]: T[K]
+}
+
+/** Change string index type to `never`. */
+type StringIndexNever<T> = {
+    [K in keyof T]: string extends K ? never : T[K]
+}
+
+/** Removes a string index type */
+export type RemoveStringIndex<T> = RemoveNeverValues<StringIndexNever<T>>
+
+/** Get the known (non-index) keys of a type. */
+export type KnownKeys<T> = keyof RemoveStringIndex<T>
 
 // --- API CLIENTS --- //
 
