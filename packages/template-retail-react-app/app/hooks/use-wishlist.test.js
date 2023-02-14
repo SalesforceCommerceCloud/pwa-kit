@@ -316,7 +316,7 @@ describe('useWishlist hook', () => {
     test('createListItem also calls init if not already initialized', () => {
         const mock = jest.fn()
         const mockFindListByName = jest.fn().mockReturnValue({})
-        const mockInit = jest.fn().mockReturnValue({ id: 'test' })
+        const mockInit = jest.fn().mockReturnValue({id: 'test'})
 
         useCustomerProductLists.mockReturnValue({
             createListItem: mock,
