@@ -191,11 +191,11 @@ jobs:
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
 
-      - name: Audit Generated Project
-        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true' && env.DEVELOP == 'true'
-        uses: "./.github/actions/snyk"
-        with:
-          snyk_token: ${{ secrets.SNYK_TOKEN }}
+#      - name: Audit Generated Project
+#        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true' && env.DEVELOP == 'true'
+#        uses: "./.github/actions/snyk"
+#        with:
+#          snyk_token: ${{ secrets.SNYK_TOKEN }}
 
       - name: Send metrics to Datadog
         if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'

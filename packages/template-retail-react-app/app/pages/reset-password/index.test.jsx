@@ -11,9 +11,18 @@ import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 import mockConfig from '../../../config/mocks/default'
-import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 
 jest.mock('../../commerce-api/einstein')
+
+const mockRegisteredCustomer = {
+    authType: 'registered',
+    customerId: 'registeredCustomerId',
+    customerNo: 'testno',
+    email: 'darek@test.com',
+    firstName: 'Tester',
+    lastName: 'Testing',
+    login: 'darek@test.com'
+}
 
 const MockedComponent = () => {
     return (
@@ -25,10 +34,11 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
+    jest.resetModules()
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
         }),
         rest.get('*/customers/:customerId', (req, res, ctx) => {
             const {customerId} = req.params
@@ -42,13 +52,15 @@ beforeEach(() => {
                     })
                 )
             }
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
         })
     )
 })
 afterEach(() => {
     jest.resetModules()
     localStorage.clear()
+    jest.clearAllMocks()
+    window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 
 test.skip('Allows customer to go to sign in page', async () => {
@@ -64,7 +76,6 @@ test.skip('Allows customer to go to sign in page', async () => {
 })
 
 test.skip('Allows customer to generate password token', async () => {
-    // mock reset password request
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(

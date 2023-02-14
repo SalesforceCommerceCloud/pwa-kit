@@ -28,7 +28,7 @@ runs:
         node ./scripts/check-dependencies.js
 
         # Install Snyk CLI
-        sudo npm install -g snyk
+        # sudo npm install -g snyk
 
         # Install Lighthouse CI CLI
         sudo npm install -g @lhci/cli

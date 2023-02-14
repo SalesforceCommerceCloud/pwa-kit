@@ -34,6 +34,14 @@ const MockedComponent = () => {
     )
 }
 
+beforeEach(() => {
+    global.server.use(
+        rest.post('*/payment-instruments', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        )
+    )
+})
 // Set up and clean up
 afterEach(() => {
     jest.resetModules()
@@ -41,12 +49,6 @@ afterEach(() => {
 })
 
 test('Allows customer to add and remove payment methods', async () => {
-    global.server.use(
-        rest.post('*/payment-instruments', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        )
-    )
     renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('customerid')).toBeInTheDocument())
 

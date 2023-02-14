@@ -54,14 +54,6 @@ afterEach(() => {
 })
 
 test('Renders order history and details', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrderHistory))
-        }),
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrderProducts))
-        })
-    )
     renderWithProviders(<MockedComponent history={history} />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
