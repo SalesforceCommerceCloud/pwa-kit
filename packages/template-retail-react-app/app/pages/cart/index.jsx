@@ -208,10 +208,12 @@ const Cart = () => {
                 }
             },
             {
-                onSuccess: () => {
+                onSettled: () => {
                     // reset the state
                     setCartItemLoading(false)
                     setSelectedItem(undefined)
+                },
+                onSuccess: () => {
                     setLocalQuantity({...localQuantity, [product.itemId]: undefined})
                 },
                 onError: () => {
