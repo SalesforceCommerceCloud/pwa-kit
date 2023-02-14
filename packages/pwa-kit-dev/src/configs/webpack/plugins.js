@@ -64,22 +64,21 @@ export const createModuleReplacementPlugin = (projectDir) => {
     })
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
-        if (resource.context.includes('pwa-kit-react-sdk')) {
+        const sdkPaths = [
+            path.join('packages', 'pwa-kit-react-sdk'),
+            path.join('node_modules', 'pwa-kit-react-sdk')
+        ]
+
+        if (
+            resource.context.includes('pwa-kit-react-sdk') &&
+            sdkPaths.some((p) => resource.context.includes(p))
+        ) {
             const resolved = path.resolve(resource.context, resource.request)
 
             const replacement = replacements.find(({path}) => resolved.match(path))
 
             if (replacement) {
-                const sdkPaths = [
-                    path.join('packages', 'pwa-kit-react-sdk'),
-                    path.join('node_modules', 'pwa-kit-react-sdk')
-                ]
-
-                const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))
-
-                if (requestedFromSDK) {
-                    resource.request = replacement.newPath
-                }
+                resource.request = replacement.newPath
             }
         }
     })
