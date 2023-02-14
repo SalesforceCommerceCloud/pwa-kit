@@ -327,6 +327,20 @@ class Auth {
     }
 
     /**
+     * Creates a function that only executes after a session is initialized.
+     * @param fn Function that needs to wait until the session is initialized.
+     * @returns Wrapped function
+     */
+    whenReady<Args extends unknown[], Data>(
+        fn: (...args: Args) => Promise<Data>
+    ): (...args: Args) => Promise<Data> {
+        return async (...args) => {
+            await this.ready()
+            return await fn(...args)
+        }
+    }
+
+    /**
      * A wrapper method for commerce-sdk-isomorphic helper: loginGuestUser.
      *
      */

@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useMutation} from '../useMutation'
+import {MutationFunction, useMutation, UseMutationResult} from '@tanstack/react-query'
 import useAuth from '../useAuth'
-import {UseMutationResult} from '@tanstack/react-query'
+import Auth from '../../auth'
 
 export const ShopperLoginHelpers = {
     LoginGuestUser: 'loginGuestUser',
@@ -15,7 +15,7 @@ export const ShopperLoginHelpers = {
     Logout: 'logout'
 } as const
 
-type ShopperLoginHelpersType = (typeof ShopperLoginHelpers)[keyof typeof ShopperLoginHelpers]
+export type ShopperLoginHelper = (typeof ShopperLoginHelpers)[keyof typeof ShopperLoginHelpers]
 
 /**
  * A hook for Public Client Shopper Login OAuth helpers.
@@ -28,27 +28,25 @@ type ShopperLoginHelpersType = (typeof ShopperLoginHelpers)[keyof typeof Shopper
  * - register
  * - logout
  */
-export function useShopperLoginHelper<Action extends ShopperLoginHelpersType>(
-    action: Action
+export function useShopperLoginHelper<Mutation extends ShopperLoginHelper>(
+    mutation: Mutation
 ): UseMutationResult<
-    // TODO: what's the better way for declaring the types?
-    any,
-    Error,
-    any
+    // Extract the data from the returned promise (all mutations should be async)
+    ReturnType<Auth[Mutation]> extends Promise<infer Data> ? Data : never,
+    unknown,
+    // Variables = void if no arguments, otherwise the first argument
+    [] extends Parameters<Auth[Mutation]> ? void : Parameters<Auth[Mutation]>[0],
+    unknown
 > {
     const auth = useAuth()
-    if (action === ShopperLoginHelpers.LoginGuestUser) {
-        return useMutation(() => auth.loginGuestUser())
-    }
-    if (action === ShopperLoginHelpers.Logout) {
-        return useMutation(() => auth.logout())
-    }
-    if (action === ShopperLoginHelpers.Register) {
-        return useMutation((body) => auth.register(body))
-    }
-    if (action === ShopperLoginHelpers.LoginRegisteredUserB2C) {
-        return useMutation((credentials) => auth.loginRegisteredUserB2C(credentials))
-    }
+    if (!auth[mutation]) throw new Error(`Unknown login helper mutation: ${mutation}`)
 
-    throw new Error('Unknown ShopperLogin helper.')
+    // I'm not sure if there's a way to avoid this type assertion, but, I'm fairly confident that
+    // it is safe to do, as it seems to be simply re-asserting what we already know.
+    type Method = Auth[Mutation]
+    type PromisedData = ReturnType<Method>
+    type Data = PromisedData extends Promise<infer D> ? D : never
+    type Variables = [] extends Parameters<Method> ? void : Parameters<Method>[0]
+    const method = auth[mutation].bind(auth) as MutationFunction<Data, Variables>
+    return useMutation(auth.whenReady(method))
 }
