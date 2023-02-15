@@ -21,7 +21,6 @@ import {
 } from '../../commerce-api/mock-data'
 import mockBasketWithSuit from '../../commerce-api/mocks/basket-with-suit'
 import mockVariant from '../../commerce-api/mocks/variant-750518699578M'
-// import mockEmptyBasket from '../../commerce-api/mocks/empty-basket'
 import {keysToCamel} from '../../commerce-api/utils'
 import {rest} from 'msw'
 
@@ -100,15 +99,12 @@ beforeEach(() => {
     jest.resetModules()
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
-            console.log('productId---------------------')
             return res(ctx.delay(0), ctx.json(mockProduct))
         }),
         rest.get('*/products', (req, res, ctx) => {
-            console.log('product------------------111')
             return res(ctx.delay(0), ctx.json({data: [mockCartVariant]}))
         }),
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            console.log('customerBasket11111111')
             return res(ctx.delay(0), ctx.json(mockCustomerBaskets))
         }),
 
@@ -267,28 +263,28 @@ describe('Remove item from cart', function () {
 
 describe('Coupons tests', function () {
     beforeEach(() => {
-        global.server.use(
-            rest.post('*/baskets/:basket/items/:itemId', (req, res, ctx) => {
-                const basketWithCoupon = {
-                    ...mockCustomerBaskets.baskets[0],
-                    couponItems: [
-                        {
-                            code: 'menssuits',
-                            couponItemId: 'c94c8a130c63caa6f786b89c5f',
-                            statusCode: 'applied',
-                            valid: true,
-                            _type: 'coupon_item'
-                        }
-                    ],
-                    productItems: [
-                        {
-                            ...mockCustomerBaskets.baskets[0].productItems[0]
-                        }
-                    ]
-                }
-                return res(ctx.delay(0), ctx.json())
-            })
-        )
+        // global.server.use(
+        //     rest.post('*/baskets/:basket/items/:itemId', (req, res, ctx) => {
+        //         const basketWithCoupon = {
+        //             ...mockCustomerBaskets.baskets[0],
+        //             couponItems: [
+        //                 {
+        //                     code: 'menssuits',
+        //                     couponItemId: 'c94c8a130c63caa6f786b89c5f',
+        //                     statusCode: 'applied',
+        //                     valid: true,
+        //                     _type: 'coupon_item'
+        //                 }
+        //             ],
+        //             productItems: [
+        //                 {
+        //                     ...mockCustomerBaskets.baskets[0].productItems[0]
+        //                 }
+        //             ]
+        //         }
+        //         return res(ctx.delay(0), ctx.json())
+        //     })
+        // )
     })
     test.skip('Can apply and remove product-level coupon code with promotion', async () => {
         renderWithProviders(<WrappedCart />)
