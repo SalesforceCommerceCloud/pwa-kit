@@ -23,7 +23,10 @@ import {
 /** Makes a type easier to read. */
 export type Prettify<T extends object> = NonNullable<Pick<T, keyof T>>
 
-/** Marks the given keys as required. */
+/**
+ * Marks the given keys as required.
+ * WARNING: Does not work if T has an index signature.
+ */
 // The outer Pick<...> is used to prettify the result type
 type RequireKeys<T, K extends keyof T> = Pick<T & Required<Pick<T, K>>, keyof T>
 
@@ -74,8 +77,8 @@ export type ApiClient = ApiClients[keyof ApiClients]
  */
 export type ApiOptions<
     Parameters extends object = Record<string, unknown>,
-    Headers extends Record<string, string> = Record<string, string>,
-    Body extends object | unknown[] | undefined = Record<string, unknown> | unknown[] | undefined
+    Body extends object | unknown[] | undefined = Record<string, unknown> | unknown[] | undefined,
+    Headers extends Record<string, string> = Record<string, string>
 > = {
     parameters?: Parameters
     headers?: Headers
@@ -109,11 +112,11 @@ export type DataType<T> = T extends ApiMethod<any, Response | infer R> ? R : nev
 export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> = RequireKeys<
     ApiOptions<
         NonNullable<Client['clientConfig']['parameters'] & Options['parameters']>,
-        NonNullable<Client['clientConfig']['headers'] & Options['headers']>,
         // `body` may not exist on `Options`, in which case it is `unknown` here. Due to the type
         // constraint in `ApiOptions`, that is not a valid value. We must replace it with `never`
         // to indicate that the result type does not have a `body`.
-        unknown extends Options['body'] ? never : Options['body']
+        unknown extends Options['body'] ? never : Options['body'],
+        NonNullable<Client['clientConfig']['headers'] & Options['headers']>
     >,
     'parameters' | 'headers'
 >
