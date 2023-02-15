@@ -75,7 +75,7 @@ test('ProductView Component renders with addToCart event handler', async () => {
 
     const addToCartButton = screen.getAllByText(/add to cart/i)[0]
     fireEvent.click(addToCartButton)
-    
+
     await waitFor(() => {
         expect(addToCart).toHaveBeenCalledTimes(1)
     })
@@ -84,7 +84,9 @@ test('ProductView Component renders with addToCart event handler', async () => {
 test('ProductView Component renders with addToWishList event handler', async () => {
     const addToWishlist = jest.fn()
 
-    await renderWithProviders(<MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />)
+    await renderWithProviders(
+        <MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />
+    )
 
     await waitFor(() => {
         expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
@@ -125,11 +127,11 @@ test('Product View can update quantity', async () => {
     await waitFor(() => {
         quantityBox = screen.getByRole('spinbutton')
     })
-    
+
     await waitFor(() => {
         expect(quantityBox).toHaveValue('1')
     })
-    
+
     // update item quantity
     userEvent.type(quantityBox, '{backspace}3')
 
