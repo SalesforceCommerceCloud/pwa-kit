@@ -50,12 +50,12 @@ beforeEach(() => {
 
 afterEach(() => {
     jest.resetModules()
+    sessionStorage.clear()
 })
 
 test('should execute onClick for registered users', async () => {
     const onClick = jest.fn()
-
-    renderWithProviders(<MockedComponent onClick={onClick} />)
+    await renderWithProviders(<MockedComponent onClick={onClick} />)
 
     await waitFor(() => {
         // we wait for login to complete and user's firstName to show up on screen.
@@ -65,24 +65,30 @@ test('should execute onClick for registered users', async () => {
     const trigger = screen.getByText(/button/i)
     user.click(trigger)
 
-    expect(onClick).toHaveBeenCalledTimes(1)
+    await waitFor(() => {
+        expect(onClick).toHaveBeenCalledTimes(1)
+    })
 })
 
-test('should show login modal if user not registered', () => {
+test('should show login modal if user not registered', async () => {
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
         })
     )
     const onClick = jest.fn()
+    await renderWithProviders(<MockedComponent onClick={onClick} />)
 
-    renderWithProviders(<MockedComponent onClick={onClick} />)
+    let trigger
+    await waitFor(() => {
+        trigger = screen.getByText(/button/i)
+    })
 
-    const trigger = screen.getByText(/button/i)
-    user.click(trigger)
-
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Password/)).toBeInTheDocument()
-    expect(screen.getByText(/forgot password/i)).toBeInTheDocument()
-    expect(screen.getByText(/sign in/i)).toBeInTheDocument()
+    await waitFor(() => {
+        user.click(trigger)
+        expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/Password/)).toBeInTheDocument()
+        expect(screen.getByText(/forgot password/i)).toBeInTheDocument()
+        expect(screen.getByText(/sign in/i)).toBeInTheDocument()
+    })
 })
