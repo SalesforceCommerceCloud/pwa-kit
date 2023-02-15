@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiOptions, ApiMethod} from './types'
-import useAuth from './useAuth'
+import useAuthContext from './useAuthContext'
 
 /**
  * Creates a method that waits for authentication to complete and automatically includes an
@@ -16,7 +16,7 @@ import useAuth from './useAuth'
 export const useAuthorizationHeader = <Options extends ApiOptions, Data>(
     method: ApiMethod<Options, Data>
 ): ApiMethod<Options, Data> => {
-    const auth = useAuth()
+    const auth = useAuthContext()
     return async (options) => {
         const {access_token} = await auth.ready()
         return await method({

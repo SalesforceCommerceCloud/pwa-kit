@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import useAuth from './useAuth'
+import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
 
 const onClient = typeof window !== 'undefined'
@@ -32,7 +32,7 @@ const useCustomerType = (): useCustomerType => {
     if (onClient) {
         customerType = useLocalStorage('customer_type')
     } else {
-        const auth = useAuth()
+        const auth = useAuthContext()
         customerType = auth.get('customer_type')
     }
 

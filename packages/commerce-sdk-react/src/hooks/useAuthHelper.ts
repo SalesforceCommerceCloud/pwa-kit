@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {MutationFunction, useMutation, UseMutationResult} from '@tanstack/react-query'
-import useAuth from './useAuth'
+import useAuthContext from './useAuthContext'
 import Auth from '../auth'
 
 export const AuthHelpers = {
@@ -38,7 +38,7 @@ export function useAuthHelper<Mutation extends AuthHelper>(
     [] extends Parameters<Auth[Mutation]> ? void : Parameters<Auth[Mutation]>[0],
     unknown
 > {
-    const auth = useAuth()
+    const auth = useAuthContext()
     if (!auth[mutation]) throw new Error(`Unknown login helper mutation: ${mutation}`)
 
     // I'm not sure if there's a way to avoid this type assertion, but, I'm fairly confident that
