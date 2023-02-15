@@ -8,27 +8,27 @@ import {MutationFunction, useMutation, UseMutationResult} from '@tanstack/react-
 import useAuth from '../useAuth'
 import Auth from '../../auth'
 
-export const ShopperLoginHelpers = {
+export const AuthHelpers = {
     LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
-    Register: 'register',
-    Logout: 'logout'
+    Logout: 'logout',
+    Register: 'register'
 } as const
 
-export type ShopperLoginHelper = (typeof ShopperLoginHelpers)[keyof typeof ShopperLoginHelpers]
+export type AuthHelper = (typeof AuthHelpers)[keyof typeof AuthHelpers]
 
 /**
- * A hook for Public Client Shopper Login OAuth helpers.
+ * A hook for Public Client OAuth helpers.
  * The hook calls the SLAS helpers imported from commerce-sdk-isomorphic.
  * For more, see https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/#public-client-shopper-login-helpers
  *
  * Avaliable helpers:
  * - loginRegisteredUserB2C
  * - loginGuestUser
- * - register
  * - logout
+ * - register
  */
-export function useShopperLoginHelper<Mutation extends ShopperLoginHelper>(
+export function useAuthHelper<Mutation extends AuthHelper>(
     mutation: Mutation
 ): UseMutationResult<
     // Extract the data from the returned promise (all mutations should be async)
