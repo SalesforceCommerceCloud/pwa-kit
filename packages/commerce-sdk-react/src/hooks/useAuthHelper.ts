@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {MutationFunction, useMutation, UseMutationResult} from '@tanstack/react-query'
-import useAuth from '../useAuth'
-import Auth from '../../auth'
+import useAuth from './useAuth'
+import Auth from '../auth'
 
 export const AuthHelpers = {
     LoginGuestUser: 'loginGuestUser',
