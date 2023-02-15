@@ -40,7 +40,6 @@ type AuthData = Prettify<
     RemoveStringIndex<TokenResponse> & {
         customer_type: CustomerType
         idp_access_token: string
-        site_id?: string // TODO - make required or remove
     }
 >
 
@@ -110,10 +109,6 @@ const DATA_MAP: AuthDataMap = {
         callback: (store) => {
             store.delete('cc-nx-g')
         }
-    },
-    site_id: {
-        storageType: 'cookie',
-        key: 'cc-site-id'
     },
     customer_type: {
         storageType: 'local',
