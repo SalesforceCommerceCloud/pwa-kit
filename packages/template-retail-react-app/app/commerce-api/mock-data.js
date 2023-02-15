@@ -384,43 +384,34 @@ export const ocapiBasketWithPaymentInstrumentAndBillingAddress = {
 }
 
 export const mockShippingMethods = {
-    _v: '21.3',
-    _type: 'shipping_method_result',
-    applicable_shipping_methods: [
+    applicableShippingMethods: [
         {
-            _type: 'shipping_method',
-            _resource_state: '860cde3040519cce439cd99e209f8a87c3ad0b7e2813edbf6f5501f763b73bd5',
-            description: 'The default shipping method.',
-            id: 'DefaultShippingMethod',
-            name: 'Default Shipping Method',
-            price: 5.55,
-            shipping_promotions: [
-                {
-                    callout_msg: 'Free Shipping Amount Above 150',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/3184d71eea54c9d27e88dc41ca',
-                    promotion_id: 'FreeShippingAmountAbove150',
-                    promotion_name: 'Free Shipping Amount Above 150'
-                }
-            ]
+            description: 'Order received within 7-10 business days',
+            id: '001',
+            name: 'Ground',
+            price: 15.99
         },
         {
-            _type: 'shipping_method',
-            _resource_state: '847f9c3c5867f641470b3046aeec31f07757991b792d722e10079926f7a289fb',
-            description: 'The base shipping method.',
-            id: 'BaseShippingMethod',
-            name: 'Base Shipping Method',
-            price: 0.99
+            description: 'Order received in 2 business days',
+            id: '002',
+            name: '2-Day Express',
+            price: 20.99
         },
         {
-            _type: 'shipping_method',
-            _resource_state: 'c3c5867f641470b3046aeec31f07757991b792d722e10079926f7a289fb',
-            description: 'A shipping method that contains product level shipping costs.',
-            id: 'ProductLevelShippingCostsShippingMethod',
-            name: 'Product Level Shipping Costs Shipping Method',
-            price: 0.1
+            description: 'Order received the next business day',
+            id: '003',
+            name: 'Overnight',
+            price: 29.99
+        },
+        {
+            description: 'Store Pickup',
+            id: '005',
+            name: 'Store Pickup',
+            price: 0,
+            c_storePickupEnabled: true
         }
     ],
-    default_shipping_method_id: 'DefaultShippingMethod'
+    defaultShippingMethodId: '001'
 }
 
 export const ocapiOrderResponse = {
@@ -5676,6 +5667,79 @@ export const mockCategory = {
     c_showInMenu: true
 }
 
+export const mockEmptyBasket = {
+    total: 1,
+    baskets: [
+        {
+            adjustedMerchandizeTotalTax: 0,
+            adjustedShippingTotalTax: 0,
+            agentBasket: false,
+            basketId: '10cf6aa40edba4fcfcc6915594',
+            channelType: 'storefront',
+            creationDate: '2023-02-14T20:53:36.255Z',
+            currency: 'GBP',
+            customerInfo: {
+                customerId: 'abkKsUmbJIlrkRk0wVxaYYlXBI',
+                email: ''
+            },
+            lastModified: '2023-02-14T23:55:28.782Z',
+            merchandizeTotalTax: 0,
+            notes: {},
+            orderTotal: 0,
+            productSubTotal: 0,
+            productTotal: 0,
+            shipments: [
+                {
+                    adjustedMerchandizeTotalTax: 0,
+                    adjustedShippingTotalTax: 0,
+                    gift: false,
+                    merchandizeTotalTax: 0,
+                    productSubTotal: 0,
+                    productTotal: 0,
+                    shipmentId: 'me',
+                    shipmentTotal: 0,
+                    shippingMethod: {
+                        description: 'Order received within 7-10 business days',
+                        id: 'GBP001',
+                        name: 'Ground',
+                        price: 0,
+                        shippingPromotions: [
+                            {
+                                calloutMsg: 'Free Shipping Amount Above 50',
+                                promotionId: 'FreeShippingAmountAbove50',
+                                promotionName: 'Free Shipping Amount Above 50'
+                            }
+                        ],
+                        c_estimatedArrivalTime: '7-10 Business Days'
+                    },
+                    shippingStatus: 'not_shipped',
+                    shippingTotal: 0,
+                    shippingTotalTax: 0,
+                    taxTotal: 0
+                }
+            ],
+            shippingItems: [
+                {
+                    adjustedTax: 0,
+                    basePrice: 0,
+                    itemId: 'b62ed8c04cc91b2002be03dcaf',
+                    itemText: 'Shipping',
+                    price: 0,
+                    priceAfterItemDiscount: 0,
+                    shipmentId: 'me',
+                    tax: 0,
+                    taxBasis: 0,
+                    taxClassId: 'CustomRate',
+                    taxRate: 0
+                }
+            ],
+            shippingTotal: 0,
+            shippingTotalTax: 0,
+            taxation: 'gross',
+            taxTotal: 0
+        }
+    ]
+}
 export const mockCustomerBaskets = {
     baskets: [
         {
@@ -5706,7 +5770,7 @@ export const mockCustomerBaskets = {
                     priceAfterOrderDiscount: 61.43,
                     productId: '701642889830M',
                     productName: 'Belted Cardigan With Studs',
-                    quantity: 1,
+                    quantity: 2,
                     shipmentId: 'me',
                     tax: 2.93,
                     taxBasis: 61.43,
@@ -5734,16 +5798,32 @@ export const mockCustomerBaskets = {
             ],
             shippingItems: [
                 {
-                    adjustedTax: null,
-                    basePrice: null,
-                    itemId: '6455af8345d031600c8a8ad67c',
+                    adjustedTax: 0,
+                    basePrice: 9.99,
+                    itemId: 'b62ed8c04cc91b2002be03dcaf',
                     itemText: 'Shipping',
-                    price: null,
-                    priceAfterItemDiscount: null,
+                    price: 9.99,
+                    priceAdjustments: [
+                        {
+                            appliedDiscount: {
+                                amount: 1,
+                                type: 'free'
+                            },
+                            creationDate: '2023-02-15T00:18:09.801Z',
+                            custom: false,
+                            itemText: 'Free Shipping Amount Above 50',
+                            lastModified: '2023-02-15T00:18:09.804Z',
+                            manual: false,
+                            price: -9.99,
+                            priceAdjustmentId: '65253f9d5221263c604351a4e4',
+                            promotionId: 'FreeShippingAmountAbove50'
+                        }
+                    ],
+                    priceAfterItemDiscount: 0,
                     shipmentId: 'me',
-                    tax: null,
-                    taxBasis: null,
-                    taxClassId: null,
+                    tax: 0.48,
+                    taxBasis: 9.99,
+                    taxClassId: 'standard',
                     taxRate: 0.05
                 }
             ],
@@ -6251,4 +6331,311 @@ export const mockMasterProduct = {
             ]
         }
     ]
+}
+export const mockCartVariant = {
+    currency: 'GBP',
+    id: '701642889830M',
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c2304f9/images/large/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c2304f9/images/large/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23cbdec5/images/large/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23cbdec5/images/large/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c2304f9/images/large/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c2304f9/images/large/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23cbdec5/images/large/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23cbdec5/images/large/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ0NLD0'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw521c09a6/images/medium/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw521c09a6/images/medium/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb147ee45/images/medium/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb147ee45/images/medium/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw521c09a6/images/medium/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw521c09a6/images/medium/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb147ee45/images/medium/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb147ee45/images/medium/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ0NLD0'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa5ed67ee/images/small/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa5ed67ee/images/small/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2baf85f2/images/small/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2baf85f2/images/small/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa5ed67ee/images/small/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa5ed67ee/images/small/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2baf85f2/images/small/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2baf85f2/images/small/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ0NLD0'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw024437d3/images/swatch/PG.10215179.JJ0NLD0.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw024437d3/images/swatch/PG.10215179.JJ0NLD0.CP.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ0NLD0'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        }
+    ],
+    inventory: {
+        ats: 68,
+        backorderable: false,
+        id: 'inventory_m',
+        orderable: true,
+        preorderable: false,
+        stockLevel: 68
+    },
+    longDescription:
+        'Our best selling cardigan is now updated with a detachable belt and studs. Pair it with a Commerce Cloud Store shell and it is great for nine-to-five and beyond.',
+    master: {
+        masterId: '25502228M',
+        orderable: true,
+        price: 61.43
+    },
+    minOrderQuantity: 1,
+    name: 'Belted Cardigan With Studs',
+    pageDescription:
+        'Our best selling cardigan is now updated with a detachable belt and studs. Pair it with a Commerce Cloud Store shell and it is great for nine-to-five and beyond.',
+    pageTitle: 'Belted Cardigan With Studs',
+    price: 61.43,
+    pricePerUnit: 61.43,
+    productPromotions: [
+        {
+            calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+            promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+        },
+        {
+            calloutMsg: '$50 Fixed Products Amount Above 100',
+            promotionId: '$50FixedProductsAmountAbove100'
+        },
+        {
+            calloutMsg: 'Bonus Product for Order Amounts Above 250',
+            promotionId: 'BonusProductOnOrderOfAmountABove250'
+        }
+    ],
+    shortDescription:
+        'Our best selling cardigan is now updated with a detachable belt and studs. Pair it with a Commerce Cloud Store shell and it is great for nine-to-five and beyond.',
+    slugUrl:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArchGlobal/belted-cardigan-with-studs/701642889830M.html?lang=en_GB',
+    stepQuantity: 1,
+    type: {
+        variant: true
+    },
+    unitMeasure: '',
+    unitQuantity: 0,
+    upc: '701642889830',
+    validFrom: {
+        default: '2010-11-18T05:00:00.000Z'
+    },
+    variants: [
+        {
+            orderable: true,
+            price: 61.43,
+            productId: '701642889823M',
+            variationValues: {
+                color: 'JJ0NLD0',
+                size: '9LG'
+            }
+        },
+        {
+            orderable: true,
+            price: 61.43,
+            productId: '701642889847M',
+            variationValues: {
+                color: 'JJ0NLD0',
+                size: '9SM'
+            }
+        },
+        {
+            orderable: true,
+            price: 61.43,
+            productId: '701642889830M',
+            variationValues: {
+                color: 'JJ0NLD0',
+                size: '9MD'
+            }
+        },
+        {
+            orderable: true,
+            price: 61.43,
+            productId: '701642889854M',
+            variationValues: {
+                color: 'JJ0NLD0',
+                size: '9XL'
+            }
+        }
+    ],
+    variationAttributes: [
+        {
+            id: 'color',
+            name: 'Colour',
+            values: [
+                {
+                    name: 'Laurel',
+                    orderable: true,
+                    value: 'JJ0NLD0'
+                }
+            ]
+        },
+        {
+            id: 'size',
+            name: 'Size',
+            values: [
+                {
+                    name: 'S',
+                    orderable: true,
+                    value: '9SM'
+                },
+                {
+                    name: 'M',
+                    orderable: true,
+                    value: '9MD'
+                },
+                {
+                    name: 'L',
+                    orderable: true,
+                    value: '9LG'
+                },
+                {
+                    name: 'XL',
+                    orderable: true,
+                    value: '9XL'
+                }
+            ]
+        }
+    ],
+    variationValues: {
+        color: 'JJ0NLD0',
+        size: '9MD'
+    },
+    c_color: 'JJ0NLD0',
+    c_refinementColor: 'black',
+    c_size: '9MD',
+    c_width: 'Z'
 }
