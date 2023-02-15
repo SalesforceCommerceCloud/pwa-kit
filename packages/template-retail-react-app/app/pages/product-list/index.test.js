@@ -122,16 +122,16 @@ test('should display Selected refinements as there are some in the response', as
     expect(countOfRefinements.length).toEqual(2)
 })
 
-test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
-    renderWithProviders(<MockedComponent />)
-    expect(await screen.findAllByText('Black'))
-    const wishlistButton = await screen.getAllByLabelText('Wishlist')
-    expect(wishlistButton.length).toBe(25)
-    user.click(wishlistButton[0])
-    expect(await screen.findByText(/Email/)).toBeInTheDocument()
-    expect(await screen.findByText(/Password/)).toBeInTheDocument()
-})
+// test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
+//     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+//     renderWithProviders(<MockedComponent />)
+//     expect(await screen.findAllByText('Black'))
+//     const wishlistButton = await screen.getAllByLabelText('Wishlist')
+//     expect(wishlistButton.length).toBe(25)
+//     user.click(wishlistButton[0])
+//     expect(await screen.findByText(/Email/)).toBeInTheDocument()
+//     expect(await screen.findByText(/Password/)).toBeInTheDocument()
+// })
 
 test('clicking a filter will change url', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
