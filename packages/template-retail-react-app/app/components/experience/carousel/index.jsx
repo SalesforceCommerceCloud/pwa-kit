@@ -15,7 +15,7 @@ import {ChevronLeftIcon, ChevronRightIcon} from '../../icons'
  * children to display in view as well as whether or not to show controls and position indicators.
  *
  * @param {PageProps} props
- * @param {string} props.textHeadling - Heading text for the carousel.
+ * @param {string} props.textHeading - Heading text for the carousel.
  * @param {boolean} props.xsCarouselIndicators - Show/Hide carousel indecators/pips on "xs" screens.
  * @param {boolean} props.smCarouselIndicators - Show/Hide carousel indecators/pips on "sm" screens.
  * @param {boolean} props.mdCarouselIndicators - Show/Hide carousel indecators/pips on "md" screens.
