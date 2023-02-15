@@ -52,11 +52,11 @@
       "ssrFunctionNodeVersion": "14.x",
       "proxyConfigs": [
         {
-          "host": "sandbox-001.api.commercecloud.salesforce.com",
+          "host": "kv7kzm78.api.commercecloud.salesforce.com",
           "path": "api"
         },
         {
-          "host": "development-functional38-qa222.demandware.net",
+          "host": "zzrf-001.dx.commercecloud.salesforce.com",
           "path": "ocapi"
         }
       ]
