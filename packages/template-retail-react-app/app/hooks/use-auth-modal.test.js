@@ -175,8 +175,9 @@ test.skip('Allows customer to generate password token', async () => {
     expect(authModal.isOpen).toBe(true)
 
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'foo@test.com')
-    user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
+    user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
+    user.click(withinForm.getByText(/reset password/i))
 
     // wait for success state
     await waitFor(() => {

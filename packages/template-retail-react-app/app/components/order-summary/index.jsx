@@ -8,7 +8,7 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Box, Flex, Button, Stack, Text, Heading, Divider} from '@chakra-ui/react'
-import useBasket from '../../commerce-api/hooks/useBasket'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {BasketIcon, ChevronDownIcon, ChevronUpIcon} from '../icons'
 import Link from '../link'
 import {PromoCode, usePromoCode} from '../promo-code'
@@ -20,7 +20,7 @@ import CartItemVariantPrice from '../item-variant/item-price'
 import PromoPopover from '../promo-popover'
 
 const CartItems = ({basket}) => {
-    basket = basket || useBasket()
+    basket ||= useCurrentBasket().basket
     const [cartItemsExpanded, setCartItemsExpanded] = useState(false)
 
     return (
@@ -91,7 +91,7 @@ const OrderSummary = ({
     isEstimate = false,
     fontSize = 'md'
 }) => {
-    basket = basket || useBasket()
+    basket = basket || useCurrentBasket().basket
 
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
     const shippingItem = basket.shippingItems?.[0]

@@ -246,7 +246,7 @@ const ProductView = ({
                         {/*
                             Customize the skeletons shown for attributes to suit your needs. At the point
                             that we show the skeleton we do not know how many variations are selectable. So choose
-                            a a skeleton that will meet most of your needs.
+                            a skeleton that will meet most of your needs.
                         */}
                         {showLoading ? (
                             <>

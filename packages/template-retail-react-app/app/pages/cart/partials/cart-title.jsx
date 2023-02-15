@@ -7,15 +7,16 @@
 import React from 'react'
 import {FormattedMessage} from 'react-intl'
 import {Text} from '@chakra-ui/react'
-import useBasket from '../../../commerce-api/hooks/useBasket'
+// import useBasket from '../../../commerce-api/hooks/useBasket'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
 const CartTitle = () => {
-    const basket = useBasket()
+    const {totalItems} = useCurrentBasket()
     return (
         <Text fontWeight="bold" fontSize={['xl', 'xl', 'xl', '2xl']}>
             <FormattedMessage
                 defaultMessage="Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
-                values={{itemCount: basket.itemAccumulatedCount}}
+                values={{itemCount: totalItems}}
                 id="cart_title.title.cart_num_of_items"
             />
         </Text>
