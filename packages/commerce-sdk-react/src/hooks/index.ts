@@ -7,6 +7,7 @@
 export * from './ShopperBaskets'
 export * from './ShopperContexts'
 export * from './ShopperCustomers'
+export * from './ShopperExperience'
 export * from './ShopperDiscoverySearch'
 export * from './ShopperGiftCertificates'
 export * from './ShopperLogin'
@@ -16,4 +17,5 @@ export * from './ShopperPromotions'
 export * from './ShopperSearch'
 import useCommerceApi from './useCommerceApi'
 import useCustomerId from './useCustomerId'
-export {useCommerceApi, useCustomerId}
+import useCustomerType from './useCustomerType'
+export {useCommerceApi, useCustomerId, useCustomerType}
