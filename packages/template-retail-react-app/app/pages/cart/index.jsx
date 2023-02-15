@@ -32,7 +32,8 @@ import useNavigation from '../../hooks/use-navigation'
 import {
     API_ERROR_MESSAGE,
     TOAST_ACTION_VIEW_WISHLIST,
-    TOAST_MESSAGE_ADDED_TO_WISHLIST
+    TOAST_MESSAGE_ADDED_TO_WISHLIST,
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
 } from '../../constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from './partials/cart-secondary-button-group'
 
@@ -274,10 +275,7 @@ const Cart = () => {
                 },
                 onSuccess: () => {
                     toast({
-                        title: formatMessage({
-                            defaultMessage: 'Item removed from cart',
-                            id: 'cart.info.removed_from_cart'
-                        }),
+                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
                         status: 'success'
                     })
                 },
