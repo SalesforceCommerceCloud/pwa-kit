@@ -121,7 +121,7 @@ jobs:
         # TODO: We don't *need* a matrix with single values,
         # but is it worth keeping for supporting multiple versions in the future?
         matrix:
-          node: [14]
+          node: [14, 16]
           npm: [6]
     runs-on: windows-latest
     steps:
