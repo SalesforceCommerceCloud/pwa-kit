@@ -11,6 +11,7 @@ import useAuth from './useAuth'
  * Creates a method that waits for authentication to complete and automatically includes an
  * Authorization header when making requests.
  * @param method Bound API method
+ * @internal
  */
 export const useAuthorizationHeader = <Options extends ApiOptions, Data>(
     method: ApiMethod<Options, Data>
