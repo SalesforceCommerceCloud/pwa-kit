@@ -8,6 +8,7 @@ import webpack from 'webpack'
 import path, {resolve} from 'path'
 import fs from 'fs'
 import glob from 'glob'
+import {password} from '../../../../template-retail-react-app/app/commerce-api/mock-data'
 
 const projectDir = process.cwd()
 const pkg = require(resolve(projectDir, 'package.json'))
@@ -89,7 +90,6 @@ export const sdkReplacementPlugin = (projectDir) => {
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-
         const replacement = replacements.find(({path}) => resolved.match(path))
 
         const sdkPaths = [
@@ -99,7 +99,7 @@ export const sdkReplacementPlugin = (projectDir) => {
 
         const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))
         if (requestedFromSDK && replacement) {
-            console.log('~======= ', replacement.newPath)
+            // console.log('~======= ', replacement.newPath)
             resource.request = replacement.newPath
         }
     })
@@ -112,87 +112,108 @@ const templateAppPathRegex = makeRegExp(
 export const allFiles = (projectDir) => {
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-        if (resolved.match(/icons/)) {
-            console.log('~resolved', resolved)
+        if (resolved.match(/template\-retail\-react\-app\/app\/components\/icons/)) {
+            console.log('~OOPS!')
+            console.log('~ALL FILES ==== resource.context', resource.context)
+            console.log('~ALL FILES ==== resource.request', resource.request)
+        }
+        if (resolved.match(/\/app\/components\/icons/)) {
+            // console.log('~========================================')
+            // console.log('~ALL FILES ==== resolved', resolved)
+            // console.log('~ALL FILES ==== resource.context', resource.context)
+            // console.log('~ALL FILES ==== resource.request', resource.request)
         }
     })
 }
 
 export const extendedTemplateReplacementPlugin = (projectDir) => {
-    console.log('~templateAppPtsxathRegex', templateAppPathRegex)
+    console.log('~templateAppPathRegex', templateAppPathRegex)
     const globPattern = `${pkg?.mobify?.overridesDir?.replace(/\//, '')}/**/*.+(js|jsx|ts|tsx)`
-    const overrides = glob.sync(globPattern)
+    // push a copy of overrides array with the extends path as base
+    const overrides = glob.sync(globPattern)?.flatMap((item) => {
+        return [
+            item,
+            item?.replace(
+                pkg?.mobify?.overridesDir?.replace(/^\//, ''),
+                `/${pkg?.mobify?.extends}`
+            ),
+            // TODO: this needs a better solution, but maybe only a pain for local dev until we publish
+            // the retail react app template?
+            item?.replace(
+                pkg?.mobify?.overridesDir?.replace(/^\//, ''),
+                `/template-${pkg?.mobify?.extends}`
+            )
+        ]
+    })
+    const _overrides = [...overrides]
     const overridesMap = [
         ...overrides,
-        ...overrides?.flatMap((item) => {
-            item = item.split('.')?.[0]
-            var stripped = minimatch.makeRe(item + `*.+(js|jsx|ts|tsx)`)
-            const wIndex = minimatch.makeRe(
-                item.replace(/(\/index)\.*$/, '$1') + `*.+(js|jsx|ts|tsx)`
-            )
-            console.log('~stripped', stripped)
-            console.log('~wIndex', wIndex)
-            // var wIndex =
-            //     item?.replace?.(pkg?.mobify?.overridesDir?.replace(/^\//, ''), '')
-            // if (wIndex?.match(/(.*)\/$/)) {
-            //     wIndex = wIndex.substring(0, wIndex.length - 1)
-            // }
-            // const sansIndex =
-            //     item?.replace?.(pkg?.mobify?.overridesDir?.replace(/^\//, ''), '') + '$'
-            // console.log('~flatMap', [wIndex, sansIndex])
-
-            // return 'app/components/_app-config(/index).jsx'
-
-            return [stripped, wIndex]
+        ...overrides.flatMap((item) => {
+            const EXTENSIONS = '.+(js|jsx|ts|tsx)$'
+            const patterns = [item]
+            const extRe = /\.\w+$/
+            const hasExt = item?.test?.(extRe)
+            const hasSlash = item?.endsWith('/')
+            const endsWithIndex = item?.split(extRe)?.[0]?.endsWith?.('index')
+            if (!endsWithIndex) {
+                return patterns
+            }
+            if (hasExt || !hasSlash) {
+                const noExt = item.replace(extRe, '')
+                const noExtExtends =
+                    pkg?.mobify?.extends + noExt.replace(pkg?.mobify?.overridesDir, '')
+                patterns.push(minimatch.makeRe('**/*' + noExt + EXTENSIONS))
+                patterns.push(minimatch.makeRe('**/*' + noExtExtends + EXTENSIONS))
+            }
+            if (hasSlash) {
+                patterns.push(minimatch.makeRe('**/*' + item + 'index' + EXTENSIONS))
+                patterns.push(
+                    minimatch.makeRe(
+                        '**/*' +
+                            item.replace(pkg?.mobify?.overridesDir?.replace(/\//, ''), '') +
+                            EXTENSIONS
+                    )
+                )
+            }
+            return patterns
         })
     ]
     console.log('~overridesMap', overridesMap)
     // TODO: manually push a false positive e.g. chakra-ui/whatever/icons to make sure we don't override that
+
+    // TODO: filter regex already generated above out of this map
     const overridesRegex = makeRegExp(
-        `(${overridesMap?.map((override) => override?.replace?.(/^\//))?.join('|')})`
+        `(${overridesMap
+            ?.map((override) =>
+                override instanceof RegExp && override?.source
+                    ? override?.source
+                    : override?.replace && override?.startsWith('/')
+                    ? override?.replace?.(/^\//, '')
+                    : override
+            )
+            ?.join('|')})`
     )
     console.log('~overridesRegex', overridesRegex)
+    // TODO: maybe parse the whole dependency tree and rewrite it with this
+    //  https://github.com/dependents/node-dependency-tree
+
     return new webpack.NormalModuleReplacementPlugin(overridesRegex, (resource) => {
-        const requestedFile = path.resolve(resource.context, resource.request)
-        console.log('~requestedFile context:', resource.context)
-        console.log('~requestedFile request:', resource.request)
-        console.log('~requestedFile full path:', requestedFile)
-
-        // from this context:
-        // ~requestedFile context: /Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app/components/icons
-        // ~requestedFile request: @babel/runtime/helpers/extends
-
-        // // if (overridables?.filter((override) => resource?.context?.match?.(override))?.length) {
-        // //     console.log('~overr')
-        // //     return
-        // // }
-        // const found = overridesMap?.filter((override) => {
-        //     return requestedFile?.match?.(override)?.length
-        // })
-        // TODO: we need to drop `template-` for this to work
         if (
-            requestedFile?.match?.(`/template-${pkg?.mobify?.extends}`) ||
-            requestedFile?.match?.(`/${pkg?.mobify?.extends}`)
+            path
+                .resolve(resource.context, resource.request)
+                ?.match('template-retail-react-app/app/components/icons')
         ) {
-            // TODO: rewrite this to the pkg.mobify.extends /node_modules
-            // currently yielding this:
-            // '/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/node_modules/retail-react-app/app/retail-react-app/app/pages/product-detail'
-            const newContext = projectDir + pkg?.mobify?.overridesDir
-            const newRequest = requestedFile?.split?.(`/template-${pkg?.mobify?.extends}/`)?.[1]
-            console.log('~!!! OVERRIDING', requestedFile)
-            console.log('~!!! newContext', newContext)
-            console.log('~!!! newRequest', newRequest)
-            // if (requestedFile.match(makeRegExp('app/components/icons'))) {
-            if (newContext && newRequest) {
-                // resource.context = newContext
-                // const newreq = path.resolve(newContext, newRequest, 'index.jsx')
-                const newreq =
-                    '/Users/bfeister/dev/pwa-kit/packages/template-retail-react-app/app/components/icons/index.jsx'
-                console.log('~newreq', newreq)
-                resource.request = newreq
-                console.log('new full path:', path.resolve(resource.context, resource.request))
-            }
-            return
+            console.log(
+                '~======= file path.resolve()',
+                path.resolve(resource.context, resource.request)
+            )
+            console.log('~requestedFile context:', resource.context)
+            console.log('~requestedFile request:', resource.request)
+            // resource.context =
+            //     '/Users/bfeister/dev/pwa-kit/packages/spike-extended-retail-app/pwa-kit/overrides'
+            // resource.request = '/app/components/icons'
+            resource.context = '/Users/bfeister/dev/pwa-kit/packages/spike-extended-retail-app'
+            resource.request = 'pwa-kit/overrides/app/components/icons'
         }
     })
 }

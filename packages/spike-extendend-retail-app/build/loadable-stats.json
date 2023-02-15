@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "hash": "886f0d1abafc166b8e92",
+  "hash": "fdf85cc8ac040a7f4666",
   "publicPath": "/mobify/bundle/development/",
   "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
@@ -54,7 +54,7 @@
     {
       "type": "asset",
       "name": "vendor.js",
-      "size": 4102322,
+      "size": 5285779,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -81,7 +81,7 @@
     {
       "type": "asset",
       "name": "main.js",
-      "size": 631768,
+      "size": 1162543,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -105,133 +105,8 @@
     },
     {
       "type": "asset",
-      "name": "pages-home.js",
-      "size": 57773,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "pages-home.js.map"
-        }
-      },
-      "chunkNames": [
-        "pages-home"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "pages-home"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "retail-react-app-app-pages-checkout-confirmation.js",
-      "size": 40560,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "retail-react-app-app-pages-checkout-confirmation.js.map"
-        }
-      },
-      "chunkNames": [
-        "retail-react-app-app-pages-checkout-confirmation"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "retail-react-app-app-pages-checkout-confirmation"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "retail-react-app-app-pages-product-list.js",
-      "size": 38673,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "retail-react-app-app-pages-product-list.js.map"
-        }
-      },
-      "chunkNames": [
-        "retail-react-app-app-pages-product-list"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "retail-react-app-app-pages-product-list"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "retail-react-app-app-pages-product-detail.js",
-      "size": 23298,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "retail-react-app-app-pages-product-detail.js.map"
-        }
-      },
-      "chunkNames": [
-        "retail-react-app-app-pages-product-detail"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "retail-react-app-app-pages-product-detail"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "retail-react-app-app-pages-cart.js",
-      "size": 20780,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "retail-react-app-app-pages-cart.js.map"
-        }
-      },
-      "chunkNames": [
-        "retail-react-app-app-pages-cart"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "retail-react-app-app-pages-cart"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
       "name": "retail-react-app-app-pages-account.js",
-      "size": 16895,
+      "size": 169374,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -255,33 +130,8 @@
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-account-wishlist.js",
-      "size": 12020,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "retail-react-app-app-pages-account-wishlist.js.map"
-        }
-      },
-      "chunkNames": [
-        "retail-react-app-app-pages-account-wishlist"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "retail-react-app-app-pages-account-wishlist"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
       "name": "retail-react-app-app-pages-checkout.js",
-      "size": 11497,
+      "size": 155463,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -305,8 +155,501 @@
     },
     {
       "type": "asset",
+      "name": "retail-react-app-app-pages-product-list.js",
+      "size": 119136,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "retail-react-app-app-pages-product-list.js.map"
+        }
+      },
+      "chunkNames": [
+        "retail-react-app-app-pages-product-list"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "retail-react-app-app-pages-product-list"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51.js",
+      "size": 78307,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51.js.map"
+        }
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_en-XB_json.js",
+      "size": 68918,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_en-XB_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_partials_product-view_index_jsx.js",
+      "size": 61692,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "template-retail-react-app_app_partials_product-view_index_jsx.js.map"
+        }
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "template-retail-react-app_app_partials_product-view_index_jsx"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "retail-react-app-app-pages-cart.js",
+      "size": 61071,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "retail-react-app-app-pages-cart.js.map"
+        }
+      },
+      "chunkNames": [
+        "retail-react-app-app-pages-cart"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "retail-react-app-app-pages-cart"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "retail-react-app-app-pages-checkout-confirmation.js",
+      "size": 53996,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "retail-react-app-app-pages-checkout-confirmation.js.map"
+        }
+      },
+      "chunkNames": [
+        "retail-react-app-app-pages-checkout-confirmation"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "retail-react-app-app-pages-checkout-confirmation"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_ja-JP_json.js",
+      "size": 48140,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_ja-JP_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_fr-FR_json.js",
+      "size": 45583,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_fr-FR_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_de-DE_json.js",
+      "size": 45199,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_de-DE_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_components_order-summary_index_jsx.js",
+      "size": 45058,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "template-retail-react-app_app_components_order-summary_index_jsx.js.map"
+        }
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "template-retail-react-app_app_components_order-summary_index_jsx"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_es-MX_json.js",
+      "size": 44920,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_es-MX_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_ko-KR_json.js",
+      "size": 44685,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_ko-KR_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_it-IT_json.js",
+      "size": 43806,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_it-IT_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_pt-BR_json.js",
+      "size": 43767,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_pt-BR_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_en-GB_json.js",
+      "size": 42943,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_en-GB_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0.js",
+      "size": 42799,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0.js.map"
+        }
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_en-US_json.js",
+      "size": 42374,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_en-US_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_zh-TW_json.js",
+      "size": 42287,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_zh-TW_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_translations_compiled_zh-CN_json.js",
+      "size": 42265,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        "template-retail-react-app_app_translations_compiled_zh-CN_json"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-home.js",
+      "size": 39484,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "pages-home.js.map"
+        }
+      },
+      "chunkNames": [
+        "pages-home"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "pages-home"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "retail-react-app-app-pages-account-wishlist.js",
+      "size": 39144,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "retail-react-app-app-pages-account-wishlist.js.map"
+        }
+      },
+      "chunkNames": [
+        "retail-react-app-app-pages-account-wishlist"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "retail-react-app-app-pages-account-wishlist"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1.js",
+      "size": 36367,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1.js.map"
+        }
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "retail-react-app-app-pages-product-detail.js",
+      "size": 23718,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "retail-react-app-app-pages-product-detail.js.map"
+        }
+      },
+      "chunkNames": [
+        "retail-react-app-app-pages-product-detail"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "retail-react-app-app-pages-product-detail"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
       "name": "retail-react-app-app-pages-reset-password.js",
-      "size": 9063,
+      "size": 10461,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -330,33 +673,8 @@
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-page-not-found.js",
-      "size": 7220,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "retail-react-app-app-pages-page-not-found.js.map"
-        }
-      },
-      "chunkNames": [
-        "retail-react-app-app-pages-page-not-found"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "retail-react-app-app-pages-page-not-found"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
       "name": "retail-react-app-app-pages-login.js",
-      "size": 6735,
+      "size": 8379,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -380,8 +698,33 @@
     },
     {
       "type": "asset",
+      "name": "retail-react-app-app-pages-page-not-found.js",
+      "size": 7779,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "retail-react-app-app-pages-page-not-found.js.map"
+        }
+      },
+      "chunkNames": [
+        "retail-react-app-app-pages-page-not-found"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "retail-react-app-app-pages-page-not-found"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
       "name": "retail-react-app-app-pages-registration.js",
-      "size": 6016,
+      "size": 7562,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -406,7 +749,7 @@
     {
       "type": "asset",
       "name": "retail-react-app-app-pages-login-redirect.js",
-      "size": 3112,
+      "size": 3060,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -425,6 +768,52 @@
       "filteredRelated": 1,
       "chunks": [
         "retail-react-app-app-pages-login-redirect"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "_8dba.js",
+      "size": 284,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "_8dba.js.map"
+        }
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "_8dba"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "_cc12.js",
+      "size": 284,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "_cc12.js.map"
+        }
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "_cc12"
       ],
       "auxiliaryChunks": []
     }
@@ -454,20 +843,16 @@
     "pages-home": {
       "name": "pages-home",
       "chunks": [
-        "vendor",
         "pages-home"
       ],
       "assets": [
-        {
-          "name": "vendor.js"
-        },
         {
           "name": "pages-home.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 2,
+      "filteredAuxiliaryAssets": 1,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -526,16 +911,44 @@
     "retail-react-app-app-pages-account": {
       "name": "retail-react-app-app-pages-account",
       "chunks": [
+        "vendor",
+        "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
+        "template-retail-react-app_app_partials_product-view_index_jsx",
+        "template-retail-react-app_app_components_order-summary_index_jsx",
+        "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1",
+        "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51",
+        "retail-react-app-app-pages-account-wishlist",
         "retail-react-app-app-pages-account"
       ],
       "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0.js"
+        },
+        {
+          "name": "template-retail-react-app_app_partials_product-view_index_jsx.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_order-summary_index_jsx.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51.js"
+        },
+        {
+          "name": "retail-react-app-app-pages-account-wishlist.js"
+        },
         {
           "name": "retail-react-app-app-pages-account.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 1,
+      "filteredAuxiliaryAssets": 8,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -543,16 +956,32 @@
     "retail-react-app-app-pages-cart": {
       "name": "retail-react-app-app-pages-cart",
       "chunks": [
+        "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
+        "template-retail-react-app_app_partials_product-view_index_jsx",
+        "template-retail-react-app_app_components_order-summary_index_jsx",
+        "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1",
         "retail-react-app-app-pages-cart"
       ],
       "assets": [
+        {
+          "name": "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0.js"
+        },
+        {
+          "name": "template-retail-react-app_app_partials_product-view_index_jsx.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_order-summary_index_jsx.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1.js"
+        },
         {
           "name": "retail-react-app-app-pages-cart.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 1,
+      "filteredAuxiliaryAssets": 5,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -560,16 +989,32 @@
     "retail-react-app-app-pages-checkout": {
       "name": "retail-react-app-app-pages-checkout",
       "chunks": [
+        "vendor",
+        "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
+        "template-retail-react-app_app_components_order-summary_index_jsx",
+        "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51",
         "retail-react-app-app-pages-checkout"
       ],
       "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_order-summary_index_jsx.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51.js"
+        },
         {
           "name": "retail-react-app-app-pages-checkout.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 1,
+      "filteredAuxiliaryAssets": 5,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -577,16 +1022,20 @@
     "retail-react-app-app-pages-checkout-confirmation": {
       "name": "retail-react-app-app-pages-checkout-confirmation",
       "chunks": [
+        "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
         "retail-react-app-app-pages-checkout-confirmation"
       ],
       "assets": [
+        {
+          "name": "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0.js"
+        },
         {
           "name": "retail-react-app-app-pages-checkout-confirmation.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 1,
+      "filteredAuxiliaryAssets": 2,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -611,16 +1060,20 @@
     "retail-react-app-app-pages-product-detail": {
       "name": "retail-react-app-app-pages-product-detail",
       "chunks": [
+        "template-retail-react-app_app_partials_product-view_index_jsx",
         "retail-react-app-app-pages-product-detail"
       ],
       "assets": [
+        {
+          "name": "template-retail-react-app_app_partials_product-view_index_jsx.js"
+        },
         {
           "name": "retail-react-app-app-pages-product-detail.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 1,
+      "filteredAuxiliaryAssets": 2,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -645,16 +1098,32 @@
     "retail-react-app-app-pages-account-wishlist": {
       "name": "retail-react-app-app-pages-account-wishlist",
       "chunks": [
+        "vendor",
+        "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
+        "template-retail-react-app_app_partials_product-view_index_jsx",
+        "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1",
         "retail-react-app-app-pages-account-wishlist"
       ],
       "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0.js"
+        },
+        {
+          "name": "template-retail-react-app_app_partials_product-view_index_jsx.js"
+        },
+        {
+          "name": "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1.js"
+        },
         {
           "name": "retail-react-app-app-pages-account-wishlist.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 1,
+      "filteredAuxiliaryAssets": 5,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -683,6 +1152,90 @@
       "id": "main",
       "files": [
         "main.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_de-DE_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_de-DE_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_en-GB_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_en-GB_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_en-US_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_en-US_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_en-XB_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_en-XB_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_es-MX_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_es-MX_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_fr-FR_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_fr-FR_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_it-IT_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_it-IT_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_ja-JP_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_ja-JP_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_ko-KR_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_ko-KR_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_pt-BR_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_pt-BR_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_zh-CN_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_zh-CN_json.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_translations_compiled_zh-TW_json",
+      "files": [
+        "template-retail-react-app_app_translations_compiled_zh-TW_json.js"
+      ]
+    },
+    {
+      "id": "_cc12",
+      "files": [
+        "_cc12.js"
+      ]
+    },
+    {
+      "id": "_8dba",
+      "files": [
+        "_8dba.js"
       ]
     },
     {
@@ -767,6 +1320,36 @@
       "id": "vendor",
       "files": [
         "vendor.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
+      "files": [
+        "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_partials_product-view_index_jsx",
+      "files": [
+        "template-retail-react-app_app_partials_product-view_index_jsx.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_components_order-summary_index_jsx",
+      "files": [
+        "template-retail-react-app_app_components_order-summary_index_jsx.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1",
+      "files": [
+        "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1.js"
+      ]
+    },
+    {
+      "id": "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51",
+      "files": [
+        "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51.js"
       ]
     }
   ]
