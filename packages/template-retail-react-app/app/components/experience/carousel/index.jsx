@@ -84,20 +84,20 @@ const Carousel = (props = {}) => {
     // force them to show. Please note that this feature only works on web-kit browsers,
     // for all other brosers the scroller/indicator will be shown.
     const css = `
-        .indicator-scroller::-webkit-scrollbar {
+        .scroll-indicator::-webkit-scrollbar {
             display:${overflowXScrollValue};
             -webkit-appearance: none;
             height: 8px;
         }
-        .indicator-scroller::-webkit-scrollbar-thumb {
+        .scroll-indicator::-webkit-scrollbar-thumb {
             background-color: rgba(0, 0, 0, 0.5);
         }
     `
 
     return (
-        <Box className={'carousel'} position="relative" data-testid="experience-carousel">
+        <Box className={'carousel'} position="relative" data-testid="carousel">
             <style>{css}</style>
-            <Stack spacing={6}>
+            <Stack className={'carousel-container'} data-testid="carousel-container" spacing={6}>
                 {textHeadline && (
                     <Heading as="h2" fontSize="xl" textAlign="center">
                         {textHeadline}
@@ -106,7 +106,8 @@ const Carousel = (props = {}) => {
 
                 <Stack
                     ref={scrollRef}
-                    className="indicator-scroller"
+                    className={'carousel-container-items scroll-indicator'}
+                    data-testid="carousel-container-items"
                     direction="row"
                     spacing={0}
                     wrap="nowrap"
@@ -142,8 +143,8 @@ const Carousel = (props = {}) => {
                     transform="translateY(-50%)"
                 >
                     <IconButton
-                        data-testid="product-scroller-nav-left"
-                        aria-label="Scroll products left"
+                        data-testid="carousel-nav-left"
+                        aria-label="Scroll carousel left"
                         icon={<ChevronLeftIcon color="black" />}
                         borderRadius="full"
                         colorScheme="whiteAlpha"
@@ -159,8 +160,8 @@ const Carousel = (props = {}) => {
                     transform="translateY(-50%)"
                 >
                     <IconButton
-                        data-testid="product-scroller-nav-right"
-                        aria-label="Scroll products right"
+                        data-testid="carousel-nav-right"
+                        aria-label="Scroll carousel right"
                         icon={<ChevronRightIcon color="black" />}
                         borderRadius="full"
                         colorScheme="whiteAlpha"
@@ -173,16 +174,18 @@ const Carousel = (props = {}) => {
 }
 
 Carousel.propTypes = {
+    regions: PropTypes.array.isRequired,
     textHeadline: PropTypes.string,
-    regions: PropTypes.array,
     xsCarouselIndicators: PropTypes.bool,
     smCarouselIndicators: PropTypes.bool,
     mdCarouselIndicators: PropTypes.bool,
     xsCarouselControls: PropTypes.bool,
     smCarouselControls: PropTypes.bool,
-    xsCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)],
-    smCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)],
-    mdCarouselSlidesToDisplay: PropTypes.oneOf[(1, 2, 3, 4, 5, 6)]
+    xsCarouselSlidesToDisplay: PropTypes.oneOf([1, 2, 3, 4, 5, 6]),
+    smCarouselSlidesToDisplay: PropTypes.oneOf([1, 2, 3, 4, 5, 6]),
+    mdCarouselSlidesToDisplay: PropTypes.oneOf([1, 2, 3, 4, 5, 6])
 }
+
+Carousel.displayName = 'Carousel'
 
 export default Carousel
