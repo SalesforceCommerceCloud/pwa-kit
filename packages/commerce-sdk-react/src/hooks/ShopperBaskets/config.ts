@@ -28,8 +28,7 @@ const updateBasketQuery = (
     if (!basketId) return {}
     const update: Array<CacheUpdateUpdate<Basket> | CacheUpdateUpdate<CustomerBasketsResult>> = [
         {
-            queryKey: ['/baskets', basketId, {basketId}],
-            updater: newBasket
+            queryKey: ['/baskets', basketId, {basketId}]
         }
     ]
     if (customerId) {

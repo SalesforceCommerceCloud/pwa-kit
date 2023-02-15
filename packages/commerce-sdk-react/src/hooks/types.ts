@@ -137,7 +137,7 @@ export type ApiQueryKey =
  */
 export type CacheUpdateUpdate<T> = {
     queryKey: ApiQueryKey
-    updater: Updater<T | undefined, T | undefined>
+    updater?: Updater<T | undefined, T | undefined>
 }
 
 /** Query predicate for queries to invalidate */

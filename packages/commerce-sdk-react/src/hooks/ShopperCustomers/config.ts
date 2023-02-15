@@ -4,259 +4,272 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, CacheUpdateMatrix, DataType} from '../types'
+import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {
+    ApiClients,
+    ApiOptions,
+    CacheUpdate,
+    CacheUpdateMatrix,
+    CacheUpdateUpdate,
+    MergedOptions
+} from '../types'
+import {and, matchesApiConfig, NotImplementedError, pathStartsWith} from '../utils'
 
 type Client = ApiClients['shopperCustomers']
-
-export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {}
-
-type CacheUpdateMatrixElement = any // Tempoary to quiet errors
+type Customer = ShopperCustomersTypes.Customer
+type CustomerOptions = MergedOptions<Client, ApiOptions<{customerId: string}, Customer>>
 
 const noop = () => ({})
-// TODO: Convert old matrix to new format
-export const shopperCustomersCacheUpdateMatrix = {
-    authorizeCustomer: noop,
-    authorizeTrustedSystem: noop,
-    deleteCustomerProductList: noop,
-    getResetPasswordToken: noop,
-    invalidateCustomerAuth: noop,
-    registerCustomer: noop,
-    registerExternalProfile: noop,
-    resetPassword: noop,
-    updateCustomerPassword: noop,
-    updateCustomerProductList: noop,
-    updateCustomer: (
-        params: Argument<Client['updateCustomer']>,
-        response: DataType<Client['updateCustomer']>
-    ): CacheUpdateMatrixElement => {
-        const {customerId} = params.parameters
-        return {
-            update: [
-                {
-                    name: 'customer',
-                    key: ['/customers', customerId, {customerId}],
-                    updater: () => response
-                }
-            ],
-            invalidate: [
-                {
-                    name: 'customerPaymentInstrument',
-                    key: ['/customers', customerId, '/payment-instruments']
-                },
-                {name: 'customerAddress', key: ['/customers', customerId, '/addresses']},
-                {name: 'externalProfile', key: ['/customers', '/external-profile']}
-            ]
-        }
-    },
+const TODO = (method: keyof Client) => {
+    throw new NotImplementedError(`Cache logic for '${method}'`)
+}
 
-    updateCustomerAddress: (
-        params: Argument<Client['updateCustomerAddress']>,
-        response: DataType<Client['updateCustomerAddress']>
-    ): CacheUpdateMatrixElement => {
-        const {customerId, addressName} = params.parameters
-        return {
-            update: [
-                {
-                    name: 'customerAddress',
-                    key: ['/customers', customerId, '/addresses', {addressName, customerId}],
-                    updater: () => response
-                }
-            ],
-            invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}]
-        }
-    },
+const baseQueryKey = (customerId: string, parameters: CustomerOptions['parameters']) => [
+    '/organizations/',
+    parameters.organizationId,
+    '/customers/',
+    customerId
+]
 
-    createCustomerAddress: (
-        params: Argument<Client['createCustomerAddress']>,
-        response: DataType<Client['createCustomerAddress']>
-    ): CacheUpdateMatrixElement => {
-        const {customerId} = params.parameters
-        const {addressId} = params.body
+/** Invalidates the customer and all derivative endpoints */
+const invalidateCustomer = (
+    customerId: string,
+    parameters: CustomerOptions['parameters']
+): CacheUpdate => {
+    return {
+        invalidate: [
+            and(matchesApiConfig(parameters), pathStartsWith(baseQueryKey(customerId, parameters)))
+        ]
+    }
+}
+
+// TODO: Rather than every /customers/{customerId} endpoint whenever we update
+// a derivative property (e.g. address), can we instead update the corresponding
+// cached query and insert the data into the cached customer query, but leave
+// everything else alone?
+export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
+    authorizeCustomer: TODO('authorizeCustomer'),
+    authorizeTrustedSystem: TODO('authorizeTrustedSystem'),
+    createCustomerAddress(customerId, {parameters}, response) {
+        if (!customerId) return {}
         return {
+            ...invalidateCustomer(customerId, parameters),
             update: [
                 {
-                    name: 'customerAddress',
-                    key: [
-                        '/customers',
-                        customerId,
+                    queryKey: [
+                        ...baseQueryKey(customerId, parameters),
                         '/addresses',
-                        {addressName: addressId, customerId}
-                    ],
-                    updater: () => response
-                }
-            ],
-            invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}]
-        }
-    },
-
-    removeCustomerAddress: (
-        params: Argument<Client['removeCustomerAddress']>,
-        response: DataType<Client['removeCustomerAddress']>
-    ): CacheUpdateMatrixElement => {
-        // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
-        //  The required parameters become optional accidentally
-        // @ts-ignore
-        const {customerId, addressName} = params.parameters
-        return {
-            invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}],
-            remove: [
-                {
-                    name: 'customerAddress',
-                    key: ['/customers', customerId, '/addresses', {addressName, customerId}]
-                }
-            ]
-        }
-    },
-
-    createCustomerPaymentInstrument: (
-        params: Argument<Client['createCustomerPaymentInstrument']>,
-        response: DataType<Client['createCustomerPaymentInstrument']>
-    ): CacheUpdateMatrixElement => {
-        const {customerId} = params.parameters
-        return {
-            update: [
-                {
-                    name: 'customerPaymentInstrument',
-                    key: [
-                        '/customers',
-                        customerId,
-                        '/payment-instruments',
-                        {customerId, paymentInstrumentId: response?.paymentInstrumentId}
-                    ],
-                    updater: () => response
-                }
-            ],
-            invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}]
-        }
-    },
-
-    deleteCustomerPaymentInstrument: (
-        params: Argument<Client['deleteCustomerPaymentInstrument']>,
-        response: DataType<Client['deleteCustomerPaymentInstrument']>
-    ): CacheUpdateMatrixElement => {
-        // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
-        //  The required parameters become optional accidentally
-        // @ts-ignore
-        const {customerId, paymentInstrumentId} = params.parameters
-        return {
-            invalidate: [{name: 'customer', key: ['/customers', customerId, {customerId}]}],
-            remove: [
-                {
-                    name: 'customerPaymentInstrument',
-                    key: [
-                        '/customers',
-                        customerId,
-                        '/payment-instruments',
-                        {customerId, paymentInstrumentId}
+                        response.addressId,
+                        // getCustomerAddress uses `addressName` rather than `addressId`
+                        {...parameters, addressName: response.addressId}
                     ]
                 }
             ]
         }
     },
+    createCustomerPaymentInstrument(customerId, {parameters}, response) {
+        if (!customerId) return {}
 
-    createCustomerProductList: (
-        params: Argument<Client['createCustomerProductList']>,
-        response: DataType<Client['createCustomerProductList']>
-    ): CacheUpdateMatrixElement => {
-        const {customerId} = params.parameters
         return {
+            ...invalidateCustomer(customerId, parameters),
             update: [
                 {
-                    name: 'customerProductList',
-                    key: [
-                        '/customers',
-                        customerId,
-                        '/product-list',
-                        {customerId, listId: response?.id}
-                    ],
-                    updater: () => response
+                    queryKey: [
+                        ...baseQueryKey(customerId, parameters),
+                        '/payment-instruments/',
+                        response.paymentInstrumentId,
+                        {parameters, paymentInstrumentId: response.paymentInstrumentId}
+                    ]
                 }
             ]
         }
     },
-
-    createCustomerProductListItem: (
-        params: Argument<Client['createCustomerProductListItem']>,
-        response: DataType<Client['createCustomerProductListItem']>
-    ): CacheUpdateMatrixElement => {
-        const {customerId, listId} = params.parameters
+    createCustomerProductList(customerId, {parameters}, response) {
+        if (!customerId) return {}
+        const base = baseQueryKey(customerId, parameters)
         return {
-            update: [
-                {
-                    name: 'customerProductListItem',
-                    key: [
-                        '/customers',
-                        customerId,
-                        '/product-list',
-                        listId,
-                        {itemId: response?.id}
-                    ],
-                    updater: () => response
-                }
-            ],
+            // We can only update cache if the response comes with an ID
+            update: !response.id
+                ? []
+                : [
+                      {
+                          queryKey: [
+                              ...base,
+                              '/product-lists/',
+                              response.id,
+                              {
+                                  ...parameters,
+                                  listId: response.id
+                              }
+                          ]
+                      }
+                  ],
+            // We always invalidate, because even without an ID we assume that something has changed
             invalidate: [
-                {
-                    name: 'customerProductList',
-                    key: ['/customers', customerId, '/product-list', {customerId, listId}]
-                }
+                // TODO: Convert to exact path match
+                and(matchesApiConfig(parameters), pathStartsWith([...base, '/product-lists']))
             ]
         }
     },
-
-    updateCustomerProductListItem: (
-        params: Argument<Client['updateCustomerProductListItem']>,
-        response: DataType<Client['updateCustomerProductListItem']>
-    ): CacheUpdateMatrixElement => {
-        const {customerId, listId, itemId} = params.parameters
+    createCustomerProductListItem(customerId, {parameters}, response) {
+        if (!customerId) return {}
+        const base = baseQueryKey(customerId, parameters)
         return {
-            update: [
-                {
-                    name: 'customerProductListItem',
-                    key: ['/customers', customerId, '/product-list', listId, {itemId}],
-                    updater: () => response
-                }
-            ],
+            // We can only update cache if the response comes with an ID
+            update: !response.id
+                ? []
+                : [
+                      {
+                          queryKey: [
+                              ...base,
+                              '/product-lists/',
+                              parameters.listId,
+                              '/items/',
+                              response.id,
+                              {
+                                  ...parameters,
+                                  itemId: response.id
+                              }
+                          ]
+                      }
+                  ],
+            // We always invalidate, because even without an ID we assume that something has changed
             invalidate: [
-                {
-                    name: 'customerProductList',
-                    key: ['/customers', customerId, '/product-list', {customerId, listId}]
-                }
+                and(
+                    matchesApiConfig(parameters),
+                    // TODO: Convert to exact path match
+                    pathStartsWith([...base, '/product-lists/', parameters.listId])
+                )
             ]
         }
     },
-
-    deleteCustomerProductListItem: (
-        params: Argument<Client['deleteCustomerProductListItem']>,
-        response: DataType<Client['deleteCustomerProductListItem']>
-    ): CacheUpdateMatrixElement => {
-        // TODO: Fix the RequireParametersUnlessAllAreOptional commerce-sdk-isomorphic type assertion
-        //  The required parameters become optional accidentally
-        // @ts-ignore
-        const {customerId, listId, itemId} = params.parameters
+    deleteCustomerPaymentInstrument(customerId, {parameters}) {
+        if (!customerId) return {}
+        return {
+            ...invalidateCustomer(customerId, parameters),
+            remove: [
+                and(
+                    matchesApiConfig(parameters),
+                    pathStartsWith([
+                        ...baseQueryKey(customerId, parameters),
+                        '/payment-instruments',
+                        parameters.paymentInstrumentId
+                    ])
+                )
+            ]
+        }
+    },
+    deleteCustomerProductList: TODO('deleteCustomerProductList'),
+    deleteCustomerProductListItem(customerId, {parameters}) {
+        if (!customerId) return {}
+        const base = baseQueryKey(customerId, parameters)
         return {
             invalidate: [
-                {
-                    name: 'customerProductList',
-                    key: ['/customers', customerId, '/product-list', {customerId, listId}]
-                }
+                and(
+                    matchesApiConfig(parameters),
+                    pathStartsWith([...base, '/product-lists/', parameters.listId])
+                )
             ],
             remove: [
+                and(
+                    matchesApiConfig(parameters),
+                    pathStartsWith([
+                        ...base,
+                        '/product-lists/',
+                        parameters.listId,
+                        '/items/',
+                        parameters.itemId
+                    ])
+                )
+            ]
+        }
+    },
+    getResetPasswordToken: noop,
+    invalidateCustomerAuth: TODO('invalidateCustomerAuth'),
+    registerCustomer: noop,
+    registerExternalProfile: TODO('registerExternalProfile'),
+    removeCustomerAddress(customerId, {parameters}) {
+        if (!customerId) return {}
+        return {
+            ...invalidateCustomer(customerId, parameters),
+            remove: [
+                and(
+                    matchesApiConfig(parameters),
+                    pathStartsWith([
+                        ...baseQueryKey(customerId, parameters),
+                        '/addresses',
+                        parameters.addressName
+                    ])
+                )
+            ]
+        }
+    },
+    resetPassword: TODO('resetPassword'),
+    updateCustomer(customerId, {parameters}) {
+        if (!customerId) return {}
+        const base = baseQueryKey(customerId, parameters)
+        const update: CacheUpdateUpdate<unknown>[] = [
+            {
+                queryKey: [...base, parameters]
+            }
+        ]
+        // TODO: Can we just use invalidateCustomer() here, since it invalidates all child paths?
+        const invalidate = [
+            and(matchesApiConfig(parameters), pathStartsWith([...base, '/payment-instruments'])),
+            and(matchesApiConfig(parameters), pathStartsWith([...base, '/addresses'])),
+            and(
+                matchesApiConfig(parameters),
+                pathStartsWith([
+                    '/organizations/',
+                    parameters.organizationId,
+                    '/customers/external-profile'
+                ])
+            )
+        ]
+        return {update, invalidate}
+    },
+    updateCustomerAddress(customerId, {parameters}) {
+        if (!customerId) return {}
+        // TODO: Can this `invalidate` instead be an update that targets the appropriate property?
+        return {
+            ...invalidateCustomer(customerId, parameters),
+            update: [
                 {
-                    name: 'customerProductListItem',
-                    key: ['/customers', customerId, '/product-list', listId, {itemId}]
+                    queryKey: [
+                        ...baseQueryKey(customerId, parameters),
+                        '/addresses',
+                        parameters.addressName,
+                        parameters
+                    ]
                 }
+            ]
+        }
+    },
+    updateCustomerPassword: TODO('updateCustomerPassword'),
+    updateCustomerProductList: TODO('updateCustomerProductList'),
+    updateCustomerProductListItem(customerId, {parameters}) {
+        if (!customerId) return {}
+        const base = baseQueryKey(customerId, parameters)
+        return {
+            update: [
+                {
+                    queryKey: [
+                        ...base,
+                        '/product-lists/',
+                        parameters.listId,
+                        '/items/',
+                        parameters.itemId,
+                        parameters
+                    ]
+                }
+            ],
+            invalidate: [
+                and(
+                    matchesApiConfig(parameters),
+                    // TODO: Convert to exact path match
+                    pathStartsWith([...base, '/product-lists/', parameters.listId])
+                )
             ]
         }
     }
 }
-
-export const SHOPPER_CUSTOMERS_NOT_IMPLEMENTED = [
-    'authorizeCustomer',
-    'authorizeTrustedSystem',
-    'deleteCustomerProductList',
-    'invalidateCustomerAuth',
-    'registerExternalProfile',
-    'resetPassword',
-    'updateCustomerPassword',
-    'updateCustomerProductList'
-]

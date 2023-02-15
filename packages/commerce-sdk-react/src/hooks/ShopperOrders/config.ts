@@ -4,38 +4,56 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {DataType, ApiClients, CacheUpdateMatrix} from '../types'
+import {ApiClients, CacheUpdateMatrix, CacheUpdateUpdate, CacheUpdateInvalidate} from '../types'
+import {and, matchesApiConfig, NotImplementedError, pathStartsWith} from '../utils'
+import type {ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
 
 type Client = ApiClients['shopperOrders']
+type Order = ShopperOrdersTypes.Order
 
-export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {}
-
-type CacheUpdateMatrixElement = any // Temporary to quiet errors
-
-const noop = () => ({})
-
-// TODO: Convert old matrix to new format
-export const shopperOrdersCacheUpdateMatrix = {
-    createOrder: (response: DataType<Client['createOrder']>): CacheUpdateMatrixElement => {
-        const customerId = response?.customerInfo?.customerId
-        return {
-            update: [
-                {
-                    name: 'order',
-                    key: ['/orders', {orderNo: response.orderNo}],
-                    updater: () => response
-                }
-            ],
-            invalidate: [{name: 'customerBaskets', key: ['/customers', customerId, '/baskets']}]
-        }
-    },
-    createPaymentInstrumentForOrder: noop,
-    removePaymentInstrumentFromOrder: noop,
-    updatePaymentInstrumentForOrder: noop
+const TODO = (method: keyof Client) => {
+    throw new NotImplementedError(`Cache logic for '${method}'`)
 }
 
-export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
-    'CreatePaymentInstrumentForOrder',
-    'RemovePaymentInstrumentFromOrder',
-    'UpdatePaymentInstrumentForOrder'
-]
+export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
+    createOrder(customerId, {parameters}, response) {
+        const update: CacheUpdateUpdate<unknown>[] = []
+        if (response.orderNo) {
+            const updateOrder: CacheUpdateUpdate<Order> = {
+                queryKey: [
+                    '/organizations/',
+                    parameters.organizationId,
+                    '/orders/',
+                    response.orderNo,
+                    // TODO: These parameters are not guaranteed to match those sent to getOrder,
+                    // how do we handle that?
+                    {...parameters, orderNo: response.orderNo}
+                ]
+            }
+            // TODO: This type assertion is so that we "forget" what type the updater uses.
+            // Is there a way to avoid the assertion?
+            update.push(updateOrder as CacheUpdateUpdate<unknown>)
+        }
+
+        const invalidate: CacheUpdateInvalidate[] = []
+        if (customerId) {
+            invalidate.push(
+                and(
+                    matchesApiConfig(parameters),
+                    pathStartsWith([
+                        '/organization/',
+                        parameters.organizationId,
+                        '/customers/',
+                        customerId,
+                        '/baskets'
+                    ])
+                )
+            )
+        }
+
+        return {update, invalidate}
+    },
+    createPaymentInstrumentForOrder: TODO('createPaymentInstrumentForOrder'),
+    removePaymentInstrumentFromOrder: TODO('removePaymentInstrumentFromOrder'),
+    updatePaymentInstrumentForOrder: TODO('updatePaymentInstrumentForOrder')
+}

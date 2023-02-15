@@ -8,12 +8,13 @@ import {Query, QueryClient} from '@tanstack/react-query'
 import {ApiClient, ApiOptions, CacheUpdate, MergedOptions} from './types'
 
 /** Applies the set of cache updates to the query client. */
-export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate) => {
-    cacheUpdates.update?.forEach(({queryKey, updater}) =>
-        queryClient.setQueryData(queryKey, updater)
-    )
+export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate, data: unknown) => {
     cacheUpdates.invalidate?.forEach((predicate) => queryClient.invalidateQueries({predicate}))
     cacheUpdates.remove?.forEach((predicate) => queryClient.removeQueries({predicate}))
+    cacheUpdates.update?.forEach(({queryKey, updater}) =>
+        // If an updater isn't given, fall back to just setting the data
+        queryClient.setQueryData(queryKey, updater ?? data)
+    )
 }
 
 /** Error thrown when a method is not implemented. */
