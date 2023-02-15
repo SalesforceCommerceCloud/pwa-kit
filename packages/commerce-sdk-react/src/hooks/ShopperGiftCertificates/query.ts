@@ -41,10 +41,10 @@ export const useGiftCertificate = (
     return useQuery(
         apiOptions,
         {
-            // !!! This is a violation of our design goal of minimal logic in the endpoint hook
-            // implementations. This is because getGiftCertificate is actually a POST method,
-            // rather than GET, and its body contains a secret (gift certificate code). To avoid
-            // exposing that secret in the shared cache, we set cacheTime to 0 to avoid caching it.
+            // !!! This is a violation of our design goal of minimal logic in the indivudal endpoint
+            // endpoint hooks. This is because this method is a POST method, rather than GET,
+            // and its body contains secrets. Setting cacheTime to 0 avoids exposing the secrets in
+            // the shared cache.
             cacheTime: 0,
             ...queryOptions
         },
