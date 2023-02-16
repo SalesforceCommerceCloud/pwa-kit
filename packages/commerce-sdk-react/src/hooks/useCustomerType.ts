@@ -6,6 +6,7 @@
  */
 import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
+import useConfig from './useConfig'
 
 const onClient = typeof window !== 'undefined'
 export type CustomerType = null | 'guest' | 'registered'
@@ -30,7 +31,8 @@ type useCustomerType = {
 const useCustomerType = (): useCustomerType => {
     let customerType = null
     if (onClient) {
-        customerType = useLocalStorage('customer_type')
+        const {siteId} = useConfig()
+        customerType = useLocalStorage(`${siteId}_customer_type`)
     } else {
         const auth = useAuthContext()
         customerType = auth.get('customer_type')
