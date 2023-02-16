@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {Fragment, useCallback, useRef} from 'react'
+import React, {Fragment, useCallback, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {AspectRatio, Box, Heading, IconButton, Stack, useBreakpointValue} from '@chakra-ui/react'
+import {AspectRatio, Box, Heading, IconButton, Stack, useBreakpoint, useBreakpointValue} from '@chakra-ui/react'
 import {Component} from 'commerce-sdk-react-preview/components'
 import {ChevronLeftIcon, ChevronRightIcon} from '../../icons'
+import { useEffect } from 'react'
 
 /**
  * Display child components in a carousel slider manner. Configurations include the number of
@@ -29,6 +30,8 @@ import {ChevronLeftIcon, ChevronRightIcon} from '../../icons'
  */
 const Carousel = (props = {}) => {
     const scrollRef = useRef()
+    const breakpoint = useBreakpoint()
+    const [hasOverflow, setHasOverflow] = useState(false)
 
     const {
         textHeadline,
@@ -44,12 +47,14 @@ const Carousel = (props = {}) => {
         regions
     } = props
 
-    const controlDisplay = {
-        base: xsCarouselControls ? 'block' : 'none',
-        sm: xsCarouselControls ? 'block' : 'none',
-        md: smCarouselControls ? 'block' : 'none',
-        lg: 'block'
-    }
+    const controlDisplay = useMemo(() => {
+        return {
+            base: xsCarouselControls && hasOverflow ? 'block' : 'none',
+            sm: xsCarouselControls && hasOverflow ? 'block' : 'none',
+            md: smCarouselControls && hasOverflow ? 'block' : 'none',
+            lg: hasOverflow ? 'block' : 'none'
+        }
+    }, [hasOverflow])
 
     const itemWidth = {
         base: `calc(${100 / xsCarouselSlidesToDisplay}%)`,
@@ -93,6 +98,11 @@ const Carousel = (props = {}) => {
             background-color: rgba(0, 0, 0, 0.5);
         }
     `
+
+    useEffect(() => {
+        const {clientWidth, scrollWidth} = scrollRef.current
+        setHasOverflow(scrollWidth > clientWidth)
+    }, [breakpoint, props])
 
     return (
         <Box className={'carousel'} position="relative" data-testid="carousel">
