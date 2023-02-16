@@ -38,6 +38,14 @@ export const pathStartsWith =
     ({queryKey}: Query): boolean =>
         queryKey.length >= search.length && search.every((lookup, idx) => queryKey[idx] === lookup)
 
+/** Creates a query predicate that determines whether a query key fully matches the given path segments. */
+export const matchesPath =
+    (search: readonly string[]) =>
+    ({queryKey}: Query): boolean =>
+        // ApiQueryKey = [...path, parameters]
+        queryKey.length === 1 + search.length &&
+        search.every((lookup, idx) => queryKey[idx] === lookup)
+
 /**
  * Creates a query predicate that determines whether the parameters of the query key exactly match
  * the search object.

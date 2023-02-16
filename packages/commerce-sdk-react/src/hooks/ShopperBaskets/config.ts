@@ -13,88 +13,100 @@ import {
     CacheUpdateUpdate,
     MergedOptions
 } from '../types'
-import {and, matchesApiConfig, pathStartsWith} from '../utils'
+import {and, matchesApiConfig, matchesPath} from '../utils'
 
 type Client = ApiClients['shopperBaskets']
 type Basket = ShopperBasketsTypes.Basket
+type BasketOptions = MergedOptions<Client, ApiOptions<{basketId?: string}>>
+type BasketParameters = BasketOptions['parameters']
 type CustomerBasketsResult = ShopperCustomersTypes.BasketsResult
-type BasketOptions = MergedOptions<Client, ApiOptions<Basket>>
+
+// Path helpers to avoid typos!
+const getBasePath = (parameters: BasketParameters) => ['/organizations/', parameters.organizationId]
+const getBasketPath = (parameters: BasketParameters & {basketId: string}) => [
+    ...getBasePath(parameters),
+    '/baskets/',
+    parameters.basketId
+]
+
+const getCustomerBasketsPath = (customerId: string, parameters: BasketParameters) => [
+    ...getBasePath(parameters),
+    '/customers/',
+    customerId,
+    '/baskets' // No trailing / as it's an aggregate endpoint
+]
 
 const updateBasketQuery = (
     customerId: string | null,
-    basketId: string | undefined,
+    parameters: BasketOptions['parameters'],
     newBasket: Basket
-): Pick<CacheUpdate, 'update'> => {
-    if (!basketId) return {}
-    const update: Array<CacheUpdateUpdate<Basket> | CacheUpdateUpdate<CustomerBasketsResult>> = [
-        {
-            queryKey: ['/baskets', basketId, {basketId}]
-        }
-    ]
-    if (customerId) {
-        const updateCustomerBaskets: CacheUpdateUpdate<CustomerBasketsResult> = {
-            // Since we use baskets from customer basket query, we need to update it for any basket mutation
-            queryKey: ['/customers', customerId, '/baskets', {customerId}],
-            updater: (oldData) => {
-                // do not update if response basket is not part of existing customer baskets
-                if (!oldData?.baskets?.some((basket) => basket.basketId === basketId)) {
-                    return undefined
-                }
-                const updatedBaskets = oldData.baskets.map((basket) => {
-                    return basket.basketId === basketId ? newBasket : basket
-                })
-                return {
-                    ...oldData,
-                    // TODO: Remove type assertion when RAML specs match
-                    baskets: updatedBaskets as CustomerBasketsResult['baskets']
-                }
+): CacheUpdate => {
+    // If we just check `!parameters.basketId`, then TypeScript doesn't infer that the value is
+    // not `undefined`. We have to use this slightly convoluted predicate to give it that info.
+    const hasBasketId = (p: {basketId?: string}): p is {basketId: string} => Boolean(p.basketId)
+    if (!hasBasketId(parameters)) return {}
+    const updateBasket: CacheUpdateUpdate<unknown> = {
+        // TODO: This method is used by multiple endpoints, so `parameters` could have properties
+        // that don't match getBasket
+        queryKey: [...getBasketPath(parameters), parameters]
+    }
+
+    if (!customerId) return {update: [updateBasket]}
+    const updateCustomerBaskets: CacheUpdateUpdate<unknown> = {
+        // TODO: This method is used by multiple endpoints, so `parameters` could have properties
+        // that don't match getCustomerBaskets
+        queryKey: [...getCustomerBasketsPath(customerId, parameters), parameters],
+        updater: (oldData?: CustomerBasketsResult): CustomerBasketsResult | undefined => {
+            // do not update if response basket is not part of existing customer baskets
+            if (!oldData?.baskets?.some((basket) => basket.basketId === parameters.basketId)) {
+                return undefined
+            }
+            const updatedBaskets = oldData.baskets.map((basket) => {
+                return basket.basketId === parameters.basketId ? newBasket : basket
+            })
+            return {
+                ...oldData,
+                // Shopper Customers and Shopper Baskets have different definitions for the `Basket`
+                // type. (99% similar, but that's not good enough for TypeScript.)
+                // TODO: Remove this type assertion when the RAML specs match.
+                baskets: updatedBaskets as CustomerBasketsResult['baskets']
             }
         }
-        update.push(updateCustomerBaskets)
     }
-    // TODO: This type assertion is so that we "forget" what type the updater uses.
-    // Is there a way to avoid the assertion?
-    return {update} as CacheUpdate
-}
-
-const removeBasketQuery = (
-    options: BasketOptions,
-    basketId?: string
-): Pick<CacheUpdate, 'remove'> => {
-    if (!basketId) return {}
-    return {
-        remove: [and(matchesApiConfig(options), pathStartsWith(['/baskets', basketId]))]
-    }
+    return {update: [updateBasket, updateCustomerBaskets]}
 }
 
 const invalidateCustomerBasketsQuery = (
     customerId: string | null,
-    options: BasketOptions
+    parameters: BasketOptions['parameters']
 ): Pick<CacheUpdate, 'invalidate'> => {
     if (!customerId) return {}
     return {
         invalidate: [
-            and(matchesApiConfig(options), pathStartsWith(['/customers', customerId, '/baskets']))
+            and(
+                matchesApiConfig(parameters),
+                matchesPath(getCustomerBasketsPath(customerId, parameters))
+            )
         ]
     }
 }
 
 const updateBasketFromRequest = (
     customerId: string | null,
-    options: BasketOptions,
+    {parameters}: BasketOptions,
     response: Basket
 ): CacheUpdate => ({
-    ...updateBasketQuery(customerId, options.parameters?.basketId, response),
-    ...invalidateCustomerBasketsQuery(customerId, options)
+    ...updateBasketQuery(customerId, parameters, response),
+    ...invalidateCustomerBasketsQuery(customerId, parameters)
 })
 
 const updateBasketFromResponse = (
     customerId: string | null,
-    options: BasketOptions,
+    {parameters}: BasketOptions,
     response: Basket
 ): CacheUpdate => ({
-    ...updateBasketQuery(customerId, response.basketId, response),
-    ...invalidateCustomerBasketsQuery(customerId, options)
+    ...updateBasketQuery(customerId, {...parameters, basketId: response.basketId}, response),
+    ...invalidateCustomerBasketsQuery(customerId, parameters)
 })
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
@@ -103,9 +115,9 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     removeItemFromBasket: updateBasketFromRequest,
     addPaymentInstrumentToBasket: updateBasketFromRequest,
     createBasket: updateBasketFromResponse, // Response!
-    deleteBasket: (customerId, options): CacheUpdate => ({
-        ...invalidateCustomerBasketsQuery(customerId, options),
-        ...removeBasketQuery(options)
+    deleteBasket: (customerId, {parameters}) => ({
+        ...invalidateCustomerBasketsQuery(customerId, parameters),
+        remove: [and(matchesApiConfig(parameters), matchesPath(getBasketPath(parameters)))]
     }),
     mergeBasket: updateBasketFromResponse, // Response!
     removeCouponFromBasket: updateBasketFromRequest,

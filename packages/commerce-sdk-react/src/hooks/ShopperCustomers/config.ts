@@ -4,132 +4,109 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
-import {
-    ApiClients,
-    ApiOptions,
-    CacheUpdate,
-    CacheUpdateMatrix,
-    CacheUpdateUpdate,
-    MergedOptions
-} from '../types'
-import {and, matchesApiConfig, NotImplementedError, pathStartsWith} from '../utils'
+import {ApiClientConfigParams, ApiClients, CacheUpdateMatrix} from '../types'
+import {and, matchesApiConfig, matchesPath, NotImplementedError, pathStartsWith} from '../utils'
 
 type Client = ApiClients['shopperCustomers']
-type Customer = ShopperCustomersTypes.Customer
-type CustomerOptions = MergedOptions<Client, ApiOptions<{customerId: string}, Customer>>
 
 const noop = () => ({})
 const TODO = (method: keyof Client) => {
     throw new NotImplementedError(`Cache logic for '${method}'`)
 }
 
-const baseQueryKey = (customerId: string, parameters: CustomerOptions['parameters']) => [
+// Path helpers (avoid subtle typos!)
+const getCustomerPath = (customerId: string, parameters: ApiClientConfigParams) => [
     '/organizations/',
     parameters.organizationId,
     '/customers/',
     customerId
 ]
-
-/** Invalidates the customer and all derivative endpoints */
-const invalidateCustomer = (
+const getProductListPath = (
     customerId: string,
-    parameters: CustomerOptions['parameters']
-): CacheUpdate => {
+    parameters: ApiClientConfigParams & {listId: string}
+) => [...getCustomerPath(customerId, parameters), '/product-lists/', parameters.listId]
+const getProductListItemPath = (
+    customerId: string,
+    parameters: ApiClientConfigParams & {listId: string; itemId: string}
+) => [...getProductListPath(customerId, parameters), '/items/', parameters.itemId]
+const getPaymentInstrumentPath = (
+    customerId: string,
+    parameters: ApiClientConfigParams & {paymentInstrumentId: string}
+) => [
+    ...getCustomerPath(customerId, parameters),
+    '/payment-instruments/',
+    parameters.paymentInstrumentId
+]
+const getCustomerAddressPath = (
+    customerId: string,
+    parameters: ApiClientConfigParams,
+    address: string // Not a parameter because some endpoints use addressId and some use addressName
+) => [...getCustomerPath(customerId, parameters), '/addresses/', address]
+
+/** Invalidates the customer endpoint, but not derivative endpoints. */
+const invalidateCustomer = (customerId: string, parameters: ApiClientConfigParams) => {
     return {
         invalidate: [
-            and(matchesApiConfig(parameters), pathStartsWith(baseQueryKey(customerId, parameters)))
+            and(matchesApiConfig(parameters), matchesPath(getCustomerPath(customerId, parameters)))
         ]
     }
 }
 
-// TODO: Rather than every /customers/{customerId} endpoint whenever we update
-// a derivative property (e.g. address), can we instead update the corresponding
-// cached query and insert the data into the cached customer query, but leave
-// everything else alone?
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     authorizeCustomer: TODO('authorizeCustomer'),
     authorizeTrustedSystem: TODO('authorizeTrustedSystem'),
     createCustomerAddress(customerId, {parameters}, response) {
         if (!customerId) return {}
+        // getCustomerAddress uses `addressName` rather than `addressId`
+        const address = response.addressId
+        const newParams = {...parameters, addressName: address}
         return {
             ...invalidateCustomer(customerId, parameters),
             update: [
-                {
-                    queryKey: [
-                        ...baseQueryKey(customerId, parameters),
-                        '/addresses',
-                        response.addressId,
-                        // getCustomerAddress uses `addressName` rather than `addressId`
-                        {...parameters, addressName: response.addressId}
-                    ]
-                }
+                {queryKey: [...getCustomerAddressPath(customerId, newParams, address), newParams]}
             ]
         }
     },
     createCustomerPaymentInstrument(customerId, {parameters}, response) {
         if (!customerId) return {}
-
+        const newParams = {...parameters, paymentInstrumentId: response.paymentInstrumentId}
         return {
             ...invalidateCustomer(customerId, parameters),
-            update: [
-                {
-                    queryKey: [
-                        ...baseQueryKey(customerId, parameters),
-                        '/payment-instruments/',
-                        response.paymentInstrumentId,
-                        {parameters, paymentInstrumentId: response.paymentInstrumentId}
-                    ]
-                }
-            ]
+            update: [{queryKey: [...getPaymentInstrumentPath(customerId, newParams), newParams]}]
         }
     },
     createCustomerProductList(customerId, {parameters}, response) {
         if (!customerId) return {}
-        const base = baseQueryKey(customerId, parameters)
+        const customerPath = getCustomerPath(customerId, parameters)
+        // We always invalidate, because even without an ID we assume that something has changed
+        const invalidate = [
+            and(
+                matchesApiConfig(parameters),
+                // NOTE: This is the aggregate endpoint, so there's no trailing / on /product-lists
+                matchesPath([...customerPath, '/product-lists'])
+            )
+        ]
+        const listId = response.id
+        // We can only update cache for this product list if we get the ID
+        if (!listId) return {invalidate}
+        const newParams = {...parameters, listId}
         return {
-            // We can only update cache if the response comes with an ID
-            update: !response.id
-                ? []
-                : [
-                      {
-                          queryKey: [
-                              ...base,
-                              '/product-lists/',
-                              response.id,
-                              {
-                                  ...parameters,
-                                  listId: response.id
-                              }
-                          ]
-                      }
-                  ],
-            // We always invalidate, because even without an ID we assume that something has changed
-            invalidate: [
-                // TODO: Convert to exact path match
-                and(matchesApiConfig(parameters), pathStartsWith([...base, '/product-lists']))
-            ]
+            invalidate,
+            update: [{queryKey: [...getProductListPath(customerId, newParams), newParams]}]
         }
     },
     createCustomerProductListItem(customerId, {parameters}, response) {
         if (!customerId) return {}
-        const base = baseQueryKey(customerId, parameters)
+        const itemId = response.id
         return {
             // We can only update cache if the response comes with an ID
-            update: !response.id
+            update: !itemId
                 ? []
                 : [
                       {
                           queryKey: [
-                              ...base,
-                              '/product-lists/',
-                              parameters.listId,
-                              '/items/',
-                              response.id,
-                              {
-                                  ...parameters,
-                                  itemId: response.id
-                              }
+                              ...getProductListItemPath(customerId, {...parameters, itemId}),
+                              {...parameters, itemId}
                           ]
                       }
                   ],
@@ -137,8 +114,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             invalidate: [
                 and(
                     matchesApiConfig(parameters),
-                    // TODO: Convert to exact path match
-                    pathStartsWith([...base, '/product-lists/', parameters.listId])
+                    matchesPath(getProductListPath(customerId, parameters))
                 )
             ]
         }
@@ -150,11 +126,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             remove: [
                 and(
                     matchesApiConfig(parameters),
-                    pathStartsWith([
-                        ...baseQueryKey(customerId, parameters),
-                        '/payment-instruments',
-                        parameters.paymentInstrumentId
-                    ])
+                    matchesPath(getPaymentInstrumentPath(customerId, parameters))
                 )
             ]
         }
@@ -162,24 +134,17 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     deleteCustomerProductList: TODO('deleteCustomerProductList'),
     deleteCustomerProductListItem(customerId, {parameters}) {
         if (!customerId) return {}
-        const base = baseQueryKey(customerId, parameters)
         return {
             invalidate: [
                 and(
                     matchesApiConfig(parameters),
-                    pathStartsWith([...base, '/product-lists/', parameters.listId])
+                    matchesPath(getProductListPath(customerId, parameters))
                 )
             ],
             remove: [
                 and(
                     matchesApiConfig(parameters),
-                    pathStartsWith([
-                        ...base,
-                        '/product-lists/',
-                        parameters.listId,
-                        '/items/',
-                        parameters.itemId
-                    ])
+                    matchesPath(getProductListItemPath(customerId, parameters))
                 )
             ]
         }
@@ -195,11 +160,9 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             remove: [
                 and(
                     matchesApiConfig(parameters),
-                    pathStartsWith([
-                        ...baseQueryKey(customerId, parameters),
-                        '/addresses',
-                        parameters.addressName
-                    ])
+                    matchesPath(
+                        getCustomerAddressPath(customerId, parameters, parameters.addressName)
+                    )
                 )
             ]
         }
@@ -207,38 +170,23 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     resetPassword: TODO('resetPassword'),
     updateCustomer(customerId, {parameters}) {
         if (!customerId) return {}
-        const base = baseQueryKey(customerId, parameters)
-        const update: CacheUpdateUpdate<unknown>[] = [
-            {
-                queryKey: [...base, parameters]
-            }
-        ]
-        // TODO: Can we just use invalidateCustomer() here, since it invalidates all child paths?
-        const invalidate = [
-            and(matchesApiConfig(parameters), pathStartsWith([...base, '/payment-instruments'])),
-            and(matchesApiConfig(parameters), pathStartsWith([...base, '/addresses'])),
-            and(
-                matchesApiConfig(parameters),
-                pathStartsWith([
-                    '/organizations/',
-                    parameters.organizationId,
-                    '/customers/external-profile'
-                ])
-            )
-        ]
-        return {update, invalidate}
+        const customerPath = getCustomerPath(customerId, parameters)
+        return {
+            update: [{queryKey: [...customerPath, parameters]}],
+            // This is NOT invalidateCustomer(), as we want to invalidate *all* customer endpoints,
+            // not just getCustomer
+            invalidate: [and(matchesApiConfig(parameters), pathStartsWith(customerPath))]
+        }
     },
     updateCustomerAddress(customerId, {parameters}) {
         if (!customerId) return {}
-        // TODO: Can this `invalidate` instead be an update that targets the appropriate property?
         return {
+            // TODO: Rather than invalidating customer, can we selectively update its `addresses`?
             ...invalidateCustomer(customerId, parameters),
             update: [
                 {
                     queryKey: [
-                        ...baseQueryKey(customerId, parameters),
-                        '/addresses',
-                        parameters.addressName,
+                        ...getCustomerAddressPath(customerId, parameters, parameters.addressName),
                         parameters
                     ]
                 }
@@ -249,27 +197,10 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     updateCustomerProductList: TODO('updateCustomerProductList'),
     updateCustomerProductListItem(customerId, {parameters}) {
         if (!customerId) return {}
-        const base = baseQueryKey(customerId, parameters)
+        const productListPath = getProductListPath(customerId, parameters)
         return {
-            update: [
-                {
-                    queryKey: [
-                        ...base,
-                        '/product-lists/',
-                        parameters.listId,
-                        '/items/',
-                        parameters.itemId,
-                        parameters
-                    ]
-                }
-            ],
-            invalidate: [
-                and(
-                    matchesApiConfig(parameters),
-                    // TODO: Convert to exact path match
-                    pathStartsWith([...base, '/product-lists/', parameters.listId])
-                )
-            ]
+            update: [{queryKey: [...getProductListItemPath(customerId, parameters), parameters]}],
+            invalidate: [and(matchesApiConfig(parameters), matchesPath(productListPath))]
         }
     }
 }
