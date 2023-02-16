@@ -126,7 +126,7 @@ const Carousel = (props = {}) => {
                             style={{scrollSnapAlign: 'start'}}
                         >
                             <AspectRatio ratio={1}>
-                                <Component component={{...component, index}} />
+                                <Component component={component} />
                             </AspectRatio>
                         </Box>
                     ))}

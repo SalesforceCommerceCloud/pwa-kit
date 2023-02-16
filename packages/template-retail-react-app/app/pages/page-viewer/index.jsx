@@ -17,8 +17,8 @@ const componentMapProxy = new Proxy(
             let componentClass
             switch (prop) {
                 case 'commerce_assets.productTile':
-                    componentClass = ({index}) => (
-                        <img src={`https://picsum.photos/id/${index + 10}/200/300`} />
+                    componentClass = ({id}) => (
+                        <img src={`https://picsum.photos/seed/${id}/200/300`} />
                     )
                     break
                 case 'commerce_layouts.carousel':
