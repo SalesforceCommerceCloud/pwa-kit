@@ -9,11 +9,12 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
-import useBasket from '../../commerce-api/hooks/useBasket'
 import {Flex, Stack, Text} from '@chakra-ui/react'
 import {useItemVariant} from './'
 import PromoPopover from '../promo-popover'
 import {useCurrency} from '../../hooks'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
+import {usePromotions} from 'commerce-sdk-react-preview'
 
 /**
  * In the context of a cart product item variant, this component renders a styled
@@ -21,10 +22,24 @@ import {useCurrency} from '../../hooks'
  */
 const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const variant = useItemVariant()
-    const basket = useBasket()
-    const [promos, setPromos] = useState([])
+    const {basket} = useCurrentBasket()
     const {currency: activeCurrency} = useCurrency()
+    const promotionIds =
+        variant.priceAdjustments?.length > 0
+            ? variant.priceAdjustments.map((adj) => adj.promotionId)
+            : []
 
+    // Fetch all the promotions given by price adjustments. We display this info in
+    // the promotion info popover when applicable.
+    const {data: res} = usePromotions(
+        {
+            ids: promotionIds?.join(',')
+        },
+        {
+            enabled: promotionIds.length > 0
+        }
+    )
+    const promos = res?.data || []
     // Create a mapping of variation values to their associated attributes. This allows us
     // the render the readable names/labels rather than variation value IDs.
     const variationValues = Object.keys(variant.variationValues || []).map((key) => {
@@ -36,27 +51,6 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             value: attr.values.find((val) => val.value === value)?.name || value
         }
     })
-
-    // Fetch all the promotions given by price adjustments. We display this info in
-    // the promotion info popover when applicable.
-    useEffect(() => {
-        ;(async () => {
-            let ids
-            if (variant.priceAdjustments?.length > 0) {
-                ids = variant.priceAdjustments
-                    .map((adj) => adj.promotionId)
-                    .filter((id) => {
-                        return !promos.find((promo) => promo.id === id)
-                    })
-            }
-            if (ids && ids.length > 0) {
-                const promos = await basket.getPromotions(ids)
-                if (promos?.data) {
-                    setPromos(promos.data)
-                }
-            }
-        })()
-    }, [variant.priceAdjustments])
 
     return (
         <Stack spacing={1.5} flex={1} {...props}>
