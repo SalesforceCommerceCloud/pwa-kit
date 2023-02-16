@@ -10,7 +10,7 @@ import {and, matchesApiConfig, matchesPath, NotImplementedError, pathStartsWith}
 type Client = ApiClients['shopperCustomers']
 
 const noop = () => ({})
-const TODO = (method: keyof Client) => {
+const TODO = (method: keyof Client) => () => {
     throw new NotImplementedError(`Cache logic for '${method}'`)
 }
 

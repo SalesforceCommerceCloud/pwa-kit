@@ -14,7 +14,7 @@ const basePath = (parameters: Client['clientConfig']['parameters']) => [
     parameters.organizationId
 ]
 
-const TODO = (method: keyof Client) => {
+const TODO = (method: keyof Client) => () => {
     throw new NotImplementedError(`Cache logic for '${method}'`)
 }
 

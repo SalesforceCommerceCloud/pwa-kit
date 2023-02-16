@@ -9,7 +9,7 @@ import {NotImplementedError} from '../utils'
 
 type Client = ApiClients['shopperContexts']
 
-const TODO = (method: keyof Client) => {
+const TODO = (method: keyof Client) => () => {
     throw new NotImplementedError(`Cache logic for '${method}'`)
 }
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
