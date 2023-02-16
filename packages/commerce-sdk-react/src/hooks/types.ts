@@ -126,9 +126,7 @@ export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> 
 /**
  * Query key interface used by API query hooks.
  */
-export type ApiQueryKey =
-    // | readonly string[] // TODO: Is this needed?
-    readonly [...path: string[], parameters: Record<string, unknown>]
+export type ApiQueryKey = readonly [...path: string[], parameters: Record<string, unknown>]
 
 /**
  * Interface to update a cached API response.
