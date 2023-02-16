@@ -22,8 +22,8 @@ export const useAuthorizationHeader = <Options extends ApiOptions, Data>(
         return await method({
             ...options,
             headers: {
-                ...options.headers,
-                Authorization: `Bearer ${access_token}`
+                Authorization: `Bearer ${access_token}`,
+                ...options.headers
             }
         })
     }
