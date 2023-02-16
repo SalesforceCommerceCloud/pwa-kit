@@ -89,19 +89,19 @@ test('Allows customer to generate password token', async () => {
         )
     )
     // render our test component
-    renderWithProviders(<MockedComponent />, {
+    await renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'foo@test.com')
-    user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    user.type(await screen.getByLabelText('Email'), 'foo@test.com')
+    user.click(within(await screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
     // wait for success state
     expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
-    expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+    expect(await screen.getByText(/foo@test.com/i)).toBeInTheDocument()
 
-    user.click(screen.getByText('Back to Sign In'))
+    user.click(await screen.getByText('Back to Sign In'))
     await waitFor(() => {
         expect(window.location.pathname).toEqual('/uk/en-GB/login')
     })
