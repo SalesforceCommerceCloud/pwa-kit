@@ -122,7 +122,7 @@ jobs:
         # but is it worth keeping for supporting multiple versions in the future?
         matrix:
           node: [14, 16]
-          npm: [6]
+          npm: [6, 7, 8]
     runs-on: windows-latest
     steps:
         - name: Checkout
