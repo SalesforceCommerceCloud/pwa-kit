@@ -28,7 +28,6 @@ const getBasketPath = (parameters: BasketParameters & {basketId: string}) => [
     '/baskets/',
     parameters.basketId
 ]
-
 const getCustomerBasketsPath = (customerId: string, parameters: BasketParameters) => [
     ...getBasePath(parameters),
     '/customers/',
@@ -91,7 +90,7 @@ const invalidateCustomerBasketsQuery = (
     }
 }
 
-const updateBasketFromRequest = (
+const updateBasket = (
     customerId: string | null,
     {parameters}: BasketOptions,
     response: Basket
@@ -100,7 +99,7 @@ const updateBasketFromRequest = (
     ...invalidateCustomerBasketsQuery(customerId, parameters)
 })
 
-const updateBasketFromResponse = (
+const updateBasketWithResponseBasketId = (
     customerId: string | null,
     {parameters}: BasketOptions,
     response: Basket
@@ -110,23 +109,23 @@ const updateBasketFromResponse = (
 })
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
-    addCouponToBasket: updateBasketFromRequest,
-    addItemToBasket: updateBasketFromRequest,
-    removeItemFromBasket: updateBasketFromRequest,
-    addPaymentInstrumentToBasket: updateBasketFromRequest,
-    createBasket: updateBasketFromResponse, // Response!
+    addCouponToBasket: updateBasket,
+    addItemToBasket: updateBasket,
+    removeItemFromBasket: updateBasket,
+    addPaymentInstrumentToBasket: updateBasket,
+    createBasket: updateBasketWithResponseBasketId,
     deleteBasket: (customerId, {parameters}) => ({
         ...invalidateCustomerBasketsQuery(customerId, parameters),
         remove: [and(matchesApiConfig(parameters), matchesPath(getBasketPath(parameters)))]
     }),
-    mergeBasket: updateBasketFromResponse, // Response!
-    removeCouponFromBasket: updateBasketFromRequest,
-    removePaymentInstrumentFromBasket: updateBasketFromRequest,
-    updateBasket: updateBasketFromRequest,
-    updateBillingAddressForBasket: updateBasketFromRequest,
-    updateCustomerForBasket: updateBasketFromRequest,
-    updateItemInBasket: updateBasketFromRequest,
-    updatePaymentInstrumentInBasket: updateBasketFromRequest,
-    updateShippingAddressForShipment: updateBasketFromRequest,
-    updateShippingMethodForShipment: updateBasketFromRequest
+    mergeBasket: updateBasketWithResponseBasketId,
+    removeCouponFromBasket: updateBasket,
+    removePaymentInstrumentFromBasket: updateBasket,
+    updateBasket: updateBasket,
+    updateBillingAddressForBasket: updateBasket,
+    updateCustomerForBasket: updateBasket,
+    updateItemInBasket: updateBasket,
+    updatePaymentInstrumentInBasket: updateBasket,
+    updateShippingAddressForShipment: updateBasket,
+    updateShippingMethodForShipment: updateBasket
 }
