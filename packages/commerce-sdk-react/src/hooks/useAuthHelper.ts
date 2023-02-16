@@ -50,5 +50,3 @@ export function useAuthHelper<Mutation extends AuthHelper>(
     const method = auth[mutation].bind(auth) as MutationFunction<Data, Variables>
     return useMutation(auth.whenReady(method))
 }
-
-export default useAuthHelper
