@@ -7,7 +7,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import Component from './index'
-import {PageContext} from '../Page'
+import {PageContext} from '../page'
 
 const SAMPLE_COMPONENT = {
     id: 'rfdvj4ojtltljw3',

@@ -7,7 +7,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import Region from './index'
-import {PageContext} from '../Page'
+import {PageContext} from '../page'
 
 const SAMPLE_REGION = {
     id: 'regionB',
