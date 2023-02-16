@@ -8,11 +8,10 @@ import webpack from 'webpack'
 import path, {resolve} from 'path'
 import fs from 'fs'
 import glob from 'glob'
-import {password} from '../../../../template-retail-react-app/app/commerce-api/mock-data'
+import minimatch from 'minimatch'
 
 const projectDir = process.cwd()
 const pkg = require(resolve(projectDir, 'package.json'))
-var minimatch = require('minimatch')
 
 const getOverridePath = (path) => {
     const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
@@ -212,6 +211,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             // resource.context =
             //     '/Users/bfeister/dev/pwa-kit/packages/spike-extended-retail-app/pwa-kit/overrides'
             // resource.request = '/app/components/icons'
+
             resource.context = '/Users/bfeister/dev/pwa-kit/packages/spike-extended-retail-app'
             resource.request = 'pwa-kit/overrides/app/components/icons'
         }

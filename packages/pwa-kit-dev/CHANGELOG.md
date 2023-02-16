@@ -1,9 +1,19 @@
-## v2.5.0-dev (Dec 06, 2022)
-## v2.4.0-dev (Dec 06, 2022)
-## v2.5.0-dev (Dec 06, 2022)
-## v2.5.0-dev.0 (Dec 06, 2022)
-## v2.4.0-dev (Oct 27, 2022)
+## v2.8.0-dev.0 (Feb 16, 2023)
+## v2.8.0-dev.0 (Feb 16, 2023)
+## v2.8.0-dev.0 (Feb 15, 2023)
+## v2.8.0-dev (Feb 15, 2023)
+## v2.8.0-dev (Feb 15, 2023)
+## v2.7.0-dev (Jan 25, 2023)
+## v2.6.0 (Jan 25, 2023)
+- Upgrade prettier to v2 [#926](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/926)
+- Security package updates
+
+## v2.5.0 (Jan 05, 2023)
+- Logging cid from res header isntead of req in local development [#821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/821)
+
+## v2.4.0 (Dec 01, 2022)
 -   Add `tail-logs` command [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
+-   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793)
 
 ## v2.3.0 (Oct 27, 2022)
 -   Minimize "Module not found" error during webpack rebuild, whenever a package dependency is being updated/built [#722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/722)

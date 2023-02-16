@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import compression from 'compression'
-import expressLogging from 'morgan'
 import express from 'express'
 import path from 'path'
 import fs from 'fs'
@@ -91,17 +90,6 @@ export const DevServerMixin = {
                 level: 9,
                 filter: shouldCompress
             })
-        )
-    },
-
-    /**
-     * @private
-     */
-    _setupLogging(app) {
-        app.use(
-            expressLogging(
-                '(:req[correlation-id]) :method :url :status :response-time ms - :res[content-length]'
-            )
         )
     },
 

@@ -1,6 +1,6 @@
 {
   "name": "test-commerce-sdk-react",
-  "version": "2.5.0-dev",
+  "version": "2.8.0-dev.0",
   "private": true,
   "engines": {
     "node": "^14.0.0",
@@ -13,10 +13,10 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "@types/react-router-dom": "^5.1.2",
-    "commerce-sdk-react": "^2.5.0-dev",
-    "pwa-kit-dev": "^2.5.0-dev",
-    "pwa-kit-react-sdk": "^2.5.0-dev",
-    "pwa-kit-runtime": "^2.5.0-dev",
+    "commerce-sdk-react-preview": "^2.8.0-dev.0",
+    "pwa-kit-dev": "^2.8.0-dev.0",
+    "pwa-kit-react-sdk": "^2.8.0-dev.0",
+    "pwa-kit-runtime": "^2.8.0-dev.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
@@ -58,10 +58,6 @@
         {
           "host": "zzrf-001.dx.commercecloud.salesforce.com",
           "path": "ocapi"
-        },
-        {
-          "host": "api.cquotient.com",
-          "path": "einstein"
         }
       ]
     }

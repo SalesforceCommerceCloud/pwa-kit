@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {DataType, Argument} from '../types'
+import {DataType, Argument, ApiClients} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction, useQueryClient} from '@tanstack/react-query'
-import {updateCache, QueryKeysMatrixElement, Client, NotImplemented} from '../utils'
+import {MutationFunction, UseMutationResult, useQueryClient} from '@tanstack/react-query'
+import {updateCache, CacheUpdateMatrixElement, Client, NotImplementedError} from '../utils'
 
 export const ShopperOrdersMutations = {
     /**
@@ -42,35 +42,39 @@ export const ShopperOrdersMutations = {
     UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
 } as const
 
-export type ShopperOrdersMutationType = typeof ShopperOrdersMutations[keyof typeof ShopperOrdersMutations]
-
-export const shopperOrdersQueryKeysMatrix = {
+export const shopperOrdersCacheUpdateMatrix = {
     createOrder: (
         params: Argument<Client['createOrder']>,
         response: DataType<Client['createOrder']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         const customerId = response?.customerInfo?.customerId
         return {
-            update: [['/orders', {orderNo: response.orderNo}]],
-            invalidate: [['/customers', customerId, '/baskets']]
+            update: [
+                {
+                    name: 'order',
+                    key: ['/orders', {orderNo: response.orderNo}],
+                    updater: () => response
+                }
+            ],
+            invalidate: [{name: 'customerBaskets', key: ['/customers', customerId, '/baskets']}]
         }
     },
     createPaymentInstrumentForOrder: (
         params: Argument<Client['createPaymentInstrumentForOrder']>,
         response: DataType<Client['createPaymentInstrumentForOrder']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     removePaymentInstrumentFromOrder: (
         params: Argument<Client['removePaymentInstrumentFromOrder']>,
         response: DataType<Client['removePaymentInstrumentFromOrder']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     },
     updatePaymentInstrumentForOrder: (
         params: Argument<Client['updatePaymentInstrumentForOrder']>,
         response: DataType<Client['updatePaymentInstrumentForOrder']>
-    ): QueryKeysMatrixElement => {
+    ): CacheUpdateMatrixElement => {
         return {}
     }
 }
@@ -81,25 +85,55 @@ export const SHOPPER_ORDERS_NOT_IMPLEMENTED = [
     'UpdatePaymentInstrumentForOrder'
 ]
 
+export type ShopperOrdersMutationType =
+    (typeof ShopperOrdersMutations)[keyof typeof ShopperOrdersMutations]
+
+type UseShopperOrdersMutationHeaders = NonNullable<Argument<Client['createOrder']>>['headers']
+type UseShopperOrdersMutationArg = {
+    headers?: UseShopperOrdersMutationHeaders
+    rawResponse?: boolean
+    action: ShopperOrdersMutationType
+}
+
+type ShopperOrdersClient = ApiClients['shopperOrders']
+
 /**
  * A hook for performing mutations with the Shopper Orders API.
  */
-export function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(action: Action) {
+
+function useShopperOrdersMutation<Action extends ShopperOrdersMutationType>(
+    arg: UseShopperOrdersMutationArg
+): UseMutationResult<
+    DataType<ShopperOrdersClient[Action]> | Response,
+    Error,
+    Argument<ShopperOrdersClient[Action]>
+> {
+    const {headers, rawResponse, action} = arg
+
     if (SHOPPER_ORDERS_NOT_IMPLEMENTED.includes(action)) {
-        NotImplemented()
+        NotImplementedError()
     }
-    type Params = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
+    type Params = Argument<ShopperOrdersClient[Action]>
+    type Data = DataType<ShopperOrdersClient[Action]>
     const queryClient = useQueryClient()
+
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperOrders'][action] as MutationFunction<Data, Params>
-            return method.call(apiClients['shopperOrders'], params)
+            return (
+                method.call as (
+                    apiClient: ShopperOrdersClient,
+                    params: Params,
+                    rawResponse: boolean | undefined
+                ) => any
+            )(apiClients['shopperOrders'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {
-                updateCache(queryClient, action, shopperOrdersQueryKeysMatrix, data, params)
+                updateCache(queryClient, action, shopperOrdersCacheUpdateMatrix, data, params)
             }
         }
     )
 }
+
+export {useShopperOrdersMutation}

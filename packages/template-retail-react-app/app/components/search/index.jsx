@@ -105,7 +105,7 @@ const Search = (props) => {
 
         // Check if term is already in the saved searches
         searches = searches.filter((savedSearchTerm) => {
-            searchText.toLowerCase() !== savedSearchTerm.toLowerCase()
+            return searchText.toLowerCase() !== savedSearchTerm.toLowerCase()
         })
 
         // Create a new array consisting of the search text and up to 4 other resent searches.

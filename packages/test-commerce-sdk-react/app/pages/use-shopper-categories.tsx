@@ -6,14 +6,18 @@
  */
 
 import React from 'react'
-import {useCategories} from 'commerce-sdk-react'
+import {useCategories} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 import {Link} from 'react-router-dom'
 import {flatten} from '../utils/utils'
 
 function UseShopperCategories() {
     // how to get the categories type
-    const {isLoading, error, data: result} = useCategories({
+    const {
+        isLoading,
+        error,
+        data: result
+    } = useCategories({
         ids: 'root',
         levels: 2
     })

@@ -14,7 +14,7 @@ import {
     useCustomerProductList,
     useShopperCustomersMutation,
     useShopperLoginHelper
-} from 'commerce-sdk-react'
+} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 import {useQueryClient} from '@tanstack/react-query'
 
@@ -24,9 +24,7 @@ const LIST_ID = 'bcd08be6f883120b4960ca8a0b'
 const ITEM_ID = '60ee899e9305de0df5b0fcade5'
 const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
 const PRODUCT_ID = '25518823M'
-const RANDOM_STR = Math.random()
-    .toString(36)
-    .slice(2, 7)
+const RANDOM_STR = Math.random().toString(36).slice(2, 7)
 
 const renderQueryHook = (name: string, {data, isLoading, error}: any) => {
     if (isLoading) {
@@ -107,19 +105,19 @@ function UseCustomer() {
             body: {firstName: `Kobe${RANDOM_STR}`},
             parameters: {customerId: CUSTOMER_ID}
         },
-        {
-            action: 'updateCustomerPassword',
-            body: {currentPassword: 'Test12345!', password: 'Test1234!'},
-            parameters: {customerId: CUSTOMER_ID}
-        },
+        // {
+        //     action: 'updateCustomerPassword',
+        //     body: {currentPassword: 'Test12345!', password: 'Test1234!'},
+        //     parameters: {customerId: CUSTOMER_ID}
+        // },
         // TODO: Not working in PWA Kit Today. Potentially related to the issue scoping tokens
         //  https://pwa-kit.mobify-storefront.com/global/en-GB/reset-password
         //  {"type":"https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized","title":"Unauthorized","detail":"Your access-token is invalid and could not be used to identify the API client."}
-        {
-            action: 'getResetPasswordToken',
-            body: {login: 'kobe@test.com'},
-            parameters: {}
-        },
+        // {
+        //     action: 'getResetPasswordToken',
+        //     body: {login: 'kobe@test.com'},
+        //     parameters: {}
+        // },
         {
             action: 'createCustomerAddress',
             body: {addressId: `TestAddress${RANDOM_STR}`, countryCode: 'CA', lastName: 'Murphy'},
@@ -182,7 +180,7 @@ function UseCustomer() {
     ].map(({action, body, parameters}) => {
         return {
             name: action,
-            hook: useShopperCustomersMutation(action),
+            hook: useShopperCustomersMutation({action}),
             body,
             parameters
         }

@@ -6,7 +6,7 @@
  */
 import React, {useState, ReactElement} from 'react'
 // @ts-ignore
-import {CommerceApiProvider} from 'commerce-sdk-react'
+import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 // @ts-ignore
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 // @ts-ignore

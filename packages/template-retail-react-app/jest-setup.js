@@ -9,11 +9,87 @@ const mockConfig = require(path.join(__dirname, 'config/mocks/default.js'))
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
 const {Crypto} = require('@peculiar/webcrypto')
+const {setupServer} = require('msw/node')
+const {rest} = require('msw')
+const {
+    mockCategory,
+    mockedRegisteredCustomer,
+    exampleTokenReponse
+} = require('./app/commerce-api/mock-data')
+
+/**
+ * Set up an API mocking server for testing purposes.
+ * This mock server includes the basic oauth flow endpoints.
+ */
+export const setupMockServer = () => {
+    return setupServer(
+        rest.post('*/oauth2/authorize', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
+        rest.get('*/oauth2/authorize', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
+        rest.post('*/oauth2/login', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        ),
+        rest.get('*/oauth2/logout', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
+        ),
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        ),
+        rest.post('*/customers/action/login', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    authType: 'guest',
+                    customerId: 'customerid'
+                })
+            )
+        }),
+        rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
+        rest.post('*/oauth2/token', (req, res, ctx) =>
+            res(
+                ctx.delay(0),
+                ctx.json({
+                    customer_id: 'test',
+                    access_token: 'testtoken',
+                    refresh_token: 'testrefeshtoken',
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId',
+                    id_token: 'testIdToken'
+                })
+            )
+        ),
+        rest.get('*/categories/:categoryId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
+        ),
+        rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200)))
+    )
+}
+
+global.server = setupMockServer()
+
+beforeAll(() => {
+    global.server.listen()
+})
+afterEach(() => {
+    global.server.resetHandlers()
+})
+afterAll(() => {
+    global.server.close()
+})
 
 // Mock the application configuration to be used in all tests.
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {
         getConfig: () => mockConfig
+    }
+})
+
+// Mock isTokenValid globally
+jest.mock('./app/commerce-api/utils', () => {
+    const originalModule = jest.requireActual('./app/commerce-api/utils')
+    return {
+        ...originalModule,
+        isTokenValid: jest.fn().mockReturnValue(true)
     }
 })
 

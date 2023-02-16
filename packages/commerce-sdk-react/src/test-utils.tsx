@@ -8,7 +8,8 @@
 import React from 'react'
 import {render, RenderOptions} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks/dom'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryClient, QueryClientProvider, UseQueryResult} from '@tanstack/react-query'
+import nock from 'nock'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 
 // Note: this host does NOT exist
@@ -85,4 +86,52 @@ export function renderHookWithProviders<TProps, TResult>(
             <TestProviders {...props}>{children}</TestProviders>
         )
     })
+}
+
+export const mockMutationEndpoints = (
+    matchingPath: string,
+    options?: {errorResponse: number},
+    response = {}
+) => {
+    const responseStatus = options?.errorResponse ? options.errorResponse : 200
+
+    nock(DEFAULT_TEST_HOST)
+        .patch((uri) => {
+            return uri.includes(matchingPath)
+        })
+        .reply(responseStatus, response)
+        .put((uri) => {
+            return uri.includes(matchingPath)
+        })
+        .reply(responseStatus, response)
+        .post((uri) => {
+            return uri.includes(matchingPath)
+        })
+        .reply(responseStatus, response)
+        .delete((uri) => {
+            return uri.includes(matchingPath)
+        })
+        .reply(responseStatus, response)
+}
+
+export const assertUpdateQuery = (
+    queryResult: UseQueryResult,
+    newData: Record<string, unknown>
+) => {
+    // query should be updated without a refetch
+    expect(queryResult.data).toEqual(newData)
+    expect(queryResult.isRefetching).toBe(false)
+}
+
+export const assertInvalidateQuery = (
+    queryResult: UseQueryResult,
+    oldData: Record<string, unknown>
+) => {
+    // query should be invalidated and refetching
+    expect(queryResult.data).toEqual(oldData)
+    expect(queryResult.isRefetching).toBe(true)
+}
+
+export const assertRemoveQuery = (queryResult: UseQueryResult) => {
+    expect(queryResult.data).not.toBeDefined()
 }

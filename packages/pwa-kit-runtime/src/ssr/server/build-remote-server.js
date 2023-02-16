@@ -40,6 +40,8 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import awsServerlessExpress from 'aws-serverless-express'
+import expressLogging from 'morgan'
+import {morganStream} from '../../utils/morgan-stream'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -181,7 +183,25 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line no-unused-vars
     _setupLogging(app) {
-        // Hook for the dev-server
+        app.use(
+            expressLogging(
+                function (tokens, req, res) {
+                    const contentLength = tokens.res(req, res, 'content-length')
+                    return [
+                        `(${res.locals.requestId})`,
+                        tokens.method(req, res),
+                        tokens.url(req, res),
+                        tokens.status(req, res),
+                        tokens['response-time'](req, res),
+                        'ms',
+                        contentLength && `- ${contentLength}`
+                    ].join(' ')
+                },
+                {
+                    stream: morganStream
+                }
+            )
+        )
     },
 
     /**
@@ -325,14 +345,7 @@ export const RemoteServerFactory = {
 
             get applicationCache() {
                 if (!this._applicationCache) {
-                    const bucket = process.env.CACHE_BUCKET_NAME
-                    const useLocalCache = !(isRemote() || bucket)
-                    this._applicationCache = new PersistentCache({
-                        useLocalCache,
-                        bucket,
-                        prefix: process.env.CACHE_BUCKET_PREFIX,
-                        sendMetric: app.sendMetric.bind(app)
-                    })
+                    this._applicationCache = new PersistentCache()
                 }
                 return this._applicationCache
             }
@@ -578,10 +591,7 @@ export const RemoteServerFactory = {
      */
     _setupHealthcheck(app) {
         app.get('/mobify/ping', (_, res) =>
-            res
-                .set('cache-control', NO_CACHE)
-                .sendStatus(200)
-                .end()
+            res.set('cache-control', NO_CACHE).sendStatus(200).end()
         )
     },
 
@@ -938,7 +948,7 @@ const prepNonProxyRequest = (req, res, next) => {
     // to intercept and discard cookie setting.
     const setHeader = Object.getPrototypeOf(res).setHeader
     const remote = isRemote()
-    res.setHeader = function(header, value) {
+    res.setHeader = function (header, value) {
         /* istanbul ignore else */
         if (header && header.toLowerCase() !== SET_COOKIE && value) {
             setHeader.call(this, header, value)
@@ -1021,7 +1031,7 @@ const applyPatches = once((options) => {
     // Patch the ExpressJS Response class's redirect function to suppress
     // the creation of a body (DESKTOP-485). Including the body may
     // trigger a parsing error in aws-serverless-express.
-    express.response.redirect = function(status, url) {
+    express.response.redirect = function (status, url) {
         let workingStatus = status
         let workingUrl = url
 
@@ -1034,9 +1044,7 @@ const applyPatches = once((options) => {
         const address = this.location(workingUrl).get('Location')
 
         // Send a minimal response with just a status and location
-        this.status(workingStatus)
-            .location(address)
-            .end()
+        this.status(workingStatus).location(address).end()
     }
 
     // Patch the whatwg-encoding decode function so that it will accept plain

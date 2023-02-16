@@ -300,6 +300,7 @@ const renderApp = (args) => {
     //
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
+        __INITIAL_CORRELATION_ID__: res.locals.requestId,
         __CONFIG__: config,
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,

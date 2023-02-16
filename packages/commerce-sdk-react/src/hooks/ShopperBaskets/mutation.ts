@@ -6,9 +6,12 @@
  */
 import {ApiClients, Argument, DataType} from '../types'
 import {useMutation} from '../useMutation'
-import {MutationFunction, useQueryClient} from '@tanstack/react-query'
+import {MutationFunction, UseMutationResult, useQueryClient} from '@tanstack/react-query'
+import {CacheUpdateMatrixElement, NotImplementedError, updateCache} from '../utils'
+import useCustomerId from '../useCustomerId'
 
 type Client = ApiClients['shopperBaskets']
+type CustomerClient = ApiClients['shopperCustomers']
 
 export const ShopperBasketsMutations = {
     /**
@@ -66,6 +69,9 @@ export const ShopperBasketsMutations = {
      */
     UpdateCustomerForBasket: 'updateCustomerForBasket',
     /**
+     *
+     * * WARNING: This method is not implemented.
+     *
      * Adds a gift certificate item to an existing basket.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addGiftCertificateItemToBasket} for more information about the API endpoint.
      * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addgiftcertificateitemtobasket} for more information on the parameters and returned data type.
@@ -169,45 +175,308 @@ export const ShopperBasketsMutations = {
     AddTaxesForBasket: 'addTaxesForBasket'
 } as const
 
-type ShopperBasketMutationType = typeof ShopperBasketsMutations[keyof typeof ShopperBasketsMutations]
+type UseShopperBasketsMutationHeaders = NonNullable<Argument<Client['createBasket']>>['headers']
+type UseShopperBasketsMutationArg = {
+    headers?: UseShopperBasketsMutationHeaders
+    rawResponse?: boolean
+    action: ShopperBasketsMutationType
+}
+
+type ShopperBasketsClient = ApiClients['shopperBaskets']
+export type ShopperBasketsMutationType =
+    (typeof ShopperBasketsMutations)[keyof typeof ShopperBasketsMutations]
+
+/**
+ * @private
+ */
+export const getCacheUpdateMatrix = (customerId: string | null) => {
+    const updateBasketQuery = (
+        basketId?: string,
+        response?: DataType<Client[ShopperBasketsMutationType]>
+    ) => {
+        // TODO: we're missing headers, rawResponse -> not only {basketId}
+        const arg = {basketId}
+
+        return basketId
+            ? {
+                  update: [
+                      {
+                          name: 'basket',
+                          key: ['/baskets', basketId, arg],
+                          updater: () => response
+                      },
+                      {
+                          // Since we use baskets from customer basket query, we need to update it for any basket mutation
+                          name: 'customerBaskets',
+                          key: ['/customers', customerId, '/baskets', {customerId}],
+                          updater: (
+                              oldData: NonNullable<DataType<CustomerClient['getCustomerBaskets']>>
+                          ) => {
+                              // do not update if responded basket does not exist inside existing customer baskets
+                              if (
+                                  !oldData?.baskets?.some(
+                                      (basket) => basket.basketId === response?.basketId
+                                  )
+                              ) {
+                                  return undefined
+                              }
+                              const updatedBaskets = oldData.baskets?.map(
+                                  (basket: DataType<Client[ShopperBasketsMutationType]>) => {
+                                      return basket?.basketId === basketId ? response : basket
+                                  }
+                              )
+                              return {
+                                  ...oldData,
+                                  baskets: updatedBaskets
+                              }
+                          }
+                      }
+                  ]
+              }
+            : {}
+    }
+
+    const removeBasketQuery = (basketId?: string) => {
+        const arg = {basketId}
+        return basketId
+            ? {
+                  remove: [
+                      {
+                          name: 'basket',
+                          key: ['/baskets', basketId, arg]
+                      }
+                  ]
+              }
+            : {}
+    }
+
+    const invalidateCustomerBasketsQuery = (customerId: string | null) => {
+        // TODO: should we use arg here or not? The invalidate method does not need exact query key.
+        const arg = {customerId}
+        return customerId
+            ? {
+                  invalidate: [
+                      {
+                          name: 'customerBaskets',
+                          key: ['/customers', customerId, '/baskets', arg]
+                      }
+                  ]
+              }
+            : {}
+    }
+
+    return {
+        addCouponToBasket: (
+            params: Argument<Client['addCouponToBasket']>,
+            response: DataType<Client['addCouponToBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        addItemToBasket: (
+            params: Argument<Client['addItemToBasket']>,
+            response: DataType<Client['addItemToBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        removeItemFromBasket: (
+            params: Argument<Client['removeItemFromBasket']>,
+            response: DataType<Client['removeItemFromBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params?.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        addPaymentInstrumentToBasket: (
+            params: Argument<Client['addPaymentInstrumentToBasket']>,
+            response: DataType<Client['addPaymentInstrumentToBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        createBasket: (
+            params: Argument<Client['createBasket']>,
+            response: DataType<Client['createBasket']>
+        ): CacheUpdateMatrixElement => {
+            return {
+                // we want to re-fetch basket data in this case to get the basket total and other baskets data
+                ...invalidateCustomerBasketsQuery(customerId)
+            }
+        },
+        deleteBasket: (
+            params: Argument<Client['deleteBasket']>,
+            response: DataType<Client['deleteBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params?.parameters.basketId
+
+            return {
+                ...invalidateCustomerBasketsQuery(customerId),
+                ...removeBasketQuery(basketId)
+            }
+        },
+        mergeBasket: (
+            params: Argument<Client['mergeBasket']>,
+            response: DataType<Client['mergeBasket']>
+        ): CacheUpdateMatrixElement => {
+            return {
+                ...invalidateCustomerBasketsQuery(customerId)
+            }
+        },
+        removeCouponFromBasket: (
+            params: Argument<Client['removeCouponFromBasket']>,
+            response: DataType<Client['removeCouponFromBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params?.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        removePaymentInstrumentFromBasket: (
+            params: Argument<Client['removePaymentInstrumentFromBasket']>,
+            response: DataType<Client['removePaymentInstrumentFromBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params?.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        updateBasket: (
+            params: Argument<Client['updateBasket']>,
+            response: DataType<Client['updateBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        updateBillingAddressForBasket: (
+            params: Argument<Client['updateBillingAddressForBasket']>,
+            response: DataType<Client['updateBillingAddressForBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        updateCustomerForBasket: (
+            params: Argument<Client['updateCustomerForBasket']>,
+            response: DataType<Client['updateCustomerForBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        updateItemInBasket: (
+            params: Argument<Client['updateItemInBasket']>,
+            response: DataType<Client['updateItemInBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        updatePaymentInstrumentInBasket: (
+            params: Argument<Client['updatePaymentInstrumentInBasket']>,
+            response: DataType<Client['updatePaymentInstrumentInBasket']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        updateShippingAddressForShipment: (
+            params: Argument<Client['updateShippingAddressForShipment']>,
+            response: DataType<Client['updateShippingAddressForShipment']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        },
+        updateShippingMethodForShipment: (
+            params: Argument<Client['updateShippingMethodForShipment']>,
+            response: DataType<Client['updateShippingMethodForShipment']>
+        ): CacheUpdateMatrixElement => {
+            const basketId = params.parameters.basketId
+
+            return {
+                ...updateBasketQuery(basketId, response)
+            }
+        }
+    }
+}
+
+export const SHOPPER_BASKETS_NOT_IMPLEMENTED = [
+    'addGiftCertificateItemToBasket',
+    'addPriceBooksToBasket',
+    'addTaxesForBasket',
+    'addTaxesForBasketItem',
+    'createShipmentForBasket',
+    'removeGiftCertificateItemFromBasket',
+    'removeShipmentFromBasket',
+    'transferBasket',
+    'updateGiftCertificateItemInBasket',
+    'updateShipmentForBasket'
+]
 
 /**
  * A hook for performing mutations with the Shopper Baskets API.
  */
-export function useShopperBasketsMutation<Action extends ShopperBasketMutationType>(
-    action: Action
-) {
-    type Params = Argument<Client[Action]>
-    type Data = DataType<Client[Action]>
+export function useShopperBasketsMutation<Action extends ShopperBasketsMutationType>(
+    arg: UseShopperBasketsMutationArg
+): UseMutationResult<
+    DataType<ShopperBasketsClient[Action]> | Response,
+    Error,
+    Argument<ShopperBasketsClient[Action]>
+> {
+    const {headers, rawResponse, action} = arg
+
+    type Params = Argument<ShopperBasketsClient[Action]>
+    type Data = DataType<ShopperBasketsClient[Action]>
+
+    if (SHOPPER_BASKETS_NOT_IMPLEMENTED.includes(action)) {
+        NotImplementedError()
+    }
     const queryClient = useQueryClient()
+    const customerId = useCustomerId()
+
+    const cacheUpdateMatrix = getCacheUpdateMatrix(customerId)
+
     return useMutation<Data, Error, Params>(
         (params, apiClients) => {
             const method = apiClients['shopperBaskets'][action] as MutationFunction<Data, Params>
-            return method.call(apiClients['shopperBaskets'], params)
+            return (
+                method.call as (
+                    apiClient: ShopperBasketsClient,
+                    params: Params,
+                    rawResponse: boolean | undefined
+                ) => any
+            )(apiClients['shopperBaskets'], {...params, headers}, rawResponse)
         },
         {
             onSuccess: (data, params) => {
-                if (
-                    action === 'createBasket' ||
-                    action === 'transferBasket' ||
-                    action === 'mergeBasket'
-                ) {
-                    if ('customerInfo' in data && data.customerInfo?.customerId) {
-                        queryClient.invalidateQueries([
-                            '/customers',
-                            data.customerInfo?.customerId,
-                            '/baskets'
-                        ])
-                        queryClient.setQueryData(['/baskets', data.basketId], data)
-                    }
-                }
-
-                // @ts-ignore some action doesn't have basketId as parameter, like createBasket
-                if (params?.parameters?.basketId) {
-                    // @ts-ignore
-                    // invalidate all cache entries that are related to the basket
-                    queryClient.invalidateQueries(['/baskets', params?.parameters?.basketId])
-                }
+                updateCache(queryClient, action, cacheUpdateMatrix, data, params)
             }
         }
     )
