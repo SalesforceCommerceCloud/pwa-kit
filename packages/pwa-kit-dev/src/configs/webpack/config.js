@@ -20,7 +20,12 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {sdkReplacementPlugin, extendedTemplateReplacementPlugin, allFiles} from './plugins'
+import {
+    sdkReplacementPlugin,
+    extendedTemplateReplacementPlugin,
+    magicImportReplacementPlugin,
+    allFiles
+} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
@@ -181,9 +186,13 @@ const baseConfig = (target) => {
 
                     sdkReplacementPlugin(projectDir),
 
-                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                    //     ? extendedTemplateReplacementPlugin(projectDir)
-                    //     : () => null,
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? magicImportReplacementPlugin(projectDir)
+                        : () => null,
+
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? extendedTemplateReplacementPlugin(projectDir)
+                        : () => null,
 
                     allFiles(),
                     // Don't chunk if it's a node target – faster Lambda startup.

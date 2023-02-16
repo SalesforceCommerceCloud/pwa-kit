@@ -125,6 +125,19 @@ export const allFiles = (projectDir) => {
     })
 }
 
+export const magicImportReplacementPlugin = (projectDir) => {
+    return new webpack.NormalModuleReplacementPlugin(/\^/, (resource) => {
+        const resolved = path.resolve(resource.context, resource.request)
+        console.log('~===== ^^ Magic', resolved)
+        const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
+        const newPath = path.resolve(projectDir, 'node_modules', relativePath)
+        console.log('~^ magic newPath', newPath)
+        // NOTE: overriding either of these alone does not work, both must be set
+        resource.request = newPath
+        resource.createData.resource = newPath
+    })
+}
+
 export const extendedTemplateReplacementPlugin = (projectDir) => {
     console.log('~templateAppPathRegex', templateAppPathRegex)
     const globPattern = `${pkg?.mobify?.overridesDir?.replace(/\//, '')}/**/*.+(js|jsx|ts|tsx)`
@@ -197,23 +210,21 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
     //  https://github.com/dependents/node-dependency-tree
 
     return new webpack.NormalModuleReplacementPlugin(overridesRegex, (resource) => {
-        if (
-            path
-                .resolve(resource.context, resource.request)
-                ?.match('template-retail-react-app/app/components/icons')
-        ) {
-            console.log(
-                '~======= file path.resolve()',
-                path.resolve(resource.context, resource.request)
-            )
+        const resolved = path.resolve(resource.context, resource.request)
+        if (resolved?.match?.(/retail\-react\-app\/app\/components\/icons/)) {
+            console.log('~======= file path.resolve()', resolved)
             console.log('~requestedFile context:', resource.context)
             console.log('~requestedFile request:', resource.request)
-            // resource.context =
-            //     '/Users/bfeister/dev/pwa-kit/packages/spike-extended-retail-app/pwa-kit/overrides'
-            // resource.request = '/app/components/icons'
 
-            resource.context = '/Users/bfeister/dev/pwa-kit/packages/spike-extended-retail-app'
-            resource.request = 'pwa-kit/overrides/app/components/icons'
+            const depth = pkg?.mobify?.overridesDir?.replace?.(/^\//, '')?.split('/') || []
+            const relativePath = resolved?.split?.(/retail\-react\-app/)?.[1]
+            const newPath = projectDir + pkg?.mobify?.overridesDir + relativePath
+            console.log('~new resource.request!!!', newPath)
+            // NOTE: overriding either of these alone does not work, both must be set
+            resource.request = newPath
+            // TODO: without the file extension, this fails, so we need to pull this from
+            // the original detected overridesMap
+            resource.createData.resource = newPath + '/index.jsx'
         }
     })
 }
