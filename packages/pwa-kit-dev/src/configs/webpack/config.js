@@ -23,7 +23,8 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import {
     sdkReplacementPlugin,
     extendedTemplateReplacementPlugin,
-    magicImportReplacementPlugin,
+    importFromExtendsPlugin,
+    importFromLocalPlugin,
     allFiles
 } from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
@@ -187,7 +188,11 @@ const baseConfig = (target) => {
                     sdkReplacementPlugin(projectDir),
 
                     pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                        ? magicImportReplacementPlugin(projectDir)
+                        ? importFromExtendsPlugin(projectDir)
+                        : () => null,
+
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? importFromLocalPlugin(projectDir)
                         : () => null,
 
                     pkg?.mobify?.extends && pkg?.mobify?.overridesDir

@@ -119,7 +119,7 @@ export const allFiles = (projectDir) => {
     })
 }
 
-export const magicImportReplacementPlugin = (projectDir) => {
+export const importFromExtendsPlugin = (projectDir) => {
     // TODO: does any other library use this weird magic character import schema?
     return new webpack.NormalModuleReplacementPlugin(/\^/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
@@ -127,6 +127,24 @@ export const magicImportReplacementPlugin = (projectDir) => {
         const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
         const newPath = path.resolve(projectDir, 'node_modules', relativePath)
         console.log('~^ magic newPath', newPath)
+        // NOTE: overriding either of these alone does not work, both must be set
+        resource.request = newPath
+        resource.createData.resource = newPath
+    })
+}
+
+export const importFromLocalPlugin = (projectDir) => {
+    // TODO: does any other library use this weird magic character import schema?
+    return new webpack.NormalModuleReplacementPlugin(/\*/, (resource) => {
+        const resolved = path.resolve(resource.context, resource.request)
+        console.log('~===== ** Magic', resolved)
+        const relativePath = resolved?.split(`*`)?.[1]?.replace(/\*/, '')
+        const newPath = path.resolve(
+            projectDir,
+            pkg?.mobify?.overridesDir?.replace(/^\//, ''),
+            relativePath
+        )
+        console.log('~* magic newPath', newPath)
         // NOTE: overriding either of these alone does not work, both must be set
         resource.request = newPath
         resource.createData.resource = newPath
