@@ -7,6 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Component} from '../component'
+import {regionType} from '../types'
 
 /**
  * This component will render a page designer region given its serialized data object.
@@ -33,7 +34,7 @@ export const Region = (props) => {
 Region.displayName = 'Region'
 
 Region.propTypes = {
-    region: PropTypes.object.isRequired,
+    region: regionType.isRequired,
     className: PropTypes.string
 }
 

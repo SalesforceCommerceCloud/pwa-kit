@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import PropTypes from 'prop-types'
 import {usePageContext} from '../page'
+import {componentType} from '../types'
 
 /**
  * This component will render a page designer page given its serialized data object.
@@ -21,6 +21,7 @@ export const Component = ({component}) => {
         pageContext?.components[component.typeId] ||
         (({typeId}) => <div>{`Component type '${typeId}' not found!`}</div>)
     const {data, ...rest} = component
+
     return (
         <div id={component.id} className="component">
             <div className="container">
@@ -33,7 +34,7 @@ export const Component = ({component}) => {
 Component.displayName = 'Component'
 
 Component.propTypes = {
-    component: PropTypes.object.isRequired
+    component: componentType.isRequired
 }
 
 export default Component

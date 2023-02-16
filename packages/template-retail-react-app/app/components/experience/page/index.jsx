@@ -8,6 +8,7 @@ import React, {useContext, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {Region} from '../region'
+import {pageType} from '../types'
 
 // This context will hold the component map as well as any other future context.
 export const PageContext = React.createContext(undefined)
@@ -68,7 +69,7 @@ export const Page = (props) => {
 Page.displayName = 'Page'
 
 Page.propTypes = {
-    page: PropTypes.object.isRequired,
+    page: pageType.isRequired,
     components: PropTypes.object.isRequired,
     className: PropTypes.string
 }
