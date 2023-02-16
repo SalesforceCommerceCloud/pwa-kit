@@ -28,7 +28,7 @@ export type AuthHelper = (typeof AuthHelpers)[keyof typeof AuthHelpers]
  * - logout
  * - register
  */
-export default function useAuthHelper<Mutation extends AuthHelper>(
+export function useAuthHelper<Mutation extends AuthHelper>(
     mutation: Mutation
 ): UseMutationResult<
     // Extract the data from the returned promise (all mutations should be async)
@@ -50,3 +50,5 @@ export default function useAuthHelper<Mutation extends AuthHelper>(
     const method = auth[mutation].bind(auth) as MutationFunction<Data, Variables>
     return useMutation(auth.whenReady(method))
 }
+
+export default useAuthHelper

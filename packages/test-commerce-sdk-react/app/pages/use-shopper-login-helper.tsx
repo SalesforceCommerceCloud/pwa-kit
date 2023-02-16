@@ -5,14 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {ShopperLoginHelpers, useShopperLoginHelper} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 
 const UseShopperLoginHelper = () => {
     // use string or enum
-    const loginGuestUser = useShopperLoginHelper('loginGuestUser')
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
+    const loginGuestUser = useAuthHelper(AuthHelpers.LoginGuestUser)
+    const loginRegisteredUser = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const logout = useAuthHelper(AuthHelpers.Logout)
 
     //logout before logging guest user in
     const loginGuestUserFlow = async () => {

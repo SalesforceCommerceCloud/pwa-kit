@@ -11,8 +11,8 @@ import Json from '../components/Json'
 
 const QueryErrors = () => {
     // @ts-ignore
-    const products = useProducts({FOO: ''})
-    const product = useProduct({id: '25502228Mxxx'})
+    const products = useProducts({parameters: {FOO: ''}})
+    const product = useProduct({parameters: {id: '25502228Mxxx'}})
 
     return (
         <>
