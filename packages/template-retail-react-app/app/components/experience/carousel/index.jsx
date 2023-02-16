@@ -6,10 +6,18 @@
  */
 import React, {Fragment, useCallback, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {AspectRatio, Box, Heading, IconButton, Stack, useBreakpoint, useBreakpointValue} from '@chakra-ui/react'
+import {
+    AspectRatio,
+    Box,
+    Heading,
+    IconButton,
+    Stack,
+    useBreakpoint,
+    useBreakpointValue
+} from '@chakra-ui/react'
 import {Component} from 'commerce-sdk-react-preview/components'
 import {ChevronLeftIcon, ChevronRightIcon} from '../../icons'
-import { useEffect } from 'react'
+import {useEffect} from 'react'
 
 /**
  * Display child components in a carousel slider manner. Configurations include the number of
@@ -88,16 +96,16 @@ const Carousel = (props = {}) => {
     // item selected. Because MacOS hides scroll bars after they come to rest we need to
     // force them to show. Please note that this feature only works on web-kit browsers,
     // for all other brosers the scroller/indicator will be shown.
-    const css = `
-        .scroll-indicator::-webkit-scrollbar {
-            display:${overflowXScrollValue};
-            -webkit-appearance: none;
-            height: 8px;
+    const style = {
+        '.scroll-indicator::-webkit-scrollbar': {
+            display: overflowXScrollValue,
+            ['-webkit-appearance']: `none`,
+            height: `8px`
+        },
+        '.scroll-indicator::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)'
         }
-        .scroll-indicator::-webkit-scrollbar-thumb {
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-    `
+    }
 
     useEffect(() => {
         const {clientWidth, scrollWidth} = scrollRef.current
@@ -105,8 +113,7 @@ const Carousel = (props = {}) => {
     }, [breakpoint, props])
 
     return (
-        <Box className={'carousel'} position="relative" data-testid="carousel">
-            <style>{css}</style>
+        <Box className={'carousel'} sx={style} position="relative" data-testid="carousel">
             <Stack className={'carousel-container'} data-testid="carousel-container" spacing={6}>
                 {textHeadline && (
                     <Heading as="h2" fontSize="xl" textAlign="center">
@@ -142,6 +149,34 @@ const Carousel = (props = {}) => {
                     ))}
                 </Stack>
             </Stack>
+
+            {/* Indicators */}
+            <Fragment>
+                <Box
+                    id="dots"
+                    position="absolute"
+                    bottom="10px"
+                    left="50%"
+                    transform="translateX(-50%)"
+                    style={{
+                        paddingLeft: '5px',
+                        paddingRight: '5px',
+                        borderRadius: '10px',
+                        height: '30px',
+                        lineHeight: '20px',
+                        background: 'rgba(0, 0, 0, 0.5)'
+                    }}
+                >
+                    {components.map((_, index) => (
+                        <a
+                            key={index}
+                            style={{fontSize: '50px', color: 'white', opacity: '0.5'}}
+                        >
+                            &#x2022;
+                        </a>
+                    ))}
+                </Box>
+            </Fragment>
 
             {/* Button Controls */}
             <Fragment>
