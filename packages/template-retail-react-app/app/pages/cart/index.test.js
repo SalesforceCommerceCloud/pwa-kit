@@ -11,7 +11,6 @@ import {screen, within, fireEvent, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Cart from './index'
 import userEvent from '@testing-library/user-event'
-import useShopper from '../../commerce-api/hooks/useShopper'
 import {
     mockedGuestCustomer,
     mockShippingMethods,
@@ -19,15 +18,8 @@ import {
     mockEmptyBasket,
     mockCartVariant
 } from '../../commerce-api/mock-data'
-import mockBasketWithSuit from '../../commerce-api/mocks/basket-with-suit'
 import mockVariant from '../../commerce-api/mocks/variant-750518699578M'
-import {keysToCamel} from '../../commerce-api/utils'
 import {rest} from 'msw'
-
-jest.setTimeout(60000)
-
-let mockedBasketResponse = keysToCamel(mockBasketWithSuit)
-let mockedShippingMethodsResponse = keysToCamel(mockShippingMethods)
 
 const mockProduct = {
     ...mockVariant,
@@ -44,13 +36,15 @@ const mockProduct = {
     c_width: 'V'
 }
 const mockPromotions = {
-    count: 1,
+    limit: 1,
     data: [
         {
             calloutMsg: "10% off men's suits with coupon",
             details: 'exceptions apply',
+            endDate: '2022-10-25T00:00Z',
             id: '10offsuits',
-            name: "10% off men's suits"
+            name: "10% off men's suits",
+            startDate: '2022-10-11T00:00Z'
         }
     ],
     total: 1
@@ -65,34 +59,6 @@ jest.mock('../../commerce-api/auth', () => {
 })
 
 jest.mock('../../commerce-api/einstein')
-
-// jest.mock('../../commerce-api/ocapi-shopper-baskets', () => {
-//     return class ShopperBasketsMock {
-//         async addCouponToBasket() {
-//             return mockedBasketResponse
-//         }
-//         async removeCouponFromBasket() {
-//             return mockedBasketResponse
-//         }
-//         async removeItemFromBasket() {
-//             return mockedBasketResponse
-//         }
-//         async updateItemInBasket() {
-//             return mockedBasketResponse
-//         }
-//         async updateShippingMethodForShipment() {
-//             return mockedBasketResponse
-//         }
-//         async getShippingMethodsForShipment() {
-//             return mockedShippingMethodsResponse
-//         }
-//     }
-// })
-
-const WrappedCart = () => {
-    // useShopper()
-    return <Cart />
-}
 
 // Set up and clean up
 beforeEach(() => {
@@ -255,7 +221,6 @@ describe('Remove item from cart', function () {
 
         userEvent.click(within(cartItem).getByRole('button', {name: /remove/i}))
         userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
-        screen.logTestingPlaygroundURL()
 
         expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
     })
@@ -263,89 +228,212 @@ describe('Remove item from cart', function () {
 
 describe('Coupons tests', function () {
     beforeEach(() => {
-        // global.server.use(
-        //     rest.post('*/baskets/:basket/items/:itemId', (req, res, ctx) => {
-        //         const basketWithCoupon = {
-        //             ...mockCustomerBaskets.baskets[0],
-        //             couponItems: [
-        //                 {
-        //                     code: 'menssuits',
-        //                     couponItemId: 'c94c8a130c63caa6f786b89c5f',
-        //                     statusCode: 'applied',
-        //                     valid: true,
-        //                     _type: 'coupon_item'
-        //                 }
-        //             ],
-        //             productItems: [
-        //                 {
-        //                     ...mockCustomerBaskets.baskets[0].productItems[0]
-        //                 }
-        //             ]
-        //         }
-        //         return res(ctx.delay(0), ctx.json())
-        //     })
-        // )
-    })
-    test.skip('Can apply and remove product-level coupon code with promotion', async () => {
-        renderWithProviders(<WrappedCart />)
-        expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
-
-        mockedBasketResponse = {
-            ...mockedBasketResponse,
-            couponItems: [
+        const customerBasketsWithSuit = {
+            baskets: [
                 {
-                    code: 'menssuits',
-                    couponItemId: 'c94c8a130c63caa6f786b89c5f',
-                    statusCode: 'applied',
-                    valid: true,
-                    _type: 'coupon_item'
-                }
-            ],
-            productItems: [
-                keysToCamel({
-                    _type: 'product_item',
-                    adjusted_tax: 13.5,
-                    base_price: 299.99,
-                    bonus_product_line_item: false,
-                    gift: false,
-                    item_id: '12d70b6c0c3cedd3523001906d',
-                    item_text: 'Black Single Pleat Athletic Fit Wool Suit',
-                    price: 299.99,
-                    price_adjustments: [
+                    adjustedMerchandizeTotalTax: 9.14,
+                    adjustedShippingTotalTax: 0,
+                    agentBasket: false,
+                    basketId: '4796c3bf2647f3afdcc89426fb',
+                    channelType: 'storefront',
+                    creationDate: '2023-02-15T18:01:47.294Z',
+                    currency: 'USD',
+                    customerInfo: {
+                        customerId: 'abkKsUmbJIlrkRk0wVxaYYlXBI'
+                    },
+                    lastModified: '2023-02-15T23:56:18.604Z',
+                    merchandizeTotalTax: 9.14,
+                    notes: {},
+                    orderTotal: 191.99,
+                    productItems: [
                         {
-                            _type: 'price_adjustment',
-                            applied_discount: {
-                                _type: 'discount',
-                                amount: 0.1,
-                                percentage: 10.0,
-                                type: 'percentage'
-                            },
-                            coupon_code: 'menssuits',
-                            creation_date: '2021-06-07T12:31:05.234Z',
-                            custom: false,
-                            item_text: "10% off men's suits",
-                            last_modified: '2021-06-07T12:31:05.252Z',
-                            manual: false,
-                            price: -30.0,
-                            price_adjustment_id: 'eda472de37d9c7fdae7251c4a1',
-                            promotion_id: '10offsuits',
-                            promotion_link:
-                                'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/10offsuits'
+                            adjustedTax: 9.14,
+                            basePrice: 191.99,
+                            bonusProductLineItem: false,
+                            gift: false,
+                            itemId: '54c599fdace475d97aeec72453',
+                            itemText: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
+                            price: 191.99,
+                            priceAfterItemDiscount: 191.99,
+                            priceAfterOrderDiscount: 191.99,
+                            productId: '750518699585M',
+                            productName: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
+                            quantity: 1,
+                            shipmentId: 'me',
+                            tax: 9.14,
+                            taxBasis: 191.99,
+                            taxClassId: 'standard',
+                            taxRate: 0.05
                         }
                     ],
-                    price_after_item_discount: 269.99,
-                    price_after_order_discount: 269.99,
-                    product_id: '750518699578M',
-                    product_name: 'Black Single Pleat Athletic Fit Wool Suit',
+                    productSubTotal: 191.99,
+                    productTotal: 191.99,
+                    shipments: [
+                        {
+                            adjustedMerchandizeTotalTax: 9.14,
+                            adjustedShippingTotalTax: 0,
+                            gift: false,
+                            merchandizeTotalTax: 9.14,
+                            productSubTotal: 191.99,
+                            productTotal: 191.99,
+                            shipmentId: 'me',
+                            shipmentTotal: 191.99,
+                            shippingMethod: {
+                                description: 'Order received within 7-10 business days',
+                                id: 'GBP001',
+                                name: 'Ground',
+                                price: 7.99,
+                                shippingPromotions: [
+                                    {
+                                        calloutMsg: 'Free Shipping Amount Above 50',
+                                        promotionId: 'FreeShippingAmountAbove50',
+                                        promotionName: 'Free Shipping Amount Above 50'
+                                    }
+                                ],
+                                c_estimatedArrivalTime: '7-10 Business Days'
+                            },
+                            shippingStatus: 'not_shipped',
+                            shippingTotal: 0,
+                            shippingTotalTax: 0.38,
+                            taxTotal: 9.14
+                        }
+                    ],
+                    shippingItems: [
+                        {
+                            adjustedTax: 0,
+                            basePrice: 7.99,
+                            itemId: '7f368d1803e05678853fc9cc45',
+                            itemText: 'Shipping',
+                            price: 7.99,
+                            priceAdjustments: [
+                                {
+                                    appliedDiscount: {
+                                        amount: 1,
+                                        type: 'free'
+                                    },
+                                    creationDate: '2023-02-15T18:04:23.375Z',
+                                    custom: false,
+                                    itemText: 'Free Shipping Amount Above 50',
+                                    lastModified: '2023-02-15T23:56:18.604Z',
+                                    manual: false,
+                                    price: -7.99,
+                                    priceAdjustmentId: 'c4fcf2f90840c2a6161223caa5',
+                                    promotionId: 'FreeShippingAmountAbove50'
+                                }
+                            ],
+                            priceAfterItemDiscount: 0,
+                            shipmentId: 'me',
+                            tax: 0.38,
+                            taxBasis: 7.99,
+                            taxClassId: 'standard',
+                            taxRate: 0.05
+                        }
+                    ],
+                    shippingTotal: 0,
+                    shippingTotalTax: 0.38,
+                    taxation: 'gross',
+                    taxTotal: 9.14
+                }
+            ],
+            total: 1
+        }
+        const mockCustomerBasketsWithSuit = {
+            ...mockCustomerBaskets.baskets[0],
+            shippingTotalTax: 0.38,
+            taxTotal: 9.14,
+            taxation: 'gross',
+            currency: 'USD',
+            productItems: [
+                {
+                    adjustedTax: 9.14,
+                    basePrice: 191.99,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: '54c599fdace475d97aeec72453',
+                    itemText: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
+                    price: 191.99,
+                    priceAfterItemDiscount: 191.99,
+                    priceAfterOrderDiscount: 191.99,
+                    productId: '750518699585M',
+                    productName: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
                     quantity: 1,
-                    shipment_id: 'me',
-                    tax: 15.0,
-                    tax_basis: 299.99,
-                    tax_class_id: 'standard',
-                    tax_rate: 0.05
-                })
+                    shipmentId: 'me',
+                    tax: 9.14,
+                    taxBasis: 191.99,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
             ]
         }
+
+        global.server.use(
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({total: 1, baskets: [mockCustomerBasketsWithSuit]})
+                )
+            }),
+            rest.post('*/baskets/:basketId/coupons', (req, res, ctx) => {
+                const basketWithCoupon = {
+                    ...mockCustomerBasketsWithSuit,
+                    couponItems: [
+                        {
+                            code: 'menssuits',
+                            couponItemId: '565dd1c773fcb316d4c2ff9211',
+                            statusCode: 'applied',
+                            valid: true
+                        }
+                    ],
+                    productItems: [
+                        {
+                            adjustedTax: 8.23,
+                            basePrice: 191.99,
+                            bonusProductLineItem: false,
+                            gift: false,
+                            itemId: '54c599fdace475d97aeec72453',
+                            itemText: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
+                            price: 191.99,
+                            priceAdjustments: [
+                                {
+                                    appliedDiscount: {
+                                        amount: 0.1,
+                                        percentage: 10,
+                                        type: 'percentage'
+                                    },
+                                    couponCode: 'menssuits',
+                                    creationDate: '2023-02-15T18:04:27.857Z',
+                                    custom: false,
+                                    itemText: "10% off men's suits",
+                                    lastModified: '2023-02-15T18:04:27.863Z',
+                                    manual: false,
+                                    price: -19.2,
+                                    priceAdjustmentId: '3207da3927b865d676e68bcb60',
+                                    promotionId: '10offsuits'
+                                }
+                            ],
+                            priceAfterItemDiscount: 172.79,
+                            priceAfterOrderDiscount: 172.79,
+                            productId: '750518699585M',
+                            productName: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
+                            quantity: 1,
+                            shipmentId: 'me',
+                            tax: 9.14,
+                            taxBasis: 191.99,
+                            taxClassId: 'standard',
+                            taxRate: 0.05
+                        }
+                    ]
+                }
+                return res(ctx.delay(0), ctx.json(basketWithCoupon))
+            }),
+            rest.delete('*/baskets/:basketId/coupons/:couponId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockCustomerBasketsWithSuit))
+            })
+        )
+    })
+    test('Can apply and remove product-level coupon code with promotion', async () => {
+        renderWithProviders(<Cart />)
+        expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
         // add coupon
         userEvent.click(screen.getByText('Do you have a promo code?'))
@@ -355,16 +443,20 @@ describe('Coupons tests', function () {
         expect(await screen.findByText('Promotion applied')).toBeInTheDocument()
         expect(await screen.findByText(/MENSSUITS/i)).toBeInTheDocument()
 
-        const cartItem = await screen.findByTestId('sf-cart-item-750518699578M')
-        expect(await within(cartItem).findByText(/^-([A-Z]{2})?\$30\.00$/)).toBeInTheDocument()
+        const cartItem = await screen.findByTestId('sf-cart-item-750518699585M')
+        // Promotions discount
+        expect(await within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)).toBeInTheDocument()
 
-        // remove coupon
-        mockedBasketResponse = keysToCamel(mockBasketWithSuit)
         const orderSummary = screen.getByTestId('sf-order-summary')
         userEvent.click(within(orderSummary).getByText('Remove'))
 
         expect(await screen.findByText('Promotion removed')).toBeInTheDocument()
-        expect(await screen.queryByText(/MENSSUITS/i)).not.toBeInTheDocument()
-        expect(await within(cartItem).queryByText(/^-([A-Z]{2})?\$30\.00$/)).not.toBeInTheDocument()
+        await waitFor(async () => {
+            const menSuit = await screen.queryByText(/MENSSUITS/i)
+            const promotionDiscount = await within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)
+            expect(promotionDiscount).not.toBeInTheDocument()
+            expect(menSuit).not.toBeInTheDocument()
+            screen.logTestingPlaygroundURL()
+        })
     })
 })
