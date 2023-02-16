@@ -43,7 +43,6 @@ test('changes url when enter is pressed', async () => {
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dresses{enter}')
     await waitFor(() => {
-        console.log('window.location.pathname', window?.location?.search)
         expect(window.location.pathname).toEqual(createPathWithDefaults('/search'))
         expect(window.location.search).toEqual('?q=Dresses')
         const suggestionPopoverEl = screen.getByTestId('sf-suggestion-popover')
@@ -57,8 +56,8 @@ test('shows previously searched items when focused', async () => {
     const searchInput = document.querySelector('input[type="search"]')
     user.clear(searchInput)
     await searchInput.focus()
-    const suggestionPopoverEl = await screen.findByTestId('sf-suggestion-popover')
-    const recentSearchesEl = await within(suggestionPopoverEl).findByTestId('sf-suggestion-recent')
+    const suggestionPopoverEl = await screen.getByTestId('sf-suggestion-popover')
+    const recentSearchesEl = await within(suggestionPopoverEl).getByTestId('sf-suggestion-recent')
     expect(recentSearchesEl).toBeInTheDocument()
     expect(
         document.querySelectorAll('[data-testid=sf-suggestion-popover] button[name=recent-search]')
@@ -81,7 +80,6 @@ test('limits number of saved recent searches', async () => {
     expect(getSessionJSONItem(RECENT_SEARCH_KEY)).toHaveLength(RECENT_SEARCH_LIMIT)
 })
 
-// why turning on this test causes the tests to not running at all
 test('suggestions render when there are some', async () => {
     await act(() => {
         renderWithProviders(<SearchInput />)
@@ -89,9 +87,11 @@ test('suggestions render when there are some', async () => {
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dress')
     expect(searchInput.value).toBe('Dress')
-    // const suggestionPopoverEl = await screen.findByTestId('sf-suggestion-popover')
-    // const suggestionsEl = await within(suggestionPopoverEl).findByTestId('sf-suggestion')
-    // expect(suggestionsEl.querySelector('button').textContent).toBe('Dresses')
+    const suggestionPopoverEl = await screen.getByTestId('sf-suggestion-popover')
+    await waitFor(() => {
+        const suggestionsEl = within(suggestionPopoverEl).getByTestId('sf-suggestion')
+        expect(suggestionsEl.querySelector('button').textContent).toBe('Dresses')
+    })
 })
 
 test('clicking clear searches clears recent searches', async () => {
