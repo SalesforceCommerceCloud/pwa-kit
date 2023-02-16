@@ -33,7 +33,8 @@ export const Region = (props) => {
 Region.displayName = 'Region'
 
 Region.propTypes = {
-    region: PropTypes.object.isRequired
+    region: PropTypes.object.isRequired,
+    className: PropTypes.string
 }
 
 export default Region

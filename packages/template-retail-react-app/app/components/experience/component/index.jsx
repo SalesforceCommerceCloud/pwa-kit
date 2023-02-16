@@ -8,10 +8,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {usePageContext} from '../page'
 
-const ComponentNotFound = ({typeId}) => (
-    <div>{`Component type '${typeId}' not found!`}</div>
-)
-
 /**
  * This component will render a page designer page given its serialized data object.
  *
@@ -21,7 +17,9 @@ const ComponentNotFound = ({typeId}) => (
  */
 export const Component = ({component}) => {
     const pageContext = usePageContext()
-    const ComponentClass = pageContext?.components[component.typeId] || ComponentNotFound
+    const ComponentClass =
+        pageContext?.components[component.typeId] ||
+        (({typeId}) => <div>{`Component type '${typeId}' not found!`}</div>)
     const {data, ...rest} = component
     return (
         <div id={component.id} className="component">
@@ -34,8 +32,8 @@ export const Component = ({component}) => {
 
 Component.displayName = 'Component'
 
-Component.propsTypes = {
-    component: PropTypes.object
+Component.propTypes = {
+    component: PropTypes.object.isRequired
 }
 
 export default Component

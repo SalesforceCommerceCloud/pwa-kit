@@ -70,6 +70,7 @@ Page.displayName = 'Page'
 Page.propTypes = {
     page: PropTypes.object.isRequired,
     components: PropTypes.object.isRequired,
+    className: PropTypes.string
 }
 
 export default Page

@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {componentMapProxy} from './utils'
 import {Page} from '../../components/experience/page'
 
@@ -21,6 +22,12 @@ PageViewer.getProps = async ({api}) => {
     return {
         page
     }
+}
+
+PageViewer.displayName = 'PageViewer'
+
+PageViewer.propTypes = {
+    page: PropTypes.object.isRequired
 }
 
 export default PageViewer
