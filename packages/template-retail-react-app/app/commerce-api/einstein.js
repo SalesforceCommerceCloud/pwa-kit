@@ -121,13 +121,21 @@ class EinsteinAPI {
         }
 
         let response
-        response = await fetch(`${host}/v3${endpoint}`, {
-            method: method,
-            headers: headers,
-            ...(body && {
-                body: JSON.stringify(body)
+        try {
+            response = await fetch(`${host}/v3${endpoint}`, {
+                method: method,
+                headers: headers,
+                ...(body && {
+                    body: JSON.stringify(body)
+                })
             })
-        })
+        } catch {
+            console.warn('Einstein request failed')
+        }
+
+        if (!response?.ok) {
+            return {}
+        }
 
         const responseJson = await response.json()
 

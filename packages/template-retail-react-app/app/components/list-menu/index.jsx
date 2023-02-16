@@ -65,7 +65,6 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
                 onMouseOver={onOpen}
                 {...baseStyle.listMenuTriggerLink}
                 {...(hasItems ? {name: name + ' __'} : {name: name})}
-                {...(!hasItems ? baseStyle.listMenuTriggerLinkWithIcon : {})}
                 {...(isOpen ? baseStyle.listMenuTriggerLinkActive : {})}
             >
                 {name}
@@ -260,7 +259,7 @@ const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
                     </Stack>
                 ) : (
                     <Center p="2">
-                        <Spinner opacity="0" size="lg" />
+                        <Spinner size="lg" />
                     </Center>
                 )}
             </Flex>

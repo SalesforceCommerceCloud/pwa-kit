@@ -16,29 +16,6 @@ let mockCustomer = {}
 
 jest.setTimeout(30000)
 
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async createCustomerAddress(address) {
-                mockCustomer.addresses = [address.body]
-                return {}
-            }
-
-            async updateCustomerAddress(address) {
-                mockCustomer.addresses[0] = address.body
-                return {}
-            }
-
-            async removeCustomerAddress() {
-                mockCustomer.addresses = undefined
-                return {}
-            }
-        }
-    }
-})
-
 const mockToastSpy = jest.fn()
 jest.mock('@chakra-ui/toast', () => {
     return {
@@ -71,17 +48,29 @@ beforeEach(() => {
         lastName: 'Keane',
         login: 'jkeane@64labs.com'
     }
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockCustomer))
+        }),
+        rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
+            mockCustomer.addresses = [req.body]
+            return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
+        }),
+        rest.patch('*/customers/:customerId/addresses/:addressName', (req, res, ctx) => {
+            mockCustomer.addresses[0] = req.body
+            return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
+        }),
+        rest.delete('*/customers/:customerId/addresses/:addressName', (req, res, ctx) => {
+            mockCustomer.addresses = undefined
+            return res(ctx.delay(0), ctx.status(200))
+        })
+    )
 })
 afterEach(() => {
     localStorage.clear()
 })
 
 test('Allows customer to add/edit/remove addresses', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockCustomer))
-        })
-    )
     renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
 
