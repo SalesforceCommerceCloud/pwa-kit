@@ -116,16 +116,11 @@ export const allFiles = (projectDir) => {
             console.log('~ALL FILES ==== resource.context', resource.context)
             console.log('~ALL FILES ==== resource.request', resource.request)
         }
-        if (resolved.match(/\/app\/components\/icons/)) {
-            // console.log('~========================================')
-            // console.log('~ALL FILES ==== resolved', resolved)
-            // console.log('~ALL FILES ==== resource.context', resource.context)
-            // console.log('~ALL FILES ==== resource.request', resource.request)
-        }
     })
 }
 
 export const magicImportReplacementPlugin = (projectDir) => {
+    // TODO: does any other library use this weird magic character import schema?
     return new webpack.NormalModuleReplacementPlugin(/\^/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
         console.log('~===== ^^ Magic', resolved)
