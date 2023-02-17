@@ -149,7 +149,7 @@ const runGenerator = () => {
     // See https://github.com/shelljs/shelljs/wiki/FAQ#running-interactive-programs-with-exec
 
     const flags = semver.satisfies(process.version, '>=15') ? '-y' : ''
-    cp.execSync(`npx ${flags} pwa-kit-create-app ${process.argv.slice(2).join(' ')}`, {
+    cp.execSync(`npx ${flags} pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`, {
         stdio: 'inherit'
     })
 }
