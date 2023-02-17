@@ -36,8 +36,7 @@ export const useQuery = <
     const netOptions = mergeOptions(hookConfig.client, apiOptions)
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
     return useReactQuery(
-        // End user can override queryKey if they really want to...
-        queryOptions.queryKey ?? hookConfig.getQueryKey(netOptions),
+        hookConfig.getQueryKey(netOptions),
         () => authenticatedMethod(apiOptions),
         {
             enabled:
