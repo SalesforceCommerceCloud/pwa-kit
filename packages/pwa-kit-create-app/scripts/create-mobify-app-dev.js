@@ -148,7 +148,11 @@ const runGenerator = () => {
     // Shelljs can't run interactive programs, so we have to switch to child_process.
     // See https://github.com/shelljs/shelljs/wiki/FAQ#running-interactive-programs-with-exec
 
-    const flags = semver.satisfies(process.version, '>=15') ? '-y' : ''
+    const extension = process.platform === 'win32' ? '.cmd' : ''
+    const npm = `npm${extension}`
+    const foundNpm = cp.spawnSync(npm, ['-v']).stdout.toString().trim()
+    const flags = semver.satisfies(foundNpm, '>=7') ? '-y' : ''
+
     cp.execSync(`npx ${flags} pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`, {
         stdio: 'inherit'
     })
