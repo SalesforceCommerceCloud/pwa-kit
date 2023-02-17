@@ -32,19 +32,11 @@ jobs:
       matrix:
         node: [14, 16]
         npm: [6, 7, 8]
-        exclude:
-          - node: 14
-            npm: 7
-          - node: 14
-            npm: 8
-          - node: 16
-            npm: 6
     runs-on: ubuntu-latest
     env:
-      # The "default" npm is the one that ships with a given version of node
-      # node v14 uses npm@6, latest node v16 uses npm@8
+      # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.npm == 8 }}
+      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -125,16 +117,13 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   pwa-kit-windows:
     strategy:
-        matrix:
-          node: [14, 16]
-          npm: [6, 7, 8]
-          exclude:
-            - node: 14
-              npm: 7
-            - node: 14
-              npm: 8
-            - node: 16
-              npm: 6
+      matrix:
+        node: [14, 16]
+        npm: [6, 7, 8]
+    env:
+      # The "default" npm is the one that ships with a given version of node.
+      # For more: https://nodejs.org/en/download/releases/
+      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
     runs-on: windows-latest
     steps:
         - name: Checkout
@@ -145,6 +134,11 @@ jobs:
           with:
             node-version: ${{ matrix.node }}
             cache: npm
+
+        - name: Update NPM version
+          if: env.IS_DEFAULT_NPM == 'false'
+          run: |-
+            npm install -g npm@${{ matrix.npm }}
 
         - name: Setup Windows Machine
           uses: "./.github/actions/setup_windows"
