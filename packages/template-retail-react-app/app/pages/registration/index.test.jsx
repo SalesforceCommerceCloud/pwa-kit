@@ -117,8 +117,8 @@ test('Allows customer to create an account', async () => {
     user.click(withinForm.getByText(/create account/i))
 
     // wait for success state to appear
-    await waitFor(() => {
+    await waitFor(async () => {
         screen.logTestingPlaygroundURL()
-        expect(screen.getAllByText(/My Account/).length).toEqual(2)
+        expect(await screen.getAllByText(/My Account/).length).toEqual(2)
     })
 })
