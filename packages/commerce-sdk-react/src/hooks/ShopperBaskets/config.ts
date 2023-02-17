@@ -17,8 +17,7 @@ import {and, matchesApiConfig, matchesPath} from '../utils'
 
 type Client = ApiClients['shopperBaskets']
 type Basket = ShopperBasketsTypes.Basket
-type BasketOptions = MergedOptions<Client, ApiOptions<{basketId?: string}>>
-type BasketParameters = BasketOptions['parameters']
+type BasketParameters = MergedOptions<Client, ApiOptions<{basketId?: string}>>['parameters']
 type CustomerBasketsResult = ShopperCustomersTypes.BasketsResult
 
 // Path helpers to avoid typos!
@@ -37,7 +36,7 @@ const getCustomerBasketsPath = (customerId: string, parameters: BasketParameters
 
 const updateBasketQuery = (
     customerId: string | null,
-    parameters: BasketOptions['parameters'],
+    parameters: BasketParameters,
     newBasket: Basket
 ): CacheUpdate => {
     // If we just check `!parameters.basketId`, then TypeScript doesn't infer that the value is
@@ -77,7 +76,7 @@ const updateBasketQuery = (
 
 const invalidateCustomerBasketsQuery = (
     customerId: string | null,
-    parameters: BasketOptions['parameters']
+    parameters: BasketParameters
 ): Pick<CacheUpdate, 'invalidate'> => {
     if (!customerId) return {}
     return {
@@ -92,7 +91,7 @@ const invalidateCustomerBasketsQuery = (
 
 const updateBasket = (
     customerId: string | null,
-    {parameters}: BasketOptions,
+    {parameters}: {parameters: BasketParameters},
     response: Basket
 ): CacheUpdate => ({
     ...updateBasketQuery(customerId, parameters, response),
@@ -101,7 +100,7 @@ const updateBasket = (
 
 const updateBasketWithResponseBasketId = (
     customerId: string | null,
-    {parameters}: BasketOptions,
+    {parameters}: {parameters: BasketParameters},
     response: Basket
 ): CacheUpdate => ({
     ...updateBasketQuery(customerId, {...parameters, basketId: response.basketId}, response),
