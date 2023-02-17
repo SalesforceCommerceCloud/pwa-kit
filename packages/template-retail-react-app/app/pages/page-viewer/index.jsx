@@ -19,7 +19,7 @@ PageViewer.getProps = async ({api}) => {
             pageId: 'homepage-example'
         }
     })
-
+    console.log('Page: ', page)
     return {
         page
     }

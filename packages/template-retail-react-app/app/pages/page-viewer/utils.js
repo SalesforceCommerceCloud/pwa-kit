@@ -7,6 +7,8 @@
 import React from 'react'
 import {Region} from '../../components/experience/region'
 
+import * as Layouts from '../../components/experience/layouts'
+
 export const componentMapProxy = new Proxy(
     {},
     {
@@ -14,6 +16,24 @@ export const componentMapProxy = new Proxy(
         get(_target, prop) {
             let componentClass
             switch (prop) {
+                case 'commerce_layouts.mobileGrid1r1c':
+                    componentClass = Layouts['MobileGrid1r1c']
+                    break
+                case 'commerce_layouts.mobileGrid2r1c':
+                    componentClass = Layouts['MobileGrid2r1c']
+                    break
+                case 'commerce_layouts.mobileGrid2r2c':
+                    componentClass = Layouts['MobileGrid2r2c']
+                    break
+                case 'commerce_layouts.mobileGrid2r3c':
+                    componentClass = Layouts['MobileGrid2r3c']
+                    break
+                case 'commerce_layouts.mobileGrid3r1c':
+                    componentClass = Layouts['MobileGrid3r1c']
+                    break
+                case 'commerce_layouts.mobileGrid3r2c':
+                    componentClass = Layouts['MobileGrid3r2c']
+                    break
                 default:
                     componentClass = (props) => (
                         <div style={{marginBottom: '10px'}}>
