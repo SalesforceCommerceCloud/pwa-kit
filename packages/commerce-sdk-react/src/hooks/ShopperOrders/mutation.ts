@@ -9,7 +9,7 @@ import {useMutation} from '../useMutation'
 import {UseMutationResult} from '@tanstack/react-query'
 import {NotImplementedError} from '../utils'
 import useCommerceApi from '../useCommerceApi'
-import {cacheUpdateMatrix} from './config'
+import {cacheUpdateMatrix} from './cache'
 
 type Client = ApiClients['shopperOrders']
 
