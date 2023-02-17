@@ -9,7 +9,26 @@ import PropTypes from 'prop-types'
 import {Image, Box, Text, Link} from '@chakra-ui/react'
 
 /**
+ * The Shopper Experience API response wraps the text in HTML paragraph tags.
+ * The string is always treated as text in JSX since its source is untrusted (input form).
+ * The function removes the HTML tags from the string to avoid rendering HTML tags as text.
+ * @param string string with HTML paragraph tags.
+ * @returns {*} string without the HTML tags.
+ */
+const removeHTMLTagsFromString = (string) => {
+    return string.replace(/(<([^>]+)>)/gi, '')
+}
+
+/**
+ * Image with text caption
  *
+ * @param ITCLink
+ * @param ITCText
+ * @param image
+ * @param heading
+ * @param alt
+ * @returns {JSX.Element}
+ * @constructor
  */
 const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     return (
@@ -34,14 +53,14 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                         {heading && (
                             <Box className={'image-with-text-heading-container'}>
                                 <Text as="span" className={'image-with-text-heading-text'}>
-                                    {heading}
+                                    {removeHTMLTagsFromString(heading)}
                                 </Text>
                             </Box>
                         )}
                         {ITCText && (
                             <Box>
                                 <Text as="span" className={'image-with-text-text-underneath'}>
-                                    {ITCText}
+                                    {removeHTMLTagsFromString(ITCText)}
                                 </Text>
                             </Box>
                         )}
