@@ -32,12 +32,19 @@ jobs:
       matrix:
         node: [14, 16]
         npm: [6, 7, 8]
+      exclude:
+        - node: 14
+          npm: 7
+        - node: 14
+          npm: 8
+        - node: 16
+          npm: 6
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node
       # node v14 uses npm@6, latest node v16 uses npm@8
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.npm == 6 }}
+      IS_DEFAULT_NPM: ${{ matrix.npm == 8 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -118,11 +125,16 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   pwa-kit-windows:
     strategy:
-        # TODO: We don't *need* a matrix with single values,
-        # but is it worth keeping for supporting multiple versions in the future?
         matrix:
           node: [14, 16]
           npm: [6, 7, 8]
+        exclude:
+          - node: 14
+            npm: 7
+          - node: 14
+            npm: 8
+          - node: 16
+            npm: 6
     runs-on: windows-latest
     steps:
         - name: Checkout
