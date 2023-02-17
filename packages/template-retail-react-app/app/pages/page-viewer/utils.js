@@ -9,6 +9,30 @@ import {Region} from '../../components/experience/region'
 
 import * as Layouts from '../../components/experience/layouts'
 
+const withTitle = (Component) => {
+    const WrappedComponent = (props) => {
+        return (
+            <div style={{position: 'relative'}}>
+                <b
+                    style={{
+                        position: 'absolute',
+                        background: 'rgb(220, 120, 120, 0.2)',
+                        fontSize: '10px',
+                        top: '0px',
+                        right: '0px',
+                        borderRadius: '5px',
+                        padding: '2px'
+                    }}
+                >
+                    {props.typeId.split('.')[1]}
+                </b>
+                <Component {...props} />
+            </div>
+        )
+    }
+
+    return WrappedComponent
+}
 export const componentMapProxy = new Proxy(
     {},
     {
@@ -18,28 +42,30 @@ export const componentMapProxy = new Proxy(
             switch (prop) {
                 case 'commerce_assets.editorialRichText':
                     componentClass = ({richText}) => (
-                        <div dangerouslySetInnerHTML={{
-                            __html: richText
-                        }} />
+                        <div
+                            dangerouslySetInnerHTML={{
+                                __html: richText
+                            }}
+                        />
                     )
                     break
                 case 'commerce_layouts.mobileGrid1r1c':
-                    componentClass = Layouts['MobileGrid1r1c']
+                    componentClass = withTitle(Layouts['MobileGrid1r1c'])
                     break
                 case 'commerce_layouts.mobileGrid2r1c':
-                    componentClass = Layouts['MobileGrid2r1c']
+                    componentClass = withTitle(Layouts['MobileGrid2r1c'])
                     break
                 case 'commerce_layouts.mobileGrid2r2c':
-                    componentClass = Layouts['MobileGrid2r2c']
+                    componentClass = withTitle(Layouts['MobileGrid2r2c'])
                     break
                 case 'commerce_layouts.mobileGrid2r3c':
-                    componentClass = Layouts['MobileGrid2r3c']
+                    componentClass = withTitle(Layouts['MobileGrid2r3c'])
                     break
                 case 'commerce_layouts.mobileGrid3r1c':
-                    componentClass = Layouts['MobileGrid3r1c']
+                    componentClass = withTitle(Layouts['MobileGrid3r1c'])
                     break
                 case 'commerce_layouts.mobileGrid3r2c':
-                    componentClass = Layouts['MobileGrid3r2c']
+                    componentClass = withTitle(Layouts['MobileGrid3r2c'])
                     break
                 default:
                     componentClass = (props) => (
