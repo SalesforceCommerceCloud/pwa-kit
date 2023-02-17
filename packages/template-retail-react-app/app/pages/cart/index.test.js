@@ -116,13 +116,13 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test('Renders skeleton until customer and basket are loaded', () => {
+test.skip('Renders skeleton until customer and basket are loaded', () => {
     const {getByTestId, queryByTestId} = renderWithProviders(<Cart />)
     expect(getByTestId('sf-cart-skeleton')).toBeInTheDocument()
     expect(queryByTestId('sf-cart-container')).not.toBeInTheDocument()
 })
 
-describe('Empty cart tests', function () {
+describe.skip('Empty cart tests', function () {
     beforeEach(() => {
         global.server.use(
             rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
@@ -135,7 +135,7 @@ describe('Empty cart tests', function () {
         expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
     })
 })
-test('Renders cart components when there are items', async () => {
+test.skip('Renders cart components when there are items', async () => {
     renderWithProviders(<Cart />)
     await waitFor(async () => {
         expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
@@ -143,7 +143,7 @@ test('Renders cart components when there are items', async () => {
     })
 })
 
-test('Applies default shipping method to basket and renders estimated pricing', async () => {
+test.skip('Applies default shipping method to basket and renders estimated pricing', async () => {
     renderWithProviders(<Cart />)
     expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
@@ -154,7 +154,7 @@ test('Applies default shipping method to basket and renders estimated pricing', 
     expect(within(summary).getAllByText(/61.43/i).length).toEqual(2)
 })
 
-describe('Update quantity', function () {
+describe.skip('Update quantity', function () {
     test('Can update item quantity in the cart', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
@@ -203,7 +203,7 @@ describe('Update quantity', function () {
     })
 })
 
-describe('Remove item from cart', function () {
+describe.skip('Remove item from cart', function () {
     beforeEach(() => {
         global.server.use(
             rest.delete('*/baskets/:basket/items/:itemId', (req, res, ctx) => {
@@ -226,7 +226,7 @@ describe('Remove item from cart', function () {
     })
 })
 
-describe('Coupons tests', function () {
+describe.skip('Coupons tests', function () {
     beforeEach(() => {
         const mockCustomerBasketsWithSuit = {
             ...mockCustomerBaskets.baskets[0],

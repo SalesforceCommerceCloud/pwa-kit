@@ -82,6 +82,8 @@ export const useProductViewModal = (initialProduct) => {
             history.replace(updatedUrl)
         }
     }, [variant])
+
+    console.log('-------fetching', isFetching)
     return {
         product,
         variant,

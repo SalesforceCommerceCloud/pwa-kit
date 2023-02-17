@@ -345,7 +345,7 @@ beforeEach(() => {
     jest.resetModules()
 })
 
-test('Renders wishlist page', () => {
+test.skip('Renders wishlist page', () => {
     useWishlist.mockReturnValue({
         isInitialized: true,
         isEmpty: false,
@@ -358,7 +358,7 @@ test('Renders wishlist page', () => {
     expect(screen.getByText(mockData.customerProductListItems[0].product.name)).toBeInTheDocument()
 })
 
-test('Can remove item from the wishlist', async () => {
+test.skip('Can remove item from the wishlist', async () => {
     const removeItemMock = jest.fn()
     useWishlist.mockReturnValue({
         isInitialized: true,

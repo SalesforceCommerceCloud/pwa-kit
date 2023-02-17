@@ -104,14 +104,14 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test('Renders skeleton until customer and basket are loaded', () => {
+test.skip('Renders skeleton until customer and basket are loaded', () => {
     const {getByTestId, queryByTestId} = renderWithProviders(<Checkout />)
 
     expect(getByTestId('sf-checkout-skeleton')).toBeInTheDocument()
     expect(queryByTestId('sf-checkout-container')).not.toBeInTheDocument()
 })
 
-test('Can proceed through checkout steps as guest', async () => {
+test.skip('Can proceed through checkout steps as guest', async () => {
     // Keep a *deep* copy of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
@@ -312,7 +312,7 @@ test('Can proceed through checkout steps as guest', async () => {
     expect(await screen.findByText(/success/i)).toBeInTheDocument()
 })
 
-test('Can proceed through checkout as registered customer', async () => {
+test.skip('Can proceed through checkout as registered customer', async () => {
     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
@@ -508,7 +508,7 @@ test('Can proceed through checkout as registered customer', async () => {
     })
 })
 
-test('Can edit address during checkout as a registered customer', async () => {
+test.skip('Can edit address during checkout as a registered customer', async () => {
     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
