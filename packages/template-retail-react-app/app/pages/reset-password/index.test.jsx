@@ -101,7 +101,9 @@ test('Allows customer to generate password token', async () => {
     expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
     expect(await screen.getByText(/foo@test.com/i)).toBeInTheDocument()
 
-    user.click(await screen.getByText('Back to Sign In'))
+    await waitFor(async () => {
+        user.click(await screen.getByText('Back to Sign In'))
+    })
 
     await waitFor(() => {
         expect(window.location.pathname).toEqual('/uk/en-GB/login')
