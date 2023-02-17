@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "hash": "0fb7982b629c4bedfbec",
+  "hash": "bb2721da0c152ace1396",
   "publicPath": "/mobify/bundle/development/",
   "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
@@ -10,41 +10,41 @@
     "pages-home": [
       "pages-home.js"
     ],
-    "retail-react-app-app-pages-login": [
-      "retail-react-app-app-pages-login.js"
+    "^retail-react-app-app-pages-login": [
+      "^retail-react-app-app-pages-login.js"
     ],
-    "retail-react-app-app-pages-registration": [
-      "retail-react-app-app-pages-registration.js"
+    "^retail-react-app-app-pages-registration": [
+      "^retail-react-app-app-pages-registration.js"
     ],
-    "retail-react-app-app-pages-reset-password": [
-      "retail-react-app-app-pages-reset-password.js"
+    "^retail-react-app-app-pages-reset-password": [
+      "^retail-react-app-app-pages-reset-password.js"
     ],
-    "retail-react-app-app-pages-account": [
-      "retail-react-app-app-pages-account.js"
+    "^retail-react-app-app-pages-account": [
+      "^retail-react-app-app-pages-account.js"
     ],
-    "retail-react-app-app-pages-cart": [
-      "retail-react-app-app-pages-cart.js"
+    "^retail-react-app-app-pages-cart": [
+      "^retail-react-app-app-pages-cart.js"
     ],
-    "retail-react-app-app-pages-checkout": [
-      "retail-react-app-app-pages-checkout.js"
+    "^retail-react-app-app-pages-checkout": [
+      "^retail-react-app-app-pages-checkout.js"
     ],
-    "retail-react-app-app-pages-checkout-confirmation": [
-      "retail-react-app-app-pages-checkout-confirmation.js"
+    "^retail-react-app-app-pages-checkout-confirmation": [
+      "^retail-react-app-app-pages-checkout-confirmation.js"
     ],
-    "retail-react-app-app-pages-login-redirect": [
-      "retail-react-app-app-pages-login-redirect.js"
+    "^retail-react-app-app-pages-login-redirect": [
+      "^retail-react-app-app-pages-login-redirect.js"
     ],
-    "retail-react-app-app-pages-product-detail": [
-      "retail-react-app-app-pages-product-detail.js"
+    "^retail-react-app-app-pages-product-detail": [
+      "^retail-react-app-app-pages-product-detail.js"
     ],
-    "retail-react-app-app-pages-product-list": [
-      "retail-react-app-app-pages-product-list.js"
+    "^retail-react-app-app-pages-product-list": [
+      "^retail-react-app-app-pages-product-list.js"
     ],
-    "retail-react-app-app-pages-account-wishlist": [
-      "retail-react-app-app-pages-account-wishlist.js"
+    "^retail-react-app-app-pages-account-wishlist": [
+      "^retail-react-app-app-pages-account-wishlist.js"
     ],
-    "retail-react-app-app-pages-page-not-found": [
-      "retail-react-app-app-pages-page-not-found.js"
+    "^retail-react-app-app-pages-page-not-found": [
+      "^retail-react-app-app-pages-page-not-found.js"
     ],
     "vendor": [
       "vendor.js"
@@ -81,7 +81,7 @@
     {
       "type": "asset",
       "name": "main.js",
-      "size": 1156806,
+      "size": 1157793,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -105,76 +105,76 @@
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-account.js",
-      "size": 169339,
+      "name": "^retail-react-app-app-pages-account.js",
+      "size": 169341,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-account.js.map"
+          "sourceMap": "^retail-react-app-app-pages-account.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-account"
+        "^retail-react-app-app-pages-account"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-account"
+        "^retail-react-app-app-pages-account"
       ],
       "auxiliaryChunks": []
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-checkout.js",
-      "size": 155438,
+      "name": "^retail-react-app-app-pages-checkout.js",
+      "size": 155440,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-checkout.js.map"
+          "sourceMap": "^retail-react-app-app-pages-checkout.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-checkout"
+        "^retail-react-app-app-pages-checkout"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-checkout"
+        "^retail-react-app-app-pages-checkout"
       ],
       "auxiliaryChunks": []
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-product-list.js",
-      "size": 115785,
+      "name": "^retail-react-app-app-pages-product-list.js",
+      "size": 115787,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-product-list.js.map"
+          "sourceMap": "^retail-react-app-app-pages-product-list.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-product-list"
+        "^retail-react-app-app-pages-product-list"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-product-list"
+        "^retail-react-app-app-pages-product-list"
       ],
       "auxiliaryChunks": []
     },
@@ -245,51 +245,51 @@
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-cart.js",
-      "size": 60899,
+      "name": "^retail-react-app-app-pages-cart.js",
+      "size": 60901,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-cart.js.map"
+          "sourceMap": "^retail-react-app-app-pages-cart.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-cart"
+        "^retail-react-app-app-pages-cart"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-cart"
+        "^retail-react-app-app-pages-cart"
       ],
       "auxiliaryChunks": []
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-checkout-confirmation.js",
-      "size": 53991,
+      "name": "^retail-react-app-app-pages-checkout-confirmation.js",
+      "size": 53993,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-checkout-confirmation.js.map"
+          "sourceMap": "^retail-react-app-app-pages-checkout-confirmation.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-checkout-confirmation"
+        "^retail-react-app-app-pages-checkout-confirmation"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-checkout-confirmation"
+        "^retail-react-app-app-pages-checkout-confirmation"
       ],
       "auxiliaryChunks": []
     },
@@ -551,7 +551,7 @@
     {
       "type": "asset",
       "name": "pages-home.js",
-      "size": 39479,
+      "size": 39516,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -575,26 +575,26 @@
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-account-wishlist.js",
-      "size": 39134,
+      "name": "^retail-react-app-app-pages-account-wishlist.js",
+      "size": 39136,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-account-wishlist.js.map"
+          "sourceMap": "^retail-react-app-app-pages-account-wishlist.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-account-wishlist"
+        "^retail-react-app-app-pages-account-wishlist"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-account-wishlist"
+        "^retail-react-app-app-pages-account-wishlist"
       ],
       "auxiliaryChunks": []
     },
@@ -623,151 +623,151 @@
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-product-detail.js",
-      "size": 23690,
+      "name": "^retail-react-app-app-pages-product-detail.js",
+      "size": 23692,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-product-detail.js.map"
+          "sourceMap": "^retail-react-app-app-pages-product-detail.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-product-detail"
+        "^retail-react-app-app-pages-product-detail"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-product-detail"
+        "^retail-react-app-app-pages-product-detail"
       ],
       "auxiliaryChunks": []
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-reset-password.js",
-      "size": 10456,
+      "name": "^retail-react-app-app-pages-reset-password.js",
+      "size": 10458,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-reset-password.js.map"
+          "sourceMap": "^retail-react-app-app-pages-reset-password.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-reset-password"
+        "^retail-react-app-app-pages-reset-password"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-reset-password"
+        "^retail-react-app-app-pages-reset-password"
       ],
       "auxiliaryChunks": []
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-login.js",
-      "size": 8379,
+      "name": "^retail-react-app-app-pages-login.js",
+      "size": 8381,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-login.js.map"
+          "sourceMap": "^retail-react-app-app-pages-login.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-login"
+        "^retail-react-app-app-pages-login"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-login"
+        "^retail-react-app-app-pages-login"
       ],
       "auxiliaryChunks": []
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-page-not-found.js",
-      "size": 7774,
+      "name": "^retail-react-app-app-pages-page-not-found.js",
+      "size": 7776,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-page-not-found.js.map"
+          "sourceMap": "^retail-react-app-app-pages-page-not-found.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-page-not-found"
+        "^retail-react-app-app-pages-page-not-found"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-page-not-found"
+        "^retail-react-app-app-pages-page-not-found"
       ],
       "auxiliaryChunks": []
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-registration.js",
-      "size": 7562,
+      "name": "^retail-react-app-app-pages-registration.js",
+      "size": 7564,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-registration.js.map"
+          "sourceMap": "^retail-react-app-app-pages-registration.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-registration"
+        "^retail-react-app-app-pages-registration"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-registration"
+        "^retail-react-app-app-pages-registration"
       ],
       "auxiliaryChunks": []
     },
     {
       "type": "asset",
-      "name": "retail-react-app-app-pages-login-redirect.js",
-      "size": 3060,
+      "name": "^retail-react-app-app-pages-login-redirect.js",
+      "size": 3062,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "retail-react-app-app-pages-login-redirect.js.map"
+          "sourceMap": "^retail-react-app-app-pages-login-redirect.js.map"
         }
       },
       "chunkNames": [
-        "retail-react-app-app-pages-login-redirect"
+        "^retail-react-app-app-pages-login-redirect"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "retail-react-app-app-pages-login-redirect"
+        "^retail-react-app-app-pages-login-redirect"
       ],
       "auxiliaryChunks": []
     },
@@ -857,14 +857,14 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-login": {
-      "name": "retail-react-app-app-pages-login",
+    "^retail-react-app-app-pages-login": {
+      "name": "^retail-react-app-app-pages-login",
       "chunks": [
-        "retail-react-app-app-pages-login"
+        "^retail-react-app-app-pages-login"
       ],
       "assets": [
         {
-          "name": "retail-react-app-app-pages-login.js"
+          "name": "^retail-react-app-app-pages-login.js"
         }
       ],
       "filteredAssets": 0,
@@ -874,14 +874,14 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-registration": {
-      "name": "retail-react-app-app-pages-registration",
+    "^retail-react-app-app-pages-registration": {
+      "name": "^retail-react-app-app-pages-registration",
       "chunks": [
-        "retail-react-app-app-pages-registration"
+        "^retail-react-app-app-pages-registration"
       ],
       "assets": [
         {
-          "name": "retail-react-app-app-pages-registration.js"
+          "name": "^retail-react-app-app-pages-registration.js"
         }
       ],
       "filteredAssets": 0,
@@ -891,14 +891,14 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-reset-password": {
-      "name": "retail-react-app-app-pages-reset-password",
+    "^retail-react-app-app-pages-reset-password": {
+      "name": "^retail-react-app-app-pages-reset-password",
       "chunks": [
-        "retail-react-app-app-pages-reset-password"
+        "^retail-react-app-app-pages-reset-password"
       ],
       "assets": [
         {
-          "name": "retail-react-app-app-pages-reset-password.js"
+          "name": "^retail-react-app-app-pages-reset-password.js"
         }
       ],
       "filteredAssets": 0,
@@ -908,8 +908,8 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-account": {
-      "name": "retail-react-app-app-pages-account",
+    "^retail-react-app-app-pages-account": {
+      "name": "^retail-react-app-app-pages-account",
       "chunks": [
         "vendor",
         "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
@@ -917,8 +917,8 @@
         "template-retail-react-app_app_components_order-summary_index_jsx",
         "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1",
         "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51",
-        "retail-react-app-app-pages-account-wishlist",
-        "retail-react-app-app-pages-account"
+        "^retail-react-app-app-pages-account-wishlist",
+        "^retail-react-app-app-pages-account"
       ],
       "assets": [
         {
@@ -940,10 +940,10 @@
           "name": "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51.js"
         },
         {
-          "name": "retail-react-app-app-pages-account-wishlist.js"
+          "name": "^retail-react-app-app-pages-account-wishlist.js"
         },
         {
-          "name": "retail-react-app-app-pages-account.js"
+          "name": "^retail-react-app-app-pages-account.js"
         }
       ],
       "filteredAssets": 0,
@@ -953,14 +953,14 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-cart": {
-      "name": "retail-react-app-app-pages-cart",
+    "^retail-react-app-app-pages-cart": {
+      "name": "^retail-react-app-app-pages-cart",
       "chunks": [
         "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
         "template-retail-react-app_app_partials_product-view_index_jsx",
         "template-retail-react-app_app_components_order-summary_index_jsx",
         "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1",
-        "retail-react-app-app-pages-cart"
+        "^retail-react-app-app-pages-cart"
       ],
       "assets": [
         {
@@ -976,7 +976,7 @@
           "name": "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1.js"
         },
         {
-          "name": "retail-react-app-app-pages-cart.js"
+          "name": "^retail-react-app-app-pages-cart.js"
         }
       ],
       "filteredAssets": 0,
@@ -986,14 +986,14 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-checkout": {
-      "name": "retail-react-app-app-pages-checkout",
+    "^retail-react-app-app-pages-checkout": {
+      "name": "^retail-react-app-app-pages-checkout",
       "chunks": [
         "vendor",
         "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
         "template-retail-react-app_app_components_order-summary_index_jsx",
         "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51",
-        "retail-react-app-app-pages-checkout"
+        "^retail-react-app-app-pages-checkout"
       ],
       "assets": [
         {
@@ -1009,7 +1009,7 @@
           "name": "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51.js"
         },
         {
-          "name": "retail-react-app-app-pages-checkout.js"
+          "name": "^retail-react-app-app-pages-checkout.js"
         }
       ],
       "filteredAssets": 0,
@@ -1019,18 +1019,18 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-checkout-confirmation": {
-      "name": "retail-react-app-app-pages-checkout-confirmation",
+    "^retail-react-app-app-pages-checkout-confirmation": {
+      "name": "^retail-react-app-app-pages-checkout-confirmation",
       "chunks": [
         "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
-        "retail-react-app-app-pages-checkout-confirmation"
+        "^retail-react-app-app-pages-checkout-confirmation"
       ],
       "assets": [
         {
           "name": "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0.js"
         },
         {
-          "name": "retail-react-app-app-pages-checkout-confirmation.js"
+          "name": "^retail-react-app-app-pages-checkout-confirmation.js"
         }
       ],
       "filteredAssets": 0,
@@ -1040,14 +1040,14 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-login-redirect": {
-      "name": "retail-react-app-app-pages-login-redirect",
+    "^retail-react-app-app-pages-login-redirect": {
+      "name": "^retail-react-app-app-pages-login-redirect",
       "chunks": [
-        "retail-react-app-app-pages-login-redirect"
+        "^retail-react-app-app-pages-login-redirect"
       ],
       "assets": [
         {
-          "name": "retail-react-app-app-pages-login-redirect.js"
+          "name": "^retail-react-app-app-pages-login-redirect.js"
         }
       ],
       "filteredAssets": 0,
@@ -1057,18 +1057,18 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-product-detail": {
-      "name": "retail-react-app-app-pages-product-detail",
+    "^retail-react-app-app-pages-product-detail": {
+      "name": "^retail-react-app-app-pages-product-detail",
       "chunks": [
         "template-retail-react-app_app_partials_product-view_index_jsx",
-        "retail-react-app-app-pages-product-detail"
+        "^retail-react-app-app-pages-product-detail"
       ],
       "assets": [
         {
           "name": "template-retail-react-app_app_partials_product-view_index_jsx.js"
         },
         {
-          "name": "retail-react-app-app-pages-product-detail.js"
+          "name": "^retail-react-app-app-pages-product-detail.js"
         }
       ],
       "filteredAssets": 0,
@@ -1078,14 +1078,14 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-product-list": {
-      "name": "retail-react-app-app-pages-product-list",
+    "^retail-react-app-app-pages-product-list": {
+      "name": "^retail-react-app-app-pages-product-list",
       "chunks": [
-        "retail-react-app-app-pages-product-list"
+        "^retail-react-app-app-pages-product-list"
       ],
       "assets": [
         {
-          "name": "retail-react-app-app-pages-product-list.js"
+          "name": "^retail-react-app-app-pages-product-list.js"
         }
       ],
       "filteredAssets": 0,
@@ -1095,14 +1095,14 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-account-wishlist": {
-      "name": "retail-react-app-app-pages-account-wishlist",
+    "^retail-react-app-app-pages-account-wishlist": {
+      "name": "^retail-react-app-app-pages-account-wishlist",
       "chunks": [
         "vendor",
         "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0",
         "template-retail-react-app_app_partials_product-view_index_jsx",
         "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1",
-        "retail-react-app-app-pages-account-wishlist"
+        "^retail-react-app-app-pages-account-wishlist"
       ],
       "assets": [
         {
@@ -1118,7 +1118,7 @@
           "name": "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1.js"
         },
         {
-          "name": "retail-react-app-app-pages-account-wishlist.js"
+          "name": "^retail-react-app-app-pages-account-wishlist.js"
         }
       ],
       "filteredAssets": 0,
@@ -1128,14 +1128,14 @@
       "children": {},
       "childAssets": {}
     },
-    "retail-react-app-app-pages-page-not-found": {
-      "name": "retail-react-app-app-pages-page-not-found",
+    "^retail-react-app-app-pages-page-not-found": {
+      "name": "^retail-react-app-app-pages-page-not-found",
       "chunks": [
-        "retail-react-app-app-pages-page-not-found"
+        "^retail-react-app-app-pages-page-not-found"
       ],
       "assets": [
         {
-          "name": "retail-react-app-app-pages-page-not-found.js"
+          "name": "^retail-react-app-app-pages-page-not-found.js"
         }
       ],
       "filteredAssets": 0,
@@ -1245,75 +1245,75 @@
       ]
     },
     {
-      "id": "retail-react-app-app-pages-login",
+      "id": "^retail-react-app-app-pages-login",
       "files": [
-        "retail-react-app-app-pages-login.js"
+        "^retail-react-app-app-pages-login.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-registration",
+      "id": "^retail-react-app-app-pages-registration",
       "files": [
-        "retail-react-app-app-pages-registration.js"
+        "^retail-react-app-app-pages-registration.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-reset-password",
+      "id": "^retail-react-app-app-pages-reset-password",
       "files": [
-        "retail-react-app-app-pages-reset-password.js"
+        "^retail-react-app-app-pages-reset-password.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-account",
+      "id": "^retail-react-app-app-pages-account",
       "files": [
-        "retail-react-app-app-pages-account.js"
+        "^retail-react-app-app-pages-account.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-cart",
+      "id": "^retail-react-app-app-pages-cart",
       "files": [
-        "retail-react-app-app-pages-cart.js"
+        "^retail-react-app-app-pages-cart.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-checkout",
+      "id": "^retail-react-app-app-pages-checkout",
       "files": [
-        "retail-react-app-app-pages-checkout.js"
+        "^retail-react-app-app-pages-checkout.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-checkout-confirmation",
+      "id": "^retail-react-app-app-pages-checkout-confirmation",
       "files": [
-        "retail-react-app-app-pages-checkout-confirmation.js"
+        "^retail-react-app-app-pages-checkout-confirmation.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-login-redirect",
+      "id": "^retail-react-app-app-pages-login-redirect",
       "files": [
-        "retail-react-app-app-pages-login-redirect.js"
+        "^retail-react-app-app-pages-login-redirect.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-product-detail",
+      "id": "^retail-react-app-app-pages-product-detail",
       "files": [
-        "retail-react-app-app-pages-product-detail.js"
+        "^retail-react-app-app-pages-product-detail.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-product-list",
+      "id": "^retail-react-app-app-pages-product-list",
       "files": [
-        "retail-react-app-app-pages-product-list.js"
+        "^retail-react-app-app-pages-product-list.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-account-wishlist",
+      "id": "^retail-react-app-app-pages-account-wishlist",
       "files": [
-        "retail-react-app-app-pages-account-wishlist.js"
+        "^retail-react-app-app-pages-account-wishlist.js"
       ]
     },
     {
-      "id": "retail-react-app-app-pages-page-not-found",
+      "id": "^retail-react-app-app-pages-page-not-found",
       "files": [
-        "retail-react-app-app-pages-page-not-found.js"
+        "^retail-react-app-app-pages-page-not-found.js"
       ]
     },
     {

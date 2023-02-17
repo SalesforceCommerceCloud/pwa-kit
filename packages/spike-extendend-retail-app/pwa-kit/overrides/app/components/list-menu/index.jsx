@@ -12,7 +12,7 @@ import {Link as RouteLink} from 'react-router-dom'
 import omit from 'lodash/omit'
 
 // Project Components
-import LinksList from 'retail-react-app/app/components/links-list'
+import LinksList from '^retail-react-app/app/components/links-list'
 
 // Components
 import {
@@ -32,10 +32,10 @@ import {
     useTheme,
     useDisclosure,
 } from '@chakra-ui/react'
-import Link from 'retail-react-app/app/components/link'
+import Link from '^retail-react-app/app/components/link'
 // Others
-import {categoryUrlBuilder} from 'retail-react-app/app/utils/url'
-import {ChevronDownIcon} from 'retail-react-app/app/components/icons'
+import {categoryUrlBuilder} from '^retail-react-app/app/utils/url'
+import {ChevronDownIcon} from '^retail-react-app/app/components/icons'
 
 const MAXIMUM_NUMBER_COLUMNS = 5
 

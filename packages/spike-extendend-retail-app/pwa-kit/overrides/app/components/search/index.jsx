@@ -18,29 +18,29 @@ import {
     HStack,
     Spinner,
 } from '@chakra-ui/react'
-import SearchSuggestions from 'retail-react-app/app/components/search/partials/search-suggestions'
-import {SearchIcon} from 'retail-react-app/app/components/icons'
-import useSearchSuggestions from 'retail-react-app/app/commerce-api/hooks/useSearchSuggestions'
+import SearchSuggestions from '^retail-react-app/app/components/search/partials/search-suggestions'
+import {SearchIcon} from '^retail-react-app/app/components/icons'
+import useSearchSuggestions from '^retail-react-app/app/commerce-api/hooks/useSearchSuggestions'
 import {
     capitalize,
     boldString,
     getSessionJSONItem,
     setSessionJSONItem,
-} from 'retail-react-app/app/utils/utils'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/responsive'
+} from '^retail-react-app/app/utils/utils'
+import useNavigation from '^retail-react-app/app/hooks/use-navigation'
+import {HideOnDesktop, HideOnMobile} from '^retail-react-app/app/components/responsive'
 // import {FormattedMessage} from 'react-intl'
 import debounce from 'lodash/debounce'
 import {
     RECENT_SEARCH_KEY,
     RECENT_SEARCH_LIMIT,
     RECENT_SEARCH_MIN_LENGTH,
-} from 'retail-react-app/app/constants'
+} from '^retail-react-app/app/constants'
 import {
     productUrlBuilder,
     searchUrlBuilder,
     categoryUrlBuilder,
-} from 'retail-react-app/app/utils/url'
+} from '^retail-react-app/app/utils/url'
 
 const formatSuggestions = (searchSuggestions, input) => {
     return {

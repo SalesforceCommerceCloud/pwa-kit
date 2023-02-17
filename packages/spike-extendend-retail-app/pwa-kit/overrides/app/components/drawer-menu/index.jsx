@@ -10,9 +10,9 @@ import PropTypes from 'prop-types'
 // import {useIntl} from 'react-intl'
 
 // Project Components
-import LocaleSelector from 'retail-react-app/app/components/locale-selector'
-import NestedAccordion from 'retail-react-app/app/components/nested-accordion'
-import SocialIcons from 'retail-react-app/app/components/social-icons'
+import LocaleSelector from '^retail-react-app/app/components/locale-selector'
+import NestedAccordion from '^retail-react-app/app/components/nested-accordion'
+import SocialIcons from '^retail-react-app/app/components/social-icons'
 
 // Components
 import {
@@ -41,18 +41,23 @@ import {
     useBreakpointValue,
     useMultiStyleConfig,
 } from '@chakra-ui/react'
-import Link from 'retail-react-app/app/components/link'
+import Link from '^retail-react-app/app/components/link'
 // Icons
-import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from 'retail-react-app/app/components/icons'
+import {
+    BrandLogo,
+    LocationIcon,
+    SignoutIcon,
+    UserIcon,
+} from '^retail-react-app/app/components/icons'
 
 // Others
-import {noop} from 'retail-react-app/app/utils/utils'
-import {getPathWithLocale, categoryUrlBuilder} from 'retail-react-app/app/utils/url'
-import useCustomer from 'retail-react-app/app/commerce-api/hooks/useCustomer'
-import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
+import {noop} from '^retail-react-app/app/utils/utils'
+import {getPathWithLocale, categoryUrlBuilder} from '^retail-react-app/app/utils/url'
+import useCustomer from '^retail-react-app/app/commerce-api/hooks/useCustomer'
+import LoadingSpinner from '^retail-react-app/app/components/loading-spinner'
 
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
+import useNavigation from '^retail-react-app/app/hooks/use-navigation'
+import useMultiSite from '^retail-react-app/app/hooks/use-multi-site'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign

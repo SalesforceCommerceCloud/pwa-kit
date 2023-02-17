@@ -224,13 +224,17 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
 
     return new webpack.NormalModuleReplacementPlugin(overridesRegex, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-        if (resolved?.match?.(/retail\-react\-app\/app\/components\/icons/)) {
+        const matchRegex = makeRegExp(pkg?.mobify?.extends)
+        if (
+            resolved?.match?.(matchRegex) &&
+            _overrides?.filter((override) => override?.match(/\.(?=[^\/]+$)/))?.length
+        ) {
             console.log('~======= file path.resolve()', resolved)
             console.log('~requestedFile context:', resource.context)
             console.log('~requestedFile request:', resource.request)
 
             const depth = pkg?.mobify?.overridesDir?.replace?.(/^\//, '')?.split('/') || []
-            const relativePath = resolved?.split?.(/retail\-react\-app/)?.[1]
+            const relativePath = resolved?.split?.(matchRegex)?.[1]
             const newPath = projectDir + pkg?.mobify?.overridesDir + relativePath
             console.log('~new resource.request!!!', newPath)
             // NOTE: overriding either of these alone does not work, both must be set

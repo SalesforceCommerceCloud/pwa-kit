@@ -22,9 +22,9 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 import {
     sdkReplacementPlugin,
-    extendedTemplateReplacementPlugin,
     importFromExtendsPlugin,
     importFromLocalPlugin,
+    extendedTemplateReplacementPlugin,
     allFiles
 } from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
@@ -198,7 +198,6 @@ const baseConfig = (target) => {
                     pkg?.mobify?.extends && pkg?.mobify?.overridesDir
                         ? extendedTemplateReplacementPlugin(projectDir)
                         : () => null,
-
                     allFiles(),
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})

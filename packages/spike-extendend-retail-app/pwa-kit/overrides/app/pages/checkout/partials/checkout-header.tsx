@@ -7,10 +7,10 @@
 import React from 'react'
 // import {FormattedMessage} from 'react-intl'
 import {Badge, Box, Button, Flex, Center} from '@chakra-ui/react'
-import useBasket from 'retail-react-app/app/commerce-api/hooks/useBasket'
-import Link from 'retail-react-app/app/components/link'
-import {BasketIcon, BrandLogo} from 'retail-react-app/app/components/icons'
-import {HOME_HREF} from 'retail-react-app/app/constants'
+import useBasket from '^retail-react-app/app/commerce-api/hooks/useBasket'
+import Link from '^retail-react-app/app/components/link'
+import {BasketIcon, BrandLogo} from '^retail-react-app/app/components/icons'
+import {HOME_HREF} from '^retail-react-app/app/constants'
 
 const CheckoutHeader = () => {
     const basket = useBasket()

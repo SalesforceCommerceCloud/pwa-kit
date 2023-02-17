@@ -28,12 +28,12 @@ import {
     useMediaQuery,
 } from '@chakra-ui/react'
 
-import useBasket from 'retail-react-app/app/commerce-api/hooks/useBasket'
-import useCustomer from 'retail-react-app/app/commerce-api/hooks/useCustomer'
+import useBasket from '^retail-react-app/app/commerce-api/hooks/useBasket'
+import useCustomer from '^retail-react-app/app/commerce-api/hooks/useCustomer'
 
-import Link from 'retail-react-app/app/components/link'
-import Search from 'retail-react-app/app/components/search'
-import withRegistration from 'retail-react-app/app/hoc/with-registration'
+import Link from '^retail-react-app/app/components/link'
+import Search from '^retail-react-app/app/components/search'
+import withRegistration from '^retail-react-app/app/hoc/with-registration'
 import {
     AccountIcon,
     BrandLogo,
@@ -44,11 +44,11 @@ import {
     SignoutIcon,
 } from '../icons'
 
-import {noop} from 'retail-react-app/app/utils/utils'
-import {navLinks, messages} from 'retail-react-app/app/pages/account/constant'
+import {noop} from '^retail-react-app/app/utils/utils'
+import {navLinks, messages} from '^retail-react-app/app/pages/account/constant'
 // import {navLinks} from '../../pages/account/constant'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
+import useNavigation from '^retail-react-app/app/hooks/use-navigation'
+import LoadingSpinner from '^retail-react-app/app/components/loading-spinner'
 
 const ENTER_KEY = 'Enter'
 

@@ -18,10 +18,10 @@ import {
 } from '@chakra-ui/react'
 
 // Project Components
-import Hero from 'retail-react-app/app/components/hero'
-import Seo from 'retail-react-app/app/components/seo'
-import Section from 'retail-react-app/app/components/section'
-import ProductScroller from 'retail-react-app/app/components/product-scroller'
+import Hero from '^retail-react-app/app/components/hero'
+import Seo from '^retail-react-app/app/components/seo'
+import Section from '^retail-react-app/app/components/section'
+import ProductScroller from '^retail-react-app/app/components/product-scroller'
 
 // Others
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
@@ -31,17 +31,17 @@ import {heroFeatures, features} from './data'
 
 // TODO: remove me!
 import {ChakraProvider} from '@chakra-ui/react'
-import theme from 'retail-react-app/app/theme'
+import theme from '^retail-react-app/app/theme'
 
 //Hooks
-import useEinstein from 'retail-react-app/app/commerce-api/hooks/useEinstein'
+import useEinstein from '^retail-react-app/app/commerce-api/hooks/useEinstein'
 
 // Constants
 import {
     MAX_CACHE_AGE,
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
     HOME_SHOP_PRODUCTS_LIMIT,
-} from 'retail-react-app/app/constants'
+} from '^retail-react-app/app/constants'
 
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()

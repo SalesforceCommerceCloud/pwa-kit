@@ -11,19 +11,19 @@ import {ChakraProvider} from '@chakra-ui/react'
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
-import theme from 'retail-react-app/app/theme'
-import CommerceAPI from 'retail-react-app/app/commerce-api'
+import theme from '^retail-react-app/app/theme'
+import CommerceAPI from '^retail-react-app/app/commerce-api'
 import {
     BasketProvider,
     CommerceAPIProvider,
     CustomerProductListsProvider,
     CustomerProvider,
-} from 'retail-react-app/app/commerce-api/contexts'
-import {MultiSiteProvider} from 'retail-react-app/app/contexts'
-import {resolveSiteFromUrl} from 'retail-react-app/app/utils/site-utils'
-import {resolveLocaleFromUrl} from 'retail-react-app/app/utils/utils'
+} from '^retail-react-app/app/commerce-api/contexts'
+import {MultiSiteProvider} from '^retail-react-app/app/contexts'
+import {resolveSiteFromUrl} from '^retail-react-app/app/utils/site-utils'
+import {resolveLocaleFromUrl} from '^retail-react-app/app/utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {createUrlTemplate} from 'retail-react-app/app/utils/url'
+import {createUrlTemplate} from '^retail-react-app/app/utils/url'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
