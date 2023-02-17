@@ -11,10 +11,10 @@ import {Region} from '../../region'
 
 /**
  * This layout component displays its children in a 1 x 1 grid on both mobile and desktop.
- * 
+ *
  * NOTE: This component is not intended to be used directly, it's used by the core page designer
  * components.
- * 
+ *
  * @param {componentProps} props
  * @param {regionType []} props.regions - The page designer regions for this component.
  * @param {object} props.data - The data for the component.
