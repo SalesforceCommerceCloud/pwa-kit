@@ -83,7 +83,6 @@ export const useProductViewModal = (initialProduct) => {
         }
     }, [variant])
 
-    console.log('-------fetching', isFetching)
     return {
         product,
         variant,

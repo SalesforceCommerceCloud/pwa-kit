@@ -38,7 +38,6 @@ const MockComponent = ({product}) => {
     const productViewModalData = useProductViewModal(product)
     const [isShown, setIsShown] = React.useState(false)
 
-    console.log('--------product', productViewModalData)
 
     return (
         <div>
