@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import {ApiClients, Argument, DataType, MergedOptions} from '../types'
+import {UseQueryResult} from '@tanstack/react-query'
+import {ApiClients, ApiQueryKey, ApiQueryOptions, Argument, DataType} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
+import {mergeOptions} from '../utils'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -20,28 +21,29 @@ type Client = ApiClients['shopperBaskets']
  */
 export const useBasket = (
     apiOptions: Argument<Client['getBasket']>,
-    queryOptions: Omit<UseQueryOptions<DataType<Client['getBasket']>>, 'queryFn'> = {}
+    queryOptions: ApiQueryOptions<Client['getBasket']> = {}
 ): UseQueryResult<DataType<Client['getBasket']>> => {
     const {shopperBaskets: client} = useCommerceApi()
-    const method = (arg: Argument<Client['getBasket']>) => client.getBasket(arg)
+    const method = async (options: Argument<Client['getBasket']>) => await client.getBasket(options)
     const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
-    // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
-    // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({parameters}: MergedOptions<Client, Argument<Client['getBasket']>>) =>
-        [
-            '/organizations/',
-            parameters.organizationId,
-            '/baskets/',
-            parameters.basketId,
-            // Full parameters last for easy lookup
-            parameters
-        ] as const
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const {parameters} = netOptions
+    const queryKey: ApiQueryKey<typeof parameters> = [
+        '/organizations/',
+        parameters.organizationId,
+        '/baskets/',
+        parameters.basketId,
+        parameters
+    ]
 
-    return useQuery(apiOptions, queryOptions, {
-        client,
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<typeof netOptions, DataType<Client['getBasket']>>(netOptions, queryOptions, {
         method,
-        requiredParameters,
-        getQueryKey
+        queryKey,
+        requiredParameters
     })
 }
 /**
@@ -53,36 +55,36 @@ export const useBasket = (
  */
 export const usePaymentMethodsForBasket = (
     apiOptions: Argument<Client['getPaymentMethodsForBasket']>,
-    queryOptions: Omit<
-        UseQueryOptions<DataType<Client['getPaymentMethodsForBasket']>>,
-        'queryFn'
-    > = {}
+    queryOptions: ApiQueryOptions<Client['getPaymentMethodsForBasket']> = {}
 ): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']>> => {
     const {shopperBaskets: client} = useCommerceApi()
-    const method = (arg: Argument<Client['getPaymentMethodsForBasket']>) =>
-        client.getPaymentMethodsForBasket(arg)
+    const method = async (options: Argument<Client['getPaymentMethodsForBasket']>) =>
+        await client.getPaymentMethodsForBasket(options)
     const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
-    // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
-    // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const {parameters} = netOptions
+    const queryKey: ApiQueryKey<typeof parameters> = [
+        '/organizations/',
+        parameters.organizationId,
+        '/baskets/',
+        parameters.basketId,
+        '/payment-methods',
         parameters
-    }: MergedOptions<Client, Argument<Client['getPaymentMethodsForBasket']>>) =>
-        [
-            '/organizations/',
-            parameters.organizationId,
-            '/baskets/',
-            parameters.basketId,
-            '/payment-methods',
-            // Full parameters last for easy lookup
-            parameters
-        ] as const
+    ]
 
-    return useQuery(apiOptions, queryOptions, {
-        client,
-        method,
-        requiredParameters,
-        getQueryKey
-    })
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<typeof netOptions, DataType<Client['getPaymentMethodsForBasket']>>(
+        netOptions,
+        queryOptions,
+        {
+            method,
+            queryKey,
+            requiredParameters
+        }
+    )
 }
 /**
  * A hook for `ShopperBaskets#getPriceBooksForBasket`.
@@ -93,33 +95,36 @@ export const usePaymentMethodsForBasket = (
  */
 export const usePriceBooksForBasket = (
     apiOptions: Argument<Client['getPriceBooksForBasket']>,
-    queryOptions: Omit<UseQueryOptions<DataType<Client['getPriceBooksForBasket']>>, 'queryFn'> = {}
+    queryOptions: ApiQueryOptions<Client['getPriceBooksForBasket']> = {}
 ): UseQueryResult<DataType<Client['getPriceBooksForBasket']>> => {
     const {shopperBaskets: client} = useCommerceApi()
-    const method = (arg: Argument<Client['getPriceBooksForBasket']>) =>
-        client.getPriceBooksForBasket(arg)
+    const method = async (options: Argument<Client['getPriceBooksForBasket']>) =>
+        await client.getPriceBooksForBasket(options)
     const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
-    // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
-    // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const {parameters} = netOptions
+    const queryKey: ApiQueryKey<typeof parameters> = [
+        '/organizations/',
+        parameters.organizationId,
+        '/baskets/',
+        parameters.basketId,
+        '/price-books',
         parameters
-    }: MergedOptions<Client, Argument<Client['getPriceBooksForBasket']>>) =>
-        [
-            '/organizations/',
-            parameters.organizationId,
-            '/baskets/',
-            parameters.basketId,
-            '/price-books',
-            // Full parameters last for easy lookup
-            parameters
-        ] as const
+    ]
 
-    return useQuery(apiOptions, queryOptions, {
-        client,
-        method,
-        requiredParameters,
-        getQueryKey
-    })
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<typeof netOptions, DataType<Client['getPriceBooksForBasket']>>(
+        netOptions,
+        queryOptions,
+        {
+            method,
+            queryKey,
+            requiredParameters
+        }
+    )
 }
 /**
  * A hook for `ShopperBaskets#getShippingMethodsForShipment`.
@@ -130,38 +135,38 @@ export const usePriceBooksForBasket = (
  */
 export const useShippingMethodsForShipment = (
     apiOptions: Argument<Client['getShippingMethodsForShipment']>,
-    queryOptions: Omit<
-        UseQueryOptions<DataType<Client['getShippingMethodsForShipment']>>,
-        'queryFn'
-    > = {}
+    queryOptions: ApiQueryOptions<Client['getShippingMethodsForShipment']> = {}
 ): UseQueryResult<DataType<Client['getShippingMethodsForShipment']>> => {
     const {shopperBaskets: client} = useCommerceApi()
-    const method = (arg: Argument<Client['getShippingMethodsForShipment']>) =>
-        client.getShippingMethodsForShipment(arg)
+    const method = async (options: Argument<Client['getShippingMethodsForShipment']>) =>
+        await client.getShippingMethodsForShipment(options)
     const requiredParameters = ['organizationId', 'basketId', 'shipmentId', 'siteId'] as const
-    // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
-    // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const {parameters} = netOptions
+    const queryKey: ApiQueryKey<typeof parameters> = [
+        '/organizations/',
+        parameters.organizationId,
+        '/baskets/',
+        parameters.basketId,
+        '/shipments/',
+        parameters.shipmentId,
+        '/shipping-methods',
         parameters
-    }: MergedOptions<Client, Argument<Client['getShippingMethodsForShipment']>>) =>
-        [
-            '/organizations/',
-            parameters.organizationId,
-            '/baskets/',
-            parameters.basketId,
-            '/shipments/',
-            parameters.shipmentId,
-            '/shipping-methods',
-            // Full parameters last for easy lookup
-            parameters
-        ] as const
+    ]
 
-    return useQuery(apiOptions, queryOptions, {
-        client,
-        method,
-        requiredParameters,
-        getQueryKey
-    })
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<typeof netOptions, DataType<Client['getShippingMethodsForShipment']>>(
+        netOptions,
+        queryOptions,
+        {
+            method,
+            queryKey,
+            requiredParameters
+        }
+    )
 }
 /**
  * A hook for `ShopperBaskets#getTaxesFromBasket`.
@@ -172,30 +177,34 @@ export const useShippingMethodsForShipment = (
  */
 export const useTaxesFromBasket = (
     apiOptions: Argument<Client['getTaxesFromBasket']>,
-    queryOptions: Omit<UseQueryOptions<DataType<Client['getTaxesFromBasket']>>, 'queryFn'> = {}
+    queryOptions: ApiQueryOptions<Client['getTaxesFromBasket']> = {}
 ): UseQueryResult<DataType<Client['getTaxesFromBasket']>> => {
     const {shopperBaskets: client} = useCommerceApi()
-    const method = (arg: Argument<Client['getTaxesFromBasket']>) => client.getTaxesFromBasket(arg)
+    const method = async (options: Argument<Client['getTaxesFromBasket']>) =>
+        await client.getTaxesFromBasket(options)
     const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
-    // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
-    // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const {parameters} = netOptions
+    const queryKey: ApiQueryKey<typeof parameters> = [
+        '/organizations/',
+        parameters.organizationId,
+        '/baskets/',
+        parameters.basketId,
+        '/taxes',
         parameters
-    }: MergedOptions<Client, Argument<Client['getTaxesFromBasket']>>) =>
-        [
-            '/organizations/',
-            parameters.organizationId,
-            '/baskets/',
-            parameters.basketId,
-            '/taxes',
-            // Full parameters last for easy lookup
-            parameters
-        ] as const
+    ]
 
-    return useQuery(apiOptions, queryOptions, {
-        client,
-        method,
-        requiredParameters,
-        getQueryKey
-    })
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<typeof netOptions, DataType<Client['getTaxesFromBasket']>>(
+        netOptions,
+        queryOptions,
+        {
+            method,
+            queryKey,
+            requiredParameters
+        }
+    )
 }

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {Query, Updater} from '@tanstack/react-query'
+import {Query, Updater, UseQueryOptions} from '@tanstack/react-query'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -27,8 +27,7 @@ export type Prettify<T extends object> = NonNullable<Pick<T, keyof T>>
  * Marks the given keys as required.
  * WARNING: Does not work if T has an index signature.
  */
-// The outer Pick<...> is used to prettify the result type
-type RequireKeys<T, K extends keyof T> = Pick<T & Required<Pick<T, K>>, keyof T>
+export type RequireKeys<T, K extends keyof T> = Prettify<T & Required<Pick<T, K>>>
 
 /** Removes keys whose value is `never`. */
 type RemoveNeverValues<T> = {
@@ -109,7 +108,7 @@ export type DataType<T> = T extends ApiMethod<any, Response | infer R> ? R : nev
  * Merged headers and parameters from client config and options, mimicking the behavior
  * of commerce-sdk-isomorphic.
  */
-export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> = RequireKeys<
+export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> = Required<
     ApiOptions<
         NonNullable<Client['clientConfig']['parameters'] & Options['parameters']>,
         // `body` may not exist on `Options`, in which case it is `unknown` here. Due to the type
@@ -117,16 +116,23 @@ export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> 
         // to indicate that the result type does not have a `body`.
         unknown extends Options['body'] ? never : Options['body'],
         NonNullable<Client['clientConfig']['headers'] & Options['headers']>
-    >,
-    'parameters' | 'headers'
+    >
+>
+
+/** Query key interface used by API query hooks. */
+export type ApiQueryKey<Params extends Record<string, unknown> = Record<string, unknown>> =
+    readonly [...path: string[], parameters: Params]
+
+/** Query options for endpoint hooks. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ApiQueryOptions<Method extends ApiMethod<any, unknown>> = Prettify<
+    Omit<
+        UseQueryOptions<DataType<Method>, unknown, DataType<Method>, ApiQueryKey>,
+        'queryFn' | 'queryKey'
+    >
 >
 
 // --- CACHE HELPERS --- //
-
-/**
- * Query key interface used by API query hooks.
- */
-export type ApiQueryKey = readonly [...path: string[], parameters: Record<string, unknown>]
 
 /**
  * Interface to update a cached API response.

@@ -105,19 +105,20 @@ export const mergeOptions = <Client extends ApiClient, Options extends ApiOption
     options: Options
 ): MergedOptions<Client, Options> => {
     const merged = {
-        ...options,
-        headers: {
-            ...client.clientConfig.headers,
-            ...options.headers
-        },
+        // Only include body if it is set
+        ...('body' in options
+            ? // I'm not entirely sure why these type assertions are necessary. It seems likely that
+              // the type definitions are more complex than they need to be.
+              {body: options.body as MergedOptions<Client, Options>['body']}
+            : ({} as {body: never})),
         parameters: {
+            ...client.clientConfig.parameters,
+            ...options.parameters
+        },
+        headers: {
             ...client.clientConfig.parameters,
             ...options.parameters
         }
     }
-    // I don't know why TypeScript complains if we don't include `body`, but this type assertion
-    // fixes it. The type error can also be fixed by adding `body: undefined` before `...options`,
-    // and then deleting `merged.body` if `options` doesn't have `body`. That's the same as just not
-    // including it in the first place, so I don't know what difference it makes to TypeScript...
-    return merged as typeof merged & {body?: undefined}
+    return merged
 }

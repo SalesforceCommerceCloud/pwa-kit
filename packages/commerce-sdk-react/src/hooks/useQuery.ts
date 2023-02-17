@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useQuery as useReactQuery, UseQueryOptions, QueryKey} from '@tanstack/react-query'
+import {useQuery as useReactQuery} from '@tanstack/react-query'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
-import {ApiClient, ApiMethod, ApiOptions, MergedOptions} from './types'
-import {hasAllKeys, mergeOptions} from './utils'
+import {ApiMethod, ApiOptions, ApiQueryKey, ApiQueryOptions, RequireKeys} from './types'
+import {hasAllKeys} from './utils'
 
 /**
  * Helper for query hooks, contains most of the logic in order to keep individual hooks small.
@@ -16,36 +16,24 @@ import {hasAllKeys, mergeOptions} from './utils'
  * @param hookConfig - Config values that vary per API endpoint
  * @internal
  */
-export const useQuery = <
-    Client extends ApiClient,
-    Options extends Omit<ApiOptions, 'body'>,
-    Data,
-    Err,
-    QK extends QueryKey
->(
+export const useQuery = <Options extends RequireKeys<ApiOptions, 'parameters'>, Data>(
     apiOptions: Options,
-    queryOptions: UseQueryOptions<Data, Err, Data, QK>,
+    queryOptions: ApiQueryOptions<ApiMethod<Options, Data>>,
     hookConfig: {
-        client: Client
         method: ApiMethod<Options, Data>
-        getQueryKey: (options: MergedOptions<Client, Options>) => QK
-        requiredParameters: ReadonlyArray<keyof MergedOptions<Client, Options>['parameters']>
+        queryKey: ApiQueryKey<Options['parameters']>
+        requiredParameters: ReadonlyArray<keyof Options['parameters']>
         enabled?: boolean
     }
 ) => {
-    const netOptions = mergeOptions(hookConfig.client, apiOptions)
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
-    return useReactQuery(
-        hookConfig.getQueryKey(netOptions),
-        () => authenticatedMethod(apiOptions),
-        {
-            enabled:
-                // Individual hooks can provide `enabled` checks that are done in ADDITION to
-                // the required parameter check
-                hookConfig.enabled !== false &&
-                hasAllKeys(netOptions.parameters, hookConfig.requiredParameters),
-            // End users can always completely OVERRIDE the default `enabled` check
-            ...queryOptions
-        }
-    )
+    return useReactQuery(hookConfig.queryKey, () => authenticatedMethod(apiOptions), {
+        enabled:
+            // Individual hooks can provide `enabled` checks that are done in ADDITION to
+            // the required parameter check
+            hookConfig.enabled !== false &&
+            hasAllKeys(apiOptions.parameters, hookConfig.requiredParameters),
+        // End users can always completely OVERRIDE the default `enabled` check
+        ...queryOptions
+    })
 }
