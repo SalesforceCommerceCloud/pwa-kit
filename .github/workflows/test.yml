@@ -32,13 +32,13 @@ jobs:
       matrix:
         node: [14, 16]
         npm: [6, 7, 8]
-      exclude:
-        - node: 14
-          npm: 7
-        - node: 14
-          npm: 8
-        - node: 16
-          npm: 6
+        exclude:
+          - node: 14
+            npm: 7
+          - node: 14
+            npm: 8
+          - node: 16
+            npm: 6
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node
@@ -128,13 +128,13 @@ jobs:
         matrix:
           node: [14, 16]
           npm: [6, 7, 8]
-        exclude:
-          - node: 14
-            npm: 7
-          - node: 14
-            npm: 8
-          - node: 16
-            npm: 6
+          exclude:
+            - node: 14
+              npm: 7
+            - node: 14
+              npm: 8
+            - node: 16
+              npm: 6
     runs-on: windows-latest
     steps:
         - name: Checkout
