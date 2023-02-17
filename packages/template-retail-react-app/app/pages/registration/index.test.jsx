@@ -103,12 +103,12 @@ afterEach(() => {
 
 test('Allows customer to create an account', async () => {
     // render our test component
-    renderWithProviders(<MockedComponent />, {
+    await renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
     // fill out form and submit
-    const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
+    const withinForm = within(await screen.getByTestId('sf-auth-modal-form'))
 
     user.paste(withinForm.getByLabelText('First Name'), 'Tester')
     user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
