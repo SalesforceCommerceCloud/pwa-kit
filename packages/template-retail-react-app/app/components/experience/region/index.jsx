@@ -21,7 +21,7 @@ export const Region = (props) => {
     const {id, components} = region
 
     return (
-        <div id={id} className={`region ${className}`} {...rest}>
+        <div id={id} className={`region ${className}`} style={{marginBottom: 15}} {...rest}>
             <div className="container">
                 {components?.map((component) => (
                     <Component key={component.id} component={component} />

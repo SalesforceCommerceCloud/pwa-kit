@@ -9,15 +9,13 @@ import PropTypes from 'prop-types'
 import {SimpleGrid} from '@chakra-ui/react'
 import {Region} from '../../region'
 
-export const MobileGrid2r2c = ({regions}) => {
-    return (
-        <SimpleGrid className="mobile-2r-2c" style={{border: '1px solid black'}} columns={2}>
-            {regions.map((region) => (
-                <Region key={region.id} region={region} />
-            ))}
-        </SimpleGrid>
-    )
-}
+export const MobileGrid2r2c = ({regions}) => (
+    <SimpleGrid className="mobile-2r-2c" columns={{base: 2, md: 4}} spacingX={15} spacingY={15}>
+        {regions.map((region) => (
+            <Region key={region.id} region={region} />
+        ))}
+    </SimpleGrid>
+)
 
 MobileGrid2r2c.displayName = 'MobileGrid1r1c'
 

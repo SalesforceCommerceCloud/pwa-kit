@@ -8,18 +8,22 @@ import React from 'react'
 import {componentMapProxy} from './utils'
 import {Page} from '../../components/experience/page'
 import {pageType} from '../../components/experience/types'
+import {Box} from '@chakra-ui/react'
 
 const PageViewer = ({page}) => {
-    return <Page page={page} components={componentMapProxy} />
+    return (
+        <Box layerStyle={'page'}>
+            <Page page={page} components={componentMapProxy} />
+        </Box>
+    )
 }
 
 PageViewer.getProps = async ({api}) => {
     const page = await api.shopperExperience.getPage({
         parameters: {
-            pageId: 'homepage-example'
+            pageId: 'layout-example'
         }
     })
-    console.log('Page: ', page)
     return {
         page
     }
