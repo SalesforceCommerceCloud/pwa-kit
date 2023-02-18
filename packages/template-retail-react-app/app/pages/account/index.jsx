@@ -8,12 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    Route,
-    Switch,
-    useRouteMatch
-    // Redirect
-} from 'react-router'
+import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
 import {
     Accordion,
     AccordionButton,
@@ -28,7 +23,6 @@ import {
     Text,
     Divider
 } from '@chakra-ui/react'
-// import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Seo from '../../components/seo'
 import Link from '../../components/link'
 import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../components/icons'
@@ -42,7 +36,7 @@ import {useLocation} from 'react-router-dom'
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-// import useMultiSite from '../../hooks/use-multi-site'
+import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 import {
     useCustomerId,
@@ -68,7 +62,7 @@ const Account = () => {
 
     const einstein = useEinstein()
 
-    // const {buildUrl} = useMultiSite()
+    const {buildUrl} = useMultiSite()
 
     /**************** Einstein ****************/
     useEffect(() => {
@@ -109,14 +103,13 @@ const Account = () => {
         </>
     )
 
-    // TODO: hook integration WIP
     // If we have customer data and they are not registered, push to login page
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
-    // if (customer.authType != null && !customer.isRegistered) {
-    //     const path = buildUrl('/login')
-    //     return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
-    // }
+    if (!isRegistered) {
+        const path = buildUrl('/login')
+        return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
+    }
 
     return (
         <Box
