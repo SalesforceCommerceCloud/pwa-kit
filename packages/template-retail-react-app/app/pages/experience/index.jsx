@@ -38,7 +38,7 @@ const Experience = () => {
         <Box bg="gray.50" py={[8, 16]}>
             <Container
                 paddingTop={16}
-                width={['100%', '407px']}
+                width={['100%', '907px']}
                 bg="white"
                 paddingBottom={14}
                 marginTop={8}

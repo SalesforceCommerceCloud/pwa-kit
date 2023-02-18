@@ -32,7 +32,13 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
 
     return (
         <div className={'image-with-text'}>
-            <figure className={'image-with-text-figure'}>
+            <Box
+                as="figure"
+                className={'image-with-text-figure'}
+                position={'relative'}
+                margin={0}
+                width={'100%'}
+            >
                 <picture>
                     <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
                     <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
@@ -44,14 +50,24 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                             ignoreFallback={true}
                             alt={alt}
                             title={alt}
+                            filter={'brightness(40%)'}
                         />
                     </Link>
                 </picture>
                 {(ITCText || heading) && (
                     <Text as="figcaption">
                         {heading && (
-                            <Box className={'image-with-text-heading-container'}>
-                                <Text as="span" className={'image-with-text-heading-text'}>
+                            <Box
+                                className={'image-with-text-heading-container'}
+                                position={'absolute'}
+                                top={'50%'}
+                                width={'100%'}
+                            >
+                                <Text
+                                    as="span"
+                                    className={'image-with-text-heading-text'}
+                                    color={'white'}
+                                >
                                     <div
                                         dangerouslySetInnerHTML={{
                                             __html: sanitizedHtml?.heading
@@ -73,7 +89,7 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                         )}
                     </Text>
                 )}
-            </figure>
+            </Box>
         </div>
     )
 }
