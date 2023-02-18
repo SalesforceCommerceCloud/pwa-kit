@@ -7,7 +7,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Image, Box, Text, Link} from '@chakra-ui/react'
-import DOMPurify from 'dompurify'
+import sanitizeHtml from 'sanitize-html'
 
 /**
  * Image with text caption
@@ -21,15 +21,9 @@ import DOMPurify from 'dompurify'
  * @constructor
  */
 const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
-    const [sanitizedHtml, setSainitizedHtml] = useState(null)
-
-    useEffect(() => {
-        const purify = DOMPurify(window)
-        const cleanHeading = purify.sanitize(heading)
-        const cleanITCText = purify.sanitize(ITCText)
-        setSainitizedHtml({heading: cleanHeading, ITCText: cleanITCText})
-    }, [])
-
+    const sanitizeHtmlOptions = {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img'])
+    }
     return (
         <div className={'image-with-text'}>
             <figure className={'image-with-text-figure'}>
@@ -51,24 +45,24 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                     <Text as="figcaption">
                         {heading && (
                             <Box className={'image-with-text-heading-container'}>
-                                <Text as="span" className={'image-with-text-heading-text'}>
-                                    <div
-                                        dangerouslySetInnerHTML={{
-                                            __html: sanitizedHtml?.heading
-                                        }}
-                                    />
-                                </Text>
+                                <Text
+                                    as="span"
+                                    className={'image-with-text-heading-text'}
+                                    dangerouslySetInnerHTML={{
+                                        __html: sanitizeHtml(heading, sanitizeHtmlOptions)
+                                    }}
+                                ></Text>
                             </Box>
                         )}
                         {ITCText && (
                             <Box>
-                                <Text as="span" className={'image-with-text-text-underneath'}>
-                                    <div
-                                        dangerouslySetInnerHTML={{
-                                            __html: sanitizedHtml?.ITCText
-                                        }}
-                                    />
-                                </Text>
+                                <Text
+                                    as="span"
+                                    className={'image-with-text-text-underneath'}
+                                    dangerouslySetInnerHTML={{
+                                        __html: sanitizeHtml(ITCText, sanitizeHtmlOptions)
+                                    }}
+                                ></Text>
                             </Box>
                         )}
                     </Text>
