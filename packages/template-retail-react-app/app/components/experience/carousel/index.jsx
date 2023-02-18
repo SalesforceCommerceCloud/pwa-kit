@@ -150,34 +150,6 @@ const Carousel = (props = {}) => {
                 </Stack>
             </Stack>
 
-            {/* Indicators */}
-            <Fragment>
-                <Box
-                    id="dots"
-                    position="absolute"
-                    bottom="10px"
-                    left="50%"
-                    transform="translateX(-50%)"
-                    style={{
-                        paddingLeft: '5px',
-                        paddingRight: '5px',
-                        borderRadius: '10px',
-                        height: '30px',
-                        lineHeight: '20px',
-                        background: 'rgba(0, 0, 0, 0.5)'
-                    }}
-                >
-                    {components.map((_, index) => (
-                        <a
-                            key={index}
-                            style={{fontSize: '50px', color: 'white', opacity: '0.5'}}
-                        >
-                            &#x2022;
-                        </a>
-                    ))}
-                </Box>
-            </Fragment>
-
             {/* Button Controls */}
             <Fragment>
                 <Box
