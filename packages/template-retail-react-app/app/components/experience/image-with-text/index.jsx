@@ -4,20 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Image, Box, Text, Link} from '@chakra-ui/react'
-
-/**
- * The Shopper Experience API response wraps the text in HTML paragraph tags.
- * The string is always treated as text in JSX since its source is untrusted (input form).
- * The function removes the HTML tags from the string to avoid rendering HTML tags as text.
- * @param string string with HTML paragraph tags.
- * @returns {*} string without the HTML tags.
- */
-const removeHTMLTagsFromString = (string) => {
-    return string.replace(/(<([^>]+)>)/gi, '')
-}
+import DOMPurify from 'dompurify'
 
 /**
  * Image with text caption
@@ -31,6 +21,15 @@ const removeHTMLTagsFromString = (string) => {
  * @constructor
  */
 const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
+    const [sanitizedHtml, setSainitizedHtml] = useState(null)
+
+    useEffect(() => {
+        const purify = DOMPurify(window)
+        const cleanHeading = purify.sanitize(heading)
+        const cleanITCText = purify.sanitize(ITCText)
+        setSainitizedHtml({heading: cleanHeading, ITCText: cleanITCText})
+    }, [])
+
     return (
         <div className={'image-with-text'}>
             <figure className={'image-with-text-figure'}>
@@ -53,14 +52,22 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                         {heading && (
                             <Box className={'image-with-text-heading-container'}>
                                 <Text as="span" className={'image-with-text-heading-text'}>
-                                    {removeHTMLTagsFromString(heading)}
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: sanitizedHtml?.heading
+                                        }}
+                                    />
                                 </Text>
                             </Box>
                         )}
                         {ITCText && (
                             <Box>
                                 <Text as="span" className={'image-with-text-text-underneath'}>
-                                    {removeHTMLTagsFromString(ITCText)}
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: sanitizedHtml?.ITCText
+                                        }}
+                                    />
                                 </Text>
                             </Box>
                         )}
