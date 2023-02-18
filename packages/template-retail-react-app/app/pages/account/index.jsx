@@ -28,7 +28,7 @@ import {
     Text,
     Divider
 } from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+// import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Seo from '../../components/seo'
 import Link from '../../components/link'
 import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../components/icons'
@@ -44,11 +44,22 @@ import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 // import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
+import {
+    useCustomerId,
+    useCustomerType,
+    useShopperLoginHelper,
+    useCustomer,
+    ShopperLoginHelpers
+} from 'commerce-sdk-react-preview'
 
 const Account = () => {
     const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
-    const customer = useCustomer()
+    const customerId = useCustomerId()
+    const {isRegistered} = useCustomerType()
+    const {data: customer} = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
+    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
+
     const location = useLocation()
     const navigate = useNavigation()
 
@@ -66,7 +77,7 @@ const Account = () => {
 
     const onSignoutClick = async () => {
         setShowLoading(true)
-        await customer.logout()
+        await logout.mutateAsync()
         navigate('/login')
     }
 
@@ -109,7 +120,7 @@ const Account = () => {
 
     return (
         <Box
-            data-testid={customer.isRegistered ? 'account-page' : 'account-page-skeleton'}
+            data-testid={isRegistered ? 'account-page' : 'account-page-skeleton'}
             layerStyle="page"
             paddingTop={[4, 4, 12, 12, 16]}
         >
