@@ -86,6 +86,9 @@ test('should show login modal if user not registered', async () => {
 
     await waitFor(() => {
         user.click(trigger)
+    })
+
+    await waitFor(() => {
         expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
         expect(screen.getByLabelText(/Password/)).toBeInTheDocument()
         expect(screen.getByText(/forgot password/i)).toBeInTheDocument()

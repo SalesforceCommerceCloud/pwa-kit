@@ -68,7 +68,7 @@ test('Allows customer to go to sign in page', async () => {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
-    user.click(await screen.getByText('Sign in'))
+    user.click(screen.getByText('Sign in'))
 
     await waitFor(() => {
         expect(window.location.pathname).toEqual('/uk/en-GB/login')
@@ -95,14 +95,14 @@ test('Allows customer to generate password token', async () => {
     })
 
     // enter credentials and submit
-    user.type(await screen.getByLabelText('Email'), 'foo@test.com')
-    user.click(within(await screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    user.type(screen.getByLabelText('Email'), 'foo@test.com')
+    user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
     expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
-    expect(await screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+    expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
 
-    await waitFor(async () => {
-        user.click(await screen.getByText('Back to Sign In'))
+    await waitFor(() => {
+        user.click(screen.getByText('Back to Sign In'))
     })
 
     await waitFor(() => {
@@ -126,8 +126,8 @@ test('Renders error message from server', async () => {
     )
     await renderWithProviders(<MockedComponent />)
 
-    user.type(await screen.getByLabelText('Email'), 'foo@test.com')
-    user.click(within(await screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    user.type(screen.getByLabelText('Email'), 'foo@test.com')
+    user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
     expect(await screen.findByText('Something went wrong')).toBeInTheDocument()
 })

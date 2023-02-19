@@ -80,7 +80,7 @@ test('Provides navigation for subpages', async () => {
     })
     expect(await screen.findByTestId('account-page')).toBeInTheDocument()
 
-    const nav = within(await screen.getByTestId('account-detail-nav'))
+    const nav = within(screen.getByTestId('account-detail-nav'))
     user.click(nav.getByText('Addresses'))
     await waitFor(() =>
         expect(window.location.pathname).toEqual(`${expectedBasePath}/account/addresses`)

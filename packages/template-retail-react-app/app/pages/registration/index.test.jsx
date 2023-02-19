@@ -108,7 +108,7 @@ test('Allows customer to create an account', async () => {
     })
 
     // fill out form and submit
-    const withinForm = within(await screen.getByTestId('sf-auth-modal-form'))
+    const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
 
     user.paste(withinForm.getByLabelText('First Name'), 'Tester')
     user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
@@ -117,8 +117,8 @@ test('Allows customer to create an account', async () => {
     user.click(withinForm.getByText(/create account/i))
 
     // wait for success state to appear
-    await waitFor(async () => {
+    await waitFor(() => {
         screen.logTestingPlaygroundURL()
-        expect(await screen.getAllByText(/My Account/).length).toEqual(2)
+        expect(screen.getAllByText(/My Account/).length).toEqual(2)
     })
 })
