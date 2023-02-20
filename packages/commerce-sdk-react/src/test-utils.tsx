@@ -140,3 +140,32 @@ export const assertInvalidateQuery = (
 export const assertRemoveQuery = (queryResult: UseQueryResult) => {
     expect(queryResult.data).not.toBeDefined()
 }
+
+const getQueryName = (method: string): string => {
+    const prefix = /^get|^retrieve/
+    // Most query endpoints start with 'get'; replace it with 'use'
+    if (method.startsWith('get')) return method.replace(/^get/, 'use')
+    // Shopper Login retrieveCredQualityUserInfo is a special case
+    if (method.startsWith('retrieve')) return method.replace(/^retrieve/, 'use')
+    // Otherwise just prefix the method with 'use' and fix the case
+    return method.replace(/^./, (ltr) => `use${ltr.toUpperCase()}`)
+}
+
+export const expectAllEndpointsHaveHooks = (
+    SdkClass: {prototype: object},
+    queryHooks: Record<string, unknown>,
+    mutationsEnum: Record<string, string>
+) => {
+    const unimplemented = new Set(Object.getOwnPropertyNames(SdkClass.prototype))
+    // Always present on a class; we can ignore
+    unimplemented.delete('constructor')
+    // Names of implemented mutation endpoints exist as values of the enum
+    Object.values(mutationsEnum).forEach((method) => unimplemented.delete(method))
+    // Names of implemented query endpoints have been mangled when converted into hooks
+    unimplemented.forEach((method) => {
+        const queryName = getQueryName(method)
+        if (queryName in queryHooks) unimplemented.delete(method)
+    })
+    // Convert to array for easier comparison / better jest output
+    expect([...unimplemented]).toEqual([])
+}
