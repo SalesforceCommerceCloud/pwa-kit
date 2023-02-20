@@ -1,11 +1,12 @@
 {
   "name": "client",
-  "hash": "bb2721da0c152ace1396",
+  "hash": "ea6aeb2875c976f42f4d",
   "publicPath": "/mobify/bundle/development/",
   "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
     "main": [
-      "main.js"
+      "main.js",
+      "main.332d0220af4f84e2bdcf.hot-update.js"
     ],
     "pages-home": [
       "pages-home.js"
@@ -198,6 +199,33 @@
       "filteredRelated": 1,
       "chunks": [
         "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "main.332d0220af4f84e2bdcf.hot-update.js",
+      "size": 76921,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "332d0220af4f84e2bdcf",
+        "related": {
+          "sourceMap": "main.332d0220af4f84e2bdcf.hot-update.js.map"
+        }
+      },
+      "chunkNames": [
+        "main"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "main"
       ],
       "auxiliaryChunks": []
     },
@@ -816,6 +844,25 @@
         "_cc12"
       ],
       "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "main.332d0220af4f84e2bdcf.hot-update.json",
+      "size": 28,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "332d0220af4f84e2bdcf"
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [],
+      "auxiliaryChunks": []
     }
   ],
   "namedChunkGroups": {
@@ -831,11 +878,14 @@
         },
         {
           "name": "main.js"
+        },
+        {
+          "name": "main.332d0220af4f84e2bdcf.hot-update.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 2,
+      "filteredAuxiliaryAssets": 3,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -1151,7 +1201,8 @@
     {
       "id": "main",
       "files": [
-        "main.js"
+        "main.js",
+        "main.332d0220af4f84e2bdcf.hot-update.js"
       ]
     },
     {
