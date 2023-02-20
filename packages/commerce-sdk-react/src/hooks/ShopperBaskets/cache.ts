@@ -4,33 +4,43 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {
-    ApiClients,
-    ApiOptions,
-    CacheUpdate,
-    CacheUpdateMatrix,
-    CacheUpdateUpdate,
-    MergedOptions
-} from '../types'
-import {and, matchesApiConfig, matchesPath} from '../utils'
+    ShopperBaskets,
+    ShopperBasketsTypes,
+    ShopperCustomers,
+    ShopperCustomersTypes
+} from 'commerce-sdk-isomorphic'
+import {ApiClients, Argument, CacheUpdate, CacheUpdateMatrix, MergedOptions} from '../types'
+import {and, matchesApiConfig, matchesPath, pick} from '../utils'
 
 type Client = ApiClients['shopperBaskets']
+/** Data returned by every Shopper Baskets endpoint (except `deleteBasket`) */
 type Basket = ShopperBasketsTypes.Basket
-type BasketParameters = MergedOptions<Client, ApiOptions<{basketId?: string}>>['parameters']
+/** Data returned by `getCustomerBaskets` */
 type CustomerBasketsResult = ShopperCustomersTypes.BasketsResult
+/** Parameters that get passed around, includes client config and possible parameters from other endpoints */
+type BasketParameters = MergedOptions<Client, Argument<Client['getBasket']>>['parameters']
+/** Parameters that we actually send to the API for `getBasket` */
+type GetBasketParameters = Argument<ShopperBaskets<{shortCode: string}>['getBasket']>['parameters']
+/** Parameters that we actually send to the API for `getCustomerBaskets` */
+type GetCustomerBasketsParameters = Argument<
+    ShopperCustomers<{shortCode: string}>['getCustomerBaskets']
+>['parameters']
 
 // Path helpers to avoid typos!
-const getBasePath = (parameters: BasketParameters) => ['/organizations/', parameters.organizationId]
-const getBasketPath = (parameters: BasketParameters & {basketId: string}) => [
+const getBasePath = (parameters: {organizationId: string}) => [
+    '/organizations/',
+    parameters.organizationId
+]
+const getBasketPath = (parameters: GetBasketParameters) => [
     ...getBasePath(parameters),
     '/baskets/',
     parameters.basketId
 ]
-const getCustomerBasketsPath = (customerId: string, parameters: BasketParameters) => [
+const getCustomerBasketsPath = (parameters: GetCustomerBasketsParameters) => [
     ...getBasePath(parameters),
     '/customers/',
-    customerId,
+    parameters.customerId,
     '/baskets' // No trailing / as it's an aggregate endpoint
 ]
 
@@ -39,21 +49,32 @@ const updateBasketQuery = (
     parameters: BasketParameters,
     newBasket: Basket
 ): CacheUpdate => {
-    // If we just check `!parameters.basketId`, then TypeScript doesn't infer that the value is
-    // not `undefined`. We have to use this slightly convoluted predicate to give it that info.
-    const hasBasketId = (p: {basketId?: string}): p is {basketId: string} => Boolean(p.basketId)
-    if (!hasBasketId(parameters)) return {}
-    const updateBasket: CacheUpdateUpdate<unknown> = {
-        // TODO: This method is used by multiple endpoints, so `parameters` could have properties
-        // that don't match getBasket
-        queryKey: [...getBasketPath(parameters), parameters]
+    // The `parameters` received includes the client config and parameters from other endpoints
+    // so we need to exclude unwanted parameters in the query key
+    const getBasketParameters: GetBasketParameters = pick(parameters, [
+        'basketId',
+        'locale',
+        'organizationId',
+        'siteId'
+    ])
+    const basketUpdate = {
+        queryKey: [...getBasketPath(parameters), getBasketParameters] as const
     }
 
-    if (!customerId) return {update: [updateBasket]}
-    const updateCustomerBaskets: CacheUpdateUpdate<unknown> = {
-        // TODO: This method is used by multiple endpoints, so `parameters` could have properties
-        // that don't match getCustomerBaskets
-        queryKey: [...getCustomerBasketsPath(customerId, parameters), parameters],
+    // We can only update customer baskets if we have a customer!
+    if (!customerId) return {update: [basketUpdate]}
+
+    // Same elision as done for `getBasket`
+    const getCustomerBasketsParameters: GetCustomerBasketsParameters = {
+        customerId,
+        organizationId: parameters.organizationId,
+        siteId: parameters.siteId
+    }
+    const customerBasketsUpdate = {
+        queryKey: [
+            ...getCustomerBasketsPath(getCustomerBasketsParameters),
+            getCustomerBasketsParameters
+        ] as const,
         updater: (oldData?: CustomerBasketsResult): CustomerBasketsResult | undefined => {
             // do not update if response basket is not part of existing customer baskets
             if (!oldData?.baskets?.some((basket) => basket.basketId === parameters.basketId)) {
@@ -71,19 +92,19 @@ const updateBasketQuery = (
             }
         }
     }
-    return {update: [updateBasket, updateCustomerBaskets]}
+    return {update: [basketUpdate, customerBasketsUpdate]}
 }
 
 const invalidateCustomerBasketsQuery = (
     customerId: string | null,
-    parameters: BasketParameters
-): Pick<CacheUpdate, 'invalidate'> => {
+    parameters: Omit<GetCustomerBasketsParameters, 'customerId'>
+): CacheUpdate => {
     if (!customerId) return {}
     return {
         invalidate: [
             and(
                 matchesApiConfig(parameters),
-                matchesPath(getCustomerBasketsPath(customerId, parameters))
+                matchesPath(getCustomerBasketsPath({...parameters, customerId}))
             )
         ]
     }
@@ -94,18 +115,23 @@ const updateBasket = (
     {parameters}: {parameters: BasketParameters},
     response: Basket
 ): CacheUpdate => ({
+    // TODO: We only update the basket from the matching locale; we should also invalidate other locales
     ...updateBasketQuery(customerId, parameters, response),
     ...invalidateCustomerBasketsQuery(customerId, parameters)
 })
 
 const updateBasketWithResponseBasketId = (
     customerId: string | null,
-    {parameters}: {parameters: BasketParameters},
+    {parameters}: {parameters: Omit<BasketParameters, 'basketId'>},
     response: Basket
-): CacheUpdate => ({
-    ...updateBasketQuery(customerId, {...parameters, basketId: response.basketId}, response),
-    ...invalidateCustomerBasketsQuery(customerId, parameters)
-})
+): CacheUpdate => {
+    const {basketId} = response
+    return {
+        // TODO: We only update the basket from the matching locale; we should also invalidate other locales
+        ...(basketId && updateBasketQuery(customerId, {...parameters, basketId}, response)),
+        ...invalidateCustomerBasketsQuery(customerId, parameters)
+    }
+}
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     addCouponToBasket: updateBasket,
@@ -114,6 +140,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     addPaymentInstrumentToBasket: updateBasket,
     createBasket: updateBasketWithResponseBasketId,
     deleteBasket: (customerId, {parameters}) => ({
+        // TODO: Convert invalidate to an update that removes the matching basket
         ...invalidateCustomerBasketsQuery(customerId, parameters),
         remove: [and(matchesApiConfig(parameters), matchesPath(getBasketPath(parameters)))]
     }),
