@@ -43,13 +43,8 @@ const ProductItem = ({
     onItemQuantityChange = noop,
     showLoading = false
 }) => {
-    const {
-        stepQuantity,
-        showInventoryMessage,
-        inventoryMessage,
-        quantity,
-        setQuantity
-    } = useDerivedProduct(product)
+    const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
+        useDerivedProduct(product)
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <ItemVariantProvider variant={product}>

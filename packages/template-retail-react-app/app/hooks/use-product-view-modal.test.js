@@ -38,7 +38,6 @@ const MockComponent = ({product}) => {
     const productViewModalData = useProductViewModal(product)
     const [isShown, setIsShown] = React.useState(false)
 
-
     return (
         <div>
             <button onClick={() => setIsShown(!isShown)}>Toggle the content</button>
