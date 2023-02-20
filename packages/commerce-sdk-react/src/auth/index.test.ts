@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import Auth from './'
+import Auth, {AuthData} from './'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
@@ -85,7 +85,7 @@ describe('Auth', () => {
     test('this.data returns the storage value', () => {
         const auth = new Auth(config)
 
-        const sample = {
+        const sample: Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: string} = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: 'access_token',
             customer_id: 'customer_id',
@@ -97,7 +97,9 @@ describe('Auth', () => {
             usid: 'usid',
             customer_type: 'guest'
         }
-        const {refresh_token_guest, ...result} = {...sample, refresh_token: 'refresh_token_guest'}
+        // Convert stored format to exposed format
+        const result = {...sample, refresh_token: 'refresh_token_guest'}
+        delete result.refresh_token_guest
 
         Object.keys(sample).forEach((key) => {
             // @ts-expect-error private method
@@ -161,7 +163,7 @@ describe('Auth', () => {
     test('ready - re-use valid access token', () => {
         const auth = new Auth(config)
 
-        const data = {
+        const data: Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: string} = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret'),
             customer_id: 'customer_id',
@@ -173,7 +175,9 @@ describe('Auth', () => {
             usid: 'usid',
             customer_type: 'guest'
         }
-        const {refresh_token_guest, ...result} = {...data, refresh_token: 'refresh_token_guest'}
+        // Convert stored format to exposed format
+        const result = {...data, refresh_token: 'refresh_token_guest'}
+        delete result.refresh_token_guest
 
         Object.keys(data).forEach((key) => {
             // @ts-expect-error private method
@@ -185,7 +189,7 @@ describe('Auth', () => {
     test('ready - use refresh token when access token is expired', async () => {
         const auth = new Auth(config)
 
-        const data = {
+        const data: Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: string} = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret'),
             customer_id: 'customer_id',
@@ -197,7 +201,9 @@ describe('Auth', () => {
             usid: 'usid',
             customer_type: 'guest'
         }
-        const {refresh_token_guest, ...result} = {...data, refresh_token: 'refresh_token_guest'}
+        // Convert stored format to exposed format
+        const result = {...data, refresh_token: 'refresh_token_guest'}
+        delete result.refresh_token_guest
 
         Object.keys(data).forEach((key) => {
             // @ts-expect-error private method

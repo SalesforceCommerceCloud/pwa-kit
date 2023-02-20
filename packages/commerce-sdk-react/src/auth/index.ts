@@ -36,7 +36,7 @@ interface JWTHeaders {
  * Plus, the getCustomer endpoint only works for registered user, it returns a 404 for a guest user,
  * and it's not easy to grab this info in user land, so we add it into the Auth object, and expose it via a hook
  */
-type AuthData = Prettify<
+export type AuthData = Prettify<
     RemoveStringIndex<TokenResponse> & {
         customer_type: CustomerType
         idp_access_token: string

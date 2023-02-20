@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, salesforce.com, inc.
+ * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -43,165 +43,175 @@ const QUERY_TESTS = [
     // ShopperBasket
     {
         name: 'useBasket',
-        hook: () => useBasket({basketId: 'test'}),
+        hook: () => useBasket({parameters: {basketId: 'test'}}),
         endpoint: /\/baskets\/test$/
     },
     {
         name: 'usePaymentMethodsForBasket',
-        hook: () => usePaymentMethodsForBasket({basketId: 'test'}),
+        hook: () => usePaymentMethodsForBasket({parameters: {basketId: 'test'}}),
         endpoint: /\/baskets\/test\/payment-methods$/
     },
     {
         name: 'usePriceBooksForBasket',
-        hook: () => usePriceBooksForBasket(),
+        hook: () => usePriceBooksForBasket({parameters: {basketId: 'test'}}),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     {
         name: 'useTaxesFromBasket',
-        hook: () => useTaxesFromBasket(),
+        hook: () => useTaxesFromBasket({parameters: {basketId: 'test'}}),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     {
         name: 'useShippingMethodsForShipment',
-        hook: () => useShippingMethodsForShipment({basketId: 'test', shipmentId: '123'}),
+        hook: () =>
+            useShippingMethodsForShipment({parameters: {basketId: 'test', shipmentId: '123'}}),
         endpoint: /\/baskets\/test\/shipments\/123\/shipping-methods$/
     },
     // ShopperContext
     {
         name: 'useShopperContext',
-        hook: () => useShopperContext(),
+        hook: () => useShopperContext({parameters: {usid: 'test'}}),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     // ShopperCustomers
     {
         name: 'useExternalProfile',
-        hook: () => useExternalProfile(),
+        hook: () =>
+            useExternalProfile({
+                parameters: {externalId: 'externalId', authenticationProviderId: 'authProvider'}
+            }),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     {
         name: 'useCustomer',
-        hook: () => useCustomer({customerId: '123'}),
+        hook: () => useCustomer({parameters: {customerId: '123'}}),
         endpoint: /\/customers\/123$/
     },
     {
         name: 'useCustomerAddress',
-        hook: () => useCustomerAddress({customerId: '123', addressName: '456'}),
+        hook: () => useCustomerAddress({parameters: {customerId: '123', addressName: '456'}}),
         endpoint: /\/customers\/123\/addresses\/456$/
     },
     {
         name: 'useCustomerBaskets',
-        hook: () => useCustomerBaskets({customerId: '123'}),
+        hook: () => useCustomerBaskets({parameters: {customerId: '123'}}),
         endpoint: /\/customers\/123\/baskets$/
     },
     {
         name: 'useCustomerOrders',
-        hook: () => useCustomerOrders({customerId: '123'}),
+        hook: () => useCustomerOrders({parameters: {customerId: '123'}}),
         endpoint: /\/customers\/123\/orders$/
     },
     {
         name: 'useCustomerPaymentInstrument',
-        hook: () => useCustomerPaymentInstrument(),
+        hook: () =>
+            useCustomerPaymentInstrument({
+                parameters: {customerId: '123', paymentInstrumentId: '456'}
+            }),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     {
         name: 'useCustomerProductLists',
-        hook: () => useCustomerProductLists({customerId: '123'}),
+        hook: () => useCustomerProductLists({parameters: {customerId: '123'}}),
         endpoint: /\/customers\/123\/product-lists$/
     },
     {
         name: 'useCustomerProductList',
-        hook: () => useCustomerProductList({customerId: '123', listId: '456'}),
+        hook: () => useCustomerProductList({parameters: {customerId: '123', listId: '456'}}),
         endpoint: /\/customers\/123\/product-lists\/456$/
     },
     {
         name: 'useCustomerProductListItem',
-        hook: () => useCustomerProductListItem(),
+        hook: () =>
+            useCustomerProductListItem({
+                parameters: {customerId: '123', listId: '456', itemId: '789'}
+            }),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     {
         name: 'usePublicProductListsBySearchTerm',
-        hook: () => usePublicProductListsBySearchTerm(),
+        hook: () => usePublicProductListsBySearchTerm({parameters: {}}),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     {
         name: 'usePublicProductList',
-        hook: () => usePublicProductList(),
+        hook: () => usePublicProductList({parameters: {listId: '123'}}),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     {
         name: 'useProductListItem',
-        hook: () => useProductListItem(),
+        hook: () => useProductListItem({parameters: {listId: '123', itemId: '456'}}),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     // ShopperOrders
     {
         name: 'useOrder',
-        hook: () => useOrder({orderNo: '123'}),
+        hook: () => useOrder({parameters: {orderNo: '123'}}),
         endpoint: /\/orders\/123$/
     },
     {
         name: 'usePaymentMethodsForOrder',
-        hook: () => usePaymentMethodsForOrder(),
+        hook: () => usePaymentMethodsForOrder({parameters: {orderNo: '123'}}),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     {
         name: 'useTaxesFromOrder',
-        hook: () => useTaxesFromOrder(),
+        hook: () => useTaxesFromOrder({parameters: {orderNo: '123'}}),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     // ShopperProducts
     {
         name: 'useProducts',
-        hook: () => useProducts({ids: '123,456'}),
+        hook: () => useProducts({parameters: {ids: '123,456'}}),
         endpoint: /\/products$/
     },
     {
         name: 'useProduct',
-        hook: () => useProduct({id: '123'}),
+        hook: () => useProduct({parameters: {id: '123'}}),
         endpoint: /\/products\/123$/
     },
     {
         name: 'useCategories',
-        hook: () => useCategories({ids: '123,456'}),
+        hook: () => useCategories({parameters: {ids: '123,456'}}),
         endpoint: /\/categories$/
     },
     {
         name: 'useCategory',
-        hook: () => useCategory({id: '123'}),
+        hook: () => useCategory({parameters: {id: '123'}}),
         endpoint: /\/categories\/123$/
     },
     // ShopperPromotions
     {
         name: 'usePromotions',
-        hook: () => usePromotions({ids: '123,456'}),
+        hook: () => usePromotions({parameters: {ids: '123,456'}}),
         endpoint: /\/promotions$/
     },
     {
         name: 'usePromotionsForCampaign',
-        hook: () => usePromotionsForCampaign(),
+        hook: () => usePromotionsForCampaign({parameters: {campaignId: '123'}}),
         endpoint: new RegExp(''),
         notImplemented: true
     },
     // ShopperSearch
     {
         name: 'useProductSearch',
-        hook: () => useProductSearch({q: 'test'}),
+        hook: () => useProductSearch({parameters: {q: 'test'}}),
         endpoint: /\/product-search$/
     },
     {
         name: 'useSearchSuggestions',
-        hook: () => useSearchSuggestions({q: 'test'}),
+        hook: () => useSearchSuggestions({parameters: {q: 'test'}}),
         endpoint: /\/search-suggestions$/
     }
 ]
@@ -215,7 +225,6 @@ test.each(QUERY_TESTS)('%j - 200 returns data', async ({hook, endpoint, notImple
     nock(DEFAULT_TEST_HOST)
         .get((uri) => endpoint.test(uri.split('?')[0]))
         .reply(200, data)
-    // @ts-ignore
     const {result, waitForNextUpdate} = renderHookWithProviders(hook)
     expect(result.current.data).toBe(undefined)
     expect(result.current.isLoading).toBe(true)
@@ -233,7 +242,6 @@ test.each(QUERY_TESTS)('%j - 400 returns error', async ({hook, endpoint, notImpl
     nock(DEFAULT_TEST_HOST)
         .get((uri) => endpoint.test(uri.split('?')[0]))
         .reply(400)
-    // @ts-ignore
     const {result, waitForNextUpdate} = renderHookWithProviders(hook)
     expect(result.current.data).toBe(undefined)
     expect(result.current.isLoading).toBe(true)
