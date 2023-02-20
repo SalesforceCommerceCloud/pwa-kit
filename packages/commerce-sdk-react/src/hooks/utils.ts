@@ -122,3 +122,9 @@ export const mergeOptions = <Client extends ApiClient, Options extends ApiOption
     }
     return merged
 }
+
+export const pick = <T, K extends keyof T>(obj: T, keys: readonly K[]): Pick<T, K> => {
+    const picked = {} as Pick<T, K> // Assertion is not true, yet, but we make it so!
+    keys.forEach((key) => (picked[key] = obj[key]))
+    return picked
+}

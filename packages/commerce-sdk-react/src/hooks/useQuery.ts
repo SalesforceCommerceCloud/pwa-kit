@@ -6,7 +6,7 @@
  */
 import {useQuery as useReactQuery} from '@tanstack/react-query'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
-import {ApiMethod, ApiOptions, ApiQueryKey, ApiQueryOptions, RequireKeys} from './types'
+import {ApiMethod, ApiOptions, ApiQueryKey, ApiQueryOptions} from './types'
 import {hasAllKeys} from './utils'
 
 /**
@@ -16,13 +16,13 @@ import {hasAllKeys} from './utils'
  * @param hookConfig - Config values that vary per API endpoint
  * @internal
  */
-export const useQuery = <Options extends RequireKeys<ApiOptions, 'parameters'>, Data>(
+export const useQuery = <Options extends ApiOptions, Data>(
     apiOptions: Options,
     queryOptions: ApiQueryOptions<ApiMethod<Options, Data>>,
     hookConfig: {
         method: ApiMethod<Options, Data>
-        queryKey: ApiQueryKey<Options['parameters']>
-        requiredParameters: ReadonlyArray<keyof Options['parameters']>
+        queryKey: ApiQueryKey<NonNullable<Options['parameters']>>
+        requiredParameters: ReadonlyArray<keyof NonNullable<Options['parameters']>>
         enabled?: boolean
     }
 ) => {
@@ -32,7 +32,8 @@ export const useQuery = <Options extends RequireKeys<ApiOptions, 'parameters'>, 
             // Individual hooks can provide `enabled` checks that are done in ADDITION to
             // the required parameter check
             hookConfig.enabled !== false &&
-            hasAllKeys(apiOptions.parameters, hookConfig.requiredParameters),
+            // The default `enabled` is "has all required parameters"
+            hasAllKeys(apiOptions.parameters ?? {}, hookConfig.requiredParameters),
         // End users can always completely OVERRIDE the default `enabled` check
         ...queryOptions
     })

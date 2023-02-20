@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryResult} from '@tanstack/react-query'
-import {ApiClients, ApiQueryKey, ApiQueryOptions, Argument, DataType} from '../types'
+import {ApiClients, ApiQueryOptions, Argument, DataType} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {mergeOptions} from '../utils'
+import {mergeOptions, pick} from '../utils'
 
 type Client = ApiClients['shopperContexts']
 
@@ -23,31 +23,31 @@ export const useShopperContext = (
     apiOptions: Argument<Client['getShopperContext']>,
     queryOptions: ApiQueryOptions<Client['getShopperContext']> = {}
 ): UseQueryResult<DataType<Client['getShopperContext']>> => {
+    type Options = Argument<Client['getShopperContext']>
+    type Data = DataType<Client['getShopperContext']>
     const {shopperContexts: client} = useCommerceApi()
-    const method = async (options: Argument<Client['getShopperContext']>) =>
-        await client.getShopperContext(options)
+    const method = async (options: Options) => await client.getShopperContext(options)
     const requiredParameters = ['organizationId', 'usid'] as const
+    const allParameters = [...requiredParameters] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    const {parameters} = netOptions
-    const queryKey: ApiQueryKey<typeof parameters> = [
+    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
+    // exclude them when generating the query key.
+    const parameters = pick(netOptions.parameters, allParameters)
+    const queryKey = [
         '/organizations/',
         parameters.organizationId,
         '/shopper-context/',
         parameters.usid,
         parameters
-    ]
+    ] as const
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<typeof netOptions, DataType<Client['getShopperContext']>>(
-        netOptions,
-        queryOptions,
-        {
-            method,
-            queryKey,
-            requiredParameters
-        }
-    )
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
 }

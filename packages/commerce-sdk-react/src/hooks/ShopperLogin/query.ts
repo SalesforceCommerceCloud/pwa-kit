@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryResult} from '@tanstack/react-query'
-import {ApiClients, ApiQueryKey, ApiQueryOptions, Argument, DataType} from '../types'
+import {ApiClients, ApiQueryOptions, Argument, DataType} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {mergeOptions} from '../utils'
+import {mergeOptions, pick} from '../utils'
 
 type Client = ApiClients['shopperLogin']
 
@@ -23,32 +23,32 @@ export const useCredQualityUserInfo = (
     apiOptions: Argument<Client['retrieveCredQualityUserInfo']>,
     queryOptions: ApiQueryOptions<Client['retrieveCredQualityUserInfo']> = {}
 ): UseQueryResult<DataType<Client['retrieveCredQualityUserInfo']>> => {
+    type Options = Argument<Client['retrieveCredQualityUserInfo']>
+    type Data = DataType<Client['retrieveCredQualityUserInfo']>
     const {shopperLogin: client} = useCommerceApi()
-    const method = async (options: Argument<Client['retrieveCredQualityUserInfo']>) =>
-        await client.retrieveCredQualityUserInfo(options)
+    const method = async (options: Options) => await client.retrieveCredQualityUserInfo(options)
     const requiredParameters = ['organizationId', 'username'] as const
+    const allParameters = [...requiredParameters] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    const {parameters} = netOptions
-    const queryKey: ApiQueryKey<typeof parameters> = [
+    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
+    // exclude them when generating the query key.
+    const parameters = pick(netOptions.parameters, allParameters)
+    const queryKey = [
         '/organizations/',
         parameters.organizationId,
         '/cred-qual/user',
         parameters
-    ]
+    ] as const
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<typeof netOptions, DataType<Client['retrieveCredQualityUserInfo']>>(
-        netOptions,
-        queryOptions,
-        {
-            method,
-            queryKey,
-            requiredParameters
-        }
-    )
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
 }
 /**
  * A hook for `ShopperLogin#authorizeCustomer`.
@@ -63,9 +63,10 @@ export const useAuthorizeCustomer = (
     apiOptions: Argument<Client['authorizeCustomer']>,
     queryOptions: ApiQueryOptions<Client['authorizeCustomer']> = {}
 ): UseQueryResult<DataType<Client['authorizeCustomer']>> => {
+    type Options = Argument<Client['authorizeCustomer']>
+    type Data = DataType<Client['authorizeCustomer']>
     const {shopperLogin: client} = useCommerceApi()
-    const method = async (options: Argument<Client['authorizeCustomer']>) =>
-        await client.authorizeCustomer(options)
+    const method = async (options: Options) => await client.authorizeCustomer(options)
     const requiredParameters = [
         'organizationId',
         'redirect_uri',
@@ -74,28 +75,35 @@ export const useAuthorizeCustomer = (
 
         'code_challenge'
     ] as const
+    const allParameters = [
+        ...requiredParameters,
+
+        'scope',
+        'state',
+        'usid',
+        'hint',
+        'channel_id'
+    ] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    const {parameters} = netOptions
-    const queryKey: ApiQueryKey<typeof parameters> = [
+    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
+    // exclude them when generating the query key.
+    const parameters = pick(netOptions.parameters, allParameters)
+    const queryKey = [
         '/organizations/',
         parameters.organizationId,
         '/oauth2/authorize',
         parameters
-    ]
+    ] as const
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<typeof netOptions, DataType<Client['authorizeCustomer']>>(
-        netOptions,
-        queryOptions,
-        {
-            method,
-            queryKey,
-            requiredParameters
-        }
-    )
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
 }
 /**
  * A hook for `ShopperLogin#getTrustedAgentAuthorizationToken`.
@@ -108,8 +116,10 @@ export const useTrustedAgentAuthorizationToken = (
     apiOptions: Argument<Client['getTrustedAgentAuthorizationToken']>,
     queryOptions: ApiQueryOptions<Client['getTrustedAgentAuthorizationToken']> = {}
 ): UseQueryResult<DataType<Client['getTrustedAgentAuthorizationToken']>> => {
+    type Options = Argument<Client['getTrustedAgentAuthorizationToken']>
+    type Data = DataType<Client['getTrustedAgentAuthorizationToken']>
     const {shopperLogin: client} = useCommerceApi()
-    const method = async (options: Argument<Client['getTrustedAgentAuthorizationToken']>) =>
+    const method = async (options: Options) =>
         await client.getTrustedAgentAuthorizationToken(options)
     const requiredParameters = [
         'organizationId',
@@ -121,28 +131,27 @@ export const useTrustedAgentAuthorizationToken = (
         'redirect_uri',
         'response_type'
     ] as const
+    const allParameters = [...requiredParameters] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    const {parameters} = netOptions
-    const queryKey: ApiQueryKey<typeof parameters> = [
+    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
+    // exclude them when generating the query key.
+    const parameters = pick(netOptions.parameters, allParameters)
+    const queryKey = [
         '/organizations/',
         parameters.organizationId,
         '/oauth2/trusted-agent/authorize',
         parameters
-    ]
+    ] as const
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<typeof netOptions, DataType<Client['getTrustedAgentAuthorizationToken']>>(
-        netOptions,
-        queryOptions,
-        {
-            method,
-            queryKey,
-            requiredParameters
-        }
-    )
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
 }
 /**
  * A hook for `ShopperLogin#getUserInfo`.
@@ -155,24 +164,28 @@ export const useUserInfo = (
     apiOptions: Argument<Client['getUserInfo']>,
     queryOptions: ApiQueryOptions<Client['getUserInfo']> = {}
 ): UseQueryResult<DataType<Client['getUserInfo']>> => {
+    type Options = Argument<Client['getUserInfo']>
+    type Data = DataType<Client['getUserInfo']>
     const {shopperLogin: client} = useCommerceApi()
-    const method = async (options: Argument<Client['getUserInfo']>) =>
-        await client.getUserInfo(options)
+    const method = async (options: Options) => await client.getUserInfo(options)
     const requiredParameters = ['organizationId'] as const
+    const allParameters = [...requiredParameters, 'channel_id'] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    const {parameters} = netOptions
-    const queryKey: ApiQueryKey<typeof parameters> = [
+    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
+    // exclude them when generating the query key.
+    const parameters = pick(netOptions.parameters, allParameters)
+    const queryKey = [
         '/organizations/',
         parameters.organizationId,
         '/oauth2/userinfo',
         parameters
-    ]
+    ] as const
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<typeof netOptions, DataType<Client['getUserInfo']>>(netOptions, queryOptions, {
+    return useQuery<Options, Data>(netOptions, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -189,32 +202,32 @@ export const useWellknownOpenidConfiguration = (
     apiOptions: Argument<Client['getWellknownOpenidConfiguration']>,
     queryOptions: ApiQueryOptions<Client['getWellknownOpenidConfiguration']> = {}
 ): UseQueryResult<DataType<Client['getWellknownOpenidConfiguration']>> => {
+    type Options = Argument<Client['getWellknownOpenidConfiguration']>
+    type Data = DataType<Client['getWellknownOpenidConfiguration']>
     const {shopperLogin: client} = useCommerceApi()
-    const method = async (options: Argument<Client['getWellknownOpenidConfiguration']>) =>
-        await client.getWellknownOpenidConfiguration(options)
+    const method = async (options: Options) => await client.getWellknownOpenidConfiguration(options)
     const requiredParameters = ['organizationId'] as const
+    const allParameters = [...requiredParameters] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    const {parameters} = netOptions
-    const queryKey: ApiQueryKey<typeof parameters> = [
+    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
+    // exclude them when generating the query key.
+    const parameters = pick(netOptions.parameters, allParameters)
+    const queryKey = [
         '/organizations/',
         parameters.organizationId,
         '/oauth2/.well-known/openid-configuration',
         parameters
-    ]
+    ] as const
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<typeof netOptions, DataType<Client['getWellknownOpenidConfiguration']>>(
-        netOptions,
-        queryOptions,
-        {
-            method,
-            queryKey,
-            requiredParameters
-        }
-    )
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
 }
 /**
  * A hook for `ShopperLogin#getJwksUri`.
@@ -227,24 +240,28 @@ export const useJwksUri = (
     apiOptions: Argument<Client['getJwksUri']>,
     queryOptions: ApiQueryOptions<Client['getJwksUri']> = {}
 ): UseQueryResult<DataType<Client['getJwksUri']>> => {
+    type Options = Argument<Client['getJwksUri']>
+    type Data = DataType<Client['getJwksUri']>
     const {shopperLogin: client} = useCommerceApi()
-    const method = async (options: Argument<Client['getJwksUri']>) =>
-        await client.getJwksUri(options)
+    const method = async (options: Options) => await client.getJwksUri(options)
     const requiredParameters = ['organizationId'] as const
+    const allParameters = [...requiredParameters] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    const {parameters} = netOptions
-    const queryKey: ApiQueryKey<typeof parameters> = [
+    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
+    // exclude them when generating the query key.
+    const parameters = pick(netOptions.parameters, allParameters)
+    const queryKey = [
         '/organizations/',
         parameters.organizationId,
         '/oauth2/jwks',
         parameters
-    ]
+    ] as const
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<typeof netOptions, DataType<Client['getJwksUri']>>(netOptions, queryOptions, {
+    return useQuery<Options, Data>(netOptions, queryOptions, {
         method,
         queryKey,
         requiredParameters
