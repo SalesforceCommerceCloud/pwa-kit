@@ -93,30 +93,32 @@ export function renderHookWithProviders<TProps, TResult>(
     })
 }
 
+/** Mocks DELETE, PATCH, POST, and PUT so we don't have to look up which verb an endpoint uses. */
 export const mockMutationEndpoints = (
     matchingPath: string,
-    options?: {errorResponse: number},
-    response = {}
+    response: string | Record<string, unknown>,
+    statusCode = 200
 ) => {
-    const responseStatus = options?.errorResponse ? options.errorResponse : 200
+    const matcher = (uri: string) => uri.includes(matchingPath)
+    return nock(DEFAULT_TEST_HOST)
+        .delete(matcher)
+        .reply(statusCode, response)
+        .patch(matcher)
+        .reply(statusCode, response)
+        .put(matcher)
+        .reply(statusCode, response)
+        .post(matcher)
+        .reply(statusCode, response)
+}
 
-    nock(DEFAULT_TEST_HOST)
-        .patch((uri) => {
-            return uri.includes(matchingPath)
-        })
-        .reply(responseStatus, response)
-        .put((uri) => {
-            return uri.includes(matchingPath)
-        })
-        .reply(responseStatus, response)
-        .post((uri) => {
-            return uri.includes(matchingPath)
-        })
-        .reply(responseStatus, response)
-        .delete((uri) => {
-            return uri.includes(matchingPath)
-        })
-        .reply(responseStatus, response)
+/** Mocks a GET request to an endpoint. */
+export const mockQueryEndpoint = (
+    matchingPath: string,
+    response: string | Record<string, unknown>,
+    statusCode = 200
+) => {
+    const matcher = (uri: string) => uri.includes(matchingPath)
+    return nock(DEFAULT_TEST_HOST).get(matcher).reply(statusCode, response)
 }
 
 export const assertUpdateQuery = (
@@ -168,14 +170,3 @@ export const expectAllEndpointsHaveHooks = (
     // Convert to array for easier comparison / better jest output
     expect([...unimplemented]).toEqual([])
 }
-
-export type HttpMethod = 'delete' | 'get' | 'patch' | 'post' | 'put'
-export const mockEndpoint = (
-    endpoint: string,
-    data: string | Record<string, unknown>,
-    method: HttpMethod = 'get',
-    code = 200
-) =>
-    nock(DEFAULT_TEST_HOST)
-        [method]((uri) => uri.includes(endpoint))
-        .reply(code, data)
