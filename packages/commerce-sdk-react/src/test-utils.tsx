@@ -30,6 +30,11 @@ export const DEFAULT_TEST_CONFIG = {
 
 export const createQueryClient = () => {
     return new QueryClient({
+        logger: {
+            ...console,
+            // Disable error logs as we intentionally cause errors during tests
+            error() {} // eslint-disable-line @typescript-eslint/no-empty-function
+        },
         // During testing, we want things to fail immediately
         defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
     })
