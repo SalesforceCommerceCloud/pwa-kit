@@ -142,11 +142,10 @@ export const assertRemoveQuery = (queryResult: UseQueryResult) => {
 }
 
 const getQueryName = (method: string): string => {
+    // Most query endpoints start with 'get'; Shopper Login retrieveCredQualityUserInfo also exists
     const prefix = /^get|^retrieve/
-    // Most query endpoints start with 'get'; replace it with 'use'
-    if (method.startsWith('get')) return method.replace(/^get/, 'use')
-    // Shopper Login retrieveCredQualityUserInfo is a special case
-    if (method.startsWith('retrieve')) return method.replace(/^retrieve/, 'use')
+    // If it exists, replace the prefix verb with 'use'
+    if (prefix.test(method)) return method.replace(prefix, 'use')
     // Otherwise just prefix the method with 'use' and fix the case
     return method.replace(/^./, (ltr) => `use${ltr.toUpperCase()}`)
 }
@@ -169,3 +168,14 @@ export const expectAllEndpointsHaveHooks = (
     // Convert to array for easier comparison / better jest output
     expect([...unimplemented]).toEqual([])
 }
+
+export type HttpMethod = 'delete' | 'get' | 'patch' | 'post' | 'put'
+export const mockEndpoint = (
+    endpoint: string,
+    data: string | Record<string, unknown>,
+    method: HttpMethod = 'get',
+    code = 200
+) =>
+    nock(DEFAULT_TEST_HOST)
+        [method]((uri) => uri.includes(endpoint))
+        .reply(code, data)
