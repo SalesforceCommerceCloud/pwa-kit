@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, salesforce.com, inc.
+ * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,15 +7,9 @@
 import React from 'react'
 import {renderWithProviders, DEFAULT_TEST_HOST, createQueryClient} from '../../test-utils'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import {
-    useShopperOrdersMutation,
-    ShopperOrdersMutationType,
-    shopperOrdersCacheUpdateMatrix,
-    SHOPPER_ORDERS_NOT_IMPLEMENTED
-} from './mutation'
+import {useShopperOrdersMutation, ShopperOrdersMutation} from './mutation'
 import nock from 'nock'
-import {QueryKey} from '@tanstack/react-query'
-import {QueryKeyMap} from '../utils'
+import {ApiClients, Argument} from '../types'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
@@ -26,7 +20,7 @@ jest.mock('../../auth/index.ts', () => {
 const BASKET_ID = '12345'
 
 type MutationPayloads = {
-    [key in ShopperOrdersMutationType]?: {body: any; parameters: any}
+    [Mutation in ShopperOrdersMutation]?: Argument<ApiClients['shopperOrders'][Mutation]>
 }
 
 const mutationPayloads: MutationPayloads = {
@@ -37,24 +31,27 @@ const mutationPayloads: MutationPayloads = {
 }
 
 interface OrderMutationComponentParams {
-    action: ShopperOrdersMutationType
+    action: ShopperOrdersMutation
 }
 
 const OrderMutationComponent = ({action}: OrderMutationComponentParams) => {
-    const mutationHook = useShopperOrdersMutation({action})
+    const mutationHook = useShopperOrdersMutation(action)
+    const error = mutationHook.error as Error | undefined
+    const payload = mutationPayloads[action]
+    if (!payload) throw new Error(`Missing payload for ${action}`)
 
     return (
         <div>
-            <button onClick={() => mutationHook.mutate(mutationPayloads[action])}>{action}</button>
+            <button onClick={() => mutationHook.mutate(payload)}>{action}</button>
 
-            {mutationHook.error?.message && <p>Error: {mutationHook.error?.message}</p>}
+            {error?.message && <p>Error: {error.message}</p>}
             <hr />
             {mutationHook.isSuccess && <span>isSuccess</span>}
         </div>
     )
 }
 
-const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map((mutationName) => {
+const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutation[]).map((mutationName) => {
     return {
         hook: mutationName,
         cases: [
@@ -69,7 +66,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
 
                     const queryClient = createQueryClient()
 
-                    const mutation: any = shopperOrdersCacheUpdateMatrix[mutationName]
+                    const mutation = shopperOrdersCacheUpdateMatrix[mutationName]
 
                     const {invalidate, update, remove} = mutation(
                         mutationPayloads[mutationName],
@@ -78,14 +75,12 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
 
                     const queryKeys = [...(invalidate || []), ...(update || []), ...(remove || [])]
 
-                    queryKeys.forEach(({key: queryKey}: QueryKeyMap) => {
+                    queryKeys.forEach(({key: queryKey}) => {
                         queryClient.setQueryData(queryKey, {test: true})
                     })
 
                     renderWithProviders(
-                        <OrderMutationComponent
-                            action={mutationName as ShopperOrdersMutationType}
-                        />,
+                        <OrderMutationComponent action={mutationName as ShopperOrdersMutation} />,
                         {queryClient}
                     )
 
@@ -104,13 +99,13 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
                     expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
 
                     // Assert changes in cache
-                    update?.forEach(({key: queryKey}: QueryKeyMap) => {
+                    update?.forEach(({key: queryKey}) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeFalsy()
                     })
-                    invalidate?.forEach(({key: queryKey}: QueryKeyMap) => {
+                    invalidate?.forEach(({key: queryKey}) => {
                         expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
                     })
-                    remove?.forEach(({key: queryKey}: QueryKeyMap) => {
+                    remove?.forEach(({key: queryKey}) => {
                         expect(queryClient.getQueryState(queryKey)).toBeFalsy()
                     })
                 }
@@ -125,9 +120,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperOrdersMutationType[]).map
                         .reply(500)
 
                     renderWithProviders(
-                        <OrderMutationComponent
-                            action={mutationName as ShopperOrdersMutationType}
-                        />
+                        <OrderMutationComponent action={mutationName as ShopperOrdersMutation} />
                     )
                     await waitFor(() =>
                         screen.getByRole('button', {
@@ -158,12 +151,11 @@ tests.forEach(({hook, cases}) => {
     })
 })
 
-test.each(SHOPPER_ORDERS_NOT_IMPLEMENTED)(
-    '%j - throws error when not implemented',
-    (methodName) => {
-        const action = methodName as ShopperOrdersMutationType
-        expect(() => {
-            useShopperOrdersMutation({action})
-        }).toThrowError('This method is not implemented.')
-    }
-)
+// TODO: Methods that haven't been implemented are no longer an explicit list,
+// but are implicitly derived from their absence in the `cacheUpdateMatrix` of implementations.
+test.each([])('%j - throws error when not implemented', (methodName) => {
+    const action = methodName as ShopperOrdersMutation
+    expect(() => {
+        useShopperOrdersMutation(action)
+    }).toThrowError('This method is not implemented.')
+})
