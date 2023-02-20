@@ -136,7 +136,6 @@ const updateBasketWithResponseBasketId = (
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     addCouponToBasket: updateBasket,
     addItemToBasket: updateBasket,
-    removeItemFromBasket: updateBasket,
     addPaymentInstrumentToBasket: updateBasket,
     createBasket: updateBasketWithResponseBasketId,
     deleteBasket: (customerId, {parameters}) => ({
@@ -146,6 +145,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     }),
     mergeBasket: updateBasketWithResponseBasketId,
     removeCouponFromBasket: updateBasket,
+    removeItemFromBasket: updateBasket,
     removePaymentInstrumentFromBasket: updateBasket,
     updateBasket: updateBasket,
     updateBillingAddressForBasket: updateBasket,
