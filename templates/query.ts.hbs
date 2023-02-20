@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import {ApiClients, Argument, DataType, MergedOptions} from '../types'
+import {UseQueryResult} from '@tanstack/react-query'
+import {ApiClients, ApiQueryOptions, Argument, DataType} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
+import {mergeOptions, pick} from '../utils'
 
 {{!~-- Add aliases to @root for brevity/clarity --~}}
 {{~ assign 'clientInstance' name.lowerCamelCase ~}}
@@ -32,24 +33,41 @@ export const use{{#startsWith 'get' (getValue name)~}}
 {{capitalize (getValue name)}}
 {{~/startsWith}}{{/startsWith}} = (
     apiOptions: Argument<Client['{{name}}']>,
-    queryOptions: Omit<UseQueryOptions<DataType<Client['{{name}}']>>, 'queryFn'> = {}
+    queryOptions: ApiQueryOptions<Client['{{name}}']> = {}
 ): UseQueryResult<DataType<Client['{{name}}']>> => {
+    type Options = Argument<Client['{{name}}']>
+    type Data = DataType<Client['{{name}}']>
     const { {{~@root.clientInstance}}: client} = useCommerceApi()
-    const method = (arg: Argument<Client['{{name}}']>) => client.{{name}}(arg)
+    const method = async (options: Options) => await client.{{name}}(options)
     const requiredParameters = [
-        {{#each ../parameters}}'{{name}}',{{/each}}
-        {{#each request.queryParameters}}{{#if (is required "true")}}'{{name}}',{{/if}}{{/each}}
+        {{#each ../parameters}}
+        '{{name}}',
+        {{/each~}}
+        {{~#each request.queryParameters}}
+        {{#if (is required "true")}}'{{name}}',{{/if}}
+        {{/each}}
     ] as const
-    // Parameters can be set in `apiOptions` or `client.clientConfig`; they are merged in the helper
-    // hook, so we use a callback here that receives that merged object.
-    const getQueryKey = ({parameters}: MergedOptions<Client, Argument<Client['{{name}}']>>) => [
+    const allParameters = [
+        ...requiredParameters,
+        {{~#each request.queryParameters}}
+        {{#unless (is required "true")}}'{{name}}',{{/unless}}
+        {{/each}}
+    ] as const
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
+    // exclude them when generating the query key.
+    const parameters = pick(netOptions.parameters, allParameters)
+    const queryKey = [
         {{{createQueryKeyFragment (getValue ../path) 'parameters'}}},
-        // Full parameters last for easy lookup
         parameters
     ] as const
     
-    return useQuery(
-        apiOptions,
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Options, Data>(
+        netOptions,
         {{#if (is method 'get')}}queryOptions,
         {{~else~}}
         {
@@ -61,10 +79,9 @@ export const use{{#startsWith 'get' (getValue name)~}}
             ...queryOptions
         },{{/if}}
         {
-            client,
             method,
-            requiredParameters,
-            getQueryKey,
+            queryKey,
+            requiredParameters
         }
     )
 }
