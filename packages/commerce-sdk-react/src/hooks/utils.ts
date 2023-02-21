@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {Query, QueryClient} from '@tanstack/react-query'
-import {ApiClient, ApiOptions, CacheUpdate, MergedOptions} from './types'
+import {ApiClient, ApiOptions, ApiParameter, CacheUpdate, MergedOptions} from './types'
 
 /** Applies the set of cache updates to the query client. */
 export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate, data: unknown) => {
@@ -46,48 +46,61 @@ export const matchesPath =
         queryKey.length === 1 + search.length &&
         search.every((lookup, idx) => queryKey[idx] === lookup)
 
+/** Does an equality check for two API parameter values */
+const matchParameter = (search: ApiParameter, param: unknown): boolean => {
+    // 1. Are they matching primitives?
+    if (search === param) return true
+    // 2. They're not both primitives. Are they both arrays?
+    if (!Array.isArray(search) || !Array.isArray(param)) return false
+    // 3. They're both arrays. Are they the same length?
+    if (search.length !== param.length) return false
+    // 4. They're the same length. Do all of the values match?
+    return param.every((value, index) => search[index] === value)
+}
+
 /**
  * Creates a query predicate that determines whether the parameters of the query key exactly match
- * the search object.
+ * the search object. NOTE: This returns `true` even when the query key has additional properties.
  */
 export const matchParametersStrict =
-    (search: Record<string, unknown>) =>
+    (search: Record<string, ApiParameter>) =>
     ({queryKey}: Query): boolean => {
         const parameters = queryKey[queryKey.length - 1]
         if (!isObject(parameters)) return false
         const searchEntries = Object.entries(search)
         return (
             // Can't be a match if we're looking for more values than we have
-            searchEntries.length > Object.keys(parameters).length &&
-            // TODO: Support arrays - parameters can also be string | number
-            searchEntries.every(([key, lookup]) => parameters[key] === lookup)
+            searchEntries.length <= Object.keys(parameters).length &&
+            searchEntries.every(([key, lookup]) => matchParameter(lookup, parameters[key]))
         )
     }
 
 /**
  * Creates a query predicate that determines whether the parameters of the query key match the
- * search object, for the subset of given keys present on the search object.
+ * search object, if the value on the search object is not `undefined`.
  */
-const matchParameters = (parameters: Record<string, unknown>, keys = Object.keys(parameters)) => {
-    const search: Record<string, unknown> = {}
+export const matchParameters = (
+    parameters: Record<string, ApiParameter | undefined>,
+    keys = Object.keys(parameters)
+) => {
+    const search: Record<string, ApiParameter> = {}
     for (const key of keys) {
-        if (parameters[key] !== undefined) search[key] = parameters[key]
+        const value = parameters[key]
+        if (value !== undefined) search[key] = value
     }
     return matchParametersStrict(search)
 }
 
 /** Creates a query predicate that matches against common API config parameters. */
-export const matchesApiConfig = (parameters: Record<string, unknown>) =>
+export const matchesApiConfig = (parameters: Record<string, ApiParameter | undefined>) =>
     matchParameters(parameters, [
+        // NOTE: `shortCode` and `version` are omitted, as query keys are constructed from endpoint
+        // paths, but the two paarameters are only used to construct the base URI.
         'clientId',
         'currency', // TODO: maybe?
         'locale', // TODO: maybe?
         'organizationId',
-        'shortCode',
-        'siteId',
-        // Version is never used directly by us, but is set on the client config
-        // in `commerce-sdk-isomorphic`, so we include it here for completeness
-        'version'
+        'siteId'
     ])
 
 /** Creates a query predicate that returns true if all of the given predicates return true. */
@@ -123,8 +136,16 @@ export const mergeOptions = <Client extends ApiClient, Options extends ApiOption
     return merged
 }
 
-export const pick = <T, K extends keyof T>(obj: T, keys: readonly K[]): Pick<T, K> => {
+/** Constructs a subset of the given object containing only the given keys. */
+export const pick = <T extends object, K extends keyof T>(
+    obj: T,
+    keys: readonly K[]
+): Pick<T, K> => {
     const picked = {} as Pick<T, K> // Assertion is not true, yet, but we make it so!
-    keys.forEach((key) => (picked[key] = obj[key]))
+    keys.forEach((key) => {
+        if (key in obj) {
+            picked[key] = obj[key]
+        }
+    })
     return picked
 }

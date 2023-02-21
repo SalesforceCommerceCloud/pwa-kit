@@ -11,7 +11,7 @@ import {
     ShopperCustomersTypes
 } from 'commerce-sdk-isomorphic'
 import {ApiClients, Argument, CacheUpdate, CacheUpdateMatrix, MergedOptions} from '../types'
-import {and, matchesApiConfig, matchesPath, pick} from '../utils'
+import {and, matchesPath, matchParameters, pick} from '../utils'
 
 type Client = ApiClients['shopperBaskets']
 /** Data returned by every Shopper Baskets endpoint (except `deleteBasket`) */
@@ -44,6 +44,23 @@ const getCustomerBasketsPath = (parameters: GetCustomerBasketsParameters) => [
     '/baskets' // No trailing / as it's an aggregate endpoint
 ]
 
+// Parameters helpers
+/**
+ * Creates an object with *only* the parameters from `getBasket`, omitting unwanted parameters from
+ * other endpoints. (Extra parameters can break query key matching.)
+ */
+const toGetBasketParameters = (parameters: GetBasketParameters): GetBasketParameters =>
+    pick(parameters, ['basketId', 'locale', 'organizationId', 'siteId'])
+/**
+ * Creates an object with *only* the parameters from `getBasket`, omitting unwanted parameters from
+ * other endpoints. (Extra parameters can break query key matching.)
+ */
+const toGetCustomerBasketsParameters = (
+    customerId: string,
+    parameters: Omit<GetCustomerBasketsParameters, 'customerId'>
+): GetCustomerBasketsParameters =>
+    pick({customerId, ...parameters}, ['customerId', 'organizationId', 'siteId'])
+
 const updateBasketQuery = (
     customerId: string | null,
     parameters: BasketParameters,
@@ -51,12 +68,7 @@ const updateBasketQuery = (
 ): CacheUpdate => {
     // The `parameters` received includes the client config and parameters from other endpoints
     // so we need to exclude unwanted parameters in the query key
-    const getBasketParameters: GetBasketParameters = pick(parameters, [
-        'basketId',
-        'locale',
-        'organizationId',
-        'siteId'
-    ])
+    const getBasketParameters = toGetBasketParameters(parameters)
     const basketUpdate = {
         queryKey: [...getBasketPath(parameters), getBasketParameters] as const
     }
@@ -64,12 +76,8 @@ const updateBasketQuery = (
     // We can only update customer baskets if we have a customer!
     if (!customerId) return {update: [basketUpdate]}
 
-    // Same elision as done for `getBasket`
-    const getCustomerBasketsParameters: GetCustomerBasketsParameters = {
-        customerId,
-        organizationId: parameters.organizationId,
-        siteId: parameters.siteId
-    }
+    // Similar elision as done for `getBasket`
+    const getCustomerBasketsParameters = toGetCustomerBasketsParameters(customerId, parameters)
     const customerBasketsUpdate = {
         queryKey: [
             ...getCustomerBasketsPath(getCustomerBasketsParameters),
@@ -103,7 +111,7 @@ const invalidateCustomerBasketsQuery = (
     return {
         invalidate: [
             and(
-                matchesApiConfig(parameters),
+                matchParameters(toGetCustomerBasketsParameters(customerId, parameters)),
                 matchesPath(getCustomerBasketsPath({...parameters, customerId}))
             )
         ]
@@ -141,7 +149,12 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     deleteBasket: (customerId, {parameters}) => ({
         // TODO: Convert invalidate to an update that removes the matching basket
         ...invalidateCustomerBasketsQuery(customerId, parameters),
-        remove: [and(matchesApiConfig(parameters), matchesPath(getBasketPath(parameters)))]
+        remove: [
+            and(
+                matchParameters(toGetBasketParameters(parameters)),
+                matchesPath(getBasketPath(parameters))
+            )
+        ]
     }),
     mergeBasket: updateBasketWithResponseBasketId,
     removeCouponFromBasket: updateBasket,

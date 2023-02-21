@@ -43,6 +43,7 @@ type StringIndexNever<T> = {
 export type RemoveStringIndex<T> = RemoveNeverValues<StringIndexNever<T>>
 
 // --- API CLIENTS --- //
+export type ApiParameter = string | number | boolean | string[] | number[]
 
 export type ApiClientConfigParams = {
     clientId: string
