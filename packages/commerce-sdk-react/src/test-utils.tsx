@@ -100,15 +100,13 @@ export const mockMutationEndpoints = (
     statusCode = 200
 ) => {
     const matcher = (uri: string) => uri.includes(matchingPath)
-    return nock(DEFAULT_TEST_HOST)
-        .delete(matcher)
-        .reply(statusCode, response)
-        .patch(matcher)
-        .reply(statusCode, response)
-        .put(matcher)
-        .reply(statusCode, response)
-        .post(matcher)
-        .reply(statusCode, response)
+    // For some reason, re-using scope (i.e. nock() and chained methods)
+    // results in duplicate mocked requests, which breaks our validation
+    // of # of requests used.
+    nock(DEFAULT_TEST_HOST).delete(matcher).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).patch(matcher).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).put(matcher).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).post(matcher).reply(statusCode, response)
 }
 
 /** Mocks a GET request to an endpoint. */

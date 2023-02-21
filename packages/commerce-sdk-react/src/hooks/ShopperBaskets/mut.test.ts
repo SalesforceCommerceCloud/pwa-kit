@@ -105,16 +105,11 @@ describe('ShopperBaskets mutations', () => {
         window.localStorage.removeItem(storedCustomerIdKey)
     })
 
-    beforeEach(() => {
-        nock.cleanAll()
-        expect(nock.pendingMocks()).toEqual([])
-    })
+    beforeEach(() => nock.cleanAll())
     afterEach(() => {
-        // TODO: The counts are frequently off, is this an incorrect assumption?
-        // Every mutation could be one of DELETE | PATCH | POST | PUT. We mock them all, so that we
-        // don't need to know which method a mutation uses, but we want to validate that exactly ONE
-        // endpoint was used (otherwise something didn't work as expected!)
-        // expect(nock.pendingMocks().length).toBe(3)
+        // To avoid needing to know which HTTP verb a mutation uses (DELETE/PATCH/POST/PUT),
+        // we mock them all, and then validate that exactly one was used.
+        expect(nock.pendingMocks().length).toBe(3)
     })
 
     test.each(testCases)('%s returns data on success', async (mutationName, options) => {
