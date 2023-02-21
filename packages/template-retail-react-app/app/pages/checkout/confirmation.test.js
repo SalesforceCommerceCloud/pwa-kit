@@ -178,7 +178,7 @@ afterEach(() => {
     window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 
-test.skip('Navigates to homepage when no order present', async () => {
+test('Navigates to homepage when no order present', async () => {
     renderWithProviders(<Confirmation />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })

@@ -104,7 +104,7 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test.skip('Renders skeleton until customer and basket are loaded', () => {
+test('Renders skeleton until customer and basket are loaded', () => {
     const {getByTestId, queryByTestId} = renderWithProviders(<Checkout />)
 
     expect(getByTestId('sf-checkout-skeleton')).toBeInTheDocument()
