@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useQueryClient} from '@tanstack/react-query'
 import {act} from '@testing-library/react'
 import {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
@@ -67,6 +66,11 @@ const newCustomerBaskets: BasketsResult = {
     // We aren't implementing the full basket, so we assert to pretend we are
     baskets: [{basketId: 'other_basket'}, newBasket] as BasketsResult['baskets'],
     total: 2
+}
+const deletedCustomerBaskets: BasketsResult = {
+    // We aren't implementing the full basket, so we assert to pretend we are
+    baskets: [{basketId: 'other_basket'}] as BasketsResult['baskets'],
+    total: 1
 }
 
 // --- TEST CASES --- //
@@ -203,19 +207,17 @@ describe('ShopperBaskets mutations', () => {
         mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
         mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
         mockMutationEndpoints(basketsEndpoint, newBasket) // this mutation
+        mockQueryEndpoint(customersEndpoint, deletedCustomerBaskets) // getCustomerBaskets refetch
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
             basket: queries.useBasket(getBasketOptions),
             customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
-            mutation: useShopperBasketsMutation(mutationName),
-            queryClient: useQueryClient() // TODO: Remove
+            mutation: useShopperBasketsMutation(mutationName)
         }))
         await waitAndExpectSuccess(wait, () => result.current.basket)
-        // TODO customerBaskets: isSuccess isFetched isFetchedAfterMount isStale
         expect(result.current.basket.data).toEqual(oldBasket)
         expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
         act(() => result.current.mutation.mutate(options))
         await waitAndExpectSuccess(wait, () => result.current.mutation)
-        // TODO customerBaskets: isError isFetched isFetchedAfterMount isRefetchError isStale
         assertRemoveQuery(result.current.basket)
         assertInvalidateQuery(result.current.customerBaskets, oldCustomerBaskets)
     })
