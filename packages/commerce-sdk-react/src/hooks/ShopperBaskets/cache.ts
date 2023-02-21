@@ -11,7 +11,7 @@ import {
     ShopperCustomersTypes
 } from 'commerce-sdk-isomorphic'
 import {ApiClients, Argument, CacheUpdate, CacheUpdateMatrix, MergedOptions} from '../types'
-import {and, matchesPath, matchParameters, pick} from '../utils'
+import {and, matchesPath, matchParameters, NotImplementedError, pick} from '../utils'
 
 type Client = ApiClients['shopperBaskets']
 /** Data returned by every Shopper Baskets endpoint (except `deleteBasket`) */
@@ -141,11 +141,20 @@ const updateBasketWithResponseBasketId = (
     }
 }
 
+const TODO = (method: keyof Client) => () => {
+    throw new NotImplementedError(`Cache logic for '${method}'`)
+}
+
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     addCouponToBasket: updateBasket,
+    addGiftCertificateItemToBasket: TODO('addGiftCertificateItemToBasket'),
     addItemToBasket: updateBasket,
     addPaymentInstrumentToBasket: updateBasket,
+    addPriceBooksToBasket: TODO('addPriceBooksToBasket'),
+    addTaxesForBasket: TODO('addTaxesForBasket'),
+    addTaxesForBasketItem: TODO('addTaxesForBasketItem'),
     createBasket: updateBasketWithResponseBasketId,
+    createShipmentForBasket: TODO('createShipmentForBasket'),
     deleteBasket: (customerId, {parameters}) => ({
         // TODO: Convert invalidate to an update that removes the matching basket
         ...invalidateCustomerBasketsQuery(customerId, parameters),
@@ -158,13 +167,18 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     }),
     mergeBasket: updateBasketWithResponseBasketId,
     removeCouponFromBasket: updateBasket,
+    removeGiftCertificateItemFromBasket: TODO('removeGiftCertificateItemFromBasket'),
     removeItemFromBasket: updateBasket,
     removePaymentInstrumentFromBasket: updateBasket,
+    removeShipmentFromBasket: TODO('removeShipmentFromBasket'),
+    transferBasket: TODO('transferBasket'),
     updateBasket: updateBasket,
     updateBillingAddressForBasket: updateBasket,
     updateCustomerForBasket: updateBasket,
+    updateGiftCertificateItemInBasket: TODO('updateGiftCertificateItemInBasket'),
     updateItemInBasket: updateBasket,
     updatePaymentInstrumentInBasket: updateBasket,
+    updateShipmentForBasket: TODO('updateShipmentForBasket'),
     updateShippingAddressForShipment: updateBasket,
     updateShippingMethodForShipment: updateBasket
 }
