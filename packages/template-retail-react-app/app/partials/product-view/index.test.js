@@ -9,6 +9,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import mockProductDetail from '../../commerce-api/mocks/variant-750518699578M'
+import mockProductSet from '../../commerce-api/mocks/product-set-winter-lookM'
 import ProductView from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
@@ -120,3 +121,53 @@ test('Product View can update quantity', () => {
     userEvent.type(quantityBox, '{backspace}3')
     expect(quantityBox).toHaveValue('3')
 })
+
+test('renders a product set properly - parent item', () => {
+    const parent = mockProductSet
+    renderWithProviders(
+        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
+    )
+
+    // What should exist:
+    expect(screen.getAllByText(/starting at/i)[0]).toBeInTheDocument()
+    expect(screen.getAllByRole('button', {name: /add set to cart/i})[0]).toBeInTheDocument()
+    expect(screen.getAllByRole('button', {name: /add set to wishlist/i})[0]).toBeInTheDocument()
+
+    // What should _not_ exist:
+    // sizes and colours options
+    expect(screen.queryAllByRole('radiogroup').length).toEqual(0)
+    // quantity picker
+    expect(
+        screen.queryByRole('spinbutton', {
+            name: /quantity:/i
+        })
+    ).toBe(null)
+})
+
+test('renders a product set properly - child item', () => {
+    const child = mockProductSet.setProducts[0]
+    renderWithProviders(
+        <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />
+    )
+
+    // What should exist:
+    expect(screen.getAllByRole('button', {name: /add to cart/i})[0]).toBeInTheDocument()
+    expect(screen.getAllByRole('button', {name: /add to wishlist/i})[0]).toBeInTheDocument()
+    // sizes and colours options
+    expect(screen.getAllByRole('radiogroup').length).toEqual(2)
+    // quantity picker
+    expect(
+        screen.getByRole('spinbutton', {
+            name: /quantity:/i
+        })
+    ).toBeInTheDocument()
+
+    // What should _not_ exist:
+    expect(screen.queryAllByText(/starting at/i).length).toEqual(0)
+})
+
+// TODO: callback gets called
+test('validateOrderability', () => {})
+
+// TODO: callback gets called
+test('onVariantSelected', () => {})
