@@ -42,9 +42,6 @@ type StringIndexNever<T> = {
 /** Removes a string index type */
 export type RemoveStringIndex<T> = RemoveNeverValues<StringIndexNever<T>>
 
-/** Get the known (non-index) keys of a type. */
-export type KnownKeys<T> = keyof RemoveStringIndex<T>
-
 // --- API CLIENTS --- //
 
 export type ApiClientConfigParams = {
