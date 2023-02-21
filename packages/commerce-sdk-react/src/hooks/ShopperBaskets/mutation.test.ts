@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
 import {act} from '@testing-library/react'
 import {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
@@ -13,7 +12,9 @@ import {
     DEFAULT_TEST_CONFIG,
     mockMutationEndpoints,
     mockQueryEndpoint,
-    renderHookWithProviders
+    renderHookWithProviders,
+    waitAndExpectError,
+    waitAndExpectSuccess
 } from '../../test-utils'
 import {useCustomerBaskets} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
@@ -126,44 +127,38 @@ describe('ShopperBaskets mutations', () => {
 
     test.each(testCases)('%s returns data on success', async (mutationName, options) => {
         mockMutationEndpoints(basketsEndpoint, oldBasket)
-        const {result, waitForValueToChange} = renderHookWithProviders(() => {
+        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
             return useShopperBasketsMutation(mutationName)
         })
         expect(result.current.data).toBeUndefined()
         act(() => result.current.mutate(options))
         // Watching `data` and `error` together provides better info for failing tests
-        await waitForValueToChange(() => result.current.data ?? result.current.error)
-        expect(result.current.error).toBeNull()
+        await waitAndExpectSuccess(wait, () => result.current)
         expect(result.current.data).toEqual(oldBasket)
     })
     test.each(testCases)('%s returns error on error', async (mutationName, options) => {
         mockMutationEndpoints(basketsEndpoint, {}, 400)
-        const {result, waitForValueToChange} = renderHookWithProviders(() => {
+        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
             return useShopperBasketsMutation(mutationName)
         })
         expect(result.current.error).toBeNull()
         act(() => result.current.mutate(options))
-        await waitForValueToChange(() => result.current.error)
-        expect(result.current.error).toBeInstanceOf(Error)
+        await waitAndExpectError(wait, () => result.current)
     })
     test.each(testCases)('%s changes the cache on success', async (mutationName, options) => {
         mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
         mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
         mockMutationEndpoints(basketsEndpoint, newBasket) // this mutation
-        const {result, waitForValueToChange} = renderHookWithProviders(() => ({
+        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
             basket: queries.useBasket(getBasketOptions),
             customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
             mutation: useShopperBasketsMutation(mutationName)
         }))
-        await waitForValueToChange(() => result.current.basket.data)
+        await waitAndExpectSuccess(wait, () => result.current.basket)
         expect(result.current.basket.data).toEqual(oldBasket)
         expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
         act(() => result.current.mutation.mutate(options))
-        await waitForValueToChange(
-            // Watching `data` and `error` together provides better info for failing tests
-            () => result.current.mutation.data ?? result.current.mutation.error
-        )
-        expect(result.current.mutation.error).toBeNull()
+        await waitAndExpectSuccess(wait, () => result.current.mutation)
         assertUpdateQuery(result.current.basket, newBasket)
         assertUpdateQuery(result.current.customerBaskets, newCustomerBaskets)
     })
@@ -171,19 +166,18 @@ describe('ShopperBaskets mutations', () => {
         mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
         mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
         mockMutationEndpoints(basketsEndpoint, {}, 400) // this mutation
-        const {result, waitForValueToChange} = renderHookWithProviders(() => ({
+        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
             basket: queries.useBasket(getBasketOptions),
             customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
             mutation: useShopperBasketsMutation(mutationName)
         }))
-        await waitForValueToChange(() => result.current.basket.data)
+        await waitAndExpectSuccess(wait, () => result.current.basket)
         expect(result.current.basket.data).toEqual(oldBasket)
         expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
+        expect(result.current.mutation.error).toBeNull()
         act(() => result.current.mutation.mutate(options))
-        await waitForValueToChange(() => result.current.mutation.error)
-        expect(result.current.mutation.error).toBeInstanceOf(Error)
+        await waitAndExpectError(wait, () => result.current.mutation)
         assertUpdateQuery(result.current.basket, oldBasket)
         assertUpdateQuery(result.current.customerBaskets, oldCustomerBaskets)
     })
-    // TODO: Special case `deleteBasket`
 })

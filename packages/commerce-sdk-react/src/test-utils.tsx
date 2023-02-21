@@ -7,8 +7,13 @@
 
 import React from 'react'
 import {render, RenderOptions} from '@testing-library/react'
-import {renderHook} from '@testing-library/react-hooks/dom'
-import {QueryClient, QueryClientProvider, UseQueryResult} from '@tanstack/react-query'
+import {renderHook, WaitForValueToChange} from '@testing-library/react-hooks/dom'
+import {
+    QueryClient,
+    QueryClientProvider,
+    UseMutationResult,
+    UseQueryResult
+} from '@tanstack/react-query'
 import nock from 'nock'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 
@@ -167,4 +172,33 @@ export const expectAllEndpointsHaveHooks = (
     })
     // Convert to array for easier comparison / better jest output
     expect([...unimplemented]).toEqual([])
+}
+/** Helper type for WaitForValueToChange with hooks */
+type GetHookResult<Data, Err, Vars, Ctx> = () =>
+    | UseQueryResult
+    | UseMutationResult<Data, Err, Vars, Ctx>
+/** Helper that waits for a hook to finish loading. */
+const waitForHookToFinish = async <Data, Err, Vars, Ctx>(
+    wait: WaitForValueToChange,
+    getResult: GetHookResult<Data, Err, Vars, Ctx>
+) => {
+    await wait(() => getResult().isSuccess || getResult().isError)
+}
+/** Helper that asserts that a hook is a success. */
+export const waitAndExpectSuccess = async <Data, Err, Vars, Ctx>(
+    wait: WaitForValueToChange,
+    getResult: GetHookResult<Data, Err, Vars, Ctx>
+) => {
+    await waitForHookToFinish(wait, getResult)
+    // Checking the error first gives us the best context for failing tests
+    expect(getResult().error).toBeNull()
+    expect(getResult().isSuccess).toBe(true)
+}
+/** Helper that asserts that a hook returned an error */
+export const waitAndExpectError = async <Data, Err, Vars, Ctx>(
+    wait: WaitForValueToChange,
+    getResult: GetHookResult<Data, Err, Vars, Ctx>
+) => {
+    await waitForHookToFinish(wait, getResult)
+    expect(getResult().error).toBeInstanceOf(Error)
 }
