@@ -10,15 +10,14 @@ import {Image, Box, Text, Link} from '@chakra-ui/react'
 import DOMPurify from 'dompurify'
 
 /**
- * Image with text caption
+ * Image with text component
  *
- * @param ITCLink
- * @param ITCText
- * @param image
- * @param heading
- * @param alt
+ * @param ITCLink Image Link.
+ * @param ITCText Text Below Image.
+ * @param image Image.
+ * @param heading Text Overlay.
+ * @param alt The image alt text shown by the component.
  * @returns {JSX.Element}
- * @constructor
  */
 const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     const [sanitizedHtml, setSainitizedHtml] = useState(null)
@@ -68,9 +67,16 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                                     className={'image-with-text-heading-text'}
                                     color={'white'}
                                 >
-                                    <div
+                                    <Box
                                         dangerouslySetInnerHTML={{
                                             __html: sanitizedHtml?.heading
+                                        }}
+                                        sx={{
+                                            p: {
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }
                                         }}
                                     />
                                 </Text>
@@ -79,9 +85,16 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                         {ITCText && (
                             <Box>
                                 <Text as="span" className={'image-with-text-text-underneath'}>
-                                    <div
+                                    <Box
                                         dangerouslySetInnerHTML={{
                                             __html: sanitizedHtml?.ITCText
+                                        }}
+                                        sx={{
+                                            p: {
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }
                                         }}
                                     />
                                 </Text>
