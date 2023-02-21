@@ -33,7 +33,7 @@ type BasketsResult = ShopperCustomersTypes.BasketsResult
 /** Create an options object for Shopper Baskets endpoints, with `basketId` pre-filled. */
 const makeOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
     body: Argument<Client[Method]> extends {body: infer B} ? B : undefined,
-    parameters?: Omit<Argument<Client[Method]>['parameters'], 'basketId'>
+    parameters: Omit<Argument<Client[Method]>['parameters'], 'basketId'>
 ): Argument<Client[Method]> => ({
     body,
     parameters: {basketId: BASKET_ID, ...parameters}
@@ -42,7 +42,7 @@ const makeOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
 // --- getBasket constants --- //
 const basketsEndpoint = '/checkout/shopper-baskets/'
 const BASKET_ID = 'basket_id'
-const getBasketOptions = makeOptions<'getBasket'>(undefined)
+const getBasketOptions = makeOptions<'getBasket'>(undefined, {})
 const oldBasket: Basket = {basketId: BASKET_ID, mockData: 'old basket'}
 const newBasket: Basket = {basketId: BASKET_ID, mockData: 'new basket'}
 // --- getCustomerBaskets constants --- //
@@ -71,22 +71,34 @@ type NonDeleteMutation = Exclude<ShopperBasketsMutation, 'deleteBasket'>
 type TestMap = {[Mut in NonDeleteMutation]?: Argument<Client[Mut]>}
 // This is an object rather than an array to more easily ensure we cover all mutations
 const testMap: TestMap = {
-    // TODO: Figure out why commented-out mutations are failing
-    addCouponToBasket: makeOptions<'addCouponToBasket'>({code: 'coupon'}),
-    addItemToBasket: makeOptions<'addItemToBasket'>([]),
-    addPaymentInstrumentToBasket: makeOptions<'addPaymentInstrumentToBasket'>({}),
-    createBasket: makeOptions<'createBasket'>({}),
-    mergeBasket: makeOptions<'mergeBasket'>(undefined),
-    // removeCouponFromBasket: makeOptions<'removeCouponFromBasket'>(undefined),
-    // removeItemFromBasket: makeOptions<'removeItemFromBasket'>(undefined),
-    // removePaymentInstrumentFromBasket: makeOptions<'removePaymentInstrumentFromBasket'>(undefined),
-    updateBasket: makeOptions<'updateBasket'>({}),
-    updateBillingAddressForBasket: makeOptions<'updateBillingAddressForBasket'>({}),
-    updateCustomerForBasket: makeOptions<'updateCustomerForBasket'>({email: 'customer@email'})
-    // updateItemInBasket: makeOptions<'updateItemInBasket'>({}),
-    // updatePaymentInstrumentInBasket: makeOptions<'updatePaymentInstrumentInBasket'>({}),
-    // updateShippingAddressForShipment: makeOptions<'updateShippingAddressForShipment'>({}),
-    // updateShippingMethodForShipment: makeOptions<'updateShippingMethodForShipment'>({id: 'ship'})
+    addCouponToBasket: makeOptions<'addCouponToBasket'>({code: 'coupon'}, {}),
+    addItemToBasket: makeOptions<'addItemToBasket'>([], {}),
+    addPaymentInstrumentToBasket: makeOptions<'addPaymentInstrumentToBasket'>({}, {}),
+    createBasket: makeOptions<'createBasket'>({}, {}),
+    mergeBasket: makeOptions<'mergeBasket'>(undefined, {}),
+    removeCouponFromBasket: makeOptions<'removeCouponFromBasket'>(undefined, {
+        couponItemId: 'couponIemId'
+    }),
+    removeItemFromBasket: makeOptions<'removeItemFromBasket'>(undefined, {itemId: 'itemId'}),
+    removePaymentInstrumentFromBasket: makeOptions<'removePaymentInstrumentFromBasket'>(undefined, {
+        paymentInstrumentId: 'paymentInstrumentId'
+    }),
+    updateBasket: makeOptions<'updateBasket'>({}, {}),
+    updateBillingAddressForBasket: makeOptions<'updateBillingAddressForBasket'>({}, {}),
+    updateCustomerForBasket: makeOptions<'updateCustomerForBasket'>({email: 'customer@email'}, {}),
+    updateItemInBasket: makeOptions<'updateItemInBasket'>({}, {itemId: 'itemId'}),
+    updatePaymentInstrumentInBasket: makeOptions<'updatePaymentInstrumentInBasket'>(
+        {},
+        {paymentInstrumentId: 'paymentInstrumentId'}
+    ),
+    updateShippingAddressForShipment: makeOptions<'updateShippingAddressForShipment'>(
+        {},
+        {shipmentId: 'shipmentId'}
+    ),
+    updateShippingMethodForShipment: makeOptions<'updateShippingMethodForShipment'>(
+        {id: 'ship'},
+        {shipmentId: 'shipmentId'}
+    )
 }
 // This is what we actually use for `test.each`
 // Type assertion because the built-in type definition for `Object.entries` is limited :\
