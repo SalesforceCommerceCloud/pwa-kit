@@ -25,5 +25,5 @@ module.exports = {
     // this prevent expected errors from polluting jest logs
     // https://github.com/rickhanlonii/jest-silent-reporter
     reporters: [['jest-silent-reporter', {useDots: true, showPaths: true}]],
-    modulePathIgnorePatterns: ['<rootDir>/dist']
+    roots: ['src']
 }
