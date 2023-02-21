@@ -119,7 +119,9 @@ describe('ShopperBaskets mutations', () => {
         })
         expect(result.current.data).toBeUndefined()
         act(() => result.current.mutate(options))
-        await waitForValueToChange(() => result.current.data)
+        // Watching `data` and `error` together provides better info for failing tests
+        await waitForValueToChange(() => result.current.data ?? result.current.error)
+        expect(result.current.error).toBeNull()
         expect(result.current.data).toEqual(oldBasket)
     })
     test.each(testCases)('%s returns error on error', async (mutationName, options) => {
@@ -145,7 +147,11 @@ describe('ShopperBaskets mutations', () => {
         expect(result.current.basket.data).toEqual(oldBasket)
         expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
         act(() => result.current.mutation.mutate(options))
-        await waitForValueToChange(() => result.current.mutation.isSuccess)
+        await waitForValueToChange(
+            // Watching `data` and `error` together provides better info for failing tests
+            () => result.current.mutation.data ?? result.current.mutation.error
+        )
+        expect(result.current.mutation.error).toBeNull()
         assertUpdateQuery(result.current.basket, newBasket)
         assertUpdateQuery(result.current.customerBaskets, newCustomerBaskets)
     })
@@ -162,7 +168,8 @@ describe('ShopperBaskets mutations', () => {
         expect(result.current.basket.data).toEqual(oldBasket)
         expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
         act(() => result.current.mutation.mutate(options))
-        await waitForValueToChange(() => result.current.mutation.isError)
+        await waitForValueToChange(() => result.current.mutation.error)
+        expect(result.current.mutation.error).toBeInstanceOf(Error)
         assertUpdateQuery(result.current.basket, oldBasket)
         assertUpdateQuery(result.current.customerBaskets, oldCustomerBaskets)
     })
