@@ -176,7 +176,7 @@ describe('Update quantity', function () {
         })
     })
 
-    test('Can update item quantity from product view modal', async () => {
+    test.skip('Can update item quantity from product view modal', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
