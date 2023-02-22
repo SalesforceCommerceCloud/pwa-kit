@@ -46,36 +46,9 @@ import {
     ShopperLoginHelpers
 } from 'commerce-sdk-react-preview'
 
-const Account = () => {
-    const {path} = useRouteMatch()
+const LogoutButton = ({onSignoutClick}) => {
     const {formatMessage} = useIntl()
-    const customerId = useCustomerId()
-    const {isRegistered} = useCustomerType()
-    const {data: customer} = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
-    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
-
-    const location = useLocation()
-    const navigate = useNavigation()
-
-    const [mobileNavIndex, setMobileNavIndex] = useState(-1)
-    const [showLoading, setShowLoading] = useState(false)
-
-    const einstein = useEinstein()
-
-    const {buildUrl} = useMultiSite()
-
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(location.pathname)
-    }, [location])
-
-    const onSignoutClick = async () => {
-        setShowLoading(true)
-        await logout.mutateAsync()
-        navigate('/login')
-    }
-
-    const LogoutButton = () => (
+    return (
         <>
             <Divider colorScheme={'gray'} marginTop={3} />
             <Button
@@ -102,11 +75,40 @@ const Account = () => {
             </Button>
         </>
     )
+}
+const Account = () => {
+    const {path} = useRouteMatch()
+    const {formatMessage} = useIntl()
+    const customerId = useCustomerId()
+    const {isRegistered, customerType} = useCustomerType()
+    const {data: customer} = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
+    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
+    console.log('customerType', customerType)
+    const location = useLocation()
+    const navigate = useNavigation()
+
+    const [mobileNavIndex, setMobileNavIndex] = useState(-1)
+    const [showLoading, setShowLoading] = useState(false)
+
+    const einstein = useEinstein()
+
+    const {buildUrl} = useMultiSite()
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        einstein.sendViewPage(location.pathname)
+    }, [location])
+
+    const onSignoutClick = async () => {
+        setShowLoading(true)
+        await logout.mutateAsync()
+        navigate('/login')
+    }
 
     // If we have customer data and they are not registered, push to login page
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
-    if (!isRegistered) {
+    if (customerType !== null && !isRegistered) {
         const path = buildUrl('/login')
         return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
     }
@@ -166,7 +168,10 @@ const Account = () => {
                                             </Button>
                                         ))}
 
-                                        <LogoutButton justify="center" />
+                                        <LogoutButton
+                                            justify="center"
+                                            onSignoutClick={onSignoutClick}
+                                        />
                                     </Flex>
                                 </AccordionPanel>
                             </>
@@ -201,7 +206,7 @@ const Account = () => {
                                 </Button>
                             )
                         })}
-                        <LogoutButton />
+                        <LogoutButton onSignoutClick={onSignoutClick} />
                     </Flex>
                 </Stack>
 

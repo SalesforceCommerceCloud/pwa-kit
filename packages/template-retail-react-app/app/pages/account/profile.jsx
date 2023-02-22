@@ -122,7 +122,6 @@ const ProfileCard = () => {
                     }
                 }
             )
-            // await customer.updateCustomer(values)
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }
