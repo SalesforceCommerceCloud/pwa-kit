@@ -23,10 +23,6 @@ import {createModuleReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
-let sdkDir = __dirname
-while (!sdkDir.endsWith('pwa-kit-dev')) {
-    sdkDir = resolve(path.join(sdkDir, '..'))
-}
 
 const pkg = require(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
@@ -68,8 +64,17 @@ const entryPointExists = (segments) => {
 }
 
 const findInProjectThenSDK = (pkg) => {
-    const projectPath = resolve(projectDir, 'node_modules', pkg)
-    return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
+    const candidates = [
+        resolve(projectDir, 'node_modules', pkg),
+        resolve(__dirname, '..', '..', 'node_modules', pkg),
+        resolve(__dirname, '..', '..', '..', 'node_modules', pkg)
+    ]
+    for (const candidate of candidates) {
+        if (fs.existsSync(candidate)) {
+            return candidate
+        }
+    }
+    throw new Error(`${pkg} is not installed in the project or SDK`)
 }
 
 const baseConfig = (target) => {
