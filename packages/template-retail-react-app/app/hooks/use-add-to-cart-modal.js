@@ -118,6 +118,7 @@ export const AddToCartModal = () => {
                                         borderBottomWidth={{base: '1px', lg: '0px'}}
                                         borderColor="gray.200"
                                         borderStyle="solid"
+                                        data-testid="product-added"
                                     >
                                         <Flex gridGap="4">
                                             <Box w="24" flex="none">

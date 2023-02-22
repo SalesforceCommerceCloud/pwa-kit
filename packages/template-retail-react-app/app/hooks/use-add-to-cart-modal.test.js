@@ -7,6 +7,7 @@
 import React from 'react'
 import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
+import {screen} from '@testing-library/react'
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -560,7 +561,7 @@ const MOCK_PRODUCT = {
     c_width: 'Z'
 }
 
-test('Renders AddToCartModal', () => {
+test('Renders AddToCartModal with multiple products', () => {
     const MOCK_DATA = {
         product: MOCK_PRODUCT,
         itemsAdded: [
@@ -568,10 +569,16 @@ test('Renders AddToCartModal', () => {
                 product: MOCK_PRODUCT,
                 variant: MOCK_PRODUCT.variants[0],
                 quantity: 22
+            },
+            {
+                product: MOCK_PRODUCT,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 1
             }
         ]
     }
-    const {getByText} = renderWithProviders(
+
+    renderWithProviders(
         <AddToCartModalContext.Provider
             value={{
                 isOpen: true,
@@ -582,7 +589,11 @@ test('Renders AddToCartModal', () => {
         </AddToCartModalContext.Provider>
     )
 
-    expect(getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+    expect(screen.getAllByText(MOCK_PRODUCT.name)[0]).toBeInTheDocument()
+    expect(screen.getByRole('dialog', {name: /23 items added to cart/i})).toBeInTheDocument()
+
+    const numOfRowsRendered = screen.getAllByTestId('product-added').length
+    expect(numOfRowsRendered).toEqual(MOCK_DATA.itemsAdded.length)
 })
 
 test('Do not render when isOpen is false', () => {
