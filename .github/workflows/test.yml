@@ -157,6 +157,9 @@ jobs:
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
       PROJECT_DIR: generated-${{ matrix.template }}
+      # The "default" npm is the one that ships with a given version of node.
+      # For more: https://nodejs.org/en/download/releases/
+      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
