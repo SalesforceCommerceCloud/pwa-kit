@@ -99,7 +99,10 @@ test('Allows customer to generate password token', async () => {
     user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
     expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
-    expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+    
+    await waitFor(() => {
+        expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+    })
 
     await waitFor(() => {
         user.click(screen.getByText('Back to Sign In'))
