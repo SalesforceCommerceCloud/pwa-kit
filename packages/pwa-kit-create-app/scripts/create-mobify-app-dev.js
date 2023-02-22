@@ -87,12 +87,17 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
+                    console.log('Verdaccio command ran.')
+
                     const CHECK_TIME = 1000
 
                     const waitForLogFileExists = () => {
                         setTimeout(() => {
+                            console.log('waitForLogFileExists...')
                             fs.readFile(logFileName, 'utf8', (err, data) => {
+                                console.log('readFile')
                                 if (err || !data) {
+                                    console.log('err || !data')
                                     waitForLogFileExists()
                                 } else {
                                     const readStream = fs.createReadStream(logFileName, 'utf8')
@@ -111,6 +116,8 @@ const withLocalNPMRepo = (func) => {
                                             process.env['npm_config_registry'] =
                                                 'http://localhost:4873/'
                                             resolve()
+
+                                            console.log('waitForLogFileExists resolves.')
                                         } else {
                                             waitForLogFileExists()
                                         }
