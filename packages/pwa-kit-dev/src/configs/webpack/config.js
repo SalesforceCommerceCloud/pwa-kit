@@ -23,7 +23,10 @@ import {createModuleReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
-const sdkDir = resolve(path.join(__dirname, '..', '..', '..'))
+let sdkDir = __dirname
+while (!sdkDir.endsWith('pwa-kit-dev')) {
+    sdkDir = resolve(path.join(sdkDir, '..'))
+}
 
 const pkg = require(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
@@ -65,16 +68,8 @@ const entryPointExists = (segments) => {
 }
 
 const findInProjectThenSDK = (pkg) => {
-    console.log(`\npkg: ${pkg}`)
-    console.log(`__dirname: ${__dirname}`)
-    console.log(`projectDir: ${projectDir}`)
-    console.log(`projectPath: ${resolve(projectDir, 'node_modules', pkg)}`)
-    console.log(`sdkDir: ${sdkDir}`)
-    console.log(`sdkPath: ${resolve(sdkDir, 'node_modules', pkg)}`)
     const projectPath = resolve(projectDir, 'node_modules', pkg)
-    const res = fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
-    console.log(`res: ${res}`)
-    return res
+    return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
 }
 
 const baseConfig = (target) => {
