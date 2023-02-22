@@ -20,6 +20,7 @@ import {
 } from '../../test-utils'
 import {useCustomerBaskets} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
+import {NotImplementedError} from '../utils'
 import {ShopperBasketsMutation, useShopperBasketsMutation} from './mutation'
 import * as queries from './query'
 
@@ -78,7 +79,8 @@ const deletedCustomerBaskets: BasketsResult = {
 type NonDeleteMutation = Exclude<ShopperBasketsMutation, 'deleteBasket'>
 // This is an object rather than an array to more easily ensure we cover all mutations
 // TODO: Remove optional flag when all mutations are implemented
-const testMap: {[Mut in NonDeleteMutation]?: Argument<Client[Mut]>} = {
+type TestMap = {[Mut in NonDeleteMutation]?: Argument<Client[Mut]>}
+const testMap: TestMap = {
     addCouponToBasket: makeOptions<'addCouponToBasket'>({code: 'coupon'}, {}),
     addItemToBasket: makeOptions<'addItemToBasket'>([], {}),
     addPaymentInstrumentToBasket: makeOptions<'addPaymentInstrumentToBasket'>({}, {}),
@@ -116,6 +118,23 @@ const nonDeleteTestCases = Object.entries(testMap) as Array<
 >
 // Most test cases only apply to non-delete test cases, some (error handling) can include deleteBasket
 const allTestCases = [...nonDeleteTestCases, deleteTestCase]
+
+// Not implemented checks are temporary to make sure we don't forget to add tests when adding
+// implentations. When all mutations are added, the "not implemented" tests can be removed,
+// and the `TestMap` type can be changed from optional keys to required keys. Doing so will
+// leverage TypeScript to enforce having tests for all mutations.
+const notImplTestCases: NonDeleteMutation[] = [
+    'addGiftCertificateItemToBasket',
+    'addPriceBooksToBasket',
+    'addTaxesForBasket',
+    'addTaxesForBasketItem',
+    'createShipmentForBasket',
+    'removeGiftCertificateItemFromBasket',
+    'removeShipmentFromBasket',
+    'transferBasket',
+    'updateGiftCertificateItemInBasket',
+    'updateShipmentForBasket'
+]
 
 describe('ShopperBaskets mutations', () => {
     const storedCustomerIdKey = `${DEFAULT_TEST_CONFIG.siteId}_customer_id`
@@ -220,5 +239,8 @@ describe('ShopperBaskets mutations', () => {
         await waitAndExpectSuccess(wait, () => result.current.mutation)
         assertRemoveQuery(result.current.basket)
         assertInvalidateQuery(result.current.customerBaskets, oldCustomerBaskets)
+    })
+    test.each(notImplTestCases)('`%s` is not yet implemented', async (mutationName) => {
+        expect(() => useShopperBasketsMutation(mutationName)).toThrow(NotImplementedError)
     })
 })
