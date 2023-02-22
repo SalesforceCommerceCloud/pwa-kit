@@ -12,12 +12,13 @@ import DOMPurify from 'dompurify'
 /**
  * Image with text component
  *
- * @param ITCLink Image Link.
- * @param ITCText Text Below Image.
- * @param image Image.
- * @param heading Text Overlay.
- * @param alt The image alt text shown by the component.
- * @returns {JSX.Element}
+ * @param {object} props
+ * @param {string} - props.ITCLink - Image Link.
+ * @param {string} - props.ITCText - Text Below Image.
+ * @param {image} - props.image - Image.
+ * @param {string} - props.heading - Text Overlay.
+ * @param {string} - props.alt - The image alt text shown by the component.
+ * @returns {React.ReactElement} - ImageWithText component.
  */
 const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     const [sanitizedHtml, setSainitizedHtml] = useState(null)
