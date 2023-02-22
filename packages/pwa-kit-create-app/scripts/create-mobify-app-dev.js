@@ -76,6 +76,8 @@ const withLocalNPMRepo = (func) => {
             () =>
                 new Promise((resolve) => {
                     console.log('Starting up local NPM repository')
+                    console.log('{{{{{{verdaccio path: ', verdaccio)
+                    console.log('////////config dir: ', verdaccioConfigDir)
 
                     child = cp.exec(`${verdaccio} --config config.yaml`, {
                         cwd: verdaccioConfigDir,
@@ -88,7 +90,7 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    console.log('Verdaccio command ran.')
+                    console.log('Verdaccio command ran.', child)
 
                     const CHECK_TIME = 1000
 
