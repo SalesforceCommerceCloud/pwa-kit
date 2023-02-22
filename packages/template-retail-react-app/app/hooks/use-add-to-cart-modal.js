@@ -62,7 +62,7 @@ export const AddToCartModal = () => {
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const {currency, productItems, productSubTotal, itemAccumulatedCount} = basket
+    const {currency, productItems, productSubTotal} = basket
     const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     return (
@@ -180,7 +180,7 @@ export const AddToCartModal = () => {
                                                 'Cart Subtotal ({itemAccumulatedCount} item)',
                                             id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
-                                        {itemAccumulatedCount}
+                                        {itemAccumulatedCount: totalQuantity}
                                     )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
@@ -245,7 +245,7 @@ export const AddToCartModal = () => {
                                     defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)',
                                     id: 'add_to_cart_modal.label.cart_subtotal'
                                 },
-                                {itemAccumulatedCount}
+                                {itemAccumulatedCount: totalQuantity}
                             )}
                         </Text>
                         <Text alignSelf="flex-end" fontWeight="600">
