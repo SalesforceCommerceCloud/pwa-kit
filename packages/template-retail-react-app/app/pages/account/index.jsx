@@ -110,9 +110,8 @@ const Account = () => {
     // we don't want redirect on server side
     if (customerType !== null && !isRegistered && onClient) {
         const path = buildUrl('/login')
-        return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
+        return <Redirect to={{pathname: path, state: {directedFrom: '/account'}}} />
     }
-
     return (
         <Box
             data-testid={isRegistered ? 'account-page' : 'account-page-skeleton'}
