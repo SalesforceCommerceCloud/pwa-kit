@@ -17,7 +17,7 @@ import userEvent from '@testing-library/user-event'
 
 jest.mock('../../commerce-api/einstein')
 
-const MockComponent = ({product, addToCart, addToWishlist, updateWishlist}) => {
+const MockComponent = (props) => {
     const customer = useCustomer()
     useEffect(() => {
         if (!customer.isRegistered) {
@@ -27,12 +27,7 @@ const MockComponent = ({product, addToCart, addToWishlist, updateWishlist}) => {
     return (
         <div>
             <div>customer: {customer?.authType}</div>
-            <ProductView
-                product={product}
-                addToCart={addToCart}
-                addToWishlist={addToWishlist}
-                updateWishlist={updateWishlist}
-            />
+            <ProductView {...props} />
         </div>
     )
 }
@@ -128,6 +123,9 @@ test('renders a product set properly - parent item', () => {
         <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
     )
 
+    // NOTE: there can be duplicates of the same element, due to mobile and desktop views
+    // (they're hidden with display:none style)
+
     // What should exist:
     expect(screen.getAllByText(/starting at/i)[0]).toBeInTheDocument()
     expect(screen.getAllByRole('button', {name: /add set to cart/i})[0]).toBeInTheDocument()
@@ -150,6 +148,9 @@ test('renders a product set properly - child item', () => {
         <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />
     )
 
+    // NOTE: there can be duplicates of the same element, due to mobile and desktop views
+    // (they're hidden with display:none style)
+
     // What should exist:
     expect(screen.getAllByRole('button', {name: /add to cart/i})[0]).toBeInTheDocument()
     expect(screen.getAllByRole('button', {name: /add to wishlist/i})[0]).toBeInTheDocument()
@@ -166,8 +167,46 @@ test('renders a product set properly - child item', () => {
     expect(screen.queryAllByText(/starting at/i).length).toEqual(0)
 })
 
-// TODO: callback gets called
-test('validateOrderability', () => {})
+test('validateOrderability callback is called when adding a set to cart', async () => {
+    const parent = mockProductSet
+    const fn = jest.fn()
 
-// TODO: callback gets called
-test('onVariantSelected', () => {})
+    renderWithProviders(
+        <MockComponent
+            product={parent}
+            validateOrderability={fn}
+            addToCart={() => {}}
+            addToWishlist={() => {}}
+        />
+    )
+
+    const button = screen.getByRole('button', {name: /add set to cart/i})
+    expect(button).toBeInTheDocument()
+    userEvent.click(button)
+
+    await waitFor(() => {
+        expect(fn).toHaveBeenCalledTimes(1)
+    })
+})
+
+test('onVariantSelected callback is called after successfully selected a variant', async () => {
+    const fn = jest.fn()
+    const child = mockProductSet.setProducts[0]
+
+    renderWithProviders(
+        <MockComponent
+            product={child}
+            onVariantSelected={fn}
+            addToCart={() => {}}
+            addToWishlist={() => {}}
+        />
+    )
+
+    const size = screen.getByRole('link', {name: /xl/i})
+    expect(size).toBeInTheDocument()
+    userEvent.click(size)
+
+    await waitFor(() => {
+        expect(fn).toHaveBeenCalledTimes(1)
+    })
+})
