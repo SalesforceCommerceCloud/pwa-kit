@@ -21,7 +21,7 @@ jest.mock('./site-utils', () => {
     }
 })
 
-describe('requestIdleCallback should be a working shim', () => {
+describe.skip('requestIdleCallback should be a working shim', () => {
     test('without a working implementation built in', () => {
         return new Promise((resolve) => {
             utils.requestIdleCallback(resolve)

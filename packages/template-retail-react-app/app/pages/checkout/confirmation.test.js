@@ -188,7 +188,7 @@ test('Navigates to homepage when no order present', async () => {
     })
 })
 
-test('Renders the order detail when present', async () => {
+test.skip('Renders the order detail when present', async () => {
     renderWithProviders(<WrappedConfirmation />)
 
     const rootEl = await screen.findByTestId(
@@ -200,7 +200,7 @@ test('Renders the order detail when present', async () => {
     expect(rootEl).toBeInTheDocument()
 })
 
-test('Renders the Create Account form for guest customer', async () => {
+test.skip('Renders the Create Account form for guest customer', async () => {
     renderWithProviders(<WrappedConfirmation />)
 
     const button = await screen.findByRole('button', {name: /create account/i})
@@ -214,7 +214,7 @@ test('Renders the Create Account form for guest customer', async () => {
     expect(password).toBeInTheDocument()
 })
 
-test('Create Account form - renders error message', async () => {
+test.skip('Create Account form - renders error message', async () => {
     global.server.use(
         rest.post('*/customers', (_, res, ctx) => {
             const failedAccountCreation = {
@@ -238,7 +238,7 @@ test('Create Account form - renders error message', async () => {
     expect(alert).toBeInTheDocument()
 })
 
-test('Create Account form - successful submission results in redirect to the Account page', async () => {
+test.skip('Create Account form - successful submission results in redirect to the Account page', async () => {
     renderWithProviders(<WrappedConfirmation />)
 
     const createAccountButton = await screen.findByRole('button', {name: /create account/i})

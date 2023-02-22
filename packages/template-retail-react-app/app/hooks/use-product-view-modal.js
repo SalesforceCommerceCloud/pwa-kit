@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect, useState, useRef} from 'react'
+import {useEffect, useState} from 'react'
 import {rebuildPathWithParams, removeQueryParamsFromPath} from '../utils/url'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useVariant} from './use-variant'
