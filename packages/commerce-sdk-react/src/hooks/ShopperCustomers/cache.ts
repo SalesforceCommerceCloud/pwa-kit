@@ -167,7 +167,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ]
         }
     },
-    resetPassword: TODO('resetPassword'),
+    resetPassword: noop,
     updateCustomer(customerId, {parameters}) {
         if (!customerId) return {}
         const customerPath = getCustomerPath(customerId, parameters)
