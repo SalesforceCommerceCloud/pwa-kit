@@ -341,11 +341,19 @@ const mockData = {
 
 jest.mock('../../../hooks/use-wishlist')
 
+jest.mock('commerce-sdk-react-preview', () => {
+    const originalModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originalModule,
+        useCustomerBaskets: jest.fn().mockReturnValue({data: {baskets: [{currency: 'GBP'}]}})
+    }
+})
+
 beforeEach(() => {
     jest.resetModules()
 })
 
-test.skip('Renders wishlist page', () => {
+test('Renders wishlist page', () => {
     useWishlist.mockReturnValue({
         isInitialized: true,
         isEmpty: false,
@@ -358,7 +366,7 @@ test.skip('Renders wishlist page', () => {
     expect(screen.getByText(mockData.customerProductListItems[0].product.name)).toBeInTheDocument()
 })
 
-test.skip('Can remove item from the wishlist', async () => {
+test('Can remove item from the wishlist', async () => {
     const removeItemMock = jest.fn()
     useWishlist.mockReturnValue({
         isInitialized: true,

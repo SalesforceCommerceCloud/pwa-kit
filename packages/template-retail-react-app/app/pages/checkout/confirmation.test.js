@@ -26,6 +26,14 @@ jest.mock('../../commerce-api/auth', () => {
     }
 })
 
+jest.mock('commerce-sdk-react-preview', () => {
+    const originalModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originalModule,
+        useCustomerBaskets: jest.fn().mockReturnValue({data: {baskets: [{currency: 'GBP'}]}})
+    }
+})
+
 const mockOrder = keysToCamel({
     basket_id: 'testorderbasket',
     ...ocapiOrderResponse
@@ -188,7 +196,7 @@ test('Navigates to homepage when no order present', async () => {
     })
 })
 
-test.skip('Renders the order detail when present', async () => {
+test('Renders the order detail when present', async () => {
     renderWithProviders(<WrappedConfirmation />)
 
     const rootEl = await screen.findByTestId(
@@ -200,7 +208,7 @@ test.skip('Renders the order detail when present', async () => {
     expect(rootEl).toBeInTheDocument()
 })
 
-test.skip('Renders the Create Account form for guest customer', async () => {
+test('Renders the Create Account form for guest customer', async () => {
     renderWithProviders(<WrappedConfirmation />)
 
     const button = await screen.findByRole('button', {name: /create account/i})
@@ -214,7 +222,7 @@ test.skip('Renders the Create Account form for guest customer', async () => {
     expect(password).toBeInTheDocument()
 })
 
-test.skip('Create Account form - renders error message', async () => {
+test('Create Account form - renders error message', async () => {
     global.server.use(
         rest.post('*/customers', (_, res, ctx) => {
             const failedAccountCreation = {
@@ -238,7 +246,7 @@ test.skip('Create Account form - renders error message', async () => {
     expect(alert).toBeInTheDocument()
 })
 
-test.skip('Create Account form - successful submission results in redirect to the Account page', async () => {
+test('Create Account form - successful submission results in redirect to the Account page', async () => {
     renderWithProviders(<WrappedConfirmation />)
 
     const createAccountButton = await screen.findByRole('button', {name: /create account/i})
