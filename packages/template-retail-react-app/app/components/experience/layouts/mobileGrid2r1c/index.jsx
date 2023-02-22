@@ -28,7 +28,7 @@ export const MobileGrid2r1c = ({regions}) => (
     </SimpleGrid>
 )
 
-MobileGrid2r1c.displayName = 'MobileGrid1r1c'
+MobileGrid2r1c.displayName = 'MobileGrid2r1c'
 
 MobileGrid2r1c.propTypes = {
     // Internally Provided
