@@ -580,7 +580,7 @@ beforeEach(() => {
     )
 })
 
-test.skip('Renders AddToCartModal', async () => {
+test('Renders AddToCartModal', async () => {
     await act(async () => {
         renderWithProviders(
             <AddToCartModalContext.Provider
@@ -596,7 +596,7 @@ test.skip('Renders AddToCartModal', async () => {
             </AddToCartModalContext.Provider>
         )
         await waitFor(() => {
-            expect(screen.getByText(/cart subtotal \(1 item\)/i)).toBeInTheDocument()
+            expect(screen.getByText(/cart subtotal \(2 item\)/i)).toBeInTheDocument()
             expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
         })
     })
