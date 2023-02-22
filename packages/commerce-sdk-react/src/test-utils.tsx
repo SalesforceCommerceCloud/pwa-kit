@@ -117,7 +117,7 @@ export const mockMutationEndpoints = (
 /** Mocks a GET request to an endpoint. */
 export const mockQueryEndpoint = (
     matchingPath: string,
-    response: string | Record<string, unknown>,
+    response: string | Record<string, unknown> | unknown[],
     statusCode = 200
 ) => {
     const matcher = (uri: string) => uri.includes(matchingPath)
@@ -126,7 +126,7 @@ export const mockQueryEndpoint = (
 
 export const assertUpdateQuery = (
     queryResult: UseQueryResult,
-    newData: Record<string, unknown>
+    newData: Record<string, unknown> | unknown[]
 ) => {
     // query should be updated without a refetch
     expect(queryResult.data).toEqual(newData)
@@ -135,7 +135,7 @@ export const assertUpdateQuery = (
 
 export const assertInvalidateQuery = (
     queryResult: UseQueryResult,
-    oldData: Record<string, unknown>
+    oldData: Record<string, unknown> | unknown[]
 ) => {
     // query should be invalidated and refetching
     expect(queryResult.data).toEqual(oldData)
@@ -200,5 +200,5 @@ export const waitAndExpectError = async <Data, Err, Vars, Ctx>(
     getResult: GetHookResult<Data, Err, Vars, Ctx>
 ) => {
     await waitForHookToFinish(wait, getResult)
-    expect(getResult().error).toBeInstanceOf(Error)
+    expect(getResult().isError).toBe(true)
 }
