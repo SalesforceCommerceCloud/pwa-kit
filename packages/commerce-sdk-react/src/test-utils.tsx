@@ -158,7 +158,7 @@ const getQueryName = (method: string): string => {
 export const expectAllEndpointsHaveHooks = (
     SdkClass: {prototype: object},
     queryHooks: Record<string, unknown>,
-    mutationsEnum: Record<string, string>
+    mutationsEnum: Record<string, string> = {}
 ) => {
     const unimplemented = new Set(Object.getOwnPropertyNames(SdkClass.prototype))
     // Always present on a class; we can ignore
