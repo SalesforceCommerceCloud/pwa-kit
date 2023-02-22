@@ -29,7 +29,7 @@ export const useMutation = <
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
 
     return useReactQueryMutation(authenticatedMethod, {
-        onSuccess: (data, options) => {
+        onSuccess(data, options) {
             // commerce-sdk-isomorphic merges `clientConfig` and `options` under the hood,
             // so we also need to do that to get the "net" options that are actually sent to SCAPI.
             const netOptions = mergeOptions(hookConfig.client, options)
