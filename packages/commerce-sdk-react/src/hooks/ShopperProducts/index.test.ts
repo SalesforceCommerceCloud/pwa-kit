@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBaskets} from 'commerce-sdk-isomorphic'
+import {ShopperProducts} from 'commerce-sdk-isomorphic'
 import {expectAllEndpointsHaveHooks} from '../../test-utils'
 import * as queries from './query'
 
-describe('Shopper Baskets hooks', () => {
+describe('Shopper Products hooks', () => {
     test('all endpoints have hooks', () => {
-        expectAllEndpointsHaveHooks(ShopperBaskets, queries)
+        expectAllEndpointsHaveHooks(ShopperProducts, queries)
     })
 })
