@@ -11,7 +11,7 @@ import {
     ShopperCustomersTypes
 } from 'commerce-sdk-isomorphic'
 import {ApiClients, Argument, CacheUpdate, CacheUpdateMatrix, MergedOptions} from '../types'
-import {and, matchesPath, matchParameters, NotImplementedError, pick} from '../utils'
+import {and, matchesPath, matchParameters, pick} from '../utils'
 
 type Client = ApiClients['shopperBaskets']
 /** Data returned by every Shopper Baskets endpoint (except `deleteBasket`) */
