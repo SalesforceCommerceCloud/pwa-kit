@@ -152,6 +152,7 @@ jobs:
     strategy:
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
+        npm: [6, 7, 8]
     runs-on: ubuntu-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
@@ -164,6 +165,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
+      - name: Update NPM version
+        if: env.IS_DEFAULT_NPM == 'false'
+        run: |-
+          npm install -g npm@${{ matrix.npm }}
 
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
