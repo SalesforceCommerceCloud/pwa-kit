@@ -19,6 +19,14 @@ import {renderWithProviders} from '../utils/test-utils'
 import messages from '../translations/compiled/en-GB.json'
 import {rest} from 'msw'
 
+jest.mock('commerce-sdk-react-preview', () => {
+    const originalModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originalModule,
+        useProduct: jest.fn().mockReturnValue({isFetching: false})
+    }
+})
+
 const mockProduct = {
     ...mockProductDetail,
     id: '750518699660M',
@@ -64,7 +72,7 @@ beforeEach(() => {
     )
 })
 
-describe.skip('useProductViewModal hook', () => {
+describe('useProductViewModal hook', () => {
     test('return proper data', async () => {
         const history = createMemoryHistory()
         history.push('/test/path')
