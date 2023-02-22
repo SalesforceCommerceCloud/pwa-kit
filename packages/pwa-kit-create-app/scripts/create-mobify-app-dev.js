@@ -90,6 +90,8 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
+                    child.stdout.pipe(process.stdout)
+
                     console.log('Verdaccio command ran.', child)
 
                     const CHECK_TIME = 1000
