@@ -83,7 +83,6 @@ const Account = () => {
     const {isRegistered, customerType} = useCustomerType()
     const {data: customer} = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
     const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
-    console.log('customerType', customerType)
     const location = useLocation()
     const navigate = useNavigation()
 

@@ -265,7 +265,6 @@ const PasswordCard = () => {
                     }
                 }
             )
-            // await customer.updatePassword(values, customer.email)
             setIsEditing(false)
             toast({
                 title: formatMessage({
@@ -279,8 +278,6 @@ const PasswordCard = () => {
             form.setError('global', {type: 'manual', message: error.message})
         }
     }
-
-    // const {isRegistered} = customer
 
     return (
         <ToggleCard
