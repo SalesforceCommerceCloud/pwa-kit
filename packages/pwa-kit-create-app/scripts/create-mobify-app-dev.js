@@ -98,6 +98,7 @@ const withLocalNPMRepo = (func) => {
                                 console.log('readFile')
                                 if (err || !data) {
                                     console.log('err || !data')
+                                    console.log('-----err----', err)
                                     waitForLogFileExists()
                                 } else {
                                     const readStream = fs.createReadStream(logFileName, 'utf8')
