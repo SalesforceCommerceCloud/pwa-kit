@@ -45,7 +45,7 @@ import {
     useCustomer,
     ShopperLoginHelpers
 } from 'commerce-sdk-react-preview'
-
+const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onSignoutClick}) => {
     const {formatMessage} = useIntl()
     return (
@@ -108,7 +108,8 @@ const Account = () => {
     // If we have customer data and they are not registered, push to login page
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
-    if (customerType !== null && !isRegistered) {
+    // we don't want redirect on server side
+    if (customerType !== null && !isRegistered && onClient) {
         const path = buildUrl('/login')
         return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
     }
