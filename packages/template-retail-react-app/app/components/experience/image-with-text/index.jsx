@@ -21,6 +21,7 @@ import DOMPurify from 'dompurify'
  * @returns {React.ReactElement} - ImageWithText component.
  */
 const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
+    const hasCaption = ITCText || heading
     const [sanitizedHtml, setSainitizedHtml] = useState(null)
 
     useEffect(() => {
@@ -54,7 +55,7 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                         />
                     </Link>
                 </picture>
-                {(ITCText || heading) && (
+                {hasCaption && (
                     <Text as="figcaption">
                         {heading && (
                             <Box
@@ -125,7 +126,7 @@ ImageWithText.propTypes = {
         }),
         url: PropTypes.string,
         src: PropTypes.string || PropTypes.object
-    }),
+    }).isRequired,
     heading: PropTypes.string,
     alt: PropTypes.string
 }
