@@ -77,7 +77,11 @@ const withLocalNPMRepo = (func) => {
                 new Promise((resolve) => {
                     console.log('Starting up local NPM repository')
                     console.log('{{{{{{verdaccio path: ', verdaccio)
-                    console.log('////////config dir: ', verdaccioConfigDir)
+                    // console.log('////////config dir: ', verdaccioConfigDir)
+
+                    fs.readdirSync(p.join(__dirname, '..', 'local-npm-repo')).forEach(file => {
+                        console.log(file);
+                    });
 
                     child = cp.exec(`${verdaccio} --config config.yaml`, {
                         cwd: verdaccioConfigDir,
