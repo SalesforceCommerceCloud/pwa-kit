@@ -48,7 +48,7 @@ const cp = require('child_process')
 
 sh.set('-e')
 
-const logFileName = p.join(__dirname, '..', 'local-npm-repo', 'verdaccio.log')
+const logFileName = p.join(__dirname, '..', 'local-npm-repo', 'config.yaml')
 
 /**
  * Run the provided function with a local NPM repository running in the background.
