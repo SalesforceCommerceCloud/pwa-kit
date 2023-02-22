@@ -10,11 +10,8 @@ import {SimpleGrid} from '@chakra-ui/react'
 import {Region} from '../../region'
 
 /**
- * This layout component displays its children in a 3 rows x 1 column grid on mobile and desktop
- * and 1 row x 3 columns on desktop.
- *
- * NOTE: This component is not intended to be used directly, it's used by the core page designer
- * components.
+ * This layout component displays its children in a 3 row x 1 column grid on mobile
+ * and 1 row x 3 column grid on desktop.
  *
  * @param {componentProps} props
  * @param {regionType []} props.regions - The page designer regions for this component.
