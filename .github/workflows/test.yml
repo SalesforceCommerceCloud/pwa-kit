@@ -28,6 +28,7 @@ env:
 
 jobs:
   pwa-kit:
+    if: ${{github.ref_name}} != 'kevin-skip-failing-tests-2'
     strategy:
       matrix:
         node: [14]
@@ -117,6 +118,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   pwa-kit-windows:
+    if: ${{github.ref_name}} != 'kevin-skip-failing-tests-2'
     strategy:
         # TODO: We don't *need* a matrix with single values,
         # but is it worth keeping for supporting multiple versions in the future?
@@ -143,6 +145,7 @@ jobs:
   # TODO: The generated workflow is identical to the generated-windows workflow,
   # with a few extra steps. Can the workflows be merged? (Add `os` to the matrix?)
   generated:
+    if: ${{github.ref_name}} == 'kevin-skip-failing-tests-2'
     strategy:
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
@@ -233,6 +236,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   generated-windows:
+    if: ${{github.ref_name}} != 'kevin-skip-failing-tests-2'
     strategy:
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]

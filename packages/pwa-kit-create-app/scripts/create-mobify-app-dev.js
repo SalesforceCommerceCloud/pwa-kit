@@ -57,6 +57,7 @@ const withLocalNPMRepo = (func) => {
     const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
     const verdaccio = p.join(__dirname, '..', 'node_modules', '.bin', 'verdaccio')
     const verdaccioConfigDir = p.join(__dirname, '..', 'local-npm-repo')
+    console.log('+++++dirName', __dirname)
 
     // Clear any cached packages from a previous run.
     sh.rm('-rf', p.join(verdaccioConfigDir, 'storage'))
@@ -95,10 +96,10 @@ const withLocalNPMRepo = (func) => {
                         setTimeout(() => {
                             console.log('waitForLogFileExists...')
                             fs.readFile(logFileName, 'utf8', (err, data) => {
+                                console.log('-----file', logFileName)
                                 console.log('readFile')
                                 if (err || !data) {
                                     console.log('err || !data')
-                                    console.log('-----err----', err)
                                     waitForLogFileExists()
                                 } else {
                                     const readStream = fs.createReadStream(logFileName, 'utf8')
