@@ -9,7 +9,7 @@
 
 // For more information on these settings, see https://webpack.js.org/configuration
 import fs from 'fs'
-import path, {resolve} from 'path'
+import {resolve} from 'path'
 
 import webpack from 'webpack'
 import WebpackNotifierPlugin from 'webpack-notifier'
