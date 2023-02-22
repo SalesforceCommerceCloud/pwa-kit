@@ -8,6 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {SimpleGrid} from '@chakra-ui/react'
 import {Region} from '../../region'
+import {regionType} from '../../types'
 
 /**
  * This layout component displays its children in a 3 row x 1 column grid on mobile
@@ -31,7 +32,7 @@ MobileGrid3r1c.displayName = 'MobileGrid1r1c'
 
 MobileGrid3r1c.propTypes = {
     // Internally Provided
-    regions: PropTypes.array.isRequired
+    regions: PropTypes.arrayOf(regionType).isRequired
 }
 
 export default MobileGrid3r1c

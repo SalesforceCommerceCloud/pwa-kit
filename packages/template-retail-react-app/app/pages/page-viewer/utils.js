@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {Region} from '../../components/experience/region'
 
 import * as Layouts from '../../components/experience/layouts'
@@ -30,9 +31,13 @@ const withTitle = (Component) => {
             </div>
         )
     }
+    WrappedComponent.propTypes = {
+        typeId: PropTypes.string
+    }
 
     return WrappedComponent
 }
+
 export const componentMapProxy = new Proxy(
     {},
     {
