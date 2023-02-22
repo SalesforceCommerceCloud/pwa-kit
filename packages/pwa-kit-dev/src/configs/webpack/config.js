@@ -69,12 +69,13 @@ const findInProjectThenSDK = (pkg) => {
         resolve(__dirname, '..', '..', 'node_modules', pkg),
         resolve(__dirname, '..', '..', '..', 'node_modules', pkg)
     ]
-    for (const candidate of candidates) {
+    let candidate
+    for (candidate of candidates) {
         if (fs.existsSync(candidate)) {
             return candidate
         }
     }
-    throw new Error(`${pkg} is not installed in the project or SDK`)
+    return candidate
 }
 
 const baseConfig = (target) => {
