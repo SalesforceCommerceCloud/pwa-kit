@@ -35,7 +35,7 @@ type Basket = ShopperBasketsTypes.Basket
 type BasketsResult = ShopperCustomersTypes.BasketsResult
 
 /** Create an options object for Shopper Baskets endpoints, with `basketId` pre-filled. */
-const makeOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
+const createOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
     body: Argument<Client[Method]> extends {body: infer B} ? B : undefined,
     parameters: Omit<Argument<Client[Method]>['parameters'], 'basketId'>
 ): Argument<Client[Method]> => ({
@@ -46,7 +46,7 @@ const makeOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
 // --- getBasket constants --- //
 const basketsEndpoint = '/checkout/shopper-baskets/'
 const BASKET_ID = 'basket_id'
-const getBasketOptions = makeOptions<'getBasket'>(undefined, {})
+const getBasketOptions = createOptions<'getBasket'>(undefined, {})
 const oldBasket: Basket = {basketId: BASKET_ID, mockData: 'old basket'}
 const newBasket: Basket = {basketId: BASKET_ID, mockData: 'new basket'}
 // --- getCustomerBaskets constants --- //
@@ -81,36 +81,42 @@ type NonDeleteMutation = Exclude<ShopperBasketsMutation, 'deleteBasket'>
 // TODO: Remove optional flag when all mutations are implemented
 type TestMap = {[Mut in NonDeleteMutation]?: Argument<Client[Mut]>}
 const testMap: TestMap = {
-    addCouponToBasket: makeOptions<'addCouponToBasket'>({code: 'coupon'}, {}),
-    addItemToBasket: makeOptions<'addItemToBasket'>([], {}),
-    addPaymentInstrumentToBasket: makeOptions<'addPaymentInstrumentToBasket'>({}, {}),
-    createBasket: makeOptions<'createBasket'>({}, {}),
-    mergeBasket: makeOptions<'mergeBasket'>(undefined, {}),
-    removeCouponFromBasket: makeOptions<'removeCouponFromBasket'>(undefined, {
+    addCouponToBasket: createOptions<'addCouponToBasket'>({code: 'coupon'}, {}),
+    addItemToBasket: createOptions<'addItemToBasket'>([], {}),
+    addPaymentInstrumentToBasket: createOptions<'addPaymentInstrumentToBasket'>({}, {}),
+    createBasket: createOptions<'createBasket'>({}, {}),
+    mergeBasket: createOptions<'mergeBasket'>(undefined, {}),
+    removeCouponFromBasket: createOptions<'removeCouponFromBasket'>(undefined, {
         couponItemId: 'couponIemId'
     }),
-    removeItemFromBasket: makeOptions<'removeItemFromBasket'>(undefined, {itemId: 'itemId'}),
-    removePaymentInstrumentFromBasket: makeOptions<'removePaymentInstrumentFromBasket'>(undefined, {
-        paymentInstrumentId: 'paymentInstrumentId'
-    }),
-    updateBasket: makeOptions<'updateBasket'>({}, {}),
-    updateBillingAddressForBasket: makeOptions<'updateBillingAddressForBasket'>({}, {}),
-    updateCustomerForBasket: makeOptions<'updateCustomerForBasket'>({email: 'customer@email'}, {}),
-    updateItemInBasket: makeOptions<'updateItemInBasket'>({}, {itemId: 'itemId'}),
-    updatePaymentInstrumentInBasket: makeOptions<'updatePaymentInstrumentInBasket'>(
+    removeItemFromBasket: createOptions<'removeItemFromBasket'>(undefined, {itemId: 'itemId'}),
+    removePaymentInstrumentFromBasket: createOptions<'removePaymentInstrumentFromBasket'>(
+        undefined,
+        {
+            paymentInstrumentId: 'paymentInstrumentId'
+        }
+    ),
+    updateBasket: createOptions<'updateBasket'>({}, {}),
+    updateBillingAddressForBasket: createOptions<'updateBillingAddressForBasket'>({}, {}),
+    updateCustomerForBasket: createOptions<'updateCustomerForBasket'>(
+        {email: 'customer@email'},
+        {}
+    ),
+    updateItemInBasket: createOptions<'updateItemInBasket'>({}, {itemId: 'itemId'}),
+    updatePaymentInstrumentInBasket: createOptions<'updatePaymentInstrumentInBasket'>(
         {},
         {paymentInstrumentId: 'paymentInstrumentId'}
     ),
-    updateShippingAddressForShipment: makeOptions<'updateShippingAddressForShipment'>(
+    updateShippingAddressForShipment: createOptions<'updateShippingAddressForShipment'>(
         {},
         {shipmentId: 'shipmentId'}
     ),
-    updateShippingMethodForShipment: makeOptions<'updateShippingMethodForShipment'>(
+    updateShippingMethodForShipment: createOptions<'updateShippingMethodForShipment'>(
         {id: 'ship'},
         {shipmentId: 'shipmentId'}
     )
 }
-const deleteTestCase = ['deleteBasket', makeOptions<'deleteBasket'>(undefined, {})] as const
+const deleteTestCase = ['deleteBasket', createOptions<'deleteBasket'>(undefined, {})] as const
 
 // Type assertion because the built-in type definition for `Object.entries` is limited :\
 const nonDeleteTestCases = Object.entries(testMap) as Array<
