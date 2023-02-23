@@ -151,10 +151,12 @@ const ProductDetail = ({category, product, isLoading}) => {
             // Get the reference to the product view and scroll to it.
             const {ref} = childProductRefs.current[firstUnselectedProduct.id]
 
-            ref.scrollIntoView({
-                behavior: 'smooth',
-                block: 'end'
-            })
+            if (ref.scrollIntoView) {
+                ref.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end'
+                })
+            }
 
             return false
         }

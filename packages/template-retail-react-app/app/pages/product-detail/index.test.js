@@ -32,7 +32,7 @@ const MockedComponent = () => {
     )
 }
 
-const MockedProductSet = () => {
+const MockedPageWithProductSet = () => {
     return (
         <Switch>
             <Route
@@ -279,7 +279,7 @@ test('product set: render multi-product layout and add the set to cart', async (
     )
 
     const initialBasket = {basketId: 'valid_id'}
-    renderWithProviders(<MockedProductSet />, {wrapperProps: {initialBasket}})
+    renderWithProviders(<MockedPageWithProductSet />, {wrapperProps: {initialBasket}})
 
     await waitFor(() => {
         expect(screen.getAllByTestId('product-view').length).toEqual(4) // 1 parent + 3 children
@@ -295,4 +295,16 @@ test('product set: render multi-product layout and add the set to cart', async (
         },
         {timeout: 5000}
     )
+})
+
+test('product set: show message when user has not selected all variants', async () => {
+    renderWithProviders(<MockedPageWithProductSet />)
+
+    const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
+    fireEvent.click(buttons[0])
+
+    await waitFor(() => {
+        const errorMessages = screen.getAllByText(/Please select all your options above/i)
+        expect(errorMessages.length).toEqual(3)
+    })
 })
