@@ -1,3 +1,5 @@
+## v2.7.0-dev (Jan 25, 2023)
+- Add Page Designer layout components [#993](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/993)
 ## v2.6.0 (Jan 25, 2023)
 - Mega menu fixes [#875](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/875) and [#910](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/910)
 - Cache SLAS callback using request processor [#884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/884)
