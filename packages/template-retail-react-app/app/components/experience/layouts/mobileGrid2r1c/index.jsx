@@ -21,7 +21,7 @@ import {regionType} from '../../types'
  * @returns {React.ReactElement} - Grid component.
  */
 export const MobileGrid2r1c = ({regions}) => (
-    <SimpleGrid className="mobile-2r-1c" columns={{base: 1, sm: 2}} spacingX={15} spacingY={15}>
+    <SimpleGrid className="mobile-2r-1c" columns={{base: 1, sm: 2}}>
         {regions.map((region) => (
             <Region key={region.id} region={region} />
         ))}
