@@ -267,6 +267,7 @@ test('should render product details page', async () => {
     expect(screen.getAllByTestId('product-view').length).toEqual(1)
 })
 
+// TODO: split into smaller tests
 test('product set: render multi-product layout and add the set to cart', async () => {
     const urlPathAfterSelectingAllVariants =
         '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
@@ -306,5 +307,16 @@ test('product set: show message when user has not selected all variants', async 
     await waitFor(() => {
         const errorMessages = screen.getAllByText(/Please select all your options above/i)
         expect(errorMessages.length).toEqual(3)
+    })
+})
+
+test('product set: children are lazy loaded', async () => {
+    renderWithProviders(<MockedPageWithProductSet />)
+
+    const childProducts = await screen.findAllByTestId('child-product')
+
+    childProducts.forEach((child) => {
+        const heroImage = within(child).getAllByRole('img')[0]
+        expect(heroImage.getAttribute('loading')).toEqual('lazy')
     })
 })
