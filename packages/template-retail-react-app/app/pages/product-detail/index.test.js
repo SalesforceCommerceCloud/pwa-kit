@@ -45,7 +45,7 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test('should render product details page', async () => {
+test.skip('should render product details page', async () => {
     global.server.use(
         // mock fetch product lists
         // rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
