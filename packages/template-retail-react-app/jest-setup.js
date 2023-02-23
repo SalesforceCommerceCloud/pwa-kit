@@ -79,7 +79,6 @@ afterAll(() => {
     // and the tests not well written in an proper async manner.
     // Let's not close the server and see how things goes.
     // We can revisit this.
-
     // global.server.close()
 })
 
