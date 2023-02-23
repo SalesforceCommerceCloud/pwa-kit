@@ -5,15 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClientConfigParams, ApiClients, CacheUpdateMatrix} from '../types'
-import {and, matchesApiConfig, matchesPath, NotImplementedError, pathStartsWith} from '../utils'
+import {and, matchesApiConfig, matchesPath, pathStartsWith} from '../utils'
 
 type Client = ApiClients['shopperCustomers']
 
 const noop = () => ({})
-const TODO = (method: keyof Client) => () => {
-    throw new NotImplementedError(`Cache logic for '${method}'`)
+/** Logs a warning to console (on startup) and returns nothing (method is unimplemented). */
+const TODO = (method: keyof Client) => {
+    console.warn(`Cache logic for '${method}' is not yet implemented.`)
+    return undefined
 }
-
 // Path helpers (avoid subtle typos!)
 const getCustomerPath = (customerId: string, parameters: ApiClientConfigParams) => [
     '/organizations/',
