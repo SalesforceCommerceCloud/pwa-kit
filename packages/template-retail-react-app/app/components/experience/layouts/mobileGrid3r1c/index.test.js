@@ -52,5 +52,5 @@ test('MobileGrid3r1c renders without errors', () => {
             ]}
         />
     )
-    expect(document.querySelector('.mobile-1r-1c')).toBeDefined()
+    expect(document.querySelector('.mobile-3r-1c')).not.toBeNull()
 })
