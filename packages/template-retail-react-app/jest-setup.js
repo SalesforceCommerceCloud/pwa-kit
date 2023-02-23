@@ -73,7 +73,7 @@ afterEach(() => {
     global.server.resetHandlers()
 })
 afterAll(() => {
-    global.server.close()
+    // global.server.close()
 })
 
 // Mock the application configuration to be used in all tests.
