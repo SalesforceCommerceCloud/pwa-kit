@@ -30,4 +30,4 @@ publish:
   allow_offline: true
 
 logs:
-  - {type: file, path: ./verdaccio.log, level: warn}
+  - {type: stdout, path: ./verdaccio.log, level: warn}

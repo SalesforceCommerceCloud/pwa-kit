@@ -87,10 +87,18 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    setTimeout(() => {
-                        process.env['npm_config_registry'] = 'http://localhost:4873/'
-                        resolve()
-                    }, 3000)
+                    child.stdout.on('data', (data) => {
+                        if (data.includes('http address')) {
+                            console.log('verdaccio server is up')
+                            process.env['npm_config_registry'] = 'http://localhost:4873/'
+                            resolve()
+                        }
+                    })
+
+                    // setTimeout(() => {
+                    //     process.env['npm_config_registry'] = 'http://localhost:4873/'
+                    //     resolve()
+                    // }, 10000)
 
                     // console.log('Verdaccio command ran.')
 
