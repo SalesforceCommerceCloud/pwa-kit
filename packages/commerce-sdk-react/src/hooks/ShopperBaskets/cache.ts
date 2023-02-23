@@ -141,12 +141,8 @@ const updateBasketWithResponseBasketId = (
     }
 }
 
-const TODO = (method: keyof Client): undefined => {
-    // This is kind of a hacky way of passing both the "not implemented" tests in mutations.test.ts
-    // and the "all hooks have cache logic" test in index.test.ts. The former expects `undefined`
-    // as a value and the latter expects the key to exist, both of which are satisfied by setting
-    // an explicit `undefined`. So that's all that this does, plus logging a TODO warning.
-    // Hacky, but temporary!
+/** Logs a warning to console (on startup) and returns nothing (method is unimplemented). */
+const TODO = (method: keyof Client) => {
     console.warn(`Cache logic for '${method}' is not yet implemented.`)
     return undefined
 }
