@@ -452,7 +452,6 @@ export const SHOPPER_CUSTOMERS_NOT_IMPLEMENTED = [
     'invalidateCustomerAuth',
     'registerExternalProfile',
     'resetPassword',
-    'updateCustomerPassword',
     'updateCustomerProductList'
 ]
 
