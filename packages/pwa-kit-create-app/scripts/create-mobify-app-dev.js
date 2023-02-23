@@ -79,7 +79,7 @@ const withLocalNPMRepo = (func) => {
                     console.log('{{{{{{verdaccio path: ', verdaccio)
                     // console.log('////////config dir: ', verdaccioConfigDir)
 
-                    fs.readdirSync(p.join(__dirname, '..', 'local-npm-repo')).forEach(file => {
+                    fs.readdirSync(p.join(__dirname)).forEach(file => {
                         console.log(file);
                     });
 
