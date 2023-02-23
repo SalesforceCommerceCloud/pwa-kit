@@ -95,8 +95,8 @@ test('Allows customer to generate password token', async () => {
     })
 
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'foo@test.com')
-    user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+    user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
     expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
 

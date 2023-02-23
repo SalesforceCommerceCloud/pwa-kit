@@ -60,13 +60,11 @@ test('ProductView Component renders properly', async () => {
     const addToCart = jest.fn()
     await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
 
-    await waitFor(() => {
-        expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i).length).toEqual(2)
-        expect(screen.getAllByText(/299.99/).length).toEqual(2)
-        expect(screen.getAllByText(/Add to cart/i).length).toEqual(2)
-        expect(screen.getAllByRole('radiogroup').length).toEqual(3)
-        expect(screen.getAllByText(/add to cart/i).length).toEqual(2)
-    })
+    expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i).length).toEqual(2)
+    expect(screen.getAllByText(/299.99/).length).toEqual(2)
+    expect(screen.getAllByText(/Add to cart/i).length).toEqual(2)
+    expect(screen.getAllByRole('radiogroup').length).toEqual(3)
+    expect(screen.getAllByText(/add to cart/i).length).toEqual(2)
 })
 
 test('ProductView Component renders with addToCart event handler', async () => {

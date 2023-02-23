@@ -116,9 +116,6 @@ test('Allows customer to create an account', async () => {
     user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
     user.click(withinForm.getByText(/create account/i))
 
-    // wait for success state to appear
-    await waitFor(() => {
-        screen.logTestingPlaygroundURL()
-        expect(screen.getAllByText(/My Account/).length).toEqual(2)
-    })
+    const items = await screen.findAllByText(/My Account/)
+    expect(items).toHaveLength(2)
 })

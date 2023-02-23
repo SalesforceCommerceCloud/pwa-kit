@@ -79,11 +79,7 @@ test('should show login modal if user not registered', async () => {
     const onClick = jest.fn()
     await renderWithProviders(<MockedComponent onClick={onClick} />)
 
-    let trigger
-    await waitFor(() => {
-        trigger = screen.getByText(/button/i)
-    })
-
+    const trigger = await screen.findByText(/button/i)
     await waitFor(() => {
         user.click(trigger)
     })
