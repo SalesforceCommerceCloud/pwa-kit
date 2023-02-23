@@ -235,21 +235,12 @@ const basketWithProductSet = {
     tax_total: null
 }
 
-// Set up and clean up
-beforeAll(() => {
-    // TODO: move to `beforeEach`
-    // Since we're testing some navigation logic, we are using a simple Router
-    // around our component. We need to initialize the default route/path here.
-    // window.history.pushState({}, 'ProductDetail', '/en-GB/product/test-product')
-    window.history.pushState(
-        {},
-        'ProductDetail',
-        '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
-    )
-})
-
 beforeEach(() => {
     jest.resetModules()
+
+    // Since we're testing some navigation logic, we are using a simple Router
+    // around our component. We need to initialize the default route/path here.
+    window.history.pushState({}, 'ProductDetail', '/en-GB/product/test-product')
 })
 
 afterEach(() => {
@@ -276,7 +267,11 @@ test('should render product details page', async () => {
     expect(screen.getAllByTestId('product-view').length).toEqual(1)
 })
 
-test('product set: render multi-product layout', async () => {
+test('product set: render multi-product layout and add the set to cart', async () => {
+    const urlPathAfterSelectingAllVariants =
+        '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
+    window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
+
     global.server.use(
         rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
             return res(ctx.json(basketWithProductSet))
@@ -296,8 +291,7 @@ test('product set: render multi-product layout', async () => {
     await waitFor(
         () => {
             const modal = screen.getByTestId('add-to-cart-modal')
-            expect(modal).toBeInTheDocument()
-            expect(within(modal).getByText(/items added to cart/i)).toBeInTheDocument()
+            expect(within(modal).getByText(/3 items added to cart/i)).toBeInTheDocument()
         },
         {timeout: 5000}
     )
