@@ -120,7 +120,7 @@ const deleteTestCase = ['deleteBasket', createOptions<'deleteBasket'>(undefined,
 
 // Type assertion because the built-in type definition for `Object.entries` is limited :\
 const nonDeleteTestCases = Object.entries(testMap) as Array<
-    [ShopperBasketsMutation, Argument<Client[ShopperBasketsMutation]>]
+    [NonDeleteMutation, Argument<Client[NonDeleteMutation]>]
 >
 // Most test cases only apply to non-delete test cases, some (error handling) can include deleteBasket
 const allTestCases = [...nonDeleteTestCases, deleteTestCase]
@@ -165,13 +165,16 @@ describe('ShopperBaskets mutations', () => {
         expect(result.current.data).toEqual(oldBasket)
     })
     test.each(allTestCases)('`%s` returns error on error', async (mutationName, options) => {
-        mockMutationEndpoints(basketsEndpoint, {}, 400)
+        mockMutationEndpoints(basketsEndpoint, {error: true}, 400)
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
             return useShopperBasketsMutation(mutationName)
         })
         expect(result.current.error).toBeNull()
         act(() => result.current.mutate(options))
         await waitAndExpectError(wait, () => result.current)
+        // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
+        // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
+        expect(result.current.error).toHaveProperty('response')
     })
     test.each(nonDeleteTestCases)(
         '`%s` updates the cache on success',
@@ -198,7 +201,7 @@ describe('ShopperBaskets mutations', () => {
         async (mutationName, options) => {
             mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
             mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
-            mockMutationEndpoints(basketsEndpoint, {}, 400) // this mutation
+            mockMutationEndpoints(basketsEndpoint, {error: true}, 400) // this mutation
             const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
                 basket: queries.useBasket(getBasketOptions),
                 customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
@@ -210,6 +213,9 @@ describe('ShopperBaskets mutations', () => {
             expect(result.current.mutation.error).toBeNull()
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectError(wait, () => result.current.mutation)
+            // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
+            // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
+            expect(result.current.mutation.error).toHaveProperty('response')
             assertUpdateQuery(result.current.basket, oldBasket)
             assertUpdateQuery(result.current.customerBaskets, oldCustomerBaskets)
         }
