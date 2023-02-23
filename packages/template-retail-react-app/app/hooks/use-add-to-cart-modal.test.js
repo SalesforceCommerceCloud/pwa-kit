@@ -17,7 +17,10 @@ jest.mock('commerce-sdk-react-preview', () => {
         useCustomerId: jest.fn().mockReturnValue('customer_id'),
         useCustomerType: jest
             .fn()
-            .mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
+            .mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'}),
+        useCustomerBaskets: jest
+            .fn()
+            .mockReturnValue({data: {baskets: [{currency: 'GBP', productItems: [{quantity: 2}]}]}})
     }
 })
 const MOCK_PRODUCT = {
