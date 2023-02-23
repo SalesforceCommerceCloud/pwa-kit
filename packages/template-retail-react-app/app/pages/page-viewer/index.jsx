@@ -5,48 +5,34 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import {componentMapProxy} from './utils'
 import {Page} from '../../components/experience/page'
-import {Region} from '../../components/experience/region'
-import SamplePage from './sample-page.json'
-import Carousel from '../../components/experience/carousel'
+import {pageType} from '../../components/experience/types'
+import {Box} from '@chakra-ui/react'
 
-const componentMapProxy = new Proxy(
-    {},
-    {
-        // eslint-disable-next-line no-unused-vars
-        get(_target, prop) {
-            let componentClass
-            switch (prop) {
-                case 'commerce_assets.productTile':
-                    componentClass = ({id}) => (
-                        <img src={`https://picsum.photos/seed/${id}/200/300`} />
-                    )
-                    break
-                case 'commerce_layouts.carousel':
-                    componentClass = Carousel
-                    break
-                default:
-                    componentClass = (props) => (
-                        <div style={{marginBottom: '10px'}}>
-                            <b>{props.typeId}</b>
-                            {props?.regions?.map((region) => (
-                                <Region
-                                    style={{margin: '0px 0px 5px 20px'}}
-                                    key={region.id}
-                                    region={region}
-                                />
-                            ))}
-                        </div>
-                    )
-            }
+const PageViewer = ({page}) => {
+    return (
+        <Box layerStyle={'page'}>
+            <Page page={page} components={componentMapProxy} />
+        </Box>
+    )
+}
 
-            return componentClass
+PageViewer.getProps = async ({api}) => {
+    const page = await api.shopperExperience.getPage({
+        parameters: {
+            pageId: 'layout-example'
         }
+    })
+    return {
+        page
     }
-)
+}
 
-const PageViewer = () => {
-    return <Page page={SamplePage} components={componentMapProxy} />
+PageViewer.displayName = 'PageViewer'
+
+PageViewer.propTypes = {
+    page: pageType.isRequired
 }
 
 export default PageViewer
