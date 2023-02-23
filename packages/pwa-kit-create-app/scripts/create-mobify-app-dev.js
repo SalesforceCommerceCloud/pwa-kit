@@ -87,7 +87,7 @@ const withLocalNPMRepo = (func) => {
                     })
 
                     verdaccioServerProcess.stdout.on('data', (data) => {
-                        // we know verdaccio server is up when 
+                        // we know verdaccio server is up when
                         // 'http address' is in log output
                         if (data.includes('http address')) {
                             console.log('local NPM repository is up')
