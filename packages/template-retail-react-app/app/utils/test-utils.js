@@ -18,7 +18,7 @@ import {
     CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
-import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
+import {AddToCartModal, AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
@@ -64,6 +64,30 @@ export const renderWithRouterAndCommerceAPI = (node) => {
             <Router>{node}</Router>
         </CommerceAPIProvider>
     )
+}
+
+const useAddToCartModal = () => {
+    const [state, setState] = useState({
+        isOpen: false,
+        data: null
+    })
+
+    return {
+        isOpen: state.isOpen,
+        data: state.data,
+        onOpen: (data) => {
+            setState({
+                isOpen: true,
+                data
+            })
+        },
+        onClose: () => {
+            setState({
+                isOpen: false,
+                data: null
+            })
+        }
+    }
 }
 
 /**
@@ -112,12 +136,7 @@ export const TestProviders = ({
         _setBasket(data)
     })
 
-    const addToCartModal = {
-        isOpen: false,
-        data: null,
-        onOpen: () => {},
-        onClose: () => {}
-    }
+    const addToCartModal = useAddToCartModal()
 
     const site = getSiteByReference(siteAlias || appConfig.defaultSite)
 
@@ -142,6 +161,7 @@ export const TestProviders = ({
                                                     value={addToCartModal}
                                                 >
                                                     {children}
+                                                    <AddToCartModal />
                                                 </AddToCartModalContext.Provider>
                                             </ChakraProvider>
                                         </Router>
