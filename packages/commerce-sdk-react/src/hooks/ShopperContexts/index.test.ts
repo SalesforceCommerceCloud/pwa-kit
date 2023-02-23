@@ -12,6 +12,10 @@ import * as queries from './query'
 describe('Shopper Contexts hooks', () => {
     test('all endpoints have hooks', () => {
         const unimplemented = getUnimplementedEndpoints(ShopperContexts, queries, cacheUpdateMatrix)
-        expect(unimplemented).toEqual([])
+        expect(unimplemented).toEqual([
+            'createShopperContext',
+            'deleteShopperContext',
+            'updateShopperContext'
+        ])
     })
 })

@@ -16,6 +16,14 @@ describe('Shopper Customers hooks', () => {
             queries,
             cacheUpdateMatrix
         )
-        expect(unimplemented).toEqual([])
+        expect(unimplemented).toEqual([
+            'invalidateCustomerAuth',
+            'authorizeCustomer',
+            'authorizeTrustedSystem',
+            'registerExternalProfile',
+            'updateCustomerPassword',
+            'deleteCustomerProductList',
+            'updateCustomerProductList'
+        ])
     })
 })

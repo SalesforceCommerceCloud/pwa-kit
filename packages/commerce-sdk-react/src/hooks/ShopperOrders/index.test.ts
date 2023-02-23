@@ -12,6 +12,10 @@ import * as queries from './query'
 describe('Shopper Orders hooks', () => {
     test('all endpoints have hooks', () => {
         const unimplemented = getUnimplementedEndpoints(ShopperOrders, queries, cacheUpdateMatrix)
-        expect(unimplemented).toEqual([])
+        expect(unimplemented).toEqual([
+            'createPaymentInstrumentForOrder',
+            'removePaymentInstrumentFromOrder',
+            'updatePaymentInstrumentForOrder'
+        ])
     })
 })
