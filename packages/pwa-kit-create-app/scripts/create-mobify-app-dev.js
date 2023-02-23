@@ -88,6 +88,7 @@ const withLocalNPMRepo = (func) => {
                     })
 
                     setTimeout(() => {
+                        process.env['npm_config_registry'] = 'http://localhost:4873/'
                         resolve()
                     }, 3000)
 
