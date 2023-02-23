@@ -78,7 +78,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shortCode,
             siteId
         },
-        throwOnBadResponse: true,
+        throwOnBadResponse: false,
         fetchOptions
     }
     const apiClients = useMemo(() => {
