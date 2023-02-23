@@ -156,30 +156,30 @@ const getQueryName = (method: string): string => {
 }
 
 /**
- * Validates that all endpoints have hooks implemented
+ * Gets the list of API endpoints that have not yet been implemented
  * @param SdkClass Class constructor from commerce-sdk-isomorphic to use as a source for endpoints
  * @param queryHooks Object containing implemented query hooks
- * @param mutationsEnum  Enum containing mutation endpoint names
- * @param exceptions List of endpoints that are intentionally NOT implemented
+ * @param mutationsEnum Enum containing mutation endpoint names
+ * @returns List of endpoints that don't have a query or mutation hook
  */
-export const expectAllEndpointsHaveHooks = <T extends object>(
-    SdkClass: {prototype: T},
-    queryHooks: Record<string, unknown>,
-    mutationsEnum: Record<string, string> = {},
-    exceptions: Array<keyof T> = []
+export const getUnimplementedEndpoints = (
+    SdkClass: {prototype: object},
+    queryHooks: object,
+    mutationCacheUpdates: object = {}
 ) => {
     const unimplemented = new Set(Object.getOwnPropertyNames(SdkClass.prototype))
     // Always present on a class; we can ignore
     unimplemented.delete('constructor')
-    // Names of implemented mutation endpoints exist as values of the enum
-    Object.values(mutationsEnum).forEach((method) => unimplemented.delete(method))
+    // Mutations endpoints are implemented if they have a defined cache update function
+    Object.entries(mutationCacheUpdates).forEach(([method, implementation]) => {
+        if (implementation) unimplemented.delete(method)
+    })
     // Names of implemented query endpoints have been mangled when converted into hooks
     unimplemented.forEach((method) => {
         const queryName = getQueryName(method)
         if (queryName in queryHooks) unimplemented.delete(method)
     })
-    // Convert to array for easier comparison / better jest output
-    expect([...unimplemented]).toEqual(exceptions)
+    return [...unimplemented]
 }
 /** Helper type for WaitForValueToChange with hooks */
 type GetHookResult<Data, Err, Vars, Ctx> = () =>

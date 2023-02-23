@@ -5,25 +5,20 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ShopperLogin} from 'commerce-sdk-isomorphic'
-import {expectAllEndpointsHaveHooks} from '../../test-utils'
+import {getUnimplementedEndpoints} from '../../test-utils'
 import {cacheUpdateMatrix} from './cache'
-import {ShopperLoginMutations} from './mutation'
 import * as queries from './query'
 
 describe('Shopper Login hooks', () => {
     test('all endpoints have hooks', () => {
-        expectAllEndpointsHaveHooks(ShopperLogin, queries, ShopperLoginMutations, [
+        const unimplemented = getUnimplementedEndpoints(ShopperLogin, queries, cacheUpdateMatrix)
+        expect(unimplemented).toEqual([
+            // TODO: implement
+            'logoutCustomer',
             // These methods generate headers - they don't mutate or return any data, so they don't make
             // sense as query/mutation hooks (as currently implemented).
             'authorizeCustomer',
             'getTrustedAgentAuthorizationToken'
         ])
-    })
-
-    test('all mutation hooks have cache update logic', () => {
-        const cacheUpdates = Object.keys(cacheUpdateMatrix).sort()
-        const mutations = Object.values(ShopperLoginMutations).sort()
-        // If this test fails, add the missing mutation as a no-op with a TODO note
-        expect(cacheUpdates).toEqual(mutations)
     })
 })

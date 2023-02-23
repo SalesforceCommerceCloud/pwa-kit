@@ -5,20 +5,24 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ShopperBaskets} from 'commerce-sdk-isomorphic'
-import {expectAllEndpointsHaveHooks} from '../../test-utils'
+import {getUnimplementedEndpoints} from '../../test-utils'
 import {cacheUpdateMatrix} from './cache'
-import {ShopperBasketsMutations} from './mutation'
 import * as queries from './query'
 
 describe('Shopper Baskets hooks', () => {
     test('all endpoints have hooks', () => {
-        expectAllEndpointsHaveHooks(ShopperBaskets, queries, ShopperBasketsMutations)
-    })
-
-    test('all mutation hooks have cache update logic', () => {
-        const cacheUpdates = Object.keys(cacheUpdateMatrix).sort()
-        const mutations = Object.values(ShopperBasketsMutations).sort()
-        // If this test fails, add the missing mutation as a no-op with a TODO note
-        expect(cacheUpdates).toEqual(mutations)
+        const unimplemented = getUnimplementedEndpoints(ShopperBaskets, queries, cacheUpdateMatrix)
+        expect(unimplemented).toEqual([
+            'transferBasket',
+            'addGiftCertificateItemToBasket',
+            'removeGiftCertificateItemFromBasket',
+            'updateGiftCertificateItemInBasket',
+            'addTaxesForBasketItem',
+            'addPriceBooksToBasket',
+            'createShipmentForBasket',
+            'removeShipmentFromBasket',
+            'updateShipmentForBasket',
+            'addTaxesForBasket'
+        ])
     })
 })

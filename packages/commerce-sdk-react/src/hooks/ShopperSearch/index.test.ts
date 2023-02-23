@@ -5,11 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ShopperSearch} from 'commerce-sdk-isomorphic'
-import {expectAllEndpointsHaveHooks} from '../../test-utils'
+import {getUnimplementedEndpoints} from '../../test-utils'
 import * as queries from './query'
 
 describe('Shopper Search hooks', () => {
     test('all endpoints have hooks', () => {
-        expectAllEndpointsHaveHooks(ShopperSearch, queries)
+        const unimplemented = getUnimplementedEndpoints(ShopperSearch, queries)
+        expect(unimplemented).toEqual([])
     })
 })
