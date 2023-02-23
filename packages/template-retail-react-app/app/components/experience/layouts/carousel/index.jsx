@@ -15,8 +15,8 @@ import {
     useBreakpoint,
     useBreakpointValue
 } from '@chakra-ui/react'
-import {Component} from '../component'
-import {ChevronLeftIcon, ChevronRightIcon} from '../../icons'
+import {Component} from '../../component'
+import {ChevronLeftIcon, ChevronRightIcon} from '../../../icons'
 import {useEffect} from 'react'
 
 /**
@@ -36,7 +36,7 @@ import {useEffect} from 'react'
  * @param {Object []} props.region - The regions passed internally to this component by the `commerce-sdk-react` Page component.
  * @returns {React.ReactElement} - Crousel component.
  */
-const Carousel = (props = {}) => {
+export const Carousel = (props = {}) => {
     const scrollRef = useRef()
     const breakpoint = useBreakpoint()
     const [hasOverflow, setHasOverflow] = useState(false)

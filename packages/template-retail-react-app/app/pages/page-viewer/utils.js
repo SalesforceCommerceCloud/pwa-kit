@@ -45,14 +45,13 @@ export const componentMapProxy = new Proxy(
         get(_target, prop) {
             let componentClass
             switch (prop) {
-                case 'commerce_assets.editorialRichText':
-                    componentClass = ({richText}) => (
-                        <div
-                            dangerouslySetInnerHTML={{
-                                __html: richText
-                            }}
-                        />
-                    )
+                case 'commerce_assets.productTile':
+                    componentClass = withTitle(({id}) => (
+                        <img src={`https://picsum.photos/seed/${id}/200/300`} />
+                    ))
+                    break
+                case 'commerce_layouts.carousel':
+                    componentClass = withTitle(Layouts['Carousel'])
                     break
                 case 'commerce_layouts.mobileGrid1r1c':
                     componentClass = withTitle(Layouts['MobileGrid1r1c'])
