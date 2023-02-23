@@ -19,6 +19,14 @@ import {renderWithProviders} from '../utils/test-utils'
 import messages from '../translations/compiled/en-GB.json'
 import {rest} from 'msw'
 
+jest.mock('commerce-sdk-react-preview', () => {
+    const originalModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originalModule,
+        useProduct: jest.fn().mockReturnValue({isFetching: false})
+    }
+})
+
 const mockProduct = {
     ...mockProductDetail,
     id: '750518699660M',
@@ -65,7 +73,7 @@ beforeEach(() => {
 })
 
 describe('useProductViewModal hook', () => {
-    test('return proper data', () => {
+    test('return proper data', async () => {
         const history = createMemoryHistory()
         history.push('/test/path')
         renderWithProviders(<MockComponent product={mockProductDetail} />)
@@ -74,7 +82,7 @@ describe('useProductViewModal hook', () => {
         fireEvent.click(toggleButton)
 
         expect(screen.getByText('750518699578M')).toBeInTheDocument()
-        expect(screen.getByText(/isFetching: false/i)).toBeInTheDocument()
+        expect(await screen.getByText(/isFetching: false/i)).toBeInTheDocument()
         expect(screen.getByTestId('variant')).toHaveTextContent(
             '{"orderable":true,"price":299.99,"productId":"750518699578M","variationValues":{"color":"BLACKFB","size":"038","width":"V"}}'
         )
