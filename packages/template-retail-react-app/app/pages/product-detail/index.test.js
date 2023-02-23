@@ -267,8 +267,15 @@ test('should render product details page', async () => {
     expect(screen.getAllByTestId('product-view').length).toEqual(1)
 })
 
-// TODO: split into smaller tests
-test('product set: render multi-product layout and add the set to cart', async () => {
+test('product set: render multi-product layout', async () => {
+    renderWithProviders(<MockedPageWithProductSet />)
+
+    await waitFor(() => {
+        expect(screen.getAllByTestId('product-view').length).toEqual(4) // 1 parent + 3 children
+    })
+})
+
+test('product set: add the set to cart, after all variants are selected', async () => {
     const urlPathAfterSelectingAllVariants =
         '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
     window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
@@ -279,21 +286,19 @@ test('product set: render multi-product layout and add the set to cart', async (
         })
     )
 
+    // Initial basket is necessary to add items to it
     const initialBasket = {basketId: 'valid_id'}
     renderWithProviders(<MockedPageWithProductSet />, {wrapperProps: {initialBasket}})
 
-    await waitFor(() => {
-        expect(screen.getAllByTestId('product-view').length).toEqual(4) // 1 parent + 3 children
-    })
-
-    const button = screen.getAllByRole('button', {name: /add set to cart/i})[0]
-    fireEvent.click(button)
+    const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
+    fireEvent.click(buttons[0])
 
     await waitFor(
         () => {
             const modal = screen.getByTestId('add-to-cart-modal')
             expect(within(modal).getByText(/3 items added to cart/i)).toBeInTheDocument()
         },
+        // Seems like rendering the modal takes a bit more time
         {timeout: 5000}
     )
 })
