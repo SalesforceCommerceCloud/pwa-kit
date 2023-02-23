@@ -9,16 +9,12 @@ import {act} from '@testing-library/react'
 import {ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
 import {
-    assertInvalidateQuery,
-    assertRemoveQuery,
-    assertUpdateQuery,
     mockMutationEndpoints,
     mockQueryEndpoint,
     renderHookWithProviders,
     waitAndExpectError,
     waitAndExpectSuccess
 } from '../../test-utils'
-import {useCustomerBaskets} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
 import {NotImplementedError} from '../utils'
 import {ShopperOrdersMutation, useShopperOrdersMutation} from './mutation'
