@@ -85,7 +85,7 @@ const testCases = Object.entries(testMap) as Array<[Implemented, TestMap[Impleme
 // leverage TypeScript to enforce having tests for all mutations.
 const notImplTestCases = ['logoutCustomer'] as const
 
-describe('ShopperBaskets mutations', () => {
+describe('ShopperLogin mutations', () => {
     beforeEach(() => nock.cleanAll())
     test.each(testCases)('`%s` returns data on success', async (mutationName, [options, data]) => {
         mockMutationEndpoints(loginEndpoint, data ?? {}) // Fallback for `void` endpoints

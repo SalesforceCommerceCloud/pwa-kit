@@ -32,7 +32,7 @@ const testMap: TestMap = {
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>
-describe('Shopper Baskets query hooks', () => {
+describe('Shopper Contexts query hooks', () => {
     beforeEach(() => nock.cleanAll())
     afterEach(() => {
         expect(nock.pendingMocks().length).toBe(0)
