@@ -101,7 +101,7 @@ export function renderHookWithProviders<TProps, TResult>(
 /** Mocks DELETE, PATCH, POST, and PUT so we don't have to look up which verb an endpoint uses. */
 export const mockMutationEndpoints = (
     matchingPath: string,
-    response: string | Record<string, unknown>,
+    response: string | object,
     statusCode = 200
 ) => {
     const matcher = (uri: string) => uri.includes(matchingPath)
