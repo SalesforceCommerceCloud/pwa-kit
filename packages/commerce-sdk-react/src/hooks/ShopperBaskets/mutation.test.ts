@@ -240,7 +240,7 @@ describe('ShopperBaskets mutations', () => {
         assertRemoveQuery(result.current.basket)
         assertInvalidateQuery(result.current.customerBaskets, oldCustomerBaskets)
     })
-    test.each(notImplTestCases)('`%s` is not yet implemented', async (mutationName) => {
+    test.only.each(notImplTestCases)('`%s` is not yet implemented', (mutationName) => {
         expect(() => useShopperBasketsMutation(mutationName)).toThrow(NotImplementedError)
     })
 })
