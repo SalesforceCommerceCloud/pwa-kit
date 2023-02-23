@@ -48,7 +48,7 @@ const cp = require('child_process')
 
 sh.set('-e')
 
-const logFileName = p.join(__dirname, '..', 'local-npm-repo', 'config.yaml')
+const logFileName = p.join(__dirname, '..', 'local-npm-repo', 'verdaccio.log')
 
 /**
  * Run the provided function with a local NPM repository running in the background.
@@ -57,7 +57,6 @@ const withLocalNPMRepo = (func) => {
     const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
     const verdaccio = p.join(__dirname, '..', 'node_modules', '.bin', 'verdaccio')
     const verdaccioConfigDir = p.join(__dirname, '..', 'local-npm-repo')
-    console.log('+++++dirName', __dirname)
 
     // Clear any cached packages from a previous run.
     sh.rm('-rf', p.join(verdaccioConfigDir, 'storage'))
@@ -76,12 +75,6 @@ const withLocalNPMRepo = (func) => {
             () =>
                 new Promise((resolve) => {
                     console.log('Starting up local NPM repository')
-                    console.log('{{{{{{verdaccio path: ', verdaccio)
-                    // console.log('////////config dir: ', verdaccioConfigDir)
-
-                    fs.readdirSync(p.join(__dirname, '..', 'local-npm-repo')).forEach(file => {
-                        console.log(file);
-                    });
 
                     child = cp.exec(`${verdaccio} --config config.yaml`, {
                         cwd: verdaccioConfigDir,
@@ -94,51 +87,51 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    child.stdout.pipe(process.stdout)
+                    setTimeout(() => {
+                        resolve()
+                    }, 3000)
 
-                    console.log('Verdaccio command ran.', child)
+                    // console.log('Verdaccio command ran.')
 
-                    const CHECK_TIME = 1000
+                    // const CHECK_TIME = 1000
 
-                    const waitForLogFileExists = () => {
-                        setTimeout(() => {
-                            console.log('waitForLogFileExists...')
-                            fs.readFile(logFileName, 'utf8', (err, data) => {
-                                console.log('-----file', logFileName)
-                                console.log('readFile')
-                                if (err || !data) {
-                                    console.log('err || !data')
-                                    console.log(err)
-                                    waitForLogFileExists()
-                                } else {
-                                    const readStream = fs.createReadStream(logFileName, 'utf8')
+                    // const waitForLogFileExists = () => {
+                    //     setTimeout(() => {
+                    //         console.log('waitForLogFileExists...')
+                    //         fs.readFile(logFileName, 'utf8', (err, data) => {
+                    //             console.log('waitForLogFileExists...')
+                    //             if (err || !data) {
+                    //                 console.log('err || !data')
+                    //                 waitForLogFileExists()
+                    //             } else {
+                    //                 const readStream = fs.createReadStream(logFileName, 'utf8')
 
-                                    readStream.on('error', (error) => {
-                                        console.error(
-                                            `Failed to read ${logFileName}: ${error.message}`
-                                        )
-                                        waitForLogFileExists()
-                                    })
+                    //                 readStream.on('error', (error) => {
+                    //                     console.error(
+                    //                         `Failed to read ${logFileName}: ${error.message}`
+                    //                     )
+                    //                     waitForLogFileExists()
+                    //                 })
 
-                                    readStream.on('data', (data) => {
-                                        if (data.includes('http address')) {
-                                            // Verdaccio is running once it logs the HTTP address. Configure
-                                            // NPM to use the local repo, through env vars.
-                                            process.env['npm_config_registry'] =
-                                                'http://localhost:4873/'
-                                            resolve()
+                    //                 readStream.on('data', (data) => {
+                    //                     if (data.includes('http address')) {
+                    //                         // Verdaccio is running once it logs the HTTP address. Configure
+                    //                         // NPM to use the local repo, through env vars.
+                    //                         process.env['npm_config_registry'] =
+                    //                             'http://localhost:4873/'
+                    //                         resolve()
 
-                                            console.log('waitForLogFileExists resolves.')
-                                        } else {
-                                            waitForLogFileExists()
-                                        }
-                                    })
-                                }
-                            })
-                        }, CHECK_TIME)
-                    }
+                    //                         console.log('waitForLogFileExists resolves.')
+                    //                     } else {
+                    //                         waitForLogFileExists()
+                    //                     }
+                    //                 })
+                    //             }
+                    //         })
+                    //     }, CHECK_TIME)
+                    // }
 
-                    waitForLogFileExists()
+                    // waitForLogFileExists()
                 })
         )
         .then(() => {
