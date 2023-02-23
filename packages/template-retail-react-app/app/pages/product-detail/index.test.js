@@ -312,6 +312,7 @@ describe('product set', () => {
 
         await waitFor(() => {
             // Show error when users have not selected all the variants yet
+            // 1 error for each child product
             const errorMessages = screen.getAllByText(/Please select all your options above/i)
             expect(errorMessages.length).toEqual(3)
         })
