@@ -155,10 +155,18 @@ const getQueryName = (method: string): string => {
     return method.replace(/^./, (ltr) => `use${ltr.toUpperCase()}`)
 }
 
-export const expectAllEndpointsHaveHooks = (
-    SdkClass: {prototype: object},
+/**
+ * Validates that all endpoints have hooks implemented
+ * @param SdkClass Class constructor from commerce-sdk-isomorphic to use as a source for endpoints
+ * @param queryHooks Object containing implemented query hooks
+ * @param mutationsEnum  Enum containing mutation endpoint names
+ * @param exceptions List of endpoints that are intentionally NOT implemented
+ */
+export const expectAllEndpointsHaveHooks = <T extends object>(
+    SdkClass: {prototype: T},
     queryHooks: Record<string, unknown>,
-    mutationsEnum: Record<string, string> = {}
+    mutationsEnum: Record<string, string> = {},
+    exceptions: Array<keyof T> = []
 ) => {
     const unimplemented = new Set(Object.getOwnPropertyNames(SdkClass.prototype))
     // Always present on a class; we can ignore
@@ -171,7 +179,7 @@ export const expectAllEndpointsHaveHooks = (
         if (queryName in queryHooks) unimplemented.delete(method)
     })
     // Convert to array for easier comparison / better jest output
-    expect([...unimplemented]).toEqual([])
+    expect([...unimplemented]).toEqual(exceptions)
 }
 /** Helper type for WaitForValueToChange with hooks */
 type GetHookResult<Data, Err, Vars, Ctx> = () =>

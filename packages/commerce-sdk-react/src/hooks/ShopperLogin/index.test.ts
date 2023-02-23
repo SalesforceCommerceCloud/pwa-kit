@@ -12,7 +12,12 @@ import * as queries from './query'
 
 describe('Shopper Login hooks', () => {
     test('all endpoints have hooks', () => {
-        expectAllEndpointsHaveHooks(ShopperLogin, queries, ShopperLoginMutations)
+        expectAllEndpointsHaveHooks(ShopperLogin, queries, ShopperLoginMutations, [
+            // These methods generate headers - they don't mutate or return any data, so they don't make
+            // sense as query/mutation hooks (as currently implemented).
+            'authorizeCustomer',
+            'getTrustedAgentAuthorizationToken'
+        ])
     })
 
     test('all mutation hooks have cache update logic', () => {
