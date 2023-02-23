@@ -6,7 +6,7 @@
  */
 import {amf} from '@commerce-apps/raml-toolkit';
 import {
-  getBaseUriFromDocument,
+  getReturnTypeFromOperation,
   getTypeFromParameter,
 } from '@commerce-apps/raml-toolkit/lib/generate/handlebarsAmfHelpers';
 
@@ -176,10 +176,25 @@ export const createQueryKeyFragment = (url: string, variable: string): string =>
   // If the URL ends with a {template} fragment, we end up with a `, ''` that we don't need
   `'${url.replace(/\{(\w+)\}/g, `', ${variable}.$1, '`)}'`.replace(", ''", '');
 
+const isNothing = (
+  apiName: string,
+  operation: amf.model.domain.Operation
+): boolean => {
+  const name = operation.name.value();
+  return (
+    apiName === 'ShopperLogin' &&
+    // These methods manipulate headers; they don't mutate data or return a body, so they don't
+    // fall under the current scope of query or mutation hooks.
+    (name === 'authorizeCustomer' ||
+      name === 'getTrustedAgentAuthorizationToken')
+  );
+};
+
 export const isQuery = (
   apiName: string,
   operation: amf.model.domain.Operation
 ): boolean => {
+  if (isNothing(apiName, operation)) return false;
   const isGet = operation.method.value() === 'get';
   const name = operation.name.value();
   if (apiName === 'ShopperLogin') {
@@ -197,3 +212,8 @@ export const isQuery = (
   }
   return isGet;
 };
+
+export const isMutation = (
+  apiName: string,
+  operation: amf.model.domain.Operation
+): boolean => !isNothing(apiName, operation) && !isQuery(apiName, operation);
