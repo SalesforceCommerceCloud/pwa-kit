@@ -39,6 +39,9 @@ jest.mock('../utils', () => ({
     onClient: () => true
 }))
 
+/** The auth data we store has a slightly different shape than what we use. */
+type StoredAuthData = Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: string}
+
 const config = {
     clientId: 'clientId',
     organizationId: 'organizationId',
@@ -85,7 +88,7 @@ describe('Auth', () => {
     test('this.data returns the storage value', () => {
         const auth = new Auth(config)
 
-        const sample: Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: string} = {
+        const sample: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: 'access_token',
             customer_id: 'customer_id',
@@ -163,7 +166,7 @@ describe('Auth', () => {
     test('ready - re-use valid access token', () => {
         const auth = new Auth(config)
 
-        const data: Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: string} = {
+        const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret'),
             customer_id: 'customer_id',
@@ -189,7 +192,7 @@ describe('Auth', () => {
     test('ready - use refresh token when access token is expired', async () => {
         const auth = new Auth(config)
 
-        const data: Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: string} = {
+        const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret'),
             customer_id: 'customer_id',
