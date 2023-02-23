@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Image} from '@chakra-ui/react'
+import {Box, Image} from '@chakra-ui/react'
 
 /**
  * Simple ImageTile component that can be used inside any Layout component.
@@ -15,7 +15,7 @@ import {Image} from '@chakra-ui/react'
  */
 const ImageTile = ({image}) => {
     return (
-        <div className={'image-tile'}>
+        <Box className={'image-tile'}>
             <figure className={'image-tile-figure'}>
                 <picture>
                     <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
@@ -30,7 +30,7 @@ const ImageTile = ({image}) => {
                     />
                 </picture>
             </figure>
-        </div>
+        </Box>
     )
 }
 

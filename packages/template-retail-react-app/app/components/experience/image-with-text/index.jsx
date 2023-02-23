@@ -6,7 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {Image, Box, Text, Link} from '@chakra-ui/react'
+import {Box, Image, Link, Text} from '@chakra-ui/react'
 import DOMPurify from 'dompurify'
 
 /**
@@ -32,7 +32,7 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     }, [])
 
     return (
-        <div className={'image-with-text'}>
+        <Box className={'image-with-text'}>
             <Box
                 as="figure"
                 className={'image-with-text-figure'}
@@ -105,7 +105,7 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                     </Text>
                 )}
             </Box>
-        </div>
+        </Box>
     )
 }
 
