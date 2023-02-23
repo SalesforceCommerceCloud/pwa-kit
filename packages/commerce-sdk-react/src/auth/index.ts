@@ -153,7 +153,7 @@ class Auth {
                 shortCode: config.shortCode,
                 siteId: config.siteId
             },
-            throwOnBadResponse: false,
+            throwOnBadResponse: true,
             fetchOptions: config.fetchOptions
         })
         this.shopperCustomersClient = new ShopperCustomers({
@@ -164,7 +164,7 @@ class Auth {
                 shortCode: config.shortCode,
                 siteId: config.siteId
             },
-            throwOnBadResponse: false,
+            throwOnBadResponse: true,
             fetchOptions: config.fetchOptions
         })
 
