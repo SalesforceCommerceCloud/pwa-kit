@@ -11,7 +11,6 @@ import {
     waitAndExpectError,
     waitAndExpectSuccess
 } from '../../test-utils'
-import {Argument} from '../types'
 import * as queries from './query'
 
 jest.mock('../../auth/index.ts', () => {
@@ -21,31 +20,55 @@ jest.mock('../../auth/index.ts', () => {
 })
 
 type Queries = typeof queries
-const basketsEndpoint = '/checkout/shopper-baskets/'
+const customersEndpoint = '/customer/shopper-customers/'
 // Not all endpoints use all parameters, but unused parameters are safely discarded
-const OPTIONS: Argument<Queries[keyof Queries]> = {
-    parameters: {basketId: 'basketId', shipmentId: 'shipmentId'}
+const OPTIONS = {
+    parameters: {
+        externalId: 'externalId',
+        authenticationProviderId: 'authenticationProviderId',
+        customerId: 'customerId',
+        addressName: 'addressName',
+        paymentInstrumentId: 'paymentInstrumentId',
+        listId: 'listId',
+        itemId: 'itemId'
+    }
 }
 
 /** Map of query name to returned data type */
 type TestMap = {[K in keyof Queries]: NonNullable<ReturnType<Queries[K]>['data']>}
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
-    useBasket: {basketId: 'basketId'},
-    usePaymentMethodsForBasket: {applicablePaymentMethods: []},
-    usePriceBooksForBasket: ['priceBookId'],
-    useShippingMethodsForShipment: {defaultShippingMethodId: 'defaultShippingMethodId'},
-    useTaxesFromBasket: {taxes: {}}
+    useCustomer: {customerId: 'customerId'},
+    useCustomerAddress: {addressId: 'addressId', lastName: 'Human', countryCode: 'CA'},
+    useCustomerBaskets: {total: 0, baskets: []},
+    useCustomerOrders: {total: 0, data: [], limit: 0, offset: 0},
+    useCustomerPaymentInstrument: {
+        paymentBankAccount: {},
+        paymentCard: {cardType: 'fake'},
+        paymentInstrumentId: 'paymentInstrumentId',
+        paymentMethodId: 'paymentMethodId'
+    },
+    useCustomerProductList: {},
+    useCustomerProductListItem: {priority: 9000, public: false, quantity: 0},
+    useCustomerProductLists: {data: [], limit: 0, total: 0},
+    useExternalProfile: {
+        authenticationProviderId: 'squirrel',
+        customerId: 'customerId',
+        externalId: 'external'
+    },
+    useProductListItem: {id: 'id', priority: 0, type: 'thing'},
+    usePublicProductList: {id: 'id', public: true, type: 'other'},
+    usePublicProductListsBySearchTerm: {data: [], limit: 0, total: 0}
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>
-describe('Shopper Baskets query hooks', () => {
+describe('Shopper Customers query hooks', () => {
     beforeEach(() => nock.cleanAll())
     afterEach(() => {
         expect(nock.pendingMocks().length).toBe(0)
     })
     test.each(testCases)('`%s` returns data on success', async (queryName, data) => {
-        mockQueryEndpoint(basketsEndpoint, data)
+        mockQueryEndpoint(customersEndpoint, data)
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })
@@ -53,7 +76,7 @@ describe('Shopper Baskets query hooks', () => {
         expect(result.current.data).toEqual(data)
     })
     test.each(testCases)('`%s` returns error on error', async (queryName) => {
-        mockQueryEndpoint(basketsEndpoint, {}, 400)
+        mockQueryEndpoint(customersEndpoint, {}, 400)
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })

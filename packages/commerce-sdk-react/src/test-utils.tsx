@@ -117,7 +117,7 @@ export const mockMutationEndpoints = (
 /** Mocks a GET request to an endpoint. */
 export const mockQueryEndpoint = (
     matchingPath: string,
-    response: string | Record<string, unknown> | unknown[],
+    response: string | object | unknown[],
     statusCode = 200
 ) => {
     const matcher = (uri: string) => uri.includes(matchingPath)
