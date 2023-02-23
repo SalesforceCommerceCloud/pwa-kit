@@ -118,7 +118,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     }, [clientId, organizationId, shortCode, siteId, proxy, redirectURI, fetchOptions])
 
     useEffect(() => {
-        auth.ready()
+        // TODO: allow token to be passed in
+        // this is a temp fix to make testing easier
+        if (process.env.NODE_ENV !== 'test') {
+            auth.ready()
+        }
     }, [auth])
 
     return (
