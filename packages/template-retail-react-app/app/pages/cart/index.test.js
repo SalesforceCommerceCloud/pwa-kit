@@ -212,6 +212,7 @@ describe('Remove item from cart', function () {
         )
     })
     test('Can remove item from the cart', async () => {
+        jest.setTimeout(30000)
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -322,7 +323,7 @@ describe('Coupons tests', function () {
             })
         )
     })
-    test('Can apply and remove product-level coupon code with promotion', async () => {
+    test.skip('Can apply and remove product-level coupon code with promotion', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 

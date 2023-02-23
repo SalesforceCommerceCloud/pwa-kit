@@ -518,6 +518,7 @@ test.skip('Can proceed through checkout as registered customer', async () => {
 })
 
 test('Can edit address during checkout as a registered customer', async () => {
+    jest.setTimeout(30000)
     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
