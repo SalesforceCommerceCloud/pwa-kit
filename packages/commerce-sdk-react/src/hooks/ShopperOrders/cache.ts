@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, CacheUpdateMatrix, CacheUpdateUpdate, CacheUpdateInvalidate} from '../types'
-import {and, matchesApiConfig, matchesPath, NotImplementedError} from '../utils'
+import {and, matchesApiConfig, matchesPath} from '../utils'
 
 type Client = ApiClients['shopperOrders']
 
@@ -14,8 +14,10 @@ const basePath = (parameters: Client['clientConfig']['parameters']) => [
     parameters.organizationId
 ]
 
-const TODO = (method: keyof Client) => () => {
-    throw new NotImplementedError(`Cache logic for '${method}'`)
+/** Logs a warning to console (on startup) and returns nothing (method is unimplemented). */
+const TODO = (method: keyof Client) => {
+    console.warn(`Cache logic for '${method}' is not yet implemented.`)
+    return undefined
 }
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
