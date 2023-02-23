@@ -267,61 +267,64 @@ test('should render product details page', async () => {
     expect(screen.getAllByTestId('product-view').length).toEqual(1)
 })
 
-test('product set: render multi-product layout', async () => {
-    renderWithProviders(<MockedPageWithProductSet />)
+describe('product set', () => {
+    test('render multi-product layout', async () => {
+        renderWithProviders(<MockedPageWithProductSet />)
 
-    await waitFor(() => {
-        expect(screen.getAllByTestId('product-view').length).toEqual(4) // 1 parent + 3 children
-    })
-})
-
-test('product set: add the set to cart, after all variants are selected', async () => {
-    const urlPathAfterSelectingAllVariants =
-        '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
-    window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
-
-    global.server.use(
-        rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-            return res(ctx.json(basketWithProductSet))
+        await waitFor(() => {
+            expect(screen.getAllByTestId('product-view').length).toEqual(4) // 1 parent + 3 children
         })
-    )
-
-    // Initial basket is necessary to add items to it
-    const initialBasket = {basketId: 'valid_id'}
-    renderWithProviders(<MockedPageWithProductSet />, {wrapperProps: {initialBasket}})
-
-    const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
-    fireEvent.click(buttons[0])
-
-    await waitFor(
-        () => {
-            const modal = screen.getByTestId('add-to-cart-modal')
-            expect(within(modal).getByText(/3 items added to cart/i)).toBeInTheDocument()
-        },
-        // Seems like rendering the modal takes a bit more time
-        {timeout: 5000}
-    )
-})
-
-test('product set: show message when user has not selected all variants', async () => {
-    renderWithProviders(<MockedPageWithProductSet />)
-
-    const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
-    fireEvent.click(buttons[0])
-
-    await waitFor(() => {
-        const errorMessages = screen.getAllByText(/Please select all your options above/i)
-        expect(errorMessages.length).toEqual(3)
     })
-})
 
-test('product set: children are lazy loaded', async () => {
-    renderWithProviders(<MockedPageWithProductSet />)
+    test('add the set to cart successfully', async () => {
+        const urlPathAfterSelectingAllVariants =
+            '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
+        window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
 
-    const childProducts = await screen.findAllByTestId('child-product')
+        global.server.use(
+            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
+                return res(ctx.json(basketWithProductSet))
+            })
+        )
 
-    childProducts.forEach((child) => {
-        const heroImage = within(child).getAllByRole('img')[0]
-        expect(heroImage.getAttribute('loading')).toEqual('lazy')
+        // Initial basket is necessary to add items to it
+        const initialBasket = {basketId: 'valid_id'}
+        renderWithProviders(<MockedPageWithProductSet />, {wrapperProps: {initialBasket}})
+
+        const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
+        fireEvent.click(buttons[0])
+
+        await waitFor(
+            () => {
+                const modal = screen.getByTestId('add-to-cart-modal')
+                expect(within(modal).getByText(/3 items added to cart/i)).toBeInTheDocument()
+            },
+            // Seems like rendering the modal takes a bit more time
+            {timeout: 5000}
+        )
+    })
+
+    test('add the set to cart with error messages', async () => {
+        renderWithProviders(<MockedPageWithProductSet />)
+
+        const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
+        fireEvent.click(buttons[0])
+
+        await waitFor(() => {
+            // Show error when users have not selected all the variants yet
+            const errorMessages = screen.getAllByText(/Please select all your options above/i)
+            expect(errorMessages.length).toEqual(3)
+        })
+    })
+
+    test("child products' images are lazy loaded", async () => {
+        renderWithProviders(<MockedPageWithProductSet />)
+
+        const childProducts = await screen.findAllByTestId('child-product')
+
+        childProducts.forEach((child) => {
+            const heroImage = within(child).getAllByRole('img')[0]
+            expect(heroImage.getAttribute('loading')).toEqual('lazy')
+        })
     })
 })
