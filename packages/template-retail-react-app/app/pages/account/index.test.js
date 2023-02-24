@@ -30,7 +30,6 @@ jest.mock('../../commerce-api/einstein')
 const MockedComponent = () => {
     const {isRegistered} = useCustomerType()
     const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-    // const customer = useCustomer()
 
     useEffect(() => {
         if (!isRegistered) {

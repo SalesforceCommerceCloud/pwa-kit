@@ -19,7 +19,7 @@ import {
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
-import {MultiSiteProvider} from '../../contexts'
+import {AppStateProvider, MultiSiteProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
@@ -64,17 +64,23 @@ const AppConfig = ({children, locals = {}}) => {
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
         >
-            <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-                <_CommerceAPIProvider value={locals.api}>
-                    <CustomerProvider value={{customer, setCustomer}}>
-                        <BasketProvider value={{basket, setBasket}}>
-                            <CustomerProductListsProvider>
-                                <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                            </CustomerProductListsProvider>
-                        </BasketProvider>
-                    </CustomerProvider>
-                </_CommerceAPIProvider>
-            </MultiSiteProvider>
+            <AppStateProvider>
+                <MultiSiteProvider
+                    site={locals.site}
+                    locale={locals.locale}
+                    buildUrl={locals.buildUrl}
+                >
+                    <_CommerceAPIProvider value={locals.api}>
+                        <CustomerProvider value={{customer, setCustomer}}>
+                            <BasketProvider value={{basket, setBasket}}>
+                                <CustomerProductListsProvider>
+                                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                                </CustomerProductListsProvider>
+                            </BasketProvider>
+                        </CustomerProvider>
+                    </_CommerceAPIProvider>
+                </MultiSiteProvider>
+            </AppStateProvider>
         </CommerceApiProvider>
     )
 }

@@ -45,15 +45,16 @@ import {
     useCustomer,
     ShopperLoginHelpers
 } from 'commerce-sdk-react-preview'
+import {useAppState} from '../../hooks/use-app-state'
 const onClient = typeof window !== 'undefined'
-const LogoutButton = ({onSignoutClick}) => {
+const LogoutButton = ({onClick}) => {
     const {formatMessage} = useIntl()
     return (
         <>
             <Divider colorScheme={'gray'} marginTop={3} />
             <Button
                 fontWeight="500"
-                onClick={onSignoutClick}
+                onClick={onClick}
                 padding={4}
                 py={0}
                 variant="unstyled"
@@ -76,12 +77,17 @@ const LogoutButton = ({onSignoutClick}) => {
         </>
     )
 }
+
+LogoutButton.propTypes = {
+    onClick: PropTypes.func.isRequired
+}
 const Account = () => {
     const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
-    const customerId = useCustomerId()
-    const {isRegistered, customerType} = useCustomerType()
-    const {data: customer} = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
+
+    const {customer = {}} = useAppState()
+    const {isRegistered, customerType} = customer
+
     const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
     const location = useLocation()
     const navigate = useNavigation()
@@ -167,10 +173,7 @@ const Account = () => {
                                             </Button>
                                         ))}
 
-                                        <LogoutButton
-                                            justify="center"
-                                            onSignoutClick={onSignoutClick}
-                                        />
+                                        <LogoutButton justify="center" onClick={onSignoutClick} />
                                     </Flex>
                                 </AccordionPanel>
                             </>
@@ -205,7 +208,7 @@ const Account = () => {
                                 </Button>
                             )
                         })}
-                        <LogoutButton onSignoutClick={onSignoutClick} />
+                        <LogoutButton onClick={onSignoutClick} />
                     </Flex>
                 </Stack>
 

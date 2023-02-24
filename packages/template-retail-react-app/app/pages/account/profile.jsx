@@ -25,13 +25,11 @@ import ProfileFields from '../../components/forms/profile-fields'
 import UpdatePasswordFields from '../../components/forms/update-password-fields'
 import FormActionButtons from '../../components/forms/form-action-buttons'
 import {
-    useCustomerId,
-    useCustomerType,
-    useCustomer,
     useShopperCustomersMutation,
     useShopperLoginHelper,
     ShopperLoginHelpers
 } from 'commerce-sdk-react-preview'
+import {useAppState} from '../../hooks/use-app-state'
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the
@@ -41,18 +39,16 @@ import {
  */
 // eslint-disable-next-line react/prop-types
 const Skeleton = ({children, height, width, ...rest}) => {
-    const {isRegistered} = useCustomerType()
-    const customerId = useCustomerId()
-    const {data: customer} = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
+    const {customer = {}} = useAppState()
+    const {isRegistered} = customer
     const size = !isRegistered
         ? {
               height,
               width
           }
         : {}
-
     return (
-        <ChakraSkeleton isLoaded={!!customer} {...rest} {...size}>
+        <ChakraSkeleton isLoaded={!customer.isLoading} {...rest} {...size}>
             {children}
         </ChakraSkeleton>
     )
@@ -61,9 +57,8 @@ const Skeleton = ({children, height, width, ...rest}) => {
 const ProfileCard = () => {
     const {formatMessage} = useIntl()
 
-    const customerId = useCustomerId()
-    const {isRegistered} = useCustomerType()
-    const {data: customer} = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
+    const {customer = {}} = useAppState()
+    const {isRegistered, customerId} = customer
 
     const updateCustomerAction = useShopperCustomersMutation({action: 'updateCustomer'})
 
@@ -80,12 +75,14 @@ const ProfileCard = () => {
     })
 
     useEffect(() => {
-        form.reset({
-            firstName: customer?.firstName,
-            lastName: customer?.lastName,
-            email: customer?.email,
-            phone: customer?.phoneHome
-        })
+        if (customer) {
+            form.reset({
+                firstName: customer.firstName,
+                lastName: customer.lastName,
+                email: customer.email,
+                phone: customer.phoneHome
+            })
+        }
     }, [customer])
 
     const submit = async (values) => {
@@ -109,7 +106,7 @@ const ProfileCard = () => {
                     }
                 },
                 {
-                    onSuccess: (data) => {
+                    onSuccess: () => {
                         setIsEditing(false)
                         toast({
                             title: formatMessage({
@@ -222,10 +219,10 @@ const ProfileCard = () => {
 
 const PasswordCard = () => {
     const {formatMessage} = useIntl()
-    // TODO: should we create a hook for these 3 lines?
-    const customerId = useCustomerId()
-    const {isRegistered} = useCustomerType()
-    const {data: customer} = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
+
+    const {customer = {}} = useAppState()
+    const {isRegistered, customerId} = customer
+
     const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
 
     const updateCustomerPasswordAction = useShopperCustomersMutation({

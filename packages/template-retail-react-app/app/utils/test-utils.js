@@ -42,7 +42,12 @@ export const SUPPORTED_LOCALES = [
 ]
 export const DEFAULT_SITE = 'global'
 // Contexts
-import {CategoriesProvider, CurrencyProvider, MultiSiteProvider} from '../contexts'
+import {
+    AppStateProvider,
+    CategoriesProvider,
+    CurrencyProvider,
+    MultiSiteProvider
+} from '../contexts'
 
 import {createUrlTemplate} from './url'
 import {getSiteByReference} from './site-utils'
@@ -145,25 +150,27 @@ export const TestProviders = ({
                             locale={locale.id}
                             redirectURI={`${window.location.origin}/testcallback`}
                         >
-                            <CategoriesProvider treeRoot={initialCategories}>
-                                <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                                    <CustomerProvider value={{customer, setCustomer}}>
-                                        <BasketProvider value={{basket, setBasket}}>
-                                            <CustomerProductListsProvider>
-                                                <Router>
-                                                    <ChakraProvider theme={theme}>
-                                                        <AddToCartModalContext.Provider
-                                                            value={addToCartModal}
-                                                        >
-                                                            {children}
-                                                        </AddToCartModalContext.Provider>
-                                                    </ChakraProvider>
-                                                </Router>
-                                            </CustomerProductListsProvider>
-                                        </BasketProvider>
-                                    </CustomerProvider>
-                                </CurrencyProvider>
-                            </CategoriesProvider>
+                            <AppStateProvider>
+                                <CategoriesProvider treeRoot={initialCategories}>
+                                    <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                                        <CustomerProvider value={{customer, setCustomer}}>
+                                            <BasketProvider value={{basket, setBasket}}>
+                                                <CustomerProductListsProvider>
+                                                    <Router>
+                                                        <ChakraProvider theme={theme}>
+                                                            <AddToCartModalContext.Provider
+                                                                value={addToCartModal}
+                                                            >
+                                                                {children}
+                                                            </AddToCartModalContext.Provider>
+                                                        </ChakraProvider>
+                                                    </Router>
+                                                </CustomerProductListsProvider>
+                                            </BasketProvider>
+                                        </CustomerProvider>
+                                    </CurrencyProvider>
+                                </CategoriesProvider>
+                            </AppStateProvider>
                         </CommerceApiProvider>
                     </_CommerceAPIProvider>
                 </MultiSiteProvider>
