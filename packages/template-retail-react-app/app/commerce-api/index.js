@@ -79,6 +79,9 @@ class CommerceAPI {
                 sendLocale: false,
                 sendCurrency: ['createBasket']
             },
+            shopperExperience: {
+                api: sdk.ShopperExperience
+            },
             shopperGiftCertificates: {
                 api: sdk.ShopperGiftCertificates
             },

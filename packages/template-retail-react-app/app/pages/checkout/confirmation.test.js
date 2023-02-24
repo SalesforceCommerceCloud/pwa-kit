@@ -26,6 +26,14 @@ jest.mock('../../commerce-api/auth', () => {
     }
 })
 
+jest.mock('commerce-sdk-react-preview', () => {
+    const originalModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originalModule,
+        useCustomerBaskets: jest.fn().mockReturnValue({data: {baskets: [{currency: 'GBP'}]}})
+    }
+})
+
 const mockOrder = keysToCamel({
     basket_id: 'testorderbasket',
     ...ocapiOrderResponse

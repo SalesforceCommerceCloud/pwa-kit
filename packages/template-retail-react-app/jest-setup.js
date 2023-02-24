@@ -73,7 +73,13 @@ afterEach(() => {
     global.server.resetHandlers()
 })
 afterAll(() => {
-    global.server.close()
+    // Intentionally not closing the server!
+    // We run into many race condition issues,
+    // that was cause by the server close too soon
+    // and the tests not well written in an proper async manner.
+    // Let's not close the server and see how things goes.
+    // We can revisit this.
+    // global.server.close()
 })
 
 // Mock the application configuration to be used in all tests.
