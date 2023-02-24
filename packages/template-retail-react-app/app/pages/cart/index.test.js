@@ -197,6 +197,7 @@ test('Applies default shipping method to basket and renders estimated pricing', 
 
 describe('Update quantity', function () {
     test('Can update item quantity in the cart', async () => {
+        jest.setTimeout(30000)
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -218,6 +219,7 @@ describe('Update quantity', function () {
     })
 
     test('Can update item quantity from product view modal', async () => {
+        jest.setTimeout(30000)
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()

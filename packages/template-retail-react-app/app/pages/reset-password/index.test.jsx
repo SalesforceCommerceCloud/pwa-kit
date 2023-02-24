@@ -63,7 +63,7 @@ afterEach(() => {
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 
-test.skip('Allows customer to go to sign in page', async () => {
+test('Allows customer to go to sign in page', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
@@ -75,7 +75,7 @@ test.skip('Allows customer to go to sign in page', async () => {
     })
 })
 
-test.skip('Allows customer to generate password token', async () => {
+test('Allows customer to generate password token', async () => {
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
@@ -108,7 +108,7 @@ test.skip('Allows customer to generate password token', async () => {
     })
 })
 
-test.skip('Renders error message from server', async () => {
+test('Renders error message from server', async () => {
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
@@ -127,5 +127,7 @@ test.skip('Renders error message from server', async () => {
     user.type(screen.getByLabelText('Email'), 'foo@test.com')
     user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
-    expect(await screen.findByText('Something went wrong')).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByText('500 Internal Server Error')).toBeInTheDocument()
+    })
 })
