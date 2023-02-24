@@ -29,24 +29,41 @@ Below is a sample page that you can use in your _retail react app_ to visualize 
 // app/pages/page-viewer/index.jsx
 
 import React from 'react'
-import {Page} from '../../page-designer/core/page'
-import {ImageTile} from '../../page-designer/core/page'
-import {Carousel, MobileGrid1r1c} from '../../page-designer/core/page'
+import {Box} from '@chakra-ui/react'
+import {Page, pageType} from '../../page-designer'
+import {ImageTile} from '../../page-designer/assets'
+import {
+    Carousel,
+    MobileGrid1r1c,
+    MobileGrid2r1c,
+    MobileGrid2r2c,
+    MobileGrid2r3c,
+    MobileGrid3r1c,
+    MobileGrid3r2c
+} from '../../page-designer/layouts'
 
 const PageViewer = ({page}) => {
     // Assign the components to be rendered for any given page designer component type.
     const components = {
-        'commerce_assets.image-tile': ImageTile, 
+        'commerce_assets.photoTile': ImageTile,
+        'commerce_assets.imageAndText': ImageWithText,
         'commerce_layouts.carousel': Carousel,
-        'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
+        'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c,
+        'commerce_layouts.mobileGrid2r1c': MobileGrid2r1c,
+        'commerce_layouts.mobileGrid2r2c': MobileGrid2r2c,
+        'commerce_layouts.mobileGrid2r3c': MobileGrid2r3c,
+        'commerce_layouts.mobileGrid3r1c': MobileGrid3r1c,
+        'commerce_layouts.mobileGrid3r1c': MobileGrid3r2c
     }
 
     return (
-        <Page page={page} components={components} />
+        <Box layerStyle={'page'}>
+            <Page page={page} components={components} />
+        </Box>
     )
 }
 
-PageViewer.getProps = async ({params}) => {
+PageViewer.getProps = async ({api, params}) => {
     const {pageId} = params
     const page = await api.shopperExperience.getPage({
         parameters: {pageId}

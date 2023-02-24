@@ -13,7 +13,7 @@ import {Box, Image} from '@chakra-ui/react'
  * @param image Object containing the image url, _type and focalPoint.
  * @returns {JSX.Element}
  */
-const ImageTile = ({image}) => {
+export const ImageTile = ({image}) => {
     return (
         <Box className={'image-tile'}>
             <figure className={'image-tile-figure'}>
