@@ -38,6 +38,7 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
 // TODO: Example Page designer Test page. Remove before merging.
 const Experience = loadable(() => import('./pages/experience'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
+const PageViewer = loadable(() => import('./pages/page-viewer'), {fallback})
 
 const routes = [
     {
@@ -104,6 +105,10 @@ const routes = [
     {
         path: '/experience',
         component: Experience
+    },
+    {
+        path: '/page-viewer',
+        component: PageViewer
     },
     {
         path: '*',

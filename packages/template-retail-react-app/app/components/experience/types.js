@@ -20,7 +20,7 @@ export const componentType = PropTypes.shape({
  */
 export const regionType = PropTypes.shape({
     id: PropTypes.string,
-    components: PropTypes.arrayOf(componentType).isRequired
+    components: PropTypes.arrayOf(componentType)
 })
 
 /**
