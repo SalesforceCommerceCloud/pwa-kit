@@ -7,7 +7,6 @@
 import React from 'react'
 import ProductTile, {Skeleton} from './index'
 import {renderWithProviders} from '../../utils/test-utils'
-import {within} from '@testing-library/react'
 
 const mockProductSearchItem = {
     currency: 'USD',
