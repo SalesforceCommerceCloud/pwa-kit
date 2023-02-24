@@ -18,6 +18,14 @@ jest.useFakeTimers()
 
 jest.mock('../../commerce-api/einstein')
 
+jest.mock('commerce-sdk-react-preview', () => {
+    const originalModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originalModule,
+        useCustomerBaskets: jest.fn().mockReturnValue({data: {baskets: []}})
+    }
+})
+
 const MockedComponent = () => {
     return (
         <Switch>
@@ -45,12 +53,8 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test.skip('should render product details page', async () => {
+test('should render product details page', async () => {
     global.server.use(
-        // mock fetch product lists
-        // rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-        //     return res(ctx.json(mockedCustomerProductLists))
-        // }),
         // mock add item to product lists
         rest.post('*/customers/:customerId/product-lists/:listId/items', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200))
