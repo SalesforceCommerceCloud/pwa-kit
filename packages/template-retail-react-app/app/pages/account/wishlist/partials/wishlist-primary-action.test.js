@@ -65,7 +65,7 @@ test('the Add Set To Cart button', async () => {
     })
 })
 
-test('the View Full Details button', async () => {
+test('the View Full Details button', () => {
     const productSetWithVariants = mockedCustomerProductListsDetails2.data[0]
     renderWithProviders(<MockedComponent variant={productSetWithVariants} />)
 
