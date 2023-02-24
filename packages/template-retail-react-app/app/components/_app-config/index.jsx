@@ -65,12 +65,8 @@ const AppConfig = ({children, locals = {}}) => {
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
         >
-            <CustomerProvider>
-                <MultiSiteProvider
-                    site={locals.site}
-                    locale={locals.locale}
-                    buildUrl={locals.buildUrl}
-                >
+            <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
+                <CustomerProvider>
                     <_CommerceAPIProvider value={locals.api}>
                         <_CustomerProvider value={{customer, setCustomer}}>
                             <BasketProvider value={{basket, setBasket}}>
@@ -80,8 +76,8 @@ const AppConfig = ({children, locals = {}}) => {
                             </BasketProvider>
                         </_CustomerProvider>
                     </_CommerceAPIProvider>
-                </MultiSiteProvider>
-            </CustomerProvider>
+                </CustomerProvider>
+            </MultiSiteProvider>
         </CommerceApiProvider>
     )
 }
