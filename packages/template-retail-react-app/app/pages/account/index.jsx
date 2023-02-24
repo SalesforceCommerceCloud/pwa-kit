@@ -8,12 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    Route,
-    Switch,
-    useRouteMatch
-    // Redirect
-} from 'react-router'
+import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
 import {
     Accordion,
     AccordionButton,
@@ -28,7 +23,6 @@ import {
     Text,
     Divider
 } from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Seo from '../../components/seo'
 import Link from '../../components/link'
 import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../components/icons'
@@ -42,40 +36,20 @@ import {useLocation} from 'react-router-dom'
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-// import useMultiSite from '../../hooks/use-multi-site'
+import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
+import {useShopperLoginHelper, ShopperLoginHelpers} from 'commerce-sdk-react-preview'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
-const Account = () => {
-    const {path} = useRouteMatch()
+const onClient = typeof window !== 'undefined'
+const LogoutButton = ({onClick}) => {
     const {formatMessage} = useIntl()
-    const customer = useCustomer()
-    const location = useLocation()
-    const navigate = useNavigation()
-
-    const [mobileNavIndex, setMobileNavIndex] = useState(-1)
-    const [showLoading, setShowLoading] = useState(false)
-
-    const einstein = useEinstein()
-
-    // const {buildUrl} = useMultiSite()
-
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(location.pathname)
-    }, [location])
-
-    const onSignoutClick = async () => {
-        setShowLoading(true)
-        await customer.logout()
-        navigate('/login')
-    }
-
-    const LogoutButton = () => (
+    return (
         <>
             <Divider colorScheme={'gray'} marginTop={3} />
             <Button
                 fontWeight="500"
-                onClick={onSignoutClick}
+                onClick={onClick}
                 padding={4}
                 py={0}
                 variant="unstyled"
@@ -97,19 +71,50 @@ const Account = () => {
             </Button>
         </>
     )
+}
 
-    // TODO: hook integration WIP
+LogoutButton.propTypes = {
+    onClick: PropTypes.func.isRequired
+}
+const Account = () => {
+    const {path} = useRouteMatch()
+    const {formatMessage} = useIntl()
+    const customer = useCurrentCustomer()
+    const {isRegistered, customerType} = customer
+
+    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
+    const location = useLocation()
+    const navigate = useNavigation()
+
+    const [mobileNavIndex, setMobileNavIndex] = useState(-1)
+    const [showLoading, setShowLoading] = useState(false)
+
+    const einstein = useEinstein()
+
+    const {buildUrl} = useMultiSite()
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        einstein.sendViewPage(location.pathname)
+    }, [location])
+
+    const onSignoutClick = async () => {
+        setShowLoading(true)
+        await logout.mutateAsync()
+        navigate('/login')
+    }
+
     // If we have customer data and they are not registered, push to login page
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
-    // if (customer.authType != null && !customer.isRegistered) {
-    //     const path = buildUrl('/login')
-    //     return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
-    // }
-
+    // we don't want redirect on server side
+    if (customerType !== null && !isRegistered && onClient) {
+        const path = buildUrl('/login')
+        return <Redirect to={{pathname: path, state: {directedFrom: '/account'}}} />
+    }
     return (
         <Box
-            data-testid={customer.isRegistered ? 'account-page' : 'account-page-skeleton'}
+            data-testid={isRegistered ? 'account-page' : 'account-page-skeleton'}
             layerStyle="page"
             paddingTop={[4, 4, 12, 12, 16]}
         >
@@ -162,7 +167,7 @@ const Account = () => {
                                             </Button>
                                         ))}
 
-                                        <LogoutButton justify="center" />
+                                        <LogoutButton justify="center" onClick={onSignoutClick} />
                                     </Flex>
                                 </AccordionPanel>
                             </>
@@ -197,7 +202,7 @@ const Account = () => {
                                 </Button>
                             )
                         })}
-                        <LogoutButton />
+                        <LogoutButton onClick={onSignoutClick} />
                     </Flex>
                 </Stack>
 

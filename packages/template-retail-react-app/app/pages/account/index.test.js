@@ -6,7 +6,7 @@
  */
 import React, {useEffect} from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen, waitFor, within} from '@testing-library/react'
+import {screen, waitFor, within, act} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
@@ -16,18 +16,31 @@ import {
     mockedRegisteredCustomer,
     mockOrderProducts
 } from '../../commerce-api/mock-data'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
+import Login from '../login'
 import mockConfig from '../../../config/mocks/default'
+import {
+    ShopperLoginHelpers,
+    useShopperLoginHelper,
+    useCustomerType
+} from 'commerce-sdk-react-preview'
 
 jest.mock('../../commerce-api/einstein')
 
 const MockedComponent = () => {
-    const customer = useCustomer()
+    const {isRegistered} = useCustomerType()
+    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
 
     useEffect(() => {
-        if (!customer.isRegistered) {
-            customer.login('test@test.com', 'password1')
+        if (!isRegistered) {
+            login.mutate(
+                {email: 'email@test.com', password: 'password1'},
+                {
+                    onSuccess: () => {
+                        window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
+                    }
+                }
+            )
         }
     }, [])
 
@@ -37,6 +50,10 @@ const MockedComponent = () => {
                 path={createPathWithDefaults('/account')}
                 render={(props) => <Account {...props} />}
             />
+            <Route
+                path={createPathWithDefaults('/login')}
+                render={(props) => <Login {...props} />}
+            />
         </Switch>
     )
 }
@@ -44,6 +61,7 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
+    jest.resetAllMocks()
     global.server.use(
         rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
         rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
@@ -60,20 +78,34 @@ afterEach(() => {
 })
 
 const expectedBasePath = '/uk/en-GB'
-// TODO: WIP HOOK integrations
-test.skip('Redirects to login page if the customer is not logged in', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
-        })
-    )
-    renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+describe('Test redirects', function () {
+    beforeEach(() => {
+        global.server.use(
+            rest.get('*/customers/:customerId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
+            })
+        )
     })
-    await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
+    test('Redirects to login page if the customer is not logged in', async () => {
+        const Component = () => {
+            return (
+                <Switch>
+                    <Route
+                        path={createPathWithDefaults('/account')}
+                        render={(props) => <Account {...props} />}
+                    />
+                </Switch>
+            )
+        }
+        renderWithProviders(<Component />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
+    })
 })
 
-test('Provides navigation for subpages', async () => {
+//TODO: wait until other pages are integrated with hook to fix this test
+test.skip('Provides navigation for subpages', async () => {
     global.server.use(
         rest.get('*/products', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderProducts))
@@ -102,80 +134,87 @@ test('Provides navigation for subpages', async () => {
     )
 })
 
-test('Renders account detail page by default for logged-in customer', async () => {
-    renderWithProviders(<MockedComponent />)
-    expect(await screen.findByTestId('account-page')).toBeInTheDocument()
-    expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
-    expect(screen.getByText('Testing Tester')).toBeInTheDocument()
-    expect(screen.getByText('customer@test.com')).toBeInTheDocument()
-    expect(screen.getByText('(727) 555-1234')).toBeInTheDocument()
-})
+describe('Render and logs out', function () {
+    test('Renders account detail page by default for logged-in customer, and can log out', async () => {
+        renderWithProviders(<MockedComponent />)
 
-test('Allows customer to sign out', async () => {
-    renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
-    })
-    expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
-    user.click(screen.getAllByText(/Log Out/)[0])
-    await waitFor(() => {
-        expect(window.location.pathname).toEqual(`${expectedBasePath}/login`)
-    })
-})
-
-test('Allows customer to edit profile details', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(
-                ctx.json({
-                    ...mockedRegisteredCustomer,
-                    firstName: 'Geordi',
-                    phoneHome: '(567) 123-5585'
-                })
-            )
-        }),
-        rest.patch('*/customers/:customerId', (req, res, ctx) => {
-            return res(
-                ctx.json({
-                    ...mockedRegisteredCustomer,
-                    firstName: 'Geordi',
-                    phoneHome: '(567) 123-5585'
-                })
-            )
+        await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
+        // Render user profile [age
+        await waitFor(() => {
+            expect(window.location.pathname).toEqual(`${expectedBasePath}/account`)
+            expect(screen.getByTestId('account-detail-page')).toBeInTheDocument()
+            expect(screen.getByText('Testing Tester')).toBeInTheDocument()
+            expect(screen.getByText('customer@test.com')).toBeInTheDocument()
+            expect(screen.getByText('(727) 555-1234')).toBeInTheDocument()
         })
-    )
 
-    renderWithProviders(<MockedComponent />)
-    expect(await screen.findByTestId('account-page')).toBeInTheDocument()
-    expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
-
-    const el = within(screen.getByTestId('sf-toggle-card-my-profile'))
-    user.click(el.getByText(/edit/i))
-    user.type(el.getByLabelText(/first name/i), 'Geordi')
-    user.type(el.getByLabelText(/Phone Number/i), '5671235585')
-    user.click(el.getByText(/save/i))
-    expect(await screen.findByText('Geordi Tester')).toBeInTheDocument()
-    expect(await screen.findByText('(567) 123-5585')).toBeInTheDocument()
+        user.click(screen.getAllByText(/Log Out/)[0])
+        await waitFor(() => {
+            expect(window.location.pathname).toEqual(`${expectedBasePath}/login`)
+        })
+    })
 })
 
-test('Allows customer to update password', async () => {
-    global.server.use(
-        rest.put('*/password', (req, res, ctx) => {
-            return res(ctx.json())
+describe('updating profile', function () {
+    beforeEach(() => {
+        global.server.use(
+            rest.patch('*/customers/:customerId', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        ...mockedRegisteredCustomer,
+                        firstName: 'Geordi',
+                        phoneHome: '(567) 123-5585'
+                    })
+                )
+            })
+        )
+    })
+    test('Allows customer to edit profile details', async () => {
+        renderWithProviders(<MockedComponent />)
+        expect(await screen.findByTestId('account-page')).toBeInTheDocument()
+        expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
+        await waitFor(() => {
+            const firstName = screen.getByText(/Testing Tester/i)
+            expect(firstName).toBeInTheDocument()
         })
-    )
+        const el = within(screen.getByTestId('sf-toggle-card-my-profile'))
 
-    renderWithProviders(<MockedComponent />)
-    expect(await screen.findByTestId('account-page')).toBeInTheDocument()
-    expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
+        await act(async () => {
+            user.click(el.getByText(/edit/i))
+        })
+        user.type(el.getByLabelText(/first name/i), 'Geordi')
+        user.type(el.getByLabelText(/Phone Number/i), '5671235585')
 
-    const el = within(screen.getByTestId('sf-toggle-card-password'))
-    user.click(el.getByText(/edit/i))
-    user.type(el.getByLabelText(/current password/i), 'Password!12345')
-    user.type(el.getByLabelText(/new password/i), 'Password!98765')
-    user.click(el.getByText(/Forgot password/i))
+        await act(async () => {
+            user.click(el.getByText(/save/i))
+        })
+        expect(await screen.findByText('Geordi Tester')).toBeInTheDocument()
+        expect(await screen.findByText('(567) 123-5585')).toBeInTheDocument()
+    })
+})
 
-    expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
+describe('updating password', function () {
+    beforeEach(() => {
+        global.server.use(
+            rest.put('*/password', (req, res, ctx) => {
+                return res(ctx.json())
+            })
+        )
+    })
+    test('Allows customer to update password', async () => {
+        renderWithProviders(<MockedComponent />)
+        expect(await screen.findByTestId('account-page')).toBeInTheDocument()
+        expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
-    user.click(el.getByText(/save/i))
-    expect(await screen.findByText('••••••••')).toBeInTheDocument()
+        const el = within(screen.getByTestId('sf-toggle-card-password'))
+        user.click(el.getByText(/edit/i))
+        user.type(el.getByLabelText(/current password/i), 'Password!12345')
+        user.type(el.getByLabelText(/new password/i), 'Password!98765')
+        user.click(el.getByText(/Forgot password/i))
+
+        expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
+
+        user.click(el.getByText(/save/i))
+        expect(await screen.findByText('••••••••')).toBeInTheDocument()
+    })
 })

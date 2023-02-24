@@ -19,12 +19,17 @@ import {
     useToast
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AlertIcon} from '../../components/icons'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../components/toggle-card'
 import ProfileFields from '../../components/forms/profile-fields'
 import UpdatePasswordFields from '../../components/forms/update-password-fields'
 import FormActionButtons from '../../components/forms/form-action-buttons'
+import {
+    useShopperCustomersMutation,
+    useShopperLoginHelper,
+    ShopperLoginHelpers
+} from 'commerce-sdk-react-preview'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the
@@ -34,16 +39,16 @@ import FormActionButtons from '../../components/forms/form-action-buttons'
  */
 // eslint-disable-next-line react/prop-types
 const Skeleton = ({children, height, width, ...rest}) => {
-    const {isRegistered} = useCustomer()
+    const customer = useCurrentCustomer()
+    const {isRegistered} = customer
     const size = !isRegistered
         ? {
               height,
               width
           }
         : {}
-
     return (
-        <ChakraSkeleton isLoaded={isRegistered} {...rest} {...size}>
+        <ChakraSkeleton isLoaded={!customer.isLoading} {...rest} {...size}>
             {children}
         </ChakraSkeleton>
     )
@@ -51,47 +56,73 @@ const Skeleton = ({children, height, width, ...rest}) => {
 
 const ProfileCard = () => {
     const {formatMessage} = useIntl()
-    const customer = useCustomer()
+
+    const customer = useCurrentCustomer()
+    const {isRegistered, customerId} = customer
+
+    const updateCustomerAction = useShopperCustomersMutation({action: 'updateCustomer'})
+
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
 
     const form = useForm({
         defaultValues: {
-            firstName: customer.firstName,
-            lastName: customer.lastName,
-            email: customer.email,
-            phone: customer.phoneHome
+            firstName: customer?.firstName,
+            lastName: customer?.lastName,
+            email: customer?.email,
+            phone: customer?.phoneHome
         }
     })
 
     useEffect(() => {
-        form.reset({
-            firstName: customer.firstName,
-            lastName: customer.lastName,
-            email: customer.email,
-            phone: customer.phoneHome
-        })
+        if (customer) {
+            form.reset({
+                firstName: customer.firstName,
+                lastName: customer.lastName,
+                email: customer.email,
+                phone: customer.phoneHome
+            })
+        }
     }, [customer])
 
     const submit = async (values) => {
         try {
             form.clearErrors()
-            await customer.updateCustomer(values)
-            setIsEditing(false)
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'Profile updated',
-                    id: 'profile_card.info.profile_updated'
-                }),
-                status: 'success',
-                isClosable: true
-            })
+            updateCustomerAction.mutate(
+                {
+                    parameters: {customerId},
+                    body: {
+                        firstName: values.firstName,
+                        lastName: values.lastName,
+                        phoneHome: values.phone,
+                        // NOTE/ISSUE
+                        // The sdk is allowing you to change your email to an already-existing email.
+                        // I would expect an error. We also want to keep the email and login the same
+                        // for the customer, but the sdk isn't changing the login when we submit an
+                        // updated email. This will lead to issues where you change your email but end
+                        // up not being able to login since 'login' will no longer match the email.
+                        email: values.email,
+                        login: values.email
+                    }
+                },
+                {
+                    onSuccess: () => {
+                        setIsEditing(false)
+                        toast({
+                            title: formatMessage({
+                                defaultMessage: 'Profile updated',
+                                id: 'profile_card.info.profile_updated'
+                            }),
+                            status: 'success',
+                            isClosable: true
+                        })
+                    }
+                }
+            )
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }
     }
-
-    const {isRegistered} = customer
 
     return (
         <ToggleCard
@@ -141,7 +172,7 @@ const ProfileCard = () => {
 
                         <Skeleton height="21px" width="140px">
                             <Text fontSize="sm">
-                                {customer.firstName} {customer.lastName}
+                                {customer?.firstName} {customer?.lastName}
                             </Text>
                         </Skeleton>
                     </Box>
@@ -156,7 +187,7 @@ const ProfileCard = () => {
                         </Skeleton>
 
                         <Skeleton height="21px" width="64px">
-                            <Text fontSize="sm">{customer.email}</Text>
+                            <Text fontSize="sm">{customer?.email}</Text>
                         </Skeleton>
                     </Box>
                     <Box>
@@ -171,7 +202,7 @@ const ProfileCard = () => {
 
                         <Skeleton height="21px" width="120px">
                             <Text fontSize="sm">
-                                {customer.phoneHome || (
+                                {customer?.phoneHome || (
                                     <FormattedMessage
                                         defaultMessage="Not provided"
                                         id="profile_card.message.not_provided"
@@ -188,7 +219,15 @@ const ProfileCard = () => {
 
 const PasswordCard = () => {
     const {formatMessage} = useIntl()
-    const customer = useCustomer()
+
+    const customer = useCurrentCustomer()
+    const {isRegistered, customerId} = customer
+
+    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+
+    const updateCustomerPasswordAction = useShopperCustomersMutation({
+        action: 'updateCustomerPassword'
+    })
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
 
@@ -197,7 +236,32 @@ const PasswordCard = () => {
     const submit = async (values) => {
         try {
             form.clearErrors()
-            await customer.updatePassword(values, customer.email)
+            updateCustomerPasswordAction.mutate(
+                {
+                    parameters: {customerId},
+                    body: {
+                        password: values.password,
+                        currentPassword: values.currentPassword
+                    }
+                },
+                {
+                    onSuccess: () => {
+                        setIsEditing(false)
+                        toast({
+                            title: formatMessage({
+                                defaultMessage: 'Password updated',
+                                id: 'password_card.info.password_updated'
+                            }),
+                            status: 'success',
+                            isClosable: true
+                        })
+                        login.mutate({
+                            email: values.email,
+                            password: values.password
+                        })
+                    }
+                }
+            )
             setIsEditing(false)
             toast({
                 title: formatMessage({
@@ -211,8 +275,6 @@ const PasswordCard = () => {
             form.setError('global', {type: 'manual', message: error.message})
         }
     }
-
-    const {isRegistered} = customer
 
     return (
         <ToggleCard
