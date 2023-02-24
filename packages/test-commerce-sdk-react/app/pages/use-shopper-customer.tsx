@@ -223,6 +223,12 @@ function UseCustomer() {
         }
     ]
 
+    const loginError = loginRegisteredUser.error
+    const loginErrorMessage =
+        typeof loginError === 'object' && loginError !== null && 'message' in loginError
+            ? loginError.message
+            : loginError
+
     return (
         <>
             <h1>ShopperCustomer page</h1>
@@ -241,9 +247,7 @@ function UseCustomer() {
                     >
                         loginRegisteredUser
                     </button>
-                    {loginRegisteredUser.error?.message && (
-                        <p style={{color: 'red'}}>Error: {loginRegisteredUser.error?.message}</p>
-                    )}
+                    {loginError && <p style={{color: 'red'}}>Error: {loginErrorMessage}</p>}
                 </>
             ) : (
                 <>

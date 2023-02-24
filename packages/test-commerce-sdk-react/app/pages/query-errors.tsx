@@ -10,8 +10,9 @@ import {useProducts, useProduct} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 
 const QueryErrors = () => {
-    // @ts-ignore
-    const products = useProducts({parameters: {FOO: ''}})
+    // TODO: `products` no longer has an error, because the query is not enabled unless all required
+    // parameters are passed
+    const products = useProducts({parameters: {FOO: ''} as Record<string, string>})
     const product = useProduct({parameters: {id: '25502228Mxxx'}})
 
     return (
