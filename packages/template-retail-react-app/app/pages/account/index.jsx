@@ -38,13 +38,7 @@ import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
-import {
-    useCustomerId,
-    useCustomerType,
-    useShopperLoginHelper,
-    useCustomer,
-    ShopperLoginHelpers
-} from 'commerce-sdk-react-preview'
+import {useShopperLoginHelper, ShopperLoginHelpers} from 'commerce-sdk-react-preview'
 import {useAppState} from '../../hooks/use-app-state'
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
