@@ -107,6 +107,14 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.json(mockShippingMethods))
         }),
 
+        rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockShippingMethods))
+        }),
+
+        rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockShippingMethods))
+        }),
+
         rest.get('*/promotions', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockPromotions))
         })
@@ -135,7 +143,7 @@ describe('Empty cart tests', function () {
         expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
     })
 })
-test.skip('Renders cart components when there are items', async () => {
+test('Renders cart components when there are items', async () => {
     renderWithProviders(<Cart />)
     await waitFor(async () => {
         expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
@@ -149,7 +157,6 @@ test('Applies default shipping method to basket and renders estimated pricing', 
 
     const summary = screen.getByTestId('sf-order-summary')
     expect(await within(summary).findByText(/promotion applied/i)).toBeInTheDocument()
-    screen.logTestingPlaygroundURL()
     expect(within(summary).getByText(/free/i)).toBeInTheDocument()
     expect(within(summary).getAllByText(/61.43/i).length).toEqual(2)
 })
