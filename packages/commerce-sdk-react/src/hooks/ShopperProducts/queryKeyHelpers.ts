@@ -11,7 +11,7 @@ import {pick} from '../utils'
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperProducts<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
-type QueryKeys = {
+export type QueryKeys = {
     getProducts: ['/organizations/', string, '/products', Params<'getProducts'>]
     getProduct: ['/organizations/', string, '/products/', string, Params<'getProduct'>]
     getCategories: ['/organizations/', string, '/categories', Params<'getCategories'>]
