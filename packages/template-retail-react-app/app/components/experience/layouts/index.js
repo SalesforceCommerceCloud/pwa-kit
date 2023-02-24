@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+export * from './carousel'
 export * from './mobileGrid1r1c'
 export * from './mobileGrid2r1c'
 export * from './mobileGrid2r2c'
