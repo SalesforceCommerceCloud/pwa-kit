@@ -141,7 +141,5 @@ test('Product set - renders the appropriate price label', async () => {
     const {getByTestId} = renderWithProviders(<ProductTile product={mockProductSet} />)
 
     const container = getByTestId('product-tile-price')
-    const priceLabel = within(container).getByText(/starting at/i)
-
-    expect(priceLabel).toBeDefined()
+    expect(container).toHaveTextContent(/starting at/i)
 })
