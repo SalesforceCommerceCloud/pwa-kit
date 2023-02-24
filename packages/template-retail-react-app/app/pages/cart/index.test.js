@@ -149,7 +149,6 @@ test('Applies default shipping method to basket and renders estimated pricing', 
 
     const summary = screen.getByTestId('sf-order-summary')
     expect(await within(summary).findByText(/promotion applied/i)).toBeInTheDocument()
-    screen.logTestingPlaygroundURL()
     expect(within(summary).getByText(/free/i)).toBeInTheDocument()
     expect(within(summary).getAllByText(/61.43/i).length).toEqual(2)
 })
@@ -348,7 +347,6 @@ describe('Coupons tests', function () {
             const promotionDiscount = await within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)
             expect(promotionDiscount).not.toBeInTheDocument()
             expect(menSuit).not.toBeInTheDocument()
-            screen.logTestingPlaygroundURL()
         })
     })
 })
