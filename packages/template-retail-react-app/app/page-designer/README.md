@@ -31,7 +31,7 @@ Below is a sample page that you can use in your _retail react app_ to visualize 
 import React from 'react'
 import {Box} from '@chakra-ui/react'
 import {Page, pageType} from '../../page-designer'
-import {ImageTile} from '../../page-designer/assets'
+import {ImageTile, ImageWithText} from '../../page-designer/assets'
 import {
     Carousel,
     MobileGrid1r1c,
