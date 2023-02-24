@@ -48,7 +48,7 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test.skip('should execute onClick for registered users', async () => {
+test('should execute onClick for registered users', async () => {
     const onClick = jest.fn()
 
     renderWithProviders(<MockedComponent onClick={onClick} />)
