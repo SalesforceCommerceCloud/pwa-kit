@@ -146,7 +146,7 @@ beforeEach(() => {
                                 taxClassId: 'standard',
                                 taxRate: 0.05
                             }
-                        ],
+                        ]
                     }
                 ]
             }

@@ -64,7 +64,7 @@ test('should execute onClick for registered users', async () => {
     expect(onClick).toHaveBeenCalledTimes(1)
 })
 
-test.skip('should show login modal if user not registered', () => {
+test('should show login modal if user not registered', () => {
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
