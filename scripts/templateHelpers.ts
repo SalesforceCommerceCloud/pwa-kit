@@ -172,9 +172,15 @@ export function assign(
   options.data.root[varName] = varValue;
 }
 
-export const createQueryKeyFragment = (url: string, variable: string): string =>
+export const createQueryKeyFragment = (
+  url: string,
+  variable: string | null
+): string =>
   // If the URL ends with a {template} fragment, we end up with a `, ''` that we don't need
-  `'${url.replace(/\{(\w+)\}/g, `', ${variable}.$1, '`)}'`.replace(", ''", '');
+  `'${url.replace(
+    /\{(\w+)\}/g,
+    `', ${variable ? `${variable}.$1` : 'string'}, '`
+  )}'`.replace(", ''", '');
 
 const isNothing = (
   apiName: string,

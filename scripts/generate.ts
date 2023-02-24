@@ -43,6 +43,10 @@ async function generate() {
       path.join(OUTPUT_DIR, api.name.upperCamelCase, `query.ts`)
     );
     api.addTemplate(
+      path.join(TEMPLATE_DIR, 'queryKeyHelpers.ts.hbs'),
+      path.join(OUTPUT_DIR, api.name.upperCamelCase, `queryKeyHelpers.ts`)
+    );
+    api.addTemplate(
       path.join(TEMPLATE_DIR, 'index.ts'),
       path.join(OUTPUT_DIR, api.name.upperCamelCase, `index.ts`)
     );
