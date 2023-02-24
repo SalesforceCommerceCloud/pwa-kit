@@ -53,7 +53,7 @@ const PageViewer = ({page}) => {
         'commerce_layouts.mobileGrid2r2c': MobileGrid2r2c,
         'commerce_layouts.mobileGrid2r3c': MobileGrid2r3c,
         'commerce_layouts.mobileGrid3r1c': MobileGrid3r1c,
-        'commerce_layouts.mobileGrid3r1c': MobileGrid3r2c
+        'commerce_layouts.mobileGrid3r2c': MobileGrid3r2c
     }
 
     return (
