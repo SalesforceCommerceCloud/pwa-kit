@@ -6,6 +6,7 @@
  */
 import useAuth from './useAuth'
 import useLocalStorage from './useLocalStorage'
+import useConfig from './useConfig'
 
 const onClient = typeof window !== 'undefined'
 
@@ -15,7 +16,8 @@ const onClient = typeof window !== 'undefined'
  */
 const useCustomerId = (): string | null => {
     if (onClient) {
-        return useLocalStorage('customer_id')
+        const config = useConfig()
+        return useLocalStorage(`${config.siteId}_customer_id`)
     }
     const auth = useAuth()
     return auth.get('customer_id')
