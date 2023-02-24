@@ -1,6 +1,7 @@
 ## v2.7.0-dev (Jan 25, 2023)
-- Add Shopper Experience ImageTile component [#967](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/967)
-- Add Shopper Experience ImageWithText component [#991](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/991)
+- Add Page Designer ImageTile component [#967](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/967)
+- Add Page Designer ImageWithText component [#991](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/991)
+- Add Page Designer carousel component [#977](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/977)
 - Add Page Designer layout components [#993](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/993)
 
 ## v2.6.0 (Jan 25, 2023)
