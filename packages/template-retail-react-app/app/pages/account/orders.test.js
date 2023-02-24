@@ -15,6 +15,14 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
 
+jest.mock('commerce-sdk-react-preview', () => {
+    const originalModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originalModule,
+        useCustomerBaskets: jest.fn().mockReturnValue({data: {baskets: [{currency: 'GBP'}]}})
+    }
+})
+
 const MockedComponent = () => {
     const customer = useCustomer()
 
@@ -53,7 +61,7 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test.skip('Renders order history and details', async () => {
+test('Renders order history and details', async () => {
     renderWithProviders(<MockedComponent history={history} />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
