@@ -39,7 +39,8 @@ import LoadingSpinner from '../../components/loading-spinner'
 import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 import {useShopperLoginHelper, ShopperLoginHelpers} from 'commerce-sdk-react-preview'
-import {useAppState} from '../../hooks/use-app-state'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
     const {formatMessage} = useIntl()
@@ -78,8 +79,7 @@ LogoutButton.propTypes = {
 const Account = () => {
     const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
-
-    const {customer = {}} = useAppState()
+    const customer = useCurrentCustomer()
     const {isRegistered, customerType} = customer
 
     const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)

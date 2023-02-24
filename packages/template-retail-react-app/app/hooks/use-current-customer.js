@@ -10,11 +10,11 @@
  * It is a combination of many commerce-sdk-react hooks that needs to be used together in many places.
  */
 import {useContext} from 'react'
-import {AppStateContext} from '../contexts'
-export const useAppState = () => {
-    const context = useContext(AppStateContext)
+import {CustomerContext} from '../contexts'
+export const useCurrentCustomer = () => {
+    const context = useContext(CustomerContext)
     if (context === undefined) {
-        throw new Error('useAppState must be used within AppStateProvider')
+        throw new Error('useCurrentCustomer must be used within CustomerProvider')
     }
     return context
 }

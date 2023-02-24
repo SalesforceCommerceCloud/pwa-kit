@@ -193,11 +193,11 @@ CurrencyProvider.propTypes = {
     currency: PropTypes.string
 }
 /**
- * Provider that manages the app state
+ * Provider that manages the customer data
  * @type {React.Context<unknown>}
  */
-export const AppStateContext = React.createContext()
-export const AppStateProvider = ({children}) => {
+export const CustomerContext = React.createContext()
+export const CustomerProvider = ({children}) => {
     const customerId = useCustomerId()
     const {isRegistered, customerType} = useCustomerType()
     const {data, isLoading, isError, ...restOfCustomer} = useCustomer(
@@ -205,19 +205,16 @@ export const AppStateProvider = ({children}) => {
         {enabled: !!customerId && isRegistered}
     )
     const value = {
-        //TODO: Add/move other app state management here, basket/productLists
-        customer: {
-            ...data,
-            customerId,
-            isRegistered,
-            customerType,
-            isLoading,
-            isError,
-            ...restOfCustomer
-        }
+        ...data,
+        customerId,
+        isRegistered,
+        customerType,
+        isLoading,
+        isError,
+        ...restOfCustomer
     }
-    return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>
+    return <CustomerContext.Provider value={value}>{children}</CustomerContext.Provider>
 }
-AppStateProvider.propTypes = {
+CustomerProvider.propTypes = {
     children: PropTypes.node.isRequired
 }

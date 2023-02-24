@@ -29,7 +29,7 @@ import {
     useShopperLoginHelper,
     ShopperLoginHelpers
 } from 'commerce-sdk-react-preview'
-import {useAppState} from '../../hooks/use-app-state'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the
@@ -39,7 +39,7 @@ import {useAppState} from '../../hooks/use-app-state'
  */
 // eslint-disable-next-line react/prop-types
 const Skeleton = ({children, height, width, ...rest}) => {
-    const {customer = {}} = useAppState()
+    const customer = useCurrentCustomer()
     const {isRegistered} = customer
     const size = !isRegistered
         ? {
@@ -57,7 +57,7 @@ const Skeleton = ({children, height, width, ...rest}) => {
 const ProfileCard = () => {
     const {formatMessage} = useIntl()
 
-    const {customer = {}} = useAppState()
+    const customer = useCurrentCustomer()
     const {isRegistered, customerId} = customer
 
     const updateCustomerAction = useShopperCustomersMutation({action: 'updateCustomer'})
@@ -220,7 +220,7 @@ const ProfileCard = () => {
 const PasswordCard = () => {
     const {formatMessage} = useIntl()
 
-    const {customer = {}} = useAppState()
+    const customer = useCurrentCustomer()
     const {isRegistered, customerId} = customer
 
     const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
