@@ -34,7 +34,7 @@ import {useEffect} from 'react'
  * @param {number} props.smCarouselSlidesToDisplay - Number of children that will be rendered in view on "sm" screens.
  * @param {number} props.mdCarouselSlidesToDisplay - Number of children that will be rendered in view on "md" screens.
  * @param {Object []} props.region - The regions passed internally to this component by the `commerce-sdk-react` Page component.
- * @returns {React.ReactElement} - Crousel component.
+ * @returns {React.ReactElement} - Carousel component.
  */
 export const Carousel = (props = {}) => {
     const scrollRef = useRef()
