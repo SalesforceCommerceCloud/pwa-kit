@@ -26,7 +26,7 @@ import {useEffect} from 'react'
  * @param {PageProps} props
  * @param {string} props.textHeading - Heading text for the carousel.
  * @param {boolean} props.xsCarouselIndicators - Show/Hide carousel indecators/pips on "xs" screens.
- * @param {boolean} props.smCarouselIndicators - Show/Hide carousel indecators/pips on "sm" screens.
+ * @param {boolean} props.smCarouselIndicators - Show/Hide carousel indicators/pips on "sm" screens.
  * @param {boolean} props.mdCarouselIndicators - Show/Hide carousel indicators/pips on "md" screens.
  * @param {boolean} props.xsCarouselControls - Show/Hide carousel forward/back controls on "xs" screens.
  * @param {boolean} props.smCarouselControls - Show/Hide carousel forward/back controls on "sm" screens.
