@@ -126,20 +126,20 @@ test('renders a product set properly - parent item', () => {
     // NOTE: there can be duplicates of the same element, due to mobile and desktop views
     // (they're hidden with display:none style)
 
+    const startingAtLabel = screen.getAllByText(/starting at/i)[0]
+    const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
+    const addSetToWishlistButton = screen.getAllByRole('button', {name: /add set to wishlist/i})[0]
+    const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
+    const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
+
     // What should exist:
-    expect(screen.getAllByText(/starting at/i)[0]).toBeInTheDocument()
-    expect(screen.getAllByRole('button', {name: /add set to cart/i})[0]).toBeInTheDocument()
-    expect(screen.getAllByRole('button', {name: /add set to wishlist/i})[0]).toBeInTheDocument()
+    expect(startingAtLabel).toBeInTheDocument()
+    expect(addSetToCartButton).toBeInTheDocument()
+    expect(addSetToWishlistButton).toBeInTheDocument()
 
     // What should _not_ exist:
-    // sizes and colours options
-    expect(screen.queryAllByRole('radiogroup').length).toEqual(0)
-    // quantity picker
-    expect(
-        screen.queryByRole('spinbutton', {
-            name: /quantity:/i
-        })
-    ).toBe(null)
+    expect(variationAttributes.length).toEqual(0)
+    expect(quantityPicker).toBe(null)
 })
 
 test('renders a product set properly - child item', () => {
@@ -151,62 +151,60 @@ test('renders a product set properly - child item', () => {
     // NOTE: there can be duplicates of the same element, due to mobile and desktop views
     // (they're hidden with display:none style)
 
+    const addToCartButton = screen.getAllByRole('button', {name: /add to cart/i})[0]
+    const addToWishlistButton = screen.getAllByRole('button', {name: /add to wishlist/i})[0]
+    const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
+    const quantityPicker = screen.getByRole('spinbutton', {name: /quantity:/i})
+    const startingAtLabels = screen.queryAllByText(/starting at/i)
+
     // What should exist:
-    expect(screen.getAllByRole('button', {name: /add to cart/i})[0]).toBeInTheDocument()
-    expect(screen.getAllByRole('button', {name: /add to wishlist/i})[0]).toBeInTheDocument()
-    // sizes and colours options
-    expect(screen.getAllByRole('radiogroup').length).toEqual(2)
-    // quantity picker
-    expect(
-        screen.getByRole('spinbutton', {
-            name: /quantity:/i
-        })
-    ).toBeInTheDocument()
+    expect(addToCartButton).toBeInTheDocument()
+    expect(addToWishlistButton).toBeInTheDocument()
+    expect(variationAttributes.length).toEqual(2)
+    expect(quantityPicker).toBeInTheDocument()
 
     // What should _not_ exist:
-    expect(screen.queryAllByText(/starting at/i).length).toEqual(0)
+    expect(startingAtLabels.length).toEqual(0)
 })
 
 test('validateOrderability callback is called when adding a set to cart', async () => {
     const parent = mockProductSet
-    const fn = jest.fn()
+    const validateOrderability = jest.fn()
 
     renderWithProviders(
         <MockComponent
             product={parent}
-            validateOrderability={fn}
+            validateOrderability={validateOrderability}
             addToCart={() => {}}
             addToWishlist={() => {}}
         />
     )
 
     const button = screen.getByRole('button', {name: /add set to cart/i})
-    expect(button).toBeInTheDocument()
     userEvent.click(button)
 
     await waitFor(() => {
-        expect(fn).toHaveBeenCalledTimes(1)
+        expect(validateOrderability).toHaveBeenCalledTimes(1)
     })
 })
 
 test('onVariantSelected callback is called after successfully selected a variant', async () => {
-    const fn = jest.fn()
+    const onVariantSelected = jest.fn()
     const child = mockProductSet.setProducts[0]
 
     renderWithProviders(
         <MockComponent
             product={child}
-            onVariantSelected={fn}
+            onVariantSelected={onVariantSelected}
             addToCart={() => {}}
             addToWishlist={() => {}}
         />
     )
 
     const size = screen.getByRole('link', {name: /xl/i})
-    expect(size).toBeInTheDocument()
     userEvent.click(size)
 
     await waitFor(() => {
-        expect(fn).toHaveBeenCalledTimes(1)
+        expect(onVariantSelected).toHaveBeenCalledTimes(1)
     })
 })
