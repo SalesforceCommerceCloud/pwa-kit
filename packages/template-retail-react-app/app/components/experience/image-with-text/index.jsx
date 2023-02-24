@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Image, Link, Text} from '@chakra-ui/react'
-import DOMPurify from 'dompurify'
 
 /**
  * Image with text component
@@ -22,14 +21,6 @@ import DOMPurify from 'dompurify'
  */
 const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     const hasCaption = ITCText || heading
-    const [sanitizedHtml, setSainitizedHtml] = useState(null)
-
-    useEffect(() => {
-        const purify = DOMPurify(window)
-        const cleanHeading = purify.sanitize(heading)
-        const cleanITCText = purify.sanitize(ITCText)
-        setSainitizedHtml({heading: cleanHeading, ITCText: cleanITCText})
-    }, [])
 
     return (
         <Box className={'image-with-text'}>
@@ -69,9 +60,11 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                                     className={'image-with-text-heading-text'}
                                     color={'white'}
                                 >
+                                    {/* The `dangerouslySetInnerHTML` is safe to use in this context. */}
+                                    {/* The HTML in the response from Page Designer API is already sanitized. */}
                                     <Box
                                         dangerouslySetInnerHTML={{
-                                            __html: sanitizedHtml?.heading
+                                            __html: heading
                                         }}
                                         sx={{
                                             p: {
@@ -87,9 +80,11 @@ const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                         {ITCText && (
                             <Box>
                                 <Text as="span" className={'image-with-text-text-underneath'}>
+                                    {/* The `dangerouslySetInnerHTML` is safe to use in this context. */}
+                                    {/* The HTML in the response from Page Designer API is already sanitized. */}
                                     <Box
                                         dangerouslySetInnerHTML={{
-                                            __html: sanitizedHtml?.ITCText
+                                            __html: ITCText
                                         }}
                                         sx={{
                                             p: {
