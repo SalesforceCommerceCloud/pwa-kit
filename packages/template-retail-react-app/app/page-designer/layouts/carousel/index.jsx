@@ -15,8 +15,8 @@ import {
     useBreakpoint,
     useBreakpointValue
 } from '@chakra-ui/react'
-import {Component} from '../../component'
-import {ChevronLeftIcon, ChevronRightIcon} from '../../../icons'
+import {Component} from '../../core'
+import {ChevronLeftIcon, ChevronRightIcon} from '../../../components/icons'
 import {useEffect} from 'react'
 
 /**
