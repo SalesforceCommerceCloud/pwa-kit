@@ -95,7 +95,7 @@ export const Carousel = (props = {}) => {
     // Our indicator implementation uses the scrollbar to show the context of the current
     // item selected. Because MacOS hides scroll bars after they come to rest we need to
     // force them to show. Please note that this feature only works on web-kit browsers,
-    // for all other brosers the scroller/indicator will be shown.
+    // for all other browsers the scroller/indicator will be shown.
     const style = {
         '.scroll-indicator::-webkit-scrollbar': {
             display: overflowXScrollValue,
