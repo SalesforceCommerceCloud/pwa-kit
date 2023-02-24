@@ -25,16 +25,16 @@ import {useEffect} from 'react'
  *
  * @param {PageProps} props
  * @param {string} props.textHeading - Heading text for the carousel.
- * @param {boolean} props.xsCarouselIndicators - Show/Hide carousel indecators/pips on "xs" screens.
- * @param {boolean} props.smCarouselIndicators - Show/Hide carousel indecators/pips on "sm" screens.
- * @param {boolean} props.mdCarouselIndicators - Show/Hide carousel indecators/pips on "md" screens.
+ * @param {boolean} props.xsCarouselIndicators - Show/Hide carousel indicators/pips on "xs" screens.
+ * @param {boolean} props.smCarouselIndicators - Show/Hide carousel indicators/pips on "sm" screens.
+ * @param {boolean} props.mdCarouselIndicators - Show/Hide carousel indicators/pips on "md" screens.
  * @param {boolean} props.xsCarouselControls - Show/Hide carousel forward/back controls on "xs" screens.
  * @param {boolean} props.smCarouselControls - Show/Hide carousel forward/back controls on "sm" screens.
  * @param {number} props.xsCarouselSlidesToDisplay - Number of children that will be rendered in view on "xs" screens.
  * @param {number} props.smCarouselSlidesToDisplay - Number of children that will be rendered in view on "sm" screens.
  * @param {number} props.mdCarouselSlidesToDisplay - Number of children that will be rendered in view on "md" screens.
  * @param {Object []} props.region - The regions passed internally to this component by the `commerce-sdk-react` Page component.
- * @returns {React.ReactElement} - Crousel component.
+ * @returns {React.ReactElement} - Carousel component.
  */
 export const Carousel = (props = {}) => {
     const scrollRef = useRef()
@@ -95,7 +95,7 @@ export const Carousel = (props = {}) => {
     // Our indicator implementation uses the scrollbar to show the context of the current
     // item selected. Because MacOS hides scroll bars after they come to rest we need to
     // force them to show. Please note that this feature only works on web-kit browsers,
-    // for all other brosers the scroller/indicator will be shown.
+    // for all other browsers the scroller/indicator will be shown.
     const style = {
         '.scroll-indicator::-webkit-scrollbar': {
             display: overflowXScrollValue,
