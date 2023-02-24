@@ -8,7 +8,8 @@ import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {mergeOptions, pick} from '../utils'
+import {mergeOptions} from '../utils'
+import * as queryKeyHelpers from './queryKeyHelpers'
 
 type Client = ApiClients['shopperLogin']
 
@@ -26,21 +27,14 @@ export const useCredQualityUserInfo = (
     type Options = Argument<Client['retrieveCredQualityUserInfo']>
     type Data = DataType<Client['retrieveCredQualityUserInfo']>
     const {shopperLogin: client} = useCommerceApi()
-    const method = async (options: Options) => await client.retrieveCredQualityUserInfo(options)
+    const methodName = 'retrieveCredQualityUserInfo'
     const requiredParameters = ['organizationId', 'username'] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/cred-qual/user',
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -64,21 +58,14 @@ export const useUserInfo = (
     type Options = Argument<Client['getUserInfo']>
     type Data = DataType<Client['getUserInfo']>
     const {shopperLogin: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getUserInfo(options)
+    const methodName = 'getUserInfo'
     const requiredParameters = ['organizationId'] as const
-    const allParameters = [...requiredParameters, 'channel_id'] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/oauth2/userinfo',
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -102,21 +89,14 @@ export const useWellknownOpenidConfiguration = (
     type Options = Argument<Client['getWellknownOpenidConfiguration']>
     type Data = DataType<Client['getWellknownOpenidConfiguration']>
     const {shopperLogin: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getWellknownOpenidConfiguration(options)
+    const methodName = 'getWellknownOpenidConfiguration'
     const requiredParameters = ['organizationId'] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/oauth2/.well-known/openid-configuration',
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -140,21 +120,14 @@ export const useJwksUri = (
     type Options = Argument<Client['getJwksUri']>
     type Data = DataType<Client['getJwksUri']>
     const {shopperLogin: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getJwksUri(options)
+    const methodName = 'getJwksUri'
     const requiredParameters = ['organizationId'] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/oauth2/jwks',
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.

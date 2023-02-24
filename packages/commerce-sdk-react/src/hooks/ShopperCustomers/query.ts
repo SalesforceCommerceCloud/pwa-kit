@@ -8,7 +8,8 @@ import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {mergeOptions, pick} from '../utils'
+import {mergeOptions} from '../utils'
+import * as queryKeyHelpers from './queryKeyHelpers'
 
 type Client = ApiClients['shopperCustomers']
 
@@ -26,26 +27,19 @@ export const useExternalProfile = (
     type Options = Argument<Client['getExternalProfile']>
     type Data = DataType<Client['getExternalProfile']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getExternalProfile(options)
+    const methodName = 'getExternalProfile'
     const requiredParameters = [
         'organizationId',
         'externalId',
         'authenticationProviderId',
         'siteId'
     ] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/customers/external-profile',
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -69,22 +63,14 @@ export const useCustomer = (
     type Options = Argument<Client['getCustomer']>
     type Data = DataType<Client['getCustomer']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getCustomer(options)
+    const methodName = 'getCustomer'
     const requiredParameters = ['organizationId', 'customerId', 'siteId'] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/customers/',
-        parameters.customerId,
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -108,24 +94,14 @@ export const useCustomerAddress = (
     type Options = Argument<Client['getCustomerAddress']>
     type Data = DataType<Client['getCustomerAddress']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getCustomerAddress(options)
+    const methodName = 'getCustomerAddress'
     const requiredParameters = ['organizationId', 'customerId', 'addressName', 'siteId'] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/customers/',
-        parameters.customerId,
-        '/addresses/',
-        parameters.addressName,
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -149,23 +125,14 @@ export const useCustomerBaskets = (
     type Options = Argument<Client['getCustomerBaskets']>
     type Data = DataType<Client['getCustomerBaskets']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getCustomerBaskets(options)
+    const methodName = 'getCustomerBaskets'
     const requiredParameters = ['organizationId', 'customerId', 'siteId'] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/customers/',
-        parameters.customerId,
-        '/baskets',
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -189,32 +156,14 @@ export const useCustomerOrders = (
     type Options = Argument<Client['getCustomerOrders']>
     type Data = DataType<Client['getCustomerOrders']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getCustomerOrders(options)
+    const methodName = 'getCustomerOrders'
     const requiredParameters = ['organizationId', 'customerId', 'siteId'] as const
-    const allParameters = [
-        ...requiredParameters,
-        'crossSites',
-        'from',
-        'until',
-        'status',
 
-        'offset',
-        'limit'
-    ] as const
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/customers/',
-        parameters.customerId,
-        '/orders',
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -238,29 +187,19 @@ export const useCustomerPaymentInstrument = (
     type Options = Argument<Client['getCustomerPaymentInstrument']>
     type Data = DataType<Client['getCustomerPaymentInstrument']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getCustomerPaymentInstrument(options)
+    const methodName = 'getCustomerPaymentInstrument'
     const requiredParameters = [
         'organizationId',
         'customerId',
         'paymentInstrumentId',
         'siteId'
     ] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/customers/',
-        parameters.customerId,
-        '/payment-instruments/',
-        parameters.paymentInstrumentId,
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -284,23 +223,14 @@ export const useCustomerProductLists = (
     type Options = Argument<Client['getCustomerProductLists']>
     type Data = DataType<Client['getCustomerProductLists']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getCustomerProductLists(options)
+    const methodName = 'getCustomerProductLists'
     const requiredParameters = ['organizationId', 'customerId', 'siteId'] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/customers/',
-        parameters.customerId,
-        '/product-lists',
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -324,24 +254,14 @@ export const useCustomerProductList = (
     type Options = Argument<Client['getCustomerProductList']>
     type Data = DataType<Client['getCustomerProductList']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getCustomerProductList(options)
+    const methodName = 'getCustomerProductList'
     const requiredParameters = ['organizationId', 'customerId', 'listId', 'siteId'] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/customers/',
-        parameters.customerId,
-        '/product-lists/',
-        parameters.listId,
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -365,7 +285,7 @@ export const useCustomerProductListItem = (
     type Options = Argument<Client['getCustomerProductListItem']>
     type Data = DataType<Client['getCustomerProductListItem']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getCustomerProductListItem(options)
+    const methodName = 'getCustomerProductListItem'
     const requiredParameters = [
         'organizationId',
         'customerId',
@@ -373,24 +293,12 @@ export const useCustomerProductListItem = (
         'itemId',
         'siteId'
     ] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/customers/',
-        parameters.customerId,
-        '/product-lists/',
-        parameters.listId,
-        '/items/',
-        parameters.itemId,
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -414,22 +322,14 @@ export const usePublicProductListsBySearchTerm = (
     type Options = Argument<Client['getPublicProductListsBySearchTerm']>
     type Data = DataType<Client['getPublicProductListsBySearchTerm']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) =>
-        await client.getPublicProductListsBySearchTerm(options)
+    const methodName = 'getPublicProductListsBySearchTerm'
     const requiredParameters = ['organizationId', 'siteId'] as const
-    const allParameters = [...requiredParameters, 'email', 'firstName', 'lastName'] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/product-lists',
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -453,22 +353,14 @@ export const usePublicProductList = (
     type Options = Argument<Client['getPublicProductList']>
     type Data = DataType<Client['getPublicProductList']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getPublicProductList(options)
+    const methodName = 'getPublicProductList'
     const requiredParameters = ['organizationId', 'listId', 'siteId'] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/product-lists/',
-        parameters.listId,
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -492,24 +384,14 @@ export const useProductListItem = (
     type Options = Argument<Client['getProductListItem']>
     type Data = DataType<Client['getProductListItem']>
     const {shopperCustomers: client} = useCommerceApi()
-    const method = async (options: Options) => await client.getProductListItem(options)
+    const methodName = 'getProductListItem'
     const requiredParameters = ['organizationId', 'listId', 'itemId', 'siteId'] as const
-    const allParameters = [...requiredParameters] as const
+
     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
     // to generate the correct query key.
     const netOptions = mergeOptions(client, apiOptions)
-    // `client.clientConfig` can have parameters that are not relevant to this endpoint, so we must
-    // exclude them when generating the query key.
-    const parameters = pick(netOptions.parameters, allParameters)
-    const queryKey = [
-        '/organizations/',
-        parameters.organizationId,
-        '/product-lists/',
-        parameters.listId,
-        '/items/',
-        parameters.itemId,
-        parameters
-    ] as const
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.

@@ -39,8 +39,14 @@ type StringIndexNever<T> = {
     [K in keyof T]: string extends K ? never : T[K]
 }
 
-/** Removes a string index type */
+/** Removes a string index type. */
 export type RemoveStringIndex<T> = RemoveNeverValues<StringIndexNever<T>>
+
+/** Remove the last entry from a readonly tuple type. */
+export type ExcludeTail<T extends readonly unknown[]> = T extends readonly [...infer Head, unknown]
+    ? Readonly<Head>
+    : // If it's a plain array, rather than a tuple, then removing the last element has no effect
+      T
 
 // --- API CLIENTS --- //
 export type ApiParameter = string | number | boolean | string[] | number[]
