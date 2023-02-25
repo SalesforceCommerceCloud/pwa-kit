@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, withPageProvider} from '../../../../utils/test-utils'
+import {renderWithProviders, withPageProvider} from '../../../utils/test-utils'
 import MobileGrid1r1c from './index'
 
 test('MobileGrid1r1c renders without errors', () => {

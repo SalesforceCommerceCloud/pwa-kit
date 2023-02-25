@@ -19,7 +19,7 @@ import {Box, Image, Link, Text} from '@chakra-ui/react'
  * @param {string} - props.alt - The image alt text shown by the component.
  * @returns {React.ReactElement} - ImageWithText component.
  */
-const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
+export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     const hasCaption = ITCText || heading
 
     return (
