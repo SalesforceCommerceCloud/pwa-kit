@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {act} from '@testing-library/react'
+import {act, waitFor} from '@testing-library/react'
 import nock from 'nock'
 import {
     assertInvalidateQuery,
@@ -146,6 +146,7 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
                             newBasket
                         )
                         mockRelatedQueries()
+                        jest.spyOn(console, 'warn').mockImplementationOnce(jest.fn())
 
                         const {result, waitForValueToChange} = renderHookWithProviders(() => {
                             const action = mutationName as ShopperBasketsMutationType
@@ -201,19 +202,19 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
                     name: 'error',
                     assertions: async () => {
                         mockMutationEndpoints('/checkout/shopper-baskets/', {errorResponse: 500})
-
+                        jest.spyOn(console, 'warn').mockImplementationOnce(jest.fn())
                         const {result, waitForNextUpdate} = renderHookWithProviders(() => {
                             const action = mutationName as ShopperBasketsMutationType
                             return useShopperBasketsMutation({action})
                         })
 
-                        act(() => {
-                            result.current.mutate(payload)
-                        })
+                        await result.current.mutate(payload)
 
                         await waitForNextUpdate()
 
-                        expect(result.current.error).toBeDefined()
+                        await waitFor(() => {
+                            expect(result.current.error).toBeDefined()
+                        })
                     }
                 }
             ]
@@ -221,13 +222,13 @@ const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).ma
     }
 )
 
-tests.forEach(({hook, cases}) => {
+tests.forEach(async ({hook, cases}) => {
     describe(hook, () => {
         beforeEach(() => {
             jest.clearAllMocks()
         })
-        cases.forEach(({name, assertions}) => {
-            test(name, assertions)
+        cases.forEach(async ({name, assertions}) => {
+            await test(name, assertions)
         })
     })
 })

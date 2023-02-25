@@ -38,6 +38,7 @@ const TEST_COMPONENTS = {
 }
 
 test('Page throws if used outside of a Page component', () => {
+    jest.spyOn(console, 'warn').mockImplementationOnce(jest.fn())
     expect(() => render(<Component component={SAMPLE_COMPONENT} />)).toThrow()
 })
 

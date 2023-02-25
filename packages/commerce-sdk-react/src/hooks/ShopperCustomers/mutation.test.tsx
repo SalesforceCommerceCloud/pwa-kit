@@ -121,149 +121,147 @@ const CustomerMutationComponent = ({action}: CustomerMutationComponentParams) =>
     )
 }
 
-const tests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[]).map(
-    (mutationName) => {
-        return {
-            hook: mutationName,
-            cases: [
-                {
-                    name: 'success',
-                    assertions: async () => {
-                        nock(DEFAULT_TEST_HOST)
-                            .patch((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(200, {})
-                            .put((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(200, {})
-                            .post((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(200, {})
-                            .delete((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(204, {})
+const getMutationTest = (mutationName) => {
+    return [
+        {
+            name: `${mutationName} success`,
+            assertions: async () => {
+                nock(DEFAULT_TEST_HOST)
+                    .patch((uri) => {
+                        return uri.includes('/customer/shopper-customers/')
+                    })
+                    .reply(200, {})
+                    .put((uri) => {
+                        return uri.includes('/customer/shopper-customers/')
+                    })
+                    .reply(200, {})
+                    .post((uri) => {
+                        return uri.includes('/customer/shopper-customers/')
+                    })
+                    .reply(200, {})
+                    .delete((uri) => {
+                        return uri.includes('/customer/shopper-customers/')
+                    })
+                    .reply(204, {})
 
-                        const queryClient = createQueryClient()
+                const queryClient = createQueryClient()
 
-                        renderWithProviders(
-                            <CustomerMutationComponent
-                                action={mutationName as ShopperCustomersMutationType}
-                            />,
-                            {
-                                queryClient
-                            }
-                        )
-                        await waitFor(() =>
-                            screen.getByRole('button', {
-                                name: mutationName
-                            })
-                        )
-
-                        const mutation: any = shopperCustomersCacheUpdateMatrix[mutationName]
-
-                        // Pre-populate cache with query keys we invalidate/update/remove onSuccess
-                        const {invalidate, update, remove} = mutation(
-                            mutationPayloads[mutationName],
-                            {}
-                        )
-
-                        const queryKeys = [
-                            ...(invalidate || []),
-                            ...(update || []),
-                            ...(remove || [])
-                        ]
-
-                        queryKeys.forEach(({key: queryKey}: QueryKeyMap) => {
-                            queryClient.setQueryData(queryKey, () => ({test: true}))
-                        })
-
-                        const button = screen.getByRole('button', {
-                            name: mutationName
-                        })
-
-                        fireEvent.click(button)
-                        await waitFor(() => screen.getByText(/isSuccess/i))
-                        expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
-
-                        // Assert changes in cache
-                        update?.forEach(({key: queryKey}: QueryKeyMap) => {
-                            expect(queryClient.getQueryData(queryKey)).not.toEqual({test: true})
-                        })
-                        invalidate?.forEach(({key: queryKey}: QueryKeyMap) => {
-                            expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
-                        })
-                        remove?.forEach(({key: queryKey}: QueryKeyMap) => {
-                            expect(queryClient.getQueryState(queryKey)).toBeFalsy()
-                        })
+                renderWithProviders(
+                    <CustomerMutationComponent
+                        action={mutationName as ShopperCustomersMutationType}
+                    />,
+                    {
+                        queryClient
                     }
-                },
-                {
-                    name: 'error',
-                    assertions: async () => {
-                        nock(DEFAULT_TEST_HOST)
-                            .patch((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(500, {})
-                            .put((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(500, {})
-                            .post((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(500, {})
-                            .delete((uri) => {
-                                return uri.includes('/customer/shopper-customers/')
-                            })
-                            .reply(500, {})
+                )
+                await waitFor(() =>
+                    screen.getByRole('button', {
+                        name: mutationName
+                    })
+                )
 
-                        renderWithProviders(
-                            <CustomerMutationComponent
-                                action={mutationName as ShopperCustomersMutationType}
-                            />
-                        )
-                        await waitFor(() =>
-                            screen.getByRole('button', {
-                                name: mutationName
-                            })
-                        )
+                const mutation: any = shopperCustomersCacheUpdateMatrix[mutationName]
 
-                        const button = screen.getByRole('button', {
-                            name: mutationName
-                        })
+                // Pre-populate cache with query keys we invalidate/update/remove onSuccess
+                const {invalidate, update, remove} = mutation(mutationPayloads[mutationName], {})
 
-                        fireEvent.click(button)
-                        await waitFor(() => screen.getByText(/error/i))
-                        expect(screen.getByText(/error/i)).toBeInTheDocument()
-                    }
-                }
-            ]
+                const queryKeys = [...(invalidate || []), ...(update || []), ...(remove || [])]
+
+                queryKeys.forEach(({key: queryKey}: QueryKeyMap) => {
+                    queryClient.setQueryData(queryKey, () => ({test: true}))
+                })
+
+                const button = screen.getByRole('button', {
+                    name: mutationName
+                })
+
+                fireEvent.click(button)
+                await waitFor(() => screen.getByText(/isSuccess/i))
+                expect(screen.getByText(/isSuccess/i)).toBeInTheDocument()
+
+                // Assert changes in cache
+                update?.forEach(({key: queryKey}: QueryKeyMap) => {
+                    expect(queryClient.getQueryData(queryKey)).not.toEqual({test: true})
+                })
+                invalidate?.forEach(({key: queryKey}: QueryKeyMap) => {
+                    expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBeTruthy()
+                })
+                remove?.forEach(({key: queryKey}: QueryKeyMap) => {
+                    expect(queryClient.getQueryState(queryKey)).toBeFalsy()
+                })
+            }
+        },
+        {
+            name: `${mutationName} error`,
+            assertions: async () => {
+                const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+                nock(DEFAULT_TEST_HOST)
+                    .on('error', (err) => {
+                        // NOTE: nock does not throw console.errors but we want to assert against
+                        // console errors as well as swallow them to prevent noisy console test runs
+
+                        console.error(err)
+                    })
+                    .patch((uri) => {
+                        return uri.includes('/customer/shopper-customers/')
+                    })
+                    .reply(500, 'INTENTIONAL ERR!')
+                    .put((uri) => {
+                        return uri.includes('/customer/shopper-customers/')
+                    })
+                    .reply(500, 'INTENTIONAL ERR!')
+                    .post((uri) => {
+                        return uri.includes('/customer/shopper-customers/')
+                    })
+                    .reply(500, 'INTENTIONAL ERR!')
+                    .delete((uri) => {
+                        return uri.includes('/customer/shopper-customers/')
+                    })
+                    .reply(500, 'INTENTIONAL ERR!')
+
+                renderWithProviders(
+                    <CustomerMutationComponent
+                        action={mutationName as ShopperCustomersMutationType}
+                    />
+                )
+                await waitFor(() =>
+                    screen.getByRole('button', {
+                        name: mutationName
+                    })
+                )
+
+                const button = screen.getByRole('button', {
+                    name: mutationName
+                })
+
+                fireEvent.click(button)
+                await waitFor(() => expect(screen.getByText(/error/i)).toBeInTheDocument())
+                await waitFor(() => {
+                    expect(error).toHaveBeenCalled()
+                    error.mockReset()
+                })
+            }
         }
-    }
-)
+    ]
+}
 
-tests.forEach(({hook, cases}) => {
-    describe(hook, () => {
-        beforeEach(() => {
-            jest.clearAllMocks()
-        })
-        cases.forEach(({name, assertions}) => {
-            test(name, assertions)
-        })
-    })
+const mutationTests = (Object.keys(mutationPayloads) as ShopperCustomersMutationType[])
+    ?.map((mutationPayload) => getMutationTest(mutationPayload))
+    .flatMap((test) => test)
+
+test.each(mutationTests?.map((mutation) => mutation.name))(`%p`, async (name) => {
+    const assertions = mutationTests.filter((test) => test.name === name)?.[0]?.assertions
+    await assertions()
 })
 
 test.each(SHOPPER_CUSTOMERS_NOT_IMPLEMENTED)(
     '%j - throws error when not implemented',
-    (methodName) => {
+    async (methodName) => {
         const action = methodName as ShopperCustomersMutationType
-        expect(() => {
-            useShopperCustomersMutation({action})
-        }).toThrowError('This method is not implemented.')
+        await waitFor(() => {
+            expect(() => {
+                useShopperCustomersMutation({action})
+            }).toThrowError('This method is not implemented.')
+        })
     }
 )
