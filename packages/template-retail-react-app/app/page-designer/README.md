@@ -23,7 +23,7 @@ The `Page Desginer` folder is broken down into 3 main sub-folders:
 
 ## Sample Usage
 
-Below is a sample page that you can use in your _retail react app_ to visualize pages that have created in business manager.
+Below is a sample page that you can use as a starting point in your _retail react app_ to visualize pages that have created in business manager. After starting the dev server you can access the page viewer using the following url `http://localhost:3000/page-viewer/homepage-example`. _Note: "homepage-example is a sample page designer page that is included with all Business Manager backends, if you want to view another page you created, please use that id instead._
 
 ```
 // app/pages/page-viewer/index.jsx
@@ -65,6 +65,8 @@ const PageViewer = ({page}) => {
 
 PageViewer.getProps = async ({api, params}) => {
     const {pageId} = params
+
+    // Note: There is no error and 404 handling in this example, if you chose to use this code you will have to add that on your own.
     const page = await api.shopperExperience.getPage({
         parameters: {pageId}
     })
