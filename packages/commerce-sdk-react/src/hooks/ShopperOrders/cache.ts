@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {getCustomerBaskets} from '../ShopperCustomers/queryKeyHelpers'
 import {ApiClients, CacheUpdateMatrix, CacheUpdateUpdate, CacheUpdateInvalidate} from '../types'
-import {and, matchesApiConfig, matchesPath} from '../utils'
+import {getOrder} from './queryKeyHelpers'
 
 type Client = ApiClients['shopperOrders']
 
@@ -22,28 +23,17 @@ const TODO = (method: keyof Client) => {
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     createOrder(customerId, {parameters}, response) {
-        const update: CacheUpdateUpdate<unknown>[] = !response.orderNo
+        const {orderNo} = response
+        const update: CacheUpdateUpdate<unknown>[] = !orderNo
             ? []
             : [
                   {
-                      queryKey: [
-                          ...basePath(parameters),
-                          '/orders/',
-                          response.orderNo,
-                          {...parameters, orderNo: response.orderNo}
-                      ]
+                      queryKey: getOrder.queryKey({...parameters, orderNo})
                   }
               ]
-
         const invalidate: CacheUpdateInvalidate[] = !customerId
             ? []
-            : [
-                  and(
-                      matchesApiConfig(parameters),
-                      matchesPath([...basePath(parameters), '/customers/', customerId, '/baskets'])
-                  )
-              ]
-
+            : [{queryKey: getCustomerBaskets.queryKey({...parameters, customerId})}]
         return {update, invalidate}
     },
     createPaymentInstrumentForOrder: TODO('createPaymentInstrumentForOrder'),

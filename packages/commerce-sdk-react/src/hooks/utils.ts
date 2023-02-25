@@ -9,8 +9,16 @@ import {ApiClient, ApiOptions, ApiParameter, CacheUpdate, MergedOptions} from '.
 
 /** Applies the set of cache updates to the query client. */
 export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate, data: unknown) => {
-    cacheUpdates.invalidate?.forEach((predicate) => queryClient.invalidateQueries({predicate}))
-    cacheUpdates.remove?.forEach((predicate) => queryClient.removeQueries({predicate}))
+    cacheUpdates.invalidate?.forEach((invalidate) => {
+        // TODO: Update Shopper Baskets cache logic to not use predicate functions, and then this
+        // check will no longer be needed. (Same for the remove block.)
+        const filters = typeof invalidate === 'function' ? {predicate: invalidate} : invalidate
+        queryClient.invalidateQueries(filters)
+    })
+    cacheUpdates.remove?.forEach((remove) => {
+        const filters = typeof remove === 'function' ? {predicate: remove} : remove
+        queryClient.removeQueries(filters)
+    })
     cacheUpdates.update?.forEach(({queryKey, updater}) =>
         // If an updater isn't given, fall back to just setting the data
         queryClient.setQueryData(queryKey, updater ?? data)

@@ -4,8 +4,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClientConfigParams, ApiClients, CacheUpdateMatrix} from '../types'
-import {and, matchesApiConfig, matchesPath, pathStartsWith} from '../utils'
+import {getCustomerProductListItem, QueryKeys} from './queryKeyHelpers'
+import {ApiClients, CacheUpdate, CacheUpdateMatrix, Tail} from '../types'
+import {
+    getCustomer,
+    getCustomerAddress,
+    getCustomerPaymentInstrument,
+    getCustomerProductList,
+    getCustomerProductLists
+} from './queryKeyHelpers'
 
 type Client = ApiClients['shopperCustomers']
 
@@ -15,139 +22,73 @@ const TODO = (method: keyof Client) => {
     console.warn(`Cache logic for '${method}' is not yet implemented.`)
     return undefined
 }
-// Path helpers (avoid subtle typos!)
-const getCustomerPath = (customerId: string, parameters: ApiClientConfigParams) => [
-    '/organizations/',
-    parameters.organizationId,
-    '/customers/',
-    customerId
-]
-const getProductListPath = (
-    customerId: string,
-    parameters: ApiClientConfigParams & {listId: string}
-) => [...getCustomerPath(customerId, parameters), '/product-lists/', parameters.listId]
-const getProductListItemPath = (
-    customerId: string,
-    parameters: ApiClientConfigParams & {listId: string; itemId: string}
-) => [...getProductListPath(customerId, parameters), '/items/', parameters.itemId]
-const getPaymentInstrumentPath = (
-    customerId: string,
-    parameters: ApiClientConfigParams & {paymentInstrumentId: string}
-) => [
-    ...getCustomerPath(customerId, parameters),
-    '/payment-instruments/',
-    parameters.paymentInstrumentId
-]
-const getCustomerAddressPath = (
-    customerId: string,
-    parameters: ApiClientConfigParams,
-    address: string // Not a parameter because some endpoints use addressId and some use addressName
-) => [...getCustomerPath(customerId, parameters), '/addresses/', address]
 
 /** Invalidates the customer endpoint, but not derivative endpoints. */
-const invalidateCustomer = (customerId: string, parameters: ApiClientConfigParams) => {
-    return {
-        invalidate: [
-            and(matchesApiConfig(parameters), matchesPath(getCustomerPath(customerId, parameters)))
-        ]
-    }
-}
+const invalidateCustomer = (parameters: Tail<QueryKeys['getCustomer']>): CacheUpdate => ({
+    invalidate: [{queryKey: getCustomer.queryKey(parameters)}]
+})
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     authorizeCustomer: TODO('authorizeCustomer'),
     authorizeTrustedSystem: TODO('authorizeTrustedSystem'),
     createCustomerAddress(customerId, {parameters}, response) {
-        if (!customerId) return {}
         // getCustomerAddress uses `addressName` rather than `addressId`
-        const address = response.addressId
-        const newParams = {...parameters, addressName: address}
+        const newParams = {...parameters, addressName: response.addressId}
         return {
-            ...invalidateCustomer(customerId, parameters),
-            update: [
-                {queryKey: [...getCustomerAddressPath(customerId, newParams, address), newParams]}
-            ]
+            // TODO: Rather than invalidate, can we selectively update?
+            ...invalidateCustomer(newParams),
+            update: [{queryKey: getCustomerAddress.queryKey(newParams)}]
         }
     },
     createCustomerPaymentInstrument(customerId, {parameters}, response) {
-        if (!customerId) return {}
         const newParams = {...parameters, paymentInstrumentId: response.paymentInstrumentId}
         return {
-            ...invalidateCustomer(customerId, parameters),
-            update: [{queryKey: [...getPaymentInstrumentPath(customerId, newParams), newParams]}]
+            // TODO: Rather than invalidate, can we selectively update?
+            ...invalidateCustomer(newParams),
+            update: [{queryKey: getCustomerPaymentInstrument.queryKey(newParams)}]
         }
     },
     createCustomerProductList(customerId, {parameters}, response) {
-        if (!customerId) return {}
-        const customerPath = getCustomerPath(customerId, parameters)
         // We always invalidate, because even without an ID we assume that something has changed
-        const invalidate = [
-            and(
-                matchesApiConfig(parameters),
-                // NOTE: This is the aggregate endpoint, so there's no trailing / on /product-lists
-                matchesPath([...customerPath, '/product-lists'])
-            )
+        // TODO: Rather than invalidate, can we selectively update?
+        const invalidate: CacheUpdate['invalidate'] = [
+            {queryKey: getCustomerProductLists.queryKey(parameters)}
         ]
+        // We can only update cache for this product list if we have the ID
         const listId = response.id
-        // We can only update cache for this product list if we get the ID
         if (!listId) return {invalidate}
-        const newParams = {...parameters, listId}
         return {
             invalidate,
-            update: [{queryKey: [...getProductListPath(customerId, newParams), newParams]}]
+            update: [{queryKey: getCustomerProductList.queryKey({...parameters, listId})}]
         }
     },
     createCustomerProductListItem(customerId, {parameters}, response) {
-        if (!customerId) return {}
+        // We always invalidate, because even without an ID we assume that something has changed
+        // TODO: Rather than invalidate, can we selectively update?
+        const invalidate: CacheUpdate['invalidate'] = [
+            {queryKey: getCustomerProductList.queryKey(parameters)}
+        ]
+        // We can only update cache for this product list item if we have the ID
         const itemId = response.id
+        if (!itemId) return {invalidate}
         return {
-            // We can only update cache if the response comes with an ID
-            update: !itemId
-                ? []
-                : [
-                      {
-                          queryKey: [
-                              ...getProductListItemPath(customerId, {...parameters, itemId}),
-                              {...parameters, itemId}
-                          ]
-                      }
-                  ],
-            // We always invalidate, because even without an ID we assume that something has changed
-            invalidate: [
-                and(
-                    matchesApiConfig(parameters),
-                    matchesPath(getProductListPath(customerId, parameters))
-                )
-            ]
+            invalidate,
+            update: [{queryKey: getCustomerProductListItem.queryKey({...parameters, itemId})}]
         }
     },
     deleteCustomerPaymentInstrument(customerId, {parameters}) {
-        if (!customerId) return {}
         return {
-            ...invalidateCustomer(customerId, parameters),
-            remove: [
-                and(
-                    matchesApiConfig(parameters),
-                    matchesPath(getPaymentInstrumentPath(customerId, parameters))
-                )
-            ]
+            // TODO: Rather than invalidate, can we selectively update?
+            ...invalidateCustomer(parameters),
+            remove: [{queryKey: getCustomerPaymentInstrument.queryKey(parameters)}]
         }
     },
     deleteCustomerProductList: TODO('deleteCustomerProductList'),
     deleteCustomerProductListItem(customerId, {parameters}) {
-        if (!customerId) return {}
         return {
-            invalidate: [
-                and(
-                    matchesApiConfig(parameters),
-                    matchesPath(getProductListPath(customerId, parameters))
-                )
-            ],
-            remove: [
-                and(
-                    matchesApiConfig(parameters),
-                    matchesPath(getProductListItemPath(customerId, parameters))
-                )
-            ]
+            // TODO: Rather than invalidate, can we selectively update?
+            invalidate: [{queryKey: getCustomerProductList.queryKey(parameters)}],
+            remove: [{queryKey: getCustomerProductListItem.queryKey(parameters)}]
         }
     },
     getResetPasswordToken: noop,
@@ -155,53 +96,35 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     registerCustomer: noop,
     registerExternalProfile: TODO('registerExternalProfile'),
     removeCustomerAddress(customerId, {parameters}) {
-        if (!customerId) return {}
         return {
-            ...invalidateCustomer(customerId, parameters),
-            remove: [
-                and(
-                    matchesApiConfig(parameters),
-                    matchesPath(
-                        getCustomerAddressPath(customerId, parameters, parameters.addressName)
-                    )
-                )
-            ]
+            // TODO: Rather than invalidate, can we selectively update?
+            ...invalidateCustomer(parameters),
+            remove: [{queryKey: getCustomerAddress.queryKey(parameters)}]
         }
     },
     resetPassword: noop,
     updateCustomer(customerId, {parameters}) {
-        if (!customerId) return {}
-        const customerPath = getCustomerPath(customerId, parameters)
         return {
-            update: [{queryKey: [...customerPath, parameters]}],
+            update: [{queryKey: getCustomer.queryKey(parameters)}],
             // This is NOT invalidateCustomer(), as we want to invalidate *all* customer endpoints,
             // not just getCustomer
-            invalidate: [and(matchesApiConfig(parameters), pathStartsWith(customerPath))]
+            invalidate: [{queryKey: getCustomer.path(parameters)}]
         }
     },
     updateCustomerAddress(customerId, {parameters}) {
-        if (!customerId) return {}
         return {
-            // TODO: Rather than invalidating customer, can we selectively update its `addresses`?
-            ...invalidateCustomer(customerId, parameters),
-            update: [
-                {
-                    queryKey: [
-                        ...getCustomerAddressPath(customerId, parameters, parameters.addressName),
-                        parameters
-                    ]
-                }
-            ]
+            // TODO: Rather than invalidate, can we selectively update?
+            ...invalidateCustomer(parameters),
+            update: [{queryKey: getCustomerAddress.queryKey(parameters)}]
         }
     },
     updateCustomerPassword: TODO('updateCustomerPassword'),
     updateCustomerProductList: TODO('updateCustomerProductList'),
     updateCustomerProductListItem(customerId, {parameters}) {
-        if (!customerId) return {}
-        const productListPath = getProductListPath(customerId, parameters)
         return {
-            update: [{queryKey: [...getProductListItemPath(customerId, parameters), parameters]}],
-            invalidate: [and(matchesApiConfig(parameters), matchesPath(productListPath))]
+            update: [{queryKey: getCustomerProductList.queryKey(parameters)}],
+            // TODO: Rather than invalidate, can we selectively update?
+            invalidate: [{queryKey: getCustomerProductListItem.queryKey(parameters)}]
         }
     }
 }

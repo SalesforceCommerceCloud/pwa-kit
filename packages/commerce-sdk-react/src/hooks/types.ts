@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {Query, Updater, UseQueryOptions} from '@tanstack/react-query'
+import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@tanstack/react-query'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -42,11 +42,17 @@ type StringIndexNever<T> = {
 /** Removes a string index type. */
 export type RemoveStringIndex<T> = RemoveNeverValues<StringIndexNever<T>>
 
-/** Remove the last entry from a readonly tuple type. */
+/** Gets the last element of an array. */
+export type Tail<T extends readonly unknown[]> = T extends [...head: unknown[], tail: infer Tail]
+    ? Tail
+    : T
+
+/** Remove the last entry from a tuple type. */
 export type ExcludeTail<T extends readonly unknown[]> = T extends readonly [...infer Head, unknown]
-    ? Readonly<Head>
-    : // If it's a plain array, rather than a tuple, then removing the last element has no effect
-      T
+    ? T extends unknown[] // Preserve mutable or readonly from the original array
+        ? Head
+        : Readonly<Head>
+    : T // If it's a plain array, rather than a tuple, then removing the last element has no effect
 
 // --- API CLIENTS --- //
 export type ApiParameter = string | number | boolean | string[] | number[]
@@ -149,10 +155,15 @@ export type CacheUpdateUpdate<T> = {
 }
 
 /** Query predicate for queries to invalidate */
-export type CacheUpdateInvalidate = (query: Query) => boolean
+export type CacheUpdateInvalidate =
+    | InvalidateQueryFilters
+    // TODO: Change Shopper Baskets cache logic from using predicates to creating query filters
+    // using the query key helpers, then this 'predicate' type can be removed, as can the one in
+    // `CacheUpdateRemove`. The predicate helpers in `utils.ts` should also then be removed.
+    | NonNullable<InvalidateQueryFilters['predicate']>
 
 /** Query predicate for queries to remove */
-export type CacheUpdateRemove = (query: Query) => boolean
+export type CacheUpdateRemove = QueryFilters | NonNullable<QueryFilters['predicate']>
 
 /** Collection of updates to make to the cache when a request completes. */
 export type CacheUpdate = {
