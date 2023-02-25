@@ -7,11 +7,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {SimpleGrid} from '@chakra-ui/react'
-import {Region} from '../../region'
-import {regionType} from '../../types'
+import {Region, regionType} from '../../core'
 
 /**
- * This layout component displays its children in a 1 x 1 grid on both mobile and desktop.
+ * This layout component displays its children in a 3 row x 1 column grid on mobile
+ * and 1 row x 3 column grid on desktop.
  *
  * @param {componentProps} props
  * @param {regionType []} props.regions - The page designer regions for this component.
@@ -19,19 +19,19 @@ import {regionType} from '../../types'
  * @param {string} props.typeId - A mapping of typeId's to react components representing the type.
  * @returns {React.ReactElement} - Grid component.
  */
-export const MobileGrid1r1c = ({regions}) => (
-    <SimpleGrid className="mobile-1r-1c" columns={1}>
+export const MobileGrid3r1c = ({regions}) => (
+    <SimpleGrid className="mobile-3r-1c" columns={{base: 1, sm: 3}}>
         {regions.map((region) => (
             <Region key={region.id} region={region} />
         ))}
     </SimpleGrid>
 )
 
-MobileGrid1r1c.displayName = 'MobileGrid1r1c'
+MobileGrid3r1c.displayName = 'MobileGrid3r1c'
 
-MobileGrid1r1c.propTypes = {
+MobileGrid3r1c.propTypes = {
     // Internally Provided
     regions: PropTypes.arrayOf(regionType).isRequired
 }
 
-export default MobileGrid1r1c
+export default MobileGrid3r1c

@@ -5,13 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, withPageProvider} from '../../../../utils/test-utils'
-import MobileGrid2r2c from './index'
+import {renderWithProviders, withPageProvider} from '../../../utils/test-utils'
+import MobileGrid3r1c from './index'
 
-test('MobileGrid2r2c renders without errors', () => {
-    const MobileGrid2r2cWithPageProvider = withPageProvider(MobileGrid2r2c)
+test('MobileGrid3r1c renders without errors', () => {
+    const MobileGrid3r1cWithPageProvider = withPageProvider(MobileGrid3r1c)
     renderWithProviders(
-        <MobileGrid2r2cWithPageProvider
+        <MobileGrid3r1cWithPageProvider
             regions={[
                 {
                     components: [
@@ -19,7 +19,7 @@ test('MobileGrid2r2c renders without errors', () => {
                             data: {
                                 richText: '<p>Column 1</p>'
                             },
-                            id: '946afd022303cd30a8cdcb2957',
+                            id: '5ed57137d30ec867ac716dd259',
                             typeId: 'commerce_assets.editorialRichText'
                         }
                     ],
@@ -31,7 +31,7 @@ test('MobileGrid2r2c renders without errors', () => {
                             data: {
                                 richText: '<p>Column 2</p>'
                             },
-                            id: 'd94919f81bd9a5530400879fd9',
+                            id: '34e52dfa89fd2abd116912d706',
                             typeId: 'commerce_assets.editorialRichText'
                         }
                     ],
@@ -43,26 +43,14 @@ test('MobileGrid2r2c renders without errors', () => {
                             data: {
                                 richText: '<p>Column 3</p>'
                             },
-                            id: '883198f60f5d0f38ce1f895305',
+                            id: '80d8e4deead834c58505ecbf84',
                             typeId: 'commerce_assets.editorialRichText'
                         }
                     ],
                     id: 'column3'
-                },
-                {
-                    components: [
-                        {
-                            data: {
-                                richText: '<p>Column 4</p>'
-                            },
-                            id: '364bedd2f3fe569f7c83df780b',
-                            typeId: 'commerce_assets.editorialRichText'
-                        }
-                    ],
-                    id: 'column4'
                 }
             ]}
         />
     )
-    expect(document.querySelector('.mobile-2r-2c')).not.toBeNull()
+    expect(document.querySelector('.mobile-3r-1c')).not.toBeNull()
 })
