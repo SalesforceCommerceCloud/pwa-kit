@@ -68,7 +68,7 @@ test('Allows customer to go to sign in page', async () => {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
-    user.click(screen.getByText('Sign in'))
+    user.click(await screen.findByText('Sign in'))
 
     await waitFor(() => {
         expect(window.location.pathname).toEqual('/uk/en-GB/login')
@@ -129,8 +129,8 @@ test('Renders error message from server', async () => {
     )
     await renderWithProviders(<MockedComponent />)
 
-    user.type(screen.getByLabelText('Email'), 'foo@test.com')
-    user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+    user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
     expect(await screen.findByText('Something went wrong')).toBeInTheDocument()
 })
