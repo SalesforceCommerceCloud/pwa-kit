@@ -10,10 +10,22 @@ import {useProducts, useProduct} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 
 const QueryErrors = () => {
-    // TODO: `products` no longer has an error, because the query is not enabled unless all required
-    // parameters are passed
-    const products = useProducts({parameters: {FOO: ''} as Record<string, string>})
+    // TODO: `products` is a contrived situation, as the query hook is disabled by default until all
+    // required parameters have been set. Also, unused parameters (like `FOO`) are simply ignored.
+    // Do we still want to highlight this error?
+
+    // Type assertion because we're explicitly violating the expected type
+    const products = useProducts({parameters: {FOO: ''}} as any, {enabled: true})
     const product = useProduct({parameters: {id: '25502228Mxxx'}})
+    /** Errors don't nicely serialize to JSON, so we have to do it ourselves. */
+    const toLoggable = (err: unknown) => {
+        if (err instanceof Error) {
+            // Clone all keys onto a plain object
+            const keys = Object.getOwnPropertyNames(err) as Array<keyof Error>
+            return keys.reduce((acc, key) => ({...acc, [key]: err[key]}), {})
+        }
+        return err
+    }
 
     return (
         <>
@@ -36,14 +48,14 @@ const QueryErrors = () => {
 
             <h2>Validation Error</h2>
             {products.isLoading && <p style={{background: 'aqua'}}>Loading...</p>}
-            {products.error && <p style={{color: 'red'}}>Something is wrong</p>}
+            {products.error && <p style={{color: 'red'}}>Something is wrong.</p>}
 
             <div>
-                <div>Returning data</div>
+                <div>Returning data:</div>
                 <Json
                     data={{
                         isLoading: products.isLoading,
-                        error: products.error,
+                        error: toLoggable(products.error),
                         data: products.data
                     }}
                 />
@@ -51,14 +63,14 @@ const QueryErrors = () => {
 
             <h2>Response Error</h2>
             {product.isLoading && <p style={{background: 'aqua'}}>Loading...</p>}
-            {product.error && <p style={{color: 'red'}}>Something is wrong</p>}
+            {product.error && <p style={{color: 'red'}}>Something is wrong.</p>}
 
             <div>
-                <div>Returning data</div>
+                <div>Returning data:</div>
                 <Json
                     data={{
                         isLoading: product.isLoading,
-                        error: product.error,
+                        error: toLoggable(product.error),
                         data: product.data
                     }}
                 />

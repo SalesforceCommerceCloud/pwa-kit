@@ -13,6 +13,7 @@ const UseShopperLoginHelper = () => {
     const loginGuestUser = useAuthHelper(AuthHelpers.LoginGuestUser)
     const loginRegisteredUser = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
+    const isError = (err: unknown): err is Error => err instanceof Error
 
     //logout before logging guest user in
     const loginGuestUserFlow = async () => {
@@ -25,8 +26,8 @@ const UseShopperLoginHelper = () => {
             <h1>LoginGuestUser</h1>
             <Json data={loginGuestUser} />
             <button onClick={() => loginGuestUserFlow()}>loginGuestUser</button>
-            {loginGuestUser.error?.message && (
-                <p style={{color: 'red'}}>Error: {loginGuestUser.error?.message}</p>
+            {isError(loginGuestUser.error) && (
+                <p style={{color: 'red'}}>Error: {loginGuestUser.error.message}</p>
             )}
             <hr />
             <h1>LoginRegisteredUserB2C</h1>
@@ -38,14 +39,14 @@ const UseShopperLoginHelper = () => {
             >
                 loginRegisteredUser
             </button>
-            {loginRegisteredUser.error?.message && (
-                <p style={{color: 'red'}}>Error: {loginRegisteredUser.error?.message}</p>
+            {isError(loginRegisteredUser.error) && (
+                <p style={{color: 'red'}}>Error: {loginRegisteredUser.error.message}</p>
             )}
             <hr />
             <h1>Logout</h1>
             <Json data={logout} />
             <button onClick={() => logout.mutate()}>logout</button>
-            {logout.error?.message && <p style={{color: 'red'}}>Error: {logout.error?.message}</p>}
+            {isError(logout.error) && <p style={{color: 'red'}}>Error: {logout.error.message}</p>}
         </>
     )
 }
