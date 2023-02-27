@@ -29,12 +29,17 @@ import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
 import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
+// import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()
     const history = useHistory()
     const authModal = useAuthModal('password')
+    // const customerr = useCurrentCustomer()
+    // console.log(customerr.data)
 
+    // step 1. useCustomer
+    // customer.email
     const {
         customer,
         basket,
@@ -60,6 +65,7 @@ const ContactInfo = () => {
     const submitForm = async (data) => {
         setError(null)
         try {
+            // TODO
             await login(data)
             goToNextStep()
         } catch (error) {
@@ -182,6 +188,7 @@ const ContactInfo = () => {
                     isOpen={signOutConfirmDialogIsOpen}
                     onClose={() => setSignOutConfirmDialogIsOpen(false)}
                     onConfirm={async () => {
+                        // TODO
                         await customer.logout()
                         await basket.getOrCreateBasket()
                         history.replace('/')

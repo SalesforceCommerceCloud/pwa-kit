@@ -7,19 +7,21 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import useBasket from '../../../commerce-api/hooks/useBasket'
-import useCustomer from '../../../commerce-api/hooks/useCustomer'
 import useEinstein from '../../../commerce-api/hooks/useEinstein'
 import {useCommerceAPI} from '../../../commerce-api/contexts'
 import {getPaymentInstrumentCardType} from '../../../utils/cc-utils'
 import {isMatchingAddress} from '../../../utils/utils'
 import {useIntl} from 'react-intl'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 
 const CheckoutContext = React.createContext()
 
 export const CheckoutProvider = ({children}) => {
     const mounted = useRef()
     const api = useCommerceAPI()
-    const customer = useCustomer()
+    // const customer = useCustomer()
+    const {data: customer} = useCurrentCustomer()
+    console.log(customer)
     const basket = useBasket()
     const {formatMessage} = useIntl()
     const einstein = useEinstein()
@@ -186,6 +188,9 @@ export const CheckoutProvider = ({children}) => {
 
             // Async functions
             // Convenience methods for interacting with remote customer and basket data.
+            // 
+            // @TODO: ALL METHODS BELOW SHOULD BE REMOVED BY THE END OF HOOK INTEGRATION
+            // 
             // ----------------
 
             /**
