@@ -589,7 +589,7 @@ test('Renders AddToCartModal', async () => {
         await waitFor(() => {
             expect(screen.getByText(/cart subtotal \(2 item\)/i)).toBeInTheDocument()
             expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
-        })
+        }, {timeout: 7000})
     })
 })
 

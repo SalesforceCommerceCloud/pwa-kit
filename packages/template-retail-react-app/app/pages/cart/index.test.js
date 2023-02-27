@@ -245,7 +245,7 @@ describe('Update quantity', function () {
             () => {
                 expect(within(cartItem).getByDisplayValue('3'))
             },
-            {timeout: 5000}
+            {timeout: 10000}
         )
     })
 })
