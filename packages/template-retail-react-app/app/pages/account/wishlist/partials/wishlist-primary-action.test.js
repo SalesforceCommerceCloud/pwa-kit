@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {mockedCustomerProductListsDetails2} from '../../../../commerce-api/mock-data'
+import {mockWishListDetails} from './wishlist-primary-action.mock'
 import ItemVariantProvider from '../../../../components/item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistPrimaryAction from './wishlist-primary-action'
@@ -37,7 +37,7 @@ beforeEach(() => {
 })
 
 test('the Add To Cart button', async () => {
-    const variant = mockedCustomerProductListsDetails2.data[3]
+    const variant = mockWishListDetails.data[3]
     const {getByRole} = renderWithProviders(<MockedComponent variant={variant} />)
 
     const addToCartButton = getByRole('button', {
@@ -54,7 +54,7 @@ test('the Add To Cart button', async () => {
 })
 
 test('the Add Set To Cart button', async () => {
-    const productSetWithoutVariants = mockedCustomerProductListsDetails2.data[1]
+    const productSetWithoutVariants = mockWishListDetails.data[1]
     renderWithProviders(<MockedComponent variant={productSetWithoutVariants} />)
 
     const button = screen.getByRole('button', {name: /add set to cart/i})
@@ -66,7 +66,7 @@ test('the Add Set To Cart button', async () => {
 })
 
 test('the View Full Details button', () => {
-    const productSetWithVariants = mockedCustomerProductListsDetails2.data[0]
+    const productSetWithVariants = mockWishListDetails.data[0]
     renderWithProviders(<MockedComponent variant={productSetWithVariants} />)
 
     const link = screen.getByRole('link', {name: /view full details/i})
@@ -74,7 +74,7 @@ test('the View Full Details button', () => {
 })
 
 test('the View Options button', async () => {
-    const masterProduct = mockedCustomerProductListsDetails2.data[2]
+    const masterProduct = mockWishListDetails.data[2]
     renderWithProviders(<MockedComponent variant={masterProduct} />)
 
     const button = screen.getByRole('button', {name: /view options/i})
