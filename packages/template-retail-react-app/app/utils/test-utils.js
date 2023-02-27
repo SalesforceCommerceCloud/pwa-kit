@@ -15,7 +15,7 @@ import _CommerceAPI from '../commerce-api'
 import {
     BasketProvider,
     CommerceAPIProvider as _CommerceAPIProvider,
-    CustomerProvider,
+    CustomerProvider as _CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
 import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
@@ -27,7 +27,16 @@ import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-re
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
+// Contexts
+import {
+    CustomerProvider,
+    CategoriesProvider,
+    CurrencyProvider,
+    MultiSiteProvider
+} from '../contexts'
 
+import {createUrlTemplate} from './url'
+import {getSiteByReference} from './site-utils'
 export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
 export const SUPPORTED_LOCALES = [
@@ -41,11 +50,6 @@ export const SUPPORTED_LOCALES = [
     }
 ]
 export const DEFAULT_SITE = 'global'
-// Contexts
-import {CategoriesProvider, CurrencyProvider, MultiSiteProvider} from '../contexts'
-
-import {createUrlTemplate} from './url'
-import {getSiteByReference} from './site-utils'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -145,25 +149,27 @@ export const TestProviders = ({
                             locale={locale.id}
                             redirectURI={`${window.location.origin}/testcallback`}
                         >
-                            <CategoriesProvider treeRoot={initialCategories}>
-                                <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                                    <CustomerProvider value={{customer, setCustomer}}>
-                                        <BasketProvider value={{basket, setBasket}}>
-                                            <CustomerProductListsProvider>
-                                                <Router>
-                                                    <ChakraProvider theme={theme}>
-                                                        <AddToCartModalContext.Provider
-                                                            value={addToCartModal}
-                                                        >
-                                                            {children}
-                                                        </AddToCartModalContext.Provider>
-                                                    </ChakraProvider>
-                                                </Router>
-                                            </CustomerProductListsProvider>
-                                        </BasketProvider>
-                                    </CustomerProvider>
-                                </CurrencyProvider>
-                            </CategoriesProvider>
+                            <CustomerProvider>
+                                <CategoriesProvider treeRoot={initialCategories}>
+                                    <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                                        <_CustomerProvider value={{customer, setCustomer}}>
+                                            <BasketProvider value={{basket, setBasket}}>
+                                                <CustomerProductListsProvider>
+                                                    <Router>
+                                                        <ChakraProvider theme={theme}>
+                                                            <AddToCartModalContext.Provider
+                                                                value={addToCartModal}
+                                                            >
+                                                                {children}
+                                                            </AddToCartModalContext.Provider>
+                                                        </ChakraProvider>
+                                                    </Router>
+                                                </CustomerProductListsProvider>
+                                            </BasketProvider>
+                                        </_CustomerProvider>
+                                    </CurrencyProvider>
+                                </CategoriesProvider>
+                            </CustomerProvider>
                         </CommerceApiProvider>
                     </_CommerceAPIProvider>
                 </MultiSiteProvider>
