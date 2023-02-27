@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {Query} from '@tanstack/react-query'
 import {getCustomerProductListItem, QueryKeys} from './queryKeyHelpers'
 import {ApiClients, CacheUpdate, CacheUpdateMatrix, Tail} from '../types'
 import {
@@ -13,6 +14,7 @@ import {
     getCustomerProductList,
     getCustomerProductLists
 } from './queryKeyHelpers'
+import {and, pathStartsWith} from '../utils'
 
 type Client = ApiClients['shopperCustomers']
 
@@ -93,6 +95,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     },
     getResetPasswordToken: noop,
     invalidateCustomerAuth: TODO('invalidateCustomerAuth'),
+    // TODO: Should this update the `getCustomer` cache?
     registerCustomer: noop,
     registerExternalProfile: TODO('registerExternalProfile'),
     removeCustomerAddress(customerId, {parameters}) {
@@ -104,11 +107,19 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     },
     resetPassword: noop,
     updateCustomer(customerId, {parameters}) {
+        // When we update a customer, we don't know what data has changed, so we must invalidate all
+        // derivative endpoints. They conveniently all start with the same path as `getCustomer`,
+        // but we do NOT want to invalidate `getCustomer` itself, we want to _update_ it. (Ideally,
+        // we could invalidate *then* update, but React Query can't handle that.) To do so, we
+        // examine the path of each cached query. If it starts with the `getCustomer` path, we
+        // invalidate, UNLESS the first item afer the path is an object, because that means that it
+        // is the `getCustomer` query itself.
+        const path = getCustomer.path(parameters)
+        const isNotGetCustomer = ({queryKey}: Query) => typeof queryKey[path.length] !== 'object'
+        const predicate = and(pathStartsWith(path), isNotGetCustomer)
         return {
             update: [{queryKey: getCustomer.queryKey(parameters)}],
-            // This is NOT invalidateCustomer(), as we want to invalidate *all* customer endpoints,
-            // not just getCustomer
-            invalidate: [{queryKey: getCustomer.path(parameters)}]
+            invalidate: [{predicate}]
         }
     },
     updateCustomerAddress(customerId, {parameters}) {
