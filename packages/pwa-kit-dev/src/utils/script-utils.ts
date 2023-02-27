@@ -119,6 +119,11 @@ export class CloudAPIClient {
             error = {} // Cloud doesn't always return JSON
         }
 
+        if (res.status === 403) {
+            error.docs_url =
+                'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/mrt-overview.html#users,-abilities,-and-roles'
+        }
+
         throw new Error(
             [
                 `HTTP ${res.status}`,

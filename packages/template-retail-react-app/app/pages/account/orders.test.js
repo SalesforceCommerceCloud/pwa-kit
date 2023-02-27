@@ -55,7 +55,7 @@ test('Renders order history and details', async () => {
             return res(ctx.delay(0), ctx.json(mockOrderProducts))
         })
     )
-    renderWithProviders(<MockedComponent history={history} />, {
+    await renderWithProviders(<MockedComponent history={history} />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
