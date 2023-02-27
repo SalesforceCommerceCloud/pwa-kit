@@ -26,13 +26,15 @@ import {
     useToast
 } from '@chakra-ui/react'
 import {createCreditCardPaymentBodyFromForm, getCreditCardIcon} from '../../utils/cc-utils'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+
 import FormActionButtons from '../../components/forms/form-action-buttons'
 import LoadingSpinner from '../../components/loading-spinner'
 import {PlusIcon, PaymentIcon} from '../../components/icons'
 import ActionCard from '../../components/action-card'
 import CreditCardFields from '../../components/forms/credit-card-fields'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
+import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 
 const DEFAULT_SKELETON_COUNT = 3
 
@@ -92,32 +94,57 @@ CardPaymentForm.propTypes = {
 
 const AccountPaymentMethods = () => {
     const {formatMessage} = useIntl()
-    const {
-        isRegistered,
-        paymentInstruments,
-        addSavedPaymentInstrument,
-        removeSavedPaymentInstrument
-    } = useCustomer()
+    const customer = useCurrentCustomer()
+    const {isRegistered, paymentInstruments, isLoading} = customer
+    const addSavedPaymentInstrumentAction = useShopperCustomersMutation({
+        action: 'createCustomerPaymentInstrument'
+    })
+    const removeSavedPaymentInstrumentAction = useShopperCustomersMutation({
+        action: 'deleteCustomerPaymentInstrument'
+    })
+
     const [isEditing, setIsEditing] = useState(false)
     const toast = useToast()
     const form = useForm()
 
     const hasSavedPayments = paymentInstruments?.length > 0
-
     const submitForm = async (values) => {
+        const paymentInstrument = createCreditCardPaymentBodyFromForm(values)
+        const body = {
+            bankRoutingNumber: '',
+            giftCertificateCode: '',
+            ...paymentInstrument,
+            paymentCard: {
+                ...paymentInstrument.paymentCard,
+                securityCode: undefined
+            }
+        }
         try {
             form.clearErrors()
-            const paymentInstrument = createCreditCardPaymentBodyFromForm(values)
-            await addSavedPaymentInstrument(paymentInstrument)
-            toggleEdit()
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'New Payment Method Saved',
-                    id: 'account_payment_methods.info.new_method_saved'
-                }),
-                status: 'success',
-                isClosable: true
-            })
+            addSavedPaymentInstrumentAction.mutate(
+                {
+                    body,
+                    parameters: {
+                        customerId: customer.customerId
+                    }
+                },
+                {
+                    onSuccess: () => {
+                        toggleEdit()
+                        toast({
+                            title: formatMessage({
+                                defaultMessage: 'New Payment Method Saved',
+                                id: 'account_payment_methods.info.new_method_saved'
+                            }),
+                            status: 'success',
+                            isClosable: true
+                        })
+                    },
+                    onError: (e) => {
+                        console.log(e)
+                    }
+                }
+            )
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }
@@ -125,7 +152,26 @@ const AccountPaymentMethods = () => {
 
     const removePaymentInstrument = async (paymentInstrumentId) => {
         try {
-            await removeSavedPaymentInstrument(paymentInstrumentId)
+            removeSavedPaymentInstrumentAction.mutate(
+                {
+                    parameters: {
+                        customerId: customer.customerId,
+                        paymentInstrumentId
+                    }
+                },
+                {
+                    onSuccess: () => {
+                        toast({
+                            title: formatMessage({
+                                defaultMessage: 'Payment Method Removed',
+                                id: 'account_payment_methods.info.payment_method_removed'
+                            }),
+                            status: 'success',
+                            isClosable: true
+                        })
+                    }
+                }
+            )
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }
@@ -145,9 +191,7 @@ const AccountPaymentMethods = () => {
                 />
             </Heading>
 
-            {/* Show the loading skeleton if the user isn't loaded yet. We determine this be checking to see
-            if the customer is of type `registered`. */}
-            {!isRegistered && (
+            {isLoading && (
                 <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4}>
                     {new Array(DEFAULT_SKELETON_COUNT).fill().map((_, index) => {
                         return (
@@ -243,7 +287,7 @@ const AccountPaymentMethods = () => {
                 </SimpleGrid>
             )}
 
-            {!hasSavedPayments && !isEditing && isRegistered && (
+            {!hasSavedPayments && !isEditing && isRegistered && !isLoading && (
                 <PageActionPlaceHolder
                     icon={<PaymentIcon boxSize={8} />}
                     heading={formatMessage({
