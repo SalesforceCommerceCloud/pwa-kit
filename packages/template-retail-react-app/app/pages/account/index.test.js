@@ -60,7 +60,7 @@ afterEach(() => {
 })
 
 const expectedBasePath = '/uk/en-GB'
-// TODO: WIP HOOK integrations
+// @TODO: WIP HOOK integrations
 test.skip('Redirects to login page if the customer is not logged in', async () => {
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) => {
