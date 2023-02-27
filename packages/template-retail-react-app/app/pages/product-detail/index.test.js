@@ -77,6 +77,15 @@ test('should render product details page', async () => {
 })
 
 describe('product set', () => {
+    beforeEach(() => {
+        global.server.use(
+            // For adding items to basket
+            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
+                return res(ctx.json(basketWithProductSet))
+            })
+        )
+    })
+
     test('render multi-product layout', async () => {
         renderWithProviders(<MockedPageWithProductSet />)
 
@@ -89,12 +98,6 @@ describe('product set', () => {
         const urlPathAfterSelectingAllVariants =
             '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
-
-        global.server.use(
-            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-                return res(ctx.json(basketWithProductSet))
-            })
-        )
 
         // Initial basket is necessary to add items to it
         const initialBasket = {basketId: 'valid_id'}
