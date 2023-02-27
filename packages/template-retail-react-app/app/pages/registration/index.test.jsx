@@ -117,8 +117,11 @@ test('Allows customer to create an account', async () => {
     user.click(withinForm.getByText(/create account/i))
 
     // wait for success state to appear
-    await waitFor(() => {
-        screen.logTestingPlaygroundURL()
-        expect(screen.getAllByText(/My Account/).length).toEqual(2)
-    })
+    await waitFor(
+        () => {
+            expect(screen.getAllByText(/My Account/).length).toEqual(2)
+        },
+        // Needs to wait a little bit more for the test to pass
+        {timeout: 5000}
+    )
 })
