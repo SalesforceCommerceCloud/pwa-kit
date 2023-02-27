@@ -18,14 +18,6 @@ jest.useFakeTimers()
 
 jest.mock('../../commerce-api/einstein')
 
-jest.mock('commerce-sdk-react-preview', () => {
-    const originalModule = jest.requireActual('commerce-sdk-react-preview')
-    return {
-        ...originalModule,
-        useCustomerBaskets: jest.fn().mockReturnValue({data: {baskets: []}})
-    }
-})
-
 const MockedComponent = () => {
     return (
         <Switch>

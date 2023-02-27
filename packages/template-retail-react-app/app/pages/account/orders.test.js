@@ -10,18 +10,14 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import {mockOrderHistory, mockOrderProducts} from '../../commerce-api/mock-data'
+import {
+    mockCustomerBaskets,
+    mockOrderHistory,
+    mockOrderProducts
+} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
-
-jest.mock('commerce-sdk-react-preview', () => {
-    const originalModule = jest.requireActual('commerce-sdk-react-preview')
-    return {
-        ...originalModule,
-        useCustomerBaskets: jest.fn().mockReturnValue({data: {baskets: [{currency: 'GBP'}]}})
-    }
-})
 
 const MockedComponent = () => {
     const customer = useCustomer()
@@ -50,6 +46,9 @@ beforeEach(() => {
     global.server.use(
         rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
             res(ctx.delay(0), ctx.json(mockOrderHistory))
+        ),
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.json(mockCustomerBaskets))
         ),
         rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts)))
     )
