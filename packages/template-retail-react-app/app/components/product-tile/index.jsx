@@ -130,7 +130,7 @@ const ProductTile = (props) => {
             <Text {...styles.title}>{localizedProductName}</Text>
 
             {/* Price */}
-            <Text {...styles.price}>
+            <Text {...styles.price} data-testid="product-tile-price">
                 {hitType === 'set' &&
                     intl.formatMessage({
                         id: 'product_tile.label.starting_at_price',

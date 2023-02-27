@@ -6,9 +6,8 @@
  */
 
 /**
- * Given a variation attribute array and and variation values object return an object
- * where the key is the attributes display name, and the value is the attribute display
- * value.
+ * Get the human-friendly version of the variation values that users have selected.
+ * Useful for displaying these values in the UI.
  *
  * @param {Object} variationAttributes - The products variation attributes.
  * @param {Object} values - The variations selected attribute values.
@@ -16,10 +15,10 @@
  *
  * @example
  * const displayValues = getDisplayVariationValues(
- *     [{id: 'size', name: 'Size', values: [{name: "md", value: "Medium"}]}],
- *     {size: 'md'}
+ *     [ { "id": "color", "name": "Colour", "values": [ { "name": "royal", "orderable": true, "value": "JJ5FUXX" } ] } ],
+ *     { "color": "JJ5FUXX" }
  * )
- * // returns {Size: "Medium"}
+ * // returns { "Colour": "royal" }
  */
 export const getDisplayVariationValues = (variationAttributes, values = {}) => {
     const returnVal = Object.entries(values).reduce((acc, [id, value]) => {

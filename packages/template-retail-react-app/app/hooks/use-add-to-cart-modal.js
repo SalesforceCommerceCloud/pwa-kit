@@ -62,13 +62,18 @@ export const AddToCartModal = () => {
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const {currency, productItems, productSubTotal, itemAccumulatedCount} = basket
+    const {currency, productItems, productSubTotal} = basket
     const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered>
             <ModalOverlay />
-            <ModalContent margin="0" borderRadius={{base: 'none', md: 'base'}} bgColor="gray.50">
+            <ModalContent
+                margin="0"
+                borderRadius={{base: 'none', md: 'base'}}
+                bgColor="gray.50"
+                containerProps={{'data-testid': 'add-to-cart-modal'}}
+            >
                 <ModalHeader paddingY="8" bgColor="white" fontSize="2xl" fontWeight="700">
                     {intl.formatMessage(
                         {
@@ -118,6 +123,7 @@ export const AddToCartModal = () => {
                                         borderBottomWidth={{base: '1px', lg: '0px'}}
                                         borderColor="gray.200"
                                         borderStyle="solid"
+                                        data-testid="product-added"
                                     >
                                         <Flex gridGap="4">
                                             <Box w="24" flex="none">
@@ -180,7 +186,7 @@ export const AddToCartModal = () => {
                                                 'Cart Subtotal ({itemAccumulatedCount} item)',
                                             id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
-                                        {itemAccumulatedCount}
+                                        {itemAccumulatedCount: totalQuantity}
                                     )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
@@ -245,7 +251,7 @@ export const AddToCartModal = () => {
                                     defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)',
                                     id: 'add_to_cart_modal.label.cart_subtotal'
                                 },
-                                {itemAccumulatedCount}
+                                {itemAccumulatedCount: totalQuantity}
                             )}
                         </Text>
                         <Text alignSelf="flex-end" fontWeight="600">

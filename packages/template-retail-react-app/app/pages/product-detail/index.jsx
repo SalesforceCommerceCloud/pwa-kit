@@ -151,10 +151,12 @@ const ProductDetail = ({category, product, isLoading}) => {
             // Get the reference to the product view and scroll to it.
             const {ref} = childProductRefs.current[firstUnselectedProduct.id]
 
-            ref.scrollIntoView({
-                behavior: 'smooth',
-                block: 'end'
-            })
+            if (ref.scrollIntoView) {
+                ref.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end'
+                })
+            }
 
             return false
         }
@@ -215,7 +217,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                         {
                             // Product Set: render the child products
                             product.setProducts.map((childProduct) => (
-                                <Fragment key={childProduct.id}>
+                                <Box key={childProduct.id} data-testid="child-product">
                                     <ProductView
                                         // Do no use an arrow function as we are manipulating the functions scope.
                                         ref={function (ref) {
@@ -260,7 +262,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                                     <Box display={['none', 'none', 'none', 'block']}>
                                         <hr />
                                     </Box>
-                                </Fragment>
+                                </Box>
                             ))
                         }
                     </Fragment>
