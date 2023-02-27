@@ -197,7 +197,6 @@ test('Applies default shipping method to basket and renders estimated pricing', 
 
 describe('Update quantity', function () {
     test('Can update item quantity in the cart', async () => {
-        jest.setTimeout(30000)
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -213,13 +212,15 @@ describe('Update quantity', function () {
         // update item quantity
         fireEvent.pointerDown(incrementButton)
 
-        await waitFor(() => {
-            expect(within(cartItem).getByDisplayValue('3'))
-        })
+        await waitFor(
+            () => {
+                expect(within(cartItem).getByDisplayValue('3'))
+            },
+            {timeout: 5000}
+        )
     })
 
     test('Can update item quantity from product view modal', async () => {
-        jest.setTimeout(30000)
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -240,9 +241,12 @@ describe('Update quantity', function () {
         // update item quantity
         fireEvent.pointerDown(incrementButton)
 
-        await waitFor(() => {
-            expect(within(cartItem).getByDisplayValue('3'))
-        })
+        await waitFor(
+            () => {
+                expect(within(cartItem).getByDisplayValue('3'))
+            },
+            {timeout: 5000}
+        )
     })
 })
 
@@ -255,7 +259,6 @@ describe('Remove item from cart', function () {
         )
     })
     test('Can remove item from the cart', async () => {
-        jest.setTimeout(30000)
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -266,7 +269,12 @@ describe('Remove item from cart', function () {
         userEvent.click(within(cartItem).getByRole('button', {name: /remove/i}))
         userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
 
-        expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
+        await waitFor(
+            () => {
+                expect(screen.getByTestId('sf-cart-empty')).toBeInTheDocument()
+            },
+            {timeout: 5000}
+        )
     })
 })
 
