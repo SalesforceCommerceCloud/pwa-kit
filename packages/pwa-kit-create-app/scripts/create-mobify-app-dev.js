@@ -44,6 +44,7 @@
 const p = require('path')
 const sh = require('shelljs')
 const cp = require('child_process')
+const semver = require('semver')
 
 sh.set('-e')
 
@@ -89,12 +90,12 @@ const withLocalNPMRepo = (func) => {
                     verdaccioServerProcess.stdout.on('data', (data) => {
                         // we know verdaccio server is up when
                         // 'http address' is in log output
-                                        if (data.includes('http address')) {
+                        if (data.includes('http address')) {
                             console.log('local NPM repository is up')
                             process.env['npm_config_registry'] = 'http://localhost:4873/'
-                                            resolve()
-                                }
-                            })
+                            resolve()
+                        }
+                    })
                 })
         )
         .then(() => {
