@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect} from 'react'
-import {screen, waitFor, waitForElementToBeRemoved, act} from '@testing-library/react'
+import {screen, waitFor, act} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
