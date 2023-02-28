@@ -65,11 +65,12 @@ afterEach(() => {
 
 test('Allows customer to go to sign in page', async () => {
     // render our test component
-    renderWithProviders(<MockedComponent />, {
+    await renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
-    user.click(screen.getByText('Sign in'))
+    user.click(await screen.findByText('Sign in'))
+
     await waitFor(() => {
         expect(window.location.pathname).toEqual('/uk/en-GB/login')
     })
@@ -90,19 +91,24 @@ test('Allows customer to generate password token', async () => {
         )
     )
     // render our test component
-    renderWithProviders(<MockedComponent />, {
+    await renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'foo@test.com')
-    user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+    user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
-    // wait for success state
     expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
-    expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
 
-    user.click(screen.getByText('Back to Sign In'))
+    await waitFor(() => {
+        expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+    })
+
+    await waitFor(() => {
+        user.click(screen.getByText('Back to Sign In'))
+    })
+
     await waitFor(() => {
         expect(window.location.pathname).toEqual('/uk/en-GB/login')
     })
@@ -122,10 +128,10 @@ test('Renders error message from server', async () => {
             )
         )
     )
-    renderWithProviders(<MockedComponent />)
+    await renderWithProviders(<MockedComponent />)
 
-    user.type(screen.getByLabelText('Email'), 'foo@test.com')
-    user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+    user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
     await waitFor(() => {
         expect(screen.getByText('500 Internal Server Error')).toBeInTheDocument()

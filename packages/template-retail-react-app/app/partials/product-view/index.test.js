@@ -52,11 +52,12 @@ beforeEach(() => {
 afterEach(() => {
     jest.resetModules()
     localStorage.clear()
+    sessionStorage.clear()
 })
 
-test('ProductView Component renders properly', () => {
+test('ProductView Component renders properly', async () => {
     const addToCart = jest.fn()
-    renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
+    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
 
     expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i).length).toEqual(2)
     expect(screen.getAllByText(/299.99/).length).toEqual(2)
@@ -65,19 +66,24 @@ test('ProductView Component renders properly', () => {
     expect(screen.getAllByText(/add to cart/i).length).toEqual(2)
 })
 
-test('ProductView Component renders with addToCart event handler', () => {
+test('ProductView Component renders with addToCart event handler', async () => {
     const addToCart = jest.fn()
-    renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
+    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
 
     const addToCartButton = screen.getAllByText(/add to cart/i)[0]
     fireEvent.click(addToCartButton)
-    expect(addToCart).toHaveBeenCalledTimes(1)
+
+    await waitFor(() => {
+        expect(addToCart).toHaveBeenCalledTimes(1)
+    })
 })
 
 test('ProductView Component renders with addToWishList event handler', async () => {
     const addToWishlist = jest.fn()
 
-    renderWithProviders(<MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />)
+    await renderWithProviders(
+        <MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />
+    )
 
     await waitFor(() => {
         expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
@@ -94,7 +100,7 @@ test('ProductView Component renders with addToWishList event handler', async () 
 test('ProductView Component renders with updateWishlist event handler', async () => {
     const updateWishlist = jest.fn()
 
-    renderWithProviders(
+    await renderWithProviders(
         <MockComponent product={mockProductDetail} updateWishlist={updateWishlist} />
     )
 
@@ -110,12 +116,23 @@ test('ProductView Component renders with updateWishlist event handler', async ()
     })
 })
 
-test('Product View can update quantity', () => {
+test('Product View can update quantity', async () => {
     const addToCart = jest.fn()
-    renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-    const quantityBox = screen.getByRole('spinbutton')
-    expect(quantityBox).toHaveValue('1')
+    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
+
+    let quantityBox
+    await waitFor(() => {
+        quantityBox = screen.getByRole('spinbutton')
+    })
+
+    await waitFor(() => {
+        expect(quantityBox).toHaveValue('1')
+    })
+
     // update item quantity
     userEvent.type(quantityBox, '{backspace}3')
-    expect(quantityBox).toHaveValue('3')
+
+    await waitFor(() => {
+        expect(quantityBox).toHaveValue('3')
+    })
 })

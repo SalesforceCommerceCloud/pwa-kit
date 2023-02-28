@@ -61,7 +61,15 @@ afterEach(() => {
 })
 
 test('Renders order history and details', async () => {
-    renderWithProviders(<MockedComponent history={history} />, {
+    global.server.use(
+        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockOrderHistory))
+        }),
+        rest.get('*/products', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockOrderProducts))
+        })
+    )
+    await renderWithProviders(<MockedComponent history={history} />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()

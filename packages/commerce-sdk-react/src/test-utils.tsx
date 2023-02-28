@@ -25,7 +25,8 @@ export const DEFAULT_TEST_CONFIG = {
     shortCode: '12345678',
     siteId: 'RefArchGlobal',
     locale: 'en-US',
-    currency: 'USD'
+    currency: 'USD',
+    fetchedToken: 'test-token'
 }
 
 export const createQueryClient = () => {

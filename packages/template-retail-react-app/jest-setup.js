@@ -108,7 +108,7 @@ jest.mock('./app/commerce-api/utils', () => {
 global.TextEncoder = require('util').TextEncoder
 
 // This file consists of global mocks for jsdom.
-class LocalStorageMock {
+class StorageMock {
     constructor() {
         this.store = {}
     }
@@ -126,14 +126,16 @@ class LocalStorageMock {
     }
 }
 
-const localStorageMock = new LocalStorageMock()
-
 Object.defineProperty(window, 'crypto', {
     value: new Crypto()
 })
 
 Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock
+    value: new StorageMock()
+})
+
+Object.defineProperty(window, 'sessionStorage', {
+    value: new StorageMock()
 })
 
 Object.defineProperty(window, 'scrollTo', {
