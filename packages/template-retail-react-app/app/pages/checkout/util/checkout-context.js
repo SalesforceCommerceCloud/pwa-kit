@@ -76,7 +76,7 @@ export const CheckoutProvider = ({children}) => {
 
         // Derive the starting step for checkout based on current state of basket.
         // A failed condition sets the current step and returns early (order matters).
-        if (customer.customerId && basket?.basketId && state.step == undefined) {
+        if (customer.customerId && basket?.basketId && state.step === undefined) {
             if (!basket.customerInfo?.email) {
                 mergeState({step: CheckoutSteps.Contact_Info})
                 return
