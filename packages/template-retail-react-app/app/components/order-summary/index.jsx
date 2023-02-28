@@ -94,7 +94,7 @@ const OrderSummary = ({
     basket = basket || useCurrentBasket().basket
 
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
-    const shippingItem = basket?.shippingItems?.[0]
+    const shippingItem = basket.shippingItems?.[0]
     const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
     if (!basket.basketId && !basket.orderNo) {
