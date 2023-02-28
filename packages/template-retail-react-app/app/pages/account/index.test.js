@@ -33,7 +33,6 @@ const MockedComponent = () => {
 
     useEffect(() => {
         if (!isRegistered) {
-            console.log('logging.............................')
             login.mutate(
                 {email: 'email@test.com', password: 'password1'},
                 {
