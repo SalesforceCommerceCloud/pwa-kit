@@ -5,11 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {within} from '@testing-library/jest-dom'
+import {within} from '@testing-library/dom'
 import {renderWithProviders} from '../../utils/test-utils'
 import * as Icons from './index'
 
-test.skip('renders svg icons with Chakra Icon component', () => {
+test('renders svg icons with Chakra Icon component', () => {
     renderWithProviders(<Icons.CheckIcon />)
     const svg = document.querySelector('.chakra-icon')
     const use = within(svg).getByRole('presentation')
