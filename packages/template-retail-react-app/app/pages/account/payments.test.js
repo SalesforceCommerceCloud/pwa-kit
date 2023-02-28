@@ -119,7 +119,6 @@ test('Allows customer to add and remove payment methods', async () => {
         ...mockedRegisteredCustomer,
         paymentInstruments: [...mockedRegisteredCustomer.paymentInstruments, newPayment]
     }
-    // updatedCustomer.paymentInstruments.push(newPayment)
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(updatedCustomer))
