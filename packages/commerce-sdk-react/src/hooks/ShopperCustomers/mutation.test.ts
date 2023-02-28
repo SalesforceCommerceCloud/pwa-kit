@@ -36,7 +36,7 @@ const PARAMETERS = {
     itemId: 'itemId',
     listId: 'listId',
     paymentInstrumentId: 'paymentInstrumentId'
-}
+} as const
 /** Options object that can be used for all query endpoints. */
 const queryOptions = {parameters: PARAMETERS}
 const oldAddress: ShopperCustomersTypes.CustomerAddress = {
@@ -44,32 +44,15 @@ const oldAddress: ShopperCustomersTypes.CustomerAddress = {
     countryCode: 'CA',
     lastName: 'Doofenschmirtz'
 }
-const newAddress: ShopperCustomersTypes.CustomerAddress = {
-    addressId: 'address',
-    countryCode: 'US',
-    lastName: 'Doofenschmirtz'
-}
 const oldProductListItem: ShopperCustomersTypes.CustomerProductListItem = {
-    id: 'productListItemId',
+    id: 'itemId', // MUST match parameters
     priority: 0,
     public: false,
     quantity: 0
 }
-const newProductListItem: ShopperCustomersTypes.CustomerProductListItem = {
-    id: 'productListItemId',
-    priority: 1,
-    public: false,
-    quantity: 1
-}
-const oldPaymentInstrument: ShopperCustomersTypes.CustomerPaymentInstrument = {
+const basePaymentInstrument: ShopperCustomersTypes.CustomerPaymentInstrument = {
     paymentBankAccount: {},
     paymentCard: {cardType: 'fake'},
-    paymentInstrumentId: 'paymentInstrumentId',
-    paymentMethodId: 'paymentMethodId'
-}
-const newPaymentInstrument: ShopperCustomersTypes.CustomerPaymentInstrument = {
-    paymentBankAccount: {},
-    paymentCard: {cardType: 'different'},
     paymentInstrumentId: 'paymentInstrumentId',
     paymentMethodId: 'paymentMethodId'
 }
@@ -79,62 +62,26 @@ const baseCustomer: RequireKeys<
 > = {
     customerId: 'customerId',
     addresses: [oldAddress],
-    paymentInstruments: [oldPaymentInstrument]
+    paymentInstruments: [basePaymentInstrument]
 }
-const baseProductList: RequireKeys<
-    ShopperCustomersTypes.CustomerProductList,
-    'customerProductListItems'
-> = {
-    id: 'productListId',
-    customerProductListItems: []
+const baseProductList = {
+    id: 'listId', // MUST match parameters used
+    customerProductListItems: [oldProductListItem]
+}
+const emptyListResult: ShopperCustomersTypes.CustomerProductListResult = {
+    data: [],
+    limit: 0,
+    total: 0
+}
+const baseListResult: ShopperCustomersTypes.CustomerProductListResult = {
+    data: [baseProductList],
+    limit: 1,
+    total: 1
 }
 
 const createOptions = <Mut extends ShopperCustomersMutation>(
     body: Argument<Client[Mut]> extends {body: infer B} ? B : undefined
 ): Argument<Client[Mut]> => ({...queryOptions, body})
-
-// --- TEST CASES --- //
-const testMap = {
-    // Invalidate product listS, update created item endpoint
-    createCustomerProductList: [
-        createOptions<'createCustomerProductList'>({id: 'productListId'}),
-        {id: 'productListId'}
-    ],
-    // Invalidate product listS, update PL, update created item endpoint
-    createCustomerProductListItem: [
-        createOptions<'createCustomerProductListItem'>(oldProductListItem),
-        oldProductListItem
-    ],
-    // Invalidate product listS? invalidate PL, remove
-    deleteCustomerProductListItem: [
-        createOptions<'deleteCustomerProductListItem'>(undefined),
-        undefined
-    ],
-    // noop
-    getResetPasswordToken: [
-        createOptions<'getResetPasswordToken'>({login: 'login'}),
-        {email: 'customer@email', expiresInMinutes: 10, login: 'login', resetToken: 'token'}
-    ],
-    // noop
-    registerCustomer: [
-        createOptions<'registerCustomer'>({customer: {}, password: 'hunter2'}),
-        {customerId: 'customerId'}
-    ],
-    // noop
-    resetPassword: [
-        createOptions<'resetPassword'>({
-            resetToken: 'token',
-            newPassword: 'hunter3',
-            login: 'login'
-        }),
-        undefined
-    ],
-    // invalidate PLs? invalidate PL, update PLI
-    updateCustomerProductListItem: [
-        createOptions<'updateCustomerProductListItem'>({priority: 0, public: false, quantity: 0}),
-        oldProductListItem
-    ]
-}
 
 // Not implemented checks are temporary to make sure we don't forget to add tests when adding
 // implentations. When all mutations are added, the "not implemented" tests can be removed,
@@ -200,7 +147,7 @@ describe('ShopperCustomers mutations', () => {
                 paymentCard: {} as ShopperCustomersTypes.CustomerPaymentCardRequest,
                 paymentMethodId: 'paymentMethodId'
             })
-            const data: DataType<Client['createCustomerPaymentInstrument']> = oldPaymentInstrument
+            const data: DataType<Client['createCustomerPaymentInstrument']> = basePaymentInstrument
             mockQueryEndpoint(customersEndpoint, customer) // getCustomer
             mockMutationEndpoints(customersEndpoint, data) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomer refetch
@@ -232,10 +179,10 @@ describe('ShopperCustomers mutations', () => {
         test('`deleteCustomerPaymentInstrument` updates cache on success', async () => {
             // 0. Setup
             const customer = baseCustomer
-            const options = queryOptions // can be used for this mutation as it has no body
-            const queryData = oldPaymentInstrument
+            const options = queryOptions // Can be used for this mutation as it has no body
+            const data = basePaymentInstrument
             mockQueryEndpoint(customersEndpoint, customer) // getCustomer
-            mockQueryEndpoint(customersEndpoint, queryData) // query
+            mockQueryEndpoint(customersEndpoint, data) // query
             mockMutationEndpoints(customersEndpoint, {}) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomer refetch
             const {result, waitForValueToChange} = renderHookWithProviders(() => ({
@@ -247,7 +194,7 @@ describe('ShopperCustomers mutations', () => {
             // 1. Populate cache with initial data
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.customer)
             expect(result.current.customer.data).toEqual(customer)
-            expect(result.current.query.data).toEqual(queryData)
+            expect(result.current.query.data).toEqual(data)
 
             // 2. Do deletion mutation
             act(() => result.current.mutation.mutate(options))
@@ -315,9 +262,13 @@ describe('ShopperCustomers mutations', () => {
         })
         test('`updateCustomerAddress` updates cache on success', async () => {
             const customer = baseCustomer
-            const options = createOptions<'updateCustomerAddress'>(newAddress)
             const oldData = oldAddress
-            const newData = newAddress
+            const newData: ShopperCustomersTypes.CustomerAddress = {
+                addressId: 'address',
+                countryCode: 'US',
+                lastName: 'Doofenschmirtz'
+            }
+            const options = createOptions<'updateCustomerAddress'>(newData)
             mockQueryEndpoint(customersEndpoint, customer) // getCustomer
             mockQueryEndpoint(customersEndpoint, oldData) // getCustomerAddress
             mockMutationEndpoints(customersEndpoint, newData) // this mutation
@@ -343,9 +294,194 @@ describe('ShopperCustomers mutations', () => {
         })
     })
     describe('modify a customer product list', () => {
-        // TODO
+        test('`createCustomerProductList` updates cache on success', async () => {
+            const listResult = emptyListResult
+            const data: ShopperCustomersTypes.CustomerProductList = {
+                id: 'listId', // MUST match parameters used
+                customerProductListItems: []
+            }
+            const options = createOptions<'createCustomerProductList'>(data)
+            mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
+            mockMutationEndpoints(customersEndpoint, data) // this mutation
+            mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
+            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+                (props: {enabled: boolean} = {enabled: false}) => ({
+                    lists: queries.useCustomerProductLists(queryOptions),
+                    mutation: useShopperCustomersMutation('createCustomerProductList'),
+                    // Initially disabled; not needed until after the creation mutation
+                    query: queries.useCustomerProductList(queryOptions, props)
+                })
+            )
+
+            // 1. Populate cache with initial data
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.lists)
+            expect(result.current.lists.data).toEqual(listResult)
+            expect(result.current.query.data).toBeUndefined()
+
+            // 2. Do creation mutation
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
+            expect(result.current.mutation.data).toEqual(data)
+            assertInvalidateQuery(result.current.lists, listResult)
+
+            // 3. Re-render to validate the created resource was added to cache
+            await rerender({enabled: true})
+            await waitForValueToChange(() => result.current.query)
+            assertUpdateQuery(result.current.query, data)
+        })
+        test('`createCustomerProductListItem` updates cache on success', async () => {
+            const data = oldProductListItem
+            const list = emptyListResult
+            const listResult = emptyListResult
+            const options = createOptions<'createCustomerProductListItem'>(data)
+            mockQueryEndpoint(customersEndpoint, list) // getCustomerProductList
+            mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
+            mockMutationEndpoints(customersEndpoint, data) // this mutation
+            mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
+            mockQueryEndpoint(customersEndpoint, {test: 'use this? should not be!'}) // getCustomerProductLists refetch
+            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+                (props: {enabled: boolean} = {enabled: false}) => ({
+                    list: queries.useCustomerProductList(queryOptions),
+                    lists: queries.useCustomerProductLists(queryOptions),
+                    mutation: useShopperCustomersMutation('createCustomerProductListItem'),
+                    // Initially disabled; not needed until after the creation mutation
+                    query: queries.useCustomerProductListItem(queryOptions, props)
+                })
+            )
+
+            // 1. Populate cache with initial data
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.lists)
+            expect(result.current.list.data).toEqual(list)
+            expect(result.current.lists.data).toEqual(listResult)
+            expect(result.current.query.data).toBeUndefined()
+
+            // 2. Do creation mutation
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
+            expect(result.current.mutation.data).toEqual(data)
+            assertInvalidateQuery(result.current.list, list)
+            assertInvalidateQuery(result.current.lists, listResult)
+
+            // 3. Re-render to validate the created resource was added to cache
+            await rerender({enabled: true})
+            await waitForValueToChange(() => result.current.query)
+            assertUpdateQuery(result.current.query, data)
+        })
+        test.only('`deleteCustomerProductListItem` updates cache on success', async () => {
+            const data = oldProductListItem
+            const list = baseProductList
+            const listResult = baseListResult
+            const options = queryOptions // Can be used for this mutation as it has no body
+            mockQueryEndpoint(customersEndpoint, list) // getCustomerProductList
+            mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
+            mockQueryEndpoint(customersEndpoint, data) // getCustomerProductListItem
+            mockMutationEndpoints(customersEndpoint, {}) // this mutation
+            mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
+            mockQueryEndpoint(customersEndpoint, {test: 'use this? should not be!'}) // getCustomerProductLists refetch
+            const {result, waitForValueToChange} = renderHookWithProviders(() => ({
+                list: queries.useCustomerProductList(queryOptions),
+                lists: queries.useCustomerProductLists(queryOptions),
+                mutation: useShopperCustomersMutation('deleteCustomerProductListItem'),
+                query: queries.useCustomerProductListItem(queryOptions)
+            }))
+
+            // 1. Populate cache with initial data
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.lists)
+            expect(result.current.list.data).toEqual(list)
+            expect(result.current.lists.data).toEqual(listResult)
+            expect(result.current.query.data).toEqual(data)
+
+            // 2. Do deletion mutation
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
+            expect(result.current.mutation.data).toBeUndefined()
+            assertInvalidateQuery(result.current.list, list)
+            assertInvalidateQuery(result.current.lists, listResult)
+            assertRemoveQuery(result.current.query)
+        })
+        test('`updateCustomerProductListItem` updates cache on success', async () => {
+            const oldData = oldProductListItem
+            const newData: ShopperCustomersTypes.CustomerProductListItem = {
+                id: 'itemId', // MUST match parameters
+                priority: 1,
+                public: false,
+                quantity: 1
+            }
+            const list = baseProductList
+            const listResult = baseListResult
+            const options = createOptions<'updateCustomerProductListItem'>(newData)
+            mockQueryEndpoint(customersEndpoint, list) // getCustomerProductList
+            mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
+            mockQueryEndpoint(customersEndpoint, oldData) // getCustomerProductListItem
+            mockMutationEndpoints(customersEndpoint, newData) // this mutation
+            mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
+            mockQueryEndpoint(customersEndpoint, {test: 'use this? should not be!'}) // getCustomerProductLists refetch
+            const {result, waitForValueToChange} = renderHookWithProviders(() => ({
+                list: queries.useCustomerProductList(queryOptions),
+                lists: queries.useCustomerProductLists(queryOptions),
+                mutation: useShopperCustomersMutation('updateCustomerProductListItem'),
+                query: queries.useCustomerProductListItem(queryOptions)
+            }))
+
+            // 1. Populate cache with initial data
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.lists)
+            expect(result.current.list.data).toEqual(list)
+            expect(result.current.lists.data).toEqual(listResult)
+            expect(result.current.query.data).toEqual(oldData)
+
+            // 2. Do update mutation
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
+            expect(result.current.mutation.data).toEqual(newData)
+            assertInvalidateQuery(result.current.list, list)
+            assertInvalidateQuery(result.current.lists, listResult)
+            assertUpdateQuery(result.current.query, newData)
+        })
     })
-    describe('noops', () => {
-        // TODO
+    describe('simple mutations (no cache updates)', () => {
+        /** `void` doesn't play nice as a value, so just replace it with `undefined`. */
+        type FixVoid<T> = void extends T ? undefined : T
+        type TestMap = {
+            [Mut in ShopperCustomersMutation]?: [
+                Argument<Client[Mut]>,
+                FixVoid<DataType<Client[Mut]>>
+            ]
+        }
+        // Using an object, rather than array, to more easily manage data values
+        const testMap: TestMap = {
+            getResetPasswordToken: [
+                createOptions<'getResetPasswordToken'>({login: 'login'}),
+                {email: 'customer@email', expiresInMinutes: 10, login: 'login', resetToken: 'token'}
+            ],
+            registerCustomer: [
+                createOptions<'registerCustomer'>({customer: {}, password: 'hunter2'}),
+                {customerId: 'customerId'}
+            ],
+            resetPassword: [
+                createOptions<'resetPassword'>({
+                    resetToken: 'token',
+                    newPassword: 'hunter3',
+                    login: 'login'
+                }),
+                undefined
+            ]
+        }
+        // Type assertion because `Object.entries` is limited :\
+        const testCases = Object.entries(testMap) as [
+            ShopperCustomersMutation,
+            NonNullable<TestMap[ShopperCustomersMutation]>
+        ][]
+        test.each(testCases)(
+            '`%s` returns data on success',
+            async (mutationName, [options, data]) => {
+                mockMutationEndpoints(customersEndpoint, data ?? {}) // Fallback for `void` endpoints
+                const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+                    return useShopperCustomersMutation(mutationName)
+                })
+                act(() => result.current.mutate(options))
+                await waitAndExpectSuccess(wait, () => result.current)
+                expect(result.current.data).toEqual(data)
+            }
+        )
     })
 })

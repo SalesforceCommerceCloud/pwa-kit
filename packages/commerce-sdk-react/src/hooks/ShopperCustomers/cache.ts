@@ -68,7 +68,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         // We always invalidate, because even without an ID we assume that something has changed
         // TODO: Rather than invalidate, can we selectively update?
         const invalidate: CacheUpdate['invalidate'] = [
-            {queryKey: getCustomerProductList.queryKey(parameters)}
+            {queryKey: getCustomerProductList.queryKey(parameters)},
+            {queryKey: getCustomerProductLists.queryKey(parameters)}
         ]
         // We can only update cache for this product list item if we have the ID
         const itemId = response.id
@@ -89,7 +90,10 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     deleteCustomerProductListItem(customerId, {parameters}) {
         return {
             // TODO: Rather than invalidate, can we selectively update?
-            invalidate: [{queryKey: getCustomerProductList.queryKey(parameters)}],
+            invalidate: [
+                {queryKey: getCustomerProductList.queryKey(parameters)},
+                {queryKey: getCustomerProductLists.queryKey(parameters)}
+            ],
             remove: [{queryKey: getCustomerProductListItem.queryKey(parameters)}]
         }
     },
@@ -133,9 +137,12 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     updateCustomerProductList: TODO('updateCustomerProductList'),
     updateCustomerProductListItem(customerId, {parameters}) {
         return {
-            update: [{queryKey: getCustomerProductList.queryKey(parameters)}],
+            update: [{queryKey: getCustomerProductListItem.queryKey(parameters)}],
             // TODO: Rather than invalidate, can we selectively update?
-            invalidate: [{queryKey: getCustomerProductListItem.queryKey(parameters)}]
+            invalidate: [
+                {queryKey: getCustomerProductList.queryKey(parameters)},
+                {queryKey: getCustomerProductLists.queryKey(parameters)}
+            ]
         }
     }
 }
