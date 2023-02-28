@@ -76,6 +76,7 @@ export default function useProfileFields({form: {control, errors}, prefix = ''})
             },
             error: errors[`${prefix}phone`],
             inputProps: ({onChange}) => ({
+                // test comment
                 inputmode: 'numeric',
                 onChange(evt) {
                     onChange(formatPhoneNumber(evt.target.value))
