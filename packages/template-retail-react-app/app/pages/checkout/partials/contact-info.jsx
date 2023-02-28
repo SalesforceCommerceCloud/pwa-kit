@@ -72,7 +72,10 @@ const ContactInfo = () => {
         setError(null)
         try {
             if (!data.password) {
-                await updateCustomerForBasket.mutateAsync({parameters: {basketId: basket.basketId}, body:{email: data.email}})
+                await updateCustomerForBasket.mutateAsync({
+                    parameters: {basketId: basket.basketId},
+                    body: {email: data.email}
+                })
             } else {
                 await login.mutateAsync({username: data.email, password: data.password})
             }

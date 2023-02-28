@@ -200,10 +200,7 @@ export const CustomerContext = React.createContext()
 export const CustomerProvider = ({children}) => {
     const customerId = useCustomerId()
     const {isRegistered, isGuest, customerType} = useCustomerType()
-    const query = useCustomer(
-        {customerId},
-        {enabled: !!customerId && isRegistered}
-    )
+    const query = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
     const value = {
         ...query,
         data: {

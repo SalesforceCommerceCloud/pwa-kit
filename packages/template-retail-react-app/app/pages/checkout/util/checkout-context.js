@@ -186,9 +186,9 @@ export const CheckoutProvider = ({children}) => {
 
             // Async functions
             // Convenience methods for interacting with remote customer and basket data.
-            // 
+            //
             // @TODO: ALL METHODS BELOW SHOULD BE REMOVED BY THE END OF HOOK INTEGRATION
-            // 
+            //
             // ----------------
 
             /**
