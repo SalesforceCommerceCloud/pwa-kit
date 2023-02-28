@@ -56,11 +56,11 @@ test('can set customer email on the basket', async () => {
         })
     )
     renderWithProviders(<ContactInfo />)
-    
+
     const emailInput = screen.getByRole('textbox', {
         name: /email/i
     })
-    
+
     fireEvent.change(emailInput, {target: {value: email}})
     const button = screen.getByRole('button', {
         name: /checkout as guest/i
