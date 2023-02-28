@@ -571,8 +571,6 @@ test.skip('Can edit address during checkout as a registered customer', async () 
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
 
-    screen.logTestingPlaygroundURL()
-
     // Switch to login
     const haveAccountButton = await screen.findByText(/already have an account/i)
     user.click(haveAccountButton)

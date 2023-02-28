@@ -207,7 +207,6 @@ describe('updating password', function () {
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
         const el = within(screen.getByTestId('sf-toggle-card-password'))
-        screen.logTestingPlaygroundURL()
         user.click(el.getByText(/edit/i))
         user.type(el.getByLabelText(/current password/i), 'Password!12345')
         user.type(el.getByLabelText(/new password/i), 'Password!98765')
