@@ -33,11 +33,11 @@ function useAuthenticatedClient<TData, TVariables = unknown>(
     return (variables: TVariables & QueryFunctionContext<QueryKey>) => {
         return auth
             .ready()
-            .then(({access_token}) => {
+            .then(() => {
                 apiClientKeys.forEach((client) => {
                     apiClients[client].clientConfig.headers = {
                         ...apiClients[client].clientConfig.headers,
-                        Authorization: `Bearer ${access_token}`
+                        Authorization: `Bearer ${auth.get('access_token')}`
                     }
                 })
                 return apiClients
