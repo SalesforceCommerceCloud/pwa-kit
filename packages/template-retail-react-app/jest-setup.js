@@ -67,7 +67,11 @@ export const setupMockServer = () => {
 
 beforeAll(() => {
     global.server = setupMockServer()
-    global.server.listen()
+    global.server.listen({
+        onUnhandledRequest(req) {
+            console.error('Found an unhandled %s request to %s', req.method, req.url.href)
+        }
+    })
 })
 afterEach(() => {
     global.server.resetHandlers()
