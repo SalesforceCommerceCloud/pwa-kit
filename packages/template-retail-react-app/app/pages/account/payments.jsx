@@ -8,7 +8,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 
-import {FormattedMessage, useIntl} from 'react-intl'
+import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
     Alert,
@@ -20,10 +20,7 @@ import {
     SimpleGrid,
     Skeleton,
     Stack,
-    Text,
-
-    // Hooks
-    useToast
+    Text
 } from '@chakra-ui/react'
 import {createCreditCardPaymentBodyFromForm, getCreditCardIcon} from '../../utils/cc-utils'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
@@ -35,6 +32,8 @@ import ActionCard from '../../components/action-card'
 import CreditCardFields from '../../components/forms/credit-card-fields'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
+import {API_ERROR_MESSAGE} from '../../constants'
+import {useToast} from '../../hooks/use-toast'
 
 const DEFAULT_SKELETON_COUNT = 3
 
@@ -92,6 +91,14 @@ CardPaymentForm.propTypes = {
     toggleEdit: PropTypes.func
 }
 
+const successfullyAddedMessage = defineMessage({
+    defaultMessage: 'New Payment Method Saved',
+    id: 'account_payment_methods.info.new_method_saved'
+})
+const successfullyRemovedMessage = defineMessage({
+    defaultMessage: 'Payment Method Removed',
+    id: 'account_payment_methods.info.payment_method_removed'
+})
 const AccountPaymentMethods = () => {
     const {formatMessage} = useIntl()
     const customer = useCurrentCustomer()
@@ -104,8 +111,14 @@ const AccountPaymentMethods = () => {
     })
 
     const [isEditing, setIsEditing] = useState(false)
-    const toast = useToast()
     const form = useForm()
+    const showToast = useToast()
+    const showError = () => {
+        showToast({
+            title: formatMessage(API_ERROR_MESSAGE),
+            status: 'error'
+        })
+    }
 
     const hasSavedPayments = paymentInstruments?.length > 0
     const submitForm = async (values) => {
@@ -131,17 +144,14 @@ const AccountPaymentMethods = () => {
                 {
                     onSuccess: () => {
                         toggleEdit()
-                        toast({
-                            title: formatMessage({
-                                defaultMessage: 'New Payment Method Saved',
-                                id: 'account_payment_methods.info.new_method_saved'
-                            }),
+                        showToast({
+                            title: successfullyAddedMessage,
                             status: 'success',
                             isClosable: true
                         })
                     },
                     onError: (e) => {
-                        console.log(e)
+                        showError()
                     }
                 }
             )
@@ -152,7 +162,7 @@ const AccountPaymentMethods = () => {
 
     const removePaymentInstrument = async (paymentInstrumentId) => {
         try {
-            removeSavedPaymentInstrumentAction.mutate(
+            await removeSavedPaymentInstrumentAction.mutateAsync(
                 {
                     parameters: {
                         customerId: customer.customerId,
@@ -161,11 +171,8 @@ const AccountPaymentMethods = () => {
                 },
                 {
                     onSuccess: () => {
-                        toast({
-                            title: formatMessage({
-                                defaultMessage: 'Payment Method Removed',
-                                id: 'account_payment_methods.info.payment_method_removed'
-                            }),
+                        showToast({
+                            title: successfullyRemovedMessage,
                             status: 'success',
                             isClosable: true
                         })
@@ -173,7 +180,8 @@ const AccountPaymentMethods = () => {
                 }
             )
         } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
+            showError()
+            throw error
         }
     }
 

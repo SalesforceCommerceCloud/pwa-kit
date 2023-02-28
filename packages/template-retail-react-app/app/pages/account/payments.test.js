@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect} from 'react'
-import {screen, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
+import {screen, waitFor, waitForElementToBeRemoved, act} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
@@ -89,6 +89,7 @@ beforeEach(() => {
 // Set up and clean up
 afterEach(() => {
     jest.resetModules()
+    jest.resetAllMocks()
     localStorage.clear()
 })
 
@@ -96,7 +97,6 @@ test('Allows customer to add and remove payment methods', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('customerid')).toBeInTheDocument())
 
-    const updatedCustomer = {...mockedRegisteredCustomer}
     const newPayment = {
         creationDate: '2021-04-01T14:34:56.000Z',
         lastModified: '2021-04-01T14:34:56.000Z',
@@ -115,7 +115,11 @@ test('Allows customer to add and remove payment methods', async () => {
         paymentInstrumentId: 'testcard2',
         paymentMethodId: 'CREDIT_CARD'
     }
-    updatedCustomer.paymentInstruments.push(newPayment)
+    const updatedCustomer = {
+        ...mockedRegisteredCustomer,
+        paymentInstruments: [...mockedRegisteredCustomer.paymentInstruments, newPayment]
+    }
+    // updatedCustomer.paymentInstruments.push(newPayment)
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(updatedCustomer))
@@ -138,14 +142,15 @@ test('Allows customer to add and remove payment methods', async () => {
     expect(await screen.findByText('Test Customer')).toBeInTheDocument()
 
     global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        )
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        })
     )
     // remove
-    user.click(screen.getAllByText(/remove/i)[1])
-    const loadingEl = await screen.getAllByText('Loading...')
-    waitForElementToBeRemoved(loadingEl).then(() =>
+    await act(async () => {
+        user.click(screen.getAllByText(/remove/i)[1])
+    })
+    await waitFor(() => {
         expect(screen.queryByText('Test Customer')).not.toBeInTheDocument()
-    )
+    })
 })
