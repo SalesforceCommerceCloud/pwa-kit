@@ -50,7 +50,7 @@ export const setupMockServer = () => {
                 ctx.delay(0),
                 ctx.json({
                     customer_id: 'customerid',
-                    access_token: 'testtoken',
+                    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjF9.BDAp9G8nmArdBqAbsE5GUWZ3fiv2LwQKClEFDCGIyy8',
                     refresh_token: 'testrefeshtoken',
                     usid: 'testusid',
                     enc_user_id: 'testEncUserId',
