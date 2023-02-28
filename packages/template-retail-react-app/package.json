@@ -57,6 +57,9 @@
         "react-router-dom": "^5.1.2",
         "whatwg-fetch": "1.0.0"
     },
+    "peerDependencies": {
+        "@chakra-ui/system": "^1.12.1"
+    },
     "scripts": {
         "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
         "build-translations": "npm run extract-default-translations && npm run compile-translations",
