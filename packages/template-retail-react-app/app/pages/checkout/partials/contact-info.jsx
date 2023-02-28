@@ -30,6 +30,7 @@ import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components
 import Field from '../../../components/field'
 import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
 import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {
     ShopperLoginHelpers,
     useShopperLoginHelper,
@@ -41,6 +42,7 @@ const ContactInfo = () => {
     const history = useHistory()
     const authModal = useAuthModal('password')
     const {data: customer} = useCurrentCustomer()
+    const {basket} = useCurrentBasket()
     const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
     const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation({action: 'updateCustomerForBasket'})
@@ -48,19 +50,16 @@ const ContactInfo = () => {
     // step 1. useCustomer
     // customer.email
     const {
-        // customer,
-        basket,
         isGuestCheckout,
         setIsGuestCheckout,
         step,
-        // login,
         checkoutSteps,
         setCheckoutStep,
         goToNextStep
     } = useCheckout()
 
     const form = useForm({
-        defaultValues: {email: customer?.email || basket.customerInfo?.email || '', password: ''}
+        defaultValues: {email: customer?.email || basket?.customerInfo?.email || '', password: ''}
     })
 
     const fields = useLoginFields({form})
@@ -70,11 +69,10 @@ const ContactInfo = () => {
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
 
     const submitForm = async (data) => {
-        console.log(data)
         setError(null)
         try {
             if (!data.password) {
-                await updateCustomerForBasket.mutateAsync({email: data.email})
+                await updateCustomerForBasket.mutateAsync({parameters: {basketId: basket.basketId}, body:{email: data.email}})
             } else {
                 await login.mutateAsync({username: data.email, password: data.password})
             }
@@ -200,8 +198,6 @@ const ContactInfo = () => {
                     onClose={() => setSignOutConfirmDialogIsOpen(false)}
                     onConfirm={async () => {
                         await logout.mutateAsync()
-                        // TODO
-                        await basket.getOrCreateBasket()
                         history.replace('/')
                         setSignOutConfirmDialogIsOpen(false)
                     }}

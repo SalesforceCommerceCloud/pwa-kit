@@ -14,9 +14,9 @@ import ShippingAddress from './partials/shipping-address'
 import ShippingOptions from './partials/shipping-options'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useBasket from '../../commerce-api/hooks/useBasket'
-import Payment from './partials/payment'
+// import Payment from './partials/payment'
 import CheckoutSkeleton from './partials/checkout-skeleton'
-import OrderSummary from '../../components/order-summary'
+// import OrderSummary from '../../components/order-summary'
 
 const Checkout = () => {
     const navigate = useNavigation()
@@ -59,9 +59,9 @@ const Checkout = () => {
                             )}
 
                             <ContactInfo />
-                            <ShippingAddress />
-                            <ShippingOptions />
-                            <Payment />
+                            {/* <ShippingAddress /> */}
+                            {/* <ShippingOptions /> */}
+                            {/* <Payment /> */}
 
                             {step === 4 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
@@ -84,7 +84,7 @@ const Checkout = () => {
                     </GridItem>
 
                     <GridItem py={6} px={[4, 4, 4, 0]}>
-                        <OrderSummary showTaxEstimationForm={false} showCartItems={true} />
+                        {/* <OrderSummary showTaxEstimationForm={false} showCartItems={true} /> */}
 
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>

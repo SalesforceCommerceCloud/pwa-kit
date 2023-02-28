@@ -6,23 +6,21 @@
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import useBasket from '../../../commerce-api/hooks/useBasket'
 import useEinstein from '../../../commerce-api/hooks/useEinstein'
 import {useCommerceAPI} from '../../../commerce-api/contexts'
 import {getPaymentInstrumentCardType} from '../../../utils/cc-utils'
 import {isMatchingAddress} from '../../../utils/utils'
 import {useIntl} from 'react-intl'
 import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
 const CheckoutContext = React.createContext()
 
 export const CheckoutProvider = ({children}) => {
     const mounted = useRef()
     const api = useCommerceAPI()
-    // const customer = useCustomer()
     const {data: customer} = useCurrentCustomer()
-    console.log(customer)
-    const basket = useBasket()
+    const {basket} = useCurrentBasket()
     const {formatMessage} = useIntl()
     const einstein = useEinstein()
 
@@ -72,13 +70,13 @@ export const CheckoutProvider = ({children}) => {
             mergeState({isGuestCheckout: false})
         }
 
-        if (customer.isGuest && basket.customerInfo?.email && !state.isGuestCheckout) {
+        if (customer.isGuest && basket?.customerInfo?.email && !state.isGuestCheckout) {
             mergeState({isGuestCheckout: true})
         }
 
         // Derive the starting step for checkout based on current state of basket.
         // A failed condition sets the current step and returns early (order matters).
-        if (customer.customerId && basket.basketId && state.step == undefined) {
+        if (customer.customerId && basket?.basketId && state.step == undefined) {
             if (!basket.customerInfo?.email) {
                 mergeState({step: CheckoutSteps.Contact_Info})
                 return
