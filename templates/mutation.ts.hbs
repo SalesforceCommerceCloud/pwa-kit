@@ -17,17 +17,21 @@ import {cacheUpdateMatrix} from './cache'
 
 type Client = ApiClients['{{@root.clientInstance}}']
 
+/** Mutations available for {{@root.name.original}}. */
 export const {{@root.clientClass}}Mutations = {
   {{~#each model.encodes.endPoints}}{{#each operations}}{{#if (isMutation @root.clientClass this)}}
-  {{!-- /**
+  /**
    * {{{formatForTsDoc description}}}
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/{{@root.name.kebabCase}}?meta={{name~}} } for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/{{lowercase @root.name.lowerCamelCase}}.{{lowercase @root.name.lowerCamelCase}}-1.html#{{lowercase (getValue name)~}} } for more information on the parameters and returned data type.
-   */ --}}
+   * @returns A TanStack Query mutation hook for interacting with the {{@root.name.original}} `{{name}}` endpoint.
+   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/{{@root.name.kebabCase}}?meta={{name~}} | Salesforce Developer Center} for more information about the API endpoint.
+   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/{{lowercase @root.clientInstance}}.{{lowercase @root.clientInstance}}-1.html#{{lowercase (getValue name)}} | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
+   */
   {{capitalize (getValue name)}}: '{{name}}',
   {{~/if}}{{/each}}{{/each}}
 } as const
 
+/** Mutation for {{@root.name.original}}. */
 export type {{@root.clientClass}}Mutation = typeof {{@root.clientClass}}Mutations[keyof typeof {{@root.clientClass}}Mutations]
 
 export function use{{@root.clientClass}}Mutation<Mutation extends {{@root.clientClass}}Mutation>(
