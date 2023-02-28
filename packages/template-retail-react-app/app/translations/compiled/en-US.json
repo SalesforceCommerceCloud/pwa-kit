@@ -243,6 +243,12 @@
       "value": "New Payment Method Saved"
     }
   ],
+  "account_payment_methods.info.payment_method_removed": [
+    {
+      "type": 0,
+      "value": "Payment Method Removed"
+    }
+  ],
   "account_payment_methods.title.payment_methods": [
     {
       "type": 0,
