@@ -47,8 +47,6 @@ const ContactInfo = () => {
     const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation({action: 'updateCustomerForBasket'})
 
-    // step 1. useCustomer
-    // customer.email
     const {
         isGuestCheckout,
         setIsGuestCheckout,
