@@ -5,12 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, within, fireEvent} from '@testing-library/react'
+import {screen, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {rest} from 'msw'
+
 import ContactInfo from './contact-info'
 import {renderWithProviders} from '../../../utils/test-utils'
-import {mockCustomerBaskets} from '../../../commerce-api/mock-data'
 
 jest.mock('../util/checkout-context', () => {
     return {
