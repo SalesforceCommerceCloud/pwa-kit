@@ -192,18 +192,6 @@ export const CheckoutProvider = ({children}) => {
             // ----------------
 
             /**
-             * Logs in a registered customer or applies a guest email to basket.
-             * @param {Object} credentials
-             */
-            async login({email, password}) {
-                if (!password) {
-                    await basket.updateCustomerInfo({email})
-                } else {
-                    await customer.login({email, password})
-                }
-            },
-
-            /**
              * Applies the given address to the basket's shipment. Accepts CustomerAddress and OrderAddress.
              * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shoppercustomers.html#customeraddress}
              * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shoppercustomers.html#orderaddress}
