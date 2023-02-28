@@ -124,8 +124,7 @@ const updateBasket = (
     response: Basket
 ): CacheUpdate => ({
     // TODO: We only update the basket from the matching locale; we should also invalidate other locales
-    ...updateBasketQuery(customerId, parameters, response),
-    ...invalidateCustomerBasketsQuery(customerId, parameters)
+    ...updateBasketQuery(customerId, parameters, response)
 })
 
 const updateBasketWithResponseBasketId = (
@@ -136,8 +135,7 @@ const updateBasketWithResponseBasketId = (
     const {basketId} = response
     return {
         // TODO: We only update the basket from the matching locale; we should also invalidate other locales
-        ...(basketId && updateBasketQuery(customerId, {...parameters, basketId}, response)),
-        ...invalidateCustomerBasketsQuery(customerId, parameters)
+        ...(basketId && updateBasketQuery(customerId, {...parameters, basketId}, response))
     }
 }
 
