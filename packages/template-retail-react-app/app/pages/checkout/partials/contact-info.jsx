@@ -29,24 +29,31 @@ import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
 import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
-// import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {
+    ShopperLoginHelpers,
+    useShopperLoginHelper,
+    useShopperBasketsMutation
+} from 'commerce-sdk-react-preview'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()
     const history = useHistory()
     const authModal = useAuthModal('password')
-    // const customerr = useCurrentCustomer()
-    // console.log(customerr.data)
+    const {data: customer} = useCurrentCustomer()
+    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
+    const updateCustomerForBasket = useShopperBasketsMutation({action: 'updateCustomerForBasket'})
 
     // step 1. useCustomer
     // customer.email
     const {
-        customer,
+        // customer,
         basket,
         isGuestCheckout,
         setIsGuestCheckout,
         step,
-        login,
+        // login,
         checkoutSteps,
         setCheckoutStep,
         goToNextStep
@@ -63,13 +70,17 @@ const ContactInfo = () => {
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
 
     const submitForm = async (data) => {
+        console.log(data)
         setError(null)
         try {
-            // TODO
-            await login(data)
+            if (!data.password) {
+                await updateCustomerForBasket.mutateAsync({email: data.email})
+            } else {
+                await login.mutateAsync({username: data.email, password: data.password})
+            }
             goToNextStep()
         } catch (error) {
-            if (/invalid credentials/i.test(error.message)) {
+            if (/Unauthorized/i.test(error.message)) {
                 setError(
                     formatMessage({
                         defaultMessage: 'Incorrect username or password, please try again.',
@@ -188,8 +199,8 @@ const ContactInfo = () => {
                     isOpen={signOutConfirmDialogIsOpen}
                     onClose={() => setSignOutConfirmDialogIsOpen(false)}
                     onConfirm={async () => {
+                        await logout.mutateAsync()
                         // TODO
-                        await customer.logout()
                         await basket.getOrCreateBasket()
                         history.replace('/')
                         setSignOutConfirmDialogIsOpen(false)
