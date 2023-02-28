@@ -75,7 +75,7 @@ test('Provides navigation for subpages', async () => {
             return res(ctx.delay(0), ctx.json(mockOrderHistory))
         })
     )
-    renderWithProviders(<MockedComponent />, {
+    await renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
     expect(await screen.findByTestId('account-page')).toBeInTheDocument()

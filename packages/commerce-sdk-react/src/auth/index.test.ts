@@ -182,6 +182,13 @@ describe('Auth', () => {
 
         expect(auth.ready()).resolves.toEqual(result)
     })
+    test('ready - use `fetchedToken` and short circuit network request', async () => {
+        const auth = new Auth({...config, fetchedToken: 'fake-token'})
+        jest.spyOn(auth, 'queueRequest')
+        await auth.ready().then(() => {
+            expect(auth.queueRequest).not.toHaveBeenCalled()
+        })
+    })
     test('ready - use refresh token when access token is expired', async () => {
         const auth = new Auth(config)
 

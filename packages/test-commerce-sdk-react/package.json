@@ -3,7 +3,7 @@
   "version": "2.8.0-dev.0",
   "private": true,
   "engines": {
-    "node": "^14.0.0",
+    "node": "^14.0.0 || ^16.0.0",
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
   "devDependencies": {
@@ -49,7 +49,7 @@
       "**/*.json"
     ],
     "ssrParameters": {
-      "ssrFunctionNodeVersion": "14.x",
+      "ssrFunctionNodeVersion": "16.x",
       "proxyConfigs": [
         {
           "host": "kv7kzm78.api.commercecloud.salesforce.com",

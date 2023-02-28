@@ -81,8 +81,21 @@ const getAppEntryPoint = (pkg) => {
 }
 
 const findInProjectThenSDK = (pkg) => {
-    const projectPath = resolve(projectDir, 'node_modules', pkg)
-    return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
+    // Look for the SDK node_modules in two places because in CI,
+    // pwa-kit-dev is published under a 'dist' directory, which
+    // changes this file's location relative to the package root.
+    const candidates = [
+        resolve(projectDir, 'node_modules', pkg),
+        resolve(__dirname, '..', '..', 'node_modules', pkg),
+        resolve(__dirname, '..', '..', '..', 'node_modules', pkg)
+    ]
+    let candidate
+    for (candidate of candidates) {
+        if (fs.existsSync(candidate)) {
+            return candidate
+        }
+    }
+    return candidate
 }
 
 const findInProjectThenExtendsThenSDK = (pkg) => {
