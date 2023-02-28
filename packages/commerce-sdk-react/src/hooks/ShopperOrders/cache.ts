@@ -10,11 +10,6 @@ import {getOrder} from './queryKeyHelpers'
 
 type Client = ApiClients['shopperOrders']
 
-const basePath = (parameters: Client['clientConfig']['parameters']) => [
-    '/organizations/',
-    parameters.organizationId
-]
-
 /** Logs a warning to console (on startup) and returns nothing (method is unimplemented). */
 const TODO = (method: keyof Client) => {
     console.warn(`Cache logic for '${method}' is not yet implemented.`)
