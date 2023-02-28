@@ -33,6 +33,7 @@ const MockedComponent = () => {
 
     useEffect(() => {
         if (!isRegistered) {
+            console.log('logging.............................')
             login.mutate(
                 {email: 'email@test.com', password: 'password1'},
                 {
@@ -135,11 +136,11 @@ test.skip('Provides navigation for subpages', async () => {
 })
 
 describe('Render and logs out', function () {
-    test.skip('Renders account detail page by default for logged-in customer, and can log out', async () => {
+    test('Renders account detail page by default for logged-in customer, and can log out', async () => {
         renderWithProviders(<MockedComponent />)
 
         await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
-        // Render user profile [age
+        // Render user profile page
         await waitFor(() => {
             expect(window.location.pathname).toEqual(`${expectedBasePath}/account`)
             expect(screen.getByTestId('account-detail-page')).toBeInTheDocument()
@@ -169,7 +170,7 @@ describe('updating profile', function () {
             })
         )
     })
-    test.skip('Allows customer to edit profile details', async () => {
+    test('Allows customer to edit profile details', async () => {
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
@@ -201,7 +202,7 @@ describe('updating password', function () {
             })
         )
     })
-    test.skip('Allows customer to update password', async () => {
+    test('Allows customer to update password', async () => {
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
