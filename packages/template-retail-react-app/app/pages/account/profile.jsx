@@ -39,7 +39,7 @@ import {useCurrentCustomer} from '../../hooks/use-current-customer'
  */
 // eslint-disable-next-line react/prop-types
 const Skeleton = ({children, height, width, ...rest}) => {
-    const customer = useCurrentCustomer()
+    const {data: customer} = useCurrentCustomer()
     const {isRegistered} = customer
     const size = !isRegistered
         ? {
