@@ -23,6 +23,7 @@ interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
     fetchOptions?: ShopperLoginTypes.FetchOptions
+    fetchedToken?: string
 }
 
 interface JWTHeaders {
@@ -131,6 +132,7 @@ class Auth {
     private pendingToken: Promise<TokenResponse> | undefined
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
     private stores: Record<StorageType, BaseStorage>
+    private fetchedToken: string
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
@@ -176,6 +178,8 @@ class Auth {
               }
 
         this.redirectURI = config.redirectURI
+
+        this.fetchedToken = config.fetchedToken || ''
     }
 
     get(name: AuthDataKeys) {
@@ -283,21 +287,22 @@ class Auth {
      * 3. PKCE flow
      */
     async ready() {
+        if (this.fetchedToken && this.fetchedToken !== '') {
+            this.pendingToken = Promise.resolve({...this.data, access_token: this.fetchedToken})
+            return this.pendingToken
+        }
         if (this.pendingToken) {
             return this.pendingToken
         }
-
         const accessToken = this.get('access_token')
 
         if (accessToken && !this.isTokenExpired(accessToken)) {
             this.pendingToken = Promise.resolve(this.data)
             return this.pendingToken
         }
-
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
-
         if (refreshToken) {
             try {
                 return this.queueRequest(
