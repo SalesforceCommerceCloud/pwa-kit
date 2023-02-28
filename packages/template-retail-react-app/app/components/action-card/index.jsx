@@ -23,9 +23,6 @@ const ActionCard = ({children, onEdit, onRemove, ...props}) => {
         setShowLoading(true)
         try {
             return await Promise.resolve(onRemove())
-        } catch (err) {
-            console.log(err)
-            throw err
         } finally {
             setShowLoading(false)
         }
