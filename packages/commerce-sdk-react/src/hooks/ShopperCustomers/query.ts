@@ -14,11 +14,11 @@ import * as queryKeyHelpers from './queryKeyHelpers'
 type Client = ApiClients['shopperCustomers']
 
 /**
- * A hook for `ShopperCustomers#getExternalProfile`.
  * Gets the new external profile for a customer.This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getExternalProfile} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getexternalprofile} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getExternalProfile` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getExternalProfile| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getexternalprofile | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useExternalProfile = (
     apiOptions: Argument<Client['getExternalProfile']>,
@@ -50,11 +50,11 @@ export const useExternalProfile = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getCustomer`.
  * Gets a customer with all existing addresses and payment instruments associated with the requested customer.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomer} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomer} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomer` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomer| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomer | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useCustomer = (
     apiOptions: Argument<Client['getCustomer']>,
@@ -81,11 +81,11 @@ export const useCustomer = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getCustomerAddress`.
  * Retrieves a customer's address by address name.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerAddress} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomeraddress} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerAddress` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerAddress| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomeraddress | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useCustomerAddress = (
     apiOptions: Argument<Client['getCustomerAddress']>,
@@ -112,11 +112,11 @@ export const useCustomerAddress = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getCustomerBaskets`.
  * Gets the baskets of a customer.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerBaskets} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerbaskets} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerBaskets` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerBaskets| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerbaskets | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useCustomerBaskets = (
     apiOptions: Argument<Client['getCustomerBaskets']>,
@@ -143,11 +143,11 @@ export const useCustomerBaskets = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getCustomerOrders`.
  * Returns a pageable list of all customer's orders. The default page size is 10.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerOrders} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerorders} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerOrders` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerOrders| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerorders | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useCustomerOrders = (
     apiOptions: Argument<Client['getCustomerOrders']>,
@@ -174,11 +174,11 @@ export const useCustomerOrders = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getCustomerPaymentInstrument`.
  * Retrieves a customer's payment instrument by its ID.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerPaymentInstrument} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerpaymentinstrument} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerPaymentInstrument` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerPaymentInstrument| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerpaymentinstrument | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useCustomerPaymentInstrument = (
     apiOptions: Argument<Client['getCustomerPaymentInstrument']>,
@@ -210,11 +210,11 @@ export const useCustomerPaymentInstrument = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getCustomerProductLists`.
  * Returns all customer product lists.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerProductLists} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlists} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerProductLists` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerProductLists| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlists | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useCustomerProductLists = (
     apiOptions: Argument<Client['getCustomerProductLists']>,
@@ -241,11 +241,11 @@ export const useCustomerProductLists = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getCustomerProductList`.
  * Returns a customer product list of the given customer and the items in the list.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerProductList} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlist} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerProductList` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerProductList| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlist | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useCustomerProductList = (
     apiOptions: Argument<Client['getCustomerProductList']>,
@@ -272,11 +272,11 @@ export const useCustomerProductList = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getCustomerProductListItem`.
  * Returns an item of a customer product list and the actual product details like image, availability and price.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerProductListItem} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlistitem} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerProductListItem` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getCustomerProductListItem| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getcustomerproductlistitem | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useCustomerProductListItem = (
     apiOptions: Argument<Client['getCustomerProductListItem']>,
@@ -309,11 +309,11 @@ export const useCustomerProductListItem = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getPublicProductListsBySearchTerm`.
  * Retrieves all public product lists as defined by the given search term (for example, email OR first name and last name).
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getPublicProductListsBySearchTerm} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getpublicproductlistsbysearchterm} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getPublicProductListsBySearchTerm` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getPublicProductListsBySearchTerm| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getpublicproductlistsbysearchterm | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const usePublicProductListsBySearchTerm = (
     apiOptions: Argument<Client['getPublicProductListsBySearchTerm']>,
@@ -340,11 +340,11 @@ export const usePublicProductListsBySearchTerm = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getPublicProductList`.
  * Retrieves a public product list by ID and the items under that product list.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getPublicProductList} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getpublicproductlist} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getPublicProductList` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getPublicProductList| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getpublicproductlist | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const usePublicProductList = (
     apiOptions: Argument<Client['getPublicProductList']>,
@@ -371,11 +371,11 @@ export const usePublicProductList = (
     })
 }
 /**
- * A hook for `ShopperCustomers#getProductListItem`.
  * Retrieves an item from a public product list and the actual product details like product, image, availability and price.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getProductListItem} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getproductlistitem} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Customers `getProductListItem` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getProductListItem| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getproductlistitem | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useProductListItem = (
     apiOptions: Argument<Client['getProductListItem']>,

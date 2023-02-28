@@ -14,11 +14,11 @@ import * as queryKeyHelpers from './queryKeyHelpers'
 type Client = ApiClients['shopperOrders']
 
 /**
- * A hook for `ShopperOrders#getOrder`.
  * Gets information for an order.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=getOrder} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#getorder} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Orders `getOrder` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=getOrder| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#getorder | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useOrder = (
     apiOptions: Argument<Client['getOrder']>,
@@ -45,11 +45,11 @@ export const useOrder = (
     })
 }
 /**
- * A hook for `ShopperOrders#getPaymentMethodsForOrder`.
  * Gets the applicable payment methods for an existing order considering the open payment amount only.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=getPaymentMethodsForOrder} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#getpaymentmethodsfororder} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Orders `getPaymentMethodsForOrder` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=getPaymentMethodsForOrder| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#getpaymentmethodsfororder | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const usePaymentMethodsForOrder = (
     apiOptions: Argument<Client['getPaymentMethodsForOrder']>,
@@ -76,13 +76,13 @@ export const usePaymentMethodsForOrder = (
     })
 }
 /**
- * A hook for `ShopperOrders#getTaxesFromOrder`.
  * This method gives you the external taxation data of the order transferred from the basket during 
 order creation. This endpoint can be called only if external taxation was used. See POST /baskets 
 for more information.         
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=getTaxesFromOrder} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#gettaxesfromorder} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Orders `getTaxesFromOrder` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=getTaxesFromOrder| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#gettaxesfromorder | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useTaxesFromOrder = (
     apiOptions: Argument<Client['getTaxesFromOrder']>,

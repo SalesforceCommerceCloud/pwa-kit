@@ -14,11 +14,11 @@ import * as queryKeyHelpers from './queryKeyHelpers'
 type Client = ApiClients['shopperContexts']
 
 /**
- * A hook for `ShopperContexts#getShopperContext`.
  * Gets the shopper's context based on the shopperJWT. ******** This API is currently a work in progress, and not available to use yet. ********
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-contexts?meta=getShopperContext} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercontexts.shoppercontexts-1.html#getshoppercontext} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Contexts `getShopperContext` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-contexts?meta=getShopperContext| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercontexts.shoppercontexts-1.html#getshoppercontext | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useShopperContext = (
     apiOptions: Argument<Client['getShopperContext']>,

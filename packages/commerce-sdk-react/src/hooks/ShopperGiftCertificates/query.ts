@@ -14,11 +14,11 @@ import * as queryKeyHelpers from './queryKeyHelpers'
 type Client = ApiClients['shopperGiftCertificates']
 
 /**
- * A hook for `ShopperGiftCertificates#getGiftCertificate`.
  * Action to retrieve an existing gift certificate.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-gift-certificates?meta=getGiftCertificate} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppergiftcertificates.shoppergiftcertificates-1.html#getgiftcertificate} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Gift Certificates `getGiftCertificate` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-gift-certificates?meta=getGiftCertificate| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppergiftcertificates.shoppergiftcertificates-1.html#getgiftcertificate | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
 export const useGiftCertificate = (
     apiOptions: Argument<Client['getGiftCertificate']>,

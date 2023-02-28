@@ -13,13 +13,54 @@ import {cacheUpdateMatrix} from './cache'
 
 type Client = ApiClients['shopperOrders']
 
+/** Mutations available for Shopper Orders. */
 export const ShopperOrdersMutations = {
+    /**
+     * Submits an order based on a prepared basket. The only considered value from the request body is basketId.
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `createOrder` endpoint.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=createOrder| Salesforce Developer Center} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#createorder | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
+     */
     CreateOrder: 'createOrder',
+    /**
+   * Adds a payment instrument to an order. 
+
+Details:
+
+The payment instrument is added with the provided details. The payment method must be applicable for the order see GET
+/baskets/\{basketId\}/payment-methods, if the payment method is 'CREDIT_CARD' a paymentCard must be specified in the request.
+   * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `createPaymentInstrumentForOrder` endpoint.
+   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=createPaymentInstrumentForOrder| Salesforce Developer Center} for more information about the API endpoint.
+   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#createpaymentinstrumentfororder | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
+   */
     CreatePaymentInstrumentForOrder: 'createPaymentInstrumentForOrder',
+    /**
+     * Removes a payment instrument of an order.
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `removePaymentInstrumentFromOrder` endpoint.
+     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=removePaymentInstrumentFromOrder| Salesforce Developer Center} for more information about the API endpoint.
+     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#removepaymentinstrumentfromorder | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
+     */
     RemovePaymentInstrumentFromOrder: 'removePaymentInstrumentFromOrder',
+    /**
+   * Updates a payment instrument of an order.
+
+Details:
+
+The payment instrument is updated with the provided details. The payment method must be applicable for the
+order see GET /baskets/\{basketId\}/payment-methods, if the payment method is 'CREDIT_CARD' a
+paymentCard must be specified in the request.
+   * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `updatePaymentInstrumentForOrder` endpoint.
+   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-orders?meta=updatePaymentInstrumentForOrder| Salesforce Developer Center} for more information about the API endpoint.
+   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperorders.shopperorders-1.html#updatepaymentinstrumentfororder | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
+   */
     UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
 } as const
 
+/** Mutation for Shopper Orders. */
 export type ShopperOrdersMutation =
     (typeof ShopperOrdersMutations)[keyof typeof ShopperOrdersMutations]
 
