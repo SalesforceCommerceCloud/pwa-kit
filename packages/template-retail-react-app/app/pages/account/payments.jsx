@@ -134,27 +134,20 @@ const AccountPaymentMethods = () => {
         }
         try {
             form.clearErrors()
-            addSavedPaymentInstrumentAction.mutate(
-                {
-                    body,
-                    parameters: {
-                        customerId: customer.customerId
-                    }
-                },
-                {
-                    onSuccess: () => {
-                        toggleEdit()
-                        showToast({
-                            title: successfullyAddedMessage,
-                            status: 'success',
-                            isClosable: true
-                        })
-                    },
-                    onError: (e) => {
-                        showError()
-                    }
+            const data = await addSavedPaymentInstrumentAction.mutateAsync({
+                body,
+                parameters: {
+                    customerId: customer.customerId
                 }
-            )
+            })
+            if (data) {
+                toggleEdit()
+                showToast({
+                    title: formatMessage(successfullyAddedMessage),
+                    status: 'success',
+                    isClosable: true
+                })
+            }
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }
@@ -172,7 +165,7 @@ const AccountPaymentMethods = () => {
                 {
                     onSuccess: () => {
                         showToast({
-                            title: successfullyRemovedMessage,
+                            title: formatMessage(successfullyRemovedMessage),
                             status: 'success',
                             isClosable: true
                         })
