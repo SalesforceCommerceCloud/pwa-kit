@@ -35,12 +35,12 @@ type RemoveNeverValues<T> = {
 }
 
 /** Change string index type to `never`. */
-type StringIndexNever<T> = {
+type StringIndexToNever<T> = {
     [K in keyof T]: string extends K ? never : T[K]
 }
 
 /** Removes a string index type. */
-export type RemoveStringIndex<T> = RemoveNeverValues<StringIndexNever<T>>
+export type RemoveStringIndex<T> = RemoveNeverValues<StringIndexToNever<T>>
 
 /** Gets the last element of an array. */
 export type Tail<T extends readonly unknown[]> = T extends [...head: unknown[], tail: infer Tail]
