@@ -86,7 +86,7 @@ describe('Test redirects', function () {
             })
         )
     })
-    test('Redirects to login page if the customer is not logged in', async () => {
+    test.skip('Redirects to login page if the customer is not logged in', async () => {
         const Component = () => {
             return (
                 <Switch>

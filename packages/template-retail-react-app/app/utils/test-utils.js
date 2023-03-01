@@ -9,6 +9,7 @@ import {render} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {ChakraProvider} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
+import {PageContext, Region} from '../page-designer/core'
 
 import theme from '../theme'
 import _CommerceAPI from '../commerce-api'
@@ -243,4 +244,44 @@ export const createPathWithDefaults = (path) => {
 
     const updatedPath = buildUrl(path, siteAlias || defaultSite.id, defaultLocale)
     return updatedPath
+}
+
+/**
+ * When testing page designer components wrap them using this higher-order component
+ * if you plan on using `Region` of `Components` within the components definition.
+ *
+ * @param {*} Component
+ * @param {*} options
+ * @returns
+ */
+export const withPageProvider = (Component, options) => {
+    const providerProps = options?.providerProps || {
+        value: {
+            components: new Proxy(
+                {},
+                {
+                    // eslint-disable-next-line no-unused-vars
+                    get(_target, _prop) {
+                        return (props) => (
+                            <div>
+                                <b>{props.typeId}</b>
+                                {props?.regions?.map((region) => (
+                                    <Region key={region.id} region={region} />
+                                ))}
+                            </div>
+                        )
+                    }
+                }
+            )
+        }
+    }
+    const wrappedComponentName = Component.displayName || Component.name
+    const WrappedComponent = (props) => (
+        <PageContext.Provider {...providerProps}>
+            <Component {...props} />
+        </PageContext.Provider>
+    )
+    WrappedComponent.displayName = `withRouter(${wrappedComponentName})`
+
+    return WrappedComponent
 }

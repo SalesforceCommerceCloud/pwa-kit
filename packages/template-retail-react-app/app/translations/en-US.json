@@ -108,6 +108,9 @@
   "account_payment_methods.info.new_method_saved": {
     "defaultMessage": "New Payment Method Saved"
   },
+  "account_payment_methods.info.payment_method_removed": {
+    "defaultMessage": "Payment Method Removed"
+  },
   "account_payment_methods.title.payment_methods": {
     "defaultMessage": "Payment Methods"
   },

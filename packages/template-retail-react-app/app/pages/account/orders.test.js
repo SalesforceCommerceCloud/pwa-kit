@@ -10,7 +10,11 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import {mockOrderHistory, mockOrderProducts} from '../../commerce-api/mock-data'
+import {
+    mockCustomerBaskets,
+    mockOrderHistory,
+    mockOrderProducts
+} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
@@ -43,6 +47,9 @@ beforeEach(() => {
         rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
             res(ctx.delay(0), ctx.json(mockOrderHistory))
         ),
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.json(mockCustomerBaskets))
+        ),
         rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts)))
     )
 
@@ -53,7 +60,7 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test.skip('Renders order history and details', async () => {
+test('Renders order history and details', async () => {
     renderWithProviders(<MockedComponent history={history} />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })

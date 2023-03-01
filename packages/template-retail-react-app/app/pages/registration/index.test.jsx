@@ -101,7 +101,7 @@ afterEach(() => {
     jest.useRealTimers()
 })
 
-//TODO: Hook integration integration WIP
+//@TODO: Hook integration integration WIP
 test.skip('Allows customer to create an account', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {

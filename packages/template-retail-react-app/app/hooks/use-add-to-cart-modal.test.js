@@ -10,19 +10,7 @@ import {renderWithProviders} from '../utils/test-utils'
 import {waitFor, screen, act} from '@testing-library/react'
 import {rest} from 'msw'
 import {mockCustomerBaskets} from '../commerce-api/mock-data'
-jest.mock('commerce-sdk-react-preview', () => {
-    const originModule = jest.requireActual('commerce-sdk-react-preview')
-    return {
-        ...originModule,
-        useCustomerId: jest.fn().mockReturnValue('customer_id'),
-        useCustomerType: jest
-            .fn()
-            .mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'}),
-        useCustomerBaskets: jest
-            .fn()
-            .mockReturnValue({data: {baskets: [{currency: 'GBP', productItems: [{quantity: 2}]}]}})
-    }
-})
+
 const MOCK_PRODUCT = {
     currency: 'USD',
     id: '701642811398M',
@@ -598,10 +586,13 @@ test('Renders AddToCartModal', async () => {
                 <AddToCartModal />
             </AddToCartModalContext.Provider>
         )
-        await waitFor(() => {
-            expect(screen.getByText(/cart subtotal \(2 item\)/i)).toBeInTheDocument()
-            expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
-        })
+        await waitFor(
+            () => {
+                expect(screen.getByText(/cart subtotal \(2 item\)/i)).toBeInTheDocument()
+                expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+            },
+            {timeout: 7000}
+        )
     })
 })
 

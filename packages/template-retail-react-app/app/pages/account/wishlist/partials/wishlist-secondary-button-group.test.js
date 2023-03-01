@@ -355,7 +355,7 @@ beforeEach(() => {
     jest.resetModules()
 })
 
-test.skip('can remove item', async () => {
+test('can remove item', async () => {
     const removeItemMock = jest.fn().mockResolvedValue(true)
     useWishlist.mockReturnValue({
         isInitialized: true,

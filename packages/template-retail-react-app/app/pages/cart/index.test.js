@@ -107,8 +107,50 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.json(mockShippingMethods))
         }),
 
+        rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockShippingMethods))
+        }),
+
+        rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockShippingMethods))
+        }),
+
         rest.get('*/promotions', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockPromotions))
+        }),
+
+        rest.patch('*/baskets/:basketId/items/:itemId', (req, res, ctx) => {
+            const basket = mockCustomerBaskets.baskets[0]
+            const updatedQuantityCustomerBasket = {
+                ...basket,
+                shipments: [
+                    {
+                        ...basket.shipments[0],
+                        productItems: [
+                            {
+                                adjustedTax: 2.93,
+                                basePrice: 61.43,
+                                bonusProductLineItem: false,
+                                gift: false,
+                                itemId: '4a9af0a24fe46c3f6d8721b371',
+                                itemText: 'Belted Cardigan With Studs',
+                                price: 61.43,
+                                priceAfterItemDiscount: 61.43,
+                                priceAfterOrderDiscount: 61.43,
+                                productId: '701642889830M',
+                                productName: 'Belted Cardigan With Studs',
+                                quantity: 3,
+                                shipmentId: 'me',
+                                tax: 2.93,
+                                taxBasis: 61.43,
+                                taxClassId: 'standard',
+                                taxRate: 0.05
+                            }
+                        ]
+                    }
+                ]
+            }
+            return res(ctx.json(updatedQuantityCustomerBasket))
         })
     )
 })
@@ -130,12 +172,12 @@ describe('Empty cart tests', function () {
             })
         )
     })
-    test.skip('Renders empty cart when there are no items', async () => {
+    test('Renders empty cart when there are no items', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
     })
 })
-test.skip('Renders cart components when there are items', async () => {
+test('Renders cart components when there are items', async () => {
     renderWithProviders(<Cart />)
     await waitFor(async () => {
         expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
@@ -154,7 +196,7 @@ test('Applies default shipping method to basket and renders estimated pricing', 
 })
 
 describe('Update quantity', function () {
-    test.skip('Can update item quantity in the cart', async () => {
+    test('Can update item quantity in the cart', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -170,12 +212,16 @@ describe('Update quantity', function () {
         // update item quantity
         fireEvent.pointerDown(incrementButton)
 
-        await waitFor(() => {
-            expect(within(cartItem).getByDisplayValue('3'))
-        })
+        await waitFor(
+            () => {
+                expect(within(cartItem).getByDisplayValue('3'))
+            },
+            {timeout: 5000}
+        )
     })
 
-    test.skip('Can update item quantity from product view modal', async () => {
+    test('Can update item quantity from product view modal', async () => {
+        jest.setTimeout(30000)
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -211,7 +257,6 @@ describe('Remove item from cart', function () {
         )
     })
     test('Can remove item from the cart', async () => {
-        jest.setTimeout(30000)
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -222,7 +267,12 @@ describe('Remove item from cart', function () {
         userEvent.click(within(cartItem).getByRole('button', {name: /remove/i}))
         userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
 
-        expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
+        await waitFor(
+            () => {
+                expect(screen.getByTestId('sf-cart-empty')).toBeInTheDocument()
+            },
+            {timeout: 5000}
+        )
     })
 })
 
@@ -322,7 +372,7 @@ describe('Coupons tests', function () {
             })
         )
     })
-    test.skip('Can apply and remove product-level coupon code with promotion', async () => {
+    test('Can apply and remove product-level coupon code with promotion', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 

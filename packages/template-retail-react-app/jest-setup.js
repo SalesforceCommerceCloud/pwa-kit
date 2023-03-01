@@ -49,7 +49,7 @@ export const setupMockServer = () => {
             res(
                 ctx.delay(0),
                 ctx.json({
-                    customer_id: 'test',
+                    customer_id: 'customerid',
                     access_token: 'testtoken',
                     refresh_token: 'testrefeshtoken',
                     usid: 'testusid',
@@ -67,7 +67,11 @@ export const setupMockServer = () => {
 
 beforeAll(() => {
     global.server = setupMockServer()
-    global.server.listen()
+    global.server.listen({
+        onUnhandledRequest(req) {
+            console.error('Found an unhandled %s request to %s', req.method, req.url.href)
+        }
+    })
 })
 afterEach(() => {
     global.server.resetHandlers()

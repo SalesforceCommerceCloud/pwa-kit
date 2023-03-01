@@ -79,7 +79,7 @@ beforeEach(() => {
 afterEach(() => {
     localStorage.clear()
 })
-test.skip('renders Header', async () => {
+test('renders Header', async () => {
     await act(async () => {
         renderWithProviders(<Header />)
     })
