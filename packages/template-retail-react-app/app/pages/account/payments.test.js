@@ -48,8 +48,7 @@ afterEach(() => {
     localStorage.clear()
 })
 
-// @TODO
-test.skip('Allows customer to add and remove payment methods', async () => {
+test('Allows customer to add and remove payment methods', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('customerid')).toBeInTheDocument())
 
