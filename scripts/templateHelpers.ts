@@ -5,10 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {amf} from '@commerce-apps/raml-toolkit';
-import {
-  getReturnTypeFromOperation,
-  getTypeFromParameter,
-} from '@commerce-apps/raml-toolkit/lib/generate/handlebarsAmfHelpers';
+import {getTypeFromParameter} from '@commerce-apps/raml-toolkit/lib/generate/handlebarsAmfHelpers';
 
 /**
  * Given an individual type or an array of types in the format Array\<Foo | Baa\>
@@ -182,20 +179,37 @@ export const createQueryKeyFragment = (
     `', ${variable ? `${variable}.$1` : 'string'}, '`
   )}'`.replace(", ''", '');
 
+/** Determines whether an API endpoint is neither a query nor mutation. */
 const isNothing = (
   apiName: string,
   operation: amf.model.domain.Operation
 ): boolean => {
   const name = operation.name.value();
-  return (
-    apiName === 'ShopperLogin' &&
+  const SKIP_SLAS = [
     // These methods manipulate headers; they don't mutate data or return a body, so they don't
     // fall under the current scope of query or mutation hooks.
-    (name === 'authorizeCustomer' ||
-      name === 'getTrustedAgentAuthorizationToken')
-  );
+    'authenticateCustomer',
+    'authorizeCustomer',
+    'getPasswordResetToken',
+    'getTrustedAgentAuthorizationToken',
+  ];
+  const SKIP_SHOPPER_CUSTOMERS = [
+    // These methods are deprecated
+    'invalidateCustomerAuth',
+    'authorizeCustomer',
+    'authorizeTrustedSystem',
+  ];
+  switch (apiName) {
+    case 'ShopperLogin':
+      return SKIP_SLAS.includes(name);
+    case 'ShopperCustomers':
+      return SKIP_SHOPPER_CUSTOMERS.includes(name);
+    default:
+      return false;
+  }
 };
 
+/** Determines whether an API endpoint is a query. */
 export const isQuery = (
   apiName: string,
   operation: amf.model.domain.Operation
@@ -219,6 +233,7 @@ export const isQuery = (
   return isGet;
 };
 
+/** Determines whether an API endpoint is a mutation. */
 export const isMutation = (
   apiName: string,
   operation: amf.model.domain.Operation
