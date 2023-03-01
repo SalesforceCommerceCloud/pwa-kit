@@ -166,15 +166,12 @@ const getQueryName = (method: string): string => {
 export const getUnimplementedEndpoints = (
     SdkClass: {prototype: object},
     queryHooks: object,
-    mutationCacheUpdates: object = {}
+    mutations: object = {}
 ) => {
     const unimplemented = new Set(Object.getOwnPropertyNames(SdkClass.prototype))
     // Always present on a class; we can ignore
     unimplemented.delete('constructor')
-    // Mutations endpoints are implemented if they have a defined cache update function
-    Object.entries(mutationCacheUpdates).forEach(([method, implementation]) => {
-        if (implementation) unimplemented.delete(method)
-    })
+    Object.values(mutations).forEach((method) => unimplemented.delete(method))
     // Names of implemented query endpoints have been mangled when converted into hooks
     unimplemented.forEach((method) => {
         const queryName = getQueryName(method)
