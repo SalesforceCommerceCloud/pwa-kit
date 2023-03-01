@@ -13,42 +13,43 @@ import * as queryKeyHelpers from './queryKeyHelpers'
 
 type Client = ApiClients['shopperCustomers']
 
-/**
- * Gets the new external profile for a customer.This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
- * @returns A TanStack Query query hook with data from the Shopper Customers `getExternalProfile` endpoint.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getExternalProfile| Salesforce Developer Center} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getexternalprofile | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
- * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
- */
-export const useExternalProfile = (
-    apiOptions: Argument<Client['getExternalProfile']>,
-    queryOptions: ApiQueryOptions<Client['getExternalProfile']> = {}
-): UseQueryResult<DataType<Client['getExternalProfile']>> => {
-    type Options = Argument<Client['getExternalProfile']>
-    type Data = DataType<Client['getExternalProfile']>
-    const {shopperCustomers: client} = useCommerceApi()
-    const methodName = 'getExternalProfile'
-    const requiredParameters = [
-        'organizationId',
-        'externalId',
-        'authenticationProviderId',
-        'siteId'
-    ] as const
+// TODO: Re-implement (and update description from RAML spec) when the endpoint exits closed beta.
+// /**
+//  * Gets the new external profile for a customer.This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
+//  * @returns A TanStack Query query hook with data from the Shopper Customers `getExternalProfile` endpoint.
+//  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=getExternalProfile| Salesforce Developer Center} for more information about the API endpoint.
+//  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#getexternalprofile | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+//  * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
+//  */
+// export const useExternalProfile = (
+//     apiOptions: Argument<Client['getExternalProfile']>,
+//     queryOptions: ApiQueryOptions<Client['getExternalProfile']> = {}
+// ): UseQueryResult<DataType<Client['getExternalProfile']>> => {
+//     type Options = Argument<Client['getExternalProfile']>
+//     type Data = DataType<Client['getExternalProfile']>
+//     const {shopperCustomers: client} = useCommerceApi()
+//     const methodName = 'getExternalProfile'
+//     const requiredParameters = [
+//         'organizationId',
+//         'externalId',
+//         'authenticationProviderId',
+//         'siteId'
+//     ] as const
 
-    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
-    // to generate the correct query key.
-    const netOptions = mergeOptions(client, apiOptions)
-    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
-    const method = async (options: Options) => await client[methodName](options)
+//     // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+//     // to generate the correct query key.
+//     const netOptions = mergeOptions(client, apiOptions)
+//     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+//     const method = async (options: Options) => await client[methodName](options)
 
-    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
-    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Options, Data>(netOptions, queryOptions, {
-        method,
-        queryKey,
-        requiredParameters
-    })
-}
+//     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+//     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+//     return useQuery<Options, Data>(netOptions, queryOptions, {
+//         method,
+//         queryKey,
+//         requiredParameters
+//     })
+// }
 /**
  * Gets a customer with all existing addresses and payment instruments associated with the requested customer.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomer` endpoint.

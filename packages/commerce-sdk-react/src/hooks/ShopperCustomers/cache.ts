@@ -31,8 +31,6 @@ const invalidateCustomer = (parameters: Tail<QueryKeys['getCustomer']>): CacheUp
 })
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
-    authorizeCustomer: TODO('authorizeCustomer'),
-    authorizeTrustedSystem: TODO('authorizeTrustedSystem'),
     createCustomerAddress(customerId, {parameters}, response) {
         // getCustomerAddress uses `addressName` rather than `addressId`
         const newParams = {...parameters, addressName: response.addressId}
@@ -101,7 +99,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     invalidateCustomerAuth: TODO('invalidateCustomerAuth'),
     // TODO: Should this update the `getCustomer` cache?
     registerCustomer: noop,
-    registerExternalProfile: TODO('registerExternalProfile'),
+    // TODO: Implement when the endpoint exits closed beta.
+    // registerExternalProfile: TODO('registerExternalProfile'),
     removeCustomerAddress(customerId, {parameters}) {
         return {
             // TODO: Rather than invalidate, can we selectively update?

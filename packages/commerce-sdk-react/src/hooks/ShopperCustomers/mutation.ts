@@ -39,14 +39,15 @@ export const ShopperCustomersMutations = {
      * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     GetResetPasswordToken: 'getResetPasswordToken',
-    /**
-     * Registers a new external profile for a customer. This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Customers `registerExternalProfile` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=registerExternalProfile| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#registerexternalprofile | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
-     */
-    RegisterExternalProfile: 'registerExternalProfile',
+    // TODO: Re-implement (and update description from RAML spec) when the endpoint exits closed beta.
+    // /**
+    //  * Registers a new external profile for a customer. This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
+    //  * @returns A TanStack Query mutation hook for interacting with the Shopper Customers `registerExternalProfile` endpoint.
+    //  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers?meta=registerExternalProfile| Salesforce Developer Center} for more information about the API endpoint.
+    //  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shoppercustomers.shoppercustomers-1.html#registerexternalprofile | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+    //  * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
+    //  */
+    // RegisterExternalProfile: 'registerExternalProfile',
     /**
      * Updates a customer.
      * @returns A TanStack Query mutation hook for interacting with the Shopper Customers `updateCustomer` endpoint.
