@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {Component as ComponentType} from '../types'
-import {usePageContext} from '../Page'
+import {usePageContext, Page, SAMPLE_PAGE} from '../Page'
 
 type ComponentProps = {
     component: ComponentType

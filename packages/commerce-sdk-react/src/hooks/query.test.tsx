@@ -33,6 +33,7 @@ import {
 import {useOrder, usePaymentMethodsForOrder, useTaxesFromOrder} from './ShopperOrders/query'
 import {useProducts, useProduct, useCategories, useCategory} from './ShopperProducts/query'
 import {usePromotions, usePromotionsForCampaign} from './ShopperPromotions/query'
+import {waitFor} from '@testing-library/react'
 
 jest.mock('../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
@@ -238,6 +239,7 @@ test.each(QUERY_TESTS)('%j - 400 returns error', async ({hook, endpoint, notImpl
     if (notImplemented) {
         return
     }
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {})
     nock(DEFAULT_TEST_HOST)
         .get((uri) => endpoint.test(uri.split('?')[0]))
         .reply(400)
@@ -250,6 +252,10 @@ test.each(QUERY_TESTS)('%j - 400 returns error', async ({hook, endpoint, notImpl
 
     expect(result.current.isLoading).toBe(false)
     expect(result.current.error).toBeTruthy()
+    await waitFor(() => {
+        expect(error).toHaveBeenCalled()
+        error.mockReset()
+    })
 })
 
 test.each(QUERY_TESTS)('%j - throws error when not implemented', async ({hook, notImplemented}) => {

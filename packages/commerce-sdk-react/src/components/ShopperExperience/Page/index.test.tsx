@@ -9,7 +9,7 @@ import {render} from '@testing-library/react'
 import Page from './index'
 import {Helmet} from 'react-helmet'
 
-const SAMPLE_PAGE = {
+export const SAMPLE_PAGE = {
     id: 'samplepage',
     typeId: 'storePage',
     aspectTypeId: 'pdpAspect',

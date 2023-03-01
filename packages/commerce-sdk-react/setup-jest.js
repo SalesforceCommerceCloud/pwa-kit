@@ -32,6 +32,16 @@ Object.defineProperty(window, 'localStorage', {
     value: localStorageMock
 })
 
+global.beforeAll(() => {
+    // disable all real http requests
+    nock.disableNetConnect()
+    nock.emitter.on('no match', (req) => {
+        throw Error(
+            `\n\n\nYOUR TEST IS MAKING A REAL HTTP REQUEST. THIS IS A PROBLEM! PLEASE MOCK ALL HTTP CALLS\n\n\n `
+        )
+    })
+})
+
 global.afterEach(() => {
     nock.cleanAll()
 })
