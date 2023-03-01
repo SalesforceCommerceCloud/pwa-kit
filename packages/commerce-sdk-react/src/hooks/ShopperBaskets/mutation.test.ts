@@ -34,8 +34,7 @@ const SHIPMENT_ID = 'SHIPMENT_ID'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
-        ready: jest.fn().mockResolvedValue({access_token: '123'}),
-        get: jest.fn().mockResolvedValue('123')
+        ready: jest.fn().mockResolvedValue({access_token: '123'})
     }))
 })
 
