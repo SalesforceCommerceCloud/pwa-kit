@@ -88,10 +88,7 @@ const createOptions = <Mut extends ShopperCustomersMutation>(
 // and the `TestMap` type can be changed from optional keys to required keys. Doing so will
 // leverage TypeScript to enforce having tests for all mutations.
 const notImplTestCases: ShopperCustomersMutation[][] = [
-    ['authorizeCustomer'],
-    ['authorizeTrustedSystem'],
     ['deleteCustomerProductList'],
-    ['invalidateCustomerAuth'],
     ['updateCustomerPassword'],
     ['updateCustomerProductList']
 ]
