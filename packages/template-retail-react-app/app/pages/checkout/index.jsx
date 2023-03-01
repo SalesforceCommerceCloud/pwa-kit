@@ -14,8 +14,8 @@ import ContactInfo from './partials/contact-info'
 // import ShippingOptions from './partials/shipping-options'
 // import Payment from './partials/payment'
 // import OrderSummary from '../../components/order-summary'
-import { useCurrentCustomer } from '../../hooks/use-current-customer'
-import { useCurrentBasket } from '../../hooks/use-current-basket'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 import CheckoutSkeleton from './partials/checkout-skeleton'
 
 const Checkout = () => {
