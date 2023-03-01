@@ -10,7 +10,11 @@ import {usePromotions} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 
 function UsePromotions() {
-    const {data: result, isLoading, error} = usePromotions({ids: '10offsuits,50%offorder'})
+    const {
+        data: result,
+        isLoading,
+        error
+    } = usePromotions({parameters: {ids: '10offsuits,50%offorder'}})
     if (isLoading) {
         return (
             <div>
