@@ -126,7 +126,7 @@ export const Carousel = (props = {}) => {
                     className={'carousel-container-items scroll-indicator'}
                     data-testid="carousel-container-items"
                     direction="row"
-                    spacing={0}
+                    spacing={4}
                     wrap="nowrap"
                     overflowX="scroll"
                     sx={{
@@ -142,7 +142,7 @@ export const Carousel = (props = {}) => {
                             width={itemWidth}
                             style={{scrollSnapAlign: 'start'}}
                         >
-                            <AspectRatio ratio={1}>
+                            <AspectRatio ratio={0.75}>
                                 <Component component={component} />
                             </AspectRatio>
                         </Box>
@@ -156,7 +156,7 @@ export const Carousel = (props = {}) => {
                     display={controlDisplay}
                     position="absolute"
                     top="50%"
-                    left={{base: 0, lg: 4}}
+                    left={{base: 1, lg: 4}}
                     transform="translateY(-50%)"
                 >
                     <IconButton
@@ -173,7 +173,7 @@ export const Carousel = (props = {}) => {
                     display={controlDisplay}
                     position="absolute"
                     top="50%"
-                    right={{base: 0, lg: 4}}
+                    right={{base: 1, lg: 4}}
                     transform="translateY(-50%)"
                 >
                     <IconButton
