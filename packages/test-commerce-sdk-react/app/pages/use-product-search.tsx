@@ -18,8 +18,10 @@ function UseProductSearch() {
         error,
         data: result
     } = useProductSearch({
-        q: searchQuery,
-        refine: refinement
+        parameters: {
+            q: searchQuery,
+            refine: refinement
+        }
     })
     if (isLoading) {
         return (

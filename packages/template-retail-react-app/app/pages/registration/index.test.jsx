@@ -103,12 +103,12 @@ afterEach(() => {
 
 test('Allows customer to create an account', async () => {
     // render our test component
-    renderWithProviders(<MockedComponent />, {
+    await renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
     // fill out form and submit
-    const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
+    const withinForm = within(await screen.findByTestId('sf-auth-modal-form'))
 
     user.paste(withinForm.getByLabelText('First Name'), 'Tester')
     user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
@@ -117,11 +117,8 @@ test('Allows customer to create an account', async () => {
     user.click(withinForm.getByText(/create account/i))
 
     // wait for success state to appear
-    await waitFor(
-        () => {
-            expect(screen.getAllByText(/My Account/).length).toEqual(2)
-        },
-        // Needs to wait a little bit more for the test to pass
-        {timeout: 5000}
-    )
+    const myAccount = await screen.findAllByText(/My Account/)
+    await waitFor(() => {
+        expect(myAccount.length).toEqual(2)
+    })
 })

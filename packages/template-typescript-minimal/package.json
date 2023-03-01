@@ -2,7 +2,7 @@
     "name": "typescript-minimal",
     "version": "2.7.0-dev",
     "engines": {
-        "node": "^14.0.0",
+        "node": "^14.0.0 || ^16.0.0",
         "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
     },
     "private": true,
@@ -48,7 +48,7 @@
             "**/*.json"
         ],
         "ssrParameters": {
-            "ssrFunctionNodeVersion": "14.x",
+            "ssrFunctionNodeVersion": "16.x",
             "proxyConfigs": [
                 {
                     "host": "kv7kzm78.api.commercecloud.salesforce.com",
