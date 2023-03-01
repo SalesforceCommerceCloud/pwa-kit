@@ -20,7 +20,6 @@ import CartItemVariantPrice from '../item-variant/item-price'
 import PromoPopover from '../promo-popover'
 
 const CartItems = ({basket}) => {
-    basket ||= useCurrentBasket().basket
     const [cartItemsExpanded, setCartItemsExpanded] = useState(false)
 
     return (
