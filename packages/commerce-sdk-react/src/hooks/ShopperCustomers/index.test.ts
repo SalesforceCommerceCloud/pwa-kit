@@ -17,10 +17,12 @@ describe('Shopper Customers hooks', () => {
             cacheUpdateMatrix
         )
         expect(unimplemented).toEqual([
-            'invalidateCustomerAuth',
-            'authorizeCustomer',
-            'authorizeTrustedSystem',
-            'registerExternalProfile',
+            'invalidateCustomerAuth', // DEPRECATED, not included
+            'authorizeCustomer', // DEPRECATED, not included
+            'authorizeTrustedSystem', // DEPRECATED, not included
+            'registerExternalProfile', // TODO: Implement when the endpoint exits closed beta
+            'getExternalProfile', // TODO: Implement when the endpoint exits closed beta
+            // The rest, we just haven't gotten to yet
             'updateCustomerPassword',
             'deleteCustomerProductList',
             'updateCustomerProductList'

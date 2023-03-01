@@ -51,11 +51,12 @@ const testMap: TestMap = {
     useCustomerProductList: {},
     useCustomerProductListItem: {priority: 9000, public: false, quantity: 0},
     useCustomerProductLists: {data: [], limit: 0, total: 0},
-    useExternalProfile: {
-        authenticationProviderId: 'squirrel',
-        customerId: 'customerId',
-        externalId: 'external'
-    },
+    // TODO: Re-implement test when the endpoint exits closed beta.
+    // useExternalProfile: {
+    //     authenticationProviderId: 'squirrel',
+    //     customerId: 'customerId',
+    //     externalId: 'external'
+    // },
     useProductListItem: {id: 'id', priority: 0, type: 'thing'},
     usePublicProductList: {id: 'id', public: true, type: 'other'},
     usePublicProductListsBySearchTerm: {data: [], limit: 0, total: 0}
