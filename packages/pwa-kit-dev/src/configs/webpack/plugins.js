@@ -9,6 +9,7 @@ import path, {resolve} from 'path'
 import fs from 'fs'
 import glob from 'glob'
 import minimatch from 'minimatch'
+import {inspect} from 'util'
 
 const projectDir = process.cwd()
 const pkg = require(resolve(projectDir, 'package.json'))
@@ -111,22 +112,27 @@ const templateAppPathRegex = makeRegExp(
 export const allFiles = (projectDir) => {
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-        if (resolved.match(/template\-retail\-react\-app\/app\/components\/icons/)) {
-            console.log('~OOPS!')
-            console.log('~ALL FILES ==== resource.context', resource.context)
-            console.log('~ALL FILES ==== resource.request', resource.request)
-        }
+        // if (resolved.match(/template\-retail\-react\-app\/app\/components\/icons/)) {
+        //     console.log('~OOPS!')
+        //     console.log('~ALL FILES ==== resource.context', resource.context)
+        //     console.log('~ALL FILES ==== resource.request', resource.request)
+        // }
     })
 }
 
 export const importFromExtendsPlugin = (projectDir) => {
     // TODO: does any other library use this weird magic character import schema?
+
     return new webpack.NormalModuleReplacementPlugin(/\^/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-        console.log('~===== ^^ Magic', resolved)
+        if (resolved?.match(/app\/components\/icons$/)) {
+            console.log('~===== ^^ Magic', resolved)
+        }
         const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
         const newPath = path.resolve(projectDir, 'node_modules', relativePath)
-        console.log('~^ magic newPath', newPath)
+        if (resolved?.match(/app\/components\/icons$/)) {
+            console.log('~^ magic newPath', newPath)
+        }
         // NOTE: overriding either of these alone does not work, both must be set
         resource.request = newPath
         resource.createData.resource = newPath
@@ -137,14 +143,21 @@ export const importFromLocalPlugin = (projectDir) => {
     // TODO: does any other library use this weird magic character import schema?
     return new webpack.NormalModuleReplacementPlugin(/\*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-        console.log('~===== ** Magic', resolved)
-        const relativePath = resolved?.split(`*`)?.[1]?.replace(/\*/, '')
+        if (resolved?.match(/app\/components\/icons$/)) {
+            console.log('~===== ** Magic', resolved)
+        }
+        const relativePath = resolved
+            ?.split(`*`)?.[1]
+            ?.replace(pkg?.mobify?.extends, '')
+            ?.replace(/^\//, '')
         const newPath = path.resolve(
             projectDir,
             pkg?.mobify?.overridesDir?.replace(/^\//, ''),
             relativePath
         )
-        console.log('~* magic newPath', newPath)
+        if (resolved?.match(/app\/components\/icons$/)) {
+            console.log('~* magic newPath', newPath)
+        }
         // NOTE: overriding either of these alone does not work, both must be set
         resource.request = newPath
         resource.createData.resource = newPath
@@ -224,19 +237,38 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
 
     return new webpack.NormalModuleReplacementPlugin(overridesRegex, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
+        // ignore magic paths and don't attempt to overwrite them
+        if (resource.request.match(/\*/) || resource.request.match(/\^/)) {
+            console.log('~EARLY RETURN')
+            return
+        }
         const matchRegex = makeRegExp(pkg?.mobify?.extends)
         if (
             resolved?.match?.(matchRegex) &&
-            _overrides?.filter((override) => override?.match(/\.(?=[^\/]+$)/))?.length
+            _overrides?.filter((override) => override?.match(/\.(?=[^\/]+$)/))?.length &&
+            // TODO: this array appears to always contain object where the `dependency[x].request
+            // holds reference to the original request, which is what we want to introspect on
+            // whether magic characters like `^` were used
+            !resource?.dependencies?.[0]?.request?.match('^')
         ) {
-            console.log('~======= file path.resolve()', resolved)
-            console.log('~requestedFile context:', resource.context)
-            console.log('~requestedFile request:', resource.request)
+            if (resolved?.match(/app\/components\/icons$/)) {
+                console.log('~resource', inspect(resource))
+                console.log('**********')
+                console.log('~resource.createData.context', inspect(resource.createData.context))
+                console.log('~======= file path.resolve()', resolved)
+                console.log('~requestedFile context:', resource.context)
+                console.log('~requestedFile request:', resource.request)
+            }
 
             const depth = pkg?.mobify?.overridesDir?.replace?.(/^\//, '')?.split('/') || []
             const relativePath = resolved?.split?.(matchRegex)?.[1]
             const newPath = projectDir + pkg?.mobify?.overridesDir + relativePath
-            console.log('~new resource.request!!!', newPath)
+            if (resolved?.match(/app\/components\/icons$/)) {
+                console.log('~new resource.request!!!', newPath)
+                resource.myKey = '1 whoa! ^'
+                // resource.createData.resource.myKey = '2 whoa! ^'
+            }
+
             // NOTE: overriding either of these alone does not work, both must be set
             resource.request = newPath
             // TODO: without the file extension, this fails, so we need to pull this from

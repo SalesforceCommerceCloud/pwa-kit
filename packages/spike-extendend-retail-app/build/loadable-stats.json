@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "hash": "5753804cf089892ff966",
+  "hash": "8fad1c2fbe6589e3e72c",
   "publicPath": "/mobify/bundle/development/",
   "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
@@ -54,7 +54,7 @@
     {
       "type": "asset",
       "name": "vendor.js",
-      "size": 5285779,
+      "size": 5303777,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -81,7 +81,7 @@
     {
       "type": "asset",
       "name": "main.js",
-      "size": 1157913,
+      "size": 1151141,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -551,7 +551,7 @@
     {
       "type": "asset",
       "name": "pages-home.js",
-      "size": 39516,
+      "size": 39733,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,

@@ -18,12 +18,13 @@ import {
     BasketIcon,
     BrandLogo,
     FigmaLogo,
-    GithubLogo,
     DashboardIcon,
     HeartIcon,
     LikeIcon,
     PlugIcon,
 } from '^retail-react-app/app/components/icons'
+
+import {GithubLogo} from '*retail-react-app/app/components/icons'
 
 export const heroFeatures = [
     {
