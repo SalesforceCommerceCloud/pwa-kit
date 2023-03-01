@@ -29,12 +29,14 @@ MockComponent.propTypes = {
 }
 describe('Image Gallery Component', () => {
     test('renders component with all images', () => {
-        renderWithProviders(<MockComponent imageGroups={data} selectedVariationAttributes={{}} />)
+        renderWithProviders(<MockComponent imageGroups={data} selectedVariationAttributes={{}} />, {
+            wrapperProps: {bypassAuth: true}
+        })
         expect(screen.getAllByAltText(/Ruffle Front V-Neck Cardigan/).length).toEqual(3)
     })
 
     test('render skeleton', () => {
-        renderWithProviders(<MockComponent />)
+        renderWithProviders(<MockComponent />, {wrapperProps: {bypassAuth: true}})
         expect(screen.getByTestId('sf-image-gallery-skeleton')).toBeInTheDocument()
     })
 

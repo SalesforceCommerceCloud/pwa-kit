@@ -88,7 +88,8 @@ export const TestProviders = ({
     locale = {id: DEFAULT_LOCALE},
     messages = fallbackMessages,
     appConfig = mockConfig.app,
-    siteAlias = DEFAULT_SITE
+    siteAlias = DEFAULT_SITE,
+    bypassAuth = false
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -137,6 +138,9 @@ export const TestProviders = ({
         locale.alias || locale.id
     )
 
+    const JWTThatNeverExpires =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjF9.BDAp9G8nmArdBqAbsE5GUWZ3fiv2LwQKClEFDCGIyy8'
+
     return (
         <ServerContext.Provider value={{}}>
             <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
@@ -149,6 +153,7 @@ export const TestProviders = ({
                             siteId={site?.id}
                             locale={locale.id}
                             redirectURI={`${window.location.origin}/testcallback`}
+                            fetchedToken={bypassAuth ? JWTThatNeverExpires : ''}
                         >
                             <CustomerProvider>
                                 <CategoriesProvider treeRoot={initialCategories}>
@@ -188,7 +193,8 @@ TestProviders.propTypes = {
     messages: PropTypes.object,
     locale: PropTypes.object,
     appConfig: PropTypes.object,
-    siteAlias: PropTypes.string
+    siteAlias: PropTypes.string,
+    bypassAuth: PropTypes.bool
 }
 
 /**
