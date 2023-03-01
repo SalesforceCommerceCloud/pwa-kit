@@ -12,11 +12,11 @@ import {CheckoutProvider, useCheckout} from './util/checkout-context'
 import ContactInfo from './partials/contact-info'
 // import ShippingAddress from './partials/shipping-address'
 // import ShippingOptions from './partials/shipping-options'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
-import useBasket from '../../commerce-api/hooks/useBasket'
 // import Payment from './partials/payment'
-import CheckoutSkeleton from './partials/checkout-skeleton'
 // import OrderSummary from '../../components/order-summary'
+import { useCurrentCustomer } from '../../hooks/use-current-customer'
+import { useCurrentBasket } from '../../hooks/use-current-basket'
+import CheckoutSkeleton from './partials/checkout-skeleton'
 
 const Checkout = () => {
     const navigate = useNavigation()
@@ -127,8 +127,8 @@ const Checkout = () => {
 }
 
 const CheckoutContainer = () => {
-    const customer = useCustomer()
-    const basket = useBasket()
+    const {data: customer} = useCurrentCustomer()
+    const {basket} = useCurrentBasket()
 
     if (!customer || !customer.customerId || !basket || !basket.basketId) {
         return <CheckoutSkeleton />
