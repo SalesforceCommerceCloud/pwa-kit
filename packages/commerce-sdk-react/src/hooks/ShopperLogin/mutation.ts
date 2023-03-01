@@ -16,27 +16,6 @@ type Client = ApiClients['shopperLogin']
 /** Mutations available for Shopper Login. */
 export const ShopperLoginMutations = {
     /**
-   * Logs in a shopper with credentials that are managed by a B2C Commerce instance (ECOM). It follows the authorization code grant flow as defined by the OAuth 2.1 standard. It also uses a proof key for code exchange (PKCE).
-
-For PKCE values:
-- The `code_verifier` string is a random string used for the `/token` endpoint request.
-- The `code_challenge` is an encoded version of the `code_verifier` string using an SHA-256 hash.
-
-The request must include a basic authorization header that contains a Base64 encoded version of the following string: `\<shopperUserID\>:\<shopperPassword\>`.
-
-Required parameters: `code_challenge`, `channel_id`, `client_id`, and `redirect_uri`.
-
-Optional parameters: `usid``.
-
-The SLAS `/login`` endpoint redirects back to the redirect URI and returns an authorization code.
-
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Login `authenticateCustomer` endpoint.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-login?meta=authenticateCustomer| Salesforce Developer Center} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperlogin.shopperlogin-1.html#authenticatecustomer | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
-   */
-    AuthenticateCustomer: 'authenticateCustomer',
-    /**
      * Allows the customer to authenticate when their identity provider is down.
      * @returns A TanStack Query mutation hook for interacting with the Shopper Login `authorizePasswordlessCustomer` endpoint.
      * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-login?meta=authorizePasswordlessCustomer| Salesforce Developer Center} for more information about the API endpoint.
@@ -112,14 +91,6 @@ The value of the `_sfdc_client_auth` header must be a Base64-encoded string. The
    * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
    */
     GetTrustedAgentAccessToken: 'getTrustedAgentAccessToken',
-    /**
-     * Request a reset password token
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Login `getPasswordResetToken` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-login?meta=getPasswordResetToken| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperlogin.shopperlogin-1.html#getpasswordresettoken | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
-     */
-    GetPasswordResetToken: 'getPasswordResetToken',
     /**
      * Creates a new password
      * @returns A TanStack Query mutation hook for interacting with the Shopper Login `resetPassword` endpoint.

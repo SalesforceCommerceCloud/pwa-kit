@@ -64,11 +64,9 @@ type Implemented = Exclude<ShopperLoginMutation, 'logoutCustomer'>
 // This is an object rather than an array to more easily ensure we cover all mutations
 type TestMap = {[Mut in Implemented]: [Argument<Client[Mut]>, DataType<Client[Mut]>]}
 const testMap: TestMap = {
-    authenticateCustomer: [OPTIONS, undefined],
     authorizePasswordlessCustomer: [OPTIONS, {}],
     getAccessToken: [OPTIONS, TOKEN_RESPONSE],
     getPasswordLessAccessToken: [OPTIONS, TOKEN_RESPONSE],
-    getPasswordResetToken: [OPTIONS, undefined],
     getSessionBridgeAccessToken: [OPTIONS, TOKEN_RESPONSE],
     getTrustedAgentAccessToken: [OPTIONS, TOKEN_RESPONSE],
     getTrustedSystemAccessToken: [OPTIONS, TOKEN_RESPONSE],
