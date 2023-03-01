@@ -13,12 +13,11 @@ describe('Shopper Login hooks', () => {
     test('all endpoints have hooks', () => {
         const unimplemented = getUnimplementedEndpoints(ShopperLogin, queries, cacheUpdateMatrix)
         expect(unimplemented).toEqual([
-            // TODO: implement
-            'logoutCustomer',
-            // These methods generate headers - they don't mutate or return any data, so they don't make
-            // sense as query/mutation hooks (as currently implemented).
+            'authenticateCustomer',
+            'logoutCustomer', // TODO: Implement
             'authorizeCustomer',
-            'getTrustedAgentAuthorizationToken'
+            'getTrustedAgentAuthorizationToken',
+            'getPasswordResetToken'
         ])
     })
 })

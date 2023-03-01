@@ -18,14 +18,12 @@ const TODO = (method: string): undefined => {
 }
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<ApiClients['shopperLogin']> = {
-    authenticateCustomer: noop,
     authorizePasswordlessCustomer: noop,
     logoutCustomer: TODO('logoutCustomer'),
     getAccessToken: noop,
     getSessionBridgeAccessToken: noop,
     getTrustedSystemAccessToken: noop,
     getTrustedAgentAccessToken: noop,
-    getPasswordResetToken: noop,
     resetPassword: noop,
     getPasswordLessAccessToken: noop,
     revokeToken: noop,
