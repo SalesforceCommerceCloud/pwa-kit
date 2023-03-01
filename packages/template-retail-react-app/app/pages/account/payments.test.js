@@ -28,7 +28,7 @@ jest.mock('@chakra-ui/toast', () => {
 const MockedComponent = () => {
     const {isRegistered} = useCustomerType()
     const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-    const customer = useCurrentCustomer()
+    const {data: customer} = useCurrentCustomer()
     useEffect(() => {
         if (!isRegistered) {
             login.mutate(

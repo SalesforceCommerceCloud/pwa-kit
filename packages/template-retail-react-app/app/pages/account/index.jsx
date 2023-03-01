@@ -79,7 +79,7 @@ LogoutButton.propTypes = {
 const Account = () => {
     const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
-    const customer = useCurrentCustomer()
+    const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerType} = customer
 
     const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)

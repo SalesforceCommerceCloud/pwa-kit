@@ -139,7 +139,7 @@ describe('Render and logs out', function () {
         renderWithProviders(<MockedComponent />)
 
         await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
-        // Render user profile [age
+        // Render user profile page
         await waitFor(() => {
             expect(window.location.pathname).toEqual(`${expectedBasePath}/account`)
             expect(screen.getByTestId('account-detail-page')).toBeInTheDocument()

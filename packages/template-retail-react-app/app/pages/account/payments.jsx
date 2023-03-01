@@ -101,7 +101,7 @@ const successfullyRemovedMessage = defineMessage({
 })
 const AccountPaymentMethods = () => {
     const {formatMessage} = useIntl()
-    const customer = useCurrentCustomer()
+    const {data: customer} = useCurrentCustomer()
     const {isRegistered, paymentInstruments, isLoading} = customer
     const addSavedPaymentInstrumentAction = useShopperCustomersMutation({
         action: 'createCustomerPaymentInstrument'
