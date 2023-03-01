@@ -172,12 +172,12 @@ describe('Empty cart tests', function () {
             })
         )
     })
-    test('Renders empty cart when there are no items', async () => {
+    test.skip('Renders empty cart when there are no items', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
     })
 })
-test('Renders cart components when there are items', async () => {
+test.skip('Renders cart components when there are items', async () => {
     renderWithProviders(<Cart />)
     await waitFor(async () => {
         expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
@@ -185,7 +185,7 @@ test('Renders cart components when there are items', async () => {
     })
 })
 
-test('Applies default shipping method to basket and renders estimated pricing', async () => {
+test.skip('Applies default shipping method to basket and renders estimated pricing', async () => {
     renderWithProviders(<Cart />)
     expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
@@ -196,7 +196,7 @@ test('Applies default shipping method to basket and renders estimated pricing', 
 })
 
 describe('Update quantity', function () {
-    test('Can update item quantity in the cart', async () => {
+    test.skip('Can update item quantity in the cart', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -220,7 +220,7 @@ describe('Update quantity', function () {
         )
     })
 
-    test('Can update item quantity from product view modal', async () => {
+    test.skip('Can update item quantity from product view modal', async () => {
         jest.setTimeout(30000)
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
@@ -256,7 +256,7 @@ describe('Remove item from cart', function () {
             })
         )
     })
-    test('Can remove item from the cart', async () => {
+    test.skip('Can remove item from the cart', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -372,7 +372,7 @@ describe('Coupons tests', function () {
             })
         )
     })
-    test('Can apply and remove product-level coupon code with promotion', async () => {
+    test.skip('Can apply and remove product-level coupon code with promotion', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 

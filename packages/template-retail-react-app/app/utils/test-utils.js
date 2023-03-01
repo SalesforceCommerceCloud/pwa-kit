@@ -89,7 +89,7 @@ export const TestProviders = ({
     messages = fallbackMessages,
     appConfig = mockConfig.app,
     siteAlias = DEFAULT_SITE,
-    bypassAuth = false
+    bypassAuth = true
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.

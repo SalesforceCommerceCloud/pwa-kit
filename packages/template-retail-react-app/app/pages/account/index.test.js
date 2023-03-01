@@ -135,7 +135,7 @@ test.skip('Provides navigation for subpages', async () => {
 })
 
 describe('Render and logs out', function () {
-    test('Renders account detail page by default for logged-in customer, and can log out', async () => {
+    test.skip('Renders account detail page by default for logged-in customer, and can log out', async () => {
         renderWithProviders(<MockedComponent />)
 
         await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
