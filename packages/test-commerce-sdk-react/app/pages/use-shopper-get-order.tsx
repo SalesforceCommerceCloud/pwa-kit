@@ -12,7 +12,7 @@ import Json from '../components/Json'
 
 function UseShopperGetOrder() {
     const {orderNo}: {orderNo: string} = useParams()
-    const {data, isLoading, error} = useOrder({orderNo})
+    const {data, isLoading, error} = useOrder({parameters: {orderNo}})
     if (isLoading) {
         return (
             <div>

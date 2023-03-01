@@ -20,7 +20,7 @@ import {
 jest.mock('cross-fetch', () => {
     return {
         __esModule: true,
-        default: jest.fn(() => ({json: jest.fn()}))
+        default: jest.fn(() => ({json: jest.fn(), ok: true}))
     }
 })
 
@@ -224,7 +224,8 @@ describe('EinsteinAPI', () => {
             return {
                 json: async () => {
                     return mockGetZoneRecommendationsResponse
-                }
+                },
+                ok: true
             }
         })
 
@@ -277,7 +278,8 @@ describe('EinsteinAPI', () => {
             return {
                 json: async () => {
                     return mockRecommendationsResponse
-                }
+                },
+                ok: true
             }
         })
 

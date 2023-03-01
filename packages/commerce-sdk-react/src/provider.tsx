@@ -9,11 +9,11 @@ import {
     ShopperBaskets,
     ShopperContexts,
     ShopperCustomers,
+    ShopperExperience,
     ShopperLogin,
     ShopperOrders,
     ShopperProducts,
     ShopperPromotions,
-    ShopperDiscoverySearch,
     ShopperGiftCertificates,
     ShopperSearch,
     ShopperBasketsTypes
@@ -30,6 +30,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     redirectURI: string
     fetchOptions?: ShopperBasketsTypes.FetchOptions
     headers?: Record<string, string>
+    fetchedToken?: string
 }
 
 /**
@@ -65,7 +66,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         shortCode,
         locale,
-        currency
+        currency,
+        fetchedToken
     } = props
 
     const config = {
@@ -85,7 +87,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
             shopperCustomers: new ShopperCustomers(config),
-            shopperDiscoverySearch: new ShopperDiscoverySearch(config),
+            shopperExperience: new ShopperExperience(config),
             shopperGiftCertificates: new ShopperGiftCertificates(config),
             shopperLogin: new ShopperLogin(config),
             shopperOrders: new ShopperOrders(config),
@@ -111,9 +113,19 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             siteId,
             proxy,
             redirectURI,
-            fetchOptions
+            fetchOptions,
+            fetchedToken
         })
-    }, [clientId, organizationId, shortCode, siteId, proxy, redirectURI, fetchOptions])
+    }, [
+        clientId,
+        organizationId,
+        shortCode,
+        siteId,
+        proxy,
+        redirectURI,
+        fetchOptions,
+        fetchedToken
+    ])
 
     useEffect(() => {
         auth.ready()

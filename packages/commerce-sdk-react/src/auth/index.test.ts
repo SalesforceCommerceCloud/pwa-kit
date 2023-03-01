@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import Auth, {injectAccessToken} from './'
+import Auth, {AuthData} from './'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
@@ -39,10 +39,8 @@ jest.mock('../utils', () => ({
     onClient: () => true
 }))
 
-test('injectAccessToken', () => {
-    expect(injectAccessToken({}, 'test')).toEqual({Authorization: 'Bearer test'})
-    expect(injectAccessToken(undefined, 'test')).toEqual({Authorization: 'Bearer test'})
-})
+/** The auth data we store has a slightly different shape than what we use. */
+type StoredAuthData = Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: string}
 
 const config = {
     clientId: 'clientId',
@@ -90,7 +88,7 @@ describe('Auth', () => {
     test('this.data returns the storage value', () => {
         const auth = new Auth(config)
 
-        const sample = {
+        const sample: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: 'access_token',
             customer_id: 'customer_id',
@@ -99,9 +97,12 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
-        const {refresh_token_guest, ...result} = {...sample, refresh_token: 'refresh_token_guest'}
+        // Convert stored format to exposed format
+        const result = {...sample, refresh_token: 'refresh_token_guest'}
+        delete result.refresh_token_guest
 
         Object.keys(sample).forEach((key) => {
             // @ts-expect-error private method
@@ -120,6 +121,17 @@ describe('Auth', () => {
         expect(auth.isTokenExpired(JWTExpired)).toBe(true)
         // @ts-expect-error private method
         expect(() => auth.isTokenExpired()).toThrow()
+    })
+    test('site switch clears auth storage', () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token', '123')
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', '456')
+        const switchSiteConfig = {...config, siteId: 'another site'}
+        const newAuth = new Auth(switchSiteConfig)
+        expect(newAuth.get('access_token')).not.toBe('123')
+        expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
     test('isTokenExpired', () => {
         const auth = new Auth(config)
@@ -143,7 +155,8 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
         // @ts-expect-error private method
         auth.pendingToken = Promise.resolve(data)
@@ -153,7 +166,7 @@ describe('Auth', () => {
     test('ready - re-use valid access token', () => {
         const auth = new Auth(config)
 
-        const data = {
+        const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret'),
             customer_id: 'customer_id',
@@ -162,9 +175,12 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
-        const {refresh_token_guest, ...result} = {...data, refresh_token: 'refresh_token_guest'}
+        // Convert stored format to exposed format
+        const result = {...data, refresh_token: 'refresh_token_guest'}
+        delete result.refresh_token_guest
 
         Object.keys(data).forEach((key) => {
             // @ts-expect-error private method
@@ -173,10 +189,17 @@ describe('Auth', () => {
 
         expect(auth.ready()).resolves.toEqual(result)
     })
+    test('ready - use `fetchedToken` and short circuit network request', async () => {
+        const auth = new Auth({...config, fetchedToken: 'fake-token'})
+        jest.spyOn(auth, 'queueRequest')
+        await auth.ready().then(() => {
+            expect(auth.queueRequest).not.toHaveBeenCalled()
+        })
+    })
     test('ready - use refresh token when access token is expired', async () => {
         const auth = new Auth(config)
 
-        const data = {
+        const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret'),
             customer_id: 'customer_id',
@@ -185,9 +208,12 @@ describe('Auth', () => {
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
-            usid: 'usid'
+            usid: 'usid',
+            customer_type: 'guest'
         }
-        const {refresh_token_guest, ...result} = {...data, refresh_token: 'refresh_token_guest'}
+        // Convert stored format to exposed format
+        const result = {...data, refresh_token: 'refresh_token_guest'}
+        delete result.refresh_token_guest
 
         Object.keys(data).forEach((key) => {
             // @ts-expect-error private method

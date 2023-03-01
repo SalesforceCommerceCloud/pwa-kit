@@ -18,8 +18,10 @@ function UseShopperCategories() {
         error,
         data: result
     } = useCategories({
-        ids: 'root',
-        levels: 2
+        parameters: {
+            ids: 'root',
+            levels: 2
+        }
     })
     if (isLoading) {
         return (
