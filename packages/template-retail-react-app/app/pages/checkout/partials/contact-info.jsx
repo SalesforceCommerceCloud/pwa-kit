@@ -29,6 +29,9 @@ import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
 import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()
