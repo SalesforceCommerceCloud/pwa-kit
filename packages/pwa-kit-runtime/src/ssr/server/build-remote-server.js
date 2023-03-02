@@ -87,6 +87,9 @@ export const RemoteServerFactory = {
          * testing, or to handle non-standard projects.
          */
         const defaults = {
+            // For test only – allow the project dir to be overridden.
+            projectDir: process.cwd(),
+
             // Absolute path to the build directory
             buildDir: path.resolve(process.cwd(), BUILD),
 

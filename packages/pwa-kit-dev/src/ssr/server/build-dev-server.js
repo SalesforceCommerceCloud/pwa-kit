@@ -26,8 +26,6 @@ import {
     REQUEST_PROCESSOR
 } from '../../configs/webpack/config-names'
 import {randomUUID} from 'crypto'
-const projectDir = process.cwd()
-const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
 
 const chalk = require('chalk')
 
@@ -125,6 +123,11 @@ export const DevServerMixin = {
         // But the SSR render function must!
 
         let config = require('../../configs/webpack/config')
+
+        const projectWebpackPath = path.resolve(
+            app.options.projectDir,
+            'webpack.config.js',
+        )
         if (fs.existsSync(projectWebpackPath)) {
             config = require(projectWebpackPath)
         }
@@ -218,7 +221,7 @@ export const DevServerMixin = {
         //
         // This function assumes that an SDK build step will copy all
         // non-webpacked assets from the 'app' dir to the 'build' dir.
-        ///
+        //
         // If you look carefully through the history, this has never
         // been true though – assets get copied from app/static to
         // build/static but this isn't really clear from the API.
@@ -227,14 +230,14 @@ export const DevServerMixin = {
         //
         // packages/pwa-kit-dev/src/configs/webpack/config.js
         //
-        // We should maintain this. But know that we have plans to make
-        // a robust Bundle spec in 246.
+        // We need to maintain this. But be aware that we have plans
+        // to make a robust Bundle spec in 246.
         //
         // Discussion here:
         //
         // https://salesforce-internal.slack.com/archives/C8YDDMKFZ/p1677793769255659?thread_ts=1677791840.174309&cid=C8YDDMKFZ
         return (req, res) => {
-            const baseDir = path.resolve(projectDir, 'app')
+            const baseDir = path.resolve(req.app.options.projectDir, 'app')
             return this._serveStaticFile(req, res, baseDir, filePath, opts)
         }
     },
