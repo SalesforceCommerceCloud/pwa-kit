@@ -132,7 +132,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             update: [{queryKey: getCustomerAddress.queryKey(parameters)}]
         }
     },
-    updateCustomerPassword: TODO('updateCustomerPassword'),
+    updateCustomerPassword: noop,
     updateCustomerProductList: TODO('updateCustomerProductList'),
     updateCustomerProductListItem(customerId, {parameters}) {
         return {
