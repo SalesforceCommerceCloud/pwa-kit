@@ -154,7 +154,7 @@ const ProductList = (props) => {
             }
         },
         {
-            enabled: !isSearch && params.categoryId
+            enabled: !isSearch && !!params.categoryId
             // TODO: Why isn't this working?
             // onError: (error) => {
             //     const errorStatus = error.response?.status
