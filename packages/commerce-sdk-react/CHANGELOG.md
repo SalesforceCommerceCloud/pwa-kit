@@ -1,4 +1,4 @@
-## v2.7.0-alpha.0 (Mar 02, 2023)
+## v2.7.0-alpha.1 (Mar 02, 2023)
 - Add Page/Region/Component components for shopper experience/page designer page rendering [#963](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/963)
 - Namespace `Auth` storage keys with site identifier to allow multi-site support [#911](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/911)
 - Add Shopper Experience `usePage` and `usePages` hooks[#958](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/958)
