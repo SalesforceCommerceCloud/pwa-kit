@@ -1,4 +1,4 @@
-## v2.7.0-alpha.0 (Mar 02, 2023)
+## v2.7.0-alpha.1 (Mar 02, 2023)
 - Support Node 16 [#965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/965)
 
 ## v2.6.0 (Jan 25, 2023)
