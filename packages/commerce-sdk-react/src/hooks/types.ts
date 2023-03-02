@@ -1,21 +1,61 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBaskets} from 'commerce-sdk-isomorphic'
-import {ShopperContexts} from 'commerce-sdk-isomorphic'
-import {ShopperCustomers} from 'commerce-sdk-isomorphic'
-import {ShopperDiscoverySearch} from 'commerce-sdk-isomorphic'
-import {ShopperExperience} from 'commerce-sdk-isomorphic'
-import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
-import {ShopperLogin} from 'commerce-sdk-isomorphic'
-import {ShopperOrders} from 'commerce-sdk-isomorphic'
-import {ShopperProducts} from 'commerce-sdk-isomorphic'
-import {ShopperPromotions} from 'commerce-sdk-isomorphic'
-import {ShopperSearch} from 'commerce-sdk-isomorphic'
-import {QueryKey, QueryFunctionContext} from '@tanstack/react-query'
+import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@tanstack/react-query'
+import {
+    ShopperBaskets,
+    ShopperContexts,
+    ShopperCustomers,
+    ShopperExperience,
+    ShopperGiftCertificates,
+    ShopperLogin,
+    ShopperOrders,
+    ShopperProducts,
+    ShopperPromotions,
+    ShopperSearch
+} from 'commerce-sdk-isomorphic'
+
+// --- GENERAL UTILITIES --- //
+
+/** Makes a type easier to read. */
+export type Prettify<T extends object> = NonNullable<Pick<T, keyof T>>
+
+/**
+ * Marks the given keys as required.
+ * WARNING: Does not work if T has an index signature.
+ */
+export type RequireKeys<T, K extends keyof T> = Prettify<T & Required<Pick<T, K>>>
+
+/** Removes keys whose value is `never`. */
+type RemoveNeverValues<T> = {
+    [K in keyof T as T[K] extends never ? never : K]: T[K]
+}
+
+/** Change string index type to `never`. */
+type StringIndexToNever<T> = {
+    [K in keyof T]: string extends K ? never : T[K]
+}
+
+/** Removes a string index type. */
+export type RemoveStringIndex<T> = RemoveNeverValues<StringIndexToNever<T>>
+
+/** Gets the last element of an array. */
+export type Tail<T extends readonly unknown[]> = T extends [...head: unknown[], tail: infer Tail]
+    ? Tail
+    : T
+
+/** Remove the last entry from a tuple type. */
+export type ExcludeTail<T extends readonly unknown[]> = T extends readonly [...infer Head, unknown]
+    ? T extends unknown[] // Preserve mutable or readonly from the original array
+        ? Head
+        : Readonly<Head>
+    : T // If it's a plain array, rather than a tuple, then removing the last element has no effect
+
+// --- API CLIENTS --- //
+export type ApiParameter = string | number | boolean | string[] | number[]
 
 export type ApiClientConfigParams = {
     clientId: string
@@ -28,7 +68,6 @@ export interface ApiClients {
     shopperBaskets: ShopperBaskets<ApiClientConfigParams>
     shopperContexts: ShopperContexts<ApiClientConfigParams>
     shopperCustomers: ShopperCustomers<ApiClientConfigParams>
-    shopperDiscoverySearch: ShopperDiscoverySearch<ApiClientConfigParams>
     shopperExperience: ShopperExperience<ApiClientConfigParams>
     shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
     shopperLogin: ShopperLogin<ApiClientConfigParams>
@@ -38,35 +77,114 @@ export interface ApiClients {
     shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
+export type ApiClient = ApiClients[keyof ApiClients]
+
+// --- API HELPERS --- //
+
+/**
+ * Generic signature of the options objects used by commerce-sdk-isomorphic
+ */
+export type ApiOptions<
+    Parameters extends object = Record<string, unknown>,
+    Body extends object | unknown[] | undefined = Record<string, unknown> | unknown[] | undefined,
+    Headers extends Record<string, string> = Record<string, string>
+> = {
+    parameters?: Parameters
+    headers?: Headers
+    body?: Body
+}
+
+/**
+ * Generic signature of API methods exported by commerce-sdk-isomorphic
+ */
+export type ApiMethod<Options extends ApiOptions, Data> = {
+    (options: Options): Promise<Data>
+}
+
 /**
  * The first argument of a function.
  */
-export type Argument<T extends (arg: any) => unknown> = Parameters<T>[0]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Argument<T extends (arg: any) => unknown> = NonNullable<Parameters<T>[0]>
 
 /**
  * The data type returned by a commerce-sdk-isomorphic method when the raw response
  * flag is not set.
  */
-export type DataType<T extends (arg: any) => Promise<unknown>> = T extends (
-    arg: any
-) => Promise<Response | infer R>
-    ? R
-    : never
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DataType<T> = T extends ApiMethod<any, Response | infer R> ? R : never
 
 /**
- * Modified version of React Query's Mutation Function. Added a second argument
- * API clients.
+ * Merged headers and parameters from client config and options, mimicking the behavior
+ * of commerce-sdk-isomorphic.
  */
-export type IMutationFunction<TData = unknown, TVariables = unknown> = (
-    variables: TVariables,
-    apiClients: ApiClients
-) => Promise<TData>
+export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> = Required<
+    ApiOptions<
+        NonNullable<Client['clientConfig']['parameters'] & Options['parameters']>,
+        // `body` may not exist on `Options`, in which case it is `unknown` here. Due to the type
+        // constraint in `ApiOptions`, that is not a valid value. We must replace it with `never`
+        // to indicate that the result type does not have a `body`.
+        unknown extends Options['body'] ? never : Options['body'],
+        NonNullable<Client['clientConfig']['headers'] & Options['headers']>
+    >
+>
+
+/** Query key interface used by API query hooks. */
+export type ApiQueryKey<Params extends Record<string, unknown> = Record<string, unknown>> =
+    readonly [...path: string[], parameters: Params]
+
+/** Query options for endpoint hooks. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ApiQueryOptions<Method extends ApiMethod<any, unknown>> = Prettify<
+    Omit<
+        UseQueryOptions<DataType<Method>, unknown, DataType<Method>, ApiQueryKey>,
+        'queryFn' | 'queryKey'
+    >
+>
+
+// --- CACHE HELPERS --- //
 
 /**
- * Modified version of React Query's Query Function. Added a second argument
- * API clients.
+ * Interface to update a cached API response.
+ * @property queryKey - The query key to update
+ * @property updater - Either the new data or a function that accepts old data and returns new data
  */
-export type IQueryFunction<TData = unknown> = (
-    context: QueryFunctionContext<QueryKey>,
-    apiClients: ApiClients
-) => Promise<TData>
+export type CacheUpdateUpdate<T> = {
+    queryKey: ApiQueryKey
+    updater?: Updater<T | undefined, T | undefined>
+}
+
+/** Query predicate for queries to invalidate */
+export type CacheUpdateInvalidate =
+    | InvalidateQueryFilters
+    // TODO: Change Shopper Baskets cache logic from using predicates to creating query filters
+    // using the query key helpers, then this 'predicate' type can be removed, as can the one in
+    // `CacheUpdateRemove`. The predicate helpers in `utils.ts` should also then be removed.
+    | NonNullable<InvalidateQueryFilters['predicate']>
+
+/** Query predicate for queries to remove */
+export type CacheUpdateRemove = QueryFilters | NonNullable<QueryFilters['predicate']>
+
+/** Collection of updates to make to the cache when a request completes. */
+export type CacheUpdate = {
+    update?: CacheUpdateUpdate<unknown>[]
+    invalidate?: CacheUpdateInvalidate[]
+    remove?: CacheUpdateRemove[]
+}
+
+/** Generates a collection of cache updates to make for a given request. */
+export type CacheUpdateGetter<Options, Data> = (
+    customerId: string | null,
+    options: Options,
+    response: Data
+) => CacheUpdate
+
+/** Collection of cache update getters for each method of an API client. */
+export type CacheUpdateMatrix<Client extends ApiClient> = {
+    // It feels like we should be able to do <infer Arg, infer Data>, but that
+    // results in some methods being `never`, so we just use Argument<> later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [Method in keyof Client]?: Client[Method] extends ApiMethod<any, Response | infer Data>
+        ? CacheUpdateGetter<MergedOptions<Client, Argument<Client[Method]>>, Data>
+        : never
+}

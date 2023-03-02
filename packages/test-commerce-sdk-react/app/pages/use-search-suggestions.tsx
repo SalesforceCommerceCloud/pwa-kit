@@ -11,7 +11,7 @@ import Json from '../components/Json'
 const searchQuery = 'shirt'
 
 function UseSearchSuggestions() {
-    const {isLoading, error, data: result} = useSearchSuggestions({q: searchQuery})
+    const {isLoading, error, data: result} = useSearchSuggestions({parameters: {q: searchQuery}})
     if (isLoading) {
         return (
             <div>

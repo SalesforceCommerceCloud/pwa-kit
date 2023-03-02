@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 module.exports = {
-    parser: 'babel-eslint',
+    parser: '@babel/eslint-parser',
     parserOptions: {
         ecmaVersion: 2017,
         sourceType: 'module',
