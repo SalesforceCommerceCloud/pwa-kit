@@ -56,7 +56,7 @@ const ProfileCard = () => {
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
 
-    const updateCustomerAction = useShopperCustomersMutation({action: 'updateCustomer'})
+    const updateCustomerMutation = useShopperCustomersMutation('updateCustomer')
 
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
@@ -84,7 +84,7 @@ const ProfileCard = () => {
     const submit = async (values) => {
         try {
             form.clearErrors()
-            updateCustomerAction.mutate(
+            updateCustomerMutation.mutate(
                 {
                     parameters: {customerId},
                     body: {
@@ -221,9 +221,7 @@ const PasswordCard = () => {
 
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
-    const updateCustomerPasswordAction = useShopperCustomersMutation({
-        action: 'updateCustomerPassword'
-    })
+    const updateCustomerPassword = useShopperCustomersMutation('updateCustomerPassword')
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
 
@@ -232,7 +230,7 @@ const PasswordCard = () => {
     const submit = async (values) => {
         try {
             form.clearErrors()
-            updateCustomerPasswordAction.mutate(
+            updateCustomerPassword.mutate(
                 {
                     parameters: {customerId},
                     body: {

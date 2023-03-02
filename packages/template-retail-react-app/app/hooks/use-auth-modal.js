@@ -58,7 +58,10 @@ export const AuthModal = ({
     const {formatMessage} = useIntl()
     const customerId = useCustomerId()
     const {isRegistered} = useCustomerType()
-    const customer = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
+    const customer = useCustomer(
+        {parameters: {customerId}},
+        {enabled: !!customerId && isRegistered}
+    )
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
@@ -67,10 +70,9 @@ export const AuthModal = ({
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
 
-    // TODO: simplify the args to remove action
-    const getResetPasswordToken = useShopperCustomersMutation({
-        action: ShopperCustomersMutations.GetResetPasswordToken
-    })
+    const getResetPasswordToken = useShopperCustomersMutation(
+        ShopperCustomersMutations.GetResetPasswordToken
+    )
 
     const submitForm = async (data) => {
         form.clearErrors()

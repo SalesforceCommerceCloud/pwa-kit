@@ -123,12 +123,12 @@ const ProductList = (props) => {
     }
 
     /**************** Mutation Actions ****************/
-    const {mutate: createCustomerProductListItem} = useShopperCustomersMutation({
-        action: 'createCustomerProductListItem'
-    })
-    const {mutate: deleteCustomerProductListItem} = useShopperCustomersMutation({
-        action: 'deleteCustomerProductListItem'
-    })
+    const {mutate: createCustomerProductListItem} = useShopperCustomersMutation(
+        'createCustomerProductListItem'
+    )
+    const {mutate: deleteCustomerProductListItem} = useShopperCustomersMutation(
+        'deleteCustomerProductListItem'
+    )
 
     /**************** Query Actions ****************/
     const {
@@ -137,8 +137,10 @@ const ProductList = (props) => {
         data: productSearchResult
     } = useProductSearch(
         {
-            ...searchParams,
-            refine: searchParams._refine
+            parameters: {
+                ...searchParams,
+                refine: searchParams._refine
+            }
         },
         {
             keepPreviousData: true
@@ -147,10 +149,12 @@ const ProductList = (props) => {
 
     const {error, data: category} = useCategory(
         {
-            id: params.categoryId
+            parameters: {
+                id: params.categoryId
+            }
         },
         {
-            enabled: !isSearch
+            enabled: !isSearch && params.categoryId
             // TODO: Why isn't this working?
             // onError: (error) => {
             //     const errorStatus = error.response?.status
@@ -667,8 +671,6 @@ const ProductList = (props) => {
         </Box>
     )
 }
-
-ProductList.getTemplateName = () => 'product-list'
 
 ProductList.propTypes = {
     onAddToWishlistClick: PropTypes.func,

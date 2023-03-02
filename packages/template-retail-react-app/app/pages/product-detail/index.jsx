@@ -57,8 +57,8 @@ const ProductDetail = () => {
 
     /****************************** Basket *********************************/
     const {hasBasket, basket} = useCurrentBasket()
-    const createBasket = useShopperBasketsMutation({action: 'createBasket'})
-    const addItemToBasketAction = useShopperBasketsMutation({action: 'addItemToBasket'})
+    const createBasket = useShopperBasketsMutation('createBasket')
+    const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
@@ -69,8 +69,10 @@ const ProductDetail = () => {
     const urlParams = new URLSearchParams(location.search)
     const {data: product, isLoading: isProductLoading} = useProduct(
         {
-            id: urlParams.get('pid') || productId,
-            allImages: true
+            parameters: {
+                id: urlParams.get('pid') || productId,
+                allImages: true
+            }
         },
         {
             // When shoppers select a different variant (and the app fetches the new data),
@@ -80,15 +82,12 @@ const ProductDetail = () => {
     )
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
-    const {data: category} = useCategory(
-        {
+    const {data: category} = useCategory({
+        parameters: {
             id: product?.primaryCategoryId,
             level: 1
-        },
-        {
-            enabled: !!product?.primaryCategoryId
         }
-    )
+    })
     const variant = useVariant(product)
     const [primaryCategory, setPrimaryCategory] = useState(category)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
@@ -165,7 +164,7 @@ const ProductDetail = () => {
             }
         ]
 
-        addItemToBasketAction.mutate(
+        addItemToBasketMutation.mutate(
             {parameters: {basketId}, body: productItems},
             {
                 onSuccess: () => {
@@ -360,8 +359,6 @@ const ProductDetail = () => {
         </Box>
     )
 }
-
-ProductDetail.getTemplateName = () => 'product-detail'
 
 ProductDetail.propTypes = {
     /**

@@ -200,7 +200,7 @@ export const CustomerContext = React.createContext()
 export const CustomerProvider = ({children}) => {
     const customerId = useCustomerId()
     const {isRegistered, isGuest, customerType} = useCustomerType()
-    const query = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
+    const query = useCustomer({parameters: {customerId}}, {enabled: !!customerId && isRegistered})
     const value = {
         ...query,
         data: {
@@ -213,7 +213,4 @@ export const CustomerProvider = ({children}) => {
     }
 
     return <CustomerContext.Provider value={value}>{children}</CustomerContext.Provider>
-}
-CustomerProvider.propTypes = {
-    children: PropTypes.node.isRequired
 }

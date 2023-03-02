@@ -4,14 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-/*
- * Copyright (c) 2022, salesforce.com, inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
-
 import {useCustomerBaskets, useCustomerId, useProducts} from 'commerce-sdk-react-preview'
 
 /**
@@ -25,7 +17,7 @@ export const useCurrentBasket = ({id = '', shouldFetchProductDetail = false} = {
         data: basketsData,
         isLoading: isBasketsLoading,
         error: basketsError
-    } = useCustomerBaskets({customerId})
+    } = useCustomerBaskets({parameters: {customerId}})
     // if id is not defined, by default use the first basket in the list
     const basket =
         basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
@@ -36,8 +28,10 @@ export const useCurrentBasket = ({id = '', shouldFetchProductDetail = false} = {
         error: productsError
     } = useProducts(
         {
-            ids: productIds,
-            allImages: true
+            parameters: {
+                ids: productIds,
+                allImages: true
+            }
         },
         {
             enabled: shouldFetchProductDetail && !!productIds,

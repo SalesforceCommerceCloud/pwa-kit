@@ -103,12 +103,12 @@ const AccountPaymentMethods = () => {
     const {formatMessage} = useIntl()
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, paymentInstruments, isLoading} = customer
-    const addSavedPaymentInstrumentAction = useShopperCustomersMutation({
-        action: 'createCustomerPaymentInstrument'
-    })
-    const removeSavedPaymentInstrumentAction = useShopperCustomersMutation({
-        action: 'deleteCustomerPaymentInstrument'
-    })
+    const addPaymentInstrumentMutation = useShopperCustomersMutation(
+        'createCustomerPaymentInstrument'
+    )
+    const removePaymentInstrumentMutation = useShopperCustomersMutation(
+        'deleteCustomerPaymentInstrument'
+    )
 
     const [isEditing, setIsEditing] = useState(false)
     const form = useForm()
@@ -134,7 +134,7 @@ const AccountPaymentMethods = () => {
         }
         try {
             form.clearErrors()
-            const data = await addSavedPaymentInstrumentAction.mutateAsync({
+            const data = await addPaymentInstrumentMutation.mutateAsync({
                 body,
                 parameters: {
                     customerId: customer.customerId
@@ -155,7 +155,7 @@ const AccountPaymentMethods = () => {
 
     const removePaymentInstrument = async (paymentInstrumentId) => {
         try {
-            await removeSavedPaymentInstrumentAction.mutateAsync(
+            await removePaymentInstrumentMutation.mutateAsync(
                 {
                     parameters: {
                         customerId: customer.customerId,
@@ -320,5 +320,3 @@ const AccountPaymentMethods = () => {
 }
 
 AccountPaymentMethods.getTemplateName = () => 'account-payment-methods'
-
-export default AccountPaymentMethods
