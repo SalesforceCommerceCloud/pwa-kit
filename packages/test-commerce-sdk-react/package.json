@@ -3,7 +3,7 @@
   "version": "2.7.0-dev",
   "private": true,
   "engines": {
-    "node": "^14.0.0",
+    "node": "^14.0.0 || ^16.0.0",
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
   "devDependencies": {
@@ -14,6 +14,7 @@
     "@types/react-dom": "^17.0.2",
     "@types/react-router-dom": "^5.1.2",
     "commerce-sdk-react-preview": "^2.7.0-dev",
+    "internal-lib-build": "^2.7.0-dev",
     "pwa-kit-dev": "^2.7.0-dev",
     "pwa-kit-react-sdk": "^2.7.0-dev",
     "pwa-kit-runtime": "^2.7.0-dev",
@@ -23,8 +24,8 @@
     "react-router-dom": "^5.1.2"
   },
   "scripts": {
-    "format": "pwa-kit-dev format \"**/*.{js,jsx,tsx}\"",
-    "lint": "pwa-kit-dev lint \"**/*.{js,jsx,tsx}\"",
+    "format": "internal-lib-build format \"**/*.{js,jsx,tsx}\"",
+    "lint": "internal-lib-build lint \"**/*.{js,jsx,tsx}\"",
     "lint:fix": "npm run lint -- --fix",
     "save-credentials": "pwa-kit-dev save-credentials",
     "start": "pwa-kit-dev start",
@@ -49,14 +50,14 @@
       "**/*.json"
     ],
     "ssrParameters": {
-      "ssrFunctionNodeVersion": "14.x",
+      "ssrFunctionNodeVersion": "16.x",
       "proxyConfigs": [
         {
-          "host": "sandbox-001.api.commercecloud.salesforce.com",
+          "host": "kv7kzm78.api.commercecloud.salesforce.com",
           "path": "api"
         },
         {
-          "host": "development-functional38-qa222.demandware.net",
+          "host": "zzrf-001.dx.commercecloud.salesforce.com",
           "path": "ocapi"
         }
       ]

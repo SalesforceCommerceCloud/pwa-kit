@@ -9,6 +9,7 @@ import {render} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {ChakraProvider} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
+import {PageContext, Region} from '../page-designer/core'
 
 import theme from '../theme'
 import CommerceAPI from '../commerce-api'
@@ -18,7 +19,7 @@ import {
     CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
-import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
+import {AddToCartModal, AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
@@ -64,6 +65,30 @@ export const renderWithRouterAndCommerceAPI = (node) => {
             <Router>{node}</Router>
         </CommerceAPIProvider>
     )
+}
+
+const useAddToCartModal = () => {
+    const [state, setState] = useState({
+        isOpen: false,
+        data: null
+    })
+
+    return {
+        isOpen: state.isOpen,
+        data: state.data,
+        onOpen: (data) => {
+            setState({
+                isOpen: true,
+                data
+            })
+        },
+        onClose: () => {
+            setState({
+                isOpen: false,
+                data: null
+            })
+        }
+    }
 }
 
 /**
@@ -112,12 +137,7 @@ export const TestProviders = ({
         _setBasket(data)
     })
 
-    const addToCartModal = {
-        isOpen: false,
-        data: null,
-        onOpen: () => {},
-        onClose: () => {}
-    }
+    const addToCartModal = useAddToCartModal()
 
     const site = getSiteByReference(siteAlias || appConfig.defaultSite)
 
@@ -142,6 +162,7 @@ export const TestProviders = ({
                                                     value={addToCartModal}
                                                 >
                                                     {children}
+                                                    <AddToCartModal />
                                                 </AddToCartModalContext.Provider>
                                             </ChakraProvider>
                                         </Router>
@@ -201,4 +222,44 @@ export const createPathWithDefaults = (path) => {
 
     const updatedPath = buildUrl(path, siteAlias || defaultSite.id, defaultLocale)
     return updatedPath
+}
+
+/**
+ * When testing page designer components wrap them using this higher-order component
+ * if you plan on using `Region` of `Components` within the components definition.
+ *
+ * @param {*} Component
+ * @param {*} options
+ * @returns
+ */
+export const withPageProvider = (Component, options) => {
+    const providerProps = options?.providerProps || {
+        value: {
+            components: new Proxy(
+                {},
+                {
+                    // eslint-disable-next-line no-unused-vars
+                    get(_target, _prop) {
+                        return (props) => (
+                            <div>
+                                <b>{props.typeId}</b>
+                                {props?.regions?.map((region) => (
+                                    <Region key={region.id} region={region} />
+                                ))}
+                            </div>
+                        )
+                    }
+                }
+            )
+        }
+    }
+    const wrappedComponentName = Component.displayName || Component.name
+    const WrappedComponent = (props) => (
+        <PageContext.Provider {...providerProps}>
+            <Component {...props} />
+        </PageContext.Provider>
+    )
+    WrappedComponent.displayName = `withRouter(${wrappedComponentName})`
+
+    return WrappedComponent
 }

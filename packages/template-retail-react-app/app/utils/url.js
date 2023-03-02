@@ -46,23 +46,24 @@ export const rebuildPathWithParams = (url, extraParams) => {
     const [pathname, search] = url.split('?')
     const params = new URLSearchParams(search)
 
-    // Apply any extra params.
-    Object.keys(extraParams).forEach((key) => {
-        const value = extraParams[key]
-
-        // 0 is a valid value as for a param
-        if (!value && value !== 0) {
-            params.delete(key)
-        } else {
-            params.set(key, value)
-        }
-    })
+    updateSearchParams(params, extraParams)
 
     // Clean up any trailing `=` for params without values.
     const paramStr = params.toString().replace(/=&/g, '&').replace(/=$/, '')
 
     // Generate the newly updated url.
     return `${pathname}${Array.from(paramStr).length > 0 ? `?${paramStr}` : ''}`
+}
+
+export const updateSearchParams = (searchParams, newParams) => {
+    Object.entries(newParams).forEach(([key, value]) => {
+        // 0 is a valid value as for a param
+        if (!value && value !== 0) {
+            searchParams.delete(key)
+        } else {
+            searchParams.set(key, value)
+        }
+    })
 }
 
 /**
