@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-create-app",
-  "version": "2.7.0-alpha.1",
+  "version": "2.7.0-alpha.2",
   "description": "Salesforce's project generator tool",
   "author": "cc-pwa-kit@salesforce.com",
   "license": "See license in LICENSE",
@@ -39,7 +39,7 @@
     "tar": "^6.1.11"
   },
   "devDependencies": {
-    "internal-lib-build": "^2.7.0-alpha.1",
+    "internal-lib-build": "^2.7.0-alpha.2",
     "verdaccio": "^5.9.0"
   }
 }
