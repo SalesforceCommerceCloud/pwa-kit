@@ -360,6 +360,8 @@ const ProductDetail = () => {
     )
 }
 
+ProductDetail.getTemplateName = () => 'product-detail'
+
 ProductDetail.propTypes = {
     /**
      * The current react router match object. (Provided internally)

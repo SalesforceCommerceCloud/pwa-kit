@@ -429,4 +429,6 @@ const Cart = () => {
     )
 }
 
+Cart.getTemplateName = () => 'cart'
+
 export default Cart
