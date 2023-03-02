@@ -15,7 +15,14 @@ import {noop} from '../../utils/utils'
  * Each Swatch is a link with will direct to a href passed to them
  */
 const SwatchGroup = (props) => {
-    const {displayName, children, value, label = '', variant = 'square', onChange = noop} = props
+    const {
+        displayName,
+        children,
+        value: selectedValue,
+        label = '',
+        variant = 'square',
+        onChange = noop
+    } = props
     const styles = useStyleConfig('SwatchGroup')
     return (
         <Flex {...styles.swatchGroup} role="radiogroup">
@@ -28,9 +35,7 @@ const SwatchGroup = (props) => {
                     const childValue = child.props.value
 
                     return React.cloneElement(child, {
-                        selected: childValue === value,
-                        key: childValue,
-                        value,
+                        selected: childValue === selectedValue,
                         variant,
                         onChange
                     })

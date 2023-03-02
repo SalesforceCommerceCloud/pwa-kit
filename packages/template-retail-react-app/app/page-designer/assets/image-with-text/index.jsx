@@ -6,7 +6,8 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Image, Link, Text} from '@chakra-ui/react'
+import {Box, Image, Text} from '@chakra-ui/react'
+import Link from '../../../components/link'
 
 /**
  * Image with text component
@@ -54,6 +55,8 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                                 position={'absolute'}
                                 top={'50%'}
                                 width={'100%'}
+                                padding={'15px'}
+                                textAlign={{base: 'center', sm: 'left'}}
                             >
                                 <Text
                                     as="span"
@@ -67,6 +70,10 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                                             __html: heading
                                         }}
                                         sx={{
+                                            ['h1, h2, h3, h4, h5, h6']: {
+                                                fontSize: 'revert',
+                                                fontWeight: 'revert'
+                                            },
                                             p: {
                                                 display: 'flex',
                                                 alignItems: 'center',
