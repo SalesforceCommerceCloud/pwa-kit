@@ -11,7 +11,7 @@ import {useCheckout} from '../util/checkout-context'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import ShippingAddressSelection from './shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
-import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
+import {useShopperCustomersMutation, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 import { useCurrentCustomer } from '../../../hooks/use-current-customer'
 
 const submitButtonMessage = defineMessage({
@@ -36,6 +36,7 @@ export default function ShippingAddress() {
 
     const createCustomerAddress = useShopperCustomersMutation({action: 'createCustomerAddress'})
     const updateCustomerAddress = useShopperCustomersMutation({action: 'updateCustomerAddress'})
+    const updateShippingAddressForShipment = useShopperBasketsMutation({action: 'updateShippingAddressForShipment'})
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
