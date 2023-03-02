@@ -5,18 +5,55 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from 'react'
+import PropTypes from 'prop-types'
 
 ProductsFilter.propTypes = {
-
-};
-
-function ProductsFilter(props) {
-    return (
-        <div>Product Filter</div>
-    );
+    facets: PropTypes.array.isRequired,
+    onFilterClick: PropTypes.func.isRequired,
+    selectedFacet: PropTypes.array
 }
 
-export default ProductsFilter;
+function ProductsFilter(props) {
+    const {facets, onFilterClick, selectedFacet = []} = props
+    return (
+        <div>
+            {facets.map((facet) => {
+                return (
+                    <div>
+                        <h3>{facet.displayName}</h3>
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start'
+                            }}
+                        >
+                            {facet.values.map((val) => {
+                                const isSelected = selectedFacet.find((facet) =>
+                                    facet.values.find((value) => value === val.nameOrId)
+                                )
+                                return (
+                                    <button
+                                        key={val.nameOrId}
+                                        style={{
+                                            border: isSelected ? '1px solid red' : 'none',
+                                            background: 'none',
+                                            padding: '2px',
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => onFilterClick(val, facet)}
+                                    >
+                                        {val.nameOrId}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </div>
+                )
+            })}
+        </div>
+    )
+}
+
+export default ProductsFilter

@@ -110,7 +110,8 @@ export const useProductCategoryPath = (categoryId) => {
     )
     return data
 }
-export const useProductSearch = ({categoryId, searchTerm}, params) => {
+export const useProductSearch = ({categoryId, searchTerm}, params, queryOptions) => {
+    console.log('params', params)
     const fetchOptions = {
         method: 'POST',
         body: JSON.stringify({
@@ -123,7 +124,7 @@ export const useProductSearch = ({categoryId, searchTerm}, params) => {
     const data = useFetch(
         url,
         {categoryId, searchTerm, ...params},
-        {enabled: !!categoryId || !!searchTerm},
+        {enabled: !!categoryId || !!searchTerm, ...queryOptions},
         fetchOptions
     )
     return data

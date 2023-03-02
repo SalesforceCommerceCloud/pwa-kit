@@ -6,7 +6,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useAuth} from '../hooks/useAuth'
 import {Link} from 'react-router-dom'
 import {
@@ -99,11 +98,15 @@ function Header() {
         <div>
             <h2>PWA Kit project on SCOM API</h2>
             <div>
-                This demo demonstrates fitness of SCOM APIs against happy-path current PWA kit
-                experience{' '}
+                This demo demonstrates fitness of SCOM APIs on the happy-path current PWA kit
+                experience
             </div>
             <div>
-                {token ? <h2>Logged in as alex.vuong </h2> : <h2>Logging in as alex.vuong</h2>}
+                {token ? (
+                    <h2>Logged in as alex.vuong </h2>
+                ) : (
+                    <h2>Guest user (not support throught API). Please login</h2>
+                )}
             </div>
             <div>
                 {sessionContext?.guestUser ? (

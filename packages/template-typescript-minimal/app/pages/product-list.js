@@ -16,7 +16,7 @@ import {
 import {Link, useLocation} from 'react-router-dom'
 import {getMediaLink} from '../utils/utils'
 import Breadcrumb from '../components/breadcrumb'
-import ProductsFilter from "../components/products-filter";
+import ProductsFilter from '../components/products-filter'
 
 ProductList.propTypes = {}
 
@@ -45,16 +45,26 @@ function ProductList() {
     const {categoryId} = useParams()
     const location = useLocation()
 
+    const [selectedFacet, setSelectedFacet] = React.useState([])
+
     const queryParams = new URLSearchParams(location.search.split('?')?.[1])
     const searchTerm = queryParams.get('q')
     const {data: productPath, isLoading: isProductPathLoading} = useProductCategoryPath(categoryId)
     const {data: sortRulesData} = useSortRules()
-    const {data, isLoading: isProductSearchLoading, error} = useProductSearch(
+    const {
+        data,
+        isFetching,
+        isLoading: isProductSearchLoading,
+        error
+    } = useProductSearch(
         {
             categoryId,
             searchTerm
         },
-        {sortRuleId: sortingId}
+        {sortRuleId: sortingId, refinements: selectedFacet},
+        {
+            keepPreviousData: true
+        }
     )
     const productIds = data?.productsPage?.products.map((product) => ({productId: product.id}))
     const {
@@ -68,6 +78,37 @@ function ProductList() {
             setSortingId(sortRulesData?.sortRules[0].id)
         }
     }, [sortRulesData])
+
+    const onFilterClick = (value, facet) => {
+        const modifiedFacet = {
+            attributeType: facet.attributeType,
+            nameOrId: facet.nameOrId,
+            type: facet.facetType
+        }
+        const isFacetSelected = selectedFacet.find((f) => f.nameOrId === modifiedFacet.nameOrId)
+        if (!isFacetSelected) {
+            setSelectedFacet([...selectedFacet, {...modifiedFacet, values: [value.nameOrId]}])
+        } else {
+            const chosenFacet = selectedFacet.find((f) => f.nameOrId === modifiedFacet.nameOrId)
+            const restOfFacets = selectedFacet.filter((f) => f.nameOrId !== modifiedFacet.nameOrId)
+            const isValueSelected = chosenFacet?.values.find((v) => v === value.nameOrId)
+            // remove values from facet
+            if (isValueSelected) {
+                const updatedValues = chosenFacet?.values.filter((v) => v !== value.nameOrId)
+                if (updatedValues.length === 0) {
+                    setSelectedFacet(restOfFacets)
+                    return
+                }
+                setSelectedFacet([...restOfFacets, {...chosenFacet, values: updatedValues}])
+            } else {
+                // add values to facet
+                setSelectedFacet([
+                    ...restOfFacets,
+                    {...modifiedFacet, values: [...chosenFacet.values, value.nameOrId]}
+                ])
+            }
+        }
+    }
     if (error || productListPriceError) {
         return <div>Something is wrong</div>
     }
@@ -95,15 +136,37 @@ function ProductList() {
                     </select>
                 )}
             </div>
+            {selectedFacet.length > 0 && (
+                <div>
+                    <h3>Filters:</h3>
+                    <div>
+                        {selectedFacet.map((facet) => {
+                            return (
+                                <div key={facet.nameOrId}>
+                                    {facet?.values?.map((val) => (
+                                        <div>{val}</div>
+                                    ))}
+                                </div>
+                            )
+                        })}
+                    </div>
+                    <button onClick={() => setSelectedFacet([])}>Clear all filters</button>
+                </div>
+            )}
 
             <div style={{display: 'flex'}}>
-
-                <div>
-                    <ProductsFilter />
+                <div style={{flex: 1}}>
+                    {!isProductSearchLoading && (
+                        <ProductsFilter
+                            onFilterClick={onFilterClick}
+                            facets={data.facets}
+                            selectedFacet={selectedFacet}
+                        />
+                    )}
                 </div>
-                <div>
+                <div style={{flex: 2}}>
                     <div>
-                        {(isProductSearchLoading || productListPriceLoading) && (
+                        {(isProductSearchLoading || productListPriceLoading) && !isFetching && (
                             <div>Loading products...</div>
                         )}
                     </div>
