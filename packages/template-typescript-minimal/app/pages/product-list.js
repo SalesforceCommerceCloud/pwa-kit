@@ -61,10 +61,7 @@ function ProductList() {
             categoryId,
             searchTerm
         },
-        {sortRuleId: sortingId, refinements: selectedFacet},
-        {
-            keepPreviousData: true
-        }
+        {sortRuleId: sortingId, refinements: selectedFacet}
     )
     const productIds = data?.productsPage?.products.map((product) => ({productId: product.id}))
     const {
@@ -78,7 +75,9 @@ function ProductList() {
             setSortingId(sortRulesData?.sortRules[0].id)
         }
     }, [sortRulesData])
-
+    React.useEffect(() => {
+        setSelectedFacet([])
+    }, [categoryId])
     const onFilterClick = (value, facet) => {
         const modifiedFacet = {
             attributeType: facet.attributeType,
@@ -109,6 +108,7 @@ function ProductList() {
             }
         }
     }
+
     if (error || productListPriceError) {
         return <div>Something is wrong</div>
     }
@@ -155,15 +155,15 @@ function ProductList() {
             )}
 
             <div style={{display: 'flex'}}>
-                <div style={{flex: 1}}>
-                    {!isProductSearchLoading && (
+                {!isProductSearchLoading && (
+                    <div style={{flex: 1}}>
                         <ProductsFilter
                             onFilterClick={onFilterClick}
                             facets={data.facets}
                             selectedFacet={selectedFacet}
                         />
-                    )}
-                </div>
+                    </div>
+                )}
                 <div style={{flex: 2}}>
                     <div>
                         {(isProductSearchLoading || productListPriceLoading) && !isFetching && (

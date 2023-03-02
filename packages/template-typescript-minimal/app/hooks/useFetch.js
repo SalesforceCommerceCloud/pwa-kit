@@ -110,8 +110,7 @@ export const useProductCategoryPath = (categoryId) => {
     )
     return data
 }
-export const useProductSearch = ({categoryId, searchTerm}, params, queryOptions) => {
-    console.log('params', params)
+export const useProductSearch = ({categoryId, searchTerm}, params, queryOptions = {}) => {
     const fetchOptions = {
         method: 'POST',
         body: JSON.stringify({

@@ -18,6 +18,7 @@ function ProductsFilter(props) {
     const {facets, onFilterClick, selectedFacet = []} = props
     return (
         <div>
+            {facets.length === 0 && <div>No filter available. Try Category Test</div>}
             {facets.map((facet) => {
                 return (
                     <div>
