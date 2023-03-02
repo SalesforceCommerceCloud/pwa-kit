@@ -31,11 +31,7 @@ import Field from '../../../components/field'
 import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
 import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
-import {
-    ShopperLoginHelpers,
-    useShopperLoginHelper,
-    useShopperBasketsMutation
-} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()
@@ -43,8 +39,8 @@ const ContactInfo = () => {
     const authModal = useAuthModal('password')
     const {data: customer} = useCurrentCustomer()
     const {basket} = useCurrentBasket()
-    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation({action: 'updateCustomerForBasket'})
 
     const {

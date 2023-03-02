@@ -41,11 +41,7 @@ import {
     useBreakpointValue,
     useMultiStyleConfig
 } from '@chakra-ui/react'
-import {
-    ShopperLoginHelpers,
-    useShopperLoginHelper,
-    useCustomerType
-} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 import Link from '../../components/link'
 // Icons
 import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from '../icons'
@@ -93,7 +89,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
     const {l10n} = site
     const [showLoading, setShowLoading] = useState(false)
     const [ariaBusy, setAriaBusy] = useState('true')
-    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
+    const logout = useAuthHelper(AuthHelpers.Logout)
     const onSignoutClick = async () => {
         setShowLoading(true)
         await logout.mutateAsync()

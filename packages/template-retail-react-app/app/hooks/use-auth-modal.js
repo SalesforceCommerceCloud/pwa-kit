@@ -21,8 +21,8 @@ import {
     useToast
 } from '@chakra-ui/react'
 import {
-    ShopperLoginHelpers,
-    useShopperLoginHelper,
+    AuthHelpers,
+    useAuthHelper,
     useCustomer,
     useCustomerId,
     useCustomerType,
@@ -64,8 +64,8 @@ export const AuthModal = ({
     const form = useForm()
     const submittedEmail = useRef()
     const toast = useToast()
-    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
-    const register = useShopperLoginHelper(ShopperLoginHelpers.Register)
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const register = useAuthHelper(AuthHelpers.Register)
 
     // TODO: simplify the args to remove action
     const getResetPasswordToken = useShopperCustomersMutation({

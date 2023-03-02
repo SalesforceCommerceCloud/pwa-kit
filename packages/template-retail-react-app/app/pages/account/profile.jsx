@@ -24,11 +24,7 @@ import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../components/to
 import ProfileFields from '../../components/forms/profile-fields'
 import UpdatePasswordFields from '../../components/forms/update-password-fields'
 import FormActionButtons from '../../components/forms/form-action-buttons'
-import {
-    useShopperCustomersMutation,
-    useShopperLoginHelper,
-    ShopperLoginHelpers
-} from 'commerce-sdk-react-preview'
+import {useShopperCustomersMutation, useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 /**
@@ -223,7 +219,7 @@ const PasswordCard = () => {
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
 
-    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
     const updateCustomerPasswordAction = useShopperCustomersMutation({
         action: 'updateCustomerPassword'

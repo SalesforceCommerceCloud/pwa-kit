@@ -9,11 +9,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, defineMessage} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
-import {
-    ShopperLoginHelpers,
-    useShopperLoginHelper,
-    useCustomerType
-} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
@@ -32,7 +28,7 @@ const Login = () => {
     const location = useLocation()
     const einstein = useEinstein()
     const {isRegistered} = useCustomerType()
-    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
     const submitForm = async (data) => {
         return login.mutateAsync(

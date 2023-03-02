@@ -14,11 +14,7 @@ import {rest} from 'msw'
 import {Route, Switch} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
 import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../commerce-api/mock-data'
-import {
-    ShopperLoginHelpers,
-    useCustomerType,
-    useShopperLoginHelper
-} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useCustomerType, useAuthHelper} from 'commerce-sdk-react-preview'
 
 jest.mock('commerce-sdk-react-preview', () => {
     const originModule = jest.requireActual('commerce-sdk-react-preview')
@@ -38,7 +34,7 @@ jest.mock('@chakra-ui/react', () => {
     }
 })
 const MockedComponent = ({history}) => {
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const loginRegisteredUser = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     React.useEffect(() => {
         loginRegisteredUser.mutate({username: 'customer@test.com', password: 'password1'})
     }, [])
