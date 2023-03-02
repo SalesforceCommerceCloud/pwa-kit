@@ -320,3 +320,5 @@ const AccountPaymentMethods = () => {
 }
 
 AccountPaymentMethods.getTemplateName = () => 'account-payment-methods'
+
+export default AccountPaymentMethods
