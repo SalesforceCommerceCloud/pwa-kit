@@ -29,26 +29,35 @@ import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
 import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {
+    ShopperLoginHelpers,
+    useShopperLoginHelper,
+    useShopperBasketsMutation
+} from 'commerce-sdk-react-preview'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()
     const history = useHistory()
     const authModal = useAuthModal('password')
+    const {data: customer} = useCurrentCustomer()
+    const {basket} = useCurrentBasket()
+    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
+    const updateCustomerForBasket = useShopperBasketsMutation({action: 'updateCustomerForBasket'})
 
     const {
-        customer,
-        basket,
         isGuestCheckout,
         setIsGuestCheckout,
         step,
-        login,
         checkoutSteps,
         setCheckoutStep,
         goToNextStep
     } = useCheckout()
 
     const form = useForm({
-        defaultValues: {email: customer?.email || basket.customerInfo?.email || '', password: ''}
+        defaultValues: {email: customer?.email || basket?.customerInfo?.email || '', password: ''}
     })
 
     const fields = useLoginFields({form})
@@ -60,10 +69,17 @@ const ContactInfo = () => {
     const submitForm = async (data) => {
         setError(null)
         try {
-            await login(data)
+            if (!data.password) {
+                await updateCustomerForBasket.mutateAsync({
+                    parameters: {basketId: basket.basketId},
+                    body: {email: data.email}
+                })
+            } else {
+                await login.mutateAsync({username: data.email, password: data.password})
+            }
             goToNextStep()
         } catch (error) {
-            if (/invalid credentials/i.test(error.message)) {
+            if (/Unauthorized/i.test(error.message)) {
                 setError(
                     formatMessage({
                         defaultMessage: 'Incorrect username or password, please try again.',
@@ -182,8 +198,7 @@ const ContactInfo = () => {
                     isOpen={signOutConfirmDialogIsOpen}
                     onClose={() => setSignOutConfirmDialogIsOpen(false)}
                     onConfirm={async () => {
-                        await customer.logout()
-                        await basket.getOrCreateBasket()
+                        await logout.mutateAsync()
                         history.replace('/')
                         setSignOutConfirmDialogIsOpen(false)
                     }}

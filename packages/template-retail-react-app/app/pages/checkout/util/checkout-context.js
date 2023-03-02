@@ -6,21 +6,21 @@
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import useBasket from '../../../commerce-api/hooks/useBasket'
-import useCustomer from '../../../commerce-api/hooks/useCustomer'
 import useEinstein from '../../../commerce-api/hooks/useEinstein'
 import {useCommerceAPI} from '../../../commerce-api/contexts'
 import {getPaymentInstrumentCardType} from '../../../utils/cc-utils'
 import {isMatchingAddress} from '../../../utils/utils'
 import {useIntl} from 'react-intl'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
 const CheckoutContext = React.createContext()
 
 export const CheckoutProvider = ({children}) => {
     const mounted = useRef()
     const api = useCommerceAPI()
-    const customer = useCustomer()
-    const basket = useBasket()
+    const {data: customer} = useCurrentCustomer()
+    const {basket} = useCurrentBasket()
     const {formatMessage} = useIntl()
     const einstein = useEinstein()
 
@@ -70,13 +70,13 @@ export const CheckoutProvider = ({children}) => {
             mergeState({isGuestCheckout: false})
         }
 
-        if (customer.isGuest && basket.customerInfo?.email && !state.isGuestCheckout) {
+        if (customer.isGuest && basket?.customerInfo?.email && !state.isGuestCheckout) {
             mergeState({isGuestCheckout: true})
         }
 
         // Derive the starting step for checkout based on current state of basket.
         // A failed condition sets the current step and returns early (order matters).
-        if (customer.customerId && basket.basketId && state.step == undefined) {
+        if (customer.customerId && basket?.basketId && state.step === undefined) {
             if (!basket.customerInfo?.email) {
                 mergeState({step: CheckoutSteps.Contact_Info})
                 return
@@ -186,19 +186,10 @@ export const CheckoutProvider = ({children}) => {
 
             // Async functions
             // Convenience methods for interacting with remote customer and basket data.
+            //
+            // @TODO: ALL METHODS BELOW SHOULD BE REMOVED BY THE END OF HOOK INTEGRATION
+            //
             // ----------------
-
-            /**
-             * Logs in a registered customer or applies a guest email to basket.
-             * @param {Object} credentials
-             */
-            async login({email, password}) {
-                if (!password) {
-                    await basket.updateCustomerInfo({email})
-                } else {
-                    await customer.login({email, password})
-                }
-            },
 
             /**
              * Applies the given address to the basket's shipment. Accepts CustomerAddress and OrderAddress.

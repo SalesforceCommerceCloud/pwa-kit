@@ -199,20 +199,19 @@ CurrencyProvider.propTypes = {
 export const CustomerContext = React.createContext()
 export const CustomerProvider = ({children}) => {
     const customerId = useCustomerId()
-    const {isRegistered, customerType} = useCustomerType()
-    const {data, isLoading, isError, ...restOfCustomer} = useCustomer(
-        {customerId},
-        {enabled: !!customerId && isRegistered}
-    )
+    const {isRegistered, isGuest, customerType} = useCustomerType()
+    const query = useCustomer({customerId}, {enabled: !!customerId && isRegistered})
     const value = {
-        ...data,
-        customerId,
-        isRegistered,
-        customerType,
-        isLoading,
-        isError,
-        ...restOfCustomer
+        ...query,
+        data: {
+            ...query.data,
+            customerType,
+            customerId,
+            isRegistered,
+            isGuest
+        }
     }
+
     return <CustomerContext.Provider value={value}>{children}</CustomerContext.Provider>
 }
 CustomerProvider.propTypes = {

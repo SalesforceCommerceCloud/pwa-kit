@@ -39,7 +39,7 @@ import {useCurrentCustomer} from '../../hooks/use-current-customer'
  */
 // eslint-disable-next-line react/prop-types
 const Skeleton = ({children, height, width, ...rest}) => {
-    const customer = useCurrentCustomer()
+    const {data: customer} = useCurrentCustomer()
     const {isRegistered} = customer
     const size = !isRegistered
         ? {
@@ -57,7 +57,7 @@ const Skeleton = ({children, height, width, ...rest}) => {
 const ProfileCard = () => {
     const {formatMessage} = useIntl()
 
-    const customer = useCurrentCustomer()
+    const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
 
     const updateCustomerAction = useShopperCustomersMutation({action: 'updateCustomer'})
@@ -220,7 +220,7 @@ const ProfileCard = () => {
 const PasswordCard = () => {
     const {formatMessage} = useIntl()
 
-    const customer = useCurrentCustomer()
+    const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
 
     const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
