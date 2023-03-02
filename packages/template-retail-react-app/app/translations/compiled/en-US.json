@@ -29,6 +29,12 @@
       "value": "Add Address"
     }
   ],
+  "account_addresses.info.address_removed": [
+    {
+      "type": 0,
+      "value": "Address removed"
+    }
+  ],
   "account_addresses.info.address_updated": [
     {
       "type": 0,
