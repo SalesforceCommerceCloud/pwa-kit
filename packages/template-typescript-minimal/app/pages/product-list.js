@@ -16,6 +16,7 @@ import {
 import {Link, useLocation} from 'react-router-dom'
 import {getMediaLink} from '../utils/utils'
 import Breadcrumb from '../components/breadcrumb'
+import ProductsFilter from "../components/products-filter";
 
 ProductList.propTypes = {}
 
@@ -61,6 +62,7 @@ function ProductList() {
         isLoading: productListPriceLoading,
         error: productListPriceError
     } = useProductsPrice(productIds)
+
     React.useEffect(() => {
         if (!sortingId && sortRulesData?.sortRules.length > 0) {
             setSortingId(sortRulesData?.sortRules[0].id)
@@ -94,26 +96,34 @@ function ProductList() {
                 )}
             </div>
 
-            <div>
-                {(isProductSearchLoading || productListPriceLoading) && (
-                    <div>Loading products...</div>
-                )}
-            </div>
+            <div style={{display: 'flex'}}>
 
-            <div style={{display: 'flex', flexWrap: 'wrap', gap: '20px'}}>
-                {data?.productsPage?.products?.map((product) => {
-                    const price = productListPrice?.pricingLineItemResults?.find((i) =>
-                        product.id.includes(i.productId)
-                    )
-                    return (
-                        <ProductTile
-                            key={product.id}
-                            currency={productListPrice?.currencyIsoCode}
-                            product={product}
-                            price={price}
-                        />
-                    )
-                })}
+                <div>
+                    <ProductsFilter />
+                </div>
+                <div>
+                    <div>
+                        {(isProductSearchLoading || productListPriceLoading) && (
+                            <div>Loading products...</div>
+                        )}
+                    </div>
+
+                    <div style={{display: 'flex', flexWrap: 'wrap', gap: '20px'}}>
+                        {data?.productsPage?.products?.map((product) => {
+                            const price = productListPrice?.pricingLineItemResults?.find((i) =>
+                                product.id.includes(i.productId)
+                            )
+                            return (
+                                <ProductTile
+                                    key={product.id}
+                                    currency={productListPrice?.currencyIsoCode}
+                                    product={product}
+                                    price={price}
+                                />
+                            )
+                        })}
+                    </div>
+                </div>
             </div>
         </div>
     )
