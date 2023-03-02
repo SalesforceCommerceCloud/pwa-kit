@@ -214,3 +214,7 @@ export const CustomerProvider = ({children}) => {
 
     return <CustomerContext.Provider value={value}>{children}</CustomerContext.Provider>
 }
+
+CustomerProvider.propTypes = {
+    children: PropTypes.node.isRequired
+}

@@ -100,4 +100,9 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     )
 }
 
+ItemAttributes.propTypes = {
+    includeQuantity: PropTypes.bool,
+    currency: PropTypes.string
+}
+
 export default ItemAttributes
