@@ -4,9 +4,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {Alert, AlertIcon, Box, Button, Container, Stack, Text} from '@chakra-ui/react'
+import {
+    Alert,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogOverlay,
+    AlertIcon,
+    Box,
+    Button,
+    Container,
+    Stack,
+    Text
+} from '@chakra-ui/react'
 import {useHistory} from 'react-router-dom'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -15,9 +29,6 @@ import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
 import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
-import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()
@@ -187,6 +198,48 @@ const ContactInfo = () => {
                 />
             </ToggleCardSummary>
         </ToggleCard>
+    )
+}
+
+const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
+    const cancelRef = useRef()
+
+    return (
+        <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
+            <AlertDialogOverlay>
+                <AlertDialogContent>
+                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                        <FormattedMessage
+                            defaultMessage="Sign Out"
+                            id="signout_confirmation_dialog.heading.sign_out"
+                        />
+                    </AlertDialogHeader>
+
+                    <AlertDialogBody>
+                        <FormattedMessage
+                            defaultMessage="Are you sure you want to sign out? You will need to sign back in to proceed
+                        with your current order."
+                            id="signout_confirmation_dialog.message.sure_to_sign_out"
+                        />
+                    </AlertDialogBody>
+
+                    <AlertDialogFooter>
+                        <Button ref={cancelRef} variant="outline" onClick={onClose}>
+                            <FormattedMessage
+                                defaultMessage="Cancel"
+                                id="signout_confirmation_dialog.button.cancel"
+                            />
+                        </Button>
+                        <Button colorScheme="red" onClick={onConfirm} ml={3}>
+                            <FormattedMessage
+                                defaultMessage="Sign Out"
+                                id="signout_confirmation_dialog.button.sign_out"
+                            />
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialogOverlay>
+        </AlertDialog>
     )
 }
 
