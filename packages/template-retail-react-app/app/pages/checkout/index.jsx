@@ -10,7 +10,7 @@ import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@
 import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from './util/checkout-context'
 import ContactInfo from './partials/contact-info'
-// import ShippingAddress from './partials/shipping-address'
+import ShippingAddress from './partials/shipping-address'
 // import ShippingOptions from './partials/shipping-options'
 // import Payment from './partials/payment'
 // import OrderSummary from '../../components/order-summary'
@@ -59,7 +59,7 @@ const Checkout = () => {
                             )}
 
                             <ContactInfo />
-                            {/* <ShippingAddress /> */}
+                            <ShippingAddress />
                             {/* <ShippingOptions /> */}
                             {/* <Payment /> */}
 

@@ -18,6 +18,8 @@ import AddressDisplay from '../../../components/address-display'
 import AddressFields from '../../../components/forms/address-fields'
 import FormActionButtons from '../../../components/forms/form-action-buttons'
 import {MESSAGE_PROPTYPE} from '../../../utils/locale'
+import { useCurrentCustomer } from '../../../hooks/use-current-customer'
+import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 
 const saveButtonMessage = defineMessage({
     defaultMessage: 'Save & Continue to Shipping Method',
@@ -104,7 +106,8 @@ const ShippingAddressSelection = ({
     onSubmit = async () => null
 }) => {
     const {formatMessage} = useIntl()
-    const {customer} = useCheckout()
+    const {data: customer} = useCurrentCustomer()
+    console.log(customer)
     const hasSavedAddresses = customer.addresses && customer.addresses.length > 0
     const [isEditingAddress, setIsEditingAddress] = useState(!hasSavedAddresses)
     const [selectedAddressId, setSelectedAddressId] = useState(false)
@@ -127,6 +130,10 @@ const ShippingAddressSelection = ({
             const {id, _type, ...selectedAddr} = selectedAddress
             return shallowEquals(address, selectedAddr)
         })
+
+    const removeCustomerAddress = useShopperCustomersMutation({
+        action: 'removeCustomerAddress'
+    })
 
     useEffect(() => {
         // Automatically select the customer's default/preferred shipping address
@@ -191,7 +198,14 @@ const ShippingAddressSelection = ({
             form.reset({addressId: ''})
         }
 
-        await customer.removeSavedAddress(addressId)
+        // await customer.removeSavedAddress(addressId)
+        await removeCustomerAddress.mutateAsync(
+            {
+                parameters: {
+                    customerId: customer.customerId,
+                    addressName: addressId
+                }
+            })
     }
 
     // Opens/closes the 'add address' form. Notice that when toggling either state,
