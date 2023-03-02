@@ -214,36 +214,28 @@ export const DevServerMixin = {
     },
 
     serveStaticFile(filePath, opts = {}) {
+        // Warning: Ugly part of the Bundle spec that we need to maintain.
+        //
+        // This function assumes that an SDK build step will copy all
+        // non-webpacked assets from the 'app' dir to the 'build' dir.
+        ///
+        // If you look carefully through the history, this has never
+        // been true though – assets get copied from app/static to
+        // build/static but this isn't really clear from the API.
+        //
+        // To see where those assets get copied, see here:
+        //
+        // packages/pwa-kit-dev/src/configs/webpack/config.js
+        //
+        // We should maintain this. But know that we have plans to make
+        // a robust Bundle spec in 246.
+        //
+        // Discussion here:
+        //
+        // https://salesforce-internal.slack.com/archives/C8YDDMKFZ/p1677793769255659?thread_ts=1677791840.174309&cid=C8YDDMKFZ
         return (req, res) => {
-            req.app.__devMiddleware.waitUntilValid(() => {
-                const options = req.app.options
-                const webpackStats = req.app.__devMiddleware.context.stats.stats
-
-                const serverCompilation = webpackStats.find(
-                    // static files are copied into bundle
-                    // in the server webpack config
-                    (stat) => stat.compilation.name === SERVER
-                ).compilation
-                const {assetsInfo} = serverCompilation
-                const assetInfo = assetsInfo.get(filePath)
-
-                // if the asset is not in the webpack bundle, then
-                // return 404, we don't care whether or not the file
-                // exists in the local file system
-                if (!assetInfo) {
-                    res.sendStatus(404)
-                    return
-                }
-                const {sourceFilename} = assetInfo
-                const sourceFilePath = path.resolve(sourceFilename)
-
-                res.sendFile(sourceFilePath, {
-                    headers: {
-                        'cache-control': options.defaultCacheControl
-                    },
-                    ...opts
-                })
-            })
+            const baseDir = path.resolve(projectDir, 'app')
+            return this._serveStaticFile(req, res, baseDir, filePath, opts)
         }
     },
 

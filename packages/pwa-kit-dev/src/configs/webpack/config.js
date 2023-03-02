@@ -354,12 +354,6 @@ const renderer =
                         excludeWarnings: true,
                         skipFirstNotification: true
                     }),
-
-                    // Must only appear on one config – this one is the only mandatory one.
-                    new CopyPlugin({
-                        patterns: [{from: 'app/static/', to: 'static/'}]
-                    }),
-
                     analyzeBundle && getBundleAnalyzerPlugin('server-renderer')
                 ].filter(Boolean)
             }
@@ -383,6 +377,10 @@ const ssr = (() => {
                     },
                     plugins: [
                         ...config.plugins,
+                        // This must only appear on one config – this one is the only mandatory one.
+                        new CopyPlugin({
+                            patterns: [{from: 'app/static/', to: 'static/'}]
+                        }),
                         analyzeBundle && getBundleAnalyzerPlugin(SSR)
                     ].filter(Boolean)
                 }
