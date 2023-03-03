@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "hash": "8fad1c2fbe6589e3e72c",
+  "hash": "47416b63933634cf604a",
   "publicPath": "/mobify/bundle/development/",
   "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
@@ -54,7 +54,7 @@
     {
       "type": "asset",
       "name": "vendor.js",
-      "size": 5303777,
+      "size": 5162385,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -81,7 +81,7 @@
     {
       "type": "asset",
       "name": "main.js",
-      "size": 1151141,
+      "size": 1162872,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -550,31 +550,6 @@
     },
     {
       "type": "asset",
-      "name": "pages-home.js",
-      "size": 39733,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "pages-home.js.map"
-        }
-      },
-      "chunkNames": [
-        "pages-home"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "pages-home"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
       "name": "^retail-react-app-app-pages-account-wishlist.js",
       "size": 39136,
       "emitted": false,
@@ -595,6 +570,31 @@
       "filteredRelated": 1,
       "chunks": [
         "^retail-react-app-app-pages-account-wishlist"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-home.js",
+      "size": 38937,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "pages-home.js.map"
+        }
+      },
+      "chunkNames": [
+        "pages-home"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "pages-home"
       ],
       "auxiliaryChunks": []
     },

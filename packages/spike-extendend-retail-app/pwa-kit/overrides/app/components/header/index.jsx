@@ -34,23 +34,24 @@ import useCustomer from '^retail-react-app/app/commerce-api/hooks/useCustomer'
 import Link from '^retail-react-app/app/components/link'
 import Search from '^retail-react-app/app/components/search'
 import withRegistration from '^retail-react-app/app/hoc/with-registration'
+
 import {
     AccountIcon,
     BrandLogo,
     BasketIcon,
     HamburgerIcon,
-    ChevronDownIcon,
-    HeartIcon,
-    SignoutIcon,
-} from '../icons'
+} from '~retail-react-app/app/components/icons'
+
+import {ChevronDownIcon, HeartIcon, SignoutIcon} from '^retail-react-app/app/components/icons'
 
 import {noop} from '^retail-react-app/app/utils/utils'
 import {navLinks, messages} from '^retail-react-app/app/pages/account/constant'
-// import {navLinks} from '../../pages/account/constant'
 import useNavigation from '^retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '^retail-react-app/app/components/loading-spinner'
 
 const ENTER_KEY = 'Enter'
+
+const unused = ''
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 /**
@@ -88,61 +89,30 @@ const Header = ({
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
 
     const [showLoading, setShowLoading] = useState(false)
-    // // tracking if users enter the popover Content,
-    // // so we can decide whether to close the menu when users leave account icons
-    // const hasEnterPopoverContent = useRef()
+    // tracking if users enter the popover Content,
+    // so we can decide whether to close the menu when users leave account icons
+    const hasEnterPopoverContent = useRef()
 
     const styles = useMultiStyleConfig('Header')
 
     const onSignoutClick = async () => {
         setShowLoading(true)
-        // await customer.logout()
+        await customer.logout()
         navigate('/login')
         setShowLoading(false)
     }
 
-    // const keyMap = {
-    //     Escape: () => onClose(),
-    //     Enter: () => onOpen(),
-    // }
+    const keyMap = {
+        Escape: () => onClose(),
+        Enter: () => onOpen(),
+    }
 
-    // const handleIconsMouseLeave = () => {
-    //     // don't close the menu if users enter the popover content
-    //     setTimeout(() => {
-    //         if (!hasEnterPopoverContent.current) onClose()
-    //     }, 100)
-    // }
-
-    // return (
-    //     <Box {...styles.container} {...props}>
-    //         <Box {...styles.content}>
-    //             {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
-    //             <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>
-    //                 <IconButton
-    //                     // @TODO: modified
-    //                     aria-label="Menu"
-    //                     icon={<HamburgerIcon />}
-    //                     variant="unstyled"
-    //                     display={{lg: 'none'}}
-    //                     {...styles.icons}
-    //                     onClick={onMenuClick}
-    //                 />
-    //                 <IconButton
-    //                     aria-label="Logo"
-    //                     icon={<BrandLogo {...styles.logo} />}
-    //                     {...styles.icons}
-    //                     variant="unstyled"
-    //                     onClick={onLogoClick}
-    //                 />
-    //                 <Box {...styles.bodyContainer}>{children}</Box>
-    //                 <Box {...styles.searchContainer}>
-    //                     <Search placeholder="Search for products..." {...styles.search} />
-    //                 </Box>
-    //                 Hello Header
-    //             </Flex>
-    //         </Box>
-    //     </Box>
-    // )
+    const handleIconsMouseLeave = () => {
+        // don't close the menu if users enter the popover content
+        setTimeout(() => {
+            if (!hasEnterPopoverContent.current) onClose()
+        }, 100)
+    }
 
     return (
         <Box {...styles.container} {...props}>
@@ -150,8 +120,10 @@ const Header = ({
                 {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
                 <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>
                     <IconButton
-                        // @TODO: modified
-                        aria-label="Menu"
+                        aria-label={intl.formatMessage({
+                            id: 'header.button.assistive_msg.menu',
+                            defaultMessage: 'Menu',
+                        })}
                         icon={<HamburgerIcon />}
                         variant="unstyled"
                         display={{lg: 'none'}}
@@ -159,7 +131,10 @@ const Header = ({
                         onClick={onMenuClick}
                     />
                     <IconButton
-                        aria-label="Logo"
+                        aria-label={intl.formatMessage({
+                            id: 'header.button.assistive_msg.logo',
+                            defaultMessage: 'Logo',
+                        })}
                         icon={<BrandLogo {...styles.logo} />}
                         {...styles.icons}
                         variant="unstyled"
@@ -167,7 +142,13 @@ const Header = ({
                     />
                     <Box {...styles.bodyContainer}>{children}</Box>
                     <Box {...styles.searchContainer}>
-                        <Search placeholder="Search for products..." {...styles.search} />
+                        <Search
+                            placeholder={intl.formatMessage({
+                                id: 'header.field.placeholder.search_for_products',
+                                defaultMessage: 'Search for products...',
+                            })}
+                            {...styles.search}
+                        />
                     </Box>
                     <AccountIcon
                         {...styles.accountIcon}
@@ -177,7 +158,10 @@ const Header = ({
                             e.key === ENTER_KEY ? onMyAccountClick() : noop
                         }}
                         onClick={onMyAccountClick}
-                        aria-label="My account"
+                        aria-label={intl.formatMessage({
+                            id: 'header.button.assistive_msg.my_account',
+                            defaultMessage: 'My account',
+                        })}
                     />
 
                     {customer.isRegistered && (
@@ -214,7 +198,12 @@ const Header = ({
                             >
                                 <PopoverArrow />
                                 <PopoverHeader>
-                                    <Text>My account</Text>
+                                    <Text>
+                                        {intl.formatMessage({
+                                            defaultMessage: 'My Account',
+                                            id: 'header.popover.title.my_account',
+                                        })}
+                                    </Text>
                                 </PopoverHeader>
                                 <PopoverBody>
                                     <Stack spacing={0} as="nav" data-testid="account-detail-nav">
@@ -223,12 +212,13 @@ const Header = ({
                                             return (
                                                 <Button
                                                     key={link.name}
+                                                    as={Link}
                                                     to={`/account${link.path}`}
                                                     useNavLink={true}
                                                     variant="menu-link"
                                                     leftIcon={<LinkIcon boxSize={5} />}
                                                 >
-                                                    {link.name}
+                                                    {intl.formatMessage(messages[link.name])}
                                                 </Button>
                                             )
                                         })}
@@ -240,7 +230,10 @@ const Header = ({
                                         <Flex>
                                             <SignoutIcon boxSize={5} {...styles.signoutIcon} />
                                             <Text as="span" {...styles.signoutText}>
-                                                Log out
+                                                {intl.formatMessage({
+                                                    defaultMessage: 'Log out',
+                                                    id: 'header.popover.action.log_out',
+                                                })}
                                             </Text>
                                         </Flex>
                                     </Button>
@@ -249,14 +242,20 @@ const Header = ({
                         </Popover>
                     )}
                     <IconButtonWithRegistration
-                        aria-label="Wishlist"
+                        aria-label={intl.formatMessage({
+                            defaultMessage: 'Wishlist',
+                            id: 'header.button.assistive_msg.wishlist',
+                        })}
                         icon={<HeartIcon />}
                         variant="unstyled"
                         {...styles.icons}
                         onClick={onWishlistClick}
                     />
                     <IconButton
-                        aria-label="My cart"
+                        aria-label={intl.formatMessage({
+                            id: 'header.button.assistive_msg.my_cart',
+                            defaultMessage: 'My cart',
+                        })}
                         icon={
                             <>
                                 <BasketIcon />

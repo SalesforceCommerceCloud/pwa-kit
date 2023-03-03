@@ -37,6 +37,7 @@ const AppConfig = ({children, locals = {}}) => {
     console.log('~hello from overrides _app-config')
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
+
     return (
         <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
             <CommerceAPIProvider value={locals.api}>

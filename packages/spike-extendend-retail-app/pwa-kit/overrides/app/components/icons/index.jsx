@@ -60,7 +60,7 @@ import '^retail-react-app/app/assets/svg/close.svg'
 // proper viewBox attribute on the Icon wrapper.
 import AmexSymbol from '^retail-react-app/app/assets/svg/cc-amex.svg'
 // import BrandLogoSymbol from '^retail-react-app/app/assets/svg/brand-logo.svg'
-import BrandLogoSymbol from '*app/static/svg/brand-logo.svg'
+import BrandLogoSymbol from '~app/static/svg/brand-logo.svg'
 import CVVSymbol from '^retail-react-app/app/assets/svg/cc-cvv.svg'
 import DiscoverSymbol from '^retail-react-app/app/assets/svg/cc-discover.svg'
 import LocationSymbol from '^retail-react-app/app/assets/svg/location.svg'

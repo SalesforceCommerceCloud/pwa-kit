@@ -27,7 +27,7 @@ import ProductScroller from '^retail-react-app/app/components/product-scroller'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 console.log('~TODO: override pages/home/data below !!! (uses useIntl())')
-import {heroFeatures, features} from './data'
+import {heroFeatures, features} from '^retail-react-app/app/pages/home/data'
 
 // TODO: remove me!
 import {ChakraProvider} from '@chakra-ui/react'
@@ -147,8 +147,7 @@ const Home = ({productSearchResult, isLoading}) => {
                                                 {feature.icon}
                                             </Flex>
                                             <Text fontWeight="700">
-                                                {/* {intl.formatMessage(featureMessage.title)} */}
-                                                {featureMessage.title}
+                                                {intl.formatMessage(featureMessage.title)}
                                             </Text>
                                         </HStack>
                                     </Link>
@@ -162,47 +161,45 @@ const Home = ({productSearchResult, isLoading}) => {
                     <Section
                         padding={4}
                         paddingTop={16}
-                        // title={intl.formatMessage({
-                        //     defaultMessage: 'Shop Products',
-                        //     id: 'home.heading.shop_products',
-                        // })}
-                        title="Shop Products"
-                        subtitle="'This section contains content from the catalog. {docLink} on how to replace it.'"
-                        // subtitle={intl.formatMessage(
-                        //     {
-                        //         defaultMessage:
-                        //             'This section contains content from the catalog. {docLink} on how to replace it.',
-                        //         id: 'home.description.shop_products',
-                        //         description:
-                        //             '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs',
-                        //     },
-                        //     {
-                        //         docLink: (
-                        //             <Link
-                        //                 target="_blank"
-                        //                 href={'https://sfdc.co/business-manager-manage-catalogs'}
-                        //                 textDecoration={'none'}
-                        //                 position={'relative'}
-                        //                 _after={{
-                        //                     position: 'absolute',
-                        //                     content: `""`,
-                        //                     height: '2px',
-                        //                     bottom: '-2px',
-                        //                     margin: '0 auto',
-                        //                     left: 0,
-                        //                     right: 0,
-                        //                     background: 'gray.700',
-                        //                 }}
-                        //                 _hover={{textDecoration: 'none'}}
-                        //             >
-                        //                 {intl.formatMessage({
-                        //                     defaultMessage: 'Read docs',
-                        //                     id: 'home.link.read_docs',
-                        //                 })}
-                        //             </Link>
-                        //         ),
-                        //     }
-                        // )}
+                        title={intl.formatMessage({
+                            defaultMessage: 'Shop Products',
+                            id: 'home.heading.shop_products',
+                        })}
+                        subtitle={intl.formatMessage(
+                            {
+                                defaultMessage:
+                                    'This section contains content from the catalog. {docLink} on how to replace it.',
+                                id: 'home.description.shop_products',
+                                description:
+                                    '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs',
+                            },
+                            {
+                                docLink: (
+                                    <Link
+                                        target="_blank"
+                                        href={'https://sfdc.co/business-manager-manage-catalogs'}
+                                        textDecoration={'none'}
+                                        position={'relative'}
+                                        _after={{
+                                            position: 'absolute',
+                                            content: `""`,
+                                            height: '2px',
+                                            bottom: '-2px',
+                                            margin: '0 auto',
+                                            left: 0,
+                                            right: 0,
+                                            background: 'gray.700',
+                                        }}
+                                        _hover={{textDecoration: 'none'}}
+                                    >
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Read docs',
+                                            id: 'home.link.read_docs',
+                                        })}
+                                    </Link>
+                                ),
+                            }
+                        )}
                     >
                         <Stack pt={8} spacing={16}>
                             <ProductScroller
@@ -217,18 +214,18 @@ const Home = ({productSearchResult, isLoading}) => {
                     padding={4}
                     paddingTop={32}
                     title="Features"
-                    // title={intl.formatMessage({
-                    //     defaultMessage: 'Features',
-                    //     id: 'home.heading.features',
-                    // })}
+                    title={intl.formatMessage({
+                        defaultMessage: 'Features',
+                        id: 'home.heading.features',
+                    })}
                     subtitle={
                         'Out-of-the-box features so that you focus only on adding enhancements.'
                     }
-                    // subtitle={intl.formatMessage({
-                    //     defaultMessage:
-                    //         'Out-of-the-box features so that you focus only on adding enhancements.',
-                    //     id: 'home.description.features',
-                    // })}
+                    subtitle={intl.formatMessage({
+                        defaultMessage:
+                            'Out-of-the-box features so that you focus only on adding enhancements.',
+                        id: 'home.description.features',
+                    })}
                 >
                     <Container maxW={'6xl'} marginTop={10}>
                         <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10}>
@@ -248,12 +245,10 @@ const Home = ({productSearchResult, isLoading}) => {
                                                 {feature.icon}
                                             </Flex>
                                             <Text color={'black'} fontWeight={700} fontSize={20}>
-                                                {/* {intl.formatMessage(featureMessage.title)} */}
-                                                {featureMessage.title}
+                                                {intl.formatMessage(featureMessage.title)}
                                             </Text>
                                             <Text color={'black'}>
-                                                {/* {intl.formatMessage(featureMessage.text)} */}
-                                                {featureMessage.text}
+                                                {intl.formatMessage(featureMessage.text)}
                                             </Text>
                                         </VStack>
                                     </HStack>

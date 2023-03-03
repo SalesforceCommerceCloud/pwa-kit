@@ -19,15 +19,15 @@ import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 import {CategoriesProvider, CurrencyProvider} from '^retail-react-app/app/contexts'
 
 // Local Project Components
-import Header from '../header'
+import Header from '~retail-react-app/app/components/header'
 import OfflineBanner from '^retail-react-app/app/components/offline-banner'
 import OfflineBoundary from '^retail-react-app/app/components/offline-boundary'
 import ScrollToTop from '^retail-react-app/app/components/scroll-to-top'
 import Footer from '^retail-react-app/app/components/footer'
-import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
 import CheckoutFooter from '^retail-react-app/app/pages/checkout/partials/checkout-footer'
-import DrawerMenu from '../drawer-menu'
-import ListMenu from '../list-menu'
+import CheckoutHeader from '^retail-react-app/app/pages/checkout/partials/checkout-header'
+import DrawerMenu from '^retail-react-app/app/components/drawer-menu'
+import ListMenu from '^retail-react-app/app/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '^retail-react-app/app/components/responsive'
 
 // Hooks
@@ -43,15 +43,18 @@ import {IntlProvider} from 'react-intl'
 // Others
 import {watchOnlineStatus, flatten} from '^retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '^retail-react-app/app/utils/locale'
-import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '^retail-react-app/app/constants'
+import {
+    DEFAULT_SITE_TITLE,
+    HOME_HREF,
+    THEME_COLOR,
+    CAT_MENU_DEFAULT_NAV_DEPTH,
+    CAT_MENU_DEFAULT_ROOT_CATEGORY,
+    DEFAULT_LOCALE,
+} from '^retail-react-app/app/constants'
 
 import Seo from '^retail-react-app/app/components/seo'
 import {resolveSiteFromUrl} from '^retail-react-app/app/utils/site-utils'
 import useMultiSite from '^retail-react-app/app/hooks/use-multi-site'
-
-const DEFAULT_NAV_DEPTH = 3
-const DEFAULT_ROOT_CATEGORY = 'root'
-const DEFAULT_LOCALE = 'en-US'
 
 const App = (props) => {
     const {
@@ -146,26 +149,26 @@ const App = (props) => {
     }
 
     return (
-        <IntlProvider
-            onError={(err) => {
-                if (err.code === 'MISSING_TRANSLATION') {
-                    // NOTE: Remove the console error for missing translations during development,
-                    // as we knew translations would be added later.
-                    console.warn('Missing translation', err.message)
-                    return
-                }
-                throw err
-            }}
-            locale={targetLocale}
-            messages={messages}
-            // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
-            // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:
-            // - "extract-default-translations"
-            // - "compile-translations:pseudo"
-            defaultLocale={DEFAULT_LOCALE}
-        >
-            <Box className="sf-app" {...styles.container}>
-                <CategoriesProvider categories={allCategories}>
+        <Box className="sf-app" {...styles.container}>
+            <IntlProvider
+                onError={(err) => {
+                    if (err.code === 'MISSING_TRANSLATION') {
+                        // NOTE: Remove the console error for missing translations during development,
+                        // as we knew translations would be added later.
+                        console.warn('Missing translation', err.message)
+                        return
+                    }
+                    throw err
+                }}
+                locale={targetLocale}
+                messages={messages}
+                // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
+                // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:
+                // - "extract-default-translations"
+                // - "compile-translations:pseudo"
+                defaultLocale={DEFAULT_LOCALE}
+            >
+                <CategoriesProvider treeRoot={allCategories} locale={targetLocale}>
                     <CurrencyProvider currency={currency}>
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
@@ -215,16 +218,12 @@ const App = (props) => {
                                                 isOpen={isOpen}
                                                 onClose={onClose}
                                                 onLogoClick={onLogoClick}
-                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
                                                 locale={locale}
                                             />
                                         </HideOnDesktop>
 
                                         <HideOnMobile>
-                                            <ListMenu
-                                                root={allCategories?.[DEFAULT_ROOT_CATEGORY]}
-                                                locale={locale}
-                                            />
+                                            <ListMenu locale={locale} />
                                         </HideOnMobile>
                                     </Header>
                                 ) : (
@@ -263,8 +262,8 @@ const App = (props) => {
                         </Box>
                     </CurrencyProvider>
                 </CategoriesProvider>
-            </Box>
-        </IntlProvider>
+            </IntlProvider>
+        </Box>
     )
 }
 
@@ -301,14 +300,15 @@ App.getProps = async ({api, res}) => {
         l10nConfig,
     })
     const messages = await fetchTranslations(targetLocale)
+
     // Login as `guest` to get session.
     await api.auth.login()
 
     // Get the root category, this will be used for things like the navigation.
     const rootCategory = await api.shopperProducts.getCategory({
         parameters: {
-            id: DEFAULT_ROOT_CATEGORY,
-            levels: DEFAULT_NAV_DEPTH,
+            id: CAT_MENU_DEFAULT_ROOT_CATEGORY,
+            levels: CAT_MENU_DEFAULT_NAV_DEPTH,
         },
     })
 
@@ -325,7 +325,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
 
     // Flatten the root so we can easily access all the categories throughout
     // the application.
-    const categories = flatten(rootCategory, 'categories')
+    const categories = {root: flatten(rootCategory, 'categories').root}
 
     return {
         targetLocale,
