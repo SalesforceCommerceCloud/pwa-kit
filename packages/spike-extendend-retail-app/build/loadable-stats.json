@@ -1,11 +1,12 @@
 {
   "name": "client",
-  "hash": "47416b63933634cf604a",
+  "hash": "e5eef32b33326266931d",
   "publicPath": "/mobify/bundle/development/",
   "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
     "main": [
-      "main.js"
+      "main.js",
+      "main.774dccf937ffdcf4eaac.hot-update.js"
     ],
     "pages-home": [
       "pages-home.js"
@@ -81,7 +82,7 @@
     {
       "type": "asset",
       "name": "main.js",
-      "size": 1162872,
+      "size": 1162793,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -648,6 +649,33 @@
     },
     {
       "type": "asset",
+      "name": "main.774dccf937ffdcf4eaac.hot-update.js",
+      "size": 21806,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "774dccf937ffdcf4eaac",
+        "related": {
+          "sourceMap": "main.774dccf937ffdcf4eaac.hot-update.js.map"
+        }
+      },
+      "chunkNames": [
+        "main"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "main"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
       "name": "^retail-react-app-app-pages-reset-password.js",
       "size": 10458,
       "emitted": false,
@@ -816,6 +844,25 @@
         "_cc12"
       ],
       "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "main.774dccf937ffdcf4eaac.hot-update.json",
+      "size": 28,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "774dccf937ffdcf4eaac"
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [],
+      "auxiliaryChunks": []
     }
   ],
   "namedChunkGroups": {
@@ -831,11 +878,14 @@
         },
         {
           "name": "main.js"
+        },
+        {
+          "name": "main.774dccf937ffdcf4eaac.hot-update.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 2,
+      "filteredAuxiliaryAssets": 3,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -1151,7 +1201,8 @@
     {
       "id": "main",
       "files": [
-        "main.js"
+        "main.js",
+        "main.774dccf937ffdcf4eaac.hot-update.js"
       ]
     },
     {

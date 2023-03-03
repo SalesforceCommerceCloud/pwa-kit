@@ -35,12 +35,7 @@ import Link from '^retail-react-app/app/components/link'
 import Search from '^retail-react-app/app/components/search'
 import withRegistration from '^retail-react-app/app/hoc/with-registration'
 
-import {
-    AccountIcon,
-    BrandLogo,
-    BasketIcon,
-    HamburgerIcon,
-} from '~retail-react-app/app/components/icons'
+import {AccountIcon, BrandLogo, BasketIcon, HamburgerIcon} from '../icons'
 
 import {ChevronDownIcon, HeartIcon, SignoutIcon} from '^retail-react-app/app/components/icons'
 
@@ -130,6 +125,7 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMenuClick}
                     />
+                    <ChevronDownIcon />
                     <IconButton
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.logo',
@@ -140,6 +136,7 @@ const Header = ({
                         variant="unstyled"
                         onClick={onLogoClick}
                     />
+                    YES
                     <Box {...styles.bodyContainer}>{children}</Box>
                     <Box {...styles.searchContainer}>
                         <Search
@@ -163,7 +160,6 @@ const Header = ({
                             defaultMessage: 'My account',
                         })}
                     />
-
                     {customer.isRegistered && (
                         <Popover
                             isLazy
