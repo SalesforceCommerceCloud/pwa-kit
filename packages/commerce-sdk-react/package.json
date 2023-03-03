@@ -1,6 +1,6 @@
 {
   "name": "commerce-sdk-react-preview",
-  "version": "2.7.0-alpha.1",
+  "version": "2.7.0-alpha.2",
   "description": "A library that provides react hooks for fetching data from Commerce Cloud",
   "author": "cc-pwa-kit@salesforce.com",
   "license": "See license in LICENSE",
@@ -60,7 +60,7 @@
     "@types/react-dom": "^17.0.2",
     "@types/react-helmet": "^6.1.6",
     "cross-env": "^5.2.0",
-    "internal-lib-build": "^2.7.0-alpha.1",
+    "internal-lib-build": "^2.7.0-alpha.2",
     "jsonwebtoken": "^8.5.1",
     "nock": "^13.2.9",
     "react": "^17.0.2",
