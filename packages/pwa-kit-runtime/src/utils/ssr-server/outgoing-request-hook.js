@@ -115,7 +115,7 @@ export const outgoingRequestHook = (wrapped, options) => {
                     ? httpAgent
                     : httpsAgent
 
-            // `node-fetch` and potentially other libraries add connection: close heaaders
+            // `node-fetch` and potentially other libraries add connection: close headers
             // remove them to keep the connection alive. NOTE: There are variations in
             // whether or not the connection header is upper or lower case, so handle both.
             delete workingOptions?.headers?.connection
