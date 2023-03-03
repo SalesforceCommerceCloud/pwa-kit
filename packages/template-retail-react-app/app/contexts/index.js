@@ -9,7 +9,14 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useCommerceAPI} from '../commerce-api/contexts'
 import {CAT_MENU_STALE_TIME} from '../constants'
-import {useCustomer, useCustomerId, useCustomerType} from 'commerce-sdk-react-preview'
+import {
+    useCustomer,
+    useCustomerId,
+    useCustomerProductLists,
+    useCustomerType,
+    useShopperCustomersMutation
+} from 'commerce-sdk-react-preview'
+import {useCurrentCustomer} from '../hooks/use-current-customer'
 
 /**
  * This is the global state for categories, we use this for navigation and for
@@ -215,5 +222,49 @@ export const CustomerProvider = ({children}) => {
     return <CustomerContext.Provider value={value}>{children}</CustomerContext.Provider>
 }
 CustomerProvider.propTypes = {
+    children: PropTypes.node.isRequired
+}
+
+export const CustomerProductListsContext = React.createContext()
+
+export const CustomerProductListsProvider = ({children}) => {
+    const {data: customer} = useCurrentCustomer()
+    const {isRegistered, customerId} = customer
+    const createCustomerProductList = useShopperCustomersMutation({
+        action: 'createCustomerProductList'
+    })
+    const {data: productLists, ...restOfQuery} = useCustomerProductLists(
+        {
+            customerId
+        },
+        {
+            onError: (e) => {
+                console.log('e', e)
+            },
+            onSuccess: (data) => {
+                if (!data.total) {
+                    createCustomerProductList.mutate({
+                        parameters: {customerId},
+                        // we only use one type of product list for now
+                        body: {type: 'wish_list'}
+                    })
+                }
+            },
+            // only registered user can have product lists
+            enabled: isRegistered
+        }
+    )
+    const value = {
+        productLists,
+        ...restOfQuery
+    }
+    return (
+        <CustomerProductListsContext.Provider value={value}>
+            {children}
+        </CustomerProductListsContext.Provider>
+    )
+}
+
+CustomerProductListsProvider.propTypes = {
     children: PropTypes.node.isRequired
 }

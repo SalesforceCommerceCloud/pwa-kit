@@ -15,12 +15,12 @@ import theme from '../../theme'
 import CommerceAPI from '../../commerce-api'
 import {
     BasketProvider,
+    //TODO: Remove these providers when integration is finished
     CommerceAPIProvider as _CommerceAPIProvider,
-    CustomerProductListsProvider,
-    //TODO: Remove when integration is finished
+    CustomerProductListsProvider as _CustomerProductListsProvider,
     CustomerProvider as _CustomerProvider
 } from '../../commerce-api/contexts'
-import {CustomerProvider, MultiSiteProvider} from '../../contexts'
+import {CustomerProductListsProvider, CustomerProvider, MultiSiteProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
@@ -71,7 +71,9 @@ const AppConfig = ({children, locals = {}}) => {
                         <_CustomerProvider value={{customer, setCustomer}}>
                             <BasketProvider value={{basket, setBasket}}>
                                 <CustomerProductListsProvider>
-                                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                                    <_CustomerProductListsProvider>
+                                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                                    </_CustomerProductListsProvider>
                                 </CustomerProductListsProvider>
                             </BasketProvider>
                         </_CustomerProvider>
