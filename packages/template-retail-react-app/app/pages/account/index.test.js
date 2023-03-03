@@ -19,17 +19,13 @@ import {
 import Account from './index'
 import Login from '../login'
 import mockConfig from '../../../config/mocks/default'
-import {
-    ShopperLoginHelpers,
-    useShopperLoginHelper,
-    useCustomerType
-} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 
 jest.mock('../../commerce-api/einstein')
 
 const MockedComponent = () => {
     const {isRegistered} = useCustomerType()
-    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
     useEffect(() => {
         if (!isRegistered) {

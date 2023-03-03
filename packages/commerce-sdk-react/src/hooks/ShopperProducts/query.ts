@@ -1,160 +1,141 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, DataType} from '../types'
+import {UseQueryResult} from '@tanstack/react-query'
+import {ApiClients, ApiQueryOptions, Argument, DataType} from '../types'
+import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import useConfig from '../useConfig'
-import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
+import {mergeOptions} from '../utils'
+import * as queryKeyHelpers from './queryKeyHelpers'
 
 type Client = ApiClients['shopperProducts']
 
-type UseProductsParameters = NonNullable<Argument<Client['getProducts']>>['parameters']
-type UseProductsHeaders = NonNullable<Argument<Client['getProducts']>>['headers']
-type UseProductsArg = {headers?: UseProductsHeaders; rawResponse?: boolean} & UseProductsParameters
 /**
- * A hook for `ShopperProducts#getProducts`.
- * Allows access to multiple products by a single request. Only products that are online and assigned to a site catalog are returned. The maximum number of productIDs that can be requested are 24. Along with product details, the availability, images, price, promotions, and variations for the valid products will be included, as appropriate.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProducts} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproducts} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * Allows access to multiple products by a single request. Only products that are online and assigned to a site catalog are returned. The maximum number of productIDs that can be requested are 24. Along with product details, the availability, product options, images, price, promotions, and variations for the valid products will be included, as appropriate.
+ * @returns A TanStack Query query hook with data from the Shopper Products `getProducts` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProducts| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproducts | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function useProducts(
-    arg: Omit<UseProductsArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
-): UseQueryResult<DataType<Client['getProducts']>, Error>
-function useProducts(
-    arg: Omit<UseProductsArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
-): UseQueryResult<Response, Error>
-function useProducts(
-    arg: UseProductsArg,
-    options?: UseQueryOptions<DataType<Client['getProducts']> | Response, Error>
-): UseQueryResult<DataType<Client['getProducts']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const {locale, currency} = useConfig()
-    parameters.locale = parameters.locale || locale
-    parameters.currency = parameters.currency || currency
-    return useQuery(
-        ['/products', arg],
-        (_, {shopperProducts}) => {
-            return shopperProducts.getProducts({parameters, headers}, rawResponse)
-        },
-        options
-    )
-}
+export const useProducts = (
+    apiOptions: Argument<Client['getProducts']>,
+    queryOptions: ApiQueryOptions<Client['getProducts']> = {}
+): UseQueryResult<DataType<Client['getProducts']>> => {
+    type Options = Argument<Client['getProducts']>
+    type Data = DataType<Client['getProducts']>
+    const {shopperProducts: client} = useCommerceApi()
+    const methodName = 'getProducts'
+    const requiredParameters = ['organizationId', 'ids', 'siteId'] as const
 
-type UseProductParameters = NonNullable<Argument<Client['getProduct']>>['parameters']
-type UseProductHeaders = NonNullable<Argument<Client['getProduct']>>['headers']
-type UseProductArg = {headers?: UseProductHeaders; rawResponse?: boolean} & UseProductParameters
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}
 /**
- * A hook for `ShopperProducts#getProduct`.
  * Allows access to product details for a single product ID. Only products that are online and assigned to a site catalog are returned. Along with product details, the availability, images, price, bundled_products, set_products, recommedations, product options, variations, and promotions for the products will be included, as appropriate.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProduct} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproduct} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Products `getProduct` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProduct| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getproduct | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function useProduct(
-    arg: Omit<UseProductArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
-): UseQueryResult<DataType<Client['getProduct']>, Error>
-function useProduct(
-    arg: Omit<UseProductArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
-): UseQueryResult<Response, Error>
-function useProduct(
-    arg: UseProductArg,
-    options?: UseQueryOptions<DataType<Client['getProduct']> | Response, Error>
-): UseQueryResult<DataType<Client['getProduct']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const {locale, currency} = useConfig()
-    parameters.locale = parameters.locale || locale
-    parameters.currency = parameters.currency || currency
-    return useQuery(
-        ['/products', arg],
-        (_, {shopperProducts}) => {
-            return shopperProducts.getProduct({parameters, headers}, rawResponse)
-        },
-        options
-    )
-}
+export const useProduct = (
+    apiOptions: Argument<Client['getProduct']>,
+    queryOptions: ApiQueryOptions<Client['getProduct']> = {}
+): UseQueryResult<DataType<Client['getProduct']>> => {
+    type Options = Argument<Client['getProduct']>
+    type Data = DataType<Client['getProduct']>
+    const {shopperProducts: client} = useCommerceApi()
+    const methodName = 'getProduct'
+    const requiredParameters = ['organizationId', 'id', 'siteId'] as const
 
-type UseCategoriesParameters = NonNullable<Argument<Client['getCategories']>>['parameters']
-type UseCategoriesHeaders = NonNullable<Argument<Client['getCategories']>>['headers']
-type UseCategoriesArg = {
-    headers?: UseCategoriesHeaders
-    rawResponse?: boolean
-} & UseCategoriesParameters
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}
 /**
- * A hook for `ShopperProducts#getCategories`.
  * When you use the URL template, the server returns multiple categories (a result object of category documents). You can use this template as a convenient way of obtaining multiple categories in a single request, instead of issuing separate requests for each category. You can specify up to 50 multiple IDs. You must enclose the list of IDs in parentheses. If a category identifier contains parenthesis or the separator sign, you must URL encode the character. The server only returns online categories.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getCategories} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategories} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Products `getCategories` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getCategories| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategories | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function useCategories(
-    arg: Omit<UseCategoriesArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
-): UseQueryResult<DataType<Client['getCategories']>, Error>
-function useCategories(
-    arg: Omit<UseCategoriesArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
-): UseQueryResult<Response, Error>
-function useCategories(
-    arg: UseCategoriesArg,
-    options?: UseQueryOptions<DataType<Client['getCategories']> | Response, Error>
-): UseQueryResult<DataType<Client['getCategories']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const {locale} = useConfig()
-    parameters.locale = parameters.locale || locale
-    return useQuery(
-        ['/categories', arg],
-        (_, {shopperProducts}) => {
-            return shopperProducts.getCategories({parameters, headers}, rawResponse)
-        },
-        options
-    )
-}
+export const useCategories = (
+    apiOptions: Argument<Client['getCategories']>,
+    queryOptions: ApiQueryOptions<Client['getCategories']> = {}
+): UseQueryResult<DataType<Client['getCategories']>> => {
+    type Options = Argument<Client['getCategories']>
+    type Data = DataType<Client['getCategories']>
+    const {shopperProducts: client} = useCommerceApi()
+    const methodName = 'getCategories'
+    const requiredParameters = ['organizationId', 'ids', 'siteId'] as const
 
-type UseCategoryParameters = NonNullable<Argument<Client['getCategory']>>['parameters']
-type UseCategoryHeaders = NonNullable<Argument<Client['getCategory']>>['headers']
-type UseCategoryArg = {
-    headers?: UseCategoryHeaders
-    rawResponse?: boolean
-} & UseCategoryParameters
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}
 /**
- * A hook for `ShopperProducts#getCategory`.
  * When you use the URL template below, the server returns a category identified by its ID; by default, the server
- also returns the first level of subcategories, but you can specify another level by setting the levels
- parameter. The server only returns online categories.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getCategory} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategory} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+also returns the first level of subcategories, but you can specify another level by setting the levels
+parameter. The server only returns online categories.
+ * @returns A TanStack Query query hook with data from the Shopper Products `getCategory` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getCategory| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperproducts.shopperproducts-1.html#getcategory | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function useCategory(
-    arg: Omit<UseCategoryArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
-): UseQueryResult<DataType<Client['getCategory']>, Error>
-function useCategory(
-    arg: Omit<UseCategoryArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
-): UseQueryResult<Response, Error>
-function useCategory(
-    arg: UseCategoryArg,
-    options?: UseQueryOptions<DataType<Client['getCategory']> | Response, Error>
-): UseQueryResult<DataType<Client['getCategory']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const {locale} = useConfig()
-    parameters.locale = parameters.locale || locale
-    return useQuery(
-        ['/categories', arg],
-        (_, {shopperProducts}) => {
-            return shopperProducts.getCategory({parameters, headers}, rawResponse)
-        },
-        options
-    )
-}
+export const useCategory = (
+    apiOptions: Argument<Client['getCategory']>,
+    queryOptions: ApiQueryOptions<Client['getCategory']> = {}
+): UseQueryResult<DataType<Client['getCategory']>> => {
+    type Options = Argument<Client['getCategory']>
+    type Data = DataType<Client['getCategory']>
+    const {shopperProducts: client} = useCommerceApi()
+    const methodName = 'getCategory'
+    const requiredParameters = ['organizationId', 'id', 'siteId'] as const
 
-export {useProducts, useProduct, useCategories, useCategory}
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}

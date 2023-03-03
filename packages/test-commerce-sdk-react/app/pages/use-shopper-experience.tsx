@@ -80,14 +80,20 @@ const UseShopperExperience = () => {
     const queryHooks = [
         {
             name: 'usePage',
-            arg: {pageId: PAGE_ID},
-            hook: usePage({pageId: PAGE_ID})
+            arg: {
+                parameters: {pageId: PAGE_ID}
+            },
+            get hook() {
+                return usePage(this.arg)
+            }
         },
         {
             name: 'usePages',
             arg: {
-                aspectTypeId: ASPECT_TYPE_ID_PDP,
-                productId: PRODUCT_ID
+                parameters: {
+                    aspectTypeId: ASPECT_TYPE_ID_PDP,
+                    productId: PRODUCT_ID
+                }
             },
             get hook() {
                 return usePages(this.arg)
@@ -96,9 +102,11 @@ const UseShopperExperience = () => {
         {
             name: 'usePages',
             arg: {
-                aspectTypeId: ASPECT_TYPE_ID_PLP,
-                categoryId: CATEGORY_ID,
-                aspectAttributes: ASPECT_ATTRIBUTES
+                parameters: {
+                    aspectTypeId: ASPECT_TYPE_ID_PLP,
+                    categoryId: CATEGORY_ID,
+                    aspectAttributes: ASPECT_ATTRIBUTES
+                }
             },
             get hook() {
                 return usePages(this.arg)

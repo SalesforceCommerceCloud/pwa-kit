@@ -38,7 +38,7 @@ import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
-import {useShopperLoginHelper, ShopperLoginHelpers} from 'commerce-sdk-react-preview'
+import {useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 const onClient = typeof window !== 'undefined'
@@ -82,7 +82,7 @@ const Account = () => {
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerType} = customer
 
-    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
+    const logout = useAuthHelper(AuthHelpers.Logout)
     const location = useLocation()
     const navigate = useNavigation()
 

@@ -138,13 +138,9 @@ const AccountAddresses = () => {
     const {data: customer, isLoading} = useCurrentCustomer()
     const {isRegistered, addresses, customerId} = customer
 
-    const addCustomerAddress = useShopperCustomersMutation({action: 'createCustomerAddress'})
-    const updateSavedAddress = useShopperCustomersMutation({
-        action: 'updateCustomerAddress'
-    })
-    const removeCustomerAddress = useShopperCustomersMutation({
-        action: 'removeCustomerAddress'
-    })
+    const addCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
+    const updateSavedAddress = useShopperCustomersMutation('updateCustomerAddress')
+    const removeCustomerAddress = useShopperCustomersMutation('removeCustomerAddress')
 
     const [isEditing, setIsEditing] = useState(false)
     const [selectedAddressId, setSelectedAddressId] = useState(false)
