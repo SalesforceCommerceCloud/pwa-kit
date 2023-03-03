@@ -13,10 +13,9 @@ import {
     useCustomer,
     useCustomerId,
     useCustomerProductLists,
-    useCustomerType,
-    useShopperCustomersMutation
+    useCustomerType
 } from 'commerce-sdk-react-preview'
-import {useCurrentCustomer} from '../hooks/use-current-customer'
+import {CustomerProductListsProvider, useProductLists} from './customer-product-lists'
 
 /**
  * This is the global state for categories, we use this for navigation and for
@@ -228,44 +227,4 @@ CustomerProvider.propTypes = {
 
 export const CustomerProductListsContext = React.createContext()
 
-export const CustomerProductListsProvider = ({children}) => {
-    const {data: customer} = useCurrentCustomer()
-    const {isRegistered, customerId} = customer
-    const createCustomerProductList = useShopperCustomersMutation({
-        action: 'createCustomerProductList'
-    })
-    const {data: productLists, ...restOfQuery} = useCustomerProductLists(
-        {
-            customerId
-        },
-        {
-            onError: (e) => {
-                console.log('e', e)
-            },
-            onSuccess: (data) => {
-                if (!data.total) {
-                    createCustomerProductList.mutate({
-                        parameters: {customerId},
-                        // we only use one type of product list for now
-                        body: {type: 'wish_list'}
-                    })
-                }
-            },
-            // only registered user can have product lists
-            enabled: isRegistered
-        }
-    )
-    const value = {
-        productLists,
-        ...restOfQuery
-    }
-    return (
-        <CustomerProductListsContext.Provider value={value}>
-            {children}
-        </CustomerProductListsContext.Provider>
-    )
-}
-
-CustomerProductListsProvider.propTypes = {
-    children: PropTypes.node.isRequired
-}
+export {CustomerProductListsProvider, useProductLists}

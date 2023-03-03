@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useProductLists} from './use-product-lists'
+import {useProductLists} from '../contexts'
 import {useProducts} from 'commerce-sdk-react-preview'
 
 export const useWishList = ({listId = '', shouldFetchProductDetail = false} = {}) => {
@@ -15,11 +15,11 @@ export const useWishList = ({listId = '', shouldFetchProductDetail = false} = {}
         isLoading: isProductListsLoading
     } = useProductLists()
     const wishLists = productLists?.data?.filter((list) => list.type === 'wish_list')
-    // current use wish list
-    const wishlist = wishLists?.data?.find((list) => list.id === listId) || productLists?.data?.[0]
+    const currentWishlist =
+        wishLists?.data?.find((list) => list.id === listId) || wishLists?.data?.[0]
 
     const productIds =
-        wishlist?.customerProductListItems?.map(({productId}) => productId).join(',') ?? ''
+        currentWishlist?.customerProductListItems?.map(({productId}) => productId).join(',') ?? ''
 
     const {
         data: products,
@@ -27,11 +27,13 @@ export const useWishList = ({listId = '', shouldFetchProductDetail = false} = {}
         error: productsError
     } = useProducts(
         {
-            ids: productIds,
-            allImages: true
+            parameters: {
+                ids: productIds,
+                allImages: true
+            }
         },
         {
-            enabled: shouldFetchProductDetail && !!productIds,
+            enabled: shouldFetchProductDetail && Boolean(productIds),
             select: (result) => {
                 // Convert array into key/value object with key is the product id
                 return result?.data?.reduce((result, item) => {
@@ -44,10 +46,13 @@ export const useWishList = ({listId = '', shouldFetchProductDetail = false} = {}
     )
     return {
         error: productListsError || productsError,
-        isLoading: isProductListsLoading || isProductsLoading,
+        // isProductListsLoading is always true if shouldFetchProductDetail is false
+        isLoading: shouldFetchProductDetail
+            ? isProductListsLoading || isProductsLoading
+            : isProductListsLoading,
         productItemDetail: {
             products
         },
-        wishlist
+        wishlist: currentWishlist
     }
 }
