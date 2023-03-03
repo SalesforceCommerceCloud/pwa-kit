@@ -227,8 +227,7 @@ export const DevServerMixin = {
         //
         // packages/pwa-kit-dev/src/configs/webpack/config.js
         //
-        // We need to maintain this. But be aware that we have plans
-        // to make a robust Bundle spec in 246.
+        // We have plans to make a robust Bundle spec in 246!
         //
         // Discussion here:
         //
