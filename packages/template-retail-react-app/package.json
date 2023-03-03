@@ -1,6 +1,6 @@
 {
     "name": "retail-react-app",
-    "version": "2.7.0-alpha.2",
+    "version": "2.7.0-alpha.3",
     "license": "See license in LICENSE",
     "private": true,
     "engines": {
@@ -41,9 +41,9 @@
         "nanoid": "^3.1.31",
         "njwt": "^1.2.0",
         "prop-types": "^15.6.0",
-        "pwa-kit-dev": "^2.7.0-alpha.2",
-        "pwa-kit-react-sdk": "^2.7.0-alpha.2",
-        "pwa-kit-runtime": "^2.7.0-alpha.2",
+        "pwa-kit-dev": "^2.7.0-alpha.3",
+        "pwa-kit-react-sdk": "^2.7.0-alpha.3",
+        "pwa-kit-runtime": "^2.7.0-alpha.3",
         "query-string": "^7.0.1",
         "raf": "^3.4.0",
         "randomstring": "^1.2.1",
