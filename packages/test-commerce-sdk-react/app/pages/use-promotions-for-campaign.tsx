@@ -18,7 +18,9 @@ const UsePromotionsForCampaign = () => {
         isLoading,
         error
     } = usePromotionsForCampaign({
-        campaignId
+        parameters: {
+            campaignId
+        }
     })
     if (isLoading) {
         return (

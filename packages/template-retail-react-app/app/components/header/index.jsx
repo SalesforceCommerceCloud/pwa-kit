@@ -27,11 +27,7 @@ import {
     useDisclosure,
     useMediaQuery
 } from '@chakra-ui/react'
-import {
-    ShopperLoginHelpers,
-    useShopperLoginHelper,
-    useCustomerType
-} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 
@@ -85,7 +81,7 @@ const Header = ({
     const intl = useIntl()
     const {totalItems, basket} = useCurrentBasket()
     const {isRegistered} = useCustomerType()
-    const logout = useShopperLoginHelper(ShopperLoginHelpers.Logout)
+    const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
 
     const {isOpen, onClose, onOpen} = useDisclosure()

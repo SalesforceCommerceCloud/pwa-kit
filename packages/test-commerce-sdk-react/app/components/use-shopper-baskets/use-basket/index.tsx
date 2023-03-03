@@ -9,7 +9,7 @@ import Json from '../../Json'
 import {useBasket} from 'commerce-sdk-react-preview'
 
 export const UseBasket = ({basketId}: {basketId: string}): ReactElement | null => {
-    const {isLoading, error, data} = useBasket({basketId}, {enabled: !!basketId})
+    const {isLoading, error, data} = useBasket({parameters: {basketId}})
 
     if (!basketId) {
         return null

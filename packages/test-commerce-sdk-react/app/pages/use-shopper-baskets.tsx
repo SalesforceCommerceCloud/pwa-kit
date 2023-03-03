@@ -15,9 +15,9 @@ import {UsePaymentMethodsForBasket} from '../components/use-shopper-baskets/use-
 
 function UseShopperBaskets() {
     const customerId = useCustomerId() || ''
-    const baskets = useCustomerBaskets({customerId})
-    const createBasket = useShopperBasketsMutation({action: 'createBasket'})
-    const updateBasket = useShopperBasketsMutation({action: 'updateBasket'})
+    const baskets = useCustomerBaskets({parameters: {customerId}})
+    const createBasket = useShopperBasketsMutation('createBasket')
+    const updateBasket = useShopperBasketsMutation('updateBasket')
 
     const hasBasket = baskets.data?.total !== 0
     const basketId = baskets.data?.baskets ? baskets.data?.baskets[0].basketId : ''

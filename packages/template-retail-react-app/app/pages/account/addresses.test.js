@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -15,7 +15,7 @@ import {
     mockedRegisteredCustomer
 } from '../../commerce-api/mock-data'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {ShopperLoginHelpers, useShopperLoginHelper} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper} from 'commerce-sdk-react-preview'
 
 let mockCustomer = {}
 
@@ -27,7 +27,7 @@ jest.mock('@chakra-ui/toast', () => {
 })
 
 const MockedComponent = () => {
-    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const {data: customer} = useCurrentCustomer()
     const {isRegistered} = customer
 

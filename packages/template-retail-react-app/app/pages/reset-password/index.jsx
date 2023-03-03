@@ -25,10 +25,9 @@ const ResetPassword = () => {
     const [showSubmittedSuccess, setShowSubmittedSuccess] = useState(false)
     const einstein = useEinstein()
     const {pathname} = useLocation()
-    // TODO: simplify the args to remove action
-    const getResetPasswordToken = useShopperCustomersMutation({
-        action: ShopperCustomersMutations.GetResetPasswordToken
-    })
+    const getResetPasswordToken = useShopperCustomersMutation(
+        ShopperCustomersMutations.GetResetPasswordToken
+    )
 
     const submitForm = async ({email}) => {
         const body = {

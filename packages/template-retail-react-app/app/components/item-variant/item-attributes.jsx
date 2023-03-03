@@ -24,16 +24,15 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const variant = useItemVariant()
     const {basket} = useCurrentBasket()
     const {currency: activeCurrency} = useCurrency()
-    const promotionIds =
-        variant.priceAdjustments?.length > 0
-            ? variant.priceAdjustments.map((adj) => adj.promotionId)
-            : []
+    const promotionIds = variant.priceAdjustments?.map((adj) => adj.promotionId) ?? []
 
     // Fetch all the promotions given by price adjustments. We display this info in
     // the promotion info popover when applicable.
     const {data: res} = usePromotions(
         {
-            ids: promotionIds?.join(',')
+            parameters: {
+                ids: promotionIds.join(',')
+            }
         },
         {
             enabled: promotionIds.length > 0
