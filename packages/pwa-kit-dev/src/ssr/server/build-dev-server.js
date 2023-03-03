@@ -124,10 +124,7 @@ export const DevServerMixin = {
 
         let config = require('../../configs/webpack/config')
 
-        const projectWebpackPath = path.resolve(
-            app.options.projectDir,
-            'webpack.config.js',
-        )
+        const projectWebpackPath = path.resolve(app.options.projectDir, 'webpack.config.js')
         if (fs.existsSync(projectWebpackPath)) {
             config = require(projectWebpackPath)
         }
