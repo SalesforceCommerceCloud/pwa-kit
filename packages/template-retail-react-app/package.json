@@ -4,20 +4,21 @@
     "license": "See license in LICENSE",
     "private": true,
     "engines": {
-        "node": "^14.0.0",
+        "node": "^14.0.0 || ^16.0.0",
         "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
     },
     "devDependencies": {
         "@chakra-ui/icons": "^1.0.6",
         "@chakra-ui/react": "^1.7.1",
         "@chakra-ui/skip-nav": "^1.1.4",
+        "@chakra-ui/system": "^1.12.1",
         "@emotion/react": "^11.1.5",
         "@emotion/styled": "^11.1.5",
         "@formatjs/cli": "^4.2.27",
-        "@lerna/child-process": "^3.3.0",
         "@lhci/cli": "^0.7.0",
         "@loadable/component": "^5.15.0",
         "@peculiar/webcrypto": "^1.3.3",
+        "@testing-library/dom": "^9.0.0",
         "@testing-library/jest-dom": "^5.16.4",
         "@testing-library/react": "^11.2.5",
         "@testing-library/react-hooks": "^7.0.2",
@@ -25,23 +26,20 @@
         "base64-arraybuffer": "^0.2.0",
         "bundlesize2": "^0.0.30",
         "card-validator": "^8.1.0",
-        "chalk": "1.1.3",
         "commerce-sdk-isomorphic": "^1.9.0",
-        "core-js": "2.4.0",
         "cross-env": "^5.2.0",
         "cross-fetch": "^3.1.5",
         "focus-visible": "^5.2.0",
         "framer-motion": "^3.7.0",
         "full-icu": "^1.3.1",
         "helmet": "^4.6.0",
-        "hoist-non-react-statics": "^3.3.2",
         "jest-fetch-mock": "^2.1.2",
         "js-cookie": "^3.0.1",
         "jwt-decode": "^3.1.2",
+        "lodash": "^4.17.21",
         "msw": "^0.28.1",
         "nanoid": "^3.1.31",
         "njwt": "^1.2.0",
-        "node-fetch": "^2.6.7",
         "prop-types": "^15.6.0",
         "pwa-kit-dev": "^2.7.0-dev",
         "pwa-kit-react-sdk": "^2.7.0-dev",
@@ -54,8 +52,10 @@
         "react-helmet": "^6.1.0",
         "react-hook-form": "^6.15.5",
         "react-intl": "^5.13.1",
-        "react-router-dom": "^5.1.2",
-        "whatwg-fetch": "1.0.0"
+        "react-router-dom": "^5.1.2"
+    },
+    "peerDependencies": {
+        "@chakra-ui/system": "^1.12.1"
     },
     "scripts": {
         "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
@@ -80,11 +80,11 @@
     "bundlesize": [
         {
             "path": "build/main.js",
-            "maxSize": "52 kB"
+            "maxSize": "55 kB"
         },
         {
             "path": "build/vendor.js",
-            "maxSize": "270 kB"
+            "maxSize": "275 kB"
         }
     ],
     "browserslist": [

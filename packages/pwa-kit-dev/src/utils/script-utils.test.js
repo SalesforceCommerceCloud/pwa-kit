@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {mkdtemp, rmdir, writeFile} from 'fs/promises'
+import {mkdtemp, rm, writeFile} from 'fs/promises'
 
 const pkg = require('../../package.json')
 import * as scriptUtils from './script-utils'
@@ -23,7 +23,7 @@ describe('scriptUtils', () => {
 
     afterEach(async () => {
         process.env = originalEnv
-        tmpDir && (await rmdir(tmpDir, {recursive: true}))
+        tmpDir && (await rm(tmpDir, {recursive: true}))
     })
 
     test('glob() with no patterns matches nothing', () => {

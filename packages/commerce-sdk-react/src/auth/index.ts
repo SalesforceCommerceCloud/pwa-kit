@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -12,16 +12,18 @@ import {
     ShopperCustomersTypes
 } from 'commerce-sdk-isomorphic'
 import jwtDecode from 'jwt-decode'
-import {ApiClientConfigParams, Argument} from '../hooks/types'
+import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
 import {onClient} from '../utils'
 
+type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
     fetchOptions?: ShopperLoginTypes.FetchOptions
+    fetchedToken?: string
 }
 
 interface JWTHeaders {
@@ -29,24 +31,25 @@ interface JWTHeaders {
     iat: number
 }
 
-// this type is slightly different from ShopperLoginTypes.TokenResponse, reasons:
-// 1. TokenResponse is too generic (with & {[key:string]: any}), we need a more
-//    restrictive type to make sure type safe
-// 2. The refresh tokens are stored separately for guest and registered user. Instead
-//    of refresh_token, we have refresh_token_guest and refresh_token_registered
+/**
+ * The extended field is not from api response, we manually store the auth type,
+ * so we don't need to make another API call when we already have the data.
+ * Plus, the getCustomer endpoint only works for registered user, it returns a 404 for a guest user,
+ * and it's not easy to grab this info in user land, so we add it into the Auth object, and expose it via a hook
+ */
+export type AuthData = Prettify<
+    RemoveStringIndex<TokenResponse> & {
+        customer_type: CustomerType
+        idp_access_token: string
+    }
+>
+
+/** A shopper could be guest or registered, so we store the refresh tokens individually. */
 type AuthDataKeys =
-    | 'access_token'
-    | 'customer_id'
-    | 'enc_user_id'
-    | 'expires_in'
-    | 'id_token'
-    | 'idp_access_token'
+    | Exclude<keyof AuthData, 'refresh_token'>
     | 'refresh_token_guest'
     | 'refresh_token_registered'
-    | 'token_type'
-    | 'usid'
-    | 'site_id'
-    | 'customer_type'
+
 type AuthDataMap = Record<
     AuthDataKeys,
     {
@@ -55,16 +58,6 @@ type AuthDataMap = Record<
         callback?: (storage: BaseStorage) => void
     }
 >
-
-/**
- * The extended field is not from api response, we manually store the auth type,
- * so we don't need to make another API call when we already have the data.
- * Plus, the getCustomer endpoint only works for registered user, it returns a 404 for a guest user,
- * and it's not easy to grab this info in user land, so we add it into the Auth object, and expose it via a hook
- */
-type AuthData = ShopperLoginTypes.TokenResponse & {
-    customer_type: CustomerType
-}
 
 /**
  * A map of the data that this auth module stores. This maps the name of the property to
@@ -118,10 +111,6 @@ const DATA_MAP: AuthDataMap = {
             store.delete('cc-nx-g')
         }
     },
-    site_id: {
-        storageType: 'cookie',
-        key: 'cc-site-id'
-    },
     customer_type: {
         storageType: 'local',
         key: 'customer_type'
@@ -140,9 +129,10 @@ class Auth {
     private client: ShopperLogin<ApiClientConfigParams>
     private shopperCustomersClient: ShopperCustomers<ApiClientConfigParams>
     private redirectURI: string
-    private pendingToken: Promise<ShopperLoginTypes.TokenResponse> | undefined
+    private pendingToken: Promise<TokenResponse> | undefined
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
     private stores: Record<StorageType, BaseStorage>
+    private fetchedToken: string
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
@@ -188,6 +178,8 @@ class Auth {
               }
 
         this.redirectURI = config.redirectURI
+
+        this.fetchedToken = config.fetchedToken || ''
     }
 
     get(name: AuthDataKeys) {
@@ -204,9 +196,10 @@ class Auth {
     }
 
     private clearStorage() {
-        Object.keys(DATA_MAP).forEach((keyName) => {
-            type Key = keyof AuthDataMap
-            const {key, storageType} = DATA_MAP[keyName as Key]
+        // Type assertion because Object.keys is silly and limited :(
+        const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
+        keys.forEach((keyName) => {
+            const {key, storageType} = DATA_MAP[keyName]
             const store = this.stores[storageType]
             store.delete(key)
         })
@@ -244,7 +237,7 @@ class Auth {
      * This method stores the TokenResponse object retrived from SLAS, and
      * store the data in storage.
      */
-    private handleTokenResponse(res: ShopperLoginTypes.TokenResponse, isGuest: boolean) {
+    private handleTokenResponse(res: TokenResponse, isGuest: boolean) {
         this.set('access_token', res.access_token)
         this.set('customer_id', res.customer_id)
         this.set('enc_user_id', res.enc_user_id)
@@ -268,7 +261,7 @@ class Auth {
      *
      * @Internal
      */
-    async queueRequest(fn: () => Promise<ShopperLoginTypes.TokenResponse>, isGuest: boolean) {
+    async queueRequest(fn: () => Promise<TokenResponse>, isGuest: boolean) {
         const queue = this.pendingToken ?? Promise.resolve()
         this.pendingToken = queue.then(async () => {
             const token = await fn()
@@ -294,21 +287,22 @@ class Auth {
      * 3. PKCE flow
      */
     async ready() {
+        if (this.fetchedToken && this.fetchedToken !== '') {
+            this.pendingToken = Promise.resolve({...this.data, access_token: this.fetchedToken})
+            return this.pendingToken
+        }
         if (this.pendingToken) {
             return this.pendingToken
         }
-
         const accessToken = this.get('access_token')
 
         if (accessToken && !this.isTokenExpired(accessToken)) {
             this.pendingToken = Promise.resolve(this.data)
             return this.pendingToken
         }
-
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
-
         if (refreshToken) {
             try {
                 return this.queueRequest(
@@ -324,6 +318,20 @@ class Auth {
             () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
             true
         )
+    }
+
+    /**
+     * Creates a function that only executes after a session is initialized.
+     * @param fn Function that needs to wait until the session is initialized.
+     * @returns Wrapped function
+     */
+    whenReady<Args extends unknown[], Data>(
+        fn: (...args: Args) => Promise<Data>
+    ): (...args: Args) => Promise<Data> {
+        return async (...args) => {
+            await this.ready()
+            return await fn(...args)
+        }
     }
 
     /**

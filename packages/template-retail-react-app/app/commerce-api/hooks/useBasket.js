@@ -123,7 +123,7 @@ export default function useBasket(opts = {}) {
                     throw new Error(response)
                 } else {
                     setBasket(response)
-                    einstein.sendAddToCart(item[0])
+                    item.map((eachItem) => einstein.sendAddToCart(eachItem))
                 }
             },
 
