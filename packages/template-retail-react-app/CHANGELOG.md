@@ -1,4 +1,4 @@
-## v2.7.0-alpha.3 (Mar 03, 2023)
+## v2.7.0 (Mar 03, 2023)
 - Add Page Designer ImageTile component [#967](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/967)
 - Add Page Designer ImageWithText component [#991](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/991)
 - Add Page Designer carousel component [#977](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/977)
