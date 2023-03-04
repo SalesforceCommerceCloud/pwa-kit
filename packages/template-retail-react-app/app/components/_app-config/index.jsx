@@ -20,7 +20,7 @@ import {
     CustomerProductListsProvider as _CustomerProductListsProvider,
     CustomerProvider as _CustomerProvider
 } from '../../commerce-api/contexts'
-import {CustomerProductListsProvider, CustomerProvider, MultiSiteProvider} from '../../contexts'
+import {CustomerProvider, MultiSiteProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
@@ -70,11 +70,9 @@ const AppConfig = ({children, locals = {}}) => {
                     <_CommerceAPIProvider value={locals.api}>
                         <_CustomerProvider value={{customer, setCustomer}}>
                             <BasketProvider value={{basket, setBasket}}>
-                                <CustomerProductListsProvider>
-                                    <_CustomerProductListsProvider>
-                                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                                    </_CustomerProductListsProvider>
-                                </CustomerProductListsProvider>
+                                <_CustomerProductListsProvider>
+                                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                                </_CustomerProductListsProvider>
                             </BasketProvider>
                         </_CustomerProvider>
                     </_CommerceAPIProvider>
