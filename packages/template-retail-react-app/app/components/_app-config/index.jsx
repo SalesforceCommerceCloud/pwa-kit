@@ -15,9 +15,9 @@ import theme from '../../theme'
 import CommerceAPI from '../../commerce-api'
 import {
     BasketProvider,
-    //TODO: Remove these providers when integration is finished
     CommerceAPIProvider as _CommerceAPIProvider,
-    CustomerProductListsProvider as _CustomerProductListsProvider,
+    CustomerProductListsProvider,
+    //TODO: Remove when integration is finished
     CustomerProvider as _CustomerProvider
 } from '../../commerce-api/contexts'
 import {CustomerProvider, MultiSiteProvider} from '../../contexts'
@@ -70,9 +70,9 @@ const AppConfig = ({children, locals = {}}) => {
                     <_CommerceAPIProvider value={locals.api}>
                         <_CustomerProvider value={{customer, setCustomer}}>
                             <BasketProvider value={{basket, setBasket}}>
-                                <_CustomerProductListsProvider>
+                                <CustomerProductListsProvider>
                                     <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                                </_CustomerProductListsProvider>
+                                </CustomerProductListsProvider>
                             </BasketProvider>
                         </_CustomerProvider>
                     </_CommerceAPIProvider>
