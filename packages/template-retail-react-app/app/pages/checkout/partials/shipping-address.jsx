@@ -43,8 +43,6 @@ export default function ShippingAddress() {
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
-        console.log(address)
-        // const {addressId, ...restOfAddress} = address
         const {
             addressId,
             address1,
@@ -78,7 +76,14 @@ export default function ShippingAddress() {
 
         if (!isGuestCheckout && !addressId) {
             const body = {
-                ...address,
+                address1,
+                city,
+                countryCode,
+                firstName,
+                lastName,
+                phone,
+                postalCode,
+                stateCode,
                 addressId: nanoid()
             }
             await createCustomerAddress.mutateAsync({

@@ -106,7 +106,7 @@ const ShippingAddressSelection = ({
 }) => {
     const {formatMessage} = useIntl()
     const {data: customer} = useCurrentCustomer()
-    console.log(customer)
+
     const hasSavedAddresses = customer.addresses && customer.addresses.length > 0
     const [isEditingAddress, setIsEditingAddress] = useState(!hasSavedAddresses)
     const [selectedAddressId, setSelectedAddressId] = useState(false)
@@ -197,7 +197,6 @@ const ShippingAddressSelection = ({
             form.reset({addressId: ''})
         }
 
-        // await customer.removeSavedAddress(addressId)
         await removeCustomerAddress.mutateAsync({
             parameters: {
                 customerId: customer.customerId,
