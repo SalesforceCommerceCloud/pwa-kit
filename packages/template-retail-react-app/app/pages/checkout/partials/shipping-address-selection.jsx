@@ -10,7 +10,6 @@ import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {Box, Button, Container, Heading, SimpleGrid, Stack} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {shallowEquals} from '../../../utils/utils'
-import {useCheckout} from '../util/checkout-context'
 import {RadioCard, RadioCardGroup} from '../../../components/radio-card'
 import ActionCard from '../../../components/action-card'
 import {PlusIcon} from '../../../components/icons'
@@ -18,7 +17,7 @@ import AddressDisplay from '../../../components/address-display'
 import AddressFields from '../../../components/forms/address-fields'
 import FormActionButtons from '../../../components/forms/form-action-buttons'
 import {MESSAGE_PROPTYPE} from '../../../utils/locale'
-import { useCurrentCustomer } from '../../../hooks/use-current-customer'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 
 const saveButtonMessage = defineMessage({
@@ -199,13 +198,12 @@ const ShippingAddressSelection = ({
         }
 
         // await customer.removeSavedAddress(addressId)
-        await removeCustomerAddress.mutateAsync(
-            {
-                parameters: {
-                    customerId: customer.customerId,
-                    addressName: addressId
-                }
-            })
+        await removeCustomerAddress.mutateAsync({
+            parameters: {
+                customerId: customer.customerId,
+                addressName: addressId
+            }
+        })
     }
 
     // Opens/closes the 'add address' form. Notice that when toggling either state,

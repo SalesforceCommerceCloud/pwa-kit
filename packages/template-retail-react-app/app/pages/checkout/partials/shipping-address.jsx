@@ -5,14 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import { nanoid } from 'nanoid'
+import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import ShippingAddressSelection from './shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
 import {useShopperCustomersMutation, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
-import { useCurrentCustomer } from '../../../hooks/use-current-customer'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -27,39 +28,54 @@ export default function ShippingAddress() {
         checkoutSteps,
         isGuestCheckout,
         selectedShippingAddress,
-        setShippingAddress,
         setCheckoutStep,
         goToNextStep
     } = useCheckout()
     const [isLoading, setIsLoading] = useState()
     const {data: customer} = useCurrentCustomer()
+    const {basket} = useCurrentBasket()
 
     const createCustomerAddress = useShopperCustomersMutation({action: 'createCustomerAddress'})
     const updateCustomerAddress = useShopperCustomersMutation({action: 'updateCustomerAddress'})
-    const updateShippingAddressForShipment = useShopperBasketsMutation({action: 'updateShippingAddressForShipment'})
+    const updateShippingAddressForShipment = useShopperBasketsMutation({
+        action: 'updateShippingAddressForShipment'
+    })
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
-        // await setShippingAddress(address)
+        console.log(address)
+        // const {addressId, ...restOfAddress} = address
+        const {
+            addressId,
+            address1,
+            city,
+            countryCode,
+            firstName,
+            lastName,
+            phone,
+            postalCode,
+            stateCode
+        } = address
+        await updateShippingAddressForShipment.mutateAsync({
+            parameters: {
+                basketId: basket.basketId,
+                shipmentId: 'me',
 
-        // @TODO:
-        // await basket.setShippingAddress(address)
+                // TODO
+                useAsBilling: false
+            },
+            body: {
+                address1,
+                city,
+                countryCode,
+                firstName,
+                lastName,
+                phone,
+                postalCode,
+                stateCode
+            }
+        })
 
-        //         // Add/Update the address to the customer's account if they are registered.
-        //         if (!state.isGuestCheckout) {
-        //             !addressId
-        //                 ? customer.addSavedAddress(address)
-        //                 : customer.updateSavedAddress({...address, addressId: addressId})
-        //         }
-
-        // step 1
-        // basket setShippingAddress
-        // step 2
-        //  if registered
-        //      if new -> add saved address
-        //      if old -> update saved address
-
-        const {addressId} = address
         if (!isGuestCheckout && !addressId) {
             const body = {
                 ...address,
