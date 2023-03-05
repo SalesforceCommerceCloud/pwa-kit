@@ -130,9 +130,7 @@ const ShippingAddressSelection = ({
             return shallowEquals(address, selectedAddr)
         })
 
-    const removeCustomerAddress = useShopperCustomersMutation({
-        action: 'removeCustomerAddress'
-    })
+    const removeCustomerAddress = useShopperCustomersMutation('removeCustomerAddress')
 
     useEffect(() => {
         // Automatically select the customer's default/preferred shipping address

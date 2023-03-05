@@ -35,11 +35,11 @@ export default function ShippingAddress() {
     const {data: customer} = useCurrentCustomer()
     const {basket} = useCurrentBasket()
 
-    const createCustomerAddress = useShopperCustomersMutation({action: 'createCustomerAddress'})
-    const updateCustomerAddress = useShopperCustomersMutation({action: 'updateCustomerAddress'})
-    const updateShippingAddressForShipment = useShopperBasketsMutation({
-        action: 'updateShippingAddressForShipment'
-    })
+    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
+    const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
+    const updateShippingAddressForShipment = useShopperBasketsMutation(
+        'updateShippingAddressForShipment'
+    )
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
