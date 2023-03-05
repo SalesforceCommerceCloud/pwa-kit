@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,18 +7,17 @@
 import React, {useEffect} from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders} from '../../utils/test-utils'
+import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountAddresses from './addresses'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {
     mockedRegisteredCustomerWithNoAddress,
     mockedRegisteredCustomer
 } from '../../commerce-api/mock-data'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {AuthHelpers, useAuthHelper} from 'commerce-sdk-react-preview'
 
 let mockCustomer = {}
-
-jest.setTimeout(30000)
 
 const mockToastSpy = jest.fn()
 jest.mock('@chakra-ui/toast', () => {
@@ -28,13 +27,27 @@ jest.mock('@chakra-ui/toast', () => {
 })
 
 const MockedComponent = () => {
-    const customer = useCustomer()
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const {data: customer} = useCurrentCustomer()
+    const {isRegistered} = customer
+
     useEffect(() => {
-        customer.login('test@test.com', 'password')
+        if (!isRegistered) {
+            login.mutate(
+                {email: 'email@test.com', password: 'password1'},
+                {
+                    onSuccess: () => {
+                        window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
+                    }
+                }
+            )
+        }
     }, [])
     return (
         <div>
-            <div>{customer.customerId}</div>
+            <div>
+                <span>Customer Id:</span> {customer.customerId}
+            </div>
             <AccountAddresses />
         </div>
     )
@@ -53,9 +66,9 @@ beforeEach(() => {
         login: 'jkeane@64labs.com'
     }
     global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockCustomer))
-        }),
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        ),
         rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
             mockCustomer.addresses = [req.body]
             return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
@@ -83,7 +96,9 @@ test('Allows customer to add addresses', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('customerid')).toBeInTheDocument())
 
-    expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()
+    })
 
     user.click(screen.getByText(/add address/i))
     user.type(screen.getByLabelText('First Name'), 'Test')

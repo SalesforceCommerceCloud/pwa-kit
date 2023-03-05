@@ -9,11 +9,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
-import {
-    ShopperLoginHelpers,
-    useShopperLoginHelper,
-    useCustomerType
-} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
 import Seo from '../../components/seo'
@@ -29,7 +25,7 @@ const Registration = () => {
     const form = useForm()
     const einstein = useEinstein()
     const {pathname} = useLocation()
-    const register = useShopperLoginHelper(ShopperLoginHelpers.Register)
+    const register = useAuthHelper(AuthHelpers.Register)
 
     const submitForm = (data) => {
         const body = {

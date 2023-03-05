@@ -1,66 +1,81 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, DataType} from '../types'
+import {UseQueryResult} from '@tanstack/react-query'
+import {ApiClients, ApiQueryOptions, Argument, DataType} from '../types'
+import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import {NotImplementedError} from '../utils'
+import {mergeOptions} from '../utils'
+import * as queryKeyHelpers from './queryKeyHelpers'
 
 type Client = ApiClients['shopperPromotions']
 
-type UsePromotionsParameters = NonNullable<Argument<Client['getPromotions']>>['parameters']
-type UsePromotionsHeaders = NonNullable<Argument<Client['getPromotions']>>['headers']
-type UsePromotionsArg = {
-    headers?: UsePromotionsHeaders
-    rawResponse?: boolean
-} & UsePromotionsParameters
 /**
- * A hook for `ShopperPromotions#getPromotions`.
  * Returns an array of enabled promotions for a list of specified IDs. In the request URL, you can specify up to 50 IDs. If you specify an ID that contains either parentheses or the separator characters, you must URL encode these characters. Each request returns only enabled promotions as the server does not consider promotion qualifiers or schedules.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-promotions?meta=getPromotions} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperpromotions.shopperpromotions-1.html#getpromotions} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Promotions `getPromotions` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-promotions?meta=getPromotions| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperpromotions.shopperpromotions-1.html#getpromotions | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function usePromotions(
-    arg: Omit<UsePromotionsArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>
-): UseQueryResult<DataType<Client['getPromotions']>, Error>
-function usePromotions(
-    arg: Omit<UsePromotionsArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>
-): UseQueryResult<Response, Error>
-function usePromotions(
-    arg: UsePromotionsArg,
-    options?: UseQueryOptions<DataType<Client['getPromotions']> | Response, Error>
-): UseQueryResult<DataType<Client['getPromotions']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    return useQuery(
-        ['/promotions', arg],
-        (_, {shopperPromotions}) => {
-            return shopperPromotions.getPromotions({parameters, headers}, rawResponse)
-        },
-        options
-    )
-}
+export const usePromotions = (
+    apiOptions: Argument<Client['getPromotions']>,
+    queryOptions: ApiQueryOptions<Client['getPromotions']> = {}
+): UseQueryResult<DataType<Client['getPromotions']>> => {
+    type Options = Argument<Client['getPromotions']>
+    type Data = DataType<Client['getPromotions']>
+    const {shopperPromotions: client} = useCommerceApi()
+    const methodName = 'getPromotions'
+    const requiredParameters = ['organizationId', 'siteId', 'ids'] as const
 
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}
 /**
- * WARNING: This method is not implemented yet.
- * 
- * A hook for `ShopperPromotions#getPromotionsForCampaign`.
  * Handles get promotion by filter criteria. Returns an array of enabled promotions matching the specified filter
 criteria. In the request URL, you must provide a campaign_id parameter, and you can optionally specify a date
-range by providing start_date and end_date parameters. Both parameters are required to specify a date range, as
+range by providing start_date and end_date parameters. Both parameters are required to specify a date range, as 
 omitting one causes the server to return a MissingParameterException fault. Each request returns only enabled
 promotions, since the server does not consider promotion qualifiers or schedules.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-promotions?meta=getPromotionsForCampaign} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperpromotions.shopperpromotions-1.html#getpromotionsforcampaign} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @returns A TanStack Query query hook with data from the Shopper Promotions `getPromotionsForCampaign` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-promotions?meta=getPromotionsForCampaign| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperpromotions.shopperpromotions-1.html#getpromotionsforcampaign | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function usePromotionsForCampaign(): void {
-    NotImplementedError()
-}
+export const usePromotionsForCampaign = (
+    apiOptions: Argument<Client['getPromotionsForCampaign']>,
+    queryOptions: ApiQueryOptions<Client['getPromotionsForCampaign']> = {}
+): UseQueryResult<DataType<Client['getPromotionsForCampaign']>> => {
+    type Options = Argument<Client['getPromotionsForCampaign']>
+    type Data = DataType<Client['getPromotionsForCampaign']>
+    const {shopperPromotions: client} = useCommerceApi()
+    const methodName = 'getPromotionsForCampaign'
+    const requiredParameters = ['organizationId', 'campaignId', 'siteId'] as const
 
-export {usePromotions, usePromotionsForCampaign}
+    // Parameters can be set in `apiOptions` or `client.clientConfig`, we must merge them in order
+    // to generate the correct query key.
+    const netOptions = mergeOptions(client, apiOptions)
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}

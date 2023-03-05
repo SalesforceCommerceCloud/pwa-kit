@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
 import React, {useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
@@ -54,11 +53,11 @@ const Cart = () => {
     const customerType = useCustomerType()
 
     /*****************Basket Mutation************************/
-    const updateItemInBasketAction = useShopperBasketsMutation({action: 'updateItemInBasket'})
-    const removeItemFromBasketAction = useShopperBasketsMutation({action: 'removeItemFromBasket'})
-    const updateShippingMethodForShipmentsAction = useShopperBasketsMutation({
-        action: 'updateShippingMethodForShipment'
-    })
+    const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
+    const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
+    const updateShippingMethodForShipmentsMutation = useShopperBasketsMutation(
+        'updateShippingMethodForShipment'
+    )
     /*****************Basket Mutation************************/
 
     const [selectedItem, setSelectedItem] = useState(undefined)
@@ -76,8 +75,10 @@ const Cart = () => {
     // we need to fetch the shippment methods to get the default value before we can add it to the basket
     useShippingMethodsForShipment(
         {
-            basketId: basket?.basketId,
-            shipmentId: 'me'
+            parameters: {
+                basketId: basket?.basketId,
+                shipmentId: 'me'
+            }
         },
         {
             // only fetch if basket is has no shipping method in the first shipment
@@ -86,7 +87,7 @@ const Cart = () => {
                 basket.shipments.length > 0 &&
                 !basket.shipments[0].shippingMethod,
             onSuccess: (data) => {
-                updateShippingMethodForShipmentsAction.mutate({
+                updateShippingMethodForShipmentsMutation.mutate({
                     parameters: {
                         basketId: basket?.basketId,
                         shipmentId: 'me'
@@ -153,7 +154,7 @@ const Cart = () => {
                     quantity,
                     price: variant.price
                 }
-                return await updateItemInBasketAction.mutate({
+                return await updateItemInBasketMutation.mutate({
                     parameters: {
                         basketId: basket.basketId,
                         itemId: selectedItem.itemId
@@ -165,7 +166,7 @@ const Cart = () => {
             // The user is selecting different variant, and it has existed in basket
             // remove this item in the basket, change the quantity for the new selected variant in the basket
             if (selectedItem.id !== variant.productId && productIds.includes(variant.productId)) {
-                await removeItemFromBasketAction.mutate({
+                await removeItemFromBasketMutation.mutate({
                     parameters: {
                         basketId: basket.basketId,
                         itemId: selectedItem.itemId
@@ -200,7 +201,7 @@ const Cart = () => {
         setCartItemLoading(true)
         setSelectedItem(product)
 
-        await updateItemInBasketAction.mutate(
+        await updateItemInBasketMutation.mutate(
             {
                 parameters: {basketId: basket?.basketId, itemId: product.itemId},
                 body: {
@@ -263,7 +264,7 @@ const Cart = () => {
     const handleRemoveItem = async (product) => {
         setSelectedItem(product)
         setCartItemLoading(true)
-        await removeItemFromBasketAction.mutate(
+        await removeItemFromBasketMutation.mutate(
             {
                 parameters: {basketId: basket.basketId, itemId: product.itemId}
             },

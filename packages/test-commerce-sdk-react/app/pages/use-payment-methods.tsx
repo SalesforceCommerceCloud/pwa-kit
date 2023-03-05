@@ -11,7 +11,7 @@ import {useParams} from 'react-router-dom'
 
 function UsePaymentMethods() {
     const {orderNo}: {orderNo: string} = useParams()
-    const {data, isLoading, error} = usePaymentMethodsForOrder({orderNo: orderNo})
+    const {data, isLoading, error} = usePaymentMethodsForOrder({parameters: {orderNo: orderNo}})
     if (isLoading) {
         return (
             <div>

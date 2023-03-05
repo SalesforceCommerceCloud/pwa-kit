@@ -29,11 +29,11 @@ export const usePromoCode = () => {
     const form = useForm()
     const toast = useToast()
 
-    const applyPromoCodeAction = useShopperBasketsMutation({action: 'addCouponToBasket'})
-    const removePromoCodeAction = useShopperBasketsMutation({action: 'removeCouponFromBasket'})
+    const applyPromoCodeMutation = useShopperBasketsMutation('addCouponToBasket')
+    const removePromoCodeMutation = useShopperBasketsMutation('removeCouponFromBasket')
 
     const submitPromoCode = async ({code}) => {
-        applyPromoCodeAction.mutate(
+        applyPromoCodeMutation.mutate(
             {
                 parameters: {basketId: basket?.basketId},
                 body: {
@@ -68,7 +68,7 @@ export const usePromoCode = () => {
     }
 
     const removePromoCode = async (couponItemId) => {
-        removePromoCodeAction.mutate(
+        removePromoCodeMutation.mutate(
             {
                 parameters: {basketId: basket?.basketId, couponItemId}
             },

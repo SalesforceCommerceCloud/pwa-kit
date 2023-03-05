@@ -14,6 +14,9 @@
   "account_addresses.button.add_address": {
     "defaultMessage": "Add Address"
   },
+  "account_addresses.info.address_removed": {
+    "defaultMessage": "Address removed"
+  },
   "account_addresses.info.address_updated": {
     "defaultMessage": "Address updated"
   },

@@ -11,11 +11,7 @@ import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import PaymentMethods from './payments'
 import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
-import {
-    ShopperLoginHelpers,
-    useShopperLoginHelper,
-    useCustomerType
-} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 const mockToastSpy = jest.fn()
 
@@ -27,7 +23,7 @@ jest.mock('@chakra-ui/toast', () => {
 
 const MockedComponent = () => {
     const {isRegistered} = useCustomerType()
-    const login = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const {data: customer} = useCurrentCustomer()
     useEffect(() => {
         if (!isRegistered) {

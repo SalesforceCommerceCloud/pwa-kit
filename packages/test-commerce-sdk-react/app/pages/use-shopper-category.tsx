@@ -14,7 +14,9 @@ import {flatten} from '../utils/utils'
 function UseShopperCategory() {
     const {categoryId}: {categoryId: string} = useParams()
     const {isLoading, error, data} = useCategory({
-        id: categoryId
+        parameters: {
+            id: categoryId
+        }
     })
     if (isLoading) {
         return (

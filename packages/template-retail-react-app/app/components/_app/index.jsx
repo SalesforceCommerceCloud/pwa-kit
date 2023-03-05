@@ -60,7 +60,7 @@ import {useCategory, useCustomerType} from 'commerce-sdk-react-preview'
 const App = (props) => {
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
     const {data: allCategories} = useCategory(
-        {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_DEPTH},
+        {parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_DEPTH}},
         {
             select: (categories) => {
                 // Note: What is the best to handle special case like this?? Should commerce sdk handles this?

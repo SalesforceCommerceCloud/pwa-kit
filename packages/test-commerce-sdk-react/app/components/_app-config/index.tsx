@@ -1,15 +1,12 @@
 /*
- * Copyright (c) 2022, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState, ReactElement} from 'react'
-// @ts-ignore
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
-// @ts-ignore
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-// @ts-ignore
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 interface AppConfigProps {
