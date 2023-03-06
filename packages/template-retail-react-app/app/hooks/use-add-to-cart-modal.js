@@ -55,15 +55,16 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    if (!isOpen) {
-        return null
-    }
     const {product, itemsAdded = []} = data || {}
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const {currency, productItems, productSubTotal} = basket
     const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
+
+    if (!isOpen) {
+        return null
+    }
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered>
