@@ -20,11 +20,10 @@ import CartItemVariantPrice from '../item-variant/item-price'
 import PromoPopover from '../promo-popover'
 
 const CartItems = ({basket}) => {
-    const [cartItemsExpanded, setCartItemsExpanded] = useState(false)
-    const {totalItems, productItemDetail = {}} = useCurrentBasket({
+    const {totalItems, products} = useCurrentBasket({
         shouldFetchProductDetail: true
     })
-    const {products = {}} = productItemDetail
+    const [cartItemsExpanded, setCartItemsExpanded] = useState(false)
 
     return (
         <Stack spacing={5} width="full">

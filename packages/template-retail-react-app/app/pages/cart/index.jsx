@@ -46,10 +46,9 @@ import {
 } from 'commerce-sdk-react-preview'
 
 const Cart = () => {
-    const {basket, productItemDetail = {}} = useCurrentBasket({
+    const {basket, products} = useCurrentBasket({
         shouldFetchProductDetail: true
     })
-    const {products = {}} = productItemDetail
     const customerType = useCustomerType()
 
     /*****************Basket Mutation************************/
