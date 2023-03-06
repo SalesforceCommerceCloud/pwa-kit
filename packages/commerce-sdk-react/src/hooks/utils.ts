@@ -99,18 +99,6 @@ export const matchParameters = (
     return matchParametersStrict(search)
 }
 
-/** Creates a query predicate that matches against common API config parameters. */
-export const matchesApiConfig = (parameters: Record<string, ApiParameter | undefined>) =>
-    matchParameters(parameters, [
-        // NOTE: `shortCode` and `version` are omitted, as query keys are constructed from endpoint
-        // paths, but the two paarameters are only used to construct the base URI.
-        'clientId',
-        'currency', // TODO: maybe?
-        'locale', // TODO: maybe?
-        'organizationId',
-        'siteId'
-    ])
-
 /** Creates a query predicate that returns true if all of the given predicates return true. */
 export const and =
     <Args extends unknown[]>(...funcs: Array<(...args: Args) => boolean>) =>
