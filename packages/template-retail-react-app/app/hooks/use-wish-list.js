@@ -12,11 +12,7 @@ export const useWishList = ({listId = ''} = {}) => {
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
     const createCustomerProductList = useShopperCustomersMutation('createCustomerProductList')
-    const {
-        data: productLists,
-        isLoading: isProductListsLoading,
-        error: productListsError
-    } = useCustomerProductLists(
+    const {data: productLists, ...restOfQuery} = useCustomerProductLists(
         {
             parameters: {customerId}
         },
@@ -28,7 +24,7 @@ export const useWishList = ({listId = ''} = {}) => {
                 if (!data.total) {
                     createCustomerProductList.mutate({
                         parameters: {customerId},
-                        // we only use one type of product list for now
+                        // we only use one type of product lists for now
                         body: {type: 'wish_list'}
                     })
                 }
@@ -40,8 +36,7 @@ export const useWishList = ({listId = ''} = {}) => {
     const wishLists = productLists?.data?.filter((list) => list.type === 'wish_list') || []
     const currentWishlist = wishLists?.data?.find((list) => list.id === listId) || wishLists[0]
     return {
-        error: productListsError,
-        isLoading: isProductListsLoading,
-        wishlist: currentWishlist
+        data: currentWishlist,
+        ...restOfQuery
     }
 }
