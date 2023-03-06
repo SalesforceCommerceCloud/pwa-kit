@@ -17,9 +17,6 @@ export const useWishList = ({listId = ''} = {}) => {
             parameters: {customerId}
         },
         {
-            onError: (e) => {
-                console.error('e', e)
-            },
             onSuccess: (data) => {
                 if (!data.total) {
                     createCustomerProductList.mutate({
