@@ -42,18 +42,37 @@ import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {
     useCustomerType,
     useShopperBasketsMutation,
-    useShippingMethodsForShipment
+    useShippingMethodsForShipment,
+    useProducts
 } from 'commerce-sdk-react-preview'
 
 const Cart = () => {
+    const {basket, isLoading, hasBasket} = useCurrentBasket()
+    const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
+    console.log('productIds', productIds)
     const {
-        basket,
-        productItemDetail = {},
-        hasBasket
-    } = useCurrentBasket({
-        shouldFetchProductDetail: true
-    })
-    const {products = {}} = productItemDetail
+        data: products,
+        isLoading: isProductsLoading,
+        error: productsError
+    } = useProducts(
+        {
+            parameters: {
+                ids: productIds,
+                allImages: true
+            }
+        },
+        {
+            enabled: Boolean(productIds),
+            select: (result) => {
+                // Convert array into key/value object with key is the product id
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
     const {isRegistered} = useCustomerType()
 
     /*****************Basket Mutation************************/
@@ -290,14 +309,18 @@ const Cart = () => {
             }
         )
     }
-    /***************************** Remove Item **************************/
+    console.log('isLoading', isLoading)
+    console.log('isProductsLoading', isProductsLoading)
 
+    /***************************** Remove Item **************************/
     /********* Rendering  UI **********/
-    if (hasBasket && !basket?.basketId) {
+    if (isLoading) {
+        console.log('skepetin__________________________________________________')
         return <CartSkeleton />
     }
 
-    if (!basket?.productItems || !hasBasket) {
+    if (!isLoading && !basket?.productItems) {
+        console.log('empty cart==============================================')
         return <EmptyCart isRegistered={isRegistered} />
     }
     return (

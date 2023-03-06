@@ -11,47 +11,26 @@ import {useCustomerBaskets, useCustomerId, useProducts} from 'commerce-sdk-react
  * @param id - basket id to get the current used basket among baskets returned, use first basket in the array if not defined
  * @param shouldFetchProductDetail - boolean to indicate if the baskets should fetch product details based on basket items
  */
-export const useCurrentBasket = ({id = '', shouldFetchProductDetail = false} = {}) => {
+export const useCurrentBasket = ({id = ''} = {}) => {
     const customerId = useCustomerId() || ''
     const {
         data: basketsData,
         isLoading: isBasketsLoading,
         error: basketsError
-    } = useCustomerBaskets({parameters: {customerId}})
-    // if id is not defined, by default use the first basket in the list
-    const basket =
-        basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
-    const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {
-        data: products,
-        isLoading: isProductsLoading,
-        error: productsError
-    } = useProducts(
+    } = useCustomerBaskets(
+        {parameters: {customerId}},
         {
-            parameters: {
-                ids: productIds,
-                allImages: true
-            }
-        },
-        {
-            enabled: shouldFetchProductDetail && !!productIds,
-            select: (result) => {
-                // Convert array into key/value object with key is the product id
-                return result?.data?.reduce((result, item) => {
-                    const key = item.id
-                    result[key] = item
-                    return result
-                }, {})
-            }
+            enabled: !!customerId
         }
     )
 
+    // if id is not defined, by default use the first basket in the list
+    const basket =
+        basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
+
     return {
-        error: basketsError || productsError,
-        isLoading: isBasketsLoading || isProductsLoading,
-        productItemDetail: {
-            products
-        },
+        error: basketsError,
+        isLoading: isBasketsLoading,
         // current picked basket
         basket,
         hasBasket: basketsData?.total > 0,
