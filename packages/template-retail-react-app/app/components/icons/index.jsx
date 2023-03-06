@@ -93,6 +93,7 @@ const icon = (name, passProps) => {
     const component = forwardRef((props, ref) => {
         const theme = useTheme()
         const baseStyle = theme?.components?.Icon?.baseStyle
+        console.log('~hello ^icons')
         return (
             // <Icon ref={ref} {...baseStyle} {...passProps} {...props}>
             //     <use role="presentation" xlinkHref={`#${name}`} />
@@ -149,7 +150,7 @@ export const SearchIcon = icon('search')
 export const SocialFacebookIcon = icon('social-facebook')
 export const SocialInstagramIcon = icon('social-instagram')
 export const SocialPinterestIcon = icon('social-pinterest', {
-    viewBox: SocialPinterestSymbol.viewBox,
+    viewBox: SocialPinterestSymbol.viewBox
 })
 export const SocialTwitterIcon = icon('social-twitter')
 export const SocialYoutubeIcon = icon('social-youtube')

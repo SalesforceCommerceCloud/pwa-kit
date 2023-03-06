@@ -186,8 +186,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
     const _overrides = [...overrides]
 
     const getExtendsRelativePath = (noExt) => {
-        const noExtExtends =
-            pkg?.mobify?.extends + '/' + noExt.replace(pkg?.mobify?.overridesDir, '')
+        const noExtExtends = pkg?.mobify?.extends + noExt.replace(pkg?.mobify?.overridesDir, '')
         return
     }
 
@@ -245,7 +244,19 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
     return new webpack.NormalModuleReplacementPlugin(overridesRegex, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
         // ignore magic paths and don't attempt to overwrite them
-        if (resource.request.match(/\~/) || resource.request.match(/\^/)) {
+        console.log('++++++++')
+        console.log(`resource.context`, resource.context)
+        console.log(`resource.request`, resource.request)
+        console.log('++++++++')
+        if (
+            resource.request.match(/\~/) ||
+            resource.request.match(/\^/) ||
+            // TODO: this array appears to always contain object where the `dependency[x].request
+            // holds reference to the original request, which is what we want to introspect on
+            // whether magic characters like `^` were used
+            resource?.dependencies?.[0]?.request?.match?.(/\^/)?.[0]
+        ) {
+            console.log('~EARLY RETURN')
             return
         }
         const matchRegex = makeRegExp(pkg?.mobify?.extends)
@@ -280,11 +291,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
         }
         if (
             resolved?.match?.(matchRegex) &&
-            _overrides?.filter((override) => override?.match(/\.(?=[^\/]+$)/))?.length &&
-            // TODO: this array appears to always contain object where the `dependency[x].request
-            // holds reference to the original request, which is what we want to introspect on
-            // whether magic characters like `^` were used
-            !resource?.dependencies?.[0]?.request?.match?.(/\^/)?.[0]
+            _overrides?.filter((override) => override?.match(/\.(?=[^\/]+$)/))?.length
         ) {
             const depth = pkg?.mobify?.overridesDir?.replace?.(/^\//, '')?.split('/') || []
             const relativePath = resolved?.split?.(matchRegex)?.[1]

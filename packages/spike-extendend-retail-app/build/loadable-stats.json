@@ -1,12 +1,11 @@
 {
   "name": "client",
-  "hash": "e5eef32b33326266931d",
+  "hash": "d2b43b7f93473250485a",
   "publicPath": "/mobify/bundle/development/",
   "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
     "main": [
-      "main.js",
-      "main.774dccf937ffdcf4eaac.hot-update.js"
+      "main.js"
     ],
     "pages-home": [
       "pages-home.js"
@@ -82,7 +81,7 @@
     {
       "type": "asset",
       "name": "main.js",
-      "size": 1162793,
+      "size": 1124708,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -551,6 +550,31 @@
     },
     {
       "type": "asset",
+      "name": "pages-home.js",
+      "size": 39699,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "pages-home.js.map"
+        }
+      },
+      "chunkNames": [
+        "pages-home"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "pages-home"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
       "name": "^retail-react-app-app-pages-account-wishlist.js",
       "size": 39136,
       "emitted": false,
@@ -571,31 +595,6 @@
       "filteredRelated": 1,
       "chunks": [
         "^retail-react-app-app-pages-account-wishlist"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "pages-home.js",
-      "size": 38937,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "pages-home.js.map"
-        }
-      },
-      "chunkNames": [
-        "pages-home"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "pages-home"
       ],
       "auxiliaryChunks": []
     },
@@ -644,33 +643,6 @@
       "filteredRelated": 1,
       "chunks": [
         "^retail-react-app-app-pages-product-detail"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "main.774dccf937ffdcf4eaac.hot-update.js",
-      "size": 21806,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "hotModuleReplacement": true,
-        "immutable": true,
-        "fullhash": "774dccf937ffdcf4eaac",
-        "related": {
-          "sourceMap": "main.774dccf937ffdcf4eaac.hot-update.js.map"
-        }
-      },
-      "chunkNames": [
-        "main"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "main"
       ],
       "auxiliaryChunks": []
     },
@@ -844,25 +816,6 @@
         "_cc12"
       ],
       "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "main.774dccf937ffdcf4eaac.hot-update.json",
-      "size": 28,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "hotModuleReplacement": true,
-        "immutable": true,
-        "fullhash": "774dccf937ffdcf4eaac"
-      },
-      "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "chunks": [],
-      "auxiliaryChunks": []
     }
   ],
   "namedChunkGroups": {
@@ -878,14 +831,11 @@
         },
         {
           "name": "main.js"
-        },
-        {
-          "name": "main.774dccf937ffdcf4eaac.hot-update.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 3,
+      "filteredAuxiliaryAssets": 2,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -1201,8 +1151,7 @@
     {
       "id": "main",
       "files": [
-        "main.js",
-        "main.774dccf937ffdcf4eaac.hot-update.js"
+        "main.js"
       ]
     },
     {

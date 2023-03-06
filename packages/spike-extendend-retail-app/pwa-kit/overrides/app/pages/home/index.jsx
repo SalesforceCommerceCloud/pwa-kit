@@ -45,31 +45,31 @@ import {
 
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
-    if (isLoading) return <>Loding...</>
-    // return (
-    //     <Box
-    //         key={'temp'}
-    //         background={'white'}
-    //         boxShadow={'0px 2px 2px rgba(0, 0, 0, 0.1)'}
-    //         borderRadius={'4px'}
-    //     >
-    //         <Box data-testid="home-page" layerStyle="page">
-    //             <div>This is my new home</div>
-    //             <span>Total products: {productSearchResult?.hits?.length}</span>
-    //             <ul>
-    //                 {productSearchResult?.hits?.map((item) => (
-    //                     <li>
-    //                         {item?.productName}
-    //                         <br />
-    //                         {JSON.stringify(item)}
-    //                         <img src={item?.image?.disBaseLink} />
-    //                     </li>
-    //                 ))}
-    //             </ul>
-    //         </Box>
-    //     </Box>
-    // )
-
+    if (isLoading) {
+        return (
+            <Box
+                key={'temp'}
+                background={'white'}
+                boxShadow={'0px 2px 2px rgba(0, 0, 0, 0.1)'}
+                borderRadius={'4px'}
+            >
+                <Box data-testid="home-page" layerStyle="page">
+                    <div>This is my new home</div>
+                    <span>Total products: {productSearchResult?.hits?.length}</span>
+                    <ul>
+                        {productSearchResult?.hits?.map((item) => (
+                            <li>
+                                {item?.productName}
+                                <br />
+                                {JSON.stringify(item)}
+                                <img src={item?.image?.disBaseLink} />
+                            </li>
+                        ))}
+                    </ul>
+                </Box>
+            </Box>
+        )
+    }
     useEffect(() => {
         console.log('~74 theme', theme)
     })
