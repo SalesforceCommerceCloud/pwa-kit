@@ -46,11 +46,15 @@ import {
 } from 'commerce-sdk-react-preview'
 
 const Cart = () => {
-    const {basket, productItemDetail = {}} = useCurrentBasket({
+    const {
+        basket,
+        productItemDetail = {},
+        hasBasket
+    } = useCurrentBasket({
         shouldFetchProductDetail: true
     })
     const {products = {}} = productItemDetail
-    const customerType = useCustomerType()
+    const {isRegistered} = useCustomerType()
 
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
@@ -287,13 +291,14 @@ const Cart = () => {
         )
     }
     /***************************** Remove Item **************************/
+
     /********* Rendering  UI **********/
-    if (!basket?.basketId && products) {
+    if (hasBasket && !basket?.basketId) {
         return <CartSkeleton />
     }
 
-    if (!basket?.productItems) {
-        return <EmptyCart isRegistered={customerType === 'registered'} />
+    if (!basket?.productItems || !hasBasket) {
+        return <EmptyCart isRegistered={isRegistered} />
     }
     return (
         <Box background="gray.50" flex="1" data-testid="sf-cart-container">

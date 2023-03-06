@@ -247,7 +247,6 @@ export const useAddToCartModal = () => {
         isOpen: state.isOpen,
         data: state.data,
         onOpen: (data) => {
-            console.log('onOpen data', data)
             setState({
                 isOpen: true,
                 data
