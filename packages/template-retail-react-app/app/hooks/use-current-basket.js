@@ -49,9 +49,7 @@ export const useCurrentBasket = ({id = '', shouldFetchProductDetail = false} = {
     return {
         error: basketsError || productsError,
         isLoading: isBasketsLoading || isProductsLoading,
-        productItemDetail: {
-            products
-        },
+        products,
         // current picked basket
         basket,
         hasBasket: basketsData?.total > 0,

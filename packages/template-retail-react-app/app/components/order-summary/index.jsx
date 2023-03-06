@@ -20,6 +20,9 @@ import CartItemVariantPrice from '../item-variant/item-price'
 import PromoPopover from '../promo-popover'
 
 const CartItems = ({basket}) => {
+    const {totalItems, products} = useCurrentBasket({
+        shouldFetchProductDetail: true
+    })
     const [cartItemsExpanded, setCartItemsExpanded] = useState(false)
 
     return (
@@ -35,7 +38,7 @@ const CartItems = ({basket}) => {
                         id="order_summary.cart_items.action.num_of_items_in_cart"
                         description="clicking it would expand/show the items in cart"
                         defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart"
-                        values={{itemCount: basket.itemAccumulatedCount}}
+                        values={{itemCount: totalItems}}
                     />
                 </Button>
             </Box>
@@ -45,8 +48,7 @@ const CartItems = ({basket}) => {
                     {basket.productItems?.map((product, idx) => {
                         const variant = {
                             ...product,
-                            ...(basket._productItemsDetail &&
-                                basket._productItemsDetail[product.productId]),
+                            ...(products && products[product.productId]),
                             price: product.price
                         }
                         return (
