@@ -7,9 +7,13 @@
 import React from 'react'
 import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
+<<<<<<< HEAD
 import {waitFor, screen, act} from '@testing-library/react'
 import {rest} from 'msw'
 import {mockCustomerBaskets} from '../commerce-api/mock-data'
+=======
+import {screen} from '@testing-library/react'
+>>>>>>> develop
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -571,6 +575,7 @@ beforeEach(() => {
     )
 })
 
+<<<<<<< HEAD
 test.skip('Renders AddToCartModal', async () => {
     await act(async () => {
         renderWithProviders(
@@ -602,10 +607,57 @@ test('Do not render when isOpen is false', async () => {
             value={{
                 isOpen: false,
                 data: null
+=======
+test('Renders AddToCartModal with multiple products', () => {
+    const MOCK_DATA = {
+        product: MOCK_PRODUCT,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 22
+            },
+            {
+                product: MOCK_PRODUCT,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 1
+            }
+        ]
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA
+>>>>>>> develop
             }}
         >
             <AddToCartModal />
         </AddToCartModalContext.Provider>
     )
+<<<<<<< HEAD
     expect(screen.queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
+=======
+
+    expect(screen.getAllByText(MOCK_PRODUCT.name)[0]).toBeInTheDocument()
+    expect(screen.getByRole('dialog', {name: /23 items added to cart/i})).toBeInTheDocument()
+
+    const numOfRowsRendered = screen.getAllByTestId('product-added').length
+    expect(numOfRowsRendered).toEqual(MOCK_DATA.itemsAdded.length)
+})
+
+test('Do not render when isOpen is false', () => {
+    const {queryByText} = renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: false
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
+>>>>>>> develop
 })

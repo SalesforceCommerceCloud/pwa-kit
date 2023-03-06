@@ -75,6 +75,30 @@ export const renderWithRouterAndCommerceAPI = (node) => {
     )
 }
 
+const useAddToCartModal = () => {
+    const [state, setState] = useState({
+        isOpen: false,
+        data: null
+    })
+
+    return {
+        isOpen: state.isOpen,
+        data: state.data,
+        onOpen: (data) => {
+            setState({
+                isOpen: true,
+                data
+            })
+        },
+        onClose: () => {
+            setState({
+                isOpen: false,
+                data: null
+            })
+        }
+    }
+}
+
 /**
  * This is the Providers used to wrap components
  * for testing purposes.
@@ -123,12 +147,7 @@ export const TestProviders = ({
         _setBasket(data)
     })
 
-    const addToCartModal = {
-        isOpen: false,
-        data: null,
-        onOpen: () => {},
-        onClose: () => {}
-    }
+    const addToCartModal = useAddToCartModal()
 
     const site = getSiteByReference(siteAlias || appConfig.defaultSite)
 
