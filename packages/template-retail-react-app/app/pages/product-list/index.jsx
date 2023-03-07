@@ -214,7 +214,6 @@ const ProductList = (props) => {
 
     /**************** Action Handlers ****************/
     const {data: wishlist} = useWishList()
-    console.log('wishlist', wishlist)
     const addItemToWishlist = async (product) => {
         setWishlistLoading([...wishlistLoading, product.productId])
 
