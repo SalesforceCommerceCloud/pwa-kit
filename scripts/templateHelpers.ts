@@ -176,7 +176,7 @@ export const createQueryKeyFragment = (
   // If the URL ends with a {template} fragment, we end up with a `, ''` that we don't need
   `'${url.replace(
     /\{(\w+)\}/g,
-    `', ${variable ? `${variable}.$1` : 'string'}, '`
+    `', ${variable ? `${variable}.$1` : 'string | undefined'}, '`
   )}'`.replace(", ''", '');
 
 /** Determines whether an API endpoint is neither a query nor mutation. */

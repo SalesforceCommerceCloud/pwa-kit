@@ -13,7 +13,7 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = {{@root.clientClass}}<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
 {{#each model.encodes.endPoints}}{{#each operations}}{{#if (isQuery @root.clientClass this)}}
   {{name}}: [{{{createQueryKeyFragment (getValue ../path) null}}}, Params<'{{name}}'>];
