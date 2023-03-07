@@ -134,9 +134,31 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     },
     updateCustomerPassword: noop,
     updateCustomerProductList: TODO('updateCustomerProductList'),
-    updateCustomerProductListItem(customerId, {parameters}) {
+    updateCustomerProductListItem(customerId, {parameters}, response) {
+        const {itemId, listId} = parameters
         return {
-            update: [{queryKey: getCustomerProductListItem.queryKey(parameters)}],
+            update: [
+                {queryKey: getCustomerProductListItem.queryKey(parameters)},
+                {
+                    queryKey: getCustomerProductLists.queryKey(parameters),
+                    updater: (oldData) => {
+                        console.log('--- old data', oldData)
+
+                        const newData = {
+                            ...oldData
+                        }
+                        const list = newData.data.find((list) => list.id === listId)
+                        const listIndex = newData.data.indexOf(list)
+                        const item = list.customerProductListItems.find(
+                            (item) => item.id === itemId
+                        )
+                        const itemIndex = list.customerProductListItems.indexOf(item)
+                        newData.data[listIndex].customerProductListItems[itemIndex] = response
+
+                        return newData
+                    }
+                }
+            ],
             // TODO: Rather than invalidate, can we selectively update?
             invalidate: [
                 {queryKey: getCustomerProductList.queryKey(parameters)},
