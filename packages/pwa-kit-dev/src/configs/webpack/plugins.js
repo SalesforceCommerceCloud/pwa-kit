@@ -120,52 +120,60 @@ export const allFiles = (projectDir) => {
     })
 }
 
-export const importFromExtendsPlugin = (projectDir) => {
-    // TODO: does any other library use this weird magic character import schema?
+// export const importFromExtendsPlugin = (projectDir) => {
+//     // TODO: does any other library use this weird magic character import schema?
 
-    return new webpack.NormalModuleReplacementPlugin(/\^/, (resource) => {
-        const resolved = path.resolve(resource.context, resource.request)
-        if (resolved?.match(/app\/components\/icons$/)) {
-            console.log('~===== ^^ Magic', resolved)
-        }
-        const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
-        const newPath = path.resolve(projectDir, 'node_modules', relativePath)
-        if (resolved?.match(/app\/components\/icons$/)) {
-            console.log('~^ magic newPath', newPath)
-        }
-        // NOTE: overriding either of these alone does not work, both must be set
-        resource.request = newPath
-        resource.createData.resource = newPath
-    })
-}
+//     return new webpack.NormalModuleReplacementPlugin(/\^/, (resource) => {
+//         const resolved = path.resolve(resource.context, resource.request)
+//         if (resolved?.match(/app\/components\/icons$/)) {
+//             console.log('~===== ^^ Magic')
+//             console.log('~resource.context', resource.context)
+//             console.log('~resource.context', resource.context)
+//         }
+//         const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
+//         const newPath = path.resolve(projectDir, 'node_modules', relativePath)
+//         if (resolved?.match(/app\/components\/icons$/)) {
+//             console.log('~^ magic newPath', newPath)
+//         }
+//         // NOTE: overriding either of these alone does not work, both must be set
+//         resource.request = newPath
+//         resource.createData.resource = newPath
+//     })
+// }
 
-export const importFromLocalPlugin = (projectDir) => {
-    // TODO: does any other library use this weird magic character import schema?
-    return new webpack.NormalModuleReplacementPlugin(/\~/, (resource) => {
-        const resolved = path.resolve(resource.context, resource.request)
-        if (resolved?.match(/app\/components\/icons$/)) {
-            console.log('~===== ~~ Magic', resolved)
-        }
-        const relativePath = resolved
-            ?.split(`~`)?.[1]
-            ?.replace(pkg?.mobify?.extends, '')
-            ?.replace(/^\//, '')
-        const newPath = path.resolve(
-            projectDir,
-            pkg?.mobify?.overridesDir?.replace(/^\//, ''),
-            relativePath
-        )
-        if (resolved?.match(/app\/components\/icons$/)) {
-            console.log('~ ~ magic newPath', newPath)
-        }
-        // NOTE: overriding either of these alone does not work, both must be set
-        resource.request = newPath
-        resource.createData.resource = newPath
-    })
-}
+// export const importFromLocalPlugin = (projectDir) => {
+//     // TODO: does any other library use this weird magic character import schema?
+//     return new webpack.NormalModuleReplacementPlugin(/\~/, (resource) => {
+//         const resolved = path.resolve(resource.context, resource.request)
+//         if (resolved?.match(/app\/components\/icons$/)) {
+//             console.log('~===== ~~ Magic', resolved)
+//         }
+//         const relativePath = resolved
+//             ?.split(`~`)?.[1]
+//             ?.replace(pkg?.mobify?.extends, '')
+//             ?.replace(/^\//, '')
+//         const newPath = path.resolve(
+//             projectDir,
+//             pkg?.mobify?.overridesDir?.replace(/^\//, ''),
+//             relativePath
+//         )
+//         if (resolved?.match(/app\/components\/icons$/)) {
+//             console.log('~ ~ magic newPath', newPath)
+//         }
+//         // NOTE: overriding either of these alone does not work, both must be set
+//         resource.request = newPath
+//         resource.createData.resource = newPath
+//     })
+// }
 
 export const extendedTemplateReplacementPlugin = (projectDir) => {
     console.log('~templateAppPathRegex', templateAppPathRegex)
+    // EXAMPLE:
+    // file: overrides/app/icons/index.jsx
+    // now we manipulate this string to be
+    // --> /app/icons/index.jsx
+    // PROBLEM: ^ prefixed files would look like `^app/icons/index.jsx`
+    // which is not a regex match
     const globPattern = `${pkg?.mobify?.overridesDir?.replace(/\//, '')}/**/*.+(js|jsx|ts|tsx)`
     // push a copy of overrides array with the extends path as base
     const overrides = glob.sync(globPattern)?.flatMap((item) => {
@@ -188,11 +196,14 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
         return noExtExtends
     }
 
+    const vanillaPatterns = []
+
     const overridesMap = [
         ...overrides,
         ...overrides.flatMap((item) => {
             const EXTENSIONS = '.+(js|jsx|ts|tsx)$'
             const patterns = [minimatch.makeRe('**/*' + item)]
+            vanillaPatterns.push(item)
             const extRe = /\.\w+$/
             const hasExt = item?.test?.(extRe)
             const hasSlash = item?.endsWith('/')
@@ -205,15 +216,22 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
                 const noExtExtends =
                     pkg?.mobify?.extends + '/' + noExt.replace(pkg?.mobify?.overridesDir, '')
                 patterns.push(minimatch.makeRe('**/*' + noExt + EXTENSIONS))
+                vanillaPatterns.push(minimatch.makeRe(noExt + EXTENSIONS))
                 patterns.push(minimatch.makeRe(getExtendsRelativePath(noExt) + EXTENSIONS))
             }
             if (hasSlash) {
                 patterns.push(minimatch.makeRe('**/*' + item + 'index' + EXTENSIONS))
+                vanillaPatterns.push(minimatch.makeRe(item + 'index' + EXTENSIONS))
                 patterns.push(
                     minimatch.makeRe(
                         '**/*' +
                             item.replace(pkg?.mobify?.overridesDir?.replace(/\//, ''), '') +
                             EXTENSIONS
+                    )
+                )
+                vanillaPatterns.push(
+                    minimatch.makeRe(
+                        item.replace(pkg?.mobify?.overridesDir?.replace(/\//, ''), '') + EXTENSIONS
                     )
                 )
             }
@@ -222,6 +240,19 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
     ]
     console.log('~overridesMap', overridesMap)
     // TODO: manually push a false positive e.g. chakra-ui/whatever/icons to make sure we don't override that
+
+    const vanillaOverridesRegex = makeRegExp(
+        `(${vanillaPatterns
+            ?.map((override) =>
+                override instanceof RegExp && override?.source
+                    ? override?.source
+                    : override?.replace && override?.startsWith('/')
+                    ? override?.replace?.(/^\//, '')
+                    : override
+            )
+            ?.join('|')})`
+    )
+    console.log('~vanillaOverridesRegex', vanillaOverridesRegex)
 
     // TODO: filter regex already generated above out of this map
     const overridesRegex = makeRegExp(
@@ -239,8 +270,62 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
     // TODO: maybe parse the whole dependency tree and rewrite it with this
     //  https://github.com/dependents/node-dependency-tree
 
-    return new webpack.NormalModuleReplacementPlugin(overridesRegex, (resource) => {
+    return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
+
+        if (resource.request.match(/\~/)) {
+            if (resolved?.match(/app\/components\/icons$/)) {
+                console.log('~===== ~~ Magic', resolved)
+            }
+            const relativePath = resolved
+                ?.split(`~`)?.[1]
+                ?.replace(pkg?.mobify?.extends, '')
+                ?.replace(/^\//, '')
+            const newPath = path.resolve(
+                projectDir,
+                pkg?.mobify?.overridesDir?.replace(/^\//, ''),
+                relativePath
+            )
+            if (resolved?.match(/app\/components\/icons$/)) {
+                console.log('~ ~ magic newPath', newPath)
+            }
+            // NOTE: overriding either of these alone does not work, both must be set
+            resource.request = newPath
+            resource.createData.resource = newPath
+            return
+        }
+
+        if (resource.request.match(/\^/)) {
+            if (resolved?.match(/app\/components\/icons$/)) {
+                console.log('~===== ^^ Magic')
+                console.log('~resource.context', resource.context)
+                console.log('~resource.context', resource.context)
+            }
+
+            const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
+            const newPath = path.resolve(projectDir, 'node_modules', relativePath)
+            if (resolved?.match(/app\/components\/icons$/)) {
+                console.log('~^ magic newPath', newPath)
+            }
+            // NOTE: overriding either of these alone does not work, both must be set
+            resource.request = newPath
+            resource.createData.resource = newPath
+            return
+        }
+
+        // for now, let's early return any file that doesn't match what's expected from overrides
+        if (!resolved?.match(vanillaOverridesRegex)?.length) {
+            if (resolved?.match(/app\/components\/icons/)) {
+                console.log(`------`)
+                console.log('~NO MATCH of resolved icons file in overrides array')
+                console.log('~resource.context', resource.context)
+                console.log('~resource.request', resource.request)
+                console.log('~resolved', resolved)
+                console.log(`------`)
+            }
+
+            return
+        }
         // ignore magic paths and don't attempt to overwrite them
         console.log('++++++++')
         console.log(`resource.context`, resource.context)

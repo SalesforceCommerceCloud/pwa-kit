@@ -179,9 +179,8 @@ const baseConfig = (target) => {
                         'react-intl': findInProjectThenExtendsThenSDK('react-intl'),
                         '@chakra-ui/icons': findInProjectThenExtendsThenSDK('@chakra-ui/icons'),
                         '@chakra-ui/react': findInProjectThenExtendsThenSDK('@chakra-ui/react'),
-                        '@chakra-ui/skip-nav': findInProjectThenExtendsThenSDK(
-                            '@chakra-ui/skip-nav'
-                        ),
+                        '@chakra-ui/skip-nav':
+                            findInProjectThenExtendsThenSDK('@chakra-ui/skip-nav'),
                         '@emotion/react': findInProjectThenExtendsThenSDK('@emotion/react'),
                         '@emotion/styled': findInProjectThenExtendsThenSDK('@emotion/styled')
                     },
@@ -204,13 +203,13 @@ const baseConfig = (target) => {
                         ? extendedTemplateReplacementPlugin(projectDir)
                         : () => null,
 
-                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                        ? importFromExtendsPlugin(projectDir)
-                        : () => null,
+                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                    //     ? importFromExtendsPlugin(projectDir)
+                    //     : () => null,
 
-                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                        ? importFromLocalPlugin(projectDir)
-                        : () => null,
+                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                    //     ? importFromLocalPlugin(projectDir)
+                    //     : () => null,
 
                     allFiles(),
                     // Don't chunk if it's a node target – faster Lambda startup.
