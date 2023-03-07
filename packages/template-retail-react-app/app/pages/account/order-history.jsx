@@ -22,10 +22,11 @@ import {
     Img,
     Skeleton
 } from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useShopperCustomersMutation, useCustomerOrders} from 'commerce-sdk-react-preview'
 import useNavigation from '../../hooks/use-navigation'
 import {usePageUrls, useSearchParams} from '../../hooks'
-import {useAccountOrders} from './util/order-context'
+// import {useAccountOrders} from './util/order-context'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import Link from '../../components/link'
 import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
@@ -36,16 +37,37 @@ const AccountOrderHistory = () => {
     const {formatMessage, formatDate} = useIntl()
     const searchParams = useSearchParams({limit: 10, offset: 0})
     const navigate = useNavigation()
-    const customer = useCustomer()
-    const {orderIdsByOffset, ordersById, productsById, isLoading, fetchOrders, paging} =
-        useAccountOrders()
-    const pageUrls = usePageUrls({total: paging.total, limit: paging.limit})
 
-    const orders =
-        orderIdsByOffset[searchParams.offset || 0]?.map((orderId) => ordersById[orderId]) || []
+    // const {orderIdsByOffset, ordersById, productsById, isLoading, fetchOrders, paging} =
+    //     useAccountOrders()
+    // const pageUrls = usePageUrls({total: paging.total, limit: paging.limit})
+
+    // const orders =
+    //     orderIdsByOffset[searchParams.offset || 0]?.map((orderId) => ordersById[orderId]) || []
+
+    /// ******NEW APPROACH ******
+    // const addCustomerAddress = useShopperCustomersMutation({action: 'createCustomerAddress'})
+
+
+
+    const {data: customer} = useCurrentCustomer()
+    const {isRegistered, customerId} = customer
+
+    const {data: orders, isLoading, ...restOfQuery} = useCustomerOrders({
+        parameters: {customerId}
+    })
+
+
+    console.log('AccountOrderHistory customer', customer)
+    console.log('AccountOrderHistory customerId', customerId)
+    console.log('AccountOrderHistory orders', orders)
+    console.log('AccountOrderHistory orders?.data', orders?.data)
+    console.log('AccountOrderHistory useCustomerOrders restOfQuery', restOfQuery)
+    console.log('AccountOrderHistory isLoading', isLoading)
+
 
     useEffect(() => {
-        fetchOrders(searchParams)
+        //fetchOrders(searchParams)
         window.scrollTo(0, 0)
     }, [customer, searchParams.offset])
 
@@ -76,13 +98,15 @@ const AccountOrderHistory = () => {
                     </Stack>
                 ))}
 
-            {orders.length > 0 && !isLoading && (
+            {orders?.data?.length > 0 && !isLoading && (
+
                 <Stack spacing={4}>
-                    {orders.map((order) => {
+                    {orders.data.map((order) => {
                         return (
                             <Stack key={order.orderNo} spacing={4} layerStyle="cardBordered">
                                 <Box>
                                     <Flex justifyContent="space-between">
+
                                         <Text fontWeight="bold" fontSize="lg">
                                             <FormattedMessage
                                                 defaultMessage="Ordered: {date}"
@@ -127,10 +151,11 @@ const AccountOrderHistory = () => {
 
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
                                     {order.productItems.map((item) => {
-                                        const productDetail = productsById[item.productId]
-                                        const image = productDetail?.imageGroups?.find(
-                                            (group) => group.viewType === 'small'
-                                        ).images[0]
+                                        // TODO: useProduct detail?
+                                        // const productDetail = productsById[item.productId]
+                                        // const image = productDetail?.imageGroups?.find(
+                                        //     (group) => group.viewType === 'small'
+                                        // ).images[0]
 
                                         return (
                                             <AspectRatio
@@ -141,13 +166,14 @@ const AccountOrderHistory = () => {
                                                 borderRadius="base"
                                                 overflow="hidden"
                                             >
-                                                <Img
-                                                    alt={image?.alt}
-                                                    src={image?.disBaseLink || image?.link}
-                                                    fallback={
-                                                        <Box background="gray.100" boxSize="full" />
-                                                    }
-                                                />
+                                                <p>TODO IMG</p>
+                                                {/*<Img*/}
+                                                {/*    alt={image?.alt}*/}
+                                                {/*    src={image?.disBaseLink || image?.link}*/}
+                                                {/*    fallback={*/}
+                                                {/*        <Box background="gray.100" boxSize="full" />*/}
+                                                {/*    }*/}
+                                                {/*/>*/}
                                             </AspectRatio>
                                         )
                                     })}
@@ -191,21 +217,23 @@ const AccountOrderHistory = () => {
                                     </Text>
                                 </Stack>
                             </Stack>
+
                         )
                     })}
 
-                    {orders.length > 0 && orders.length < paging.total && (
-                        <Box pt={4}>
-                            <Pagination
-                                currentURL={`${location.pathname}${location.search}`}
-                                urls={pageUrls}
-                            />
-                        </Box>
-                    )}
+                    // TODO: replace paging.total logic
+                    {/*{orders?.length > 0 && orders?.length < paging.total && (*/}
+                    {/*    <Box pt={4}>*/}
+                    {/*        <Pagination*/}
+                    {/*            currentURL={`${location.pathname}${location.search}`}*/}
+                    {/*            urls={pageUrls}*/}
+                    {/*        />*/}
+                    {/*    </Box>*/}
+                    {/*)}*/}
                 </Stack>
             )}
 
-            {orders.length < 1 && !isLoading && (
+            {orders?.length < 1 && !isLoading && (
                 <PageActionPlaceHolder
                     icon={<ReceiptIcon boxSize={8} />}
                     heading={formatMessage({

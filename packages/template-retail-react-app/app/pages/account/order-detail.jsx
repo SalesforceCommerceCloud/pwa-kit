@@ -22,7 +22,7 @@ import {
     Skeleton
 } from '@chakra-ui/react'
 import {getCreditCardIcon} from '../../utils/cc-utils'
-import {useAccountOrders} from './util/order-context'
+// import {useAccountOrders} from './util/order-context'
 import Link from '../../components/link'
 import {ChevronLeftIcon} from '../../components/icons'
 import OrderSummary from '../../components/order-summary'
