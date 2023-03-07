@@ -33,12 +33,17 @@ const AccountWishlist = () => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
-    const {data: wishListData} = useWishList()
+    // DEBUG
+    const idOfEmptyList = 'e41812c0545ec3cafcbae8c6e8'
+    const idOfNotEmptyList = '4014963e7fdf4022d7edebe8f6'
+    const {data: wishListData, isLoading: isWishListLoading} = useWishList({
+        listId: idOfNotEmptyList
+    })
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
 
     const {data: productsData, isLoading: isProductsLoading} = useProducts(
         {parameters: {ids: productIds?.join(','), allImages: true}},
-        {enabled: Boolean(wishListData)}
+        {enabled: Boolean(productIds)}
     )
 
     const wishListItems = wishListData?.customerProductListItems?.map((item, i) => {
@@ -67,7 +72,8 @@ const AccountWishlist = () => {
             ...item,
             quantity: parseInt(quantity)
         }
-        // TODO
+        // To meet expected schema, remove the custom `product` we added
+        // TODO: better way?
         delete body.product
 
         updateCustomerProductListItem.mutate(
@@ -109,13 +115,17 @@ const AccountWishlist = () => {
         */
     }
 
+    const isPageLoading = wishListItems ? isProductsLoading : isWishListLoading
+    const hasProducts = !isPageLoading && productsData?.total > 0
+    const hasNoProducts = !isPageLoading && !wishListItems
+
     return (
         <Stack spacing={4} data-testid="account-wishlist-page">
             <Heading as="h1" fontSize="2xl">
                 <FormattedMessage defaultMessage="Wishlist" id="account_wishlist.title.wishlist" />
             </Heading>
 
-            {isProductsLoading && (
+            {isPageLoading && (
                 <Box data-testid="sf-wishlist-skeleton">
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
@@ -140,7 +150,7 @@ const AccountWishlist = () => {
                 </Box>
             )}
 
-            {!isProductsLoading && productsData.total === 0 && (
+            {hasNoProducts && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<HeartIcon boxSize={8} />}
@@ -161,14 +171,12 @@ const AccountWishlist = () => {
                 />
             )}
 
-            {!isProductsLoading &&
-                productsData.total > 0 &&
+            {hasProducts &&
                 wishListItems.map((item) => (
                     <ProductItem
                         key={item.id}
                         product={{
                             ...item.product,
-                            // TODO: simplify the UX by not doing this optimistically, because we're already showing the loader anyways
                             quantity: item.quantity
                         }}
                         showLoading={isWishlistItemLoading && selectedItem === item.productId}

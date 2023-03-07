@@ -70,7 +70,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
             <Text fontWeight="bold" lineHeight={{base: '0.5', lg: '24px'}}>
                 <FormattedNumber
                     style="currency"
-                    currency={currency || basket.currency || activeCurrency}
+                    currency={currency || basket?.currency || activeCurrency}
                     value={displayPrice}
                 />
                 {hasDiscount && (
