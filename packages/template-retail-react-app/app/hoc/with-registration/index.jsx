@@ -12,10 +12,11 @@ import {noop} from '../../utils/utils'
 import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 const withRegistration = (Component) => {
     const WrappedComponent = ({onClick = noop, ...passThroughProps}) => {
-        const customer = useCustomer()
+        const {data: customer} = useCurrentCustomer()
         const authModal = useAuthModal()
         const location = useLocation()
         const {formatMessage, locale} = useIntl()
