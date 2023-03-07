@@ -171,23 +171,21 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
     const overrides = glob.sync(globPattern)?.flatMap((item) => {
         return [
             item,
-            item?.replace(
-                pkg?.mobify?.overridesDir?.replace(/^\//, ''),
-                `/${pkg?.mobify?.extends}`
-            ),
+            item?.replace(pkg?.mobify?.overridesDir?.replace(/^\//, ''), `${pkg?.mobify?.extends}`),
             // TODO: this needs a better solution, but maybe only a pain for local dev until we publish
             // the retail react app template?
             item?.replace(
                 pkg?.mobify?.overridesDir?.replace(/^\//, ''),
-                `/template-${pkg?.mobify?.extends}`
+                `template-${pkg?.mobify?.extends}`
             )
         ]
     })
     const _overrides = [...overrides]
 
     const getExtendsRelativePath = (noExt) => {
-        const noExtExtends = pkg?.mobify?.extends + noExt.replace(pkg?.mobify?.overridesDir, '')
-        return
+        const noExtExtends =
+            pkg?.mobify?.extends + '/' + noExt.replace(pkg?.mobify?.overridesDir, '/')
+        return noExtExtends
     }
 
     const overridesMap = [
