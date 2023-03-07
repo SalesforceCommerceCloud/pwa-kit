@@ -1,14 +1,13 @@
-        ____                      ____            _                      
+        ____                      ____            _
        / __ \____ _____ ____     / __ \___  _____(_)___ _____  ___  _____
       / /_/ / __ `/ __ `/ _ \   / / / / _ \/ ___/ / __ `/ __ \/ _ \/ ___/
-     / ____/ /_/ / /_/ /  __/  / /_/ /  __(__  ) / /_/ / / / /  __/ /    
-    /_/    \__,_/\__, /\___/  /_____/\___/____/_/\__, /_/ /_/\___/_/     
-                /____/                          /____/                   
+     / ____/ /_/ / /_/ /  __/  / /_/ /  __(__  ) / /_/ / / / /  __/ /
+    /_/    \__,_/\__, /\___/  /_____/\___/____/_/\__, /_/ /_/\___/_/
+                /____/                          /____/
 
 ---
 
-This folder contains React components and utilities that render pages from [Page Designer](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/page_designer/b2c_creating_pd_pages.html
-). 
+This folder contains React components and utilities that render pages from [Page Designer](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/page_designer/b2c_creating_pd_pages.html).
 
 It is living folder where you add React.js components responsible for rendering Page Designer components that have been serialized to JSON.
 
@@ -18,9 +17,9 @@ It includes components for layout and visualization of images, grids and and car
 
 ## Folder Structure
 
-- **`/core`** - Base components for rendering: `<Page>`, `<Region>`, and `<Component>`. You shouldn't need to modify them, but will use `<Page>` to render Page Designer content. The other components are useful when you are creating new assets. 
-- **`/assets`** - Non-visual components used in Page Designer. Includes `<Image>` and `<ImageWithText>` as well as other Page Designer assets you want to use in your PWA-Kit app. If you need to visualize a component, you would add it here.
-- **`/layouts`** - Components responsible for layout. Includes various grids and a `<Carousel>` component.
+-   **`/core`** - Base components for rendering: `<Page>`, `<Region>`, and `<Component>`. You shouldn't need to modify them, but will use `<Page>` to render Page Designer content. The other components are useful when you are creating new assets.
+-   **`/assets`** - Non-visual components used in Page Designer. Includes `<Image>` and `<ImageWithText>` as well as other Page Designer assets you want to use in your PWA-Kit app. If you need to visualize a component, you would add it here.
+-   **`/layouts`** - Components responsible for layout. Includes various grids and a `<Carousel>` component.
 
 ## Sample Usage
 
@@ -30,9 +29,9 @@ First, create a new file, `app/pages/page-viewer/index.jsx`, and add the followi
 // app/pages/page-viewer/index.jsx
 
 import React from 'react'
-import { Box } from '@chakra-ui/react'
-import { Page, pageType } from '../../page-designer'
-import { ImageTile, ImageWithText } from '../../page-designer/assets'
+import {Box} from '@chakra-ui/react'
+import {Page, pageType} from '../../page-designer'
+import {ImageTile, ImageWithText} from '../../page-designer/assets'
 import {
     Carousel,
     MobileGrid1r1c,
@@ -43,7 +42,7 @@ import {
     MobileGrid3r2c
 } from '../../page-designer/layouts'
 
-import { HTTPError, HTTPNotFound } from 'pwa-kit-react-sdk/ssr/universal/errors'
+import {HTTPError, HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 const PAGEDESIGNER_TO_COMPONENT = {
     'commerce_assets.photoTile': ImageTile,
@@ -57,16 +56,16 @@ const PAGEDESIGNER_TO_COMPONENT = {
     'commerce_layouts.mobileGrid3r2c': MobileGrid3r2c
 }
 
-const PageViewer = ({ page }) => (
+const PageViewer = ({page}) => (
     <Box layerStyle={'page'}>
         <Page page={page} components={PAGEDESIGNER_TO_COMPONENT} />
     </Box>
 )
 
-PageViewer.getProps = async ({ api, params }) => {
-    const { pageId } = params
+PageViewer.getProps = async ({api, params}) => {
+    const {pageId} = params
     const page = await api.shopperExperience.getPage({
-        parameters: { pageId }
+        parameters: {pageId}
     })
 
     if (page.isError) {
@@ -74,7 +73,7 @@ PageViewer.getProps = async ({ api, params }) => {
         throw new ErrorClass(page.detail)
     }
 
-    return { page }
+    return {page}
 }
 
 PageViewer.displayName = 'PageViewer'
