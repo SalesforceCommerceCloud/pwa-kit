@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {Stack, Heading} from '@chakra-ui/layout'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Flex, Skeleton} from '@chakra-ui/react'
+import {useProducts} from 'commerce-sdk-react-preview'
 
-import useCustomer from '../../../commerce-api/hooks/useCustomer'
 import useNavigation from '../../../hooks/use-navigation'
-import useWishlist from '../../../hooks/use-wishlist'
 import {useToast} from '../../../hooks/use-toast'
+import {useWishList} from '../../../hooks/use-wish-list'
 
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
 import {HeartIcon} from '../../../components/icons'
@@ -25,14 +25,27 @@ import {API_ERROR_MESSAGE} from '../../../constants'
 const numberOfSkeletonItems = 3
 
 const AccountWishlist = () => {
-    const customer = useCustomer()
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
     const toast = useToast()
+
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
-    const wishlist = useWishlist()
+
+    const {data: wishListData} = useWishList()
+    const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
+    const {data: productsData, isLoading: isProductsLoading} = useProducts(
+        {parameters: {ids: productIds?.join(','), allImages: true}},
+        {enabled: Boolean(wishListData)}
+    )
+
+    const wishListItems = wishListData?.customerProductListItems?.map((item, i) => {
+        return {
+            ...item,
+            product: productsData?.data?.[i]
+        }
+    })
 
     const handleActionClicked = (itemId) => {
         setWishlistItemLoading(!!itemId)
@@ -46,6 +59,7 @@ const AccountWishlist = () => {
         setWishlistItemLoading(true)
         setSelectedItem(item.productId)
         try {
+            // TODO
             await wishlist.updateListItem({
                 ...item,
                 quantity: parseInt(quantity)
@@ -61,29 +75,13 @@ const AccountWishlist = () => {
         setLocalQuantity({...localQuantity, [item.productId]: undefined})
     }
 
-    useEffect(() => {
-        if (customer.isRegistered) {
-            // We want to reset the wishlist here
-            // because it is possible that a user
-            // adds an item to the wishlist on another page
-            // and the wishlist page may not have enough
-            // data to render the page.
-            // Reset the wishlist will make sure the
-            // initialization state is correct.
-            if (wishlist.isInitialized) {
-                wishlist.reset()
-            }
-
-            wishlist.init({detail: true})
-        }
-    }, [customer.isRegistered])
-
     return (
         <Stack spacing={4} data-testid="account-wishlist-page">
             <Heading as="h1" fontSize="2xl">
                 <FormattedMessage defaultMessage="Wishlist" id="account_wishlist.title.wishlist" />
             </Heading>
-            {!wishlist.hasDetail && (
+
+            {isProductsLoading && (
                 <Box data-testid="sf-wishlist-skeleton">
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
@@ -108,7 +106,7 @@ const AccountWishlist = () => {
                 </Box>
             )}
 
-            {wishlist.hasDetail && wishlist.isEmpty && (
+            {!isProductsLoading && productsData.total === 0 && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<HeartIcon boxSize={8} />}
@@ -129,9 +127,9 @@ const AccountWishlist = () => {
                 />
             )}
 
-            {wishlist.hasDetail &&
-                !wishlist.isEmpty &&
-                wishlist.items.map((item) => (
+            {!isProductsLoading &&
+                productsData.total > 0 &&
+                wishListItems.map((item) => (
                     <ProductItem
                         key={item.id}
                         product={{
