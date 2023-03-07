@@ -14,14 +14,14 @@ const AccountOrders = () => {
     const {path} = useRouteMatch()
 
     return (
-            <Switch>
-                <Route exact path={path}>
-                    <OrderHistory />
-                </Route>
-                <Route exact path={`${path}/:orderNo`}>
-                    <OrderDetail />
-                </Route>
-            </Switch>
+        <Switch>
+            <Route exact path={path}>
+                <OrderHistory />
+            </Route>
+            <Route exact path={`${path}/:orderNo`}>
+                <OrderDetail />
+            </Route>
+        </Switch>
     )
 }
 
