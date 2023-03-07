@@ -7,31 +7,32 @@
 
 ---
 
-## Summary
+This folder contains React components and utilities that render pages from [Page Designer](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/page_designer/b2c_creating_pd_pages.html
+). 
 
-This folder contains the React components and utilities required to render `pages` created in the Business Managers **Page Desginer** backend in your PWA-Kit app. This is a living folder where you, the developer, can add your own component implementations for those that exist in the **Page Designer** backend, or custom components you may have added via an SFRA cartirdge. We have given you a head start by providing some of the components for layout and visualization (e.g. images, grids, and carousels). 
+It is living folder where you add React.js components responsible for rendering Page Designer components that have been serialized to JSON.
 
-## Folders
+It includes components for layout and visualization of images, grids and and carousels.
 
-The `Page Desginer` folder is broken down into 3 main sub-folders:
+**By default, Page Designer integration is not enabled in the Retail React App.**
 
-- **/core** - Contains the _Page_, _Region_, and _Component_ base assets. Think of these as the basic building blocks for rendering your page. You will not spend a lot of time in this folder, but you will definately be using the _Page_ component, as it's the primary component used to render your experience. The other components will also be useful when you are creating new _assets_. 
+## Folder Structure
 
-- **/assets** - This folder contains the non-visual components that you dragged and dropped on your **Page Designer** pages. These include things like "Image", "ImageWithText" and and any other Page Designer assets you want to visualize in your PWA-Kit app. If you need to visualize a new component that we haven't provided, you can add it here.
-
-- **/layouts** - Contrary to the above, this folder contains only components that involve layout of other components. We have gotten you off to a good start by giving you various _grid_ and _carousel_ layout components.
+- **`/core`** - Base components for rendering: `<Page>`, `<Region>`, and `<Component>`. You shouldn't need to modify them, but will use `<Page>` to render Page Designer content. The other components are useful when you are creating new assets. 
+- **`/assets`** - Non-visual components used in Page Designer. Includes `<Image>` and `<ImageWithText>` as well as other Page Designer assets you want to use in your PWA-Kit app. If you need to visualize a component, you would add it here.
+- **`/layouts`** - Components responsible for layout. Includes various grids and a `<Carousel>` component.
 
 ## Sample Usage
 
-Below is a sample page that you can use as a starting point in your _retail react app_ to visualize pages that have created in business manager. After starting the dev server you can access the page viewer using the following url `http://localhost:3000/page-viewer/homepage-example`. _Note: "homepage-example is a sample page designer page that is included with all Business Manager backends, if you want to view another page you created, please use that id instead._
+First, create a new file, `app/pages/page-viewer/index.jsx`, and add the following:
 
-```
+```jsx
 // app/pages/page-viewer/index.jsx
 
 import React from 'react'
-import {Box} from '@chakra-ui/react'
-import {Page, pageType} from '../../page-designer'
-import {ImageTile, ImageWithText} from '../../page-designer/assets'
+import { Box } from '@chakra-ui/react'
+import { Page, pageType } from '../../page-designer'
+import { ImageTile, ImageWithText } from '../../page-designer/assets'
 import {
     Carousel,
     MobileGrid1r1c,
@@ -42,38 +43,38 @@ import {
     MobileGrid3r2c
 } from '../../page-designer/layouts'
 
-const PageViewer = ({page}) => {
-    // Assign the components to be rendered for any given page designer component type.
-    const components = {
-        'commerce_assets.photoTile': ImageTile,
-        'commerce_assets.imageAndText': ImageWithText,
-        'commerce_layouts.carousel': Carousel,
-        'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c,
-        'commerce_layouts.mobileGrid2r1c': MobileGrid2r1c,
-        'commerce_layouts.mobileGrid2r2c': MobileGrid2r2c,
-        'commerce_layouts.mobileGrid2r3c': MobileGrid2r3c,
-        'commerce_layouts.mobileGrid3r1c': MobileGrid3r1c,
-        'commerce_layouts.mobileGrid3r2c': MobileGrid3r2c
-    }
+import { HTTPError, HTTPNotFound } from 'pwa-kit-react-sdk/ssr/universal/errors'
 
-    return (
-        <Box layerStyle={'page'}>
-            <Page page={page} components={components} />
-        </Box>
-    )
+const PAGEDESIGNER_TO_COMPONENT = {
+    'commerce_assets.photoTile': ImageTile,
+    'commerce_assets.imageAndText': ImageWithText,
+    'commerce_layouts.carousel': Carousel,
+    'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c,
+    'commerce_layouts.mobileGrid2r1c': MobileGrid2r1c,
+    'commerce_layouts.mobileGrid2r2c': MobileGrid2r2c,
+    'commerce_layouts.mobileGrid2r3c': MobileGrid2r3c,
+    'commerce_layouts.mobileGrid3r1c': MobileGrid3r1c,
+    'commerce_layouts.mobileGrid3r2c': MobileGrid3r2c
 }
 
-PageViewer.getProps = async ({api, params}) => {
-    const {pageId} = params
+const PageViewer = ({ page }) => (
+    <Box layerStyle={'page'}>
+        <Page page={page} components={PAGEDESIGNER_TO_COMPONENT} />
+    </Box>
+)
 
-    // Note: There is no error and 404 handling in this example, if you chose to use this code you will have to add that on your own.
+PageViewer.getProps = async ({ api, params }) => {
+    const { pageId } = params
     const page = await api.shopperExperience.getPage({
-        parameters: {pageId}
+        parameters: { pageId }
     })
 
-    return {
-        page
+    if (page.isError) {
+        let ErrorClass = page.type?.endsWith('page-not-found') ? HTTPNotFound : HTTPError
+        throw new ErrorClass(page.detail)
     }
+
+    return { page }
 }
 
 PageViewer.displayName = 'PageViewer'
@@ -85,18 +86,20 @@ PageViewer.propTypes = {
 export default PageViewer
 ```
 
-_**Note:** To ensure that this page is routeable you need to add it to your applications routes file._
+Second, modify `app/routes.jsx`, adding a route for `<PageViewer>`:
 
-```
+```diff
 // app/routes.jsx
 
-// Create new loadabled page for the `page-viewer`
+// Create a loadable page for `page-viewer`.
 + const PageViewer = loadable(() => import('./pages/page-viewer'), {fallback})
 
 
-// Add the new route object to the routes array
+// Add a route.
 +    {
 +        path: '/page-viewer/:pageId',
 +        component: PageViewer
 +    },
 ```
+
+Using the local development server, you can now see Page Designer pages rendered in React.js at `http://localhost:3000/page-viewer/:pageid` by providing their `pageid`.
