@@ -162,6 +162,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
 
                         const listItems = newData.data[listIndex].customerProductListItems
                         if (listItems) {
+                            // Selectively update the lists with this particular item
                             listItems[itemIndex] = response
                         }
                         return newData
