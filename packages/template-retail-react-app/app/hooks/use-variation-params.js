@@ -5,25 +5,27 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useLocation} from 'react-router-dom'
+import {usePDPSearchParams} from './use-pdp-search-params'
 
 /*
  * This hook will return only the params that are also product attributes for the
  * passed in product object.
  */
-export const useVariationParams = (product = {}) => {
+export const useVariationParams = (product = {}, isProductPartOfSet = false) => {
     const {variationAttributes = [], variationValues = {}} = product
-    const variationParams = variationAttributes.map(({id}) => id)
 
-    const {search} = useLocation()
-    const params = new URLSearchParams(search)
-    // Using all the variation attribute id from the array generated above, get
+    const [allParams, productParams] = usePDPSearchParams(product.id)
+    const params = isProductPartOfSet ? productParams : allParams
+
+    // Using all the variation attribute id from the array generated below, get
     // the value if there is one from the location search params and add it to the
     // accumulator.
-    const filteredVariationParams = variationParams.reduce((acc, key) => {
-        let value = params.get(`${key}`) || variationValues?.[key]
-        return value ? {...acc, [key]: value} : acc
-    }, {})
+    const variationParams = variationAttributes
+        .map(({id}) => id)
+        .reduce((acc, key) => {
+            let value = params.get(`${key}`) || variationValues?.[key]
+            return value ? {...acc, [key]: value} : acc
+        }, {})
 
-    return filteredVariationParams
+    return variationParams
 }
