@@ -6,14 +6,15 @@
  */
 import React from 'react'
 import {
-    ShopperLoginHelpers,
+    AuthHelpers,
     useCustomer,
     useCustomerAddress,
     useCustomerBaskets,
     useCustomerOrders,
     useCustomerProductList,
     useShopperCustomersMutation,
-    useShopperLoginHelper
+    useAuthHelper,
+    ShopperCustomersMutation
 } from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 import {useQueryClient} from '@tanstack/react-query'
@@ -78,11 +79,11 @@ const renderMutationHook = ({name, hook, body, parameters}: any) => {
 
 function UseCustomer() {
     const queryClient = useQueryClient()
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const loginRegisteredUser = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
     // TODO: Implement the flow - Login as a guest user and then registered that user.
     //  Currently Login as a guest doesn't work in packages/test-commerce-sdk-react/app/pages/use-shopper-login-helper.tsx
-    // const loginGuestUser = useShopperLoginHelper('loginGuestUser')
+    // const loginGuestUser = useAuthHelper(AuthHelpers.LoginGuestUser)
     // const guestUserMutationHooks = [
     //     {
     //         action: 'registerCustomer',
@@ -180,7 +181,7 @@ function UseCustomer() {
     ].map(({action, body, parameters}) => {
         return {
             name: action,
-            hook: useShopperCustomersMutation({action}),
+            hook: useShopperCustomersMutation(action as ShopperCustomersMutation),
             body,
             parameters
         }
@@ -189,28 +190,44 @@ function UseCustomer() {
     const queryHooks = [
         {
             name: 'useCustomer',
-            hook: useCustomer({customerId: CUSTOMER_ID})
+            hook: useCustomer({
+                parameters: {customerId: CUSTOMER_ID}
+            })
         },
         {
             name: 'useCustomerAddress',
             hook: useCustomerAddress({
-                customerId: CUSTOMER_ID,
-                addressName: ADDRESS_NAME
+                parameters: {
+                    customerId: CUSTOMER_ID,
+                    addressName: ADDRESS_NAME
+                }
             })
         },
         {
             name: 'useCustomerOrders',
-            hook: useCustomerOrders({customerId: CUSTOMER_ID})
+            hook: useCustomerOrders({
+                parameters: {customerId: CUSTOMER_ID}
+            })
         },
         {
             name: 'useCustomerBaskets',
-            hook: useCustomerBaskets({customerId: CUSTOMER_ID})
+            hook: useCustomerBaskets({
+                parameters: {customerId: CUSTOMER_ID}
+            })
         },
         {
             name: 'useCustomerProductList',
-            hook: useCustomerProductList({customerId: CUSTOMER_ID, listId: LIST_ID})
+            hook: useCustomerProductList({
+                parameters: {customerId: CUSTOMER_ID, listId: LIST_ID}
+            })
         }
     ]
+
+    const loginError = loginRegisteredUser.error
+    const loginErrorMessage =
+        typeof loginError === 'object' && loginError !== null && 'message' in loginError
+            ? loginError.message
+            : loginError
 
     return (
         <>
@@ -230,9 +247,7 @@ function UseCustomer() {
                     >
                         loginRegisteredUser
                     </button>
-                    {loginRegisteredUser.error?.message && (
-                        <p style={{color: 'red'}}>Error: {loginRegisteredUser.error?.message}</p>
-                    )}
+                    {loginError && <p style={{color: 'red'}}>Error: {loginErrorMessage}</p>}
                 </>
             ) : (
                 <>

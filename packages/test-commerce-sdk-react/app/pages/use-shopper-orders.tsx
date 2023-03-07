@@ -9,9 +9,10 @@ import React from 'react'
 import {Link} from 'react-router-dom'
 import Json from '../components/Json'
 import {
+    AuthHelpers,
     useShopperOrdersMutation,
-    useShopperLoginHelper,
-    ShopperLoginHelpers
+    useAuthHelper,
+    ShopperOrdersMutation
 } from 'commerce-sdk-react-preview'
 const orderNos = ['00014202', '00014103']
 
@@ -41,7 +42,7 @@ const renderMutationHooks = ({name, hook, body, parameters}: any) => {
 }
 
 function UseShopperOrders() {
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const loginRegisteredUser = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     React.useEffect(() => {
         loginRegisteredUser.mutate({username: 'alex@test.com', password: 'Test1234#'})
     }, [])
@@ -54,11 +55,11 @@ function UseShopperOrders() {
     ].map(({action, body, parameters}) => {
         return {
             name: action,
-            hook: useShopperOrdersMutation({
-                action,
-                headers: {'test-header': 'value'},
-                rawResponse: false
-            }),
+            // hook: useShopperOrdersMutation({
+            //     action,
+            //     headers: {'test-header': 'value'}
+            // }),
+            hook: useShopperOrdersMutation(action as ShopperOrdersMutation),
             body,
             parameters
         }
