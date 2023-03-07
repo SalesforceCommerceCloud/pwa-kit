@@ -238,3 +238,21 @@ export const isMutation = (
   apiName: string,
   operation: amf.model.domain.Operation
 ): boolean => !isNothing(apiName, operation) && !isQuery(apiName, operation);
+
+/** Determines whether an API spec contains query endpoints. */
+export const hasQueries = (
+  apiName: string,
+  model: {encodes: amf.model.domain.WebApi}
+): boolean =>
+  model.encodes.endPoints.some(ep =>
+    ep.operations.some(op => isQuery(apiName, op))
+  );
+
+/** Determines whether an API spec contains mutation endpoints. */
+export const hasMutations = (
+  apiName: string,
+  model: {encodes: amf.model.domain.WebApi}
+): boolean =>
+  model.encodes.endPoints.some(ep =>
+    ep.operations.some(op => isMutation(apiName, op))
+  );

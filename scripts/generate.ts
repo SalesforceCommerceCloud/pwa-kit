@@ -6,7 +6,10 @@
  */
 /* eslint-disable no-console */
 
+import {amf} from '@commerce-apps/raml-toolkit';
 import {
+  ApiMetadata,
+  ApiModel,
   HandlebarsWithAmfHelpers as Handlebars,
   loadApiDirectory,
 } from '@commerce-apps/raml-toolkit/lib/generate';
@@ -32,24 +35,31 @@ async function generate() {
   const apis = loadApiDirectory(API_DIR);
   await apis.init();
 
+  const addTemplate = (api: ApiMetadata, filename: string) =>
+    api.addTemplate(
+      // input: look in template dir
+      path.join(TEMPLATE_DIR, filename),
+      // output: strip .hbs and give each API its own dir
+      path.join(
+        OUTPUT_DIR,
+        api.name.upperCamelCase,
+        filename.replace(/\.hbs$/, '')
+      )
+    );
+
   // Add templates to render
-  apis.children.forEach(api => {
-    api.addTemplate(
-      path.join(TEMPLATE_DIR, 'mutation.ts.hbs'),
-      path.join(OUTPUT_DIR, api.name.upperCamelCase, `mutation.ts`)
-    );
-    api.addTemplate(
-      path.join(TEMPLATE_DIR, 'query.ts.hbs'),
-      path.join(OUTPUT_DIR, api.name.upperCamelCase, `query.ts`)
-    );
-    api.addTemplate(
-      path.join(TEMPLATE_DIR, 'queryKeyHelpers.ts.hbs'),
-      path.join(OUTPUT_DIR, api.name.upperCamelCase, `queryKeyHelpers.ts`)
-    );
-    api.addTemplate(
-      path.join(TEMPLATE_DIR, 'index.ts'),
-      path.join(OUTPUT_DIR, api.name.upperCamelCase, `index.ts`)
-    );
+  (apis.children as ApiModel[]).forEach(api => {
+    const name = api.name.upperCamelCase;
+    // Type assertion because amf has bad types :\
+    const model = api.model as unknown as {encodes: amf.model.domain.WebApi};
+    if (customHelpers.hasMutations(name, model)) {
+      addTemplate(api, 'mutation.ts.hbs');
+    }
+    if (customHelpers.hasQueries(name, model)) {
+      addTemplate(api, 'query.ts.hbs');
+      addTemplate(api, 'queryKeyHelpers.ts.hbs');
+    }
+    addTemplate(api, 'index.ts.hbs');
   });
 
   // Render everything!
