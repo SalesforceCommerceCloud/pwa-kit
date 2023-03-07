@@ -31,7 +31,6 @@ const AccountWishlist = () => {
     const toast = useToast()
 
     const [selectedItem, setSelectedItem] = useState(undefined)
-    const [localQuantity, setLocalQuantity] = useState({})
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
     const {data: wishListData} = useWishList()
@@ -61,9 +60,6 @@ const AccountWishlist = () => {
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
-        // This local state allows the dropdown to show the desired quantity
-        // while the API call to update it is happening.
-        setLocalQuantity({...localQuantity, [item.productId]: quantity})
         setWishlistItemLoading(true)
         setSelectedItem(item.productId)
 
@@ -93,7 +89,6 @@ const AccountWishlist = () => {
                 onSuccess: () => {
                     setWishlistItemLoading(false)
                     setSelectedItem(undefined)
-                    setLocalQuantity({...localQuantity, [item.productId]: undefined})
                 }
             }
         )
@@ -173,9 +168,8 @@ const AccountWishlist = () => {
                         key={item.id}
                         product={{
                             ...item.product,
-                            quantity: localQuantity[item.productId]
-                                ? localQuantity[item.productId]
-                                : item.quantity
+                            // TODO: simplify the UX by not doing this optimistically, because we're already showing the loader anyways
+                            quantity: item.quantity
                         }}
                         showLoading={isWishlistItemLoading && selectedItem === item.productId}
                         primaryAction={<WishlistPrimaryAction />}
