@@ -22,7 +22,7 @@ import {
     Skeleton
 } from '@chakra-ui/react'
 import {getCreditCardIcon} from '../../utils/cc-utils'
-// import {useAccountOrders} from './util/order-context'
+import {useOrder, useProduct} from 'commerce-sdk-react-preview'
 import Link from '../../components/link'
 import {ChevronLeftIcon} from '../../components/icons'
 import OrderSummary from '../../components/order-summary'
@@ -36,18 +36,22 @@ const AccountOrderDetail = () => {
     const {url, params} = useRouteMatch()
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
-    const {ordersById, productsById, isLoading, fetchOrder} = useAccountOrders()
-    const order = ordersById[params.orderNo]
 
-    useEffect(() => {
-        fetchOrder(params.orderNo)
-    }, [])
+    const {data: order, isLoading, error} = useOrder({parameters: {orderNo: params.orderNo}})
+
+    console.log('AccountOrderDetail order', order)
+    console.log('AccountOrderDetail isLoading', isLoading)
 
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0)
+
+    console.log('AccountOrderDetail shipment', shipment)
+    console.log('AccountOrderDetail paymentCard', paymentCard)
+    console.log('AccountOrderDetail CardIcon', CardIcon)
+    console.log('AccountOrderDetail itemCount', itemCount)
 
     return (
         <Stack spacing={6} data-testid="account-order-details-page">
@@ -81,7 +85,7 @@ const AccountOrderDetail = () => {
                         />
                     </Heading>
 
-                    {!isLoading ? (
+                    {!isLoading && order ? (
                         <Stack
                             direction={['column', 'row']}
                             alignItems={['flex-start', 'center']}
@@ -293,49 +297,49 @@ const AccountOrderDetail = () => {
                             </Box>
                         ))}
 
-                    {!isLoading &&
-                        order.productItems?.map((product, idx) => {
-                            const variant = {
-                                ...product,
-                                ...productsById[product.productId],
-                                price: product.price
-                            }
-                            return (
-                                <Box
-                                    p={[4, 6]}
-                                    key={product.productId}
-                                    border="1px solid"
-                                    borderColor="gray.100"
-                                    borderRadius="base"
-                                >
-                                    <ItemVariantProvider
-                                        index={idx}
-                                        variant={variant}
-                                        currency={order.currency}
-                                    >
-                                        <Flex width="full" alignItems="flex-start">
-                                            <CartItemVariantImage width={['88px', 36]} mr={4} />
-                                            <Stack spacing={1} marginTop="-3px" flex={1}>
-                                                <CartItemVariantName />
-                                                <Flex
-                                                    width="full"
-                                                    justifyContent="space-between"
-                                                    alignItems="flex-end"
-                                                >
-                                                    <CartItemVariantAttributes
-                                                        includeQuantity
-                                                        currency={order.currency}
-                                                    />
-                                                    <CartItemVariantPrice
-                                                        currency={order.currency}
-                                                    />
-                                                </Flex>
-                                            </Stack>
-                                        </Flex>
-                                    </ItemVariantProvider>
-                                </Box>
-                            )
-                        })}
+                    {/*{!isLoading &&*/}
+                    {/*    order.productItems?.map((product, idx) => {*/}
+                    {/*        const variant = {*/}
+                    {/*            ...product,*/}
+                    {/*            ...productsById[product.productId],*/}
+                    {/*            price: product.price*/}
+                    {/*        }*/}
+                    {/*        return (*/}
+                    {/*            <Box*/}
+                    {/*                p={[4, 6]}*/}
+                    {/*                key={product.productId}*/}
+                    {/*                border="1px solid"*/}
+                    {/*                borderColor="gray.100"*/}
+                    {/*                borderRadius="base"*/}
+                    {/*            >*/}
+                    {/*                <ItemVariantProvider*/}
+                    {/*                    index={idx}*/}
+                    {/*                    variant={variant}*/}
+                    {/*                    currency={order.currency}*/}
+                    {/*                >*/}
+                    {/*                    <Flex width="full" alignItems="flex-start">*/}
+                    {/*                        <CartItemVariantImage width={['88px', 36]} mr={4} />*/}
+                    {/*                        <Stack spacing={1} marginTop="-3px" flex={1}>*/}
+                    {/*                            <CartItemVariantName />*/}
+                    {/*                            <Flex*/}
+                    {/*                                width="full"*/}
+                    {/*                                justifyContent="space-between"*/}
+                    {/*                                alignItems="flex-end"*/}
+                    {/*                            >*/}
+                    {/*                                <CartItemVariantAttributes*/}
+                    {/*                                    includeQuantity*/}
+                    {/*                                    currency={order.currency}*/}
+                    {/*                                />*/}
+                    {/*                                <CartItemVariantPrice*/}
+                    {/*                                    currency={order.currency}*/}
+                    {/*                                />*/}
+                    {/*                            </Flex>*/}
+                    {/*                        </Stack>*/}
+                    {/*                    </Flex>*/}
+                    {/*                </ItemVariantProvider>*/}
+                    {/*            </Box>*/}
+                    {/*        )*/}
+                    {/*    })}*/}
                 </Stack>
             </Stack>
         </Stack>

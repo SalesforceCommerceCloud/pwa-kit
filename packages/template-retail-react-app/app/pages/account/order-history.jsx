@@ -23,10 +23,9 @@ import {
     Skeleton
 } from '@chakra-ui/react'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {useShopperCustomersMutation, useCustomerOrders} from 'commerce-sdk-react-preview'
+import {useCustomerOrders} from 'commerce-sdk-react-preview'
 import useNavigation from '../../hooks/use-navigation'
 import {usePageUrls, useSearchParams} from '../../hooks'
-// import {useAccountOrders} from './util/order-context'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import Link from '../../components/link'
 import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
@@ -48,15 +47,17 @@ const AccountOrderHistory = () => {
     /// ******NEW APPROACH ******
     // const addCustomerAddress = useShopperCustomersMutation({action: 'createCustomerAddress'})
 
-
-
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
 
-    const {data: orders, isLoading, ...restOfQuery} = useCustomerOrders({
+    const {
+        data: orders,
+        isLoading,
+        error,
+        ...restOfQuery
+    } = useCustomerOrders({
         parameters: {customerId}
     })
-
 
     console.log('AccountOrderHistory customer', customer)
     console.log('AccountOrderHistory customerId', customerId)
@@ -65,9 +66,7 @@ const AccountOrderHistory = () => {
     console.log('AccountOrderHistory useCustomerOrders restOfQuery', restOfQuery)
     console.log('AccountOrderHistory isLoading', isLoading)
 
-
     useEffect(() => {
-        //fetchOrders(searchParams)
         window.scrollTo(0, 0)
     }, [customer, searchParams.offset])
 
@@ -99,14 +98,12 @@ const AccountOrderHistory = () => {
                 ))}
 
             {orders?.data?.length > 0 && !isLoading && (
-
                 <Stack spacing={4}>
                     {orders.data.map((order) => {
                         return (
                             <Stack key={order.orderNo} spacing={4} layerStyle="cardBordered">
                                 <Box>
                                     <Flex justifyContent="space-between">
-
                                         <Text fontWeight="bold" fontSize="lg">
                                             <FormattedMessage
                                                 defaultMessage="Ordered: {date}"
@@ -217,10 +214,8 @@ const AccountOrderHistory = () => {
                                     </Text>
                                 </Stack>
                             </Stack>
-
                         )
                     })}
-
                     // TODO: replace paging.total logic
                     {/*{orders?.length > 0 && orders?.length < paging.total && (*/}
                     {/*    <Box pt={4}>*/}
