@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {Query} from '@tanstack/react-query'
+import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {getCustomerProductListItem, QueryKeys} from './queryKeyHelpers'
 import {ApiClients, CacheUpdate, CacheUpdateMatrix, Tail} from '../types'
 import {
@@ -139,22 +140,30 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         return {
             update: [
                 {queryKey: getCustomerProductListItem.queryKey(parameters)},
+                // TODO: make separate PR that merges into develop
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
-                    updater: (oldData) => {
-                        console.log('--- old data', oldData)
-
+                    updater: (oldData: ShopperCustomersTypes.CustomerProductListResult) => {
                         const newData = {
                             ...oldData
                         }
+
                         const list = newData.data.find((list) => list.id === listId)
-                        const listIndex = newData.data.indexOf(list)
-                        const item = list.customerProductListItems.find(
+                        const listIndex = list && newData.data.indexOf(list)
+                        const item = list?.customerProductListItems?.find(
                             (item) => item.id === itemId
                         )
-                        const itemIndex = list.customerProductListItems.indexOf(item)
-                        newData.data[listIndex].customerProductListItems[itemIndex] = response
+                        const itemIndex =
+                            list && item && list.customerProductListItems?.indexOf(item)
 
+                        if (listIndex === undefined || itemIndex === undefined) {
+                            return oldData
+                        }
+
+                        const listItems = newData.data[listIndex].customerProductListItems
+                        if (listItems) {
+                            listItems[itemIndex] = response
+                        }
                         return newData
                     }
                 }
