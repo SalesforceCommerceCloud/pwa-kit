@@ -8,7 +8,7 @@ import React, {useState} from 'react'
 import {Stack, Heading} from '@chakra-ui/layout'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Flex, Skeleton} from '@chakra-ui/react'
-import {useProducts} from 'commerce-sdk-react-preview'
+import {useProducts, useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 
 import useNavigation from '../../../hooks/use-navigation'
 import {useToast} from '../../../hooks/use-toast'
@@ -21,6 +21,7 @@ import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
 
 import {API_ERROR_MESSAGE} from '../../../constants'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 
 const numberOfSkeletonItems = 3
 
@@ -35,6 +36,7 @@ const AccountWishlist = () => {
 
     const {data: wishListData} = useWishList()
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
+
     const {data: productsData, isLoading: isProductsLoading} = useProducts(
         {parameters: {ids: productIds?.join(','), allImages: true}},
         {enabled: Boolean(wishListData)}
@@ -47,7 +49,13 @@ const AccountWishlist = () => {
         }
     })
 
+    const updateCustomerProductListItem = useShopperCustomersMutation(
+        'updateCustomerProductListItem'
+    )
+    const {data: customer} = useCurrentCustomer()
+
     const handleActionClicked = (itemId) => {
+        console.log('--- handleActionClicked')
         setWishlistItemLoading(!!itemId)
         setSelectedItem(itemId)
     }
@@ -58,6 +66,39 @@ const AccountWishlist = () => {
         setLocalQuantity({...localQuantity, [item.productId]: quantity})
         setWishlistItemLoading(true)
         setSelectedItem(item.productId)
+
+        const body = {
+            ...item,
+            quantity: parseInt(quantity)
+        }
+        // TODO
+        delete body.product
+
+        updateCustomerProductListItem.mutate(
+            {
+                body,
+                parameters: {
+                    customerId: customer.customerId,
+                    itemId: item.id,
+                    listId: wishListData.id
+                }
+            },
+            {
+                onError: () => {
+                    toast({
+                        title: formatMessage(API_ERROR_MESSAGE),
+                        status: 'error'
+                    })
+                },
+                onSuccess: () => {
+                    setWishlistItemLoading(false)
+                    setSelectedItem(undefined)
+                    setLocalQuantity({...localQuantity, [item.productId]: undefined})
+                }
+            }
+        )
+
+        /*
         try {
             // TODO
             await wishlist.updateListItem({
@@ -70,9 +111,7 @@ const AccountWishlist = () => {
                 status: 'error'
             })
         }
-        setWishlistItemLoading(false)
-        setSelectedItem(undefined)
-        setLocalQuantity({...localQuantity, [item.productId]: undefined})
+        */
     }
 
     return (
