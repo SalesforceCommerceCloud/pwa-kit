@@ -32,8 +32,7 @@ import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
 import Pagination from '../../components/pagination'
 import PropTypes from 'prop-types'
 
-//TODO: WIP Pagination
-const PAGING = {limit: 2, offset: 0, total: 0}
+const DEFAULT_PAGINATION = {limit: 10, offset: 0, total: 0}
 const ProductImage = ({productId}) => {
     const {data: product} = useProduct({
         parameters: {
@@ -62,23 +61,25 @@ const ProductImage = ({productId}) => {
 ProductImage.propTypes = {
     productId: PropTypes.string
 }
+
 const AccountOrderHistory = () => {
     const location = useLocation()
     const {formatMessage, formatDate} = useIntl()
-    const searchParams = useSearchParams({limit: PAGING.limit, offset: PAGING.offset})
-    const navigate = useNavigation()
-    const pageUrls = usePageUrls({total: PAGING.total, limit: PAGING.limit})
 
-    //TODO: WIP Pagination
-    // const orders =
-    //     orderIdsByOffset[searchParams.offset || 0]?.map((orderId) => ordersById[orderId]) || []
+    const navigate = useNavigation()
 
     const {data: customer} = useCurrentCustomer()
     const {customerId} = customer
 
-    const {data: orders, isLoading} = useCustomerOrders({
-        parameters: {customerId, limit: PAGING.limit}
+    const searchParams = useSearchParams()
+    const {offset} = searchParams[0]
+
+    const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders({
+        // TODO: Why the API limit is 25 and not 10?
+        parameters: {customerId, limit: DEFAULT_PAGINATION.limit, offset}
     })
+
+    const pageUrls = usePageUrls({total: paging.total, limit: DEFAULT_PAGINATION.limit})
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -111,9 +112,9 @@ const AccountOrderHistory = () => {
                     </Stack>
                 ))}
 
-            {orders?.data?.length > 0 && !isLoading && (
+            {orders?.length > 0 && !isLoading && (
                 <Stack spacing={4}>
-                    {orders.data.map((order) => {
+                    {orders.map((order) => {
                         return (
                             <Stack key={order.orderNo} spacing={4} layerStyle="cardBordered">
                                 <Box>
@@ -208,7 +209,7 @@ const AccountOrderHistory = () => {
                         )
                     })}
                     {/*//TODO: WIP Pagination*/}
-                    {orders?.data.length > 0 && orders?.data.length > PAGING.total && (
+                    {orders?.length > 0 && orders?.length < paging.total && (
                         <Box pt={4}>
                             <Pagination
                                 currentURL={`${location.pathname}${location.search}`}
