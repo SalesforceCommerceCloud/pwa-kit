@@ -8,6 +8,8 @@
 import {useCustomerProductLists, useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from './use-current-customer'
 
+// TODO: remove `listId` input -> use the first list of type wish_list instead
+// (mimic the logic in the other older hook 'use-wishlist.js')
 export const useWishList = ({listId = ''} = {}) => {
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
