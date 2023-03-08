@@ -243,7 +243,7 @@ const ProductDetail = () => {
                     addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
                     addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                     isProductLoading={isProductLoading}
-                    isCustomerProductListLoading={isWishlistLoading}
+                    isWishlistLoading={isWishlistLoading}
                 />
 
                 {/* Information Accordion */}

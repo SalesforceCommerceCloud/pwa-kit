@@ -58,14 +58,6 @@ test.skip('should render product details page', async () => {
         })
     )
     renderWithProviders(<MockedComponent />)
-    // wait for  basket to be loaded
-    await waitFor(
-        () => {
-            expect(true).toEqual(true)
-            // expect(screen.getByText(/10cf6aa40edba4fcfcc6915594/)).toBeInTheDocument()
-        },
-        {timeout: 5000}
-    )
     await waitFor(() => {
         const productName = screen.getAllByText(/Checked Silk Tie/)
         expect(productName.length).toEqual(2)
