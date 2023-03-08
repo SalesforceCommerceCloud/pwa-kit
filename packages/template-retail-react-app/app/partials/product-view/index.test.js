@@ -11,16 +11,19 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import mockProductDetail from '../../commerce-api/mocks/variant-750518699578M'
 import ProductView from './index'
 import {renderWithProviders} from '../../utils/test-utils'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import userEvent from '@testing-library/user-event'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 
 jest.mock('../../commerce-api/einstein')
 
 const MockComponent = ({product, addToCart, addToWishlist, updateWishlist}) => {
-    const customer = useCustomer()
+    const {isRegistered} = useCustomerType()
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const {data: customer} = useCurrentCustomer()
     useEffect(() => {
-        if (!customer.isRegistered) {
-            customer.login('customer@test.com', 'password1')
+        if (!isRegistered) {
+            login.mutate({email: 'email@test.com', password: 'password1'})
         }
     }, [])
     return (
