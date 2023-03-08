@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {mockedCustomerProductLists, productsResponse, mockMasterProduct} from '../../commerce-api/mock-data'
 import {fireEvent, screen, waitFor, within} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'

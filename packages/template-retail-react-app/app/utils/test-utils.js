@@ -182,12 +182,12 @@ export const TestProviders = ({
                                                 <CustomerProductListsProvider>
                                                     <Router>
                                                         <ChakraProvider theme={theme}>
-                                                        <AddToCartModalContext.Provider
-                                                    value={addToCartModal}
-                                                >
-                                                    {children}
-                                                    <AddToCartModal />
-                                                </AddToCartModalContext.Provider>
+                                                            <AddToCartModalContext.Provider
+                                                                value={addToCartModal}
+                                                            >
+                                                                {children}
+                                                                <AddToCartModal />
+                                                            </AddToCartModalContext.Provider>
                                                         </ChakraProvider>
                                                     </Router>
                                                 </CustomerProductListsProvider>

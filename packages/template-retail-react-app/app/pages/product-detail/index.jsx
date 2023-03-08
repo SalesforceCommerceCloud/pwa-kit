@@ -36,7 +36,6 @@ import {
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -45,7 +44,6 @@ const ProductDetail = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
-    const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
     const [primaryCategory, setPrimaryCategory] = useState(category)
     const [productSetSelection, setProductSetSelection] = useState({})
     const childProductRefs = React.useRef({})
@@ -161,12 +159,13 @@ const ProductDetail = () => {
 
             // await basket.addItemToBasket(productItems)
             if (!hasBasket) {
-                await createBasket.mutateAsync({body: {}},)
+                await createBasket.mutateAsync({body: {}})
             }
 
-            await addItemToBasketMutation.mutateAsync(
-                {parameters: {basketId}, body: productItems},
-            )
+            await addItemToBasketMutation.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: productItems
+            })
 
             // @TODO verify this still works
             // onAddToCartModalOpen({product, quantity})
