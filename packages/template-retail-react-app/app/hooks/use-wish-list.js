@@ -31,7 +31,7 @@ export const useWishList = ({listId = ''} = {}) => {
         }
     )
     const wishLists = productLists?.data?.filter((list) => list.type === 'wish_list') || []
-    const currentWishlist = wishLists?.data?.find((list) => list.id === listId) || wishLists[0]
+    const currentWishlist = wishLists.find((list) => list.id === listId) || wishLists[0]
     return {
         data: currentWishlist,
         ...restOfQuery
