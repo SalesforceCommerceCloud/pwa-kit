@@ -23,7 +23,7 @@ import {
     Skeleton
 } from '@chakra-ui/react'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {useCustomerOrders} from 'commerce-sdk-react-preview'
+import {useCustomerOrders, useProduct} from 'commerce-sdk-react-preview'
 import useNavigation from '../../hooks/use-navigation'
 import {usePageUrls, useSearchParams} from '../../hooks'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
@@ -31,24 +31,47 @@ import Link from '../../components/link'
 import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
 import Pagination from '../../components/pagination'
 
+//TODO: Complete Pagination
+const PAGING = {limit: 2, offset: 0, total: 0}
+const ProductImage = ({productId}) => {
+    const {data: product, isLoading} = useProduct({
+        parameters: {
+            id: productId
+        }
+    })
+    const image = product?.imageGroups?.find((group) => group.viewType === 'small').images[0]
+
+    return (
+        <AspectRatio
+            key={productId}
+            ratio={1}
+            width="88px"
+            w="88px"
+            borderRadius="base"
+            overflow="hidden"
+        >
+            <Img
+                alt={image?.alt}
+                src={image?.disBaseLink || image?.link}
+                fallback={<Box background="gray.100" boxSize="full" />}
+            />
+        </AspectRatio>
+    )
+}
 const AccountOrderHistory = () => {
     const location = useLocation()
     const {formatMessage, formatDate} = useIntl()
-    const searchParams = useSearchParams({limit: 10, offset: 0})
+    const searchParams = useSearchParams({limit: PAGING.limit, offset: PAGING.offset})
     const navigate = useNavigation()
-
-    // const {orderIdsByOffset, ordersById, productsById, isLoading, fetchOrders, paging} =
-    //     useAccountOrders()
-    // const pageUrls = usePageUrls({total: paging.total, limit: paging.limit})
+    const pageUrls = usePageUrls({total: PAGING.total, limit: PAGING.limit})
 
     // const orders =
     //     orderIdsByOffset[searchParams.offset || 0]?.map((orderId) => ordersById[orderId]) || []
 
     /// ******NEW APPROACH ******
-    // const addCustomerAddress = useShopperCustomersMutation({action: 'createCustomerAddress'})
 
     const {data: customer} = useCurrentCustomer()
-    const {isRegistered, customerId} = customer
+    const {customerId} = customer
 
     const {
         data: orders,
@@ -56,9 +79,11 @@ const AccountOrderHistory = () => {
         error,
         ...restOfQuery
     } = useCustomerOrders({
-        parameters: {customerId}
+
+        parameters: {customerId, limit: PAGING.limit}
     })
 
+    console.log('AccountOrderHistory searchParams', searchParams)
     console.log('AccountOrderHistory customer', customer)
     console.log('AccountOrderHistory customerId', customerId)
     console.log('AccountOrderHistory orders', orders)
@@ -145,34 +170,9 @@ const AccountOrderHistory = () => {
                                         <Badge colorScheme="green">{order.status}</Badge>
                                     </Stack>
                                 </Box>
-
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
                                     {order.productItems.map((item) => {
-                                        // TODO: useProduct detail?
-                                        // const productDetail = productsById[item.productId]
-                                        // const image = productDetail?.imageGroups?.find(
-                                        //     (group) => group.viewType === 'small'
-                                        // ).images[0]
-
-                                        return (
-                                            <AspectRatio
-                                                key={item.itemId}
-                                                ratio={1}
-                                                width="88px"
-                                                w="88px"
-                                                borderRadius="base"
-                                                overflow="hidden"
-                                            >
-                                                <p>TODO IMG</p>
-                                                {/*<Img*/}
-                                                {/*    alt={image?.alt}*/}
-                                                {/*    src={image?.disBaseLink || image?.link}*/}
-                                                {/*    fallback={*/}
-                                                {/*        <Box background="gray.100" boxSize="full" />*/}
-                                                {/*    }*/}
-                                                {/*/>*/}
-                                            </AspectRatio>
-                                        )
+                                        return <ProductImage productId={item.productId} />
                                     })}
                                 </Grid>
 
@@ -216,15 +216,14 @@ const AccountOrderHistory = () => {
                             </Stack>
                         )
                     })}
-                    // TODO: replace paging.total logic
-                    {/*{orders?.length > 0 && orders?.length < paging.total && (*/}
-                    {/*    <Box pt={4}>*/}
-                    {/*        <Pagination*/}
-                    {/*            currentURL={`${location.pathname}${location.search}`}*/}
-                    {/*            urls={pageUrls}*/}
-                    {/*        />*/}
-                    {/*    </Box>*/}
-                    {/*)}*/}
+                    {orders?.data.length > 0  && orders?.data.length > PAGING.total && (
+                        <Box pt={4}>
+                            <Pagination
+                                currentURL={`${location.pathname}${location.search}`}
+                                urls={pageUrls}
+                            />
+                        </Box>
+                    )}
                 </Stack>
             )}
 
