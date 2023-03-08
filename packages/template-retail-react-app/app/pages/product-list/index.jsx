@@ -62,7 +62,7 @@ import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hoo
 import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
 // import {parse as parseSearchParams} from '../../hooks/use-search-params'
-import useEinstein from '../../commerce-api/hooks/useEinstein'
+import useEinstein from '../../hooks/useEinstein'
 
 // Others
 import {HTTPNotFound, HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'

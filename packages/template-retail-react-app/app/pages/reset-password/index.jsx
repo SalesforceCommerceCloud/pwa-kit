@@ -15,7 +15,7 @@ import Seo from '../../components/seo'
 import ResetPasswordForm from '../../components/reset-password'
 import {BrandLogo} from '../../components/icons'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../commerce-api/hooks/useEinstein'
+import useEinstein from '../../hooks/useEinstein'
 import {useLocation} from 'react-router-dom'
 
 const ResetPassword = () => {
