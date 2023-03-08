@@ -60,7 +60,6 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
 import {useToast} from '../../hooks/use-toast'
-import useWishlist from '../../hooks/use-wishlist'
 // import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
@@ -78,6 +77,7 @@ import {
 } from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
+import {useWishList} from '../../hooks/use-wish-list'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -105,7 +105,6 @@ const ProductList = (props) => {
     const toast = useToast()
     const einstein = useEinstein()
     const {res} = useServerContext()
-    const wishlist = useWishlist()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
 
@@ -123,10 +122,10 @@ const ProductList = (props) => {
     }
 
     /**************** Mutation Actions ****************/
-    const {mutate: createCustomerProductListItem} = useShopperCustomersMutation(
+    const {mutateAsync: createCustomerProductListItem} = useShopperCustomersMutation(
         'createCustomerProductListItem'
     )
-    const {mutate: deleteCustomerProductListItem} = useShopperCustomersMutation(
+    const {mutateAsync: deleteCustomerProductListItem} = useShopperCustomersMutation(
         'deleteCustomerProductListItem'
     )
 
@@ -213,16 +212,22 @@ const ProductList = (props) => {
     const limitUrls = useLimitUrls()
 
     /**************** Action Handlers ****************/
+    const {data: wishlist} = useWishList()
     const addItemToWishlist = async (product) => {
         setWishlistLoading([...wishlistLoading, product.productId])
 
         // TODO: This wishlist object is from an old API, we need to replace it with the new one.
-        const listId = wishlist.data.id
-        const itemId = product.productId
-
-        createCustomerProductListItem(
+        const listId = wishlist.id
+        await createCustomerProductListItem(
             {
-                parameters: {customerId, listId, itemId}
+                parameters: {customerId, listId},
+                body: {
+                    quantity: 1,
+                    public: false,
+                    priority: 1,
+                    type: 'product',
+                    productId: product.productId
+                }
             },
             {
                 onError: () => {
@@ -257,10 +262,12 @@ const ProductList = (props) => {
     const removeItemFromWishlist = async (product) => {
         setWishlistLoading([...wishlistLoading, product.productId])
 
-        const listId = wishlist.data.id
-        const itemId = ''
+        const listId = wishlist.id
+        const itemId = wishlist.customerProductListItems.find(
+            (i) => i.productId === product.productId
+        ).id
 
-        deleteCustomerProductListItem(
+        await deleteCustomerProductListItem(
             {
                 body: {},
                 parameters: {customerId, listId, itemId}
@@ -494,7 +501,9 @@ const ProductList = (props) => {
                                     : productSearchResult.hits.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
                                           const isInWishlist =
-                                              !!wishlist.findItemByProductId(productId)
+                                              !!wishlist?.customerProductListItems.find(
+                                                  (item) => item.productId === productId
+                                              )
 
                                           return (
                                               <ProductTile

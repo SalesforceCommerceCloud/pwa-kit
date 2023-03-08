@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {mockMasterProduct} from '../../commerce-api/mock-data'
+import {mockCustomerBaskets, mockMasterProduct} from '../../commerce-api/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
@@ -34,6 +34,9 @@ beforeEach(() => {
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
             return res(ctx.json(mockMasterProduct))
+        }),
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         })
     )
     // Since we're testing some navigation logic, we are using a simple Router
@@ -45,7 +48,8 @@ afterEach(() => {
     jest.resetModules()
 })
 
-//@TODO: Revisit this test after hooks integration is complete
+//@TODO: Test is passed, but it prompted a network failure,
+// this is because the auth data is not populate data correctly when we passed fetchedToken to the commerce-sdk-react provider
 test.skip('should render product details page', async () => {
     global.server.use(
         // mock add item to product lists
