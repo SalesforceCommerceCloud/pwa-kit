@@ -59,7 +59,6 @@ const AccountWishlist = () => {
     const {data: customer} = useCurrentCustomer()
 
     const handleActionClicked = (itemId) => {
-        console.log('--- handleActionClicked')
         setWishlistItemLoading(!!itemId)
         setSelectedItem(itemId)
     }
@@ -98,21 +97,6 @@ const AccountWishlist = () => {
                 }
             }
         )
-
-        /*
-        try {
-            // TODO
-            await wishlist.updateListItem({
-                ...item,
-                quantity: parseInt(quantity)
-            })
-        } catch {
-            toast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
-            })
-        }
-        */
     }
 
     const isPageLoading = wishListItems ? isProductsLoading : isWishListLoading

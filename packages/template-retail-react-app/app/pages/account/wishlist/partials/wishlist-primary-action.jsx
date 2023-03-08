@@ -36,6 +36,7 @@ const WishlistPrimaryAction = () => {
             }
         ]
         try {
+            // TODO: this and also in the modal
             await basket.addItemToBasket(productItems)
             showToast({
                 title: formatMessage(

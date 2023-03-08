@@ -52,6 +52,7 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
         modalProps.onOpen()
     }
 
+    // TODO
     const handleItemRemove = async () => {
         onClick(variant.id)
         try {
