@@ -1,12 +1,19 @@
 {
-    "name": "template-express-minimal",
+    "name": "template-mrt-reference-app",
     "version": "2.8.0-dev",
+    "engines": {
+      "node": "^14.0.0 || ^16.0.0",
+      "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+    },
     "license": "See license in LICENSE",
     "private": true,
     "devDependencies": {
         "pwa-kit-dev": "^2.8.0-dev",
         "pwa-kit-runtime": "^2.8.0-dev",
-        "supertest": "^4.0.2"
+        "supertest": "^4.0.2",
+        "cross-fetch": "^3.1.4",
+        "express-basic-auth": "^1.2.0",
+        "@loadable/component": "^5.15.0"
     },
     "scripts": {
         "test": "pwa-kit-dev test",
@@ -22,7 +29,13 @@
     "mobify": {
         "ssrEnabled": true,
         "ssrParameters": {
-            "ssrFunctionNodeVersion": "16.x"
+            "ssrFunctionNodeVersion": "16.x",
+            "proxyConfigs": [
+                {
+                    "host": "httpbin.org",
+                    "path": "httpbin"
+                }
+            ]
         },
         "ssrOnly": [
             "ssr.js",

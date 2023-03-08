@@ -60,11 +60,13 @@ const EXPRESS_MINIMAL = 'express-minimal'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
 const RETAIL_REACT_APP = 'retail-react-app'
+const MRT_REFERENCE_APP = 'mrt-reference-app'
 
 const PRIVATE_PRESETS = [
     TEST_PROJECT,
     EXPRESS_MINIMAL_TEST_PROJECT,
-    TYPESCRIPT_MINIMAL_TEST_PROJECT
+    TYPESCRIPT_MINIMAL_TEST_PROJECT,
+    MRT_REFERENCE_APP
 ]
 const PUBLIC_PRESETS = [
     RETAIL_REACT_APP_DEMO,
@@ -464,6 +466,12 @@ const main = (opts) => {
                     })
                 case TEST_PROJECT:
                     return runGenerator(testProjectAnswers(), opts)
+                case MRT_REFERENCE_APP:
+                    return runTemplateGenerator(
+                        'mrt-reference-app',
+                        opts,
+                        'template-mrt-reference-app'
+                    )
                 case RETAIL_REACT_APP_DEMO:
                     return Promise.resolve()
                         .then(() => runGenerator(demoProjectAnswers(), opts))
