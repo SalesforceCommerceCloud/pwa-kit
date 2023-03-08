@@ -142,30 +142,27 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {queryKey: getCustomerProductListItem.queryKey(parameters)},
                 // TODO: make separate PR that merges into develop
                 {
+                    // Also selectively update the lists
                     queryKey: getCustomerProductLists.queryKey(parameters),
                     updater: (oldData: ShopperCustomersTypes.CustomerProductListResult) => {
-                        const newData = {
-                            ...oldData
-                        }
-
-                        const list = newData.data.find((list) => list.id === listId)
-                        const listIndex = list && newData.data.indexOf(list)
+                        const clone: ShopperCustomersTypes.CustomerProductListResult = JSON.parse(
+                            JSON.stringify(oldData)
+                        )
+                        const list = clone.data.find((list) => list.id === listId)
                         const item = list?.customerProductListItems?.find(
                             (item) => item.id === itemId
                         )
                         const itemIndex =
                             list && item && list.customerProductListItems?.indexOf(item)
 
-                        if (listIndex === undefined || itemIndex === undefined) {
+                        if (list === undefined || itemIndex === undefined) {
                             return oldData
                         }
-
-                        const listItems = newData.data[listIndex].customerProductListItems
-                        if (listItems) {
-                            // Selectively update the lists with this particular item
-                            listItems[itemIndex] = response
+                        if (list.customerProductListItems) {
+                            list.customerProductListItems[itemIndex] = response
                         }
-                        return newData
+
+                        return clone
                     }
                 }
             ],
