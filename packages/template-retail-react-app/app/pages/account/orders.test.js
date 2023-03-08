@@ -6,7 +6,7 @@
  */
 import React, {useEffect} from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen} from '@testing-library/react'
+import {screen, waitFor, act} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
@@ -15,12 +15,13 @@ import {
     mockOrderHistory,
     mockOrderProducts
 } from '../../commerce-api/mock-data'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useCustomerOrders, useProduct} from 'commerce-sdk-react-preview'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
 
 const MockedComponent = () => {
-    const customer = useCustomer()
+    const customer = useCurrentCustomer()
 
     useEffect(() => {
         if (!customer.isRegistered) {
@@ -60,7 +61,6 @@ afterEach(() => {
     localStorage.clear()
 })
 
-//TODO: Fix test
 test.skip('Renders order history and details', async () => {
     global.server.use(
         rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
@@ -73,6 +73,7 @@ test.skip('Renders order history and details', async () => {
     await renderWithProviders(<MockedComponent history={history} />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
+    screen.logTestingPlaygroundURL()
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
     expect(await screen.findAllByText(/Ordered: /i)).toHaveLength(3)
     expect(

@@ -48,7 +48,7 @@ const ProductDetail = ({productId, currency}) => {
             borderColor="gray.100"
             borderRadius="base"
         >
-            {!isLoading && (
+            {!isLoading && product && (
                 <ItemVariantProvider variant={product} currency={currency}>
                     <Flex width="full" alignItems="flex-start">
                         <CartItemVariantImage width={['88px', 36]} mr={4} />
@@ -90,7 +90,7 @@ const AccountOrderDetail = () => {
                 <Box>
                     <Button
                         as={Link}
-                        to={`${url?.replace(`/${params.orderNo}`, '')}`}
+                        to={`${url.replace(`/${params.orderNo}`, '')}`}
                         variant="link"
                         leftIcon={<ChevronLeftIcon />}
                         size="sm"
@@ -162,7 +162,7 @@ const AccountOrderDetail = () => {
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
                     <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={5} py={{xl: 6}}>
-                        {isLoading && (
+                        {isLoading || !order ? (
                             <>
                                 <Stack>
                                     <Skeleton h="20px" w="84px" />
@@ -184,9 +184,7 @@ const AccountOrderDetail = () => {
                                     <Skeleton h="20px" w="56px" />
                                 </Stack>
                             </>
-                        )}
-
-                        {!isLoading && (
+                        ) : (
                             <>
                                 <Stack spacing={1}>
                                     <Text fontWeight="bold" fontSize="sm">
@@ -296,7 +294,7 @@ const AccountOrderDetail = () => {
             </Box>
 
             <Stack spacing={4}>
-                {!isLoading && (
+                {!isLoading && order && (
                     <Text>
                         <FormattedMessage
                             defaultMessage="{count} items"
@@ -307,37 +305,35 @@ const AccountOrderDetail = () => {
                 )}
 
                 <Stack spacing={4}>
-                    {isLoading &&
-                        [1, 2, 3].map((i) => (
-                            <Box
-                                key={i}
-                                p={[4, 6]}
-                                border="1px solid"
-                                borderColor="gray.100"
-                                borderRadius="base"
-                            >
-                                <Flex width="full" align="flex-start">
-                                    <Skeleton boxSize={['88px', 36]} mr={4} />
+                    {isLoading || !order
+                        ? [1, 2, 3].map((i) => (
+                              <Box
+                                  key={i}
+                                  p={[4, 6]}
+                                  border="1px solid"
+                                  borderColor="gray.100"
+                                  borderRadius="base"
+                              >
+                                  <Flex width="full" align="flex-start">
+                                      <Skeleton boxSize={['88px', 36]} mr={4} />
 
-                                    <Stack spacing={2}>
-                                        <Skeleton h="20px" w="112px" />
-                                        <Skeleton h="20px" w="84px" />
-                                        <Skeleton h="20px" w="140px" />
-                                    </Stack>
-                                </Flex>
-                            </Box>
-                        ))}
-
-                    {!isLoading &&
-                        order?.productItems?.map((item, index) => {
-                            return (
-                                <ProductDetail
-                                    key={index}
-                                    productId={item.productId}
-                                    currency={order.currency}
-                                />
-                            )
-                        })}
+                                      <Stack spacing={2}>
+                                          <Skeleton h="20px" w="112px" />
+                                          <Skeleton h="20px" w="84px" />
+                                          <Skeleton h="20px" w="140px" />
+                                      </Stack>
+                                  </Flex>
+                              </Box>
+                          ))
+                        : order.productItems?.map((item, index) => {
+                              return (
+                                  <ProductDetail
+                                      key={index}
+                                      productId={item.productId}
+                                      currency={order.currency}
+                                  />
+                              )
+                          })}
                 </Stack>
             </Stack>
         </Stack>
