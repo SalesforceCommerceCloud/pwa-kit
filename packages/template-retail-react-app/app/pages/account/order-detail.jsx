@@ -22,7 +22,7 @@ import {
     Skeleton
 } from '@chakra-ui/react'
 import {getCreditCardIcon} from '../../utils/cc-utils'
-import {useOrder, useProduct} from 'commerce-sdk-react-preview'
+import {useOrder, useProducts} from 'commerce-sdk-react-preview'
 import Link from '../../components/link'
 import {ChevronLeftIcon} from '../../components/icons'
 import OrderSummary from '../../components/order-summary'
@@ -32,47 +32,63 @@ import CartItemVariantName from '../../components/item-variant/item-name'
 import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
 import CartItemVariantPrice from '../../components/item-variant/item-price'
 import PropTypes from 'prop-types'
-import useMultiSite from "../../hooks/use-multi-site";
 
-const ProductDetail = ({productId, currency}) => {
-    const {data: product, isLoading} = useProduct({
+const Products = ({productItems, currency}) => {
+    const ids = productItems.map((item) => item.productId).join(',') ?? ''
+    const {data: {data: products} = {}, isLoading} = useProducts({
         parameters: {
-            id: productId
+            ids: ids
         }
     })
+
     return (
-        <Box
-            p={[4, 6]}
-            key={productId}
-            border="1px solid"
-            borderColor="gray.100"
-            borderRadius="base"
-        >
-            {!isLoading && product && (
-                <ItemVariantProvider variant={product} currency={currency}>
-                    <Flex width="full" alignItems="flex-start">
-                        <CartItemVariantImage width={['88px', 36]} mr={4} />
-                        <Stack spacing={1} marginTop="-3px" flex={1}>
-                            <CartItemVariantName />
-                            <Flex width="full" justifyContent="space-between" alignItems="flex-end">
-                                <CartItemVariantAttributes includeQuantity currency={currency} />
-                                <CartItemVariantPrice currency={currency} />
-                            </Flex>
-                        </Stack>
-                    </Flex>
-                </ItemVariantProvider>
-            )}
-        </Box>
+        <>
+            {!isLoading &&
+                products &&
+                products.map((product, index) => {
+                    return (
+                        <Box
+                            p={[4, 6]}
+                            key={index}
+                            border="1px solid"
+                            borderColor="gray.100"
+                            borderRadius="base"
+                        >
+                            {!isLoading && product && (
+                                <ItemVariantProvider variant={product} currency={currency}>
+                                    <Flex width="full" alignItems="flex-start">
+                                        <CartItemVariantImage width={['88px', 36]} mr={4} />
+                                        <Stack spacing={1} marginTop="-3px" flex={1}>
+                                            <CartItemVariantName />
+                                            <Flex
+                                                width="full"
+                                                justifyContent="space-between"
+                                                alignItems="flex-end"
+                                            >
+                                                <CartItemVariantAttributes
+                                                    includeQuantity
+                                                    currency={currency}
+                                                />
+                                                <CartItemVariantPrice currency={currency} />
+                                            </Flex>
+                                        </Stack>
+                                    </Flex>
+                                </ItemVariantProvider>
+                            )}
+                        </Box>
+                    )
+                })}
+        </>
     )
 }
 
-ProductDetail.propTypes = {
-    productId: PropTypes.string,
+Products.propTypes = {
+    productItems: PropTypes.array,
     currency: PropTypes.string
 }
 
 const AccountOrderDetail = () => {
-    const {url, params} = useRouteMatch()
+    const {params} = useRouteMatch()
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
 
@@ -305,35 +321,29 @@ const AccountOrderDetail = () => {
                 )}
 
                 <Stack spacing={4}>
-                    {isLoading || !order
-                        ? [1, 2, 3].map((i) => (
-                              <Box
-                                  key={i}
-                                  p={[4, 6]}
-                                  border="1px solid"
-                                  borderColor="gray.100"
-                                  borderRadius="base"
-                              >
-                                  <Flex width="full" align="flex-start">
-                                      <Skeleton boxSize={['88px', 36]} mr={4} />
+                    {isLoading || !order ? (
+                        [1, 2, 3].map((i) => (
+                            <Box
+                                key={i}
+                                p={[4, 6]}
+                                border="1px solid"
+                                borderColor="gray.100"
+                                borderRadius="base"
+                            >
+                                <Flex width="full" align="flex-start">
+                                    <Skeleton boxSize={['88px', 36]} mr={4} />
 
-                                      <Stack spacing={2}>
-                                          <Skeleton h="20px" w="112px" />
-                                          <Skeleton h="20px" w="84px" />
-                                          <Skeleton h="20px" w="140px" />
-                                      </Stack>
-                                  </Flex>
-                              </Box>
-                          ))
-                        : order.productItems?.map((item, index) => {
-                              return (
-                                  <ProductDetail
-                                      key={index}
-                                      productId={item.productId}
-                                      currency={order.currency}
-                                  />
-                              )
-                          })}
+                                    <Stack spacing={2}>
+                                        <Skeleton h="20px" w="112px" />
+                                        <Skeleton h="20px" w="84px" />
+                                        <Skeleton h="20px" w="140px" />
+                                    </Stack>
+                                </Flex>
+                            </Box>
+                        ))
+                    ) : (
+                        <Products productItems={order.productItems} currency={order.currency} />
+                    )}
                 </Stack>
             </Stack>
         </Stack>

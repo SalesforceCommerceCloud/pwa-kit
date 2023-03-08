@@ -23,7 +23,7 @@ import {
     Skeleton
 } from '@chakra-ui/react'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {useCustomerOrders, useProduct} from 'commerce-sdk-react-preview'
+import {useCustomerOrders, useProducts} from 'commerce-sdk-react-preview'
 import useNavigation from '../../hooks/use-navigation'
 import {usePageUrls, useSearchParams} from '../../hooks'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
@@ -33,33 +33,47 @@ import Pagination from '../../components/pagination'
 import PropTypes from 'prop-types'
 
 const DEFAULT_PAGINATION_LIMIT = 10
-const ProductImage = ({productId}) => {
-    const {data: product} = useProduct({
+const OrderProductImages = ({productItems}) => {
+    const ids = productItems.map((item) => item.productId).join(',') ?? ''
+    const {data: {data: products} = {}, isLoading} = useProducts({
         parameters: {
-            id: productId
+            ids: ids
         }
     })
-    const image = product?.imageGroups?.find((group) => group.viewType === 'small').images[0]
+
+    const images = products?.map((product) => {
+        return product?.imageGroups?.find((group) => group.viewType === 'small').images[0]
+    })
 
     return (
-        <AspectRatio
-            key={productId}
-            ratio={1}
-            width="88px"
-            w="88px"
-            borderRadius="base"
-            overflow="hidden"
-        >
-            <Img
-                alt={image?.alt}
-                src={image?.disBaseLink || image?.link}
-                fallback={<Box background="gray.100" boxSize="full" />}
-            />
-        </AspectRatio>
+        <>
+            {!isLoading && products ? (
+                images.map((image, index) => {
+                    return (
+                        <AspectRatio
+                            key={index}
+                            ratio={1}
+                            width="88px"
+                            w="88px"
+                            borderRadius="base"
+                            overflow="hidden"
+                        >
+                            <Img
+                                alt={image?.alt}
+                                src={image?.disBaseLink || image?.link}
+                                fallback={<Box background="gray.100" boxSize="full" />}
+                            />
+                        </AspectRatio>
+                    )
+                })
+            ) : (
+                <Skeleton h="88px" w="88px" />
+            )}
+        </>
     )
 }
-ProductImage.propTypes = {
-    productId: PropTypes.string
+OrderProductImages.propTypes = {
+    productItems: PropTypes.array
 }
 
 const AccountOrderHistory = () => {
@@ -160,11 +174,7 @@ const AccountOrderHistory = () => {
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
-                                    {order.productItems.map((item, index) => {
-                                        return (
-                                            <ProductImage key={index} productId={item.productId} />
-                                        )
-                                    })}
+                                    <OrderProductImages productItems={order.productItems} />
                                 </Grid>
 
                                 <Stack
