@@ -30,10 +30,12 @@ export const useWishList = ({listId = ''} = {}) => {
             enabled: isRegistered
         }
     )
+
     const wishLists = productLists?.data?.filter((list) => list.type === 'wish_list') || []
-    const currentWishlist = wishLists.find((list) => list.id === listId) || wishLists[0]
+    const currentWishlist = wishLists.find((list) => list.id === listId)
+
     return {
-        data: currentWishlist,
+        data: !listId ? wishLists[0] : currentWishlist,
         ...restOfQuery
     }
 }
