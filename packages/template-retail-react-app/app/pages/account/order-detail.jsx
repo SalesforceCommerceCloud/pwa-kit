@@ -32,8 +32,8 @@ import CartItemVariantName from '../../components/item-variant/item-name'
 import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
 import CartItemVariantPrice from '../../components/item-variant/item-price'
 import PropTypes from 'prop-types'
+import useMultiSite from "../../hooks/use-multi-site";
 
-// TODO: Review Skeletons on hard refresh
 const ProductDetail = ({productId, currency}) => {
     const {data: product, isLoading} = useProduct({
         parameters: {
@@ -90,7 +90,7 @@ const AccountOrderDetail = () => {
                 <Box>
                     <Button
                         as={Link}
-                        to={`${url.replace(`/${params.orderNo}`, '')}`}
+                        to={'/account/orders'}
                         variant="link"
                         leftIcon={<ChevronLeftIcon />}
                         size="sm"
