@@ -21,12 +21,17 @@ import {
     Button,
     Stack
 } from '@chakra-ui/react'
-import {useProduct, useCategory, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {
+    useProduct,
+    useCategory,
+    useShopperBasketsMutation,
+    useShopperCustomersMutation,
+    useCustomerId
+} from 'commerce-sdk-react-preview'
 
 // Hooks
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {useVariant} from '../../hooks'
-import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
@@ -45,6 +50,7 @@ import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
+import {useWishList} from '../../hooks/use-wish-list'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -54,7 +60,7 @@ const ProductDetail = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
-
+    const customerId = useCustomerId()
     /****************************** Basket *********************************/
     const {hasBasket, basket} = useCurrentBasket()
     const createBasket = useShopperBasketsMutation('createBasket')
@@ -115,35 +121,50 @@ const ProductDetail = () => {
     }, [variant])
 
     /**************** Wishlist ****************/
-    const wishlist = useWishlist()
+    const {data: wishlist, isLoading: isWishlistLoading} = useWishList()
+    const createCustomerProductListItem = useShopperCustomersMutation(
+        'createCustomerProductListItem'
+    )
 
     // TODO: DRY this handler when intl provider is available globally
-    const handleAddToWishlist = async (quantity) => {
-        try {
-            await wishlist.createListItem({
-                id: product.id,
-                quantity
-            })
-            toast({
-                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                status: 'success',
-                action: (
-                    // it would be better if we could use <Button as={Link}>
-                    // but unfortunately the Link component is not compatible
-                    // with Chakra Toast, since the ToastManager is rendered via portal
-                    // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
-                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                    </Button>
-                )
-            })
-        } catch {
-            toast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
-            })
-        }
+    const handleAddToWishlist = (quantity) => {
+        createCustomerProductListItem.mutate(
+            {
+                parameters: {
+                    listId: wishlist.id,
+                    customerId
+                },
+                body: {
+                    // NOTE: APi does not respect quantity, it always adds 1
+                    quantity,
+                    productId: urlParams.get('pid') || productId,
+                    public: false,
+                    priority: 1,
+                    type: 'product'
+                }
+            },
+            {
+                onSuccess: () => {
+                    toast({
+                        title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
+                        status: 'success',
+                        action: (
+                            // it would be better if we could use <Button as={Link}>
+                            // but unfortunately the Link component is not compatible
+                            // with Chakra Toast, since the ToastManager is rendered via portal
+                            // and the toast doesn't have access to intl provider, which is a
+                            // requirement of the Link component.
+                            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                                {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                            </Button>
+                        )
+                    })
+                },
+                onError: () => {
+                    showError()
+                }
+            }
+        )
     }
 
     /**************** Add To Cart ****************/
@@ -222,7 +243,7 @@ const ProductDetail = () => {
                     addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
                     addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                     isProductLoading={isProductLoading}
-                    isCustomerProductListLoading={!wishlist.isInitialized}
+                    isWishlistLoading={isWishlistLoading}
                 />
 
                 {/* Information Accordion */}
