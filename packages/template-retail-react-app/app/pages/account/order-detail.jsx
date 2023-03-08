@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -31,16 +31,52 @@ import CartItemVariantImage from '../../components/item-variant/item-image'
 import CartItemVariantName from '../../components/item-variant/item-name'
 import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
 import CartItemVariantPrice from '../../components/item-variant/item-price'
+import PropTypes from 'prop-types'
+
+// TODO: Review Skeletons on hard refresh
+const ProductDetail = ({productId, currency}) => {
+    const {data: product, isLoading} = useProduct({
+        parameters: {
+            id: productId
+        }
+    })
+    return (
+        <Box
+            p={[4, 6]}
+            key={productId}
+            border="1px solid"
+            borderColor="gray.100"
+            borderRadius="base"
+        >
+            {!isLoading && (
+                <ItemVariantProvider variant={product} currency={currency}>
+                    <Flex width="full" alignItems="flex-start">
+                        <CartItemVariantImage width={['88px', 36]} mr={4} />
+                        <Stack spacing={1} marginTop="-3px" flex={1}>
+                            <CartItemVariantName />
+                            <Flex width="full" justifyContent="space-between" alignItems="flex-end">
+                                <CartItemVariantAttributes includeQuantity currency={currency} />
+                                <CartItemVariantPrice currency={currency} />
+                            </Flex>
+                        </Stack>
+                    </Flex>
+                </ItemVariantProvider>
+            )}
+        </Box>
+    )
+}
+
+ProductDetail.propTypes = {
+    productId: PropTypes.string,
+    currency: PropTypes.string
+}
 
 const AccountOrderDetail = () => {
     const {url, params} = useRouteMatch()
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
 
-    const {data: order, isLoading, error} = useOrder({parameters: {orderNo: params.orderNo}})
-
-    console.log('AccountOrderDetail order', order)
-    console.log('AccountOrderDetail isLoading', isLoading)
+    const {data: order, isLoading} = useOrder({parameters: {orderNo: params.orderNo}})
 
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
@@ -48,18 +84,13 @@ const AccountOrderDetail = () => {
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0)
 
-    console.log('AccountOrderDetail shipment', shipment)
-    console.log('AccountOrderDetail paymentCard', paymentCard)
-    console.log('AccountOrderDetail CardIcon', CardIcon)
-    console.log('AccountOrderDetail itemCount', itemCount)
-
     return (
         <Stack spacing={6} data-testid="account-order-details-page">
             <Stack>
                 <Box>
                     <Button
                         as={Link}
-                        to={`${url.replace(`/${params.orderNo}`, '')}`}
+                        to={`${url?.replace(`/${params.orderNo}`, '')}`}
                         variant="link"
                         leftIcon={<ChevronLeftIcon />}
                         size="sm"
@@ -166,9 +197,9 @@ const AccountOrderDetail = () => {
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm" textTransform="titlecase">
-                                            {shippingStatus.replace(/_/g, ' ')}
+                                            {shippingStatus?.replace(/_/g, ' ')}
                                         </Text>
-                                        <Text fontSize="sm">{shippingMethod.name}</Text>
+                                        <Text fontSize="sm">{shippingMethod?.name}</Text>
                                         <Text fontSize="sm">
                                             <FormattedMessage
                                                 defaultMessage="Tracking Number"
@@ -216,12 +247,12 @@ const AccountOrderDetail = () => {
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm">
-                                            {shippingAddress.firstName} {shippingAddress.lastName}
+                                            {shippingAddress?.firstName} {shippingAddress?.lastName}
                                         </Text>
-                                        <Text fontSize="sm">{shippingAddress.address1}</Text>
+                                        <Text fontSize="sm">{shippingAddress?.address1}</Text>
                                         <Text fontSize="sm">
-                                            {shippingAddress.city}, {shippingAddress.stateCode}{' '}
-                                            {shippingAddress.postalCode}
+                                            {shippingAddress?.city}, {shippingAddress?.stateCode}{' '}
+                                            {shippingAddress?.postalCode}
                                         </Text>
                                     </Box>
                                 </Stack>
@@ -234,14 +265,14 @@ const AccountOrderDetail = () => {
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm">
-                                            {order.billingAddress.firstName}{' '}
-                                            {order.billingAddress.lastName}
+                                            {order?.billingAddress?.firstName}{' '}
+                                            {order?.billingAddress?.lastName}
                                         </Text>
-                                        <Text fontSize="sm">{order.billingAddress.address1}</Text>
+                                        <Text fontSize="sm">{order?.billingAddress?.address1}</Text>
                                         <Text fontSize="sm">
-                                            {order.billingAddress.city},{' '}
-                                            {order.billingAddress.stateCode}{' '}
-                                            {order.billingAddress.postalCode}
+                                            {order?.billingAddress?.city},{' '}
+                                            {order?.billingAddress?.stateCode}{' '}
+                                            {order?.billingAddress?.postalCode}
                                         </Text>
                                     </Box>
                                 </Stack>
@@ -249,7 +280,7 @@ const AccountOrderDetail = () => {
                         )}
                     </SimpleGrid>
 
-                    {!isLoading ? (
+                    {!isLoading && order ? (
                         <Box
                             py={{base: 6}}
                             px={{base: 6, xl: 8}}
@@ -297,49 +328,16 @@ const AccountOrderDetail = () => {
                             </Box>
                         ))}
 
-                    {/*{!isLoading &&*/}
-                    {/*    order.productItems?.map((product, idx) => {*/}
-                    {/*        const variant = {*/}
-                    {/*            ...product,*/}
-                    {/*            ...productsById[product.productId],*/}
-                    {/*            price: product.price*/}
-                    {/*        }*/}
-                    {/*        return (*/}
-                    {/*            <Box*/}
-                    {/*                p={[4, 6]}*/}
-                    {/*                key={product.productId}*/}
-                    {/*                border="1px solid"*/}
-                    {/*                borderColor="gray.100"*/}
-                    {/*                borderRadius="base"*/}
-                    {/*            >*/}
-                    {/*                <ItemVariantProvider*/}
-                    {/*                    index={idx}*/}
-                    {/*                    variant={variant}*/}
-                    {/*                    currency={order.currency}*/}
-                    {/*                >*/}
-                    {/*                    <Flex width="full" alignItems="flex-start">*/}
-                    {/*                        <CartItemVariantImage width={['88px', 36]} mr={4} />*/}
-                    {/*                        <Stack spacing={1} marginTop="-3px" flex={1}>*/}
-                    {/*                            <CartItemVariantName />*/}
-                    {/*                            <Flex*/}
-                    {/*                                width="full"*/}
-                    {/*                                justifyContent="space-between"*/}
-                    {/*                                alignItems="flex-end"*/}
-                    {/*                            >*/}
-                    {/*                                <CartItemVariantAttributes*/}
-                    {/*                                    includeQuantity*/}
-                    {/*                                    currency={order.currency}*/}
-                    {/*                                />*/}
-                    {/*                                <CartItemVariantPrice*/}
-                    {/*                                    currency={order.currency}*/}
-                    {/*                                />*/}
-                    {/*                            </Flex>*/}
-                    {/*                        </Stack>*/}
-                    {/*                    </Flex>*/}
-                    {/*                </ItemVariantProvider>*/}
-                    {/*            </Box>*/}
-                    {/*        )*/}
-                    {/*    })}*/}
+                    {!isLoading &&
+                        order?.productItems?.map((item, index) => {
+                            return (
+                                <ProductDetail
+                                    key={index}
+                                    productId={item.productId}
+                                    currency={order.currency}
+                                />
+                            )
+                        })}
                 </Stack>
             </Stack>
         </Stack>

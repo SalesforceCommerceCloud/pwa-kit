@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -30,11 +30,12 @@ import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import Link from '../../components/link'
 import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
 import Pagination from '../../components/pagination'
+import PropTypes from 'prop-types'
 
-//TODO: Complete Pagination
+//TODO: WIP Pagination
 const PAGING = {limit: 2, offset: 0, total: 0}
 const ProductImage = ({productId}) => {
-    const {data: product, isLoading} = useProduct({
+    const {data: product} = useProduct({
         parameters: {
             id: productId
         }
@@ -58,6 +59,9 @@ const ProductImage = ({productId}) => {
         </AspectRatio>
     )
 }
+ProductImage.propTypes = {
+    productId: PropTypes.string
+}
 const AccountOrderHistory = () => {
     const location = useLocation()
     const {formatMessage, formatDate} = useIntl()
@@ -65,31 +69,16 @@ const AccountOrderHistory = () => {
     const navigate = useNavigation()
     const pageUrls = usePageUrls({total: PAGING.total, limit: PAGING.limit})
 
+    //TODO: WIP Pagination
     // const orders =
     //     orderIdsByOffset[searchParams.offset || 0]?.map((orderId) => ordersById[orderId]) || []
-
-    /// ******NEW APPROACH ******
 
     const {data: customer} = useCurrentCustomer()
     const {customerId} = customer
 
-    const {
-        data: orders,
-        isLoading,
-        error,
-        ...restOfQuery
-    } = useCustomerOrders({
-
+    const {data: orders, isLoading} = useCustomerOrders({
         parameters: {customerId, limit: PAGING.limit}
     })
-
-    console.log('AccountOrderHistory searchParams', searchParams)
-    console.log('AccountOrderHistory customer', customer)
-    console.log('AccountOrderHistory customerId', customerId)
-    console.log('AccountOrderHistory orders', orders)
-    console.log('AccountOrderHistory orders?.data', orders?.data)
-    console.log('AccountOrderHistory useCustomerOrders restOfQuery', restOfQuery)
-    console.log('AccountOrderHistory isLoading', isLoading)
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -171,8 +160,10 @@ const AccountOrderHistory = () => {
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
-                                    {order.productItems.map((item) => {
-                                        return <ProductImage productId={item.productId} />
+                                    {order.productItems.map((item, index) => {
+                                        return (
+                                            <ProductImage key={index} productId={item.productId} />
+                                        )
                                     })}
                                 </Grid>
 
@@ -216,7 +207,8 @@ const AccountOrderHistory = () => {
                             </Stack>
                         )
                     })}
-                    {orders?.data.length > 0  && orders?.data.length > PAGING.total && (
+                    {/*//TODO: WIP Pagination*/}
+                    {orders?.data.length > 0 && orders?.data.length > PAGING.total && (
                         <Box pt={4}>
                             <Pagination
                                 currentURL={`${location.pathname}${location.search}`}
