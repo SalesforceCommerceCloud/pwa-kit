@@ -89,7 +89,6 @@ const createOptions = <Mut extends ShopperCustomersMutation>(
 // leverage TypeScript to enforce having tests for all mutations.
 const notImplTestCases: ShopperCustomersMutation[][] = [
     ['deleteCustomerProductList'],
-    ['updateCustomerPassword'],
     ['updateCustomerProductList']
 ]
 
@@ -459,6 +458,13 @@ describe('ShopperCustomers mutations', () => {
                     resetToken: 'token',
                     newPassword: 'hunter3',
                     login: 'login'
+                }),
+                undefined
+            ],
+            updateCustomerPassword: [
+                createOptions<'updateCustomerPassword'>({
+                    currentPassword: 'hunter2',
+                    password: 'hunter3'
                 }),
                 undefined
             ]
