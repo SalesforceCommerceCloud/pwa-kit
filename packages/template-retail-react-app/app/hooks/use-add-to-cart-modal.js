@@ -55,31 +55,16 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    if (!isOpen) {
-        return null
-    }
-<<<<<<< HEAD
-    const {product, quantity} = data || {}
+    const {product, itemsAdded = []} = data || {}
     const intl = useIntl()
     const {basket = {}, totalItems} = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const variationAttributes = useVariationAttributes(product)
+    const {currency, productItems, productSubTotal} = basket
+    const numerOfItemsAdded = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
-    const {currency, productItems, productSubTotal} = basket
-    const {id, variationValues} = product
-    const lineItemPrice = productItems?.find((item) => item.productId === id)?.basePrice * quantity
-    const image = findImageGroupBy(product.imageGroups, {
-        viewType: 'small',
-        selectedVariationAttributes: variationValues
-    })?.images?.[0]
-=======
-    const {product, itemsAdded = []} = data || {}
-    const intl = useIntl()
-    const basket = useBasket()
-    const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const {currency, productItems, productSubTotal} = basket
-    const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
->>>>>>> product-sets
+    if (!isOpen) {
+        return null
+    }
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered>
@@ -97,7 +82,7 @@ export const AddToCartModal = () => {
                                 '{quantity} {quantity, plural, one {item} other {items}} added to cart',
                             id: 'add_to_cart_modal.info.added_to_cart'
                         },
-                        {quantity: totalQuantity}
+                        {quantity: numerOfItemsAdded}
                     )}
                 </ModalHeader>
                 <ModalCloseButton />
@@ -202,11 +187,7 @@ export const AddToCartModal = () => {
                                                 'Cart Subtotal ({itemAccumulatedCount} item)',
                                             id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
-<<<<<<< HEAD
                                         {itemAccumulatedCount: totalItems}
-=======
-                                        {itemAccumulatedCount: totalQuantity}
->>>>>>> product-sets
                                     )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
@@ -271,7 +252,7 @@ export const AddToCartModal = () => {
                                     defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)',
                                     id: 'add_to_cart_modal.label.cart_subtotal'
                                 },
-                                {itemAccumulatedCount: totalQuantity}
+                                {itemAccumulatedCount: totalItems}
                             )}
                         </Text>
                         <Text alignSelf="flex-end" fontWeight="600">

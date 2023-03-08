@@ -5,24 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-<<<<<<< HEAD
-import {mockMasterProduct} from '../../commerce-api/mock-data'
-import {screen, waitFor} from '@testing-library/react'
-=======
-import {rest} from 'msw'
-import {mockedCustomerProductLists, productsResponse} from '../../commerce-api/mock-data'
+import {mockedCustomerProductLists, productsResponse, mockMasterProduct} from '../../commerce-api/mock-data'
 import {fireEvent, screen, waitFor, within} from '@testing-library/react'
->>>>>>> product-sets
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
-<<<<<<< HEAD
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
-=======
 import {basketWithProductSet} from './index.mock'
-import {renderWithProviders} from '../../utils/test-utils'
 import mockedProductSet from '../../commerce-api/mocks/product-set-winter-lookM'
->>>>>>> product-sets
 
 jest.setTimeout(60000)
 
@@ -41,36 +31,17 @@ const MockedComponent = () => {
     )
 }
 
-<<<<<<< HEAD
 beforeEach(() => {
     jest.resetModules()
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(mockMasterProduct))
+            return res(ctx.json(mockedProductSet))
         })
     )
-    // Since we're testing some navigation logic, we are using a simple Router
-    // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/701642811398M')
-=======
-const MockedPageWithProductSet = () => {
-    return (
-        <Switch>
-            <Route
-                path="/en-GB/product/:productId"
-                render={(props) => <ProductDetail {...props} product={mockedProductSet} />}
-            />
-        </Switch>
-    )
-}
-
-beforeEach(() => {
-    jest.resetModules()
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'ProductDetail', '/en-GB/product/test-product')
->>>>>>> product-sets
 })
 
 afterEach(() => {
@@ -86,18 +57,7 @@ test.skip('should render product details page', async () => {
         })
     )
     renderWithProviders(<MockedComponent />)
-<<<<<<< HEAD
-    await waitFor(() => {
-        const productName = screen.getAllByText(/Checked Silk Tie/)
-        expect(productName.length).toEqual(2)
-        expect(screen.getAllByText(/19.19/).length).toEqual(2)
-        expect(screen.getAllByText(/Add to Cart/).length).toEqual(2)
-        expect(screen.getAllByText(/Add to Wishlist/).length).toEqual(2)
-    })
-
-    await waitFor(() => {
-        expect(screen.getAllByText(/Ties/).length).toEqual(2)
-=======
+    // TODO  change the product data to use mockedProductSet
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
     expect(screen.getAllByText(/Long Sleeve Crew Neck/).length).toEqual(2)
     expect(screen.getAllByText(/14.99/).length).toEqual(2)
@@ -117,7 +77,7 @@ describe('product set', () => {
     })
 
     test('render multi-product layout', async () => {
-        renderWithProviders(<MockedPageWithProductSet />)
+        renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
             expect(screen.getAllByTestId('product-view').length).toEqual(4) // 1 parent + 3 children
@@ -131,7 +91,7 @@ describe('product set', () => {
 
         // Initial basket is necessary to add items to it
         const initialBasket = {basketId: 'valid_id'}
-        renderWithProviders(<MockedPageWithProductSet />, {wrapperProps: {initialBasket}})
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
         const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
         fireEvent.click(buttons[0])
@@ -147,7 +107,7 @@ describe('product set', () => {
     })
 
     test('add the set to cart with error messages', async () => {
-        renderWithProviders(<MockedPageWithProductSet />)
+        renderWithProviders(<MockedComponent />)
 
         const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
         fireEvent.click(buttons[0])
@@ -161,7 +121,7 @@ describe('product set', () => {
     })
 
     test("child products' images are lazy loaded", async () => {
-        renderWithProviders(<MockedPageWithProductSet />)
+        renderWithProviders(<MockedComponent />)
 
         const childProducts = await screen.findAllByTestId('child-product')
 
@@ -169,6 +129,5 @@ describe('product set', () => {
             const heroImage = within(child).getAllByRole('img')[0]
             expect(heroImage.getAttribute('loading')).toEqual('lazy')
         })
->>>>>>> product-sets
     })
 })

@@ -7,13 +7,9 @@
 import React from 'react'
 import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
-<<<<<<< HEAD
-import {waitFor, screen, act} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import {rest} from 'msw'
 import {mockCustomerBaskets} from '../commerce-api/mock-data'
-=======
-import {screen} from '@testing-library/react'
->>>>>>> product-sets
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -575,39 +571,6 @@ beforeEach(() => {
     )
 })
 
-<<<<<<< HEAD
-test.skip('Renders AddToCartModal', async () => {
-    await act(async () => {
-        renderWithProviders(
-            <AddToCartModalContext.Provider
-                value={{
-                    isOpen: true,
-                    data: {
-                        product: MOCK_PRODUCT,
-                        quantity: 2
-                    }
-                }}
-            >
-                <AddToCartModal />
-            </AddToCartModalContext.Provider>
-        )
-        await waitFor(
-            () => {
-                expect(screen.getByText(/cart subtotal \(2 item\)/i)).toBeInTheDocument()
-                expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
-            },
-            {timeout: 7000}
-        )
-    })
-})
-
-test('Do not render when isOpen is false', async () => {
-    renderWithProviders(
-        <AddToCartModalContext.Provider
-            value={{
-                isOpen: false,
-                data: null
-=======
 test('Renders AddToCartModal with multiple products', () => {
     const MOCK_DATA = {
         product: MOCK_PRODUCT,
@@ -630,15 +593,11 @@ test('Renders AddToCartModal with multiple products', () => {
             value={{
                 isOpen: true,
                 data: MOCK_DATA
->>>>>>> product-sets
             }}
         >
             <AddToCartModal />
         </AddToCartModalContext.Provider>
     )
-<<<<<<< HEAD
-    expect(screen.queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
-=======
 
     expect(screen.getAllByText(MOCK_PRODUCT.name)[0]).toBeInTheDocument()
     expect(screen.getByRole('dialog', {name: /23 items added to cart/i})).toBeInTheDocument()
@@ -659,5 +618,4 @@ test('Do not render when isOpen is false', () => {
     )
 
     expect(queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
->>>>>>> product-sets
 })

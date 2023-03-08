@@ -19,12 +19,8 @@ import {
     CustomerProvider as _CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
-<<<<<<< HEAD
-import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
-import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
-=======
 import {AddToCartModal, AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
->>>>>>> product-sets
+import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
@@ -165,7 +161,6 @@ export const TestProviders = ({
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjF9.BDAp9G8nmArdBqAbsE5GUWZ3fiv2LwQKClEFDCGIyy8'
 
     return (
-<<<<<<< HEAD
         <ServerContext.Provider value={{}}>
             <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
@@ -187,11 +182,12 @@ export const TestProviders = ({
                                                 <CustomerProductListsProvider>
                                                     <Router>
                                                         <ChakraProvider theme={theme}>
-                                                            <AddToCartModalContext.Provider
-                                                                value={addToCartModal}
-                                                            >
-                                                                {children}
-                                                            </AddToCartModalContext.Provider>
+                                                        <AddToCartModalContext.Provider
+                                                    value={addToCartModal}
+                                                >
+                                                    {children}
+                                                    <AddToCartModal />
+                                                </AddToCartModalContext.Provider>
                                                         </ChakraProvider>
                                                     </Router>
                                                 </CustomerProductListsProvider>
@@ -199,28 +195,6 @@ export const TestProviders = ({
                                         </_CustomerProvider>
                                     </CurrencyProvider>
                                 </CategoriesProvider>
-=======
-        <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-            <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
-                <CommerceAPIProvider value={api}>
-                    <CategoriesProvider treeRoot={initialCategories}>
-                        <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                            <CustomerProvider value={{customer, setCustomer}}>
-                                <BasketProvider value={{basket, setBasket}}>
-                                    <CustomerProductListsProvider>
-                                        <Router>
-                                            <ChakraProvider theme={theme}>
-                                                <AddToCartModalContext.Provider
-                                                    value={addToCartModal}
-                                                >
-                                                    {children}
-                                                    <AddToCartModal />
-                                                </AddToCartModalContext.Provider>
-                                            </ChakraProvider>
-                                        </Router>
-                                    </CustomerProductListsProvider>
-                                </BasketProvider>
->>>>>>> product-sets
                             </CustomerProvider>
                         </CommerceApiProvider>
                     </_CommerceAPIProvider>

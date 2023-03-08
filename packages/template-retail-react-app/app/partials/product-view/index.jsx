@@ -76,46 +76,7 @@ const ButtonWithRegistration = withRegistration(Button)
  * Render a product detail view that includes name, image gallery, price,
  * variant selections, action buttons
  */
-<<<<<<< HEAD
-const ProductView = ({
-    product,
-    category,
-    showFullLink = false,
-    imageSize = 'md',
-    isWishlistLoading = false,
-    addToCart,
-    updateCart,
-    addToWishlist,
-    updateWishlist,
-    isProductLoading
-}) => {
-    const intl = useIntl()
-    const history = useHistory()
-    const location = useLocation()
-    const {isOpen: isAddToCartModalOpen, onClose: onAddToCartModalClose} =
-        useAddToCartModalContext()
-    const theme = useTheme()
-    const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
-    const {
-        showLoading,
-        showInventoryMessage,
-        inventoryMessage,
-        quantity,
-        minOrderQuantity,
-        setQuantity,
-        variant,
-        variationParams,
-        variationAttributes,
-        stockLevel,
-        stepQuantity
-    } = useDerivedProduct(product)
-    const canAddToWishlist = !isProductLoading
-    const canOrder =
-        !isProductLoading &&
-        variant?.orderable &&
-        parseInt(quantity) > 0 &&
-        parseInt(quantity) <= stockLevel
-=======
+
 const ProductView = forwardRef(
     (
         {
@@ -129,6 +90,7 @@ const ProductView = forwardRef(
             addToWishlist,
             updateWishlist,
             isProductLoading,
+
             isProductPartOfSet = false,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
@@ -158,11 +120,10 @@ const ProductView = forwardRef(
             variationAttributes,
             stockLevel,
             stepQuantity
-        } = useProduct(product, isProductPartOfSet)
+        } = useDerivedProduct(product, isProductPartOfSet)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)
->>>>>>> product-sets
 
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
@@ -207,11 +168,6 @@ const ProductView = forwardRef(
                     id: 'product_view.button.add_set_to_wishlist'
                 })
             }
-<<<<<<< HEAD
-            await addToCart(variant, quantity)
-        }
-=======
->>>>>>> product-sets
 
             const handleCartItem = async () => {
                 const hasValidSelection = validateAndShowError()
@@ -502,143 +458,8 @@ const ProductView = forwardRef(
                                         </Text>
                                     </Link>
                                 )}
-<<<<<<< HEAD
-                            </HideOnMobile>
-                        </>
-                    ) : (
-                        <ImageGallerySkeleton />
-                    )}
-                </Box>
-
-                {/* Variations & Quantity Selector */}
-                <VStack align="stretch" spacing={8} flex={1} marginBottom={[16, 16, 16, 0, 0]}>
-                    <Box display={['none', 'none', 'none', 'block']}>
-                        <ProductViewHeader
-                            name={product?.name}
-                            price={product?.price}
-                            currency={product?.currency}
-                            category={category}
-                        />
-                    </Box>
-                    <VStack align="stretch" spacing={4}>
-                        {/*
-                            Customize the skeletons shown for attributes to suit your needs. At the point
-                            that we show the skeleton we do not know how many variations are selectable. So choose
-                            a skeleton that will meet most of your needs.
-                        */}
-                        {showLoading ? (
-                            <>
-                                {/* First Attribute Skeleton */}
-                                <Skeleton height={6} width={32} />
-                                <Skeleton height={20} width={64} />
-
-                                {/* Second Attribute Skeleton */}
-                                <Skeleton height={6} width={32} />
-                                <Skeleton height={20} width={64} />
-                            </>
-                        ) : (
-                            <>
-                                {/* Attribute Swatches */}
-                                {variationAttributes.map((variationAttribute) => {
-                                    const {
-                                        id,
-                                        name,
-                                        selectedValue,
-                                        values = []
-                                    } = variationAttribute
-                                    return (
-                                        <SwatchGroup
-                                            key={id}
-                                            onChange={(_, href) => {
-                                                if (!href) return
-                                                history.replace(href)
-                                            }}
-                                            variant={id === 'color' ? 'circle' : 'square'}
-                                            value={selectedValue?.value}
-                                            displayName={selectedValue?.name || ''}
-                                            label={name}
-                                        >
-                                            {values.map(({href, name, image, value, orderable}) => (
-                                                <Swatch
-                                                    key={value}
-                                                    href={href}
-                                                    disabled={!orderable}
-                                                    value={value}
-                                                    name={name}
-                                                >
-                                                    {image ? (
-                                                        <Box
-                                                            height="100%"
-                                                            width="100%"
-                                                            minWidth="32px"
-                                                            backgroundRepeat="no-repeat"
-                                                            backgroundSize="cover"
-                                                            backgroundColor={name.toLowerCase()}
-                                                            backgroundImage={
-                                                                image
-                                                                    ? `url(${
-                                                                          image.disBaseLink ||
-                                                                          image.link
-                                                                      })`
-                                                                    : ''
-                                                            }
-                                                        />
-                                                    ) : (
-                                                        name
-                                                    )}
-                                                </Swatch>
-                                            ))}
-                                        </SwatchGroup>
-                                    )
-                                })}
-                            </>
-                        )}
-
-                        {/* Quantity Selector */}
-                        <VStack align="stretch" maxWidth={'200px'}>
-                            <Box fontWeight="bold">
-                                <label htmlFor="quantity">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Quantity',
-                                        id: 'product_view.label.quantity'
-                                    })}
-                                    :
-                                </label>
-                            </Box>
-
-                            <QuantityPicker
-                                id="quantity"
-                                step={stepQuantity}
-                                value={quantity}
-                                min={minOrderQuantity}
-                                onChange={(stringValue, numberValue) => {
-                                    // Set the Quantity of product to value of input if value number
-                                    if (numberValue >= 0) {
-                                        setQuantity(numberValue)
-                                    } else if (stringValue === '') {
-                                        // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
-                                        // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
-                                        setQuantity(stringValue)
-                                    }
-                                }}
-                                onBlur={(e) => {
-                                    // Default to 1the `minOrderQuantity` if a user leaves the box with an invalid value
-                                    const value = e.target.value
-                                    if (parseInt(value) < 0 || value === '') {
-                                        setQuantity(minOrderQuantity)
-                                    }
-                                }}
-                                onFocus={(e) => {
-                                    // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
-                                    // new quantity with one click. NOTE: This is something that can be refactored into the parent
-                                    // component, potentially as a prop called `selectInputOnFocus`.
-                                    e.target.select()
-                                }}
-                            />
-=======
                             </HideOnDesktop>
                             {isProductASet && <p>{product?.shortDescription}</p>}
->>>>>>> product-sets
                         </VStack>
 
                         <Box>

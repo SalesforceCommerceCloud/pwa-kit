@@ -88,11 +88,7 @@
     "bundlesize": [
         {
             "path": "build/main.js",
-<<<<<<< HEAD
             "maxSize": "62 kB"
-=======
-            "maxSize": "55 kB"
->>>>>>> product-sets
         },
         {
             "path": "build/vendor.js",

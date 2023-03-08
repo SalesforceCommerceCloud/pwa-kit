@@ -11,21 +11,8 @@ import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-<<<<<<< HEAD
-import {
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Box,
-    Button,
-    Stack
-} from '@chakra-ui/react'
-import {useProduct, useCategory, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
-=======
 import {Box, Button, Stack} from '@chakra-ui/react'
->>>>>>> product-sets
+import {useProduct, useCategory, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 
 // Hooks
 import {useCurrentBasket} from '../../hooks/use-current-basket'
@@ -58,15 +45,12 @@ const ProductDetail = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
-<<<<<<< HEAD
     const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
-=======
     const [primaryCategory, setPrimaryCategory] = useState(category)
     const [productSetSelection, setProductSetSelection] = useState({})
     const childProductRefs = React.useRef({})
 
     const isProductASet = product?.type.set
->>>>>>> product-sets
 
     /****************************** Basket *********************************/
     const {hasBasket, basket} = useCurrentBasket()
@@ -102,7 +86,6 @@ const ProductDetail = () => {
         }
     })
     const variant = useVariant(product)
-    const [primaryCategory, setPrimaryCategory] = useState(category)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
     // attributes are selected (to get the correct inventory values), the category information
@@ -167,48 +150,6 @@ const ProductDetail = () => {
             status: 'error'
         })
     }
-<<<<<<< HEAD
-
-    const addItemToBasket = (basketId, variant, quantity) => {
-        const productItems = [
-            {
-                productId: variant.productId,
-                quantity,
-                price: variant.price
-            }
-        ]
-
-        addItemToBasketMutation.mutate(
-            {parameters: {basketId}, body: productItems},
-            {
-                onSuccess: () => {
-                    // only show this modal when a product is successfully add to cart
-                    onAddToCartModalOpen({product, quantity})
-                },
-                onError: () => {
-                    showError()
-                }
-            }
-        )
-    }
-
-    const handleAddToCart = async (variant, quantity) => {
-        if (!variant?.orderable || !quantity) return
-        if (!hasBasket) {
-            createBasket.mutate(
-                {body: {}},
-                {
-                    onSuccess: (basket) => {
-                        addItemToBasket(basket.basketId, variant, quantity)
-                    },
-                    onError: () => {
-                        showError()
-                    }
-                }
-            )
-        } else {
-            addItemToBasket(basket.basketId, variant, quantity)
-=======
 
     const handleAddToCart = async (productSelectionValues) => {
         try {
@@ -218,14 +159,23 @@ const ProductDetail = () => {
                 quantity
             }))
 
-            await basket.addItemToBasket(productItems)
+            // await basket.addItemToBasket(productItems)
+            if (!hasBasket) {
+                await createBasket.mutateAsync({body: {}},)
+            }
+
+            await addItemToBasketMutation.mutateAsync(
+                {parameters: {basketId}, body: productItems},
+            )
+
+            // @TODO verify this still works
+            // onAddToCartModalOpen({product, quantity})
 
             // If the items were sucessfully added, set the return value to be used
             // by the add to cart modal.
             return productSelectionValues
         } catch (error) {
             showError(error)
->>>>>>> product-sets
         }
     }
 
@@ -293,16 +243,6 @@ const ProductDetail = () => {
             </Helmet>
 
             <Stack spacing={16}>
-<<<<<<< HEAD
-                <ProductView
-                    product={product}
-                    category={primaryCategory?.parentCategoryTree || []}
-                    addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                    isProductLoading={isProductLoading}
-                    isCustomerProductListLoading={!wishlist.isInitialized}
-                />
-=======
                 {isProductASet ? (
                     <Fragment>
                         {/* Product Set: parent product */}
@@ -313,11 +253,10 @@ const ProductDetail = () => {
                             addToWishlist={(product, variant, quantity) =>
                                 handleAddToWishlist(product, variant, quantity)
                             }
-                            isProductLoading={isLoading}
+                            isProductLoading={isProductLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
                             validateOrderability={handleProductSetValidation}
                         />
->>>>>>> product-sets
 
                         <hr />
 
@@ -362,7 +301,7 @@ const ProductDetail = () => {
                                                 setProductSetSelection(selections)
                                             }
                                         }}
-                                        isProductLoading={isLoading}
+                                        isProductLoading={isProductLoading}
                                         isCustomerProductListLoading={!wishlist.isInitialized}
                                     />
                                     <InformationAccordion product={childProduct} />
@@ -385,7 +324,7 @@ const ProductDetail = () => {
                             addToWishlist={(product, variant, quantity) =>
                                 handleAddToWishlist(product, variant, quantity)
                             }
-                            isProductLoading={isLoading}
+                            isProductLoading={isProductLoading}
                             isCustomerProductListLoading={!wishlist.isInitialized}
                         />
                         <InformationAccordion product={product} />

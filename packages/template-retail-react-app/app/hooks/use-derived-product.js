@@ -15,11 +15,7 @@ const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'
 
 // TODO: This needs to be refactored.
-<<<<<<< HEAD:packages/template-retail-react-app/app/hooks/use-derived-product.js
-export const useDerivedProduct = (product) => {
-=======
-export const useProduct = (product, isProductPartOfSet = false) => {
->>>>>>> product-sets:packages/template-retail-react-app/app/hooks/use-product.js
+export const useDerivedProduct = (product, isProductPartOfSet = false) => {
     const showLoading = !product
     const stockLevel = product?.inventory?.stockLevel || 0
     const stepQuantity = product?.stepQuantity || 1
