@@ -32,7 +32,7 @@ import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
 import Pagination from '../../components/pagination'
 import PropTypes from 'prop-types'
 
-const DEFAULT_PAGINATION = {limit: 10, offset: 0, total: 0}
+const DEFAULT_PAGINATION_LIMIT = 10
 const ProductImage = ({productId}) => {
     const {data: product} = useProduct({
         parameters: {
@@ -72,14 +72,14 @@ const AccountOrderHistory = () => {
     const {customerId} = customer
 
     const searchParams = useSearchParams()
-    const {offset} = searchParams[0]
+    const {limit, offset} = searchParams[0]
 
     const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders({
         // TODO: Why the API limit is 25 and not 10?
-        parameters: {customerId, limit: DEFAULT_PAGINATION.limit, offset}
+        parameters: {customerId, limit: DEFAULT_PAGINATION_LIMIT || limit, offset}
     })
 
-    const pageUrls = usePageUrls({total: paging.total, limit: DEFAULT_PAGINATION.limit})
+    const pageUrls = usePageUrls({total: paging.total, limit: DEFAULT_PAGINATION_LIMIT || limit})
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -208,7 +208,7 @@ const AccountOrderHistory = () => {
                             </Stack>
                         )
                     })}
-                    {/*//TODO: WIP Pagination*/}
+
                     {orders?.length > 0 && orders?.length < paging.total && (
                         <Box pt={4}>
                             <Pagination
