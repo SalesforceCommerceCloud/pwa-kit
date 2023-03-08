@@ -214,18 +214,9 @@ const Home = ({productSearchResult, isLoading}) => {
                     padding={4}
                     paddingTop={32}
                     title="Features"
-                    title={intl.formatMessage({
-                        defaultMessage: 'Features',
-                        id: 'home.heading.features',
-                    })}
                     subtitle={
                         'Out-of-the-box features so that you focus only on adding enhancements.'
                     }
-                    subtitle={intl.formatMessage({
-                        defaultMessage:
-                            'Out-of-the-box features so that you focus only on adding enhancements.',
-                        id: 'home.description.features',
-                    })}
                 >
                     <Container maxW={'6xl'} marginTop={10}>
                         <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10}>

@@ -35,15 +35,12 @@ import Link from '^retail-react-app/app/components/link'
 import Search from '^retail-react-app/app/components/search'
 import withRegistration from '^retail-react-app/app/hoc/with-registration'
 
-// import {AccountIcon, BrandLogo, BasketIcon, HamburgerIcon} from '~app/components/icons'
+import {AccountIcon, BasketIcon, HeartIcon} from '~app/components/icons'
 
 import {
     ChevronDownIcon,
-    HeartIcon,
     SignoutIcon,
-    AccountIcon,
     BrandLogo,
-    BasketIcon,
     HamburgerIcon,
 } from '^retail-react-app/app/components/icons'
 

@@ -100,7 +100,6 @@ const icon = (name, passProps) => {
             ...theme?.components?.Icon?.baseStyle,
             ...(overrideIcons?.includes(name) ? {color: 'red !important', boxSize: 14} : {}),
         }
-        console.log('~hello ~icons')
 
         return (
             <Icon
