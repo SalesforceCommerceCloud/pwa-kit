@@ -9,21 +9,21 @@
 
 This folder contains React components and utilities that render pages from [Page Designer](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/page_designer/b2c_creating_pd_pages.html).
 
-It is living folder where you add React.js components responsible for rendering Page Designer components that have been serialized to JSON.
+Use this folder to add React components that can render Page Designer components that have been serialized to JSON.
 
-It includes components for layout and visualization of images, grids and and carousels.
+This folder includes components for layout and visualization of images, grids, and carousels.
 
 **By default, Page Designer integration is not enabled in the Retail React App.**
 
 ## Folder Structure
 
--   **`/core`** - Base components for rendering: `<Page>`, `<Region>`, and `<Component>`. You shouldn't need to modify them, but will use `<Page>` to render Page Designer content. The other components are useful when you are creating new assets.
--   **`/assets`** - Non-visual components used in Page Designer. Includes `<Image>` and `<ImageWithText>` as well as other Page Designer assets you want to use in your PWA-Kit app. If you need to visualize a component, you would add it here.
+-   **`/core`** - Base components for rendering: `<Page>`, `<Region>`, and `<Component>`. Use `<Page>` to render Page Designer content. Use `<Region>` and `<Component>` for creating new assets.
+-   **`/assets`** - Non-visual components used in Page Designer. Includes `<Image>` and `<ImageWithText>` as well as any other Page Designer assets that you want to use in your PWA-Kit app. If you need to visualize a component, add it here.
 -   **`/layouts`** - Components responsible for layout. Includes various grids and a `<Carousel>` component.
 
 ## Sample Usage
 
-First, create a new file, `app/pages/page-viewer/index.jsx`, and add the following:
+Create a new file called `app/pages/page-viewer/index.jsx`, and add the following:
 
 ```jsx
 // app/pages/page-viewer/index.jsx
@@ -85,7 +85,7 @@ PageViewer.propTypes = {
 export default PageViewer
 ```
 
-Second, modify `app/routes.jsx`, adding a route for `<PageViewer>`:
+Open `app/routes.jsx` and add a route for `<PageViewer>`:
 
 ```diff
 // app/routes.jsx
