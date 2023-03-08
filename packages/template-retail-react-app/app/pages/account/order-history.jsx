@@ -96,7 +96,7 @@ const AccountOrderHistory = () => {
                 </Heading>
             </Stack>
 
-            {isLoading &&
+            {isLoading || !orders ? (
                 [1, 2, 3].map((i) => (
                     <Stack key={i} spacing={4} layerStyle="cardBordered">
                         <Stack spacing={2}>
@@ -110,9 +110,8 @@ const AccountOrderHistory = () => {
                         </Grid>
                         <Skeleton h="20px" w="200px" />
                     </Stack>
-                ))}
-
-            {orders?.length > 0 && !isLoading && (
+                ))
+            ) : (
                 <Stack spacing={4}>
                     {orders.map((order) => {
                         return (
