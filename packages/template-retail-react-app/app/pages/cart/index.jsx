@@ -311,7 +311,6 @@ const Cart = () => {
 
     const isPageLoading = basket?.productItems?.length > 0 ? isProductsLoading : isLoading
 
-    /***************************** Remove Item **************************/
     /********* Rendering  UI **********/
     if (isPageLoading) {
         return <CartSkeleton />
