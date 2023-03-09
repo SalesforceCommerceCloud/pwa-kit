@@ -19,7 +19,7 @@ import {
     CustomerProvider as _CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
-import {AddToCartModal, AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
+import {AddToCartModalProvider} from '../hooks/use-add-to-cart-modal'
 import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
@@ -75,30 +75,6 @@ export const renderWithRouterAndCommerceAPI = (node) => {
     )
 }
 
-const useAddToCartModal = () => {
-    const [state, setState] = useState({
-        isOpen: false,
-        data: null
-    })
-
-    return {
-        isOpen: state.isOpen,
-        data: state.data,
-        onOpen: (data) => {
-            setState({
-                isOpen: true,
-                data
-            })
-        },
-        onClose: () => {
-            setState({
-                isOpen: false,
-                data: null
-            })
-        }
-    }
-}
-
 /**
  * This is the Providers used to wrap components
  * for testing purposes.
@@ -147,8 +123,6 @@ export const TestProviders = ({
         _setBasket(data)
     })
 
-    const addToCartModal = useAddToCartModal()
-
     const site = getSiteByReference(siteAlias || appConfig.defaultSite)
 
     const buildUrl = createUrlTemplate(
@@ -182,12 +156,9 @@ export const TestProviders = ({
                                                 <CustomerProductListsProvider>
                                                     <Router>
                                                         <ChakraProvider theme={theme}>
-                                                            <AddToCartModalContext.Provider
-                                                                value={addToCartModal}
-                                                            >
+                                                            <AddToCartModalProvider>
                                                                 {children}
-                                                                <AddToCartModal />
-                                                            </AddToCartModalContext.Provider>
+                                                            </AddToCartModalProvider>
                                                         </ChakraProvider>
                                                     </Router>
                                                 </CustomerProductListsProvider>
