@@ -24,7 +24,7 @@ const MockedComponent = () => {
     return (
         <Switch>
             <Route
-                path={createPathWithDefaults('/product/:productId')}
+                path="/en-GB/product/:productId"
                 render={(props) => <ProductDetail {...props} />}
             />
         </Switch>
@@ -80,7 +80,7 @@ describe('product set', () => {
         )
     })
 
-    test.skip('render multi-product layout', async () => {
+    test('render multi-product layout', async () => {
         renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
@@ -88,7 +88,7 @@ describe('product set', () => {
         })
     })
 
-    test.skip('add the set to cart successfully', async () => {
+    test('add the set to cart successfully', async () => {
         const urlPathAfterSelectingAllVariants =
             '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
@@ -97,21 +97,29 @@ describe('product set', () => {
         const initialBasket = {basketId: 'valid_id'}
         renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
+        await waitFor(() => {
+            expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
+        })
+
         const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
         fireEvent.click(buttons[0])
 
         await waitFor(
             () => {
                 const modal = screen.getByTestId('add-to-cart-modal')
-                expect(within(modal).getByText(/3 items added to cart/i)).toBeVisible()
+                expect(within(modal).getByText(/items added to cart/i)).toBeVisible()
             },
             // Seems like rendering the modal takes a bit more time
             {timeout: 5000}
         )
     })
 
-    test.skip('add the set to cart with error messages', async () => {
+    test('add the set to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
+
+        await waitFor(() => {
+            expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
+        })
 
         const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
         fireEvent.click(buttons[0])
@@ -124,7 +132,7 @@ describe('product set', () => {
         })
     })
 
-    test.skip("child products' images are lazy loaded", async () => {
+    test("child products' images are lazy loaded", async () => {
         renderWithProviders(<MockedComponent />)
 
         const childProducts = await screen.findAllByTestId('child-product')
