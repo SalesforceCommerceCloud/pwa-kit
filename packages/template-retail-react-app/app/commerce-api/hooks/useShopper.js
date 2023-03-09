@@ -62,9 +62,9 @@ const useShopper = (opts = {}) => {
     useEffect(() => {
         // Only call merge when there are items in the guest basket and you are
         // a returning customer.
-        const shouldMerge = 
-            customer.authType === 'registered' && 
-            !customer.isNewlyRegistered && 
+        const shouldMerge =
+            customer.authType === 'registered' &&
+            !customer.isNewlyRegistered &&
             basket.itemCount > 0
 
         if (shouldMerge) {
