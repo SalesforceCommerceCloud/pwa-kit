@@ -47,28 +47,28 @@ const OrderProductImages = ({productItems}) => {
 
     return (
         <>
-            {!isLoading && products ? (
-                images.map((image, index) => {
-                    return (
-                        <AspectRatio
-                            key={index}
-                            ratio={1}
-                            width="88px"
-                            w="88px"
-                            borderRadius="base"
-                            overflow="hidden"
-                        >
-                            <Img
-                                alt={image?.alt}
-                                src={image?.disBaseLink || image?.link}
-                                fallback={<Box background="gray.100" boxSize="full" />}
-                            />
-                        </AspectRatio>
-                    )
-                })
-            ) : (
-                <Skeleton h="88px" w="88px" />
-            )}
+            {!isLoading && products
+                ? images.map((image, index) => {
+                      return (
+                          <AspectRatio
+                              key={index}
+                              ratio={1}
+                              width="88px"
+                              w="88px"
+                              borderRadius="base"
+                              overflow="hidden"
+                          >
+                              <Img
+                                  alt={image?.alt}
+                                  src={image?.disBaseLink || image?.link}
+                                  fallback={<Box background="gray.100" boxSize="full" />}
+                              />
+                          </AspectRatio>
+                      )
+                  })
+                : productItems.map((item, index) => {
+                      return <Skeleton key={index} h="88px" w="88px" />
+                  })}
         </>
     )
 }

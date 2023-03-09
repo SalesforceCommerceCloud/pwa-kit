@@ -54,27 +54,25 @@ const Products = ({productItems, currency}) => {
                             borderColor="gray.100"
                             borderRadius="base"
                         >
-                            {!isLoading && product && (
-                                <ItemVariantProvider variant={product} currency={currency}>
-                                    <Flex width="full" alignItems="flex-start">
-                                        <CartItemVariantImage width={['88px', 36]} mr={4} />
-                                        <Stack spacing={1} marginTop="-3px" flex={1}>
-                                            <CartItemVariantName />
-                                            <Flex
-                                                width="full"
-                                                justifyContent="space-between"
-                                                alignItems="flex-end"
-                                            >
-                                                <CartItemVariantAttributes
-                                                    includeQuantity
-                                                    currency={currency}
-                                                />
-                                                <CartItemVariantPrice currency={currency} />
-                                            </Flex>
-                                        </Stack>
-                                    </Flex>
-                                </ItemVariantProvider>
-                            )}
+                            <ItemVariantProvider variant={product} currency={currency}>
+                                <Flex width="full" alignItems="flex-start">
+                                    <CartItemVariantImage width={['88px', 36]} mr={4} />
+                                    <Stack spacing={1} marginTop="-3px" flex={1}>
+                                        <CartItemVariantName />
+                                        <Flex
+                                            width="full"
+                                            justifyContent="space-between"
+                                            alignItems="flex-end"
+                                        >
+                                            <CartItemVariantAttributes
+                                                includeQuantity
+                                                currency={currency}
+                                            />
+                                            <CartItemVariantPrice currency={currency} />
+                                        </Flex>
+                                    </Stack>
+                                </Flex>
+                            </ItemVariantProvider>
                         </Box>
                     )
                 })}
