@@ -6,6 +6,7 @@
  */
 import React from 'react'
 import {fireEvent, screen, waitFor, within} from '@testing-library/react'
+import {mockCustomerBaskets} from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
@@ -35,6 +36,9 @@ beforeEach(() => {
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
             return res(ctx.json(mockedProductSet))
+        }),
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         })
     )
 
@@ -47,7 +51,8 @@ afterEach(() => {
     jest.resetModules()
 })
 
-//@TODO: Revisit this test after hooks integration is complete
+//@TODO: Test is passed, but it prompted a network failure,
+// this is because the auth data is not populate data correctly when we passed fetchedToken to the commerce-sdk-react provider
 test.skip('should render product details page', async () => {
     global.server.use(
         // mock add item to product lists
