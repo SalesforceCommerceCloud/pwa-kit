@@ -64,7 +64,7 @@ test('shows previously searched items when focused', async () => {
     ).toHaveLength(3)
 })
 
-test.skip('saves recent searches on submit', async () => {
+test('saves recent searches on submit', async () => {
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
