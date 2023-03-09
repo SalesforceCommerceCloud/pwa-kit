@@ -10,7 +10,9 @@ import {Text} from '@chakra-ui/react'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
 const CartTitle = () => {
-    const {totalItems} = useCurrentBasket()
+    const {
+        derivedData: {totalItems}
+    } = useCurrentBasket()
     return (
         <Text fontWeight="bold" fontSize={['xl', 'xl', 'xl', '2xl']}>
             <FormattedMessage

@@ -23,7 +23,6 @@ export const useCurrentBasket = ({id = ''} = {}) => {
             enabled: !!customerId && onClient,
             onSuccess: (data) => {
                 if (!data.total) {
-                    console.log('creating basket')
                     createBasket.mutate({
                         body: {}
                     })
@@ -33,14 +32,16 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     )
 
     // if id is not defined, by default use the first basket in the list
-    const basket =
+    const currentBasket =
         basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
 
     return {
+        data: currentBasket,
         ...restOfQuery,
-        // current picked basket
-        basket,
-        hasBasket: basketsData?.total > 0,
-        totalItems: basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0)
+        derivedData: {
+            hasBasket: basketsData?.total > 0,
+            totalItems:
+                currentBasket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
+        }
     }
 }

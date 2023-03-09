@@ -79,7 +79,10 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
-    const {totalItems, basket} = useCurrentBasket()
+    const {
+        derivedData: {totalItems},
+        basket
+    } = useCurrentBasket()
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()

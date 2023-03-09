@@ -21,7 +21,7 @@ import PromoPopover from '../promo-popover'
 import {useProducts} from 'commerce-sdk-react-preview'
 
 const CartItems = ({basket}) => {
-    const {totalItems} = useCurrentBasket()
+    const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products} = useProducts(
         {

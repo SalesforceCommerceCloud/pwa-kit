@@ -59,7 +59,10 @@ export const AddToCartModal = () => {
     }
     const {product, quantity} = data || {}
     const intl = useIntl()
-    const {basket = {}, totalItems} = useCurrentBasket()
+    const {
+        basket = {},
+        derivedData: {totalItems}
+    } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const variationAttributes = useVariationAttributes(product)
 
