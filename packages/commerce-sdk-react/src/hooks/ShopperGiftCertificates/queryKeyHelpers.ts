@@ -10,11 +10,11 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperGiftCertificates<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
     getGiftCertificate: [
         '/organizations/',
-        string,
+        string | undefined,
         '/gift-certificate',
         Params<'getGiftCertificate'>
     ]

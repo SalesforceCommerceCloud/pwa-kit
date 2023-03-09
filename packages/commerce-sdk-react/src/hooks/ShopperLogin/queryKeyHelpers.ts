@@ -10,22 +10,22 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperLogin<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
     retrieveCredQualityUserInfo: [
         '/organizations/',
-        string,
+        string | undefined,
         '/cred-qual/user',
         Params<'retrieveCredQualityUserInfo'>
     ]
-    getUserInfo: ['/organizations/', string, '/oauth2/userinfo', Params<'getUserInfo'>]
+    getUserInfo: ['/organizations/', string | undefined, '/oauth2/userinfo', Params<'getUserInfo'>]
     getWellknownOpenidConfiguration: [
         '/organizations/',
-        string,
+        string | undefined,
         '/oauth2/.well-known/openid-configuration',
         Params<'getWellknownOpenidConfiguration'>
     ]
-    getJwksUri: ['/organizations/', string, '/oauth2/jwks', Params<'getJwksUri'>]
+    getJwksUri: ['/organizations/', string | undefined, '/oauth2/jwks', Params<'getJwksUri'>]
 }
 
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
