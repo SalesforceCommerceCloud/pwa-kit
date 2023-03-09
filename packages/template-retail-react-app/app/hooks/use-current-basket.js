@@ -36,8 +36,8 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
 
     return {
-        data: currentBasket,
         ...restOfQuery,
+        data: currentBasket,
         derivedData: {
             hasBasket: basketsData?.total > 0,
             totalItems:
