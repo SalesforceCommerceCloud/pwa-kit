@@ -214,10 +214,6 @@ const Home = ({productSearchResult, isLoading}) => {
                     padding={4}
                     paddingTop={32}
                     title="Features"
-                    title={intl.formatMessage({
-                        defaultMessage: 'Features',
-                        id: 'home.heading.features',
-                    })}
                     subtitle={intl.formatMessage({
                         defaultMessage:
                             'Out-of-the-box features so that you focus only on adding enhancements.',
