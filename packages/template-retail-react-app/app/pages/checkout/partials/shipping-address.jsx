@@ -5,11 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
+import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import ShippingAddressSelection from './shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
+import {useShopperCustomersMutation, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -22,16 +26,82 @@ export default function ShippingAddress() {
     const {
         step,
         checkoutSteps,
+        isGuestCheckout,
         selectedShippingAddress,
-        setShippingAddress,
         setCheckoutStep,
         goToNextStep
     } = useCheckout()
     const [isLoading, setIsLoading] = useState()
+    const {data: customer} = useCurrentCustomer()
+    const {basket} = useCurrentBasket()
+
+    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
+    const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
+    const updateShippingAddressForShipment = useShopperBasketsMutation(
+        'updateShippingAddressForShipment'
+    )
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
-        await setShippingAddress(address)
+        const {
+            addressId,
+            address1,
+            city,
+            countryCode,
+            firstName,
+            lastName,
+            phone,
+            postalCode,
+            stateCode
+        } = address
+        await updateShippingAddressForShipment.mutateAsync({
+            parameters: {
+                basketId: basket.basketId,
+                shipmentId: 'me',
+
+                // TODO
+                useAsBilling: false
+            },
+            body: {
+                address1,
+                city,
+                countryCode,
+                firstName,
+                lastName,
+                phone,
+                postalCode,
+                stateCode
+            }
+        })
+
+        if (!isGuestCheckout && !addressId) {
+            const body = {
+                address1,
+                city,
+                countryCode,
+                firstName,
+                lastName,
+                phone,
+                postalCode,
+                stateCode,
+                addressId: nanoid()
+            }
+            await createCustomerAddress.mutateAsync({
+                body,
+                parameters: {customerId: customer.customerId}
+            })
+        }
+
+        if (!isGuestCheckout && addressId) {
+            await updateCustomerAddress.mutateAsync({
+                body: address,
+                parameters: {
+                    customerId: customer.customerId,
+                    addressName: addressId
+                }
+            })
+        }
+
         goToNextStep()
         setIsLoading(false)
     }
