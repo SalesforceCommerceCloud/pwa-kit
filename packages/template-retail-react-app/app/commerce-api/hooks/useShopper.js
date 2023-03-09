@@ -58,9 +58,16 @@ const useShopper = (opts = {}) => {
         }
     }, [customer.authType, basket.loaded])
 
-    // Call merge basket whenever user type changes from guest to registered
+    // Call merge basket.
     useEffect(() => {
-        if (customer.authType === 'registered') {
+        // Only call merge when there are items in the guest basket and you are
+        // a returning customer.
+        const shouldMerge = 
+            customer.authType === 'registered' && 
+            !customer.isNewlyRegistered && 
+            basket.itemCount > 0
+
+        if (shouldMerge) {
             basket.mergeBasket()
         }
     }, [customer.authType])

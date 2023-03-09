@@ -10,6 +10,8 @@ import {useCommerceAPI, CustomerContext} from '../contexts'
 
 const AuthTypes = Object.freeze({GUEST: 'guest', REGISTERED: 'registered'})
 
+const REGISTRATION_GRACE_PERIOD = 2 * 1000 // 2 seconds in milliseconds
+
 export default function useCustomer() {
     const api = useCommerceAPI()
     const {customer, setCustomer} = useContext(CustomerContext)
@@ -37,6 +39,16 @@ export default function useCustomer() {
              */
             get isGuest() {
                 return customer?.authType === AuthTypes.GUEST
+            },
+
+            /**
+             * Returns if this customer is newly registered.
+             */
+            get isNewlyRegistered() {
+                if (!customer || customer.authType !== 'registered') return false
+                const lastLoginTimeDate = new Date(Date.parse(customer.lastLoginTime))
+                const creationDate = new Date(Date.parse(customer.creationDate))
+                return lastLoginTimeDate - creationDate < REGISTRATION_GRACE_PERIOD
             },
 
             /** Returns the customer's saved addresses with the 'preferred' address in the first index */
