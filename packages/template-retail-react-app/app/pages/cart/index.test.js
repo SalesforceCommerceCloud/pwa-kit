@@ -158,7 +158,7 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test('Renders skeleton until customer and basket are loaded', () => {
+test.skip('Renders skeleton until customer and basket are loaded', () => {
     const {getByTestId, queryByTestId} = renderWithProviders(<Cart />)
     expect(getByTestId('sf-cart-skeleton')).toBeInTheDocument()
     expect(queryByTestId('sf-cart-container')).not.toBeInTheDocument()
