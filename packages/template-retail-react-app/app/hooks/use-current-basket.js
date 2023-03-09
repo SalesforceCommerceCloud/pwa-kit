@@ -17,11 +17,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     const createBasket = useShopperBasketsMutation('createBasket')
     const {data: customer} = useCurrentCustomer()
     const {customerId} = customer
-    const {
-        data: basketsData,
-        isLoading: isBasketsLoading,
-        error: basketsError
-    } = useCustomerBaskets(
+    const {data: basketsData, ...restOfQuery} = useCustomerBaskets(
         {parameters: {customerId}},
         {
             enabled: !!customerId && onClient,
@@ -41,8 +37,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
 
     return {
-        error: basketsError,
-        isLoading: isBasketsLoading,
+        ...restOfQuery,
         // current picked basket
         basket,
         hasBasket: basketsData?.total > 0,
