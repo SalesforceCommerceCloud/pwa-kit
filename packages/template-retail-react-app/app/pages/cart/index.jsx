@@ -47,9 +47,8 @@ import {
 } from 'commerce-sdk-react-preview'
 
 const Cart = () => {
-    const {basket, isLoading, hasBasket} = useCurrentBasket()
+    const {basket, isLoading} = useCurrentBasket()
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    console.log('productIds', productIds)
     const {
         data: products,
         isLoading: isProductsLoading,
@@ -309,17 +308,23 @@ const Cart = () => {
             }
         )
     }
-    console.log('isLoading', isLoading)
+
+    const isPageLoading = basket?.productItems?.length > 0 ? isProductsLoading : isLoading
+    console.log('productIds', productIds)
+    console.log('isPageLoading', isPageLoading)
     console.log('isProductsLoading', isProductsLoading)
+    // WHY is this turn to false on server side on second render when basket is still undefined
+    console.log('Basket loading .....', isLoading)
+    console.log('basket', basket)
 
     /***************************** Remove Item **************************/
     /********* Rendering  UI **********/
-    if (isLoading) {
-        console.log('skepetin__________________________________________________')
+    if (isPageLoading) {
+        console.log('SKELETON__________________________________________________')
         return <CartSkeleton />
     }
 
-    if (!isLoading && !basket?.productItems) {
+    if (!isPageLoading && !basket?.productItems?.length) {
         console.log('empty cart==============================================')
         return <EmptyCart isRegistered={isRegistered} />
     }
