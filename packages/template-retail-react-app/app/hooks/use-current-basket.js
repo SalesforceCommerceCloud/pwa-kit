@@ -4,14 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {
-    useCustomerBaskets,
-    useCustomerId,
-    useProducts,
-    useShopperBasketsMutation
-} from 'commerce-sdk-react-preview'
+import {useCustomerBaskets, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from './use-current-customer'
 
+const onClient = typeof window !== 'undefined'
 /**
  * This hook combine some commerce-react-sdk hooks to provide more derived data for Retail App baskets
  * @param id - basket id to get the current used basket among baskets returned, use first basket in the array if not defined
@@ -28,8 +24,8 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     } = useCustomerBaskets(
         {parameters: {customerId}},
         {
+            enabled: !!customerId && onClient,
             onSuccess: (data) => {
-                console.log('dATA', data)
                 if (!data.total) {
                     console.log('creating basket')
                     createBasket.mutate({

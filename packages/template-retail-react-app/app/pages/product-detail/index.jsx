@@ -180,21 +180,7 @@ const ProductDetail = () => {
 
     const handleAddToCart = async (variant, quantity) => {
         if (!variant?.orderable || !quantity) return
-        if (!hasBasket) {
-            createBasket.mutate(
-                {body: {}},
-                {
-                    onSuccess: (basket) => {
-                        addItemToBasket(basket.basketId, variant, quantity)
-                    },
-                    onError: () => {
-                        showError()
-                    }
-                }
-            )
-        } else {
-            addItemToBasket(basket.basketId, variant, quantity)
-        }
+        addItemToBasket(basket.basketId, variant, quantity)
     }
 
     /**************** Einstein ****************/
