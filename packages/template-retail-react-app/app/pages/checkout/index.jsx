@@ -128,7 +128,7 @@ const Checkout = () => {
 
 const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
-    const {basket} = useCurrentBasket()
+    const {data: basket} = useCurrentBasket()
 
     if (!customer || !customer.customerId || !basket || !basket.basketId) {
         return <CheckoutSkeleton />

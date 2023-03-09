@@ -112,7 +112,7 @@ const OrderSummary = ({
     isEstimate = false,
     fontSize = 'md'
 }) => {
-    basket = basket || useCurrentBasket().basket
+    basket = basket || useCurrentBasket().data
 
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
     const shippingItem = basket.shippingItems?.[0]

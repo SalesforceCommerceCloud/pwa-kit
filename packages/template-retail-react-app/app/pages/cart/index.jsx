@@ -47,7 +47,7 @@ import {
 } from 'commerce-sdk-react-preview'
 
 const Cart = () => {
-    const {basket, isLoading} = useCurrentBasket()
+    const {data: basket, isLoading} = useCurrentBasket()
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
