@@ -12,11 +12,6 @@ import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
 import {
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
     Box,
     Button,
     Stack
