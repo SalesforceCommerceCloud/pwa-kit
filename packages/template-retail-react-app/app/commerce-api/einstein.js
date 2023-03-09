@@ -69,9 +69,14 @@ class EinsteinAPI {
             }
         } else if (
             product.productType &&
-            (product.productType.master || product.productType.variant)
+            (product.productType.master ||
+                product.productType.variant ||
+                product.productType.set ||
+                product.productType.bundle ||
+                product.productType.variationGroup ||
+                product.productType.item)
         ) {
-            // handle variants for PLP / viewCategory & viewSearch
+            // handle variants & sets for PLP / viewCategory & viewSearch
             // Assumes product is a ProductSearchHit from SCAPI Shopper-Search:
             // https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-search?meta=type%3AProductSearchHit
             return {

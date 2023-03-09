@@ -668,6 +668,9 @@
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"
   },
+  "item_price.label.starting_at": {
+    "defaultMessage": "Starting at"
+  },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
   },
@@ -1008,6 +1011,15 @@
   "product_tile.assistive_msg.wishlist": {
     "defaultMessage": "Wishlist"
   },
+  "product_tile.label.starting_at_price": {
+    "defaultMessage": "Starting at"
+  },
+  "product_view.button.add_set_to_cart": {
+    "defaultMessage": "Add Set to Cart"
+  },
+  "product_view.button.add_set_to_wishlist": {
+    "defaultMessage": "Add Set to Wishlist"
+  },
   "product_view.button.add_to_cart": {
     "defaultMessage": "Add to Cart"
   },
@@ -1019,6 +1031,9 @@
   },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"
+  },
+  "product_view.label.starting_at_price": {
+    "defaultMessage": "Starting at"
   },
   "product_view.link.full_details": {
     "defaultMessage": "See full details"
@@ -1396,11 +1411,17 @@
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "New Password"
   },
+  "wishlist_primary_action.button.add_set_to_cart": {
+    "defaultMessage": "Add Set to Cart"
+  },
   "wishlist_primary_action.button.add_to_cart": {
     "defaultMessage": "Add to Cart"
   },
-  "wishlist_primary_action.button.select_options": {
-    "defaultMessage": "Select Options"
+  "wishlist_primary_action.button.view_full_details": {
+    "defaultMessage": "View Full Details"
+  },
+  "wishlist_primary_action.button.view_options": {
+    "defaultMessage": "View Options"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"

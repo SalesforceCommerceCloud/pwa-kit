@@ -86,6 +86,9 @@ export const RemoteServerFactory = {
          * testing, or to handle non-standard projects.
          */
         const defaults = {
+            // For test only – allow the project dir to be overridden.
+            projectDir: process.cwd(),
+
             // Absolute path to the build directory
             buildDir: path.resolve(process.cwd(), BUILD),
 
@@ -741,15 +744,23 @@ export const RemoteServerFactory = {
      */
     serveStaticFile(filePath, opts = {}) {
         return (req, res) => {
-            const options = req.app.options
-            const file = path.resolve(options.buildDir, filePath)
-            res.sendFile(file, {
-                headers: {
-                    [CACHE_CONTROL]: options.defaultCacheControl
-                },
-                ...opts
-            })
+            const baseDir = req.app.options.buildDir
+            return this._serveStaticFile(req, res, baseDir, filePath, opts)
         }
+    },
+
+    /**
+     * @private
+     */
+    _serveStaticFile(req, res, baseDir, filePath, opts = {}) {
+        const options = req.app.options
+        const file = path.resolve(baseDir, filePath)
+        res.sendFile(file, {
+            headers: {
+                [CACHE_CONTROL]: options.defaultCacheControl
+            },
+            ...opts
+        })
     },
 
     /**

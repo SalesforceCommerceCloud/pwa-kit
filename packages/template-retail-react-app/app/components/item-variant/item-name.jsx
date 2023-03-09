@@ -16,14 +16,10 @@ import Link from '../link'
  */
 const ItemName = (props) => {
     const variant = useItemVariant()
+    const productId = variant?.master?.masterId || variant.id
 
     return (
-        <Link
-            fontWeight="bold"
-            {...props}
-            color="black.600"
-            to={`/product/${variant?.master?.masterId}`}
-        >
+        <Link fontWeight="bold" {...props} color="black.600" to={`/product/${productId}`}>
             {variant.productName || variant.name}
         </Link>
     )

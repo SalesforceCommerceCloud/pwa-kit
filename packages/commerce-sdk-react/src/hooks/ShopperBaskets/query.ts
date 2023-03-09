@@ -1,172 +1,185 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, Argument, DataType} from '../types'
+import {UseQueryResult} from '@tanstack/react-query'
+import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
+import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
-import {NotImplementedError} from './../utils'
+import {mergeOptions, omitNullableParameters} from '../utils'
+import * as queryKeyHelpers from './queryKeyHelpers'
 
 type Client = ApiClients['shopperBaskets']
 
-type UseBasketParameters = NonNullable<Argument<Client['getBasket']>>['parameters']
-type UseBasketHeaders = NonNullable<Argument<Client['getBasket']>>['headers']
-type UseBasketArg = {
-    headers?: UseBasketHeaders
-    rawResponse?: boolean
-} & UseBasketParameters
 /**
- * A hook for `ShopperBaskets#getBasket`.
  * Gets a basket.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getBasket} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getbasket} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
+ * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
+ * @returns A TanStack Query query hook with data from the Shopper Baskets `getBasket` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getBasket| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function useBasket(
-    arg: Omit<UseBasketArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getBasket']> | Response, Error>
-): UseQueryResult<DataType<Client['getBasket']>, Error>
-function useBasket(
-    arg: Omit<UseBasketArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getBasket']> | Response, Error>
-): UseQueryResult<Response, Error>
-function useBasket(
-    arg: UseBasketArg,
-    options?: UseQueryOptions<DataType<Client['getBasket']> | Response, Error>
-): UseQueryResult<DataType<Client['getBasket']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const defaultOptions = {
-        enabled: !!parameters.basketId
-    }
-    return useQuery(
-        ['/baskets', parameters.basketId, arg],
-        (_, {shopperBaskets}) => shopperBaskets.getBasket({parameters, headers}, rawResponse),
-        {...defaultOptions, ...options}
-    )
-}
+export const useBasket = (
+    apiOptions: NullableParameters<Argument<Client['getBasket']>>,
+    queryOptions: ApiQueryOptions<Client['getBasket']> = {}
+): UseQueryResult<DataType<Client['getBasket']>> => {
+    type Options = Argument<Client['getBasket']>
+    type Data = DataType<Client['getBasket']>
+    const {shopperBaskets: client} = useCommerceApi()
+    const methodName = 'getBasket'
+    const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
 
-type UsePaymentMethodsForBasketParameters = NonNullable<
-    Argument<Client['getPaymentMethodsForBasket']>
->['parameters']
-type UsePaymentMethodsForBasketHeaders = NonNullable<
-    Argument<Client['getPaymentMethodsForBasket']>
->['headers']
-type UsePaymentMethodsForBasketArg = {
-    headers?: UsePaymentMethodsForBasketHeaders
-    rawResponse?: boolean
-} & UsePaymentMethodsForBasketParameters
+    // Parameters can be set in `apiOptions` or `client.clientConfig`;
+    // we must merge them in order to generate the correct query key.
+    const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    // We don't use `netOptions` here because we manipulate the options in `useQuery`.
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}
 /**
- * A hook for `ShopperBaskets#getPaymentMethodsForBasket`.
  * Gets applicable payment methods for an existing basket considering the open payment amount only.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getPaymentMethodsForBasket} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getpaymentmethodsforbasket} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
+ * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
+ * @returns A TanStack Query query hook with data from the Shopper Baskets `getPaymentMethodsForBasket` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getPaymentMethodsForBasket| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getpaymentmethodsforbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function usePaymentMethodsForBasket(
-    arg: Omit<UsePaymentMethodsForBasketArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getPaymentMethodsForBasket']> | Response, Error>
-): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']>, Error>
-function usePaymentMethodsForBasket(
-    arg: Omit<UsePaymentMethodsForBasketArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getPaymentMethodsForBasket']> | Response, Error>
-): UseQueryResult<Response, Error>
-function usePaymentMethodsForBasket(
-    arg: UsePaymentMethodsForBasketArg,
-    options?: UseQueryOptions<DataType<Client['getPaymentMethodsForBasket']> | Response, Error>
-): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const defaultOptions = {
-        enabled: !!parameters.basketId
-    }
+export const usePaymentMethodsForBasket = (
+    apiOptions: NullableParameters<Argument<Client['getPaymentMethodsForBasket']>>,
+    queryOptions: ApiQueryOptions<Client['getPaymentMethodsForBasket']> = {}
+): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']>> => {
+    type Options = Argument<Client['getPaymentMethodsForBasket']>
+    type Data = DataType<Client['getPaymentMethodsForBasket']>
+    const {shopperBaskets: client} = useCommerceApi()
+    const methodName = 'getPaymentMethodsForBasket'
+    const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
 
-    return useQuery(
-        ['/baskets', parameters.basketId, '/payment-methods', arg],
-        (_, {shopperBaskets}) =>
-            shopperBaskets.getPaymentMethodsForBasket({parameters, headers}, rawResponse),
-        {...defaultOptions, ...options}
-    )
+    // Parameters can be set in `apiOptions` or `client.clientConfig`;
+    // we must merge them in order to generate the correct query key.
+    const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    // We don't use `netOptions` here because we manipulate the options in `useQuery`.
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
 }
-
 /**
- * WARNING: This method is not implemented yet.
- *
- * A hook for `ShopperBaskets#getPriceBooksForBasket`.
  * Gets applicable price books for an existing basket.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getPriceBooksForBasket} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getpricebooksforbasket} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
+ * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
+ * @returns A TanStack Query query hook with data from the Shopper Baskets `getPriceBooksForBasket` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getPriceBooksForBasket| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getpricebooksforbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function usePriceBooksForBasket(): void {
-    NotImplementedError()
-}
+export const usePriceBooksForBasket = (
+    apiOptions: NullableParameters<Argument<Client['getPriceBooksForBasket']>>,
+    queryOptions: ApiQueryOptions<Client['getPriceBooksForBasket']> = {}
+): UseQueryResult<DataType<Client['getPriceBooksForBasket']>> => {
+    type Options = Argument<Client['getPriceBooksForBasket']>
+    type Data = DataType<Client['getPriceBooksForBasket']>
+    const {shopperBaskets: client} = useCommerceApi()
+    const methodName = 'getPriceBooksForBasket'
+    const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
 
-type UseShippingMethodsForShipmentParameters = NonNullable<
-    Argument<Client['getShippingMethodsForShipment']>
->['parameters']
-type UseShippingMethodsForShipmentHeaders = NonNullable<
-    Argument<Client['getShippingMethodsForShipment']>
->['headers']
-type UseShippingMethodsForShipmentArg = {
-    headers?: UseShippingMethodsForShipmentHeaders
-    rawResponse?: boolean
-} & UseShippingMethodsForShipmentParameters
+    // Parameters can be set in `apiOptions` or `client.clientConfig`;
+    // we must merge them in order to generate the correct query key.
+    const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    // We don't use `netOptions` here because we manipulate the options in `useQuery`.
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}
 /**
- * A hook for `ShopperBaskets#getShippingMethodsForShipment`.
  * Gets the applicable shipping methods for a certain shipment of a basket.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getShippingMethodsForShipment} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getshippingmethodsforshipment} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
+ * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
+ * @returns A TanStack Query query hook with data from the Shopper Baskets `getShippingMethodsForShipment` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getShippingMethodsForShipment| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getshippingmethodsforshipment | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function useShippingMethodsForShipment(
-    arg: Omit<UseShippingMethodsForShipmentArg, 'rawResponse'> & {rawResponse?: false},
-    options?: UseQueryOptions<DataType<Client['getShippingMethodsForShipment']> | Response, Error>
-): UseQueryResult<DataType<Client['getShippingMethodsForShipment']>, Error>
-function useShippingMethodsForShipment(
-    arg: Omit<UseShippingMethodsForShipmentArg, 'rawResponse'> & {rawResponse: true},
-    options?: UseQueryOptions<DataType<Client['getShippingMethodsForShipment']> | Response, Error>
-): UseQueryResult<Response, Error>
-function useShippingMethodsForShipment(
-    arg: UseShippingMethodsForShipmentArg,
-    options?: UseQueryOptions<DataType<Client['getShippingMethodsForShipment']> | Response, Error>
-): UseQueryResult<DataType<Client['getShippingMethodsForShipment']> | Response, Error> {
-    const {headers, rawResponse, ...parameters} = arg
-    const defaultOptions = {
-        enabled: !!parameters.basketId && !!parameters.shipmentId
-    }
-    return useQuery(
-        [
-            '/baskets',
-            parameters.basketId,
-            '/shipments',
-            parameters.shipmentId,
-            '/shipping-methods',
-            arg
-        ],
-        (_, {shopperBaskets}) =>
-            shopperBaskets.getShippingMethodsForShipment({parameters, headers}, rawResponse),
-        {...defaultOptions, ...options}
-    )
-}
+export const useShippingMethodsForShipment = (
+    apiOptions: NullableParameters<Argument<Client['getShippingMethodsForShipment']>>,
+    queryOptions: ApiQueryOptions<Client['getShippingMethodsForShipment']> = {}
+): UseQueryResult<DataType<Client['getShippingMethodsForShipment']>> => {
+    type Options = Argument<Client['getShippingMethodsForShipment']>
+    type Data = DataType<Client['getShippingMethodsForShipment']>
+    const {shopperBaskets: client} = useCommerceApi()
+    const methodName = 'getShippingMethodsForShipment'
+    const requiredParameters = ['organizationId', 'basketId', 'shipmentId', 'siteId'] as const
 
+    // Parameters can be set in `apiOptions` or `client.clientConfig`;
+    // we must merge them in order to generate the correct query key.
+    const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    // We don't use `netOptions` here because we manipulate the options in `useQuery`.
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}
 /**
- * WARNING: This method is not implemented yet.
- *
- * A hook for `ShopperBaskets#getTaxesFromBasket`.
  * This method gives you the external taxation data set by the PUT taxes API. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
- * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getTaxesFromBasket} for more information about the API endpoint.
- * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#gettaxesfrombasket} for more information on the parameters and returned data type.
- * @returns An object describing the state of the request.
+ * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
+ * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
+ * @returns A TanStack Query query hook with data from the Shopper Baskets `getTaxesFromBasket` endpoint.
+ * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getTaxesFromBasket| Salesforce Developer Center} for more information about the API endpoint.
+ * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#gettaxesfrombasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
+ * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
  */
-function useTaxesFromBasket(): void {
-    NotImplementedError()
-}
+export const useTaxesFromBasket = (
+    apiOptions: NullableParameters<Argument<Client['getTaxesFromBasket']>>,
+    queryOptions: ApiQueryOptions<Client['getTaxesFromBasket']> = {}
+): UseQueryResult<DataType<Client['getTaxesFromBasket']>> => {
+    type Options = Argument<Client['getTaxesFromBasket']>
+    type Data = DataType<Client['getTaxesFromBasket']>
+    const {shopperBaskets: client} = useCommerceApi()
+    const methodName = 'getTaxesFromBasket'
+    const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
 
-export {
-    useBasket,
-    usePaymentMethodsForBasket,
-    usePriceBooksForBasket,
-    useShippingMethodsForShipment,
-    useTaxesFromBasket
+    // Parameters can be set in `apiOptions` or `client.clientConfig`;
+    // we must merge them in order to generate the correct query key.
+    const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    // We don't use `netOptions` here because we manipulate the options in `useQuery`.
+    const method = async (options: Options) => await client[methodName](options)
+
+    // For some reason, if we don't explicitly set these generic parameters, the inferred type for
+    // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
+    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
 }
