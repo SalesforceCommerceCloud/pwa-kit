@@ -15,17 +15,26 @@ import {
     mockOrderHistory,
     mockOrderProducts
 } from '../../commerce-api/mock-data'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {useCustomerOrders, useProduct} from 'commerce-sdk-react-preview'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
 
 const MockedComponent = () => {
-    const customer = useCurrentCustomer()
+    const {isRegistered} = useCustomerType()
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const {data: customer} = useCurrentCustomer()
 
     useEffect(() => {
-        if (!customer.isRegistered) {
-            customer.login('est@test.com', 'password')
+        if (!isRegistered) {
+            login.mutate(
+                {email: 'email@test.com', password: 'password1'},
+                {
+                    onSuccess: () => {
+                        window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
+                    }
+                }
+            )
         }
     }, [])
 
@@ -45,6 +54,9 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     global.server.use(
+        // rest.get('*/customers/:customerId', (req, res, ctx) =>
+        //     res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        // ),
         rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
             res(ctx.delay(0), ctx.json(mockOrderHistory))
         ),
