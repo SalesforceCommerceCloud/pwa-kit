@@ -52,16 +52,18 @@ import '^retail-react-app/app/assets/svg/signout.svg'
 import '^retail-react-app/app/assets/svg/user.svg'
 import '^retail-react-app/app/assets/svg/visibility.svg'
 import '^retail-react-app/app/assets/svg/visibility-off.svg'
-import '^retail-react-app/app/assets/svg/heart.svg'
+
+// import '^retail-react-app/app/assets/svg/heart.svg'
+// actually a lock, on purpose
+import '../../assets/svg/heart.svg'
+
 import '^retail-react-app/app/assets/svg/heart-solid.svg'
 import '^retail-react-app/app/assets/svg/close.svg'
 
 // For non-square SVGs, we can use the symbol data from the import to set the
 // proper viewBox attribute on the Icon wrapper.
 import AmexSymbol from '^retail-react-app/app/assets/svg/cc-amex.svg'
-// import BrandLogoSymbol from '^retail-react-app/app/assets/svg/brand-logo.svg'
-// import BrandLogoSymbol from '../../static/svg/brand-logo.svg'
-import BrandLogoSymbol from '~app/static/svg/brand-logo.svg'
+import BrandLogoSymbol from '../../assets/svg/brand-logo.svg'
 import CVVSymbol from '^retail-react-app/app/assets/svg/cc-cvv.svg'
 import DiscoverSymbol from '^retail-react-app/app/assets/svg/cc-discover.svg'
 import LocationSymbol from '^retail-react-app/app/assets/svg/location.svg'
@@ -73,7 +75,7 @@ import VisaSymbol from '^retail-react-app/app/assets/svg/cc-visa.svg'
 // TODO: We're hardcoding the `viewBox` for these imported SVGs temporarily as the
 // SVG loader plugin is not properly providing us the symbol data on the client side.
 AmexSymbol.viewBox = AmexSymbol.viewBox || '0 0 38 22'
-// BrandLogoSymbol.viewBox = BrandLogoSymbol.viewBox || '0 0 32 32'
+BrandLogoSymbol.viewBox = BrandLogoSymbol.viewBox || '0 0 32 32'
 CVVSymbol.viewBox = CVVSymbol.viewBox || '0 0 41 24'
 DiscoverSymbol.viewBox = DiscoverSymbol.viewBox || '0 0 38 22'
 LocationSymbol.viewBox = LocationSymbol.viewBox || '0 0 16 21'
@@ -82,7 +84,7 @@ PaypalSymbol.viewBox = PaypalSymbol.viewBox || '0 0 80 20'
 SocialPinterestSymbol.viewBox = SocialPinterestSymbol.viewBox || '0 0 21 20'
 VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
 
-const overrideIcons = ['brand-logo']
+const overrideIcons = ['brand-logo', 'heart']
 
 /**
  * A helper for creating a Chakra-wrapped icon from our own SVG imports via sprite sheet.
@@ -98,7 +100,7 @@ const icon = (name, passProps) => {
         const theme = useTheme()
         const baseStyle = {
             ...theme?.components?.Icon?.baseStyle,
-            ...(overrideIcons?.includes(name) ? {color: 'red !important', boxSize: 14} : {}),
+            ...(overrideIcons?.includes(name) ? {color: 'red !important'} : {}),
         }
 
         return (
@@ -107,7 +109,7 @@ const icon = (name, passProps) => {
                 {...baseStyle}
                 {...passProps}
                 {...props}
-                {...(overrideIcons?.includes(name) ? {w: 20, h: 20} : {})}
+                {...(overrideIcons?.includes(name) ? {w: 80, h: 80} : {})}
             >
                 <use role="presentation" xlinkHref={`#${name}`} />
             </Icon>

@@ -35,14 +35,15 @@ import Link from '^retail-react-app/app/components/link'
 import Search from '^retail-react-app/app/components/search'
 import withRegistration from '^retail-react-app/app/hoc/with-registration'
 
-import {AccountIcon, BasketIcon, HeartIcon} from '~app/components/icons'
-
 import {
+    AccountIcon,
+    BrandLogo,
+    BasketIcon,
+    HeartIcon,
     ChevronDownIcon,
     SignoutIcon,
-    BrandLogo,
     HamburgerIcon,
-} from '^retail-react-app/app/components/icons'
+} from '../icons'
 
 import {noop} from '^retail-react-app/app/utils/utils'
 import {navLinks, messages} from '^retail-react-app/app/pages/account/constant'
@@ -130,7 +131,6 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMenuClick}
                     />
-                    <ChevronDownIcon />
                     <IconButton
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.logo',
@@ -141,7 +141,6 @@ const Header = ({
                         variant="unstyled"
                         onClick={onLogoClick}
                     />
-                    YES
                     <Box {...styles.bodyContainer}>{children}</Box>
                     <Box {...styles.searchContainer}>
                         <Search
