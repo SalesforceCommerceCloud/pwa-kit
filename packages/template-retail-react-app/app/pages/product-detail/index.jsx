@@ -62,8 +62,7 @@ const ProductDetail = () => {
     const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const {hasBasket, basket} = useCurrentBasket()
-    const createBasket = useShopperBasketsMutation('createBasket')
+    const {basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const {res} = useServerContext()
     if (res) {

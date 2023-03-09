@@ -18,11 +18,31 @@ import CartItemVariantName from '../item-variant/item-name'
 import CartItemVariantAttributes from '../item-variant/item-attributes'
 import CartItemVariantPrice from '../item-variant/item-price'
 import PromoPopover from '../promo-popover'
+import {useProducts} from 'commerce-sdk-react-preview'
 
 const CartItems = ({basket}) => {
-    const {totalItems, products} = useCurrentBasket({
-        shouldFetchProductDetail: true
-    })
+    const {totalItems} = useCurrentBasket()
+    const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
+    const {data: products} = useProducts(
+        {
+            parameters: {
+                ids: productIds,
+                allImages: true
+            }
+        },
+        {
+            enabled: Boolean(productIds),
+            select: (result) => {
+                // Convert array into key/value object with key is the product id
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
+
     const [cartItemsExpanded, setCartItemsExpanded] = useState(false)
 
     return (

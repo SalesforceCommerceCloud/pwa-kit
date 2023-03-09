@@ -49,11 +49,7 @@ import {
 const Cart = () => {
     const {basket, isLoading} = useCurrentBasket()
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {
-        data: products,
-        isLoading: isProductsLoading,
-        error: productsError
-    } = useProducts(
+    const {data: products, isLoading: isProductsLoading} = useProducts(
         {
             parameters: {
                 ids: productIds,
