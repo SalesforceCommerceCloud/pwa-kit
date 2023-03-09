@@ -352,11 +352,11 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
 
             // NOTE: overriding either of these alone does not work, both must be set
             resource.request = newPath
-            // TODO: without the file extension, this fails, so we need to pull this from
-            // the original detected overridesMap
+            // TODO: before, omitting file extension this would fail, verify this is
+            // no longer true before removing
 
             // _overrides knows the full file path including extension
-            resource.createData.resource = newPath + '/index.jsx'
+            //  resource.createData.resource = newPath + '/index.jsx'
         } else {
             console.log('~NOT REWRITTEN')
         }
