@@ -50,11 +50,8 @@ const ProductDetail = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
-    const [primaryCategory, setPrimaryCategory] = useState(category)
     const [productSetSelection, setProductSetSelection] = useState({})
     const childProductRefs = React.useRef({})
-
-    const isProductASet = product?.type.set
 
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
@@ -82,6 +79,7 @@ const ProductDetail = () => {
             keepPreviousData: true
         }
     )
+    const isProductASet = product?.type.set
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
     const {data: category} = useCategory({
@@ -90,6 +88,7 @@ const ProductDetail = () => {
             level: 1
         }
     })
+    const [primaryCategory, setPrimaryCategory] = useState(category)
     const variant = useVariant(product)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
@@ -323,7 +322,7 @@ const ProductDetail = () => {
                                             }
                                         }}
                                         isProductLoading={isProductLoading}
-                                        isCustomerProductListLoading={!wishlist.isInitialized}
+                                        isWishlistLoading={isWishlistLoading}
                                     />
                                     <InformationAccordion product={childProduct} />
 
@@ -346,7 +345,7 @@ const ProductDetail = () => {
                                 handleAddToWishlist(product, variant, quantity)
                             }
                             isProductLoading={isProductLoading}
-                            isCustomerProductListLoading={!wishlist.isInitialized}
+                            isWishlistLoading={isWishlistLoading}
                         />
                         <InformationAccordion product={product} />
                     </Fragment>
