@@ -1,12 +1,12 @@
 {
   "name": "client",
-  "hash": "87ff8a1e7e2dcc3080b9",
+  "hash": "b82fab89f79a16d87d23",
   "publicPath": "/mobify/bundle/development/",
-  "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
+  "outputPath": "/Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
     "main": [
       "main.js",
-      "main.77245f0b73afc8ad6fa5.hot-update.js"
+      "main.044c6df55a57bf9d2712.hot-update.js"
     ],
     "pages-home": [
       "pages-home.js"
@@ -55,7 +55,7 @@
     {
       "type": "asset",
       "name": "vendor.js",
-      "size": 5162385,
+      "size": 5169898,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -82,7 +82,7 @@
     {
       "type": "asset",
       "name": "main.js",
-      "size": 1156758,
+      "size": 1158232,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -107,7 +107,7 @@
     {
       "type": "asset",
       "name": "^retail-react-app-app-pages-account.js",
-      "size": 169278,
+      "size": 169116,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -132,7 +132,7 @@
     {
       "type": "asset",
       "name": "^retail-react-app-app-pages-checkout.js",
-      "size": 155395,
+      "size": 155264,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -157,7 +157,7 @@
     {
       "type": "asset",
       "name": "^retail-react-app-app-pages-product-list.js",
-      "size": 115742,
+      "size": 115723,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -182,7 +182,7 @@
     {
       "type": "asset",
       "name": "template-retail-react-app_app_components_action-card_index_jsx-template-retail-react-app_app_-610b51.js",
-      "size": 78279,
+      "size": 78242,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -224,7 +224,7 @@
     {
       "type": "asset",
       "name": "template-retail-react-app_app_partials_product-view_index_jsx.js",
-      "size": 61678,
+      "size": 61613,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -247,7 +247,7 @@
     {
       "type": "asset",
       "name": "^retail-react-app-app-pages-cart.js",
-      "size": 60883,
+      "size": 60886,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -272,7 +272,7 @@
     {
       "type": "asset",
       "name": "^retail-react-app-app-pages-checkout-confirmation.js",
-      "size": 53984,
+      "size": 53959,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -354,7 +354,7 @@
     {
       "type": "asset",
       "name": "template-retail-react-app_app_components_order-summary_index_jsx.js",
-      "size": 45030,
+      "size": 44973,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -472,7 +472,7 @@
     {
       "type": "asset",
       "name": "template-retail-react-app_app_components_item-variant_item-attributes_jsx-template-retail-rea-ca81a0.js",
-      "size": 42785,
+      "size": 42751,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -552,7 +552,7 @@
     {
       "type": "asset",
       "name": "pages-home.js",
-      "size": 39602,
+      "size": 39430,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -577,7 +577,7 @@
     {
       "type": "asset",
       "name": "^retail-react-app-app-pages-account-wishlist.js",
-      "size": 39118,
+      "size": 39071,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -602,7 +602,7 @@
     {
       "type": "asset",
       "name": "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1.js",
-      "size": 36367,
+      "size": 36342,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -625,7 +625,7 @@
     {
       "type": "asset",
       "name": "^retail-react-app-app-pages-product-detail.js",
-      "size": 23692,
+      "size": 23684,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -649,35 +649,8 @@
     },
     {
       "type": "asset",
-      "name": "main.77245f0b73afc8ad6fa5.hot-update.js",
-      "size": 21912,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "hotModuleReplacement": true,
-        "immutable": true,
-        "fullhash": "77245f0b73afc8ad6fa5",
-        "related": {
-          "sourceMap": "main.77245f0b73afc8ad6fa5.hot-update.js.map"
-        }
-      },
-      "chunkNames": [
-        "main"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "main"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
       "name": "^retail-react-app-app-pages-reset-password.js",
-      "size": 10449,
+      "size": 10437,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -702,7 +675,7 @@
     {
       "type": "asset",
       "name": "^retail-react-app-app-pages-login.js",
-      "size": 8381,
+      "size": 8370,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -727,7 +700,7 @@
     {
       "type": "asset",
       "name": "^retail-react-app-app-pages-page-not-found.js",
-      "size": 7767,
+      "size": 7757,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -752,7 +725,7 @@
     {
       "type": "asset",
       "name": "^retail-react-app-app-pages-registration.js",
-      "size": 7564,
+      "size": 7554,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -776,8 +749,35 @@
     },
     {
       "type": "asset",
+      "name": "main.044c6df55a57bf9d2712.hot-update.js",
+      "size": 7208,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "044c6df55a57bf9d2712",
+        "related": {
+          "sourceMap": "main.044c6df55a57bf9d2712.hot-update.js.map"
+        }
+      },
+      "chunkNames": [
+        "main"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "main"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
       "name": "^retail-react-app-app-pages-login-redirect.js",
-      "size": 3062,
+      "size": 3058,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -847,7 +847,7 @@
     },
     {
       "type": "asset",
-      "name": "main.77245f0b73afc8ad6fa5.hot-update.json",
+      "name": "main.044c6df55a57bf9d2712.hot-update.json",
       "size": 28,
       "emitted": false,
       "comparedForEmit": false,
@@ -855,7 +855,7 @@
       "info": {
         "hotModuleReplacement": true,
         "immutable": true,
-        "fullhash": "77245f0b73afc8ad6fa5"
+        "fullhash": "044c6df55a57bf9d2712"
       },
       "chunkNames": [],
       "chunkIdHints": [],
@@ -880,7 +880,7 @@
           "name": "main.js"
         },
         {
-          "name": "main.77245f0b73afc8ad6fa5.hot-update.js"
+          "name": "main.044c6df55a57bf9d2712.hot-update.js"
         }
       ],
       "filteredAssets": 0,
@@ -1202,7 +1202,7 @@
       "id": "main",
       "files": [
         "main.js",
-        "main.77245f0b73afc8ad6fa5.hot-update.js"
+        "main.044c6df55a57bf9d2712.hot-update.js"
       ]
     },
     {
