@@ -54,9 +54,6 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     global.server.use(
-        // rest.get('*/customers/:customerId', (req, res, ctx) =>
-        //     res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        // ),
         rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
             res(ctx.delay(0), ctx.json(mockOrderHistory))
         ),
