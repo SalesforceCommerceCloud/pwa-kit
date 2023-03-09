@@ -36,8 +36,6 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         }
     )
 
-    console.log('basketsData', basketsData)
-
     // if id is not defined, by default use the first basket in the list
     const basket =
         basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
