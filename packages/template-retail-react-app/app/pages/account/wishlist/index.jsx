@@ -33,12 +33,7 @@ const AccountWishlist = () => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
-    // DEBUG
-    const idOfEmptyList = 'e41812c0545ec3cafcbae8c6e8'
-    const idOfNotEmptyList = '4014963e7fdf4022d7edebe8f6'
-    const {data: wishListData, isLoading: isWishListLoading} = useWishList({
-        listId: idOfNotEmptyList
-    })
+    const {data: wishListData, isLoading: isWishListLoading} = useWishList()
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
 
     const {data: productsData, isLoading: isProductsLoading} = useProducts(
