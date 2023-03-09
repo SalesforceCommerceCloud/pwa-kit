@@ -6,7 +6,7 @@
  */
 import React, {useEffect} from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen, waitFor, act} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
@@ -75,6 +75,9 @@ afterEach(() => {
 
 test('Renders order history and details', async () => {
     global.server.use(
+        rest.get('*/orders/:orderNo', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockOrderHistory.data[0]))
+        }),
         rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderHistory))
         }),
@@ -85,7 +88,6 @@ test('Renders order history and details', async () => {
     await renderWithProviders(<MockedComponent history={history} />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
-    screen.logTestingPlaygroundURL()
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
     expect(await screen.findAllByText(/Ordered: /i)).toHaveLength(3)
     expect(

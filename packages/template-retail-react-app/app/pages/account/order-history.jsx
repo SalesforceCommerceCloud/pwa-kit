@@ -89,7 +89,6 @@ const AccountOrderHistory = () => {
     const {limit, offset} = searchParams[0]
 
     const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders({
-        // TODO: Why the API limit is 25 and not 10?
         parameters: {customerId, limit: DEFAULT_PAGINATION_LIMIT || limit, offset}
     })
 
