@@ -11,11 +11,7 @@ import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-import {
-    Box,
-    Button,
-    Stack
-} from '@chakra-ui/react'
+import {Box, Button, Stack} from '@chakra-ui/react'
 import {
     useProduct,
     useCategory,
@@ -45,7 +41,6 @@ import {
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 import {useWishList} from '../../hooks/use-wish-list'
 
 const ProductDetail = () => {
@@ -61,7 +56,6 @@ const ProductDetail = () => {
 
     const isProductASet = product?.type.set
 
-    const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
     const {hasBasket, basket} = useCurrentBasket()

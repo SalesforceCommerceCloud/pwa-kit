@@ -18,7 +18,7 @@ import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-pr
 
 jest.mock('../../commerce-api/einstein')
 
-const MockComponent = () => {
+const MockComponent = (props) => {
     const {isRegistered} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const {data: customer} = useCurrentCustomer()
