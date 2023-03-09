@@ -10,7 +10,7 @@ import {mockCustomerBaskets} from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
-import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import {basketWithProductSet} from './index.mock'
 import mockedProductSet from '../../commerce-api/mocks/product-set-winter-lookM'
 
