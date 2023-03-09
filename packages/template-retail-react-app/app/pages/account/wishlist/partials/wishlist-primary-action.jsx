@@ -6,12 +6,13 @@
  */
 import React, {useState} from 'react'
 import {Button, useDisclosure} from '@chakra-ui/react'
-import useBasket from '../../../../commerce-api/hooks/useBasket'
+import {useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
 import ProductViewModal from '../../../../components/product-view-modal'
 import {useToast} from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../constants'
+import {useCurrentBasket} from '../../../../hooks/use-current-basket'
 
 /**
  * Renders primary action on a product-item card in the form of a button.
@@ -20,12 +21,15 @@ import {API_ERROR_MESSAGE} from '../../../../constants'
  */
 const WishlistPrimaryAction = () => {
     const variant = useItemVariant()
-    const basket = useBasket()
+    const {basket} = useCurrentBasket()
     const {formatMessage} = useIntl()
     const isMasterProduct = variant?.type?.master || false
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
+
+    const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
+
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
         const productItems = [
@@ -35,28 +39,35 @@ const WishlistPrimaryAction = () => {
                 quantity
             }
         ]
-        try {
-            // TODO: this and also in the modal
-            await basket.addItemToBasket(productItems)
-            showToast({
-                title: formatMessage(
-                    {
-                        defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                        id: 'wishlist_primary_action.info.added_to_cart'
-                    },
-                    {quantity: quantity}
-                ),
-                status: 'success'
-            })
-            onClose()
-        } catch (error) {
-            showToast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
-            })
-        }
-        setIsLoading(false)
+
+        addItemToBasket.mutate(
+            {body: productItems, parameters: {basketId: basket.basketId}},
+            {
+                onSuccess: () => {
+                    showToast({
+                        title: formatMessage(
+                            {
+                                defaultMessage:
+                                    '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                                id: 'wishlist_primary_action.info.added_to_cart'
+                            },
+                            {quantity: quantity}
+                        ),
+                        status: 'success'
+                    })
+                    onClose()
+                },
+                onError: () => {
+                    showToast({
+                        title: formatMessage(API_ERROR_MESSAGE),
+                        status: 'error'
+                    })
+                },
+                onSettled: () => {
+                    setIsLoading(false)
+                }
+            }
+        )
     }
 
     return (
