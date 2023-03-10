@@ -4,22 +4,29 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useState} from 'react'
+import {useMemo, useState} from 'react'
 import fetch from 'cross-fetch'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import { useCommerceApi, useUsid, useEncUserId } from 'commerce-sdk-react-preview'
 import { keysToCamel } from '../utils/utils'
 
-const useEinstein = () => {
-    const {app: {einsteinAPI: config}} = getConfig()
-    console.log(config)
-    const [state, setState] = useState({loading: false, recommendations: []})
+export class EinsteinAPI {
+    constructor({host, einsteinId, userId, cookieId, siteId, isProduction}) {
+        this.userId = userId
+        this.cookieId = cookieId
+        this.siteId = siteId
+        this.isProduction = isProduction
+        this.host = host
+        this.einsteinId = einsteinId
+    }
+
     /**
      * Given a POJO append the correct user and cookie identifier values using the current auth state.
      *
      * @param {object} params
      * @returns {object} The decorated body object.
      */
-    const buildBody = (params) => {
+    _buildBody(params) {
         const instanceType_prd = 'prd'
         const instanceType_sbx = 'sbx'
 
@@ -27,26 +34,24 @@ const useEinstein = () => {
 
         // If we have an encrypted user id (authenticaed users only) use it as the `userId` otherwise
         // we won't send a `userId` param for guest users.
-        // TODO: how to get encUserId?
-        // if (commerceAPI.auth.encUserId) {
-        //     body.userId = commerceAPI.auth.encUserId
-        // }
+        if (this.userId) {
+            body.userId = this.userId
+        }
 
         // Append the `usid` as the `cookieId` value if present. (It should always be present as long
         // as the user is initilized)
-        // TODO: how to get usid?
-        // if (commerceAPI.auth.usid) {
-        //     body.cookieId = commerceAPI.auth.usid
-        // } else {
-        //     console.warn('Missing `cookieId`. For optimal results this value must be defined.')
-        // }
-
-        // The first part of the siteId is the realm
-        if (config.siteId) {
-            body.realm = config.siteId.split('-')[0]
+        if (this.cookieId) {
+            body.cookieId = this.cookieId
+        } else {
+            console.warn('Missing `cookieId`. For optimal results this value must be defined.')
         }
 
-        if (config.isProduction) {
+        // The first part of the siteId is the realm
+        if (this.siteId) {
+            body.realm = this.siteId.split('-')[0]
+        }
+
+        if (this.isProduction) {
             body.instanceType = instanceType_prd
         } else {
             body.instanceType = instanceType_sbx
@@ -58,7 +63,7 @@ const useEinstein = () => {
     /**
      * Given a product or item source, returns the product data that Einstein requires
      */
-    const constructEinsteinProduct = (product) => {
+    _constructEinsteinProduct(product) {
         if (product.type && (product.type.master || product.type.variant)) {
             // handle variants for PDP / viewProduct
             // Assumes product is a Product object from SCAPI Shopper-Products:
@@ -71,9 +76,14 @@ const useEinstein = () => {
             }
         } else if (
             product.productType &&
-            (product.productType.master || product.productType.variant)
+            (product.productType.master ||
+                product.productType.variant ||
+                product.productType.set ||
+                product.productType.bundle ||
+                product.productType.variationGroup ||
+                product.productType.item)
         ) {
-            // handle variants for PLP / viewCategory & viewSearch
+            // handle variants & sets for PLP / viewCategory & viewSearch
             // Assumes product is a ProductSearchHit from SCAPI Shopper-Search:
             // https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-search?meta=type%3AProductSearchHit
             return {
@@ -99,7 +109,7 @@ const useEinstein = () => {
      * Assumes item is a ProductItemfrom SCAPI Shopper-Baskets:
      * https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=type%3AProductItem
      */
-    const constructEinsteinItem = (item) => {
+    _constructEinsteinItem(item) {
         return {
             id: item.productId,
             sku: '',
@@ -108,22 +118,20 @@ const useEinstein = () => {
         }
     }
 
-    const einsteinFetch = async (endpoint, method, body) => {
-        const {host, einsteinId} = config
-
+    async einsteinFetch(endpoint, method, body) {
         const headers = {
             'Content-Type': 'application/json',
-            'x-cq-client-id': einsteinId
+            'x-cq-client-id': this.einsteinId
         }
 
         // Include `userId` and `cookieId` parameters.
         if (body) {
-            body = buildBody(body)
+            body = this._buildBody(body)
         }
 
         let response
         try {
-            response = await fetch(`${host}/v3${endpoint}`, {
+            response = await fetch(`${this.host}/v3${endpoint}`, {
                 method: method,
                 headers: headers,
                 ...(body && {
@@ -143,33 +151,30 @@ const useEinstein = () => {
         return keysToCamel(responseJson)
     }
 
-    return {
-        ...state,
-
-        /**
+    /**
      * Tells the Einstein engine when a user views a product.
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendViewProduct(product, args) {
-        const endpoint = `/activities/${config.siteId}/viewProduct`
+        const endpoint = `/activities/${this.siteId}/viewProduct`
         const method = 'POST'
         const body = {
-            product: constructEinsteinProduct(product),
+            product: this._constructEinsteinProduct(product),
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Tells the Einstein engine when a user views search results.
      **/
     async sendViewSearch(searchText, searchResults, args) {
-        const endpoint = `/activities/${config.siteId}/viewSearch`
+        const endpoint = `/activities/${this.siteId}/viewSearch`
         const method = 'POST'
 
         const products = searchResults?.hits?.map((product) =>
-            constructEinsteinProduct(product)
+            this._constructEinsteinProduct(product)
         )
 
         const body = {
@@ -179,33 +184,33 @@ const useEinstein = () => {
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Tells the Einstein engine when a user clicks on a search result.
      **/
     async sendClickSearch(searchText, product, args) {
-        const endpoint = `/activities/${config.siteId}/clickSearch`
+        const endpoint = `/activities/${this.siteId}/clickSearch`
         const method = 'POST'
         const body = {
             searchText,
-            product: constructEinsteinProduct(product),
+            product: this._constructEinsteinProduct(product),
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Tells the Einstein engine when a user views a category.
      **/
     async sendViewCategory(category, searchResults, args) {
-        const endpoint = `/activities/${config.siteId}/viewCategory`
+        const endpoint = `/activities/${this.siteId}/viewCategory`
         const method = 'POST'
 
         const products = searchResults?.hits?.map((product) =>
-            constructEinsteinProduct(product)
+            this._constructEinsteinProduct(product)
         )
 
         const body = {
@@ -217,33 +222,33 @@ const useEinstein = () => {
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Tells the Einstein engine when a user clicks a product from the category page.
      * Not meant to be used when the user clicks a category from the nav bar.
      **/
     async sendClickCategory(category, product, args) {
-        const endpoint = `/activities/${config.siteId}/clickCategory`
+        const endpoint = `/activities/${this.siteId}/clickCategory`
         const method = 'POST'
         const body = {
             category: {
                 id: category.id
             },
-            product: constructEinsteinProduct(product),
+            product: this._constructEinsteinProduct(product),
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Tells the Einstein engine when a user views a set of recommendations
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendViewReco(recommenderDetails, products, args) {
-        const endpoint = `/activities/${config.siteId}/viewReco`
+        const endpoint = `/activities/${this.siteId}/viewReco`
         const method = 'POST'
         const {__recoUUID, recommenderName} = recommenderDetails
         const body = {
@@ -253,49 +258,49 @@ const useEinstein = () => {
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Tells the Einstein engine when a user clicks on a recommendation
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendClickReco(recommenderDetails, product, args) {
-        const endpoint = `/activities/${config.siteId}/clickReco`
+        const endpoint = `/activities/${this.siteId}/clickReco`
         const method = 'POST'
         const {__recoUUID, recommenderName} = recommenderDetails
         const body = {
             recommenderName,
             __recoUUID,
-            product: constructEinsteinProduct(product),
+            product: this._constructEinsteinProduct(product),
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Tells the Einstein engine when a user views a page.
      * Use this only for pages where another activity does not fit. (ie. on the PDP, use viewProduct rather than this)
      **/
     async sendViewPage(path, args) {
-        const endpoint = `/activities/${config.siteId}/viewPage`
+        const endpoint = `/activities/${this.siteId}/viewPage`
         const method = 'POST'
         const body = {
             currentLocation: path,
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Tells the Einstein engine when a user starts the checkout process.
      **/
     async sendBeginCheckout(basket, args) {
-        const endpoint = `/activities/${config.siteId}/beginCheckout`
+        const endpoint = `/activities/${this.siteId}/beginCheckout`
         const method = 'POST'
-        const products = basket.productItems.map((item) => constructEinsteinItem(item))
+        const products = basket.productItems.map((item) => this._constructEinsteinItem(item))
         const subTotal = basket.productSubTotal
         const body = {
             products: products,
@@ -303,15 +308,15 @@ const useEinstein = () => {
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Tells the Einstein engine when a user reaches the given step during checkout.
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendCheckoutStep(stepName, stepNumber, basket, args) {
-        const endpoint = `/activities/${config.siteId}/checkoutStep`
+        const endpoint = `/activities/${this.siteId}/checkoutStep`
         const method = 'POST'
         const body = {
             stepName,
@@ -320,92 +325,95 @@ const useEinstein = () => {
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Tells the Einstein engine when a user adds an item to their cart.
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendAddToCart(item, args) {
-        const endpoint = `/activities/${config.siteId}/addToCart`
+        const endpoint = `/activities/${this.siteId}/addToCart`
         const method = 'POST'
         const body = {
-            products: [constructEinsteinItem(item)],
+            products: [this._constructEinsteinItem(item)],
             ...args
         }
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Get a list of recommenders that can be used in recommendation requests.
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async getRecommenders() {
-        const endpoint = `/personalization/recommenders/${config.siteId}`
+        const endpoint = `/personalization/recommenders/${this.siteId}`
         const method = 'GET'
         const body = null
 
-        return einsteinFetch(endpoint, method, body)
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Get a set of recommendations
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async getRecommendations(recommenderName, products, args) {
-        const endpoint = `/personalization/recs/${config.siteId}/${recommenderName}`
+        const endpoint = `/personalization/recs/${this.siteId}/${recommenderName}`
         const method = 'POST'
         const body = {
-            products: products?.map((product) => constructEinsteinProduct(product)),
+            products: products?.map((product) => this._constructEinsteinProduct(product)),
             ...args
         }
 
-        setState((s) => ({...s, loading: true}))
-
-        // Fetch the recommendations
-        const reco = await einsteinFetch(endpoint, method, body)
-
-        reco.recommenderName = recommenderName
-
-        const result = await fetchRecProductDetails(reco)
-
-        setState({loading: false, result})
-
-        return result
-    },
+        return this.einsteinFetch(endpoint, method, body)
+    }
 
     /**
      * Get a set of recommendations for a zone
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async getZoneRecommendations(zoneName, products, args) {
-        const endpoint = `/personalization/${config.siteId}/zones/${zoneName}/recs`
+        const endpoint = `/personalization/${this.siteId}/zones/${zoneName}/recs`
         const method = 'POST'
 
         const body = {
-            products: products?.map((product) => constructEinsteinProduct(product)),
+            products: products?.map((product) => this._constructEinsteinProduct(product)),
             ...args
         }
 
-        setState((s) => ({...s, loading: true}))
+        return this.einsteinFetch(endpoint, method, body)
+    }
+}
 
-        // Fetch the recommendations
-        const reco = await einsteinFetch(endpoint, method, body)
+const useEinstein = () => {
+    const api = useCommerceApi()
+    const {app: {einsteinAPI: config}} = getConfig()
+    const {host, einsteinId, siteId, isProduction} = config
+    const usid = useUsid()
+    const encUserId = useEncUserId()
 
-        const result = await fetchRecProductDetails(reco)
+    const einstein = useMemo(() => new EinsteinAPI({
+        host,
+        einsteinId,
+        userId: encUserId,
+        cookieId: usid,
+        siteId,
+        isProduction
+    }), [host,
+        einsteinId,
+        encUserId,
+        usid,
+        siteId,
+        isProduction])
+    const [state, setState] = useState({loading: false, recommendations: []})
 
-        setState({loading: false, result})
-
-        return result
-    },
-
-    async fetchRecProductDetails(reco) {
+    const fetchRecProductDetails = async (reco) => {
         const ids = reco.recs?.map((rec) => rec.id)
         if (ids?.length > 0) {
             // Fetch the product details for the recommendations
-            const products = await commerceAPI.shopperProducts.getProducts({
+            const products = await this.api.shopperProducts.getProducts({
                 parameters: {ids: ids.join(',')}
             })
 
@@ -425,6 +433,59 @@ const useEinstein = () => {
         }
         return reco
     }
+
+    return {
+        ...state,
+
+        async sendViewProduct(...args) {
+            return einstein.sendViewProduct(...args)
+        },
+        async sendViewSearch(...args) {
+            return einstein.sendViewSearch(...args)
+        },
+        async sendClickSearch(...args) {
+            return einstein.sendClickSearch(...args)
+        },
+        async sendViewCategory(...args) {
+            return einstein.sendViewCategory(...args)
+        },
+        async sendClickCategory(...args) {
+            return einstein.sendClickCategory(...args)
+        },
+        async sendViewPage(...args) {
+            return einstein.sendViewPage(...args)
+        },
+        async sendBeginCheckout(...args) {
+            return einstein.sendBeginCheckout(...args)
+        },
+        async sendCheckoutStep(...args) {
+            return einstein.sendCheckoutStep(...args)
+        },
+        async sendViewReco(...args) {
+            return einstein.sendViewReco(...args)
+        },
+        async sendClickReco(...args) {
+            return einstein.sendClickReco(...args)
+        },
+        async sendAddToCart(...args) {
+            return einstein.sendAddToCart(...args)
+        },
+        async getRecommenders(...args) {
+            return einstein.getRecommenders(...args)
+        },
+        async getRecommendations(...args) {
+            setState((s) => ({...s, loading: true}))
+            const reco = await api.einstein.getRecommendations(...args)
+            reco.recommenderName = recommenderName
+            const recommendations = await fetchRecProductDetails(reco)
+            setState({loading: false, recommendations})
+        },
+        async getZoneRecommendations(...args) {
+            setState((s) => ({...s, loading: true}))
+            const reco = await api.einstein.getZoneRecommendations(...args)
+            const recommendations = await fetchRecProductDetails(reco)
+            setState({loading: false, recommendations})
+        }
     }
 }
 
