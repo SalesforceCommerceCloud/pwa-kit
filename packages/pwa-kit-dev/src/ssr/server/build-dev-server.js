@@ -129,7 +129,6 @@ export const DevServerMixin = {
         if (fs.existsSync(projectWebpackPath)) {
             config = require(projectWebpackPath)
         }
-        console.log('~webpack config', config)
         app.__compiler = webpack(config)
         app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)

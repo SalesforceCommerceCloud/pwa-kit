@@ -101,10 +101,6 @@ export const sdkReplacementPlugin = (projectDir) => {
     })
 }
 
-const templateAppPathRegex = makeRegExp(
-    `((.*)${pkg?.mobify?.overridesDir}(.*)|(.*)/${pkg?.mobify?.extends}(.*))`
-)
-
 export const allFiles = (projectDir) => {
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
@@ -112,12 +108,6 @@ export const allFiles = (projectDir) => {
 }
 
 export const extendedTemplateReplacementPlugin = (projectDir) => {
-    // EXAMPLE:
-    // file: overrides/app/icons/index.jsx
-    // now we manipulate this string to be
-    // --> /app/icons/index.jsx
-    // PROBLEM: ^ prefixed files would look like `^app/icons/index.jsx`
-    // which is not a regex match
     const globPattern = `${pkg?.mobify?.overridesDir?.replace(
         /\//,
         ''
@@ -128,12 +118,6 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
         return [
             item,
             item?.replace(pkg?.mobify?.overridesDir?.replace(/^\//, ''), `${pkg?.mobify?.extends}`)
-            // TODO: this needs a better solution, but maybe only a pain for local dev until we publish
-            // the retail react app template?
-            // item?.replace(
-            //     pkg?.mobify?.overridesDir?.replace(/^\//, ''),
-            //     `template-${pkg?.mobify?.extends}`
-            // )
         ]
     })
     const _overrides = [...overrides]
@@ -153,7 +137,6 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
         ...overrides.flatMap((item) => {
             const patterns = []
             const EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
-            patterns.push(item)
 
             // matches '.jsx', '.js', '.tsx', '.ts'
             const extRe = /\.\w+$/
@@ -173,12 +156,13 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
                     .join('/')
 
                 patterns.push(minimatch.makeRe('**/*' + noExt + EXTENSIONS))
-                patterns.push(minimatch.makeRe('**/*' + pathNoFile))
+                patterns.push(minimatch.makeRe('**' + pathNoFile))
             }
 
             return patterns
         })
     ]
+    console.log('~~~~overridesMAP', overridesMap)
     // TODO: manually push a false positive e.g. chakra-ui/whatever/icons to make sure we don't override that
 
     // TODO: filter regex already generated above out of this map
@@ -194,6 +178,8 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             )
             ?.join('|')})`
     )
+    console.log('++++++overridesregex++++++', overridesRegex)
+
     // TODO: maybe parse the whole dependency tree and rewrite it with this
     //  https://github.com/dependents/node-dependency-tree
 

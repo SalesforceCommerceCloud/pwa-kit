@@ -93,7 +93,6 @@ const icon = (name, passProps) => {
     const component = forwardRef((props, ref) => {
         const theme = useTheme()
         const baseStyle = theme?.components?.Icon?.baseStyle
-        console.log('~hello ^icons')
         return (
             // <Icon ref={ref} {...baseStyle} {...passProps} {...props}>
             //     <use role="presentation" xlinkHref={`#${name}`} />
