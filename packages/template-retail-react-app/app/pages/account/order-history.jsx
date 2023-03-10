@@ -79,18 +79,21 @@ OrderProductImages.propTypes = {
 const AccountOrderHistory = () => {
     const location = useLocation()
     const {formatMessage, formatDate} = useIntl()
-
     const navigate = useNavigation()
 
-    const {data: customer} = useCurrentCustomer()
+    const {data: customer, isLoading: isLoadingCustomer} = useCurrentCustomer()
     const {customerId} = customer
 
     const searchParams = useSearchParams()
     const {limit, offset} = searchParams[0]
 
-    const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders({
+    const {data: {data: orders, ...paging} = {}, isLoading: isLoadingOrders} = useCustomerOrders({
         parameters: {customerId, limit: DEFAULT_PAGINATION_LIMIT || limit, offset}
-    })
+    }, {enabled: !isLoadingCustomer})
+
+    const isLoading = isLoadingOrders || isLoadingCustomer
+
+    const hasOrders = orders?.length > 0
 
     const pageUrls = usePageUrls({total: paging.total, limit: DEFAULT_PAGINATION_LIMIT || limit})
 
@@ -109,7 +112,7 @@ const AccountOrderHistory = () => {
                 </Heading>
             </Stack>
 
-            {isLoading || !orders ? (
+            {isLoading? (
                 [1, 2, 3].map((i) => (
                     <Stack key={i} spacing={4} layerStyle="cardBordered">
                         <Stack spacing={2}>
@@ -126,7 +129,7 @@ const AccountOrderHistory = () => {
                 ))
             ) : (
                 <Stack spacing={4}>
-                    {orders.map((order) => {
+                    { orders?.map((order) => {
                         return (
                             <Stack key={order.orderNo} spacing={4} layerStyle="cardBordered">
                                 <Box>
@@ -217,7 +220,7 @@ const AccountOrderHistory = () => {
                         )
                     })}
 
-                    {orders?.length > 0 && orders?.length < paging.total && (
+                    {hasOrders && orders?.length < paging.total && (
                         <Box pt={4}>
                             <Pagination
                                 currentURL={`${location.pathname}${location.search}`}
@@ -228,7 +231,7 @@ const AccountOrderHistory = () => {
                 </Stack>
             )}
 
-            {orders?.length < 1 && !isLoading && (
+            {!hasOrders && !isLoading && (
                 <PageActionPlaceHolder
                     icon={<ReceiptIcon boxSize={8} />}
                     heading={formatMessage({

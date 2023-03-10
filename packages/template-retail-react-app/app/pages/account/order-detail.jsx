@@ -33,13 +33,17 @@ import CartItemVariantAttributes from '../../components/item-variant/item-attrib
 import CartItemVariantPrice from '../../components/item-variant/item-price'
 import PropTypes from 'prop-types'
 
-const Products = ({productItems, currency}) => {
+const OrderProducts = ({productItems, currency, isLoadingOrder}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
-    const {data: {data: products} = {}, isLoading} = useProducts({
+    const {data: {data: products} = {}, isLoading: isLoadingProducts} = useProducts({
         parameters: {
             ids: ids
         }
+    },{
+        enabled:!isLoadingOrder
     })
+
+    const isLoading = isLoadingProducts || isLoadingOrder
 
     const variants =
         products &&
@@ -55,8 +59,7 @@ const Products = ({productItems, currency}) => {
     return (
         <>
             {!isLoading &&
-                products &&
-                variants.map((variant, index) => {
+                variants?.map((variant, index) => {
                     return (
                         <Box
                             p={[4, 6]}
@@ -91,7 +94,7 @@ const Products = ({productItems, currency}) => {
     )
 }
 
-Products.propTypes = {
+OrderProducts.propTypes = {
     productItems: PropTypes.array,
     currency: PropTypes.string
 }
@@ -101,8 +104,8 @@ const AccountOrderDetail = () => {
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
 
-    const {data: order, isLoading} = useOrder({parameters: {orderNo: params.orderNo}})
-
+    const {data: order, isLoading: isLoadingOrder} = useOrder({parameters: {orderNo: params.orderNo}})
+    const isLoading = isLoadingOrder || !order
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
@@ -141,7 +144,7 @@ const AccountOrderDetail = () => {
                         />
                     </Heading>
 
-                    {!isLoading && order ? (
+                    {!isLoadingOrder && order ? (
                         <Stack
                             direction={['column', 'row']}
                             alignItems={['flex-start', 'center']}
@@ -187,7 +190,7 @@ const AccountOrderDetail = () => {
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
                     <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={5} py={{xl: 6}}>
-                        {isLoading || !order ? (
+                        {isLoading ? (
                             <>
                                 <Stack>
                                     <Skeleton h="20px" w="84px" />
@@ -303,7 +306,7 @@ const AccountOrderDetail = () => {
                         )}
                     </SimpleGrid>
 
-                    {!isLoading && order ? (
+                    {!isLoading ? (
                         <Box
                             py={{base: 6}}
                             px={{base: 6, xl: 8}}
@@ -319,7 +322,7 @@ const AccountOrderDetail = () => {
             </Box>
 
             <Stack spacing={4}>
-                {!isLoading && order && (
+                {!isLoading && (
                     <Text>
                         <FormattedMessage
                             defaultMessage="{count} items"
@@ -330,7 +333,7 @@ const AccountOrderDetail = () => {
                 )}
 
                 <Stack spacing={4}>
-                    {isLoading || !order ? (
+                    {isLoading ? (
                         [1, 2, 3].map((i) => (
                             <Box
                                 key={i}
@@ -351,7 +354,7 @@ const AccountOrderDetail = () => {
                             </Box>
                         ))
                     ) : (
-                        <Products productItems={order.productItems} currency={order.currency} />
+                        <OrderProducts productItems={order.productItems} currency={order.currency} isLoadingOrder={isLoading} />
                     )}
                 </Stack>
             </Stack>
