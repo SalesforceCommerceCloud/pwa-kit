@@ -7,6 +7,7 @@
 const sites = require('./sites.js')
 
 module.exports = {
+    location: 'template project folder',
     app: {
         url: {
             site: 'path',
