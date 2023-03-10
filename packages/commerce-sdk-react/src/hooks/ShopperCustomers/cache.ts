@@ -144,24 +144,20 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                     // Also selectively update the lists
                     queryKey: getCustomerProductLists.queryKey(parameters),
                     updater: (oldData: ShopperCustomersTypes.CustomerProductListResult) => {
-                        const clone: ShopperCustomersTypes.CustomerProductListResult = JSON.parse(
-                            JSON.stringify(oldData)
-                        )
-                        const list = clone.data.find((list) => list.id === listId)
-                        const item = list?.customerProductListItems?.find(
-                            (item) => item.id === itemId
-                        )
-                        const itemIndex =
-                            list && item && list.customerProductListItems?.indexOf(item)
-
-                        if (list === undefined || itemIndex === undefined) {
-                            return oldData
+                        return {
+                            ...oldData,
+                            data: oldData.data.map((list) =>
+                                list.id !== listId
+                                    ? list
+                                    : {
+                                          ...list,
+                                          customerProductListItems:
+                                              list.customerProductListItems?.map((item) =>
+                                                  item.id !== itemId ? item : response
+                                              )
+                                      }
+                            )
                         }
-                        if (list.customerProductListItems) {
-                            list.customerProductListItems[itemIndex] = response
-                        }
-
-                        return clone
                     }
                 }
             ],
