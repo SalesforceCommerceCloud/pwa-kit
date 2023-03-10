@@ -379,8 +379,18 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional('loader', './app/loader.js'),
-                ...optional('worker', './worker/main.js'),
+                ...optional(
+                    'loader',
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? `.${pkg?.mobify?.overridesDir}/app/request-processor.js`
+                        : './app/loader.js'
+                ),
+                ...optional(
+                    'worker',
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? `.${pkg?.mobify?.overridesDir}/app/request-processor.js`
+                        : './app/main.js'
+                ),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
@@ -452,7 +462,11 @@ const ssr = (() => {
                     ...config,
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
-                    entry: './app/ssr.js',
+                    // entry: './app/ssr.js',
+                    entry:
+                        pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                            ? `.${pkg?.mobify?.overridesDir}/app/ssr.js`
+                            : './app/ssr.js',
                     output: {
                         path: buildDir,
                         filename: 'ssr.js',
@@ -481,7 +495,11 @@ const requestProcessor =
             return {
                 ...config,
                 name: REQUEST_PROCESSOR,
-                entry: './app/request-processor.js',
+                // entry: './app/request-processor.js',
+                entry:
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? `.${pkg?.mobify?.overridesDir}/app/request-processor.js`
+                        : './app/request-processor.js',
                 output: {
                     path: buildDir,
                     filename: 'request-processor.js',

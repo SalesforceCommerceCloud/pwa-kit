@@ -219,11 +219,19 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-        if (resolved?.match(/brand-logo/)) {
-            console.log('~BRAND LOGO')
+        if (resolved?.match('app/request-processor')) {
+            console.log('++++++++')
+            console.log('REQUEST PROCESSOR')
             console.log('~resource.request', resource.request)
             console.log('~resource.context', resource.context)
+            console.log('++++++++')
         }
+
+        // if (resolved?.match(/brand-logo/)) {
+        //     console.log('~BRAND LOGO')
+        //     console.log('~resource.request', resource.request)
+        //     console.log('~resource.context', resource.context)
+        // }
         // if (resource.request.match(/\~/)) {
         //     if (resolved?.match(/app\/components\/icons$/)) {
         //         console.log('~===== ~~ Magic', resolved)
@@ -328,11 +336,15 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             resolved?.match?.(matchRegex) &&
             _overrides?.filter((override) => override?.match(/\.(?=[^\/]+$)/))?.length
         ) {
+            if (resolved?.match('app/request-processor')) {
+                console.log('>>>>>')
+                console.log('HAS OVERRIDES MATCH (Request Processor )')
+            }
             const depth = pkg?.mobify?.overridesDir?.replace?.(/^\//, '')?.split('/') || []
             const relativePath = resolved?.split?.(matchRegex)?.[1]
             const newPath = projectDir + pkg?.mobify?.overridesDir + relativePath
             // TODO: delete all of this when done debugging
-            if (resolved?.match(/app\/components\/icons$/) || resolved?.match(/brand-logo/)) {
+            if (resolved?.match('app/request-processor')) {
                 console.log('~new resource.request!!!', newPath)
                 console.log('~relativePath', relativePath)
             }
@@ -343,7 +355,9 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             // no longer true before removing
 
             // _overrides knows the full file path including extension
-            // resource.createData.resource = newPath + '/index.jsx'
+            if (resolved?.match('app/theme')) {
+                resource.createData.resource = newPath + '/index.js'
+            }
         } else {
             // console.log('~NOT REWRITTEN')
         }
