@@ -76,11 +76,6 @@ const Cart = () => {
     )
     const {isRegistered} = useCustomerType()
 
-    console.log('=====================================')
-    console.log('isFetching', isFetching)
-    console.log('isRefetching', isRefetching)
-    console.log('isProductsLoading', isProductsLoading)
-
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
