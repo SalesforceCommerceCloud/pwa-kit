@@ -140,7 +140,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         return {
             update: [
                 {queryKey: getCustomerProductListItem.queryKey(parameters)},
-                // TODO: make separate PR that merges into develop
                 {
                     // Also selectively update the lists
                     queryKey: getCustomerProductLists.queryKey(parameters),

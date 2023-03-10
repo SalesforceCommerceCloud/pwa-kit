@@ -8,9 +8,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
 import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
+import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 
-import useWishlist from '../../../../hooks/use-wishlist'
 import {useToast} from '../../../../hooks/use-toast'
+import {useCurrentCustomer} from '../../../../hooks/use-current-customer'
+import {useWishList} from '../../../../hooks/use-wish-list'
 
 import ConfirmationModal from '../../../../components/confirmation-modal/index'
 import {useItemVariant} from '../../../../components/item-variant'
@@ -43,7 +45,8 @@ export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
  */
 const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
     const variant = useItemVariant()
-    const wishlist = useWishlist()
+    const {data: customer} = useCurrentCustomer()
+    const {data: wishList} = useWishList()
     const modalProps = useDisclosure()
     const toast = useToast()
     const {formatMessage} = useIntl()
@@ -52,25 +55,39 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
         modalProps.onOpen()
     }
 
-    // TODO
+    const deleteCustomerProductListItem = useShopperCustomersMutation(
+        'deleteCustomerProductListItem'
+    )
+
     const handleItemRemove = async () => {
         onClick(variant.id)
-        try {
-            await wishlist.removeListItem(productListItemId)
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'Item removed from wishlist',
-                    id: 'wishlist_secondary_button_group.info.item_removed'
-                }),
-                status: 'success'
-            })
-        } catch {
-            toast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
-            })
-        }
-        onClick('')
+
+        deleteCustomerProductListItem.mutate(
+            {
+                parameters: {
+                    customerId: customer.customerId,
+                    listId: wishList.id,
+                    itemId: productListItemId
+                }
+            },
+            {
+                onSuccess: () => {
+                    toast({
+                        title: formatMessage({
+                            defaultMessage: 'Item removed from wishlist',
+                            id: 'wishlist_secondary_button_group.info.item_removed'
+                        }),
+                        status: 'success'
+                    })
+                },
+                onError: () => {
+                    toast({title: formatMessage(API_ERROR_MESSAGE), status: 'error'})
+                },
+                onSettled: () => {
+                    onClick('')
+                }
+            }
+        )
     }
 
     return (
