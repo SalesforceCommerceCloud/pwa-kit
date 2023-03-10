@@ -12,7 +12,8 @@ import {useLocation} from 'react-router-dom'
 import {useVariationParams} from './use-variation-params'
 
 // Utils
-import {rebuildPathWithParams} from '../utils/url'
+import {updateSearchParams} from '../utils/url'
+import {usePDPSearchParams} from './use-pdp-search-params'
 
 /**
  * Return the first image in the `swatch` type image group for a given
@@ -47,8 +48,23 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @param {Object} location
  * @returns {String} a product url for the current variation value.
  */
-const buildVariantValueHref = (product, params, location) => {
-    return rebuildPathWithParams(`${location.pathname}${location.search}`, params)
+const buildVariantValueHref = ({
+    pathname,
+    existingParams,
+    newParams,
+    productId,
+    isProductPartOfSet
+}) => {
+    const [allParams, productParams] = existingParams
+
+    if (isProductPartOfSet) {
+        updateSearchParams(productParams, newParams)
+        allParams.set(productId, productParams.toString())
+    } else {
+        updateSearchParams(allParams, newParams)
+    }
+
+    return `${pathname}?${allParams.toString()}`
 }
 
 /**
@@ -80,10 +96,12 @@ const isVariantValueOrderable = (product, variationParams) => {
  * @returns {Array} a decorated variation attributes list.
  *
  */
-export const useVariationAttributes = (product = {}) => {
+export const useVariationAttributes = (product = {}, isProductPartOfSet = false) => {
     const {variationAttributes = []} = product
     const location = useLocation()
-    const variationParams = useVariationParams(product)
+    const variationParams = useVariationParams(product, isProductPartOfSet)
+
+    const existingParams = usePDPSearchParams(product.id)
 
     return useMemo(
         () =>
@@ -104,7 +122,13 @@ export const useVariationAttributes = (product = {}) => {
                     return {
                         ...value,
                         image: getVariantValueSwatch(product, value),
-                        href: buildVariantValueHref(product, params, location),
+                        href: buildVariantValueHref({
+                            pathname: location.pathname,
+                            existingParams,
+                            newParams: params,
+                            productId: product.id,
+                            isProductPartOfSet
+                        }),
                         orderable: isVariantValueOrderable(product, params)
                     }
                 })

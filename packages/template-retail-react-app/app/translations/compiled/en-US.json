@@ -1593,6 +1593,12 @@
       "value": "Sale"
     }
   ],
+  "item_price.label.starting_at": [
+    {
+      "type": 0,
+      "value": "Starting at"
+    }
+  ],
   "lCPCxk": [
     {
       "type": 0,
@@ -2317,6 +2323,24 @@
       "value": "Wishlist"
     }
   ],
+  "product_tile.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "Starting at"
+    }
+  ],
+  "product_view.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Add Set to Cart"
+    }
+  ],
+  "product_view.button.add_set_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Add Set to Wishlist"
+    }
+  ],
   "product_view.button.add_to_cart": [
     {
       "type": 0,
@@ -2339,6 +2363,12 @@
     {
       "type": 0,
       "value": "Quantity"
+    }
+  ],
+  "product_view.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "Starting at"
     }
   ],
   "product_view.link.full_details": [
@@ -3153,16 +3183,28 @@
       "value": "New Password"
     }
   ],
+  "wishlist_primary_action.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Add Set to Cart"
+    }
+  ],
   "wishlist_primary_action.button.add_to_cart": [
     {
       "type": 0,
       "value": "Add to Cart"
     }
   ],
-  "wishlist_primary_action.button.select_options": [
+  "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
-      "value": "Select Options"
+      "value": "View Full Details"
+    }
+  ],
+  "wishlist_primary_action.button.view_options": [
+    {
+      "type": 0,
+      "value": "View Options"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [
