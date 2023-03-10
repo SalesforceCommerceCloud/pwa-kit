@@ -11,7 +11,7 @@ import {useCommerceAPI, CustomerContext} from '../contexts'
 const AuthTypes = Object.freeze({GUEST: 'guest', REGISTERED: 'registered'})
 
 // This value represents the max age in milliseconds a customer can be before they are
-// no longer considered a "new" customer. 
+// no longer considered a "new" customer.
 // E.g. If a customers creation date is older than 2 seconds it will no longer be considered
 // a new customer.
 const NEW_CUSTOMER_MAX_AGE = 2 * 1000 // 2 seconds in milliseconds
