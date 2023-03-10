@@ -50,8 +50,8 @@ export default function useCustomer() {
                 const addresses = [...customer.addresses]
                 const preferredIndex = addresses.findIndex((addr) => addr.preferred)
                 if (preferredIndex === -1) return addresses
-                addresses.splice(preferredIndex, 1)
-                return [addresses[preferredIndex], ...addresses]
+                const [preferred] = addresses.splice(preferredIndex, 1)
+                return [preferred, ...addresses]
             },
 
             /**
