@@ -8,7 +8,6 @@ import webpack from 'webpack'
 import path, {resolve} from 'path'
 import glob from 'glob'
 import minimatch from 'minimatch'
-import {inspect} from 'util'
 
 const projectDir = process.cwd()
 const pkg = require(resolve(projectDir, 'package.json'))
@@ -109,16 +108,10 @@ const templateAppPathRegex = makeRegExp(
 export const allFiles = (projectDir) => {
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-        // if (resolved.match(/template\-retail\-react\-app\/app\/components\/icons/)) {
-        //     console.log('~OOPS!')
-        //     console.log('~ALL FILES ==== resource.context', resource.context)
-        //     console.log('~ALL FILES ==== resource.request', resource.request)
-        // }
     })
 }
 
 export const extendedTemplateReplacementPlugin = (projectDir) => {
-    console.log('~templateAppPathRegex', templateAppPathRegex)
     // EXAMPLE:
     // file: overrides/app/icons/index.jsx
     // now we manipulate this string to be
@@ -154,14 +147,11 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
         )
     })
 
-    console.log('~_overridesHashMap', _overridesHashMap)
-    console.log('+++++++overrides+++++', _overrides)
 
     const overridesMap = [
         ...overrides,
         ...overrides.flatMap((item) => {
             const patterns = []
-            console.log('each item', item)
             const EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
             patterns.push(item)
 
@@ -173,14 +163,6 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
 
             // returns true if the string ends with a '/'
             const hasSlash = item?.endsWith('/')
-
-            // returns true if path ends with file name of 'index'
-            const endsWithIndex = item?.split(extRe)?.[0]?.endsWith?.('index')
-
-            // if (!endsWithIndex) {
-            //     console.log('=======doesnt end with index', patterns)
-            //     return patterns
-            // }
 
             if (hasExt || !hasSlash) {
                 const noExt = item.replace(extRe, '')
@@ -197,7 +179,6 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             return patterns
         })
     ]
-    console.log('~overridesMap', overridesMap)
     // TODO: manually push a false positive e.g. chakra-ui/whatever/icons to make sure we don't override that
 
     // TODO: filter regex already generated above out of this map
@@ -213,51 +194,16 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             )
             ?.join('|')})`
     )
-    console.log('~overridesRegex', overridesRegex)
     // TODO: maybe parse the whole dependency tree and rewrite it with this
     //  https://github.com/dependents/node-dependency-tree
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-        if (resolved?.match(/brand-logo/)) {
-            console.log('~BRAND LOGO')
-            console.log('~resource.request', resource.request)
-            console.log('~resource.context', resource.context)
-        }
-        // if (resource.request.match(/\~/)) {
-        //     if (resolved?.match(/app\/components\/icons$/)) {
-        //         console.log('~===== ~~ Magic', resolved)
-        //     }
-        //     const relativePath = resolved
-        //         ?.split(`~`)?.[1]
-        //         ?.replace(pkg?.mobify?.extends, '')
-        //         ?.replace(/^\//, '')
-        //     const newPath = path.resolve(
-        //         projectDir,
-        //         pkg?.mobify?.overridesDir?.replace(/^\//, ''),
-        //         relativePath
-        //     )
-        //     if (resolved?.match(/app\/components\/icons$/)) {
-        //         console.log('~ ~ magic newPath', newPath)
-        //     }
-        //     // NOTE: overriding either of these alone does not work, both must be set
-        //     resource.request = newPath
-        //     resource.createData.resource = newPath
-        //     return
-        // }
 
         if (resource.request.match(/\^/)) {
-            // if (resolved?.match(/app\/components\/icons$/)) {
-            //     console.log('~===== ^^ Magic')
-            //     console.log('~resource.request', resource.request)
-            //     console.log('~resource.context', resource.context)
-            // }
-
             const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
             const newPath = path.resolve(projectDir, 'node_modules', relativePath)
-            // if (resolved?.match(/app\/components\/icons$/)) {
-            //     console.log('~^ magic newPath', newPath)
-            // }
+
             // NOTE: overriding either of these alone does not work, both must be set
             resource.request = newPath
             resource.createData.resource = newPath
@@ -268,62 +214,19 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
         // if there IS a match -> this is false and skips
         // if there IS NOT a match -> this is true and prints NO MATCH
         if (!resolved?.match(overridesRegex)?.length) {
-            // if (resolved?.match(/app\/components\/icons/)) {
-            //     console.log(`------`)
-            //     console.log('~NO MATCH of resolved icons file in overrides array')
-            //     console.log('~resource.context', resource.context)
-            //     console.log('~resource.request', resource.request)
-            //     console.log('~resolved', resolved)
-            //     console.log(`------`)
-            // }
-
             return
         }
-        // ignore magic paths and don't attempt to overwrite them
-        // console.log('++++++++')
-        // console.log(`resource.context`, resource.context)
-        // console.log(`resource.request`, resource.request)
-        // console.log('THERE WAS A MATCH!!!!!')
-        // console.log('++++++++')
+
         if (
             // TODO: this array appears to always contain object where the `dependency[x].request
             // holds reference to the original request, which is what we want to introspect on
             // whether magic characters like `^` were used
             resource?.dependencies?.[0]?.request?.match?.(/\^/)?.[0]
         ) {
-            // console.log('~EARLY RETURN')
             return
         }
         const matchRegex = makeRegExp(pkg?.mobify?.extends)
-        // TODO: delete all of this when done debugging
-        // if (resource?.context?.match(/header/) && resource?.request?.match(/icons/)) {
-        //     console.log('~~~~~~~~~~~~~~~~~~~~~~~')
-        //     console.log('~resource.context', resource.context)
-        //     console.log('~resource.request', resource.request)
-        //     console.log('~resolved', resolved)
-        //     console.log('~matchRegex', matchRegex)
-        //     console.log(`resolved?.match?.(matchRegex)`, resolved?.match?.(matchRegex))
-        //     console.log(
-        //         `inspect(resource?.dependencies?.[0]?.request)`,
-        //         inspect(resource?.dependencies?.[0]?.request)
-        //     )
-        //     console.log(
-        //         `_overrides?.filter((override) => override?.match(/\.(?=[^\/]+$)/))?.length`,
-        //         _overrides?.filter((override) => override?.match(/\.(?=[^\/]+$)/))?.length
-        //     )
-        //     console.log(
-        //         `resource?.dependencies?.[0]?.request?.match?.(/\^/)`,
-        //         resource?.dependencies?.[0]?.request?.match?.(/\^/)
-        //     )
-        //     console.log(
-        //         `resource?.dependencies?.[0]?.request?.match?.(/\^/)?.[0]`,
-        //         resource?.dependencies?.[0]?.request?.match?.(/\^/)?.[0]
-        //     )
-        //     console.log(
-        //         `!resource?.dependencies?.[0]?.request?.match?.(/\^/)?.[0]`,
-        //         !resource?.dependencies?.[0]?.request?.match?.(/\^/)?.[0]
-        //     )
-        // }
+
         if (
             resolved?.match?.(matchRegex) &&
             _overrides?.filter((override) => override?.match(/\.(?=[^\/]+$)/))?.length
@@ -331,21 +234,10 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             const depth = pkg?.mobify?.overridesDir?.replace?.(/^\//, '')?.split('/') || []
             const relativePath = resolved?.split?.(matchRegex)?.[1]
             const newPath = projectDir + pkg?.mobify?.overridesDir + relativePath
-            // TODO: delete all of this when done debugging
-            if (resolved?.match(/app\/components\/icons$/) || resolved?.match(/brand-logo/)) {
-                console.log('~new resource.request!!!', newPath)
-                console.log('~relativePath', relativePath)
-            }
 
             // NOTE: overriding either of these alone does not work, both must be set
             resource.request = newPath
-            // TODO: before, omitting file extension this would fail, verify this is
-            // no longer true before removing
 
-            // _overrides knows the full file path including extension
-            // resource.createData.resource = newPath + '/index.jsx'
-        } else {
-            // console.log('~NOT REWRITTEN')
         }
     })
 }
