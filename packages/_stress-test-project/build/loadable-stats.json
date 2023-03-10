@@ -1,0 +1,293 @@
+{
+  "name": "client",
+  "hash": "cf8ffd2113d8498b72ae",
+  "publicPath": "/mobify/bundle/development/",
+  "outputPath": "/Users/bfeister/dev/pwa-kit/packages/_stress-test-project/build",
+  "assetsByChunkName": {
+    "main": [
+      "main.js"
+    ],
+    "pages-home": [
+      "pages-home.js"
+    ],
+    "vendor": [
+      "vendor.js"
+    ]
+  },
+  "assets": [
+    {
+      "type": "asset",
+      "name": "vendor.js",
+      "size": 3962917,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "vendor.js.map"
+        }
+      },
+      "chunkNames": [
+        "vendor"
+      ],
+      "chunkIdHints": [
+        "vendor"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "vendor"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "main.js",
+      "size": 264207,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "main.js.map"
+        }
+      },
+      "chunkNames": [
+        "main"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "main"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-home.js",
+      "size": 19955,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "pages-home.js.map"
+        }
+      },
+      "chunkNames": [
+        "pages-home"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "pages-home"
+      ],
+      "auxiliaryChunks": []
+    }
+  ],
+  "namedChunkGroups": {
+    "main": {
+      "name": "main",
+      "chunks": [
+        "vendor",
+        "main"
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "main.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 2,
+      "auxiliaryAssetsSize": null,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-home": {
+      "name": "pages-home",
+      "chunks": [
+        "vendor",
+        "pages-home"
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "pages-home.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 2,
+      "auxiliaryAssetsSize": null,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-login": {
+      "name": "^retail-react-app-app-pages-login",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-registration": {
+      "name": "^retail-react-app-app-pages-registration",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-reset-password": {
+      "name": "^retail-react-app-app-pages-reset-password",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-account": {
+      "name": "^retail-react-app-app-pages-account",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-cart": {
+      "name": "^retail-react-app-app-pages-cart",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-checkout": {
+      "name": "^retail-react-app-app-pages-checkout",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-checkout-confirmation": {
+      "name": "^retail-react-app-app-pages-checkout-confirmation",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-login-redirect": {
+      "name": "^retail-react-app-app-pages-login-redirect",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-product-detail": {
+      "name": "^retail-react-app-app-pages-product-detail",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-product-list": {
+      "name": "^retail-react-app-app-pages-product-list",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-account-wishlist": {
+      "name": "^retail-react-app-app-pages-account-wishlist",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "^retail-react-app-app-pages-page-not-found": {
+      "name": "^retail-react-app-app-pages-page-not-found",
+      "chunks": [],
+      "assets": [],
+      "filteredAssets": 0,
+      "assetsSize": 0,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    }
+  },
+  "generator": "loadable-components",
+  "chunks": [
+    {
+      "id": "main",
+      "files": [
+        "main.js"
+      ]
+    },
+    {
+      "id": "pages-home",
+      "files": [
+        "pages-home.js"
+      ]
+    },
+    {
+      "id": "vendor",
+      "files": [
+        "vendor.js"
+      ]
+    }
+  ]
+}

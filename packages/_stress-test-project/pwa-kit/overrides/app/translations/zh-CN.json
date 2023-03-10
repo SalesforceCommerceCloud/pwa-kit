@@ -1,0 +1,1417 @@
+{
+  "account.accordion.button.my_account": {
+    "defaultMessage": "我的账户"
+  },
+  "account.heading.my_account": {
+    "defaultMessage": "我的账户"
+  },
+  "account.logout_button.button.log_out": {
+    "defaultMessage": "登出"
+  },
+  "account_addresses.badge.default": {
+    "defaultMessage": "默认"
+  },
+  "account_addresses.button.add_address": {
+    "defaultMessage": "添加地址"
+  },
+  "account_addresses.info.address_updated": {
+    "defaultMessage": "已更新地址"
+  },
+  "account_addresses.info.new_address_saved": {
+    "defaultMessage": "已保存新地址"
+  },
+  "account_addresses.page_action_placeholder.button.add_address": {
+    "defaultMessage": "添加地址"
+  },
+  "account_addresses.page_action_placeholder.heading.no_saved_addresses": {
+    "defaultMessage": "没有保存的地址"
+  },
+  "account_addresses.page_action_placeholder.message.add_new_address": {
+    "defaultMessage": "添加新地址方式，加快结账速度。"
+  },
+  "account_addresses.title.addresses": {
+    "defaultMessage": "地址"
+  },
+  "account_detail.title.account_details": {
+    "defaultMessage": "账户详情"
+  },
+  "account_order_detail.heading.billing_address": {
+    "defaultMessage": "账单地址"
+  },
+  "account_order_detail.heading.num_of_items": {
+    "defaultMessage": "{count} 件商品"
+  },
+  "account_order_detail.heading.payment_method": {
+    "defaultMessage": "付款方式"
+  },
+  "account_order_detail.heading.shipping_address": {
+    "defaultMessage": "送货地址"
+  },
+  "account_order_detail.heading.shipping_method": {
+    "defaultMessage": "送货方式"
+  },
+  "account_order_detail.label.order_number": {
+    "defaultMessage": "订单编号：{orderNumber}"
+  },
+  "account_order_detail.label.ordered_date": {
+    "defaultMessage": "下单日期：{date}"
+  },
+  "account_order_detail.label.pending_tracking_number": {
+    "defaultMessage": "待处理"
+  },
+  "account_order_detail.label.tracking_number": {
+    "defaultMessage": "跟踪编号"
+  },
+  "account_order_detail.link.back_to_history": {
+    "defaultMessage": "返回订单记录"
+  },
+  "account_order_detail.title.order_details": {
+    "defaultMessage": "订单详情"
+  },
+  "account_order_history.button.continue_shopping": {
+    "defaultMessage": "继续购物"
+  },
+  "account_order_history.description.once_you_place_order": {
+    "defaultMessage": "下订单后，详细信息将显示在此处。"
+  },
+  "account_order_history.heading.no_order_yet": {
+    "defaultMessage": "您尚未下订单。"
+  },
+  "account_order_history.label.num_of_items": {
+    "defaultMessage": "{count} 件商品",
+    "description": "Number of items in order"
+  },
+  "account_order_history.label.order_number": {
+    "defaultMessage": "订单编号：{orderNumber}"
+  },
+  "account_order_history.label.ordered_date": {
+    "defaultMessage": "下单日期：{date}"
+  },
+  "account_order_history.label.shipped_to": {
+    "defaultMessage": "送货至：{name}"
+  },
+  "account_order_history.link.view_details": {
+    "defaultMessage": "查看详情"
+  },
+  "account_order_history.title.order_history": {
+    "defaultMessage": "订单记录"
+  },
+  "account_payment_methods.button.add_method": {
+    "defaultMessage": "添加付款方式"
+  },
+  "account_payment_methods.description.add_method_for_faster_checkout": {
+    "defaultMessage": "添加新付款方式，加快结账速度。"
+  },
+  "account_payment_methods.heading.no_saved_methods": {
+    "defaultMessage": "没有保存的付款方式"
+  },
+  "account_payment_methods.info.new_method_saved": {
+    "defaultMessage": "已保存新付款方式"
+  },
+  "account_payment_methods.title.payment_methods": {
+    "defaultMessage": "付款方式"
+  },
+  "account_wishlist.button.continue_shopping": {
+    "defaultMessage": "继续购物"
+  },
+  "account_wishlist.description.continue_shopping": {
+    "defaultMessage": "继续购物并将商品加入愿望清单。"
+  },
+  "account_wishlist.heading.no_wishlist": {
+    "defaultMessage": "没有愿望清单商品"
+  },
+  "account_wishlist.title.wishlist": {
+    "defaultMessage": "愿望清单"
+  },
+  "action_card.action.edit": {
+    "defaultMessage": "编辑"
+  },
+  "action_card.action.remove": {
+    "defaultMessage": "移除"
+  },
+  "add_to_cart_modal.info.added_to_cart": {
+    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至购物车"
+  },
+  "add_to_cart_modal.label.cart_subtotal": {
+    "defaultMessage": "购物车小计（{itemAccumulatedCount} 件商品）"
+  },
+  "add_to_cart_modal.label.quantity": {
+    "defaultMessage": "数量"
+  },
+  "add_to_cart_modal.link.checkout": {
+    "defaultMessage": "继续以结账"
+  },
+  "add_to_cart_modal.link.view_cart": {
+    "defaultMessage": "查看购物车"
+  },
+  "add_to_cart_modal.recommended_products.title.might_also_like": {
+    "defaultMessage": "您可能还喜欢"
+  },
+  "auth_modal.description.now_signed_in": {
+    "defaultMessage": "您现在已登录。"
+  },
+  "auth_modal.error.incorrect_email_or_password": {
+    "defaultMessage": "您的电子邮件或密码有问题。重试"
+  },
+  "auth_modal.info.welcome_user": {
+    "defaultMessage": "欢迎 {name}，"
+  },
+  "auth_modal.password_reset_success.button.back_to_sign_in": {
+    "defaultMessage": "返回登录"
+  },
+  "auth_modal.password_reset_success.info.will_email_shortly": {
+    "defaultMessage": "您将通过 <b>{email}</b> 收到包含重置密码链接的电子邮件。"
+  },
+  "auth_modal.password_reset_success.title.password_reset": {
+    "defaultMessage": "密码重置"
+  },
+  "card_payment_form.heading.new_payment_method": {
+    "defaultMessage": "添加新付款方式"
+  },
+  "cart.info.removed_from_cart": {
+    "defaultMessage": "从购物车中移除商品"
+  },
+  "cart.recommended_products.title.may_also_like": {
+    "defaultMessage": "您可能还喜欢"
+  },
+  "cart.recommended_products.title.recently_viewed": {
+    "defaultMessage": "最近查看"
+  },
+  "cart_cta.link.checkout": {
+    "defaultMessage": "继续以结账"
+  },
+  "cart_secondary_button_group.action.added_to_wishlist": {
+    "defaultMessage": "添加到愿望清单"
+  },
+  "cart_secondary_button_group.action.edit": {
+    "defaultMessage": "编辑"
+  },
+  "cart_secondary_button_group.action.remove": {
+    "defaultMessage": "移除"
+  },
+  "cart_secondary_button_group.label.this_is_gift": {
+    "defaultMessage": "这是礼品。"
+  },
+  "cart_secondary_button_group.link_learn_more": {
+    "defaultMessage": "了解更多"
+  },
+  "cart_skeleton.heading.order_summary": {
+    "defaultMessage": "订单摘要"
+  },
+  "cart_skeleton.title.cart": {
+    "defaultMessage": "购物车"
+  },
+  "cart_title.title.cart_num_of_items": {
+    "defaultMessage": "购物车（{itemCount, plural, =0 {0 件商品} one {# 件商品} other {# 件商品}}）"
+  },
+  "cc_radio_group.action.remove": {
+    "defaultMessage": "移除"
+  },
+  "cc_radio_group.button.add_new_card": {
+    "defaultMessage": "添加新卡"
+  },
+  "checkout.button.place_order": {
+    "defaultMessage": "下订单"
+  },
+  "checkout.message.generic_error": {
+    "defaultMessage": "结帐期间发生意外错误。"
+  },
+  "checkout_confirmation.button.create_account": {
+    "defaultMessage": "创建账户"
+  },
+  "checkout_confirmation.heading.billing_address": {
+    "defaultMessage": "账单地址"
+  },
+  "checkout_confirmation.heading.create_account": {
+    "defaultMessage": "创建账户，加快结账速度"
+  },
+  "checkout_confirmation.heading.credit_card": {
+    "defaultMessage": "信用卡"
+  },
+  "checkout_confirmation.heading.delivery_details": {
+    "defaultMessage": "交货详情"
+  },
+  "checkout_confirmation.heading.order_summary": {
+    "defaultMessage": "订单摘要"
+  },
+  "checkout_confirmation.heading.payment_details": {
+    "defaultMessage": "付款详情"
+  },
+  "checkout_confirmation.heading.shipping_address": {
+    "defaultMessage": "送货地址"
+  },
+  "checkout_confirmation.heading.shipping_method": {
+    "defaultMessage": "送货方式"
+  },
+  "checkout_confirmation.heading.thank_you_for_order": {
+    "defaultMessage": "感谢您订购商品！"
+  },
+  "checkout_confirmation.label.free": {
+    "defaultMessage": "免费"
+  },
+  "checkout_confirmation.label.order_number": {
+    "defaultMessage": "订单编号"
+  },
+  "checkout_confirmation.label.order_total": {
+    "defaultMessage": "订单总额"
+  },
+  "checkout_confirmation.label.promo_applied": {
+    "defaultMessage": "已应用促销"
+  },
+  "checkout_confirmation.label.shipping": {
+    "defaultMessage": "送货"
+  },
+  "checkout_confirmation.label.subtotal": {
+    "defaultMessage": "小计"
+  },
+  "checkout_confirmation.label.tax": {
+    "defaultMessage": "税项"
+  },
+  "checkout_confirmation.link.continue_shopping": {
+    "defaultMessage": "继续购物"
+  },
+  "checkout_confirmation.link.login": {
+    "defaultMessage": "在此处登录"
+  },
+  "checkout_confirmation.message.already_has_account": {
+    "defaultMessage": "此电子邮件地址已注册账户。"
+  },
+  "checkout_confirmation.message.num_of_items_in_order": {
+    "defaultMessage": "{itemCount, plural, =0 {0 件商品} one {# 件商品} other {# 件商品}}",
+    "description": "# item(s) in order"
+  },
+  "checkout_confirmation.message.will_email_shortly": {
+    "defaultMessage": "我们会尽快向 <b>{email}</b> 发送带有您的确认号码和收据的电子邮件。"
+  },
+  "checkout_footer.link.privacy_policy": {
+    "defaultMessage": "隐私政策"
+  },
+  "checkout_footer.link.returns_exchanges": {
+    "defaultMessage": "退货与换货"
+  },
+  "checkout_footer.link.shipping": {
+    "defaultMessage": "送货"
+  },
+  "checkout_footer.link.site_map": {
+    "defaultMessage": "站点地图"
+  },
+  "checkout_footer.link.terms_conditions": {
+    "defaultMessage": "条款与条件"
+  },
+  "checkout_footer.message.copyright": {
+    "defaultMessage": "Salesforce 或其附属公司。保留所有权利。此仅为示范商店。所下订单不会被处理。"
+  },
+  "checkout_header.link.cart": {
+    "defaultMessage": "返回购物车"
+  },
+  "checkout_payment.action.remove": {
+    "defaultMessage": "移除"
+  },
+  "checkout_payment.button.review_order": {
+    "defaultMessage": "检查订单"
+  },
+  "checkout_payment.heading.billing_address": {
+    "defaultMessage": "账单地址"
+  },
+  "checkout_payment.heading.credit_card": {
+    "defaultMessage": "信用卡"
+  },
+  "checkout_payment.label.same_as_shipping": {
+    "defaultMessage": "与送货地址相同"
+  },
+  "checkout_payment.title.payment": {
+    "defaultMessage": "付款"
+  },
+  "confirmation_modal.default.action.no": {
+    "defaultMessage": "否"
+  },
+  "confirmation_modal.default.action.yes": {
+    "defaultMessage": "是"
+  },
+  "confirmation_modal.default.message.you_want_to_continue": {
+    "defaultMessage": "是否确定要继续？"
+  },
+  "confirmation_modal.default.title.confirm_action": {
+    "defaultMessage": "确认操作"
+  },
+  "confirmation_modal.remove_cart_item.action.no": {
+    "defaultMessage": "否，保留商品"
+  },
+  "confirmation_modal.remove_cart_item.action.yes": {
+    "defaultMessage": "是，移除商品"
+  },
+  "confirmation_modal.remove_cart_item.message.sure_to_remove": {
+    "defaultMessage": "是否确定要从购物车移除此商品？"
+  },
+  "confirmation_modal.remove_cart_item.title.confirm_remove": {
+    "defaultMessage": "确认移除商品"
+  },
+  "confirmation_modal.remove_wishlist_item.action.no": {
+    "defaultMessage": "否，保留商品"
+  },
+  "confirmation_modal.remove_wishlist_item.action.yes": {
+    "defaultMessage": "是，移除商品"
+  },
+  "confirmation_modal.remove_wishlist_item.message.sure_to_remove": {
+    "defaultMessage": "是否确定要从愿望清单移除此商品？"
+  },
+  "confirmation_modal.remove_wishlist_item.title.confirm_remove": {
+    "defaultMessage": "确认移除商品"
+  },
+  "contact_info.action.sign_out": {
+    "defaultMessage": "注销"
+  },
+  "contact_info.button.already_have_account": {
+    "defaultMessage": "已有账户？登录"
+  },
+  "contact_info.button.checkout_as_guest": {
+    "defaultMessage": "以访客身份结算"
+  },
+  "contact_info.button.login": {
+    "defaultMessage": "登录"
+  },
+  "contact_info.error.incorrect_username_or_password": {
+    "defaultMessage": "用户名或密码错误，请重试。"
+  },
+  "contact_info.link.forgot_password": {
+    "defaultMessage": "忘记密码？"
+  },
+  "contact_info.title.contact_info": {
+    "defaultMessage": "联系信息"
+  },
+  "credit_card_fields.tool_tip.security_code": {
+    "defaultMessage": "此 3 位数代码可在卡的背面找到。",
+    "description": "Generic credit card security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code.american_express": {
+    "defaultMessage": "此 4 位数代码可在卡的正面找到。",
+    "description": "American Express security code help text"
+  },
+  "drawer_menu.button.account_details": {
+    "defaultMessage": "账户详情"
+  },
+  "drawer_menu.button.addresses": {
+    "defaultMessage": "地址"
+  },
+  "drawer_menu.button.log_out": {
+    "defaultMessage": "退出"
+  },
+  "drawer_menu.button.my_account": {
+    "defaultMessage": "我的账户"
+  },
+  "drawer_menu.button.order_history": {
+    "defaultMessage": "订单记录"
+  },
+  "drawer_menu.button.payment_methods": {
+    "defaultMessage": "付款方式"
+  },
+  "drawer_menu.link.about_us": {
+    "defaultMessage": "关于我们"
+  },
+  "drawer_menu.link.customer_support": {
+    "defaultMessage": "客户支持"
+  },
+  "drawer_menu.link.customer_support.contact_us": {
+    "defaultMessage": "联系我们"
+  },
+  "drawer_menu.link.customer_support.shipping_and_returns": {
+    "defaultMessage": "送货与退货"
+  },
+  "drawer_menu.link.our_company": {
+    "defaultMessage": "我们的公司"
+  },
+  "drawer_menu.link.privacy_and_security": {
+    "defaultMessage": "隐私及安全"
+  },
+  "drawer_menu.link.privacy_policy": {
+    "defaultMessage": "隐私政策"
+  },
+  "drawer_menu.link.shop_all": {
+    "defaultMessage": "购买全部"
+  },
+  "drawer_menu.link.sign_in": {
+    "defaultMessage": "登录"
+  },
+  "drawer_menu.link.site_map": {
+    "defaultMessage": "站点地图"
+  },
+  "drawer_menu.link.store_locator": {
+    "defaultMessage": "实体店地址搜索"
+  },
+  "drawer_menu.link.terms_and_conditions": {
+    "defaultMessage": "条款与条件"
+  },
+  "empty_cart.description.empty_cart": {
+    "defaultMessage": "购物车内没有商品。"
+  },
+  "empty_cart.link.continue_shopping": {
+    "defaultMessage": "继续购物"
+  },
+  "empty_cart.link.sign_in": {
+    "defaultMessage": "登录"
+  },
+  "empty_cart.message.continue_shopping": {
+    "defaultMessage": "继续购物并将商品加入购物车。"
+  },
+  "empty_cart.message.sign_in_or_continue_shopping": {
+    "defaultMessage": "登录以检索您保存的商品或继续购物。"
+  },
+  "empty_search_results.info.cant_find_anything_for_category": {
+    "defaultMessage": "我们找不到{category}的任何内容。尝试搜索产品或{link}。"
+  },
+  "empty_search_results.info.cant_find_anything_for_query": {
+    "defaultMessage": "我们找不到“{searchQuery}”的任何内容。"
+  },
+  "empty_search_results.info.double_check_spelling": {
+    "defaultMessage": "请仔细检查您的拼写并重试或{link}。"
+  },
+  "empty_search_results.link.contact_us": {
+    "defaultMessage": "联系我们"
+  },
+  "empty_search_results.recommended_products.title.most_viewed": {
+    "defaultMessage": "查看最多的商品"
+  },
+  "empty_search_results.recommended_products.title.top_sellers": {
+    "defaultMessage": "最畅销"
+  },
+  "footer.column.account": {
+    "defaultMessage": "账户"
+  },
+  "footer.column.customer_support": {
+    "defaultMessage": "客户支持"
+  },
+  "footer.column.our_company": {
+    "defaultMessage": "我们的公司"
+  },
+  "footer.link.about_us": {
+    "defaultMessage": "关于我们"
+  },
+  "footer.link.contact_us": {
+    "defaultMessage": "联系我们"
+  },
+  "footer.link.order_status": {
+    "defaultMessage": "订单状态"
+  },
+  "footer.link.privacy_policy": {
+    "defaultMessage": "隐私政策"
+  },
+  "footer.link.shipping": {
+    "defaultMessage": "送货"
+  },
+  "footer.link.signin_create_account": {
+    "defaultMessage": "登录或创建账户"
+  },
+  "footer.link.site_map": {
+    "defaultMessage": "站点地图"
+  },
+  "footer.link.store_locator": {
+    "defaultMessage": "实体店地址搜索"
+  },
+  "footer.link.terms_conditions": {
+    "defaultMessage": "条款与条件"
+  },
+  "footer.message.copyright": {
+    "defaultMessage": "Salesforce 或其附属公司。保留所有权利。此仅为示范商店。所下订单不会被处理。"
+  },
+  "footer.subscribe.button.sign_up": {
+    "defaultMessage": "注册"
+  },
+  "footer.subscribe.description.sign_up": {
+    "defaultMessage": "注册以随时了解最热门的交易"
+  },
+  "footer.subscribe.heading.first_to_know": {
+    "defaultMessage": "率先了解"
+  },
+  "form_action_buttons.button.cancel": {
+    "defaultMessage": "取消"
+  },
+  "form_action_buttons.button.save": {
+    "defaultMessage": "保存"
+  },
+  "global.account.link.account_details": {
+    "defaultMessage": "账户详情"
+  },
+  "global.account.link.addresses": {
+    "defaultMessage": "地址"
+  },
+  "global.account.link.order_history": {
+    "defaultMessage": "订单记录"
+  },
+  "global.account.link.payment_methods": {
+    "defaultMessage": "付款方式"
+  },
+  "global.account.link.wishlist": {
+    "defaultMessage": "愿望清单"
+  },
+  "global.error.something_went_wrong": {
+    "defaultMessage": "出现错误。重试。"
+  },
+  "global.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
+  },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "从愿望清单中移除商品"
+  },
+  "global.link.added_to_wishlist.view_wishlist": {
+    "defaultMessage": "查看"
+  },
+  "header.button.assistive_msg.logo": {
+    "defaultMessage": "标志"
+  },
+  "header.button.assistive_msg.menu": {
+    "defaultMessage": "菜单"
+  },
+  "header.button.assistive_msg.my_account": {
+    "defaultMessage": "我的账户"
+  },
+  "header.button.assistive_msg.my_cart": {
+    "defaultMessage": "我的购物车"
+  },
+  "header.button.assistive_msg.wishlist": {
+    "defaultMessage": "愿望清单"
+  },
+  "header.field.placeholder.search_for_products": {
+    "defaultMessage": "搜索产品..."
+  },
+  "header.popover.action.log_out": {
+    "defaultMessage": "登出"
+  },
+  "header.popover.title.my_account": {
+    "defaultMessage": "我的账户"
+  },
+  "home.description.features": {
+    "defaultMessage": "开箱即用的功能，让您只需专注于添加增强功能。"
+  },
+  "home.description.here_to_help": {
+    "defaultMessage": "联系我们的支持人员。"
+  },
+  "home.description.here_to_help_line_2": {
+    "defaultMessage": "他们将为您提供适当指导。"
+  },
+  "home.description.shop_products": {
+    "defaultMessage": "本节包含目录中的内容。{docLink}（关于如何进行更换）",
+    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
+  },
+  "home.features.description.cart_checkout": {
+    "defaultMessage": "购物者购物车和结账体验的电子商务最佳实践。"
+  },
+  "home.features.description.components": {
+    "defaultMessage": "使用 Chakra UI 构建，Chakra UI 是一个简单、模块化且可访问的 React 组件库。"
+  },
+  "home.features.description.einstein_recommendations": {
+    "defaultMessage": "通过产品推荐向每位购物者提供下一个最佳产品或优惠。"
+  },
+  "home.features.description.my_account": {
+    "defaultMessage": "购物者可以管理账户信息，例如个人概况、地址、付款和订单。"
+  },
+  "home.features.description.shopper_login": {
+    "defaultMessage": "使购物者能够轻松登录并获得更加个性化的购物体验。"
+  },
+  "home.features.description.wishlist": {
+    "defaultMessage": "已注册的购物者可以将产品添加到愿望清单，以便日后购买。"
+  },
+  "home.features.heading.cart_checkout": {
+    "defaultMessage": "购物车和结账"
+  },
+  "home.features.heading.components": {
+    "defaultMessage": "组件和 Design Kit"
+  },
+  "home.features.heading.einstein_recommendations": {
+    "defaultMessage": "Einstein 推荐"
+  },
+  "home.features.heading.my_account": {
+    "defaultMessage": "我的账户"
+  },
+  "home.features.heading.shopper_login": {
+    "defaultMessage": "Shopper Login and API Access Service"
+  },
+  "home.features.heading.wishlist": {
+    "defaultMessage": "愿望清单"
+  },
+  "home.heading.features": {
+    "defaultMessage": "功能"
+  },
+  "home.heading.here_to_help": {
+    "defaultMessage": "我们随时提供帮助"
+  },
+  "home.heading.shop_products": {
+    "defaultMessage": "购买产品"
+  },
+  "home.hero_features.link.design_kit": {
+    "defaultMessage": "采用 Figma PWA Design Kit 创建"
+  },
+  "home.hero_features.link.on_github": {
+    "defaultMessage": "在 Github 下载"
+  },
+  "home.hero_features.link.on_managed_runtime": {
+    "defaultMessage": "Managed Runtime 部署"
+  },
+  "home.link.contact_us": {
+    "defaultMessage": "联系我们"
+  },
+  "home.link.get_started": {
+    "defaultMessage": "入门指南"
+  },
+  "home.link.read_docs": {
+    "defaultMessage": "阅读文档"
+  },
+  "home.title.react_starter_store": {
+    "defaultMessage": "零售 React PWA 入门商铺"
+  },
+  "item_attributes.label.promotions": {
+    "defaultMessage": "促销"
+  },
+  "item_attributes.label.quantity": {
+    "defaultMessage": "数量：{quantity}"
+  },
+  "item_image.label.sale": {
+    "defaultMessage": "销售",
+    "description": "A sale badge placed on top of a product image"
+  },
+  "lCPCxk": {
+    "defaultMessage": "请在上面选择所有选项"
+  },
+  "locale_text.message.ar-SA": {
+    "defaultMessage": "阿拉伯语（沙特阿拉伯）"
+  },
+  "locale_text.message.bn-BD": {
+    "defaultMessage": "孟加拉语（孟加拉国）"
+  },
+  "locale_text.message.bn-IN": {
+    "defaultMessage": "孟加拉语（印度）"
+  },
+  "locale_text.message.cs-CZ": {
+    "defaultMessage": "捷克语（捷克共和国）"
+  },
+  "locale_text.message.da-DK": {
+    "defaultMessage": "丹麦语（丹麦）"
+  },
+  "locale_text.message.de-AT": {
+    "defaultMessage": "德语（奥地利）"
+  },
+  "locale_text.message.de-CH": {
+    "defaultMessage": "德语（瑞士）"
+  },
+  "locale_text.message.de-DE": {
+    "defaultMessage": "德语（德国）"
+  },
+  "locale_text.message.el-GR": {
+    "defaultMessage": "希腊语（希腊）"
+  },
+  "locale_text.message.en-AU": {
+    "defaultMessage": "英语（澳大利亚）"
+  },
+  "locale_text.message.en-CA": {
+    "defaultMessage": "英语（加拿大）"
+  },
+  "locale_text.message.en-GB": {
+    "defaultMessage": "英语（英国）"
+  },
+  "locale_text.message.en-IE": {
+    "defaultMessage": "英语（爱尔兰）"
+  },
+  "locale_text.message.en-IN": {
+    "defaultMessage": "英语（印度）"
+  },
+  "locale_text.message.en-NZ": {
+    "defaultMessage": "英语（新西兰）"
+  },
+  "locale_text.message.en-US": {
+    "defaultMessage": "英语（美国）"
+  },
+  "locale_text.message.en-ZA": {
+    "defaultMessage": "英语（南非）"
+  },
+  "locale_text.message.es-AR": {
+    "defaultMessage": "西班牙语（阿根廷）"
+  },
+  "locale_text.message.es-CL": {
+    "defaultMessage": "西班牙语（智利）"
+  },
+  "locale_text.message.es-CO": {
+    "defaultMessage": "西班牙语（哥伦比亚）"
+  },
+  "locale_text.message.es-ES": {
+    "defaultMessage": "西班牙语（西班牙）"
+  },
+  "locale_text.message.es-MX": {
+    "defaultMessage": "西班牙语（墨西哥）"
+  },
+  "locale_text.message.es-US": {
+    "defaultMessage": "西班牙语（美国）"
+  },
+  "locale_text.message.fi-FI": {
+    "defaultMessage": "芬兰语（芬兰）"
+  },
+  "locale_text.message.fr-BE": {
+    "defaultMessage": "法语（比利时）"
+  },
+  "locale_text.message.fr-CA": {
+    "defaultMessage": "法语（加拿大）"
+  },
+  "locale_text.message.fr-CH": {
+    "defaultMessage": "法语（瑞士）"
+  },
+  "locale_text.message.fr-FR": {
+    "defaultMessage": "法语（法国）"
+  },
+  "locale_text.message.he-IL": {
+    "defaultMessage": "希伯来语（以色列）"
+  },
+  "locale_text.message.hi-IN": {
+    "defaultMessage": "印地语（印度）"
+  },
+  "locale_text.message.hu-HU": {
+    "defaultMessage": "匈牙利语（匈牙利）"
+  },
+  "locale_text.message.id-ID": {
+    "defaultMessage": "印尼语（印度尼西亚）"
+  },
+  "locale_text.message.it-CH": {
+    "defaultMessage": "意大利语（瑞士）"
+  },
+  "locale_text.message.it-IT": {
+    "defaultMessage": "意大利语（意大利）"
+  },
+  "locale_text.message.ja-JP": {
+    "defaultMessage": "日语（日本）"
+  },
+  "locale_text.message.ko-KR": {
+    "defaultMessage": "韩语（韩国）"
+  },
+  "locale_text.message.nl-BE": {
+    "defaultMessage": "荷兰语（比利时）"
+  },
+  "locale_text.message.nl-NL": {
+    "defaultMessage": "荷兰语（荷兰）"
+  },
+  "locale_text.message.no-NO": {
+    "defaultMessage": "挪威语（挪威）"
+  },
+  "locale_text.message.pl-PL": {
+    "defaultMessage": "波兰语（波兰）"
+  },
+  "locale_text.message.pt-BR": {
+    "defaultMessage": "葡萄牙语（巴西）"
+  },
+  "locale_text.message.pt-PT": {
+    "defaultMessage": "葡萄牙语（葡萄牙）"
+  },
+  "locale_text.message.ro-RO": {
+    "defaultMessage": "罗马尼亚语（罗马尼亚）"
+  },
+  "locale_text.message.ru-RU": {
+    "defaultMessage": "俄语（俄罗斯联邦）"
+  },
+  "locale_text.message.sk-SK": {
+    "defaultMessage": "斯洛伐克语（斯洛伐克）"
+  },
+  "locale_text.message.sv-SE": {
+    "defaultMessage": "瑞典语（瑞典）"
+  },
+  "locale_text.message.ta-IN": {
+    "defaultMessage": "泰米尔语（印度）"
+  },
+  "locale_text.message.ta-LK": {
+    "defaultMessage": "泰米尔语（斯里兰卡）"
+  },
+  "locale_text.message.th-TH": {
+    "defaultMessage": "泰语（泰国）"
+  },
+  "locale_text.message.tr-TR": {
+    "defaultMessage": "土耳其语（土耳其）"
+  },
+  "locale_text.message.zh-CN": {
+    "defaultMessage": "中文（中国）"
+  },
+  "locale_text.message.zh-HK": {
+    "defaultMessage": "中文（香港）"
+  },
+  "locale_text.message.zh-TW": {
+    "defaultMessage": "中文（台湾）"
+  },
+  "login_form.action.create_account": {
+    "defaultMessage": "创建账户"
+  },
+  "login_form.button.sign_in": {
+    "defaultMessage": "登录"
+  },
+  "login_form.link.forgot_password": {
+    "defaultMessage": "忘记密码？"
+  },
+  "login_form.message.dont_have_account": {
+    "defaultMessage": "没有账户？"
+  },
+  "login_form.message.welcome_back": {
+    "defaultMessage": "欢迎回来"
+  },
+  "login_page.error.incorrect_username_or_password": {
+    "defaultMessage": "用户名或密码错误，请重试。"
+  },
+  "offline_banner.description.browsing_offline_mode": {
+    "defaultMessage": "您正在离线模式下浏览"
+  },
+  "order_summary.action.remove_promo": {
+    "defaultMessage": "移除"
+  },
+  "order_summary.cart_items.action.num_of_items_in_cart": {
+    "defaultMessage": "购物车内有 {itemCount, plural, =0 {0 件商品} one {# 件商品} other {# 件商品}}",
+    "description": "clicking it would expand/show the items in cart"
+  },
+  "order_summary.cart_items.link.edit_cart": {
+    "defaultMessage": "编辑购物车"
+  },
+  "order_summary.heading.order_summary": {
+    "defaultMessage": "订单摘要"
+  },
+  "order_summary.label.estimated_total": {
+    "defaultMessage": "预计总数"
+  },
+  "order_summary.label.free": {
+    "defaultMessage": "免费"
+  },
+  "order_summary.label.order_total": {
+    "defaultMessage": "订单总额"
+  },
+  "order_summary.label.promo_applied": {
+    "defaultMessage": "已应用促销"
+  },
+  "order_summary.label.promotions_applied": {
+    "defaultMessage": "已应用促销"
+  },
+  "order_summary.label.shipping": {
+    "defaultMessage": "送货"
+  },
+  "order_summary.label.subtotal": {
+    "defaultMessage": "小计"
+  },
+  "order_summary.label.tax": {
+    "defaultMessage": "税项"
+  },
+  "page_not_found.action.go_back": {
+    "defaultMessage": "返回上一页"
+  },
+  "page_not_found.link.homepage": {
+    "defaultMessage": "返回主页"
+  },
+  "page_not_found.message.suggestion_to_try": {
+    "defaultMessage": "请尝试重新输入地址、返回上一页或返回主页。"
+  },
+  "page_not_found.title.page_cant_be_found": {
+    "defaultMessage": "找不到您要查找的页面。"
+  },
+  "pagination.field.num_of_pages": {
+    "defaultMessage": "/ {numOfPages}"
+  },
+  "pagination.link.next": {
+    "defaultMessage": "下一步"
+  },
+  "pagination.link.prev": {
+    "defaultMessage": "上一步"
+  },
+  "password_card.info.password_updated": {
+    "defaultMessage": "密码已更新"
+  },
+  "password_card.label.password": {
+    "defaultMessage": "密码"
+  },
+  "password_card.title.password": {
+    "defaultMessage": "密码"
+  },
+  "password_requirements.error.eight_letter_minimum": {
+    "defaultMessage": "最短 8 个字符",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_lowercase_letter": {
+    "defaultMessage": "1 个小写字母",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_number": {
+    "defaultMessage": "1 个数字",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_special_character": {
+    "defaultMessage": "1 个特殊字符（例如：, S ! %）",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_uppercase_letter": {
+    "defaultMessage": "1 个大写字母",
+    "description": "Password requirement"
+  },
+  "payment_selection.button.save_and_continue": {
+    "defaultMessage": "保存并继续"
+  },
+  "payment_selection.heading.add_new_card": {
+    "defaultMessage": "添加新卡"
+  },
+  "payment_selection.heading.credit_card": {
+    "defaultMessage": "信用卡"
+  },
+  "payment_selection.message.select_payment_method": {
+    "defaultMessage": "请选择付款方式。"
+  },
+  "payment_selection.tooltip.secure_payment": {
+    "defaultMessage": "这是一种安全的 SSL 加密支付。"
+  },
+  "price_per_item.label.each": {
+    "defaultMessage": "每件",
+    "description": "Abbreviated 'each', follows price per item, like $10/ea"
+  },
+  "product_detail.accordion.button.product_detail": {
+    "defaultMessage": "产品详情"
+  },
+  "product_detail.accordion.button.questions": {
+    "defaultMessage": "问题"
+  },
+  "product_detail.accordion.button.reviews": {
+    "defaultMessage": "点评"
+  },
+  "product_detail.accordion.button.size_fit": {
+    "defaultMessage": "尺寸与合身"
+  },
+  "product_detail.accordion.message.coming_soon": {
+    "defaultMessage": "即将到货"
+  },
+  "product_detail.recommended_products.title.complete_set": {
+    "defaultMessage": "Complete the Set（完成组合）"
+  },
+  "product_detail.recommended_products.title.might_also_like": {
+    "defaultMessage": "您可能还喜欢"
+  },
+  "product_detail.recommended_products.title.recently_viewed": {
+    "defaultMessage": "最近查看"
+  },
+  "product_item.label.quantity": {
+    "defaultMessage": "数量："
+  },
+  "product_list.button.filter": {
+    "defaultMessage": "筛选器"
+  },
+  "product_list.button.sort_by": {
+    "defaultMessage": "排序标准：{sortOption}"
+  },
+  "product_list.drawer.title.sort_by": {
+    "defaultMessage": "排序标准"
+  },
+  "product_list.modal.button.clear_filters": {
+    "defaultMessage": "清除筛选器"
+  },
+  "product_list.modal.button.view_items": {
+    "defaultMessage": "查看 {prroductCount} 件商品"
+  },
+  "product_list.modal.title.filter": {
+    "defaultMessage": "筛选器"
+  },
+  "product_list.select.sort_by": {
+    "defaultMessage": "排序标准：{sortOption}"
+  },
+  "product_tile.assistive_msg.wishlist": {
+    "defaultMessage": "愿望清单"
+  },
+  "product_view.button.add_to_cart": {
+    "defaultMessage": "添加到购物车"
+  },
+  "product_view.button.add_to_wishlist": {
+    "defaultMessage": "添加到愿望清单"
+  },
+  "product_view.button.update": {
+    "defaultMessage": "更新"
+  },
+  "product_view.label.quantity": {
+    "defaultMessage": "数量"
+  },
+  "product_view.link.full_details": {
+    "defaultMessage": "查看完整详情"
+  },
+  "profile_card.info.profile_updated": {
+    "defaultMessage": "已更新概况"
+  },
+  "profile_card.label.email": {
+    "defaultMessage": "电子邮件"
+  },
+  "profile_card.label.full_name": {
+    "defaultMessage": "全名"
+  },
+  "profile_card.label.phone": {
+    "defaultMessage": "电话号码"
+  },
+  "profile_card.message.not_provided": {
+    "defaultMessage": "未提供"
+  },
+  "profile_card.title.my_profile": {
+    "defaultMessage": "我的概况"
+  },
+  "promo_code_fields.button.apply": {
+    "defaultMessage": "确定"
+  },
+  "promo_popover.heading.promo_applied": {
+    "defaultMessage": "已应用促销"
+  },
+  "promocode.accordion.button.have_promocode": {
+    "defaultMessage": "您是否有促销码？"
+  },
+  "recent_searches.action.clear_searches": {
+    "defaultMessage": "清除最近搜索"
+  },
+  "recent_searches.heading.recent_searches": {
+    "defaultMessage": "最近搜索"
+  },
+  "register_form.action.sign_in": {
+    "defaultMessage": "登录"
+  },
+  "register_form.button.create_account": {
+    "defaultMessage": "创建账户"
+  },
+  "register_form.heading.lets_get_started": {
+    "defaultMessage": "开始使用！"
+  },
+  "register_form.message.agree_to_policy_terms": {
+    "defaultMessage": "隐私创建账户即表明您同意 Salesforce <policy>隐私政策</policy>和<terms>条款与条件</terms>"
+  },
+  "register_form.message.already_have_account": {
+    "defaultMessage": "已有账户？"
+  },
+  "register_form.message.create_an_account": {
+    "defaultMessage": "创建账户并首先查看最佳产品、妙招和虚拟社区。"
+  },
+  "reset_password.button.back_to_sign_in": {
+    "defaultMessage": "返回登录"
+  },
+  "reset_password.info.receive_email_shortly": {
+    "defaultMessage": "您将通过 <b>{email}</b> 收到包含重置密码链接的电子邮件。"
+  },
+  "reset_password.title.password_reset": {
+    "defaultMessage": "密码重置"
+  },
+  "reset_password_form.action.sign_in": {
+    "defaultMessage": "登录"
+  },
+  "reset_password_form.button.reset_password": {
+    "defaultMessage": "重置密码"
+  },
+  "reset_password_form.message.enter_your_email": {
+    "defaultMessage": "进入您的电子邮件，获取重置密码说明"
+  },
+  "reset_password_form.message.return_to_sign_in": {
+    "defaultMessage": "或返回",
+    "description": "Precedes link to return to sign in"
+  },
+  "reset_password_form.title.reset_password": {
+    "defaultMessage": "重置密码"
+  },
+  "search.action.cancel": {
+    "defaultMessage": "取消"
+  },
+  "selected_refinements.action.clear_all": {
+    "defaultMessage": "全部清除"
+  },
+  "shipping_address.button.continue_to_shipping": {
+    "defaultMessage": "继续并选择送货方式"
+  },
+  "shipping_address.title.shipping_address": {
+    "defaultMessage": "送货地址"
+  },
+  "shipping_address_edit_form.button.save_and_continue": {
+    "defaultMessage": "保存并继续选择送货方式"
+  },
+  "shipping_address_form.heading.edit_address": {
+    "defaultMessage": "编辑地址"
+  },
+  "shipping_address_form.heading.new_address": {
+    "defaultMessage": "添加新地址"
+  },
+  "shipping_address_selection.button.add_address": {
+    "defaultMessage": "添加新地址"
+  },
+  "shipping_address_selection.button.submit": {
+    "defaultMessage": "提交"
+  },
+  "shipping_address_selection.title.add_address": {
+    "defaultMessage": "添加新地址"
+  },
+  "shipping_address_selection.title.edit_shipping": {
+    "defaultMessage": "编辑送货地址"
+  },
+  "shipping_options.action.send_as_a_gift": {
+    "defaultMessage": "您想将此作为礼品发送吗？"
+  },
+  "shipping_options.button.continue_to_payment": {
+    "defaultMessage": "继续并选择付款"
+  },
+  "shipping_options.title.shipping_gift_options": {
+    "defaultMessage": "送货与礼品选项"
+  },
+  "signout_confirmation_dialog.button.cancel": {
+    "defaultMessage": "取消"
+  },
+  "signout_confirmation_dialog.button.sign_out": {
+    "defaultMessage": "注销"
+  },
+  "signout_confirmation_dialog.heading.sign_out": {
+    "defaultMessage": "注销"
+  },
+  "signout_confirmation_dialog.message.sure_to_sign_out": {
+    "defaultMessage": "是否确定要注销？您需要重新登录才能继续处理当前订单。"
+  },
+  "toggle_card.action.edit": {
+    "defaultMessage": "编辑"
+  },
+  "update_password_fields.button.forgot_password": {
+    "defaultMessage": "忘记密码？"
+  },
+  "use_address_fields.error.please_enter_first_name": {
+    "defaultMessage": "请输入您的名字。"
+  },
+  "use_address_fields.error.please_enter_last_name": {
+    "defaultMessage": "请输入您的姓氏。"
+  },
+  "use_address_fields.error.please_enter_phone_number": {
+    "defaultMessage": "请输入您的电话号码。"
+  },
+  "use_address_fields.error.please_enter_your_postal_or_zip": {
+    "defaultMessage": "请输入您的{postalOrZip}。"
+  },
+  "use_address_fields.error.please_select_your_address": {
+    "defaultMessage": "请输入您的地址。"
+  },
+  "use_address_fields.error.please_select_your_city": {
+    "defaultMessage": "请输入您所在城市。"
+  },
+  "use_address_fields.error.please_select_your_country": {
+    "defaultMessage": "请输入您所在国家/地区。"
+  },
+  "use_address_fields.error.please_select_your_state_or_province": {
+    "defaultMessage": "请选择您所在的{stateOrProvince}。"
+  },
+  "use_address_fields.error.required": {
+    "defaultMessage": "必填"
+  },
+  "use_address_fields.error.state_code_invalid": {
+    "defaultMessage": "请输入两个字母的州/省名称。"
+  },
+  "use_address_fields.label.address": {
+    "defaultMessage": "地址"
+  },
+  "use_address_fields.label.city": {
+    "defaultMessage": "城市"
+  },
+  "use_address_fields.label.country": {
+    "defaultMessage": "国家"
+  },
+  "use_address_fields.label.first_name": {
+    "defaultMessage": "名字"
+  },
+  "use_address_fields.label.last_name": {
+    "defaultMessage": "姓氏"
+  },
+  "use_address_fields.label.phone": {
+    "defaultMessage": "电话"
+  },
+  "use_address_fields.label.postal_code": {
+    "defaultMessage": "邮政编码"
+  },
+  "use_address_fields.label.preferred": {
+    "defaultMessage": "设为默认值"
+  },
+  "use_address_fields.label.province": {
+    "defaultMessage": "省"
+  },
+  "use_address_fields.label.state": {
+    "defaultMessage": "州/省"
+  },
+  "use_address_fields.label.zipCode": {
+    "defaultMessage": "邮政编码"
+  },
+  "use_credit_card_fields.error.required": {
+    "defaultMessage": "必填"
+  },
+  "use_credit_card_fields.error.required_card_number": {
+    "defaultMessage": "请输入您的卡号。"
+  },
+  "use_credit_card_fields.error.required_expiry": {
+    "defaultMessage": "请输入卡的到期日期。"
+  },
+  "use_credit_card_fields.error.required_name": {
+    "defaultMessage": "请输入卡上显示的名字。"
+  },
+  "use_credit_card_fields.error.required_security_code": {
+    "defaultMessage": "请输入您的安全码。"
+  },
+  "use_credit_card_fields.error.valid_card_number": {
+    "defaultMessage": "请输入有效的卡号。"
+  },
+  "use_credit_card_fields.error.valid_date": {
+    "defaultMessage": "请输入有效的日期。"
+  },
+  "use_credit_card_fields.error.valid_name": {
+    "defaultMessage": "请输入有效的名称。"
+  },
+  "use_credit_card_fields.error.valid_security_code": {
+    "defaultMessage": "请输入有效的安全码。"
+  },
+  "use_credit_card_fields.label.card_number": {
+    "defaultMessage": "卡号"
+  },
+  "use_credit_card_fields.label.card_type": {
+    "defaultMessage": "卡类型"
+  },
+  "use_credit_card_fields.label.expiry": {
+    "defaultMessage": "到期日期"
+  },
+  "use_credit_card_fields.label.name": {
+    "defaultMessage": "持卡人姓名"
+  },
+  "use_credit_card_fields.label.security_code": {
+    "defaultMessage": "安全码"
+  },
+  "use_login_fields.error.required_email": {
+    "defaultMessage": "请输入您的电子邮件地址。"
+  },
+  "use_login_fields.error.required_password": {
+    "defaultMessage": "请输入您的密码。"
+  },
+  "use_login_fields.label.email": {
+    "defaultMessage": "电子邮件"
+  },
+  "use_login_fields.label.password": {
+    "defaultMessage": "密码"
+  },
+  "use_product.message.inventory_remaining": {
+    "defaultMessage": "仅剩 {stockLevel} 件！"
+  },
+  "use_product.message.out_of_stock": {
+    "defaultMessage": "无库存"
+  },
+  "use_profile_fields.error.required_email": {
+    "defaultMessage": "请输入有效的电子邮件地址。"
+  },
+  "use_profile_fields.error.required_first_name": {
+    "defaultMessage": "请输入您的名字。"
+  },
+  "use_profile_fields.error.required_last_name": {
+    "defaultMessage": "请输入您的姓氏。"
+  },
+  "use_profile_fields.error.required_phone": {
+    "defaultMessage": "请输入您的电话号码。"
+  },
+  "use_profile_fields.label.email": {
+    "defaultMessage": "电子邮件"
+  },
+  "use_profile_fields.label.first_name": {
+    "defaultMessage": "名字"
+  },
+  "use_profile_fields.label.last_name": {
+    "defaultMessage": "姓氏"
+  },
+  "use_profile_fields.label.phone": {
+    "defaultMessage": "电话号码"
+  },
+  "use_promo_code_fields.error.required_promo_code": {
+    "defaultMessage": "请提供有效的促销码。"
+  },
+  "use_promo_code_fields.label.promo_code": {
+    "defaultMessage": "促销码"
+  },
+  "use_promocode.error.check_the_code": {
+    "defaultMessage": "检查促销码并重试，该促销码可能已被使用或促销已过期。"
+  },
+  "use_promocode.info.promo_applied": {
+    "defaultMessage": "已应用促销"
+  },
+  "use_promocode.info.promo_removed": {
+    "defaultMessage": "已删除促销"
+  },
+  "use_registration_fields.error.contain_number": {
+    "defaultMessage": "密码必须至少包含一个数字。"
+  },
+  "use_registration_fields.error.lowercase_letter": {
+    "defaultMessage": "密码必须至少包含一个小写字母。"
+  },
+  "use_registration_fields.error.minimum_characters": {
+    "defaultMessage": "密码必须至少包含 8 个字符。"
+  },
+  "use_registration_fields.error.required_email": {
+    "defaultMessage": "请输入有效的电子邮件地址。"
+  },
+  "use_registration_fields.error.required_first_name": {
+    "defaultMessage": "请输入您的名字。"
+  },
+  "use_registration_fields.error.required_last_name": {
+    "defaultMessage": "请输入您的姓氏。"
+  },
+  "use_registration_fields.error.required_password": {
+    "defaultMessage": "请创建密码。"
+  },
+  "use_registration_fields.error.special_character": {
+    "defaultMessage": "密码必须至少包含一个特殊字符。"
+  },
+  "use_registration_fields.error.uppercase_letter": {
+    "defaultMessage": "密码必须至少包含一个大写字母。"
+  },
+  "use_registration_fields.label.email": {
+    "defaultMessage": "电子邮件"
+  },
+  "use_registration_fields.label.first_name": {
+    "defaultMessage": "名字"
+  },
+  "use_registration_fields.label.last_name": {
+    "defaultMessage": "姓氏"
+  },
+  "use_registration_fields.label.password": {
+    "defaultMessage": "密码"
+  },
+  "use_registration_fields.label.sign_up_to_emails": {
+    "defaultMessage": "为我注册 Salesforce 电子邮件（您可以随时取消订阅）"
+  },
+  "use_reset_password_fields.error.required_email": {
+    "defaultMessage": "请输入有效的电子邮件地址。"
+  },
+  "use_reset_password_fields.label.email": {
+    "defaultMessage": "电子邮件"
+  },
+  "use_update_password_fields.error.contain_number": {
+    "defaultMessage": "密码必须至少包含一个数字。"
+  },
+  "use_update_password_fields.error.lowercase_letter": {
+    "defaultMessage": "密码必须至少包含一个小写字母。"
+  },
+  "use_update_password_fields.error.minimum_characters": {
+    "defaultMessage": "密码必须至少包含 8 个字符。"
+  },
+  "use_update_password_fields.error.required_new_password": {
+    "defaultMessage": "请提供新密码。"
+  },
+  "use_update_password_fields.error.required_password": {
+    "defaultMessage": "请输入您的密码。"
+  },
+  "use_update_password_fields.error.special_character": {
+    "defaultMessage": "密码必须至少包含一个特殊字符。"
+  },
+  "use_update_password_fields.error.uppercase_letter": {
+    "defaultMessage": "密码必须至少包含一个大写字母。"
+  },
+  "use_update_password_fields.label.current_password": {
+    "defaultMessage": "当前密码"
+  },
+  "use_update_password_fields.label.new_password": {
+    "defaultMessage": "新密码"
+  },
+  "wishlist_primary_action.button.add_to_cart": {
+    "defaultMessage": "添加到购物车"
+  },
+  "wishlist_primary_action.button.select_options": {
+    "defaultMessage": "选择选项"
+  },
+  "wishlist_primary_action.info.added_to_cart": {
+    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至购物车"
+  },
+  "wishlist_secondary_button_group.action.remove": {
+    "defaultMessage": "移除"
+  },
+  "wishlist_secondary_button_group.info.item_removed": {
+    "defaultMessage": "从愿望清单中移除商品"
+  },
+  "with_registration.info.please_sign_in": {
+    "defaultMessage": "请登录以继续！"
+  }
+}
