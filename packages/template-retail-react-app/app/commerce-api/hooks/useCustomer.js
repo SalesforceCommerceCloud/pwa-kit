@@ -10,7 +10,11 @@ import {useCommerceAPI, CustomerContext} from '../contexts'
 
 const AuthTypes = Object.freeze({GUEST: 'guest', REGISTERED: 'registered'})
 
-const REGISTRATION_GRACE_PERIOD = 2 * 1000 // 2 seconds in milliseconds
+// This value represents the max age in milliseconds a customer can be before they are
+// no longer considered a "new" customer. 
+// E.g. If a customers creation date is older than 2 seconds it will no longer be considered
+// a new customer.
+const NEW_CUSTOMER_MAX_AGE = 2 * 1000 // 2 seconds in milliseconds
 
 export default function useCustomer() {
     const api = useCommerceAPI()
@@ -44,11 +48,11 @@ export default function useCustomer() {
             /**
              * Returns if this customer is newly registered.
              */
-            get isNewlyRegistered() {
+            get isNew() {
                 if (!customer || customer.authType !== 'registered') return false
                 const lastLoginTimeStamp = Date.parse(customer.lastLoginTime)
                 const creationTimeStamp = Date.parse(customer.creationDate)
-                return lastLoginTimeStamp - creationTimeStamp < REGISTRATION_GRACE_PERIOD
+                return lastLoginTimeStamp - creationTimeStamp < NEW_CUSTOMER_MAX_AGE
             },
 
             /** Returns the customer's saved addresses with the 'preferred' address in the first index */

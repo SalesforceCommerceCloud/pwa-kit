@@ -66,7 +66,7 @@ const useShopper = (opts = {}) => {
         const shouldMerge =
             customer.authType === 'registered' &&
             prevAuthType.current === 'guest' &&
-            !customer.isNewlyRegistered &&
+            !customer.isNew &&
             basket.itemCount > 0
 
         if (shouldMerge) {
