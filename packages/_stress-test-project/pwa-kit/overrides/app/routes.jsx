@@ -18,104 +18,95 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
-import {configureRoutes} from '^retail-react-app/app/utils/routes-utils'
+import {configureRoutes} from './utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Pages
 const Home = loadable(() => import('./pages/home'), {fallback})
-const Login = loadable(() => import('^retail-react-app/app/pages/login'), {fallback})
-const Registration = loadable(() => import('^retail-react-app/app/pages/registration'), {fallback})
-const ResetPassword = loadable(() => import('^retail-react-app/app/pages/reset-password'), {
-    fallback,
-})
-const Account = loadable(() => import('^retail-react-app/app/pages/account'), {fallback})
-const Cart = loadable(() => import('^retail-react-app/app/pages/cart'), {fallback})
-const Checkout = loadable(() => import('^retail-react-app/app/pages/checkout'), {fallback})
-const CheckoutConfirmation = loadable(
-    () => import('^retail-react-app/app/pages/checkout/confirmation'),
-    {fallback}
-)
-const LoginRedirect = loadable(() => import('^retail-react-app/app/pages/login-redirect'), {
-    fallback,
-})
-const ProductDetail = loadable(() => import('^retail-react-app/app/pages/product-detail'), {
-    fallback,
-})
-const ProductList = loadable(() => import('^retail-react-app/app/pages/product-list'), {fallback})
-const Wishlist = loadable(() => import('^retail-react-app/app/pages/account/wishlist'), {fallback})
-const PageNotFound = loadable(() => import('^retail-react-app/app/pages/page-not-found'))
+const Login = loadable(() => import('./pages/login'), {fallback})
+const Registration = loadable(() => import('./pages/registration'), {fallback})
+const ResetPassword = loadable(() => import('./pages/reset-password'), {fallback})
+const Account = loadable(() => import('./pages/account'), {fallback})
+const Cart = loadable(() => import('./pages/cart'), {fallback})
+const Checkout = loadable(() => import('./pages/checkout'), {fallback})
+const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
+const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
+const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
+const ProductList = loadable(() => import('./pages/product-list'), {fallback})
+const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
+const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 const routes = [
     {
         path: '/',
         component: Home,
-        exact: true,
+        exact: true
     },
     {
         path: '/login',
         component: Login,
-        exact: true,
+        exact: true
     },
     {
         path: '/registration',
         component: Registration,
-        exact: true,
+        exact: true
     },
     {
         path: '/reset-password',
         component: ResetPassword,
-        exact: true,
+        exact: true
     },
     {
         path: '/account',
-        component: Account,
+        component: Account
     },
     {
         path: '/checkout',
         component: Checkout,
-        exact: true,
+        exact: true
     },
     {
         path: '/checkout/confirmation',
         component: CheckoutConfirmation,
-        exact: true,
+        exact: true
     },
     {
         path: '/callback',
         component: LoginRedirect,
-        exact: true,
+        exact: true
     },
     {
         path: '/cart',
         component: Cart,
-        exact: true,
+        exact: true
     },
     {
         path: '/product/:productId',
-        component: ProductDetail,
+        component: ProductDetail
     },
     {
         path: '/search',
-        component: ProductList,
+        component: ProductList
     },
     {
         path: '/category/:categoryId',
-        component: ProductList,
+        component: ProductList
     },
     {
         path: '/account/wishlist',
-        component: Wishlist,
+        component: Wishlist
     },
     {
         path: '*',
-        component: PageNotFound,
-    },
+        component: PageNotFound
+    }
 ]
 
 export default () => {
     const config = getConfig()
     return configureRoutes(routes, config, {
-        ignoredRoutes: ['/callback', '*'],
+        ignoredRoutes: ['/callback', '*']
     })
 }

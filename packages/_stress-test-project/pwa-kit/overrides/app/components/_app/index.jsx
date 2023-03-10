@@ -16,52 +16,52 @@ import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CategoriesProvider, CurrencyProvider} from '^retail-react-app/app/contexts'
+import {CategoriesProvider, CurrencyProvider} from '../../contexts'
 
 // Local Project Components
-import Header from '../header'
-import OfflineBanner from '^retail-react-app/app/components/offline-banner'
-import OfflineBoundary from '^retail-react-app/app/components/offline-boundary'
-import ScrollToTop from '^retail-react-app/app/components/scroll-to-top'
-import Footer from '^retail-react-app/app/components/footer'
-import CheckoutFooter from '^retail-react-app/app/pages/checkout/partials/checkout-footer'
-import CheckoutHeader from '^retail-react-app/app/pages/checkout/partials/checkout-header'
-import DrawerMenu from '^retail-react-app/app/components/drawer-menu'
-import ListMenu from '^retail-react-app/app/components/list-menu'
-import {HideOnDesktop, HideOnMobile} from '^retail-react-app/app/components/responsive'
+import Header from '../../components/header'
+import OfflineBanner from '../../components/offline-banner'
+import OfflineBoundary from '../../components/offline-boundary'
+import ScrollToTop from '../../components/scroll-to-top'
+import Footer from '../../components/footer'
+import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
+import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
+import DrawerMenu from '../drawer-menu'
+import ListMenu from '../list-menu'
+import {HideOnDesktop, HideOnMobile} from '../responsive'
 
 // Hooks
-import useShopper from '^retail-react-app/app/commerce-api/hooks/useShopper'
-import useCustomer from '^retail-react-app/app/commerce-api/hooks/useCustomer'
-import {AuthModal, useAuthModal} from '^retail-react-app/app/hooks/use-auth-modal'
-import {AddToCartModalProvider} from '^retail-react-app/app/hooks/use-add-to-cart-modal'
-import useWishlist from '^retail-react-app/app/hooks/use-wishlist'
+import useShopper from '../../commerce-api/hooks/useShopper'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
+import useWishlist from '../../hooks/use-wishlist'
 
 // Localization
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten} from '^retail-react-app/app/utils/utils'
-import {getTargetLocale, fetchTranslations} from '^retail-react-app/app/utils/locale'
+import {watchOnlineStatus, flatten} from '../../utils/utils'
+import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {
     DEFAULT_SITE_TITLE,
     HOME_HREF,
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE,
-} from '^retail-react-app/app/constants'
+    DEFAULT_LOCALE
+} from '../../constants'
 
-import Seo from '^retail-react-app/app/components/seo'
-import {resolveSiteFromUrl} from '^retail-react-app/app/utils/site-utils'
-import useMultiSite from '^retail-react-app/app/hooks/use-multi-site'
+import Seo from '../seo'
+import {resolveSiteFromUrl} from '../../utils/site-utils'
+import useMultiSite from '../../hooks/use-multi-site'
 
 const App = (props) => {
     const {
         children,
         targetLocale = DEFAULT_LOCALE,
         messages = {},
-        categories: allCategories = {},
+        categories: allCategories = {}
     } = props
 
     const appOrigin = getAppOrigin()
@@ -238,7 +238,7 @@ const App = (props) => {
                                         display: 'flex',
                                         flexDirection: 'column',
                                         flex: 1,
-                                        outline: 0,
+                                        outline: 0
                                     }}
                                 >
                                     <Box
@@ -297,7 +297,7 @@ App.getProps = async ({api, res}) => {
 
             return [locale]
         },
-        l10nConfig,
+        l10nConfig
     })
     const messages = await fetchTranslations(targetLocale)
 
@@ -308,8 +308,8 @@ App.getProps = async ({api, res}) => {
     const rootCategory = await api.shopperProducts.getCategory({
         parameters: {
             id: CAT_MENU_DEFAULT_ROOT_CATEGORY,
-            levels: CAT_MENU_DEFAULT_NAV_DEPTH,
-        },
+            levels: CAT_MENU_DEFAULT_NAV_DEPTH
+        }
     })
 
     if (rootCategory.isError) {
@@ -331,7 +331,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
         targetLocale,
         messages,
         categories,
-        config: res?.locals?.config,
+        config: res?.locals?.config
     }
 }
 
@@ -340,7 +340,7 @@ App.propTypes = {
     targetLocale: PropTypes.string,
     messages: PropTypes.object,
     categories: PropTypes.object,
-    config: PropTypes.object,
+    config: PropTypes.object
 }
 
 export default App

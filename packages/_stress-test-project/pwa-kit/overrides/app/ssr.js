@@ -27,7 +27,7 @@ const options = {
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development.
-    protocol: 'http',
+    protocol: 'http'
 }
 
 const runtime = getRuntime()
@@ -41,17 +41,21 @@ const {handler} = runtime.createHandler(options, (app) => {
                 directives: {
                     'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
                     'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
+                    'connect-src': ["'self'", 'api.cquotient.com'],
 
                     // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null,
-                },
+                    'upgrade-insecure-requests': isRemote() ? [] : null
+                }
             },
-            hsts: isRemote(),
+            hsts: isRemote()
         })
     )
 
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
+        // This endpoint does nothing and is not expected to change
+        // Thus we cache it for a year to maximize performance
+        res.set('Cache-Control', `max-age=31536000`)
         res.send()
     })
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))

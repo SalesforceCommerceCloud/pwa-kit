@@ -19,12 +19,12 @@ import {
 
 // Icons
 import {
+    SocialFacebookIcon,
     SocialInstagramIcon,
     SocialPinterestIcon,
-    SocialTwitterIcon
-} from '../icons'
-
-import {SocialFacebookIcon, SocialYoutubeIcon} from '^retail-react-app/app/components/icons'
+    SocialTwitterIcon,
+    SocialYoutubeIcon
+} from '../../components/icons'
 
 /**
  *

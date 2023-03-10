@@ -12,70 +12,66 @@ import {Icon, useTheme} from '@chakra-ui/react'
 // during SSR.
 // NOTE: Another solution would be to use `require-context.macro` package to accomplish
 // importing icon svg's.
-import '^retail-react-app/app/assets/svg/alert.svg'
-import '^retail-react-app/app/assets/svg/account.svg'
-import '^retail-react-app/app/assets/svg/basket.svg'
-import '^retail-react-app/app/assets/svg/check.svg'
-import '^retail-react-app/app/assets/svg/check-circle.svg'
-import '^retail-react-app/app/assets/svg/chevron-up.svg'
-import '^retail-react-app/app/assets/svg/chevron-down.svg'
-import '^retail-react-app/app/assets/svg/chevron-right.svg'
-import '^retail-react-app/app/assets/svg/chevron-left.svg'
-import '^retail-react-app/app/assets/svg/chevron-right.svg'
-import '^retail-react-app/app/assets/svg/chevron-up.svg'
-import '^retail-react-app/app/assets/svg/dashboard.svg'
-import '^retail-react-app/app/assets/svg/figma-logo.svg'
-import '^retail-react-app/app/assets/svg/filter.svg'
-import '^retail-react-app/app/assets/svg/file.svg'
-import '^retail-react-app/app/assets/svg/flag-ca.svg'
-import '^retail-react-app/app/assets/svg/flag-us.svg'
-import '^retail-react-app/app/assets/svg/flag-gb.svg'
-import '^retail-react-app/app/assets/svg/flag-fr.svg'
-import '^retail-react-app/app/assets/svg/flag-it.svg'
-import '^retail-react-app/app/assets/svg/flag-cn.svg'
-import '^retail-react-app/app/assets/svg/flag-jp.svg'
-import '^retail-react-app/app/assets/svg/github-logo.svg'
-import '^retail-react-app/app/assets/svg/hamburger.svg'
-import '^retail-react-app/app/assets/svg/info.svg'
-import '^retail-react-app/app/assets/svg/social-facebook.svg'
-import '^retail-react-app/app/assets/svg/social-instagram.svg'
-import '^retail-react-app/app/assets/svg/social-twitter.svg'
-import '^retail-react-app/app/assets/svg/social-youtube.svg'
-import '^retail-react-app/app/assets/svg/like.svg'
-import '^retail-react-app/app/assets/svg/lock.svg'
-import '^retail-react-app/app/assets/svg/payment.svg'
-import '^retail-react-app/app/assets/svg/plug.svg'
-import '^retail-react-app/app/assets/svg/plus.svg'
-import '^retail-react-app/app/assets/svg/receipt.svg'
-import '^retail-react-app/app/assets/svg/search.svg'
-import '^retail-react-app/app/assets/svg/signout.svg'
-import '^retail-react-app/app/assets/svg/user.svg'
-import '^retail-react-app/app/assets/svg/visibility.svg'
-import '^retail-react-app/app/assets/svg/visibility-off.svg'
-
-// import '^retail-react-app/app/assets/svg/heart.svg'
-// actually a lock, on purpose
+import '../../assets/svg/alert.svg'
+import '../../assets/svg/account.svg'
+import '../../assets/svg/basket.svg'
+import '../../assets/svg/check.svg'
+import '../../assets/svg/check-circle.svg'
+import '../../assets/svg/chevron-up.svg'
+import '../../assets/svg/chevron-down.svg'
+import '../../assets/svg/chevron-right.svg'
+import '../../assets/svg/chevron-left.svg'
+import '../../assets/svg/chevron-right.svg'
+import '../../assets/svg/chevron-up.svg'
+import '../../assets/svg/dashboard.svg'
+import '../../assets/svg/figma-logo.svg'
+import '../../assets/svg/filter.svg'
+import '../../assets/svg/file.svg'
+import '../../assets/svg/flag-ca.svg'
+import '../../assets/svg/flag-us.svg'
+import '../../assets/svg/flag-gb.svg'
+import '../../assets/svg/flag-fr.svg'
+import '../../assets/svg/flag-it.svg'
+import '../../assets/svg/flag-cn.svg'
+import '../../assets/svg/flag-jp.svg'
+import '../../assets/svg/github-logo.svg'
+import '../../assets/svg/hamburger.svg'
+import '../../assets/svg/info.svg'
+import '../../assets/svg/social-facebook.svg'
+import '../../assets/svg/social-instagram.svg'
+import '../../assets/svg/social-twitter.svg'
+import '../../assets/svg/social-youtube.svg'
+import '../../assets/svg/like.svg'
+import '../../assets/svg/lock.svg'
+import '../../assets/svg/payment.svg'
+import '../../assets/svg/plug.svg'
+import '../../assets/svg/plus.svg'
+import '../../assets/svg/receipt.svg'
+import '../../assets/svg/search.svg'
+import '../../assets/svg/signout.svg'
+import '../../assets/svg/user.svg'
+import '../../assets/svg/visibility.svg'
+import '../../assets/svg/visibility-off.svg'
 import '../../assets/svg/heart.svg'
-
-import '^retail-react-app/app/assets/svg/heart-solid.svg'
-import '^retail-react-app/app/assets/svg/close.svg'
+import '../../assets/svg/heart-solid.svg'
+import '../../assets/svg/close.svg'
 
 // For non-square SVGs, we can use the symbol data from the import to set the
 // proper viewBox attribute on the Icon wrapper.
-import AmexSymbol from '^retail-react-app/app/assets/svg/cc-amex.svg'
+import AmexSymbol from '../../assets/svg/cc-amex.svg'
 import BrandLogoSymbol from '../../assets/svg/brand-logo.svg'
-import CVVSymbol from '^retail-react-app/app/assets/svg/cc-cvv.svg'
-import DiscoverSymbol from '^retail-react-app/app/assets/svg/cc-discover.svg'
-import LocationSymbol from '^retail-react-app/app/assets/svg/location.svg'
-import MastercardSymbol from '^retail-react-app/app/assets/svg/cc-mastercard.svg'
-import PaypalSymbol from '^retail-react-app/app/assets/svg/paypal.svg'
-import SocialPinterestSymbol from '^retail-react-app/app/assets/svg/social-pinterest.svg'
-import VisaSymbol from '^retail-react-app/app/assets/svg/cc-visa.svg'
+import CVVSymbol from '../../assets/svg/cc-cvv.svg'
+import DiscoverSymbol from '../../assets/svg/cc-discover.svg'
+import LocationSymbol from '../../assets/svg/location.svg'
+import MastercardSymbol from '../../assets/svg/cc-mastercard.svg'
+import PaypalSymbol from '../../assets/svg/paypal.svg'
+import SocialPinterestSymbol from '../../assets/svg/social-pinterest.svg'
+import VisaSymbol from '../../assets/svg/cc-visa.svg'
 
 // TODO: We're hardcoding the `viewBox` for these imported SVGs temporarily as the
 // SVG loader plugin is not properly providing us the symbol data on the client side.
 AmexSymbol.viewBox = AmexSymbol.viewBox || '0 0 38 22'
-BrandLogoSymbol.viewBox = BrandLogoSymbol.viewBox || '0 0 32 32'
+BrandLogoSymbol.viewBox = BrandLogoSymbol.viewBox || '0 0 46 32'
 CVVSymbol.viewBox = CVVSymbol.viewBox || '0 0 41 24'
 DiscoverSymbol.viewBox = DiscoverSymbol.viewBox || '0 0 38 22'
 LocationSymbol.viewBox = LocationSymbol.viewBox || '0 0 16 21'
@@ -83,8 +79,6 @@ MastercardSymbol.viewBox = MastercardSymbol.viewBox || '0 0 38 22'
 PaypalSymbol.viewBox = PaypalSymbol.viewBox || '0 0 80 20'
 SocialPinterestSymbol.viewBox = SocialPinterestSymbol.viewBox || '0 0 21 20'
 VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
-
-const overrideIcons = ['brand-logo', 'heart']
 
 /**
  * A helper for creating a Chakra-wrapped icon from our own SVG imports via sprite sheet.
@@ -98,24 +92,15 @@ const icon = (name, passProps) => {
         .replace(/-/g, '')
     const component = forwardRef((props, ref) => {
         const theme = useTheme()
-        const baseStyle = {
-            ...theme?.components?.Icon?.baseStyle,
-            ...(overrideIcons?.includes(name) ? {color: 'red !important'} : {}),
-        }
-
+        const baseStyle = theme?.components?.Icon?.baseStyle
+        console.log('~hello ^icons')
         return (
-            <Icon
-                ref={ref}
-                {...baseStyle}
-                {...passProps}
-                {...props}
-                {...(overrideIcons?.includes(name) ? {w: 80, h: 80} : {})}
-            >
-                <use role="presentation" xlinkHref={`#${name}`} />
-            </Icon>
+            // <Icon ref={ref} {...baseStyle} {...passProps} {...props}>
+            //     <use role="presentation" xlinkHref={`#${name}`} />
+            // </Icon>
             // TODO: for demo, this can show overrides, but highlight
             // that imports within the project don't respect them
-            // <>{name}! 🎉</>
+            <>z🎉</>
         )
     })
     component.displayName = `${displayName}Icon`
@@ -165,7 +150,7 @@ export const SearchIcon = icon('search')
 export const SocialFacebookIcon = icon('social-facebook')
 export const SocialInstagramIcon = icon('social-instagram')
 export const SocialPinterestIcon = icon('social-pinterest', {
-    viewBox: SocialPinterestSymbol.viewBox,
+    viewBox: SocialPinterestSymbol.viewBox
 })
 export const SocialTwitterIcon = icon('social-twitter')
 export const SocialYoutubeIcon = icon('social-youtube')
