@@ -48,8 +48,14 @@ import {
 
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
+
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products, isLoading: isProductsLoading} = useProducts(
+    const {
+        data: products,
+        isLoading: isProductsLoading,
+        isFetching,
+        isRefetching
+    } = useProducts(
         {
             parameters: {
                 ids: productIds,
@@ -69,6 +75,11 @@ const Cart = () => {
         }
     )
     const {isRegistered} = useCustomerType()
+
+    console.log('=====================================')
+    console.log('isFetching', isFetching)
+    console.log('isRefetching', isRefetching)
+    console.log('isProductsLoading', isProductsLoading)
 
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
@@ -305,14 +316,12 @@ const Cart = () => {
         )
     }
 
-    const isPageLoading = basket?.productItems?.length > 0 ? isProductsLoading : isLoading
-
     /********* Rendering  UI **********/
-    if (isPageLoading) {
+    if (isLoading) {
         return <CartSkeleton />
     }
 
-    if (!isPageLoading && !basket?.productItems?.length) {
+    if (!isLoading && !isProductsLoading && !basket?.productItems?.length) {
         return <EmptyCart isRegistered={isRegistered} />
     }
     return (
@@ -386,7 +395,11 @@ const Cart = () => {
                             </GridItem>
                             <GridItem>
                                 <Stack spacing={4}>
-                                    <OrderSummary showPromoCodeForm={true} isEstimate={true} />
+                                    <OrderSummary
+                                        showPromoCodeForm={true}
+                                        isEstimate={true}
+                                        basket={basket}
+                                    />
                                     <Box display={{base: 'none', lg: 'block'}}>
                                         <CartCta />
                                     </Box>
