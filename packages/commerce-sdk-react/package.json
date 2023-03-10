@@ -60,7 +60,7 @@
     "@types/react-dom": "^17.0.2",
     "@types/react-helmet": "^6.1.6",
     "cross-env": "^5.2.0",
-    "internal-lib-build": "^2.7.0-dev",
+    "internal-lib-build": "^2.8.0-dev",
     "jsonwebtoken": "^8.5.1",
     "nock": "^13.2.9",
     "react": "^17.0.2",
