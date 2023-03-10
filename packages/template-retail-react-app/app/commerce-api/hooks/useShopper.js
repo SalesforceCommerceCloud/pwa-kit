@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useEffect} from 'react'
+import {useEffect, useRef} from 'react'
 import useBasket from './useBasket'
 import useCustomer from './useCustomer'
 
@@ -17,6 +17,7 @@ const useShopper = (opts = {}) => {
     const {currency} = opts
     const customer = useCustomer()
     const basket = useBasket({currency})
+    const prevAuthType = useRef()
 
     // Create or restore the user session upon mounting
     useEffect(() => {
@@ -64,12 +65,16 @@ const useShopper = (opts = {}) => {
         // a returning customer.
         const shouldMerge =
             customer.authType === 'registered' &&
+            prevAuthType.current === 'guest' &&
             !customer.isNewlyRegistered &&
             basket.itemCount > 0
 
         if (shouldMerge) {
             basket.mergeBasket()
         }
+
+        // Update the current `authType` value.
+        prevAuthType.current = customer.authType
     }, [customer.authType])
 
     useEffect(() => {

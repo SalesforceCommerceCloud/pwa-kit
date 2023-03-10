@@ -46,9 +46,9 @@ export default function useCustomer() {
              */
             get isNewlyRegistered() {
                 if (!customer || customer.authType !== 'registered') return false
-                const lastLoginTimeDate = new Date(Date.parse(customer.lastLoginTime))
-                const creationDate = new Date(Date.parse(customer.creationDate))
-                return lastLoginTimeDate - creationDate < REGISTRATION_GRACE_PERIOD
+                const lastLoginTimeStamp = Date.parse(customer.lastLoginTime)
+                const creationTimeStamp = Date.parse(customer.creationDate)
+                return lastLoginTimeStamp - creationTimeStamp < REGISTRATION_GRACE_PERIOD
             },
 
             /** Returns the customer's saved addresses with the 'preferred' address in the first index */
