@@ -22,7 +22,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         {
             enabled: !!customerId && onClient,
             onSuccess: (data) => {
-                if (!data.total) {
+                if (!data?.total) {
                     createBasket.mutate({
                         body: {}
                     })
