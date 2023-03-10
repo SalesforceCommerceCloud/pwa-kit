@@ -33,7 +33,7 @@ export default function ShippingAddress() {
     } = useCheckout()
     const [isLoading, setIsLoading] = useState()
     const {data: customer} = useCurrentCustomer()
-    const {basket} = useCurrentBasket()
+    const {data: basket} = useCurrentBasket()
 
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')

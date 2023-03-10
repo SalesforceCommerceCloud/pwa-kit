@@ -5,22 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-import {
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Box,
-    Button,
-    Stack
-} from '@chakra-ui/react'
+import {Box, Button, Stack} from '@chakra-ui/react'
 import {
     useProduct,
     useCategory,
@@ -38,6 +29,7 @@ import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '../../components/recommended-products'
 import ProductView from '../../partials/product-view'
+import InformationAccordion from './partials/information-accordion'
 
 // constant
 import {
@@ -49,7 +41,6 @@ import {
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 import {useWishList} from '../../hooks/use-wish-list'
 
 const ProductDetail = () => {
@@ -59,11 +50,11 @@ const ProductDetail = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
-    const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
+    const [productSetSelection, setProductSetSelection] = useState({})
+    const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const {hasBasket, basket} = useCurrentBasket()
-    const createBasket = useShopperBasketsMutation('createBasket')
+    const {data: basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const {res} = useServerContext()
     if (res) {
@@ -86,6 +77,7 @@ const ProductDetail = () => {
             keepPreviousData: true
         }
     )
+    const isProductASet = product?.type.set
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
     const {data: category} = useCategory({
@@ -94,8 +86,8 @@ const ProductDetail = () => {
             level: 1
         }
     })
-    const variant = useVariant(product)
     const [primaryCategory, setPrimaryCategory] = useState(category)
+    const variant = useVariant(product)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
     // attributes are selected (to get the correct inventory values), the category information
@@ -176,51 +168,75 @@ const ProductDetail = () => {
         })
     }
 
-    const addItemToBasket = (basketId, variant, quantity) => {
-        const productItems = [
-            {
+    const handleAddToCart = async (productSelectionValues) => {
+        try {
+            const productItems = productSelectionValues.map(({variant, quantity}) => ({
                 productId: variant.productId,
-                quantity,
-                price: variant.price
-            }
-        ]
+                price: variant.price,
+                quantity
+            }))
 
-        addItemToBasketMutation.mutate(
-            {parameters: {basketId}, body: productItems},
-            {
-                onSuccess: () => {
-                    // only show this modal when a product is successfully add to cart
-                    onAddToCartModalOpen({product, quantity})
-                },
-                onError: () => {
-                    showError()
-                }
-            }
-        )
+            await addItemToBasketMutation.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: productItems
+            })
+
+            // If the items were successfully added, set the return value to be used
+            // by the add to cart modal.
+            return productSelectionValues
+        } catch (error) {
+            showError(error)
+        }
     }
 
-    const handleAddToCart = async (variant, quantity) => {
-        if (!variant?.orderable || !quantity) return
-        if (!hasBasket) {
-            createBasket.mutate(
-                {body: {}},
-                {
-                    onSuccess: (basket) => {
-                        addItemToBasket(basket.basketId, variant, quantity)
-                    },
-                    onError: () => {
-                        showError()
-                    }
-                }
-            )
-        } else {
-            addItemToBasket(basket.basketId, variant, quantity)
+    /**************** Product Set Handlers ****************/
+    const handleProductSetValidation = useCallback(() => {
+        // Run validation for all child products. This will ensure the error
+        // messages are shown.
+        Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
+            validateOrderability({scrollErrorIntoView: false})
+        })
+
+        // Using ot state for which child products are selected, scroll to the first
+        // one that isn't selected.
+        const selectedProductIds = Object.keys(productSetSelection)
+        const firstUnselectedProduct = product.setProducts.find(
+            ({id}) => !selectedProductIds.includes(id)
+        )
+
+        if (firstUnselectedProduct) {
+            // Get the reference to the product view and scroll to it.
+            const {ref} = childProductRefs.current[firstUnselectedProduct.id]
+
+            if (ref.scrollIntoView) {
+                ref.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end'
+                })
+            }
+
+            return false
         }
+
+        return true
+    }, [product, productSetSelection])
+
+    const handleProductSetAddToCart = () => {
+        // Get all the selected products, and pass them to the addToCart handler which
+        // accepts an array.
+        const productSelectionValues = Object.values(productSetSelection)
+        return handleAddToCart(productSelectionValues)
     }
 
     /**************** Einstein ****************/
     useEffect(() => {
-        if (product) {
+        if (product && product.type.set) {
+            einstein.sendViewProduct(product)
+            const childrenProducts = product.setProducts
+            childrenProducts.map((child) => {
+                einstein.sendViewProduct(child)
+            })
+        } else if (product) {
             einstein.sendViewProduct(product)
         }
     }, [product])
@@ -237,121 +253,110 @@ const ProductDetail = () => {
             </Helmet>
 
             <Stack spacing={16}>
-                <ProductView
-                    product={product}
-                    category={primaryCategory?.parentCategoryTree || []}
-                    addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                    isProductLoading={isProductLoading}
-                    isWishlistLoading={isWishlistLoading}
-                />
+                {isProductASet ? (
+                    <Fragment>
+                        {/* Product Set: parent product */}
+                        <ProductView
+                            product={product}
+                            category={primaryCategory?.parentCategoryTree || []}
+                            addToCart={handleProductSetAddToCart}
+                            addToWishlist={(product, variant, quantity) =>
+                                handleAddToWishlist(product, variant, quantity)
+                            }
+                            isProductLoading={isProductLoading}
+                            isWishlistLoading={isWishlistLoading}
+                            validateOrderability={handleProductSetValidation}
+                        />
 
-                {/* Information Accordion */}
-                <Stack direction="row" spacing={[0, 0, 0, 16]}>
-                    <Accordion allowMultiple allowToggle maxWidth={'896px'} flex={[1, 1, 1, 5]}>
-                        {/* Details */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Product Detail',
-                                            id: 'product_detail.accordion.button.product_detail'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: product?.longDescription
-                                    }}
-                                />
-                            </AccordionPanel>
-                        </AccordionItem>
+                        <hr />
 
-                        {/* Size & Fit */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Size & Fit',
-                                            id: 'product_detail.accordion.button.size_fit'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
+                        {/* TODO: consider `childProduct.belongsToSet` */}
+                        {
+                            // Product Set: render the child products
+                            product.setProducts.map((childProduct) => (
+                                <Box key={childProduct.id} data-testid="child-product">
+                                    <ProductView
+                                        // Do no use an arrow function as we are manipulating the functions scope.
+                                        ref={function (ref) {
+                                            // Assign the "set" scope of the ref, this is how we access the internal
+                                            // validation.
+                                            childProductRefs.current[childProduct.id] = {
+                                                ref,
+                                                validateOrderability: this.validateOrderability
+                                            }
+                                        }}
+                                        product={childProduct}
+                                        isProductPartOfSet={true}
+                                        addToCart={(variant, quantity) =>
+                                            handleAddToCart([
+                                                {product: childProduct, variant, quantity}
+                                            ])
+                                        }
+                                        addToWishlist={(product, variant, quantity) =>
+                                            handleAddToWishlist(product, variant, quantity)
+                                        }
+                                        onVariantSelected={(product, variant, quantity) => {
+                                            if (quantity) {
+                                                setProductSetSelection((previousState) => ({
+                                                    ...previousState,
+                                                    [product.id]: {
+                                                        product,
+                                                        variant,
+                                                        quantity
+                                                    }
+                                                }))
+                                            } else {
+                                                const selections = {...productSetSelection}
+                                                delete selections[product.id]
+                                                setProductSetSelection(selections)
+                                            }
+                                        }}
+                                        isProductLoading={isProductLoading}
+                                        isWishlistLoading={isWishlistLoading}
+                                    />
+                                    <InformationAccordion product={childProduct} />
 
-                        {/* Reviews */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Reviews',
-                                            id: 'product_detail.accordion.button.reviews'
-                                        })}
+                                    <Box display={['none', 'none', 'none', 'block']}>
+                                        <hr />
                                     </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-
-                        {/* Questions */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Questions',
-                                            id: 'product_detail.accordion.button.questions'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-                    </Accordion>
-                    <Box display={['none', 'none', 'none', 'block']} flex={4}></Box>
-                </Stack>
+                                </Box>
+                            ))
+                        }
+                    </Fragment>
+                ) : (
+                    <Fragment>
+                        <ProductView
+                            product={product}
+                            category={primaryCategory?.parentCategoryTree || []}
+                            addToCart={(variant, quantity) =>
+                                handleAddToCart([{product, variant, quantity}])
+                            }
+                            addToWishlist={(product, variant, quantity) =>
+                                handleAddToWishlist(product, variant, quantity)
+                            }
+                            isProductLoading={isProductLoading}
+                            isWishlistLoading={isWishlistLoading}
+                        />
+                        <InformationAccordion product={product} />
+                    </Fragment>
+                )}
 
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Complete the Set"
-                                id="product_detail.recommended_products.title.complete_set"
-                            />
-                        }
-                        recommender={'complete-the-set'}
-                        products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-
+                    {!isProductASet && (
+                        <RecommendedProducts
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="Complete the Set"
+                                    id="product_detail.recommended_products.title.complete_set"
+                                />
+                            }
+                            recommender={'complete-the-set'}
+                            products={[product]}
+                            mx={{base: -4, md: -8, lg: 0}}
+                            shouldFetch={() => product?.id}
+                        />
+                    )}
                     <RecommendedProducts
                         title={
                             <FormattedMessage

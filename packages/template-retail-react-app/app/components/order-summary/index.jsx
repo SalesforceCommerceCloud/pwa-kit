@@ -8,7 +8,6 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Box, Flex, Button, Stack, Text, Heading, Divider} from '@chakra-ui/react'
-import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {BasketIcon, ChevronDownIcon, ChevronUpIcon} from '../icons'
 import Link from '../link'
 import {PromoCode, usePromoCode} from '../promo-code'
@@ -18,11 +17,31 @@ import CartItemVariantName from '../item-variant/item-name'
 import CartItemVariantAttributes from '../item-variant/item-attributes'
 import CartItemVariantPrice from '../item-variant/item-price'
 import PromoPopover from '../promo-popover'
+import {useProducts} from 'commerce-sdk-react-preview'
 
 const CartItems = ({basket}) => {
-    const {totalItems, products} = useCurrentBasket({
-        shouldFetchProductDetail: true
-    })
+    const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
+    const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
+    const {data: products} = useProducts(
+        {
+            parameters: {
+                ids: productIds,
+                allImages: true
+            }
+        },
+        {
+            enabled: Boolean(productIds),
+            select: (result) => {
+                // Convert array into key/value object with key is the product id
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
+
     const [cartItemsExpanded, setCartItemsExpanded] = useState(false)
 
     return (
@@ -92,13 +111,11 @@ const OrderSummary = ({
     isEstimate = false,
     fontSize = 'md'
 }) => {
-    basket = basket || useCurrentBasket().basket
-
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
     const shippingItem = basket.shippingItems?.[0]
     const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
-    if (!basket.basketId && !basket.orderNo) {
+    if (!basket?.basketId && !basket?.orderNo) {
         return null
     }
 
