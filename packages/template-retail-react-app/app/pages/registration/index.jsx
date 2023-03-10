@@ -15,7 +15,7 @@ import {useLocation} from 'react-router-dom'
 import Seo from '../../components/seo'
 import RegisterForm from '../../components/register'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../hooks/useEinstein'
+import useEinstein from '../../hooks/use-einstein'
 import {API_ERROR_MESSAGE} from '../../constants'
 
 const Registration = () => {

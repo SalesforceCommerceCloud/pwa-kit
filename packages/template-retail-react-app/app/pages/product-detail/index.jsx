@@ -28,7 +28,7 @@ import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {useVariant} from '../../hooks'
 import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../hooks/useEinstein'
+import useEinstein from '../../hooks/use-einstein'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '../../components/recommended-products'

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import fetch from 'cross-fetch'
-import EinsteinAPI from './einstein'
+import {EinsteinAPI} from './einstein'
 import {
     mockAddToCartProduct,
     mockGetZoneRecommendationsResponse,
@@ -15,7 +15,7 @@ import {
     mockBasket,
     mockRecommendationsResponse,
     mockRecommenderDetails
-} from './mocks/einstein-mock-data'
+} from './einstein-mock-data'
 
 jest.mock('cross-fetch', () => {
     return {

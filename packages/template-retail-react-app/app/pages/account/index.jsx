@@ -37,7 +37,7 @@ import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import useMultiSite from '../../hooks/use-multi-site'
-import useEinstein from '../../hooks/useEinstein'
+import useEinstein from '../../hooks/use-einstein'
 import {useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 

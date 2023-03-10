@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useContext, useMemo} from 'react'
-import useEinstein from './useEinstein'
+// import useEinstein from './useEinstein'
 import {useCommerceAPI, BasketContext} from '../contexts'
 import useCustomer from './useCustomer'
 import {isError} from '../utils'
@@ -14,7 +14,7 @@ export default function useBasket(opts = {}) {
     const {currency} = opts
     const api = useCommerceAPI()
     const customer = useCustomer()
-    const einstein = useEinstein()
+    // const einstein = useEinstein()
     const {basket, setBasket: _setBasket} = useContext(BasketContext)
 
     const setBasket = (basketData) => {
@@ -123,7 +123,7 @@ export default function useBasket(opts = {}) {
                     throw new Error(response)
                 } else {
                     setBasket(response)
-                    einstein.sendAddToCart(item[0])
+                    // einstein.sendAddToCart(item[0])
                 }
             },
 

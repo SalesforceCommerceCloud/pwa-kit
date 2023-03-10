@@ -10,9 +10,8 @@ import * as sdk from 'commerce-sdk-isomorphic'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import ShopperBaskets from './shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
-import {getTenantId, isError, isTokenValid} from './utils'
+import {isError, isTokenValid} from './utils'
 import Auth from './auth'
-import EinsteinAPI from './einstein'
 
 /**
  * The configuration details for the connecting to the API.
@@ -58,10 +57,6 @@ class CommerceAPI {
         this._config = {proxy, ...restConfig}
 
         this.auth = new Auth(this)
-
-        if (this._config.einsteinConfig?.einsteinId) {
-            this.einstein = new EinsteinAPI(this)
-        }
 
         // A mapping of property names to the SDK class constructors we'll be
         // providing instances for.
