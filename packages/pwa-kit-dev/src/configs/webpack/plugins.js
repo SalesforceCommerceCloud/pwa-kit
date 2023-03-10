@@ -135,6 +135,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
     const overridesMap = [
         ...overrides,
         ...overrides.flatMap((item) => {
+            console.log('each item', item)
             const patterns = []
             const EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
 
@@ -155,8 +156,14 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
                     .slice(0, -1)
                     .join('/')
 
+                if (item === 'pwa-kit/overrides/app/components/icons/index.jsx') {
+                    console.log('no ext', noExt)
+                    console.log('path with no file', pathNoFile)
+                    console.log('----++++++', minimatch.makeRe('**/*' + noExt + EXTENSIONS))
+                }
                 patterns.push(minimatch.makeRe('**/*' + noExt + EXTENSIONS))
-                patterns.push(minimatch.makeRe('**' + pathNoFile))
+                patterns.push(minimatch.makeRe('**/*' + noExt))
+                patterns.push(minimatch.makeRe('**/*' + pathNoFile))
             }
 
             return patterns
