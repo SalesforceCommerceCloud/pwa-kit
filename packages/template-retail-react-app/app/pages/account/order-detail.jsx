@@ -35,13 +35,16 @@ import PropTypes from 'prop-types'
 
 const OrderProducts = ({productItems, currency, isLoadingOrder}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
-    const {data: {data: products} = {}, isLoading: isLoadingProducts} = useProducts({
-        parameters: {
-            ids: ids
+    const {data: {data: products} = {}, isLoading: isLoadingProducts} = useProducts(
+        {
+            parameters: {
+                ids: ids
+            }
+        },
+        {
+            enabled: !isLoadingOrder
         }
-    },{
-        enabled:!isLoadingOrder
-    })
+    )
 
     const isLoading = isLoadingProducts || isLoadingOrder
 
@@ -96,7 +99,8 @@ const OrderProducts = ({productItems, currency, isLoadingOrder}) => {
 
 OrderProducts.propTypes = {
     productItems: PropTypes.array,
-    currency: PropTypes.string
+    currency: PropTypes.string,
+    isLoadingOrder: PropTypes.bool
 }
 
 const AccountOrderDetail = () => {
@@ -104,7 +108,9 @@ const AccountOrderDetail = () => {
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
 
-    const {data: order, isLoading: isLoadingOrder} = useOrder({parameters: {orderNo: params.orderNo}})
+    const {data: order, isLoading: isLoadingOrder} = useOrder({
+        parameters: {orderNo: params.orderNo}
+    })
     const isLoading = isLoadingOrder || !order
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
@@ -354,7 +360,11 @@ const AccountOrderDetail = () => {
                             </Box>
                         ))
                     ) : (
-                        <OrderProducts productItems={order.productItems} currency={order.currency} isLoadingOrder={isLoading} />
+                        <OrderProducts
+                            productItems={order.productItems}
+                            currency={order.currency}
+                            isLoadingOrder={isLoading}
+                        />
                     )}
                 </Stack>
             </Stack>

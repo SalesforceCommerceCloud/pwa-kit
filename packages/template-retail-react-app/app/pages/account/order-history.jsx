@@ -87,9 +87,12 @@ const AccountOrderHistory = () => {
     const searchParams = useSearchParams()
     const {limit, offset} = searchParams[0]
 
-    const {data: {data: orders, ...paging} = {}, isLoading: isLoadingOrders} = useCustomerOrders({
-        parameters: {customerId, limit: DEFAULT_PAGINATION_LIMIT || limit, offset}
-    }, {enabled: !isLoadingCustomer})
+    const {data: {data: orders, ...paging} = {}, isLoading: isLoadingOrders} = useCustomerOrders(
+        {
+            parameters: {customerId, limit: DEFAULT_PAGINATION_LIMIT || limit, offset}
+        },
+        {enabled: !isLoadingCustomer}
+    )
 
     const isLoading = isLoadingOrders || isLoadingCustomer
 
@@ -112,7 +115,7 @@ const AccountOrderHistory = () => {
                 </Heading>
             </Stack>
 
-            {isLoading? (
+            {isLoading ? (
                 [1, 2, 3].map((i) => (
                     <Stack key={i} spacing={4} layerStyle="cardBordered">
                         <Stack spacing={2}>
@@ -129,7 +132,7 @@ const AccountOrderHistory = () => {
                 ))
             ) : (
                 <Stack spacing={4}>
-                    { orders?.map((order) => {
+                    {orders?.map((order) => {
                         return (
                             <Stack key={order.orderNo} spacing={4} layerStyle="cardBordered">
                                 <Box>
