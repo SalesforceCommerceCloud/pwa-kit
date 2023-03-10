@@ -10,97 +10,103 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperCustomers<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
     getExternalProfile: [
         '/organizations/',
-        string,
+        string | undefined,
         '/customers/external-profile',
         Params<'getExternalProfile'>
     ]
-    getCustomer: ['/organizations/', string, '/customers/', string, Params<'getCustomer'>]
+    getCustomer: [
+        '/organizations/',
+        string | undefined,
+        '/customers/',
+        string | undefined,
+        Params<'getCustomer'>
+    ]
     getCustomerAddress: [
         '/organizations/',
-        string,
+        string | undefined,
         '/customers/',
-        string,
+        string | undefined,
         '/addresses/',
-        string,
+        string | undefined,
         Params<'getCustomerAddress'>
     ]
     getCustomerBaskets: [
         '/organizations/',
-        string,
+        string | undefined,
         '/customers/',
-        string,
+        string | undefined,
         '/baskets',
         Params<'getCustomerBaskets'>
     ]
     getCustomerOrders: [
         '/organizations/',
-        string,
+        string | undefined,
         '/customers/',
-        string,
+        string | undefined,
         '/orders',
         Params<'getCustomerOrders'>
     ]
     getCustomerPaymentInstrument: [
         '/organizations/',
-        string,
+        string | undefined,
         '/customers/',
-        string,
+        string | undefined,
         '/payment-instruments/',
-        string,
+        string | undefined,
         Params<'getCustomerPaymentInstrument'>
     ]
     getCustomerProductLists: [
         '/organizations/',
-        string,
+        string | undefined,
         '/customers/',
-        string,
+        string | undefined,
         '/product-lists',
         Params<'getCustomerProductLists'>
     ]
     getCustomerProductList: [
         '/organizations/',
-        string,
+        string | undefined,
         '/customers/',
-        string,
+        string | undefined,
         '/product-lists/',
-        string,
+        string | undefined,
         Params<'getCustomerProductList'>
     ]
     getCustomerProductListItem: [
         '/organizations/',
-        string,
+        string | undefined,
         '/customers/',
-        string,
+        string | undefined,
         '/product-lists/',
-        string,
+        string | undefined,
         '/items/',
-        string,
+        string | undefined,
         Params<'getCustomerProductListItem'>
     ]
     getPublicProductListsBySearchTerm: [
         '/organizations/',
-        string,
+        string | undefined,
         '/product-lists',
         Params<'getPublicProductListsBySearchTerm'>
     ]
     getPublicProductList: [
         '/organizations/',
-        string,
+        string | undefined,
         '/product-lists/',
-        string,
+        string | undefined,
         Params<'getPublicProductList'>
     ]
     getProductListItem: [
         '/organizations/',
-        string,
+        string | undefined,
         '/product-lists/',
-        string,
+        string | undefined,
         '/items/',
-        string,
+        string | undefined,
         Params<'getProductListItem'>
     ]
 }
