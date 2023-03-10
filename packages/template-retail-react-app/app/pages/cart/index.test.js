@@ -21,6 +21,7 @@ import {
 import mockVariant from '../../commerce-api/mocks/variant-750518699578M'
 import {rest} from 'msw'
 
+//TODO: Unskip this test when fetchedToken bugs are fixed. All the tests should pass when customerId is defined!
 const mockProduct = {
     ...mockVariant,
     id: '750518699660M',
@@ -158,7 +159,7 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test.skip('Renders skeleton until customer and basket are loaded', () => {
+test('Renders skeleton until customer and basket are loaded', () => {
     const {getByTestId, queryByTestId} = renderWithProviders(<Cart />)
     expect(getByTestId('sf-cart-skeleton')).toBeInTheDocument()
     expect(queryByTestId('sf-cart-container')).not.toBeInTheDocument()
@@ -172,11 +173,13 @@ describe('Empty cart tests', function () {
             })
         )
     })
+
     test.skip('Renders empty cart when there are no items', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
     })
 })
+
 test.skip('Renders cart components when there are items', async () => {
     renderWithProviders(<Cart />)
     await waitFor(async () => {

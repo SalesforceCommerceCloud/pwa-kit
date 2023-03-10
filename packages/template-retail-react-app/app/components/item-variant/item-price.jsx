@@ -43,7 +43,7 @@ PricePerItem.propTypes = {
  */
 const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...props}) => {
     const variant = useItemVariant()
-    const {basket} = useCurrentBasket()
+    const {data: basket} = useCurrentBasket()
     const {currency: activeCurrency} = useCurrency()
     const intl = useIntl()
 

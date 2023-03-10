@@ -57,7 +57,10 @@ export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, itemsAdded = []} = data || {}
     const intl = useIntl()
-    const {basket = {}, totalItems} = useCurrentBasket() || {}
+    const {
+        data: basket = {},
+        derivedData: {totalItems}
+    } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const {currency, productItems, productSubTotal} = basket
     const numerOfItemsAdded = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
@@ -325,7 +328,6 @@ export const useAddToCartModal = () => {
         isOpen: state.isOpen,
         data: state.data,
         onOpen: (data) => {
-            console.log('onOpen data', data)
             setState({
                 isOpen: true,
                 data

@@ -52,11 +52,9 @@ const ProductDetail = () => {
     const navigate = useNavigation()
     const [productSetSelection, setProductSetSelection] = useState({})
     const childProductRefs = React.useRef({})
-
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const {hasBasket, basket} = useCurrentBasket()
-    const createBasket = useShopperBasketsMutation('createBasket')
+    const {data: basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const {res} = useServerContext()
     if (res) {
@@ -178,20 +176,12 @@ const ProductDetail = () => {
                 quantity
             }))
 
-            // await basket.addItemToBasket(productItems)
-            if (!hasBasket) {
-                await createBasket.mutateAsync({body: {}})
-            }
-
             await addItemToBasketMutation.mutateAsync({
                 parameters: {basketId: basket.basketId},
                 body: productItems
             })
 
-            // @TODO verify this still works
-            // onAddToCartModalOpen({product, quantity})
-
-            // If the items were sucessfully added, set the return value to be used
+            // If the items were successfully added, set the return value to be used
             // by the add to cart modal.
             return productSelectionValues
         } catch (error) {
