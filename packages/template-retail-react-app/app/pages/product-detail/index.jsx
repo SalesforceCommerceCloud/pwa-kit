@@ -41,7 +41,6 @@ import {
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 import {useWishList} from '../../hooks/use-wish-list'
 
 const ProductDetail = () => {
@@ -51,13 +50,11 @@ const ProductDetail = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
-    const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
     const [productSetSelection, setProductSetSelection] = useState({})
     const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const {hasBasket, data: basket} = useCurrentBasket()
-    const createBasket = useShopperBasketsMutation('createBasket')
+    const {data: basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const {res} = useServerContext()
     if (res) {
@@ -89,6 +86,7 @@ const ProductDetail = () => {
             level: 1
         }
     })
+    const [primaryCategory, setPrimaryCategory] = useState(category)
     const variant = useVariant(product)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
@@ -178,16 +176,12 @@ const ProductDetail = () => {
                 quantity
             }))
 
-            const data = await addItemToBasketMutation.mutateAsync({
+            await addItemToBasketMutation.mutateAsync({
                 parameters: {basketId: basket.basketId},
                 body: productItems
             })
 
-            if (data) {
-                onAddToCartModalOpen({product, quantity})
-            }
-
-            // If the items were sucessfully added, set the return value to be used
+            // If the items were successfully added, set the return value to be used
             // by the add to cart modal.
             return productSelectionValues
         } catch (error) {

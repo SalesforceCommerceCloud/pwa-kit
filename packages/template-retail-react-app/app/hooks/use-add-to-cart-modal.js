@@ -58,7 +58,7 @@ export const AddToCartModal = () => {
     const {product, itemsAdded = []} = data || {}
     const intl = useIntl()
     const {
-        data: basket,
+        data: basket = {},
         derivedData: {totalItems}
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
