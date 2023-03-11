@@ -32,22 +32,36 @@ import CartItemVariantName from '../../components/item-variant/item-name'
 import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
 import CartItemVariantPrice from '../../components/item-variant/item-price'
 import PropTypes from 'prop-types'
+const onClient = typeof window !== 'undefined'
 
-const OrderProducts = ({productItems, currency, isLoadingOrder}) => {
-    const ids = productItems.map((item) => item.productId).join(',') ?? ''
-    const {data: {data: products} = {}, isLoading: isLoadingProducts} = useProducts(
+const OrderProducts = ({productItems, currency}) => {
+    const ids = productItems?.map((item) => item.productId).join(',') ?? ''
+    const {data: {data: products} = {}, isLoading} = useProducts(
         {
             parameters: {
                 ids: ids
             }
         },
         {
-            enabled: !isLoadingOrder
+            enabled: Boolean(ids) && onClient
         }
     )
 
-    const isLoading = isLoadingProducts || isLoadingOrder
+    if (isLoading) {
+        return [1, 2, 3].map((i) => (
+            <Box key={i} p={[4, 6]} border="1px solid" borderColor="gray.100" borderRadius="base">
+                <Flex width="full" align="flex-start">
+                    <Skeleton boxSize={['88px', 36]} mr={4} />
 
+                    <Stack spacing={2}>
+                        <Skeleton h="20px" w="112px" />
+                        <Skeleton h="20px" w="84px" />
+                        <Skeleton h="20px" w="140px" />
+                    </Stack>
+                </Flex>
+            </Box>
+        ))
+    }
     const variants =
         products &&
         products.map((product) => {
@@ -100,23 +114,27 @@ const OrderProducts = ({productItems, currency, isLoadingOrder}) => {
 OrderProducts.propTypes = {
     productItems: PropTypes.array,
     currency: PropTypes.string,
-    isLoadingOrder: PropTypes.bool
+    isOrderLoading: PropTypes.bool
 }
-
 const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
 
-    const {data: order, isLoading: isLoadingOrder} = useOrder({
-        parameters: {orderNo: params.orderNo}
-    })
-    const isLoading = isLoadingOrder || !order
+    const {data: order, isLoading: isOrderLoading} = useOrder(
+        {
+            parameters: {orderNo: params.orderNo}
+        },
+        {
+            enabled: onClient && !!params.orderNo
+        }
+    )
+    // const isLoading = isLoadingOrder || !order
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
-    const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0)
+    const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
 
     return (
         <Stack spacing={6} data-testid="account-order-details-page">
@@ -150,7 +168,7 @@ const AccountOrderDetail = () => {
                         />
                     </Heading>
 
-                    {!isLoadingOrder && order ? (
+                    {!isOrderLoading && order ? (
                         <Stack
                             direction={['column', 'row']}
                             alignItems={['flex-start', 'center']}
@@ -196,7 +214,7 @@ const AccountOrderDetail = () => {
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
                     <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={5} py={{xl: 6}}>
-                        {isLoading ? (
+                        {isOrderLoading ? (
                             <>
                                 <Stack>
                                     <Skeleton h="20px" w="84px" />
@@ -312,7 +330,7 @@ const AccountOrderDetail = () => {
                         )}
                     </SimpleGrid>
 
-                    {!isLoading ? (
+                    {!isOrderLoading ? (
                         <Box
                             py={{base: 6}}
                             px={{base: 6, xl: 8}}
@@ -328,7 +346,7 @@ const AccountOrderDetail = () => {
             </Box>
 
             <Stack spacing={4}>
-                {!isLoading && (
+                {!isOrderLoading && (
                     <Text>
                         <FormattedMessage
                             defaultMessage="{count} items"
@@ -339,33 +357,7 @@ const AccountOrderDetail = () => {
                 )}
 
                 <Stack spacing={4}>
-                    {isLoading ? (
-                        [1, 2, 3].map((i) => (
-                            <Box
-                                key={i}
-                                p={[4, 6]}
-                                border="1px solid"
-                                borderColor="gray.100"
-                                borderRadius="base"
-                            >
-                                <Flex width="full" align="flex-start">
-                                    <Skeleton boxSize={['88px', 36]} mr={4} />
-
-                                    <Stack spacing={2}>
-                                        <Skeleton h="20px" w="112px" />
-                                        <Skeleton h="20px" w="84px" />
-                                        <Skeleton h="20px" w="140px" />
-                                    </Stack>
-                                </Flex>
-                            </Box>
-                        ))
-                    ) : (
-                        <OrderProducts
-                            productItems={order.productItems}
-                            currency={order.currency}
-                            isLoadingOrder={isLoading}
-                        />
-                    )}
+                    <OrderProducts productItems={order?.productItems} currency={order?.currency} />
                 </Stack>
             </Stack>
         </Stack>

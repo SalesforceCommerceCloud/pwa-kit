@@ -22,7 +22,7 @@ const Checkout = () => {
     const navigate = useNavigation()
     const {globalError, step, placeOrder} = useCheckout()
     const [isLoading, setIsLoading] = useState(false)
-
+    const {data: basket} = useCurrentBasket()
     // Scroll to the top when we get a global error
     useEffect(() => {
         if (globalError || step === 4) {
@@ -84,7 +84,11 @@ const Checkout = () => {
                     </GridItem>
 
                     <GridItem py={6} px={[4, 4, 4, 0]}>
-                        <OrderSummary showTaxEstimationForm={false} showCartItems={true} />
+                        <OrderSummary
+                            showTaxEstimationForm={false}
+                            showCartItems={true}
+                            basket={basket}
+                        />
 
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
