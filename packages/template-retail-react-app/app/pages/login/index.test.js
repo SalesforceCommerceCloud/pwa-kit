@@ -16,8 +16,6 @@ import Registration from '../registration'
 import ResetPassword from '../reset-password'
 import mockConfig from '../../../config/mocks/default'
 
-
-
 const mockRegisteredCustomer = {
     authType: 'registered',
     customerId: 'registeredCustomerId',

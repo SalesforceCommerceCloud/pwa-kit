@@ -21,8 +21,6 @@ import useWishlist from '../../hooks/use-wishlist'
 jest.setTimeout(60000)
 let mockProductListSearchResponse = mockProductSearch
 
-
-
 jest.mock('../../hooks/use-wishlist')
 
 const MockedComponent = ({isLoading, isLoggedIn = false}) => {

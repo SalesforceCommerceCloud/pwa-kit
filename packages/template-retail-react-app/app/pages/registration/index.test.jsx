@@ -16,8 +16,6 @@ import {rest} from 'msw'
 
 jest.setTimeout(60000)
 
-
-
 const mockRegisteredCustomer = {
     authType: 'registered',
     customerId: 'registeredCustomerId',

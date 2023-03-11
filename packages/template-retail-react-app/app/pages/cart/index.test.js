@@ -58,8 +58,6 @@ jest.mock('../../commerce-api/auth', () => {
     }
 })
 
-
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()

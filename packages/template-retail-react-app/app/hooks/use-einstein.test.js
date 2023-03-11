@@ -8,12 +8,10 @@ import fetch from 'cross-fetch'
 import {EinsteinAPI} from './use-einstein'
 import {
     mockAddToCartProduct,
-    mockGetZoneRecommendationsResponse,
     mockProduct,
     mockCategory,
     mockSearchResults,
     mockBasket,
-    mockRecommendationsResponse,
     mockRecommenderDetails
 } from './einstein-mock-data'
 
@@ -26,9 +24,9 @@ jest.mock('cross-fetch', () => {
 
 const einsteinApi = new EinsteinAPI({
     host: `http://localhost/test-path`,
-            einsteinId: 'test-id',
-            siteId: 'test-site-id',
-            cookieId: 'test-usid',
+    einsteinId: 'test-id',
+    siteId: 'test-site-id',
+    cookieId: 'test-usid'
 })
 
 beforeEach(() => {

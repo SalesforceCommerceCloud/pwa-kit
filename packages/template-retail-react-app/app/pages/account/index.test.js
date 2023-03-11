@@ -21,8 +21,6 @@ import Login from '../login'
 import mockConfig from '../../../config/mocks/default'
 import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 
-
-
 const MockedComponent = () => {
     const {isRegistered} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)

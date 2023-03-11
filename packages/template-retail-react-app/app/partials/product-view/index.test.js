@@ -14,8 +14,6 @@ import {renderWithProviders} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import userEvent from '@testing-library/user-event'
 
-
-
 const MockComponent = ({product, addToCart, addToWishlist, updateWishlist}) => {
     const customer = useCustomer()
     useEffect(() => {

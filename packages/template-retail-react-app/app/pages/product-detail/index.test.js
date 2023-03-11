@@ -16,8 +16,6 @@ jest.setTimeout(60000)
 
 jest.useFakeTimers()
 
-
-
 const MockedComponent = () => {
     return (
         <Switch>
