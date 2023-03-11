@@ -16,7 +16,7 @@ import {rest} from 'msw'
 
 jest.setTimeout(60000)
 
-jest.mock('../../commerce-api/einstein')
+
 
 const mockRegisteredCustomer = {
     authType: 'registered',

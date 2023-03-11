@@ -8,7 +8,7 @@ import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import HomePage from './index'
 
-jest.mock('../../commerce-api/einstein')
+
 
 test('Home Page renders without errors', async () => {
     const {getByTestId} = renderWithProviders(<HomePage />)

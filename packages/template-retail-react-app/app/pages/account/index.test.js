@@ -21,7 +21,7 @@ import Login from '../login'
 import mockConfig from '../../../config/mocks/default'
 import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 
-jest.mock('../../commerce-api/einstein')
+
 
 const MockedComponent = () => {
     const {isRegistered} = useCustomerType()

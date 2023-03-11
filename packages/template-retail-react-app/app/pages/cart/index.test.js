@@ -58,7 +58,7 @@ jest.mock('../../commerce-api/auth', () => {
     }
 })
 
-jest.mock('../../commerce-api/einstein')
+
 
 // Set up and clean up
 beforeEach(() => {

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import fetch from 'cross-fetch'
-import {EinsteinAPI} from './einstein'
+import {EinsteinAPI} from './use-einstein'
 import {
     mockAddToCartProduct,
     mockGetZoneRecommendationsResponse,
@@ -24,22 +24,12 @@ jest.mock('cross-fetch', () => {
     }
 })
 
-const getProductsSpy = jest.fn()
-const config = {
-    _config: {
-        einsteinConfig: {
-            host: `http://localhost/test-path`,
+const einsteinApi = new EinsteinAPI({
+    host: `http://localhost/test-path`,
             einsteinId: 'test-id',
-            siteId: 'test-site-id'
-        }
-    },
-    auth: {usid: 'test-usid'},
-    shopperProducts: {
-        getProducts: getProductsSpy
-    }
-}
-
-const einsteinApi = new EinsteinAPI(config)
+            siteId: 'test-site-id',
+            cookieId: 'test-usid',
+})
 
 beforeEach(() => {
     jest.resetModules()
@@ -217,113 +207,6 @@ describe('EinsteinAPI', () => {
                 body: '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","products":{"id":"test-reco"},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
-    })
-
-    test('getZoneRecommendations fetches recs and product detail and returns merged results', async () => {
-        fetch.mockImplementationOnce(() => {
-            return {
-                json: async () => {
-                    return mockGetZoneRecommendationsResponse
-                },
-                ok: true
-            }
-        })
-
-        getProductsSpy.mockImplementationOnce(() => ({
-            data: [
-                {
-                    id: 'prod_123',
-                    price: 5.99
-                }
-            ]
-        }))
-
-        const res = await einsteinApi.getZoneRecommendations('mockZoneName')
-
-        expect(fetch).toHaveBeenCalledWith(
-            'http://localhost/test-path/v3/personalization/test-site-id/zones/mockZoneName/recs',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-cq-client-id': 'test-id'
-                },
-                body: '{"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
-            }
-        )
-
-        expect(res).toEqual({
-            displayMessage: 'Recently Viewed',
-            recommenderName: 'recently-viewed-products',
-            recoUUID: '05e0bd80-64eb-4149-ad5a-dfe1996f8f57',
-            recs: [
-                {
-                    id: 'prod_123',
-                    productName: 'Product ABC',
-                    productUrl: 'prod_abc.test.com',
-                    imageUrl: 'prod_abc.test.com',
-                    price: 5.99,
-                    productId: 'prod_123',
-                    image: {
-                        disBaseLink: 'prod_abc.test.com',
-                        alt: 'Product ABC'
-                    }
-                }
-            ]
-        })
-    })
-
-    test('getRecommendations fetches recs and product detail and returns merged results', async () => {
-        fetch.mockImplementationOnce(() => {
-            return {
-                json: async () => {
-                    return mockRecommendationsResponse
-                },
-                ok: true
-            }
-        })
-
-        getProductsSpy.mockImplementationOnce(() => ({
-            data: [
-                {
-                    id: 'prod_123',
-                    price: 5.99
-                }
-            ]
-        }))
-
-        const res = await einsteinApi.getRecommendations('testRecommenderName')
-
-        expect(fetch).toHaveBeenCalledWith(
-            'http://localhost/test-path/v3/personalization/recs/test-site-id/testRecommenderName',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-cq-client-id': 'test-id'
-                },
-                body: '{"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
-            }
-        )
-
-        expect(res).toEqual({
-            recommenderName: 'testRecommenderName',
-            recoUUID: '05e0bd80-64eb-4149-ad5a-dfe1996f8f57',
-            recs: [
-                {
-                    id: 'prod_123',
-                    productName: 'Product ABC',
-                    productUrl: 'prod_abc.test.com',
-                    imageUrl: 'prod_abc.test.com',
-                    price: 5.99,
-                    productId: 'prod_123',
-                    image: {
-                        disBaseLink: 'prod_abc.test.com',
-                        alt: 'Product ABC'
-                    }
-                }
-            ]
-        })
     })
 
     test('getRecommenders send expected api request', async () => {

@@ -25,7 +25,7 @@ import {
 } from '../../commerce-api/mock-data'
 import mockConfig from '../../../config/mocks/default'
 
-jest.mock('../../commerce-api/einstein')
+
 jest.mock('commerce-sdk-react-preview', () => {
     const originalModule = jest.requireActual('commerce-sdk-react-preview')
     return {
