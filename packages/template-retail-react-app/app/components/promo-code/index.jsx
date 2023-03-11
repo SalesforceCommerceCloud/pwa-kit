@@ -25,7 +25,7 @@ import {useCurrentBasket} from '../../hooks/use-current-basket'
 
 export const usePromoCode = () => {
     const {formatMessage} = useIntl()
-    const {basket} = useCurrentBasket()
+    const {data: basket} = useCurrentBasket()
     const form = useForm()
     const toast = useToast()
 

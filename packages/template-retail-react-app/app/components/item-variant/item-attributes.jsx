@@ -22,7 +22,7 @@ import {usePromotions} from 'commerce-sdk-react-preview'
  */
 const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const variant = useItemVariant()
-    const {basket} = useCurrentBasket()
+    const {data: basket} = useCurrentBasket()
     const {currency: activeCurrency} = useCurrency()
     const promotionIds = variant.priceAdjustments?.map((adj) => adj.promotionId) ?? []
 

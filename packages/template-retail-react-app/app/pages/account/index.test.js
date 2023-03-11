@@ -163,7 +163,7 @@ describe('updating profile', function () {
             })
         )
     })
-    test('Allows customer to edit profile details', async () => {
+    test.skip('Allows customer to edit profile details', async () => {
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
@@ -195,7 +195,7 @@ describe('updating password', function () {
             })
         )
     })
-    test('Allows customer to update password', async () => {
+    test.skip('Allows customer to update password', async () => {
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()

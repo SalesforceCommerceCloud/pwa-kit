@@ -17,9 +17,9 @@ import {useProductViewModal} from '../../hooks/use-product-view-modal'
 const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
     const productViewModalData = useProductViewModal(product)
     return (
-        <Modal data-testid={'sf-product-view-modal'} size="4xl" isOpen={isOpen} onClose={onClose}>
+        <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
-            <ModalContent>
+            <ModalContent containerProps={{'data-testid': 'product-view-modal'}}>
                 <ModalCloseButton />
                 <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                     <ProductView

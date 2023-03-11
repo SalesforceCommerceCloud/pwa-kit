@@ -20,7 +20,7 @@ export const CheckoutProvider = ({children}) => {
     const mounted = useRef()
     const api = useCommerceAPI()
     const {data: customer} = useCurrentCustomer()
-    const {basket} = useCurrentBasket()
+    const {data: basket} = useCurrentBasket()
     const {formatMessage} = useIntl()
     const einstein = useEinstein()
 
