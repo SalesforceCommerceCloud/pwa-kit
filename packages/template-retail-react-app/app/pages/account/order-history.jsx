@@ -33,27 +33,47 @@ import Pagination from '../../components/pagination'
 import PropTypes from 'prop-types'
 
 const DEFAULT_PAGINATION_LIMIT = 10
-const OrderProductImage = ({imageGroups}) => {
-    const image = imageGroups?.find((group) => group.viewType === 'small').images[0]
+const OrderProductImages = ({productItems}) => {
+    const ids = productItems.map((item) => item.productId).join(',') ?? ''
+    const {data: {data: products} = {}, isLoading} = useProducts({
+        parameters: {
+            ids: ids
+        }
+    })
+
+    const images = products?.map((product) => {
+        return product?.imageGroups?.find((group) => group.viewType === 'small').images[0]
+    })
 
     return (
         <>
-            {image ? (
-                <AspectRatio ratio={1} width="88px" w="88px" borderRadius="base" overflow="hidden">
-                    <Img
-                        alt={image?.alt}
-                        src={image?.disBaseLink || image?.link}
-                        fallback={<Box background="gray.100" boxSize="full" />}
-                    />
-                </AspectRatio>
-            ) : (
-                <Skeleton h="88px" w="88px" />
-            )}
+            {!isLoading && products
+                ? images.map((image, index) => {
+                      return (
+                          <AspectRatio
+                              key={index}
+                              ratio={1}
+                              width="88px"
+                              w="88px"
+                              borderRadius="base"
+                              overflow="hidden"
+                          >
+                              <Img
+                                  alt={image?.alt}
+                                  src={image?.disBaseLink || image?.link}
+                                  fallback={<Box background="gray.100" boxSize="full" />}
+                              />
+                          </AspectRatio>
+                      )
+                  })
+                : productItems.map((item, index) => {
+                      return <Skeleton key={index} h="88px" w="88px" />
+                  })}
         </>
     )
 }
-OrderProductImage.propTypes = {
-    imageGroups: PropTypes.array
+OrderProductImages.propTypes = {
+    productItems: PropTypes.array
 }
 
 const onClient = typeof window !== 'undefined'
@@ -65,43 +85,19 @@ const AccountOrderHistory = () => {
     const {data: customer} = useCurrentCustomer()
     const {customerId} = customer
 
-    const searchParams = useSearchParams()
+    const searchParams = useSearchParams({limit: 10, offset: 0})
     const {limit, offset} = searchParams[0]
 
     const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders(
         {
-            parameters: {customerId, limit: DEFAULT_PAGINATION_LIMIT || limit, offset}
+            parameters: {customerId, limit: limit || DEFAULT_PAGINATION_LIMIT, offset}
         },
         {enabled: onClient}
     )
 
-    const productIds = orders
-        ?.map((order) => {
-            return order.productItems.map((item) => item.productId).join(',')
-        })
-        .join(',')
-    const {data: products, isLoading: isProductLoading} = useProducts(
-        {
-            parameters: {
-                ids: productIds
-            }
-        },
-        {
-            enabled: Boolean(productIds),
-            select: (result) => {
-                // Convert array into key/value object with key is the product id
-                return result?.data?.reduce((result, item) => {
-                    const key = item.id
-                    result[key] = item
-                    return result
-                }, {})
-            }
-        }
-    )
-    const isPageLoading = productIds ? isProductLoading : isLoading
     const hasOrders = orders?.length > 0
 
-    const pageUrls = usePageUrls({total: paging.total, limit: DEFAULT_PAGINATION_LIMIT || limit})
+    const pageUrls = usePageUrls({total: paging.total, limit: limit || DEFAULT_PAGINATION_LIMIT})
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -118,7 +114,7 @@ const AccountOrderHistory = () => {
                 </Heading>
             </Stack>
 
-            {isPageLoading ? (
+            {isLoading ? (
                 [1, 2, 3].map((i) => (
                     <Stack key={i} spacing={4} layerStyle="cardBordered">
                         <Stack spacing={2}>
@@ -182,15 +178,7 @@ const AccountOrderHistory = () => {
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
-                                    {order?.productItems?.map((item) => {
-                                        const productDetail = products?.[item.productId]
-                                        return (
-                                            <OrderProductImage
-                                                key={item.productId}
-                                                imageGroups={productDetail?.imageGroups}
-                                            />
-                                        )
-                                    })}
+                                    <OrderProductImages productItems={order.productItems} />
                                 </Grid>
 
                                 <Stack
@@ -245,7 +233,7 @@ const AccountOrderHistory = () => {
                 </Stack>
             )}
 
-            {!hasOrders && !isPageLoading && (
+            {!hasOrders && !isLoading && (
                 <PageActionPlaceHolder
                     icon={<ReceiptIcon boxSize={8} />}
                     heading={formatMessage({

@@ -129,7 +129,6 @@ const AccountOrderDetail = () => {
             enabled: onClient && !!params.orderNo
         }
     )
-    // const isLoading = isLoadingOrder || !order
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
