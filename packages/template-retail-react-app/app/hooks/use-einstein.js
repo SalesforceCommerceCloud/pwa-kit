@@ -7,8 +7,8 @@
 import {useMemo, useState} from 'react'
 import fetch from 'cross-fetch'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import { useCommerceApi, useUsid, useEncUserId } from 'commerce-sdk-react-preview'
-import { keysToCamel } from '../utils/utils'
+import {useCommerceApi, useUsid, useEncUserId} from 'commerce-sdk-react-preview'
+import {keysToCamel} from '../utils/utils'
 
 export class EinsteinAPI {
     constructor({host, einsteinId, userId, cookieId, siteId, isProduction}) {
@@ -389,31 +389,32 @@ export class EinsteinAPI {
 
 const useEinstein = () => {
     const api = useCommerceApi()
-    const {app: {einsteinAPI: config}} = getConfig()
+    const {
+        app: {einsteinAPI: config}
+    } = getConfig()
     const {host, einsteinId, siteId, isProduction} = config
     const usid = useUsid()
     const encUserId = useEncUserId()
 
-    const einstein = useMemo(() => new EinsteinAPI({
-        host,
-        einsteinId,
-        userId: encUserId,
-        cookieId: usid,
-        siteId,
-        isProduction
-    }), [host,
-        einsteinId,
-        encUserId,
-        usid,
-        siteId,
-        isProduction])
+    const einstein = useMemo(
+        () =>
+            new EinsteinAPI({
+                host,
+                einsteinId,
+                userId: encUserId,
+                cookieId: usid,
+                siteId,
+                isProduction
+            }),
+        [host, einsteinId, encUserId, usid, siteId, isProduction]
+    )
     const [state, setState] = useState({loading: false, recommendations: []})
 
     const fetchRecProductDetails = async (reco) => {
         const ids = reco.recs?.map((rec) => rec.id)
         if (ids?.length > 0) {
             // Fetch the product details for the recommendations
-            const products = await this.api.shopperProducts.getProducts({
+            const products = await api.shopperProducts.getProducts({
                 parameters: {ids: ids.join(',')}
             })
 
@@ -473,16 +474,16 @@ const useEinstein = () => {
         async getRecommenders(...args) {
             return einstein.getRecommenders(...args)
         },
-        async getRecommendations(...args) {
+        async getRecommendations(recommenderName, products, args) {
             setState((s) => ({...s, loading: true}))
-            const reco = await api.einstein.getRecommendations(...args)
+            const reco = await einstein.getRecommendations(recommenderName, products, args)
             reco.recommenderName = recommenderName
             const recommendations = await fetchRecProductDetails(reco)
             setState({loading: false, recommendations})
         },
-        async getZoneRecommendations(...args) {
+        async getZoneRecommendations(zoneName, products, args) {
             setState((s) => ({...s, loading: true}))
-            const reco = await api.einstein.getZoneRecommendations(...args)
+            const reco = await einstein.getZoneRecommendations(zoneName, products, args)
             const recommendations = await fetchRecProductDetails(reco)
             setState({loading: false, recommendations})
         }
