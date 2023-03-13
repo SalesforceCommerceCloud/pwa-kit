@@ -316,9 +316,7 @@ export const keysToCamel = (obj) => {
 
         return n
     } else if (Array.isArray(obj)) {
-        return obj.map((i) => {
-            return keysToCamel(i)
-        })
+        return obj.map(keysToCamel)
     }
 
     return obj
