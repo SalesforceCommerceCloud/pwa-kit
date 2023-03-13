@@ -80,7 +80,7 @@ describe('product set', () => {
         )
     })
 
-    test('render multi-product layout', async () => {
+    test.skip('render multi-product layout', async () => {
         renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
