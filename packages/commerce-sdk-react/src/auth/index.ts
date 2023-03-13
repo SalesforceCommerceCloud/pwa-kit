@@ -11,7 +11,7 @@ import {
     ShopperLoginTypes,
     ShopperCustomersTypes
 } from 'commerce-sdk-isomorphic'
-import jwtDecode from 'jwt-decode'
+import jwtDecode, {JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
@@ -31,20 +31,9 @@ interface JWTHeaders {
     iat: number
 }
 
-interface SlasJwtPayload {
-    aut: string
-    scp: string
+interface SlasJwtPayload extends JwtPayload {
     sub: string
-    ctx: string
-    iss: string
-    ist: number
-    aud: string
-    nbf: number
-    sty: string
     isb: string
-    exp: number
-    iat: number
-    jti: string
 }
 
 /**

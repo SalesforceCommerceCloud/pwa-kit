@@ -190,10 +190,13 @@ describe('Auth', () => {
         expect(auth.ready()).resolves.toEqual(result)
     })
     test('ready - use `fetchedToken` and short circuit network request', async () => {
-        const fetchedToken = jwt.sign({
-            sub: `cc-slas::zzrf_001::scid:xxxxxx::usid:usid`,
-            isb: `uido:ecom::upn:test@gmail.com::uidn:firstname lastname::gcid:guestuserid::rcid:rcid::chid:siteId`
-        }, 'secret')
+        const fetchedToken = jwt.sign(
+            {
+                sub: `cc-slas::zzrf_001::scid:xxxxxx::usid:usid`,
+                isb: `uido:ecom::upn:test@gmail.com::uidn:firstname lastname::gcid:guestuserid::rcid:rcid::chid:siteId`
+            },
+            'secret'
+        )
         const auth = new Auth({...config, fetchedToken})
         jest.spyOn(auth, 'queueRequest')
         await auth.ready()
@@ -202,10 +205,13 @@ describe('Auth', () => {
     test('ready - use `fetchedToken` and auth data is populated for registered user', async () => {
         const usid = 'usidddddd'
         const customerId = 'customerIddddddd'
-        const fetchedToken = jwt.sign({
-            sub: `cc-slas::zzrf_001::scid:xxxxxx::usid:${usid}`,
-            isb: `uido:ecom::upn:test@gmail.com::uidn:firstname lastname::gcid:guestuserid::rcid:${customerId}::chid:siteId`
-        }, 'secret')
+        const fetchedToken = jwt.sign(
+            {
+                sub: `cc-slas::zzrf_001::scid:xxxxxx::usid:${usid}`,
+                isb: `uido:ecom::upn:test@gmail.com::uidn:firstname lastname::gcid:guestuserid::rcid:${customerId}::chid:siteId`
+            },
+            'secret'
+        )
         const auth = new Auth({...config, fetchedToken})
         await auth.ready()
         expect(auth.get('access_token')).toBe(fetchedToken)
@@ -217,10 +223,13 @@ describe('Auth', () => {
         // isb: `uido:slas::upn:Guest::uidn:Guest User::gcid:bclrdGlbIZlHaRxHsZlWYYxHwZ::chid: `
         const usid = 'usidddddd'
         const customerId = 'customerIddddddd'
-        const fetchedToken = jwt.sign({
-            sub: `cc-slas::zzrf_001::scid:xxxxxx::usid:${usid}`,
-            isb: `uido:ecom::upn:Guest::uidn:firstname lastname::gcid:${customerId}::rcid:registeredCid::chid:siteId`
-        }, 'secret')
+        const fetchedToken = jwt.sign(
+            {
+                sub: `cc-slas::zzrf_001::scid:xxxxxx::usid:${usid}`,
+                isb: `uido:ecom::upn:Guest::uidn:firstname lastname::gcid:${customerId}::rcid:registeredCid::chid:siteId`
+            },
+            'secret'
+        )
         const auth = new Auth({...config, fetchedToken})
         await auth.ready()
         expect(auth.get('access_token')).toBe(fetchedToken)
