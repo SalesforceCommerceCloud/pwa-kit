@@ -192,9 +192,8 @@ describe('Auth', () => {
     test('ready - use `fetchedToken` and short circuit network request', async () => {
         const auth = new Auth({...config, fetchedToken: 'fake-token'})
         jest.spyOn(auth, 'queueRequest')
-        await auth.ready().then(() => {
-            expect(auth.queueRequest).not.toHaveBeenCalled()
-        })
+        await auth.ready()
+        expect(auth.queueRequest).not.toHaveBeenCalled()
     })
     test('ready - use `fetchedToken` and auth data is populated for registered user', async () => {
         const fetchedToken =
@@ -210,12 +209,11 @@ describe('Auth', () => {
         const fetchedToken =
             'eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJraWQiOiJiMjNkZTU5YS1iMTk3LTQyNTAtODdkNy1mNDFmNmUzNjcwNzciLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLWV4cGVyaWVuY2Ugc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOjczN2ZiZDQwLWE2N2YtNDI4MS1iMjNmLTEyMzFlMzJmOWVlNSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY3ODY4NTk1OSwic3R5IjoiVXNlciIsImlzYiI6InVpZG86c2xhczo6dXBuOkd1ZXN0Ojp1aWRuOkd1ZXN0IFVzZXI6OmdjaWQ6YmNsWGsxeEtoSWxiYVJ3cncxeEdZWWtIRVY6OmNoaWQ6ICIsImV4cCI6MTY3ODY4Nzc4OSwiaWF0IjoxNjc4Njg1OTg5LCJqdGkiOiJDMkM0ODU2MjAxODYwLTE4OTA2Nzg5MDM0NjU3NDI4MTYxMDQ3Njk4In0.WJUcC7rKHzOZ91ccmn95RXnhjmsFI1WWPyauQXtl-oDwD0OKiaQy1TLFmWrVVpZWgkJekQ-9w6AolqeEo5zWHA'
         const auth = new Auth({...config, fetchedToken})
-        await auth.ready().then(() => {
-            expect(auth.get('access_token')).toBe(fetchedToken)
-            expect(auth.get('customer_id')).toBe('bclXk1xKhIlbaRwrw1xGYYkHEV')
-            expect(auth.get('usid')).toBe('737fbd40-a67f-4281-b23f-1231e32f9ee5')
-            expect(auth.get('customer_type')).toBe('guest')
-        })
+        await auth.ready()
+        expect(auth.get('access_token')).toBe(fetchedToken)
+        expect(auth.get('customer_id')).toBe('bclXk1xKhIlbaRwrw1xGYYkHEV')
+        expect(auth.get('usid')).toBe('737fbd40-a67f-4281-b23f-1231e32f9ee5')
+        expect(auth.get('customer_type')).toBe('guest')
     })
     test('ready - use refresh token when access token is expired', async () => {
         const auth = new Auth(config)
@@ -241,34 +239,29 @@ describe('Auth', () => {
             auth.set(key, data[key])
         })
 
-        await auth.ready().then(() => {
-            expect(helpers.refreshAccessToken).toBeCalled()
-        })
+        await auth.ready()
+        expect(helpers.refreshAccessToken).toBeCalled()
     })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
 
-        await auth.ready().then(() => {
-            expect(helpers.loginGuestUser).toBeCalled()
-        })
+        await auth.ready()
+        expect(helpers.loginGuestUser).toBeCalled()
     })
     test('loginGuestUser', async () => {
         const auth = new Auth(config)
-        await auth.loginGuestUser().then(() => {
-            expect(helpers.loginGuestUser).toBeCalled()
-        })
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUser).toBeCalled()
     })
     test('loginRegisteredUserB2C', async () => {
         const auth = new Auth(config)
-        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'}).then(() => {
-            expect(helpers.loginRegisteredUserB2C).toBeCalled()
-        })
+        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+        expect(helpers.loginRegisteredUserB2C).toBeCalled()
     })
     test('logout', async () => {
         const auth = new Auth(config)
-        await auth.logout().then(() => {
-            expect(helpers.loginGuestUser).toBeCalled()
-        })
+        await auth.logout()
+        expect(helpers.loginGuestUser).toBeCalled()
     })
     test('running on the server uses a shared context memory store', async () => {
         const refreshTokenGuest = 'guest'
