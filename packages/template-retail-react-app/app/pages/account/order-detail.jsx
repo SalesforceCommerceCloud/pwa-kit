@@ -246,7 +246,23 @@ const AccountOrderDetail = () => {
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm" textTransform="titlecase">
-                                            {shippingStatus?.replace(/_/g, ' ')}
+                                            {
+                                                {
+                                                    not_shipped: formatMessage({
+                                                        defaultMessage: 'Not shipped',
+                                                        id: 'account_order_detail.shipping_status.not_shipped'
+                                                    }),
+
+                                                    part_shipped: formatMessage({
+                                                        defaultMessage: 'Partially shipped',
+                                                        id: 'account_order_detail.shipping_status.part_shipped'
+                                                    }),
+                                                    shipped: formatMessage({
+                                                        defaultMessage: 'Shipped',
+                                                        id: 'account_order_detail.shipping_status.shipped'
+                                                    })
+                                                }[shippingStatus]
+                                            }
                                         </Text>
                                         <Text fontSize="sm">{shippingMethod?.name}</Text>
                                         <Text fontSize="sm">
