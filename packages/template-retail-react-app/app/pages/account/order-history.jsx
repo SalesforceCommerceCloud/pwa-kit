@@ -31,8 +31,8 @@ import Link from '../../components/link'
 import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
 import Pagination from '../../components/pagination'
 import PropTypes from 'prop-types'
+import {DEFAULT_ORDERS_SEARCH_PARAMS} from '../../constants'
 
-const DEFAULT_PAGINATION_LIMIT = 10
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
     const {data: {data: products} = {}, isLoading} = useProducts({
@@ -85,19 +85,19 @@ const AccountOrderHistory = () => {
     const {data: customer} = useCurrentCustomer()
     const {customerId} = customer
 
-    const searchParams = useSearchParams({limit: 10, offset: 0})
+    const searchParams = useSearchParams(DEFAULT_ORDERS_SEARCH_PARAMS)
     const {limit, offset} = searchParams[0]
 
     const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders(
         {
-            parameters: {customerId, limit: limit || DEFAULT_PAGINATION_LIMIT, offset}
+            parameters: {customerId, limit, offset}
         },
         {enabled: onClient}
     )
 
     const hasOrders = orders?.length > 0
 
-    const pageUrls = usePageUrls({total: paging.total, limit: limit || DEFAULT_PAGINATION_LIMIT})
+    const pageUrls = usePageUrls({total: paging.total, limit})
 
     useEffect(() => {
         window.scrollTo(0, 0)
