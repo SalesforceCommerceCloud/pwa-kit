@@ -36,7 +36,6 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         sendClickReco,
         sendViewReco
     } = useEinstein()
-    console.log(recommendations)
     const {isInitialized} = useCustomer()
     const wishlist = useWishlist()
     const toast = useToast()
