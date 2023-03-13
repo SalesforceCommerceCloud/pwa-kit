@@ -288,6 +288,7 @@ class Auth {
      */
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
+            
             this.pendingToken = Promise.resolve({...this.data, access_token: this.fetchedToken})
             return this.pendingToken
         }
@@ -404,6 +405,31 @@ class Auth {
         // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
         this.clearStorage()
         return this.loginGuestUser()
+    }
+
+    /**
+     * Decode SLAS JWT and extract information such as customer id, usid, etc.
+     *
+     */
+    async decodeSlasJWT(jwt: string) {
+        const payload = jwtDecode(jwt)
+        const {sub, isb}
+        // {
+            //     aut: 'GUID',
+            //     scp: 'sfcc.shopper-myaccount.baskets sfcc.shopper-myaccount.addresses sfcc.shopper-products sfcc.shopper-discovery-search sfcc.shopper-myaccount.rw sfcc.shopper-myaccount.paymentinstruments sfcc.shopper-customers.login sfcc.shopper-experience sfcc.shopper-myaccount.orders sfcc.shopper-customers.register sfcc.shopper-baskets-orders sfcc.shopper-myaccount.addresses.rw sfcc.shopper-myaccount.productlists.rw sfcc.shopper-productlists sfcc.shopper-promotions sfcc.shopper-baskets-orders.rw sfcc.shopper-myaccount.paymentinstruments.rw sfcc.shopper-gift-certificates sfcc.shopper-product-search sfcc.shopper-myaccount.productlists sfcc.shopper-categories sfcc.shopper-myaccount',
+            //     sub: 'cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-9971-40f88962b836::usid:b4865233-de92-4039-b944-aa2dfc8c1ea5',
+            //     ctx: 'slas',
+            //     iss: 'slas/prod/zzrf_001',
+            //     ist: 1,
+            //     aud: 'commercecloud/prod/zzrf_001',
+            //     nbf: 1678681064,
+            //     sty: 'User',
+            //     isb: 'uido:ecom::upn:arayanavarro@salesforce.com::uidn:FirstName LastName::gcid:abwHo2lHsWkXkRxes3kGYYkbk3::rcid:abjbeMlITbrgoyAC6MdyGGR9C5::chid:RefArchGlobal',
+            //     exp: 1678682894,
+            //     iat: 1678681094,
+            //     jti: 'C2C4856201860-18906789034652625635569919'
+            //   }
+            console.error(jwtDecode(this.fetchedToken))
     }
 }
 

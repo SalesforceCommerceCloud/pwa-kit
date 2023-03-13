@@ -196,6 +196,13 @@ describe('Auth', () => {
             expect(auth.queueRequest).not.toHaveBeenCalled()
         })
     })
+    test.only('ready - use `fetchedToken` and auth data is populated', async () => {
+        const fetchedToken = 'eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJraWQiOiJiMjNkZTU5YS1iMTk3LTQyNTAtODdkNy1mNDFmNmUzNjcwNzciLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLWV4cGVyaWVuY2Ugc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOmI0ODY1MjMzLWRlOTItNDAzOS1iOTQ0LWFhMmRmYzhjMWVhNSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY3ODY4MTA2NCwic3R5IjoiVXNlciIsImlzYiI6InVpZG86ZWNvbTo6dXBuOmFyYXlhbmF2YXJyb0BzYWxlc2ZvcmNlLmNvbTo6dWlkbjpGaXJzdE5hbWUgTGFzdE5hbWU6OmdjaWQ6YWJ3SG8ybEhzV2tYa1J4ZXMza0dZWWtiazM6OnJjaWQ6YWJqYmVNbElUYnJnb3lBQzZNZHlHR1I5QzU6OmNoaWQ6UmVmQXJjaEdsb2JhbCIsImV4cCI6MTY3ODY4Mjg5NCwiaWF0IjoxNjc4NjgxMDk0LCJqdGkiOiJDMkM0ODU2MjAxODYwLTE4OTA2Nzg5MDM0NjUyNjI1NjM1NTY5OTE5In0.WV-iEj55UQjHzJpDeHWIbKmznPolb6bLGbVvfyFGLvTMYT2Wn2sZU8jiZ9pTdIIr97zWyd-RWM4cm22NUkNyGA'
+        const auth = new Auth({...config, fetchedToken})
+        await auth.ready().then(() => {
+            expect(auth.get('access_token')).toBe(fetchedToken)
+        })
+    })
     test('ready - use refresh token when access token is expired', async () => {
         const auth = new Auth(config)
 
