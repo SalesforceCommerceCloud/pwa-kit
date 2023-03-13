@@ -163,7 +163,7 @@ describe('EinsteinAPI', () => {
     })
 
     test('addToCart sends expected api request', async () => {
-        await einsteinApi.sendAddToCart(mockAddToCartProduct)
+        await einsteinApi.sendAddToCart([mockAddToCartProduct])
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/addToCart',
             {
