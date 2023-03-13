@@ -67,7 +67,7 @@ export default function useProfileFields({form: {control, errors}, prefix = ''})
                 id: 'use_profile_fields.label.phone'
             }),
             defaultValue: '',
-            type: 'text',
+            type: 'tel',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your phone number.',
@@ -76,6 +76,7 @@ export default function useProfileFields({form: {control, errors}, prefix = ''})
             },
             error: errors[`${prefix}phone`],
             inputProps: ({onChange}) => ({
+                inputmode: 'numeric',
                 onChange(evt) {
                     onChange(formatPhoneNumber(evt.target.value))
                 }

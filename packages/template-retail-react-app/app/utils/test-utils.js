@@ -19,8 +19,8 @@ import {
     CustomerProvider as _CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
+import {AddToCartModalProvider} from '../hooks/use-add-to-cart-modal'
 import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
-import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
@@ -123,13 +123,6 @@ export const TestProviders = ({
         _setBasket(data)
     })
 
-    const addToCartModal = {
-        isOpen: false,
-        data: null,
-        onOpen: () => {},
-        onClose: () => {}
-    }
-
     const site = getSiteByReference(siteAlias || appConfig.defaultSite)
 
     const buildUrl = createUrlTemplate(
@@ -163,11 +156,9 @@ export const TestProviders = ({
                                                 <CustomerProductListsProvider>
                                                     <Router>
                                                         <ChakraProvider theme={theme}>
-                                                            <AddToCartModalContext.Provider
-                                                                value={addToCartModal}
-                                                            >
+                                                            <AddToCartModalProvider>
                                                                 {children}
-                                                            </AddToCartModalContext.Provider>
+                                                            </AddToCartModalProvider>
                                                         </ChakraProvider>
                                                     </Router>
                                                 </CustomerProductListsProvider>

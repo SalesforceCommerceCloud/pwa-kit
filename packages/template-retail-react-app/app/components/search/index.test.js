@@ -15,8 +15,19 @@ import {RECENT_SEARCH_KEY, RECENT_SEARCH_LIMIT} from '../../constants'
 import mockSearchResults from '../../commerce-api/mocks/searchResults'
 import mockConfig from '../../../config/mocks/default'
 import {rest} from 'msw'
+import {mockCustomerBaskets} from '../../commerce-api/mock-data'
 
-jest.mock('../../hooks/use-current-basket')
+//TODO: Remove this when fetchedToken bug is fixed. The bug caused customerId to be null, hence basket is never available.
+jest.mock('commerce-sdk-react-preview', () => {
+    const originModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originModule,
+        useCustomerId: jest.fn().mockReturnValue('customer_id'),
+        useCustomerType: jest
+            .fn()
+            .mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
+    }
+})
 
 beforeEach(() => {
     clearSessionJSONItem(RECENT_SEARCH_KEY)
@@ -24,6 +35,9 @@ beforeEach(() => {
     global.server.use(
         rest.get('*/search-suggestions', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockSearchResults))
+        }),
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         })
     )
 })
