@@ -32,20 +32,20 @@ interface JWTHeaders {
 }
 
 interface SlasJwtPayload {
-        aut: string
-        scp: string
-        sub: string
-        ctx: string
-        iss: string
-        ist: number
-        aud: string
-        nbf: number
-        sty: string
-        isb: string
-        exp: number
-        iat: number
-        jti: string
-      }
+    aut: string
+    scp: string
+    sub: string
+    ctx: string
+    iss: string
+    ist: number
+    aud: string
+    nbf: number
+    sty: string
+    isb: string
+    exp: number
+    iat: number
+    jti: string
+}
 
 /**
  * The extended field is not from api response, we manually store the auth type,
@@ -437,7 +437,9 @@ class Auth {
         // ISB format
         // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
         const isGuest = isb.split('::')[1].replace('upn:', '') === 'Guest'
-        const customerId = isGuest ? isb.split('::')[3].replace('gcid:', '') : isb.split('::')[4].replace('rcid:', '')
+        const customerId = isGuest
+            ? isb.split('::')[3].replace('gcid:', '')
+            : isb.split('::')[4].replace('rcid:', '')
         // SUB format
         // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
         const usid = sub.split('::')[3].replace('usid:', '')
