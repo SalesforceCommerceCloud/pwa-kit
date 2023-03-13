@@ -11,14 +11,10 @@ import useConfig from './useConfig'
 const onClient = typeof window !== 'undefined'
 
 /**
- * TBD
+ * Hook that returns the access token.
  *
  */
 const useAccessToken = (): string | null => {
-    if (onClient) {
-        const config = useConfig()
-        return useLocalStorage(`${config.siteId}_access_token`)
-    }
     const auth = useAuthContext()
     return auth.get('access_token')
 }

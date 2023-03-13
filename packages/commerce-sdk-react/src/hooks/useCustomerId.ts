@@ -11,14 +11,10 @@ import useConfig from './useConfig'
 const onClient = typeof window !== 'undefined'
 
 /**
- * TBD
+ * Hook that returns the customer ID.
  *
  */
 const useCustomerId = (): string | null => {
-    if (onClient) {
-        const config = useConfig()
-        return useLocalStorage(`${config.siteId}_customer_id`)
-    }
     const auth = useAuthContext()
     return auth.get('customer_id')
 }

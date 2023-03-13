@@ -11,14 +11,10 @@ import useConfig from './useConfig'
 const onClient = typeof window !== 'undefined'
 
 /**
- * TBD
+* Hook that returns the usid associated with the current access token.
  *
  */
 const useUsid = (): string | null => {
-    if (onClient) {
-        const config = useConfig()
-        return useLocalStorage(`${config.siteId}_usid`)
-    }
     const auth = useAuthContext()
     return auth.get('usid')
 }
