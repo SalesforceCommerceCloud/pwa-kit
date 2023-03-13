@@ -9,7 +9,6 @@
 const SUPPORTED_FILE_TYPES = ['js', 'yml', 'yaml', 'json']
 
 const IS_REMOTE = Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
-const CONFIG_SEARCH_DIRECTORY = IS_REMOTE ? 'build' : ''
 
 /**
  * Returns the express app configuration file in object form. The file will be resolved in the
@@ -38,13 +37,14 @@ const CONFIG_SEARCH_DIRECTORY = IS_REMOTE ? 'build' : ''
 /* istanbul ignore next */
 export const getConfig = (opts = {}) => {
     const {buildDirectory} = opts
+    const configDirBase = IS_REMOTE ? 'build' : ''
     let targetName = process?.env?.DEPLOY_TARGET || ''
 
     const targetSearchPlaces = SUPPORTED_FILE_TYPES.map((ext) => `config/${targetName}.${ext}`)
     const localeSearchPlaces = SUPPORTED_FILE_TYPES.map((ext) => `config/local.${ext}`)
     const defaultSearchPlaces = SUPPORTED_FILE_TYPES.map((ext) => `config/default.${ext}`)
 
-    const searchFrom = buildDirectory || process.cwd() + '/' + CONFIG_SEARCH_DIRECTORY
+    const searchFrom = buildDirectory || process.cwd() + '/' + configDirBase
 
     // Combined search places.
     const searchPlaces = [
