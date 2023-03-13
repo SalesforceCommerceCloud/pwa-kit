@@ -41,6 +41,7 @@ import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from './partials/cart-secon
 // Utilities
 import debounce from 'lodash/debounce'
 
+console.log('test')
 const Cart = () => {
     const basket = useBasket()
     const customer = useCustomer()
