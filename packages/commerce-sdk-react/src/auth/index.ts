@@ -304,7 +304,7 @@ class Auth {
      */
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
-            const {isGuest, customerId, usid} = this.decodeSlasJWT(this.fetchedToken)
+            const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
             this.set('usid', usid)
@@ -431,7 +431,7 @@ class Auth {
      * Decode SLAS JWT and extract information such as customer id, usid, etc.
      *
      */
-    decodeSlasJWT(jwt: string) {
+    parseSlasJWT(jwt: string) {
         const payload = jwtDecode(jwt) as SlasJwtPayload
         const {sub, isb} = payload
         // ISB format
