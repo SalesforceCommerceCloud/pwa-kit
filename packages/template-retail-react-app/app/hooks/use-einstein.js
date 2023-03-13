@@ -7,7 +7,7 @@
 import {useMemo, useState} from 'react'
 import fetch from 'cross-fetch'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {useCommerceApi, useUsid, useEncUserId} from 'commerce-sdk-react-preview'
+import {useCommerceApi, useAccessToken, useUsid, useEncUserId} from 'commerce-sdk-react-preview'
 import {keysToCamel} from '../utils/utils'
 
 export class EinsteinAPI {
@@ -332,11 +332,11 @@ export class EinsteinAPI {
      * Tells the Einstein engine when a user adds an item to their cart.
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
-    async sendAddToCart(item, args) {
+    async sendAddToCart(items, args) {
         const endpoint = `/activities/${this.siteId}/addToCart`
         const method = 'POST'
         const body = {
-            products: [this._constructEinsteinItem(item)],
+            products: items.map((item) => this._constructEinsteinItem(item)),
             ...args
         }
 
@@ -389,6 +389,7 @@ export class EinsteinAPI {
 
 const useEinstein = () => {
     const api = useCommerceApi()
+    const token = useAccessToken()
     const {
         app: {einsteinAPI: config}
     } = getConfig()
@@ -408,14 +409,18 @@ const useEinstein = () => {
             }),
         [host, einsteinId, encUserId, usid, siteId, isProduction]
     )
-    const [state, setState] = useState({loading: false, recommendations: []})
-
+    const [isLoading, setIsLoading] = useState(false)
+    const [recommendations, setRecommendations] = useState([])
+    
     const fetchRecProductDetails = async (reco) => {
         const ids = reco.recs?.map((rec) => rec.id)
         if (ids?.length > 0) {
             // Fetch the product details for the recommendations
             const products = await api.shopperProducts.getProducts({
-                parameters: {ids: ids.join(',')}
+                parameters: {ids: ids.join(',')},
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             })
 
             // Merge the product detail into the recommendations response
@@ -436,7 +441,9 @@ const useEinstein = () => {
     }
 
     return {
-        ...state,
+        isLoading,
+
+        recommendations,
 
         async sendViewProduct(...args) {
             return einstein.sendViewProduct(...args)
@@ -475,17 +482,23 @@ const useEinstein = () => {
             return einstein.getRecommenders(...args)
         },
         async getRecommendations(recommenderName, products, args) {
-            setState((s) => ({...s, loading: true}))
+            console.log('getRecommendations')
+            setIsLoading(true)
             const reco = await einstein.getRecommendations(recommenderName, products, args)
             reco.recommenderName = recommenderName
             const recommendations = await fetchRecProductDetails(reco)
-            setState({loading: false, recommendations})
+            setIsLoading(false)
+            setRecommendations(recommendations)
+            console.log(recommendations)
         },
         async getZoneRecommendations(zoneName, products, args) {
-            setState((s) => ({...s, loading: true}))
+            console.log('getZoneRecommendations')
+            setIsLoading(true)
             const reco = await einstein.getZoneRecommendations(zoneName, products, args)
             const recommendations = await fetchRecProductDetails(reco)
-            setState({loading: false, recommendations})
+            setIsLoading(false)
+            setRecommendations(recommendations)
+            console.log(recommendations)
         }
     }
 }

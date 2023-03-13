@@ -181,6 +181,8 @@ const ProductDetail = () => {
                 body: productItems
             })
 
+            einstein.sendAddToCart(productItems)
+
             // If the items were successfully added, set the return value to be used
             // by the add to cart modal.
             return productSelectionValues
