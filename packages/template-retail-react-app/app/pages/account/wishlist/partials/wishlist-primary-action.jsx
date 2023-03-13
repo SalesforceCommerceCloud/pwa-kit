@@ -22,7 +22,7 @@ import Link from '../../../../components/link'
  */
 const WishlistPrimaryAction = () => {
     const variant = useItemVariant()
-    const {basket} = useCurrentBasket()
+    const {data: basket} = useCurrentBasket()
     const {formatMessage} = useIntl()
     const isMasterProduct = variant?.type?.master || false
     const isProductASet = variant?.type?.set
