@@ -436,10 +436,11 @@ class Auth {
         const {sub, isb} = payload
         // ISB format
         // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
-        const isGuest = isb.split('::')[1].replace('upn:', '') === 'Guest'
+        const isbParts = isb.split('::')
+        const isGuest = isbParts[1] === 'upn:Guest'
         const customerId = isGuest
-            ? isb.split('::')[3].replace('gcid:', '')
-            : isb.split('::')[4].replace('rcid:', '')
+            ? isbParts[3].replace('gcid:', '')
+            : isbParts[4].replace('rcid:', '')
         // SUB format
         // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
         const usid = sub.split('::')[3].replace('usid:', '')
