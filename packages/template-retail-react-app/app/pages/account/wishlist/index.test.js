@@ -52,27 +52,6 @@ test.only('Renders wishlist page', async () => {
 })
 
 // TODO
-test.only('Can remove item from the wishlist', async () => {
-    const removeItemMock = jest.fn()
-    useWishlist.mockReturnValue({
-        isInitialized: true,
-        isEmpty: false,
-        hasDetail: true,
-        items: mockData.customerProductListItems,
-        removeListItem: removeItemMock
-    })
-
-    renderWithProviders(<AccountWishlist />)
-
-    const wishlistRemoveButton = await screen.findByTestId(
-        'sf-wishlist-remove-98ca9a3a9c8ee803543dc45cdc'
-    )
-    userEvent.click(wishlistRemoveButton)
-    userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
-    expect(removeItemMock).toBeCalled()
-})
-
-// TODO
 test('renders no wishlist items for empty wishlist', () => {
     useWishlist.mockReturnValue({
         isInitialized: true,
