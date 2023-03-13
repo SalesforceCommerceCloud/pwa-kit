@@ -35,7 +35,11 @@ import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
 const OrderProducts = ({productItems, currency}) => {
-    const ids = productItems?.map((item) => item.productId).join(',') ?? ''
+    const productItemsMap = productItems.reduce(
+        (map, item) => ({...map, [item.productId]: item}),
+        {}
+    )
+    const ids = Object.keys(productItemsMap).join(',') ?? ''
     const {data: {data: products} = {}, isLoading} = useProducts(
         {
             parameters: {
@@ -43,7 +47,7 @@ const OrderProducts = ({productItems, currency}) => {
             }
         },
         {
-            enabled: Boolean(ids) && onClient
+            enabled: !!ids && onClient
         }
     )
 
@@ -52,7 +56,6 @@ const OrderProducts = ({productItems, currency}) => {
             <Box key={i} p={[4, 6]} border="1px solid" borderColor="gray.100" borderRadius="base">
                 <Flex width="full" align="flex-start">
                     <Skeleton boxSize={['88px', 36]} mr={4} />
-
                     <Stack spacing={2}>
                         <Skeleton h="20px" w="112px" />
                         <Skeleton h="20px" w="84px" />
@@ -63,18 +66,14 @@ const OrderProducts = ({productItems, currency}) => {
         ))
     }
 
-    const productItemsMap = productItems.reduce((map, item) => ({...map, [item.productId]: item}), {})
-
-    const variants =
-        products &&
-        products.map((product) => {
-            const productItem = productItemsMap[product.id]
-            return {
-                ...productItem,
-                ...product,
-                price: productItem.price
-            }
-        })
+    const variants = products?.map((product) => {
+        const productItem = productItemsMap[product.id]
+        return {
+            ...productItem,
+            ...product,
+            price: productItem.price
+        }
+    })
 
     return (
         <>
@@ -115,7 +114,7 @@ const OrderProducts = ({productItems, currency}) => {
 }
 
 OrderProducts.propTypes = {
-    productItems: PropTypes.array,
+    productItems: PropTypes.array.isRequired,
     currency: PropTypes.string,
     isOrderLoading: PropTypes.bool
 }
@@ -170,7 +169,7 @@ const AccountOrderDetail = () => {
                         />
                     </Heading>
 
-                    {!isOrderLoading && order ? (
+                    {!isOrderLoading ? (
                         <Stack
                             direction={['column', 'row']}
                             alignItems={['flex-start', 'center']}
@@ -375,7 +374,12 @@ const AccountOrderDetail = () => {
                 )}
 
                 <Stack spacing={4}>
-                    <OrderProducts productItems={order?.productItems} currency={order?.currency} />
+                    {!isOrderLoading && (
+                        <OrderProducts
+                            productItems={order?.productItems}
+                            currency={order?.currency}
+                        />
+                    )}
                 </Stack>
             </Stack>
         </Stack>
