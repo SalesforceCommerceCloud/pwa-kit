@@ -10,40 +10,46 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperBaskets<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
-    getBasket: ['/organizations/', string, '/baskets/', string, Params<'getBasket'>]
+    getBasket: [
+        '/organizations/',
+        string | undefined,
+        '/baskets/',
+        string | undefined,
+        Params<'getBasket'>
+    ]
     getPaymentMethodsForBasket: [
         '/organizations/',
-        string,
+        string | undefined,
         '/baskets/',
-        string,
+        string | undefined,
         '/payment-methods',
         Params<'getPaymentMethodsForBasket'>
     ]
     getPriceBooksForBasket: [
         '/organizations/',
-        string,
+        string | undefined,
         '/baskets/',
-        string,
+        string | undefined,
         '/price-books',
         Params<'getPriceBooksForBasket'>
     ]
     getShippingMethodsForShipment: [
         '/organizations/',
-        string,
+        string | undefined,
         '/baskets/',
-        string,
+        string | undefined,
         '/shipments/',
-        string,
+        string | undefined,
         '/shipping-methods',
         Params<'getShippingMethodsForShipment'>
     ]
     getTaxesFromBasket: [
         '/organizations/',
-        string,
+        string | undefined,
         '/baskets/',
-        string,
+        string | undefined,
         '/taxes',
         Params<'getTaxesFromBasket'>
     ]

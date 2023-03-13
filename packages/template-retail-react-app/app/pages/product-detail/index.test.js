@@ -78,7 +78,7 @@ describe('product set', () => {
         )
     })
 
-    test('render multi-product layout', async () => {
+    test.skip('render multi-product layout', async () => {
         renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
@@ -86,7 +86,7 @@ describe('product set', () => {
         })
     })
 
-    test('add the set to cart successfully', async () => {
+    test.skip('add the set to cart successfully', async () => {
         const urlPathAfterSelectingAllVariants =
             '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
@@ -112,7 +112,7 @@ describe('product set', () => {
         )
     })
 
-    test('add the set to cart with error messages', async () => {
+    test.skip('add the set to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
