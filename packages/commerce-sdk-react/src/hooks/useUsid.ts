@@ -11,7 +11,7 @@ import useConfig from './useConfig'
 const onClient = typeof window !== 'undefined'
 
 /**
-* Hook that returns the usid associated with the current access token.
+ * Hook that returns the usid associated with the current access token.
  *
  */
 const useUsid = (): string | null => {
