@@ -294,6 +294,10 @@ const main = async () => {
 
                 const credentials = await scriptUtils.readCredentials(credentialsFile)
 
+                if (!fse.pathExistsSync(buildDirectory)) {
+                    throw new Error(`Supplied "buildDirectory" does not exist!`)
+                }
+
                 const mobify = getConfig({buildDirectory}) || {}
 
                 if (!projectSlug) {
