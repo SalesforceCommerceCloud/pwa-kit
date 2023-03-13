@@ -21,6 +21,7 @@ import CheckoutSkeleton from './partials/checkout-skeleton'
 const Checkout = () => {
     const navigate = useNavigation()
     const {globalError, step, placeOrder} = useCheckout()
+    const {data: basket} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
 
     // Scroll to the top when we get a global error
@@ -84,7 +85,11 @@ const Checkout = () => {
                     </GridItem>
 
                     <GridItem py={6} px={[4, 4, 4, 0]}>
-                        <OrderSummary basket={basket} showTaxEstimationForm={false} showCartItems={true} />
+                        <OrderSummary
+                            basket={basket}
+                            showTaxEstimationForm={false}
+                            showCartItems={true}
+                        />
 
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>

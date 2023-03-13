@@ -411,7 +411,7 @@ const useEinstein = () => {
     )
     const [isLoading, setIsLoading] = useState(false)
     const [recommendations, setRecommendations] = useState([])
-    
+
     const fetchRecProductDetails = async (reco) => {
         const ids = reco.recs?.map((rec) => rec.id)
         if (ids?.length > 0) {
