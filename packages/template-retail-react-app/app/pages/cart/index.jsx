@@ -42,14 +42,34 @@ import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {
     useCustomerType,
     useShopperBasketsMutation,
-    useShippingMethodsForShipment
+    useShippingMethodsForShipment,
+    useProducts
 } from 'commerce-sdk-react-preview'
 
 const Cart = () => {
-    const {basket, products} = useCurrentBasket({
-        shouldFetchProductDetail: true
-    })
-    const customerType = useCustomerType()
+    const {data: basket, isLoading} = useCurrentBasket()
+
+    const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
+    const {data: products, isLoading: isProductsLoading} = useProducts(
+        {
+            parameters: {
+                ids: productIds,
+                allImages: true
+            }
+        },
+        {
+            enabled: Boolean(productIds),
+            select: (result) => {
+                // Convert array into key/value object with key is the product id
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
+    const {isRegistered} = useCustomerType()
 
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
@@ -285,14 +305,14 @@ const Cart = () => {
             }
         )
     }
-    /***************************** Remove Item **************************/
+
     /********* Rendering  UI **********/
-    if (!basket?.basketId && products) {
+    if (isLoading) {
         return <CartSkeleton />
     }
 
-    if (!basket?.productItems) {
-        return <EmptyCart isRegistered={customerType === 'registered'} />
+    if (!isLoading && !isProductsLoading && !basket?.productItems?.length) {
+        return <EmptyCart isRegistered={isRegistered} />
     }
     return (
         <Box background="gray.50" flex="1" data-testid="sf-cart-container">
@@ -365,7 +385,11 @@ const Cart = () => {
                             </GridItem>
                             <GridItem>
                                 <Stack spacing={4}>
-                                    <OrderSummary showPromoCodeForm={true} isEstimate={true} />
+                                    <OrderSummary
+                                        showPromoCodeForm={true}
+                                        isEstimate={true}
+                                        basket={basket}
+                                    />
                                     <Box display={{base: 'none', lg: 'block'}}>
                                         <CartCta />
                                     </Box>

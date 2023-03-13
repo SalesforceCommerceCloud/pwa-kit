@@ -38,7 +38,7 @@ const ContactInfo = () => {
     const history = useHistory()
     const authModal = useAuthModal('password')
     const {data: customer} = useCurrentCustomer()
-    const {basket} = useCurrentBasket()
+    const {data: basket} = useCurrentBasket()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')

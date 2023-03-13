@@ -15,8 +15,18 @@ import {renderWithProviders} from '../../utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
+import {rest} from 'msw'
+import {mockCustomerBaskets} from '../../commerce-api/mock-data'
 
 jest.mock('../../commerce-api/einstein')
+//TODO: Remove this when fetchedToken bug is fixed. The bug caused customerId to be null, hence basket is never available.
+jest.mock('commerce-sdk-react-preview', () => {
+    const originModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originModule,
+        useCustomerId: jest.fn().mockReturnValue('customer_id')
+    }
+})
 
 const MockComponent = (props) => {
     const {isRegistered} = useCustomerType()
@@ -47,6 +57,11 @@ beforeEach(() => {
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', '/en/account')
+    global.server.use(
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
+        })
+    )
 })
 afterEach(() => {
     jest.resetModules()
