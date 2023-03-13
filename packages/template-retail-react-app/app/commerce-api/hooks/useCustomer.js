@@ -57,17 +57,17 @@ export default function useCustomer() {
 
             /** Returns the customer's saved addresses with the 'preferred' address in the first index */
             get addresses() {
+                // TODO: This performs array manipulation every time it is accessed; should it be
+                // changed to only execute once and save the result?
                 if (!customer?.addresses) {
                     return undefined
                 }
-                const preferredAddressIndex = customer.addresses.find((addr) => addr.preferred)
-                if (preferredAddressIndex > -1) {
-                    return [
-                        customer.addresses[preferredAddressIndex],
-                        customer.addresses.slice(preferredAddressIndex, preferredAddressIndex + 1)
-                    ]
-                }
-                return customer.addresses
+                // Cloned so that we can manipulate the order
+                const addresses = [...customer.addresses]
+                const preferredIndex = addresses.findIndex((addr) => addr.preferred)
+                if (preferredIndex === -1) return addresses
+                const [preferred] = addresses.splice(preferredIndex, 1)
+                return [preferred, ...addresses]
             },
 
             /**
