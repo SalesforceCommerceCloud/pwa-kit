@@ -191,7 +191,9 @@ const ProductView = forwardRef(
                 }
                 try {
                     const itemsAdded = await addToCart(variant, quantity)
-                    // only show the modal when an item is successfully added to the cart
+                    // Open modal only when `addToCart` returns some data
+                    // It's possible that the item has been added to cart, but we don't want to open the modal.
+                    // See wishlist_primary_action for example.
                     if (itemsAdded) {
                         onAddToCartModalOpen({
                             product,
