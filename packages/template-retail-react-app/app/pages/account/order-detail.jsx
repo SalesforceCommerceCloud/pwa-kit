@@ -115,8 +115,7 @@ const OrderProducts = ({productItems, currency}) => {
 
 OrderProducts.propTypes = {
     productItems: PropTypes.array.isRequired,
-    currency: PropTypes.string,
-    isOrderLoading: PropTypes.bool
+    currency: PropTypes.string
 }
 const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
@@ -131,6 +130,7 @@ const AccountOrderDetail = () => {
             enabled: onClient && !!params.orderNo
         }
     )
+    const isLoading = isOrderLoading || !order
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
@@ -169,7 +169,7 @@ const AccountOrderDetail = () => {
                         />
                     </Heading>
 
-                    {!isOrderLoading ? (
+                    {!isLoading ? (
                         <Stack
                             direction={['column', 'row']}
                             alignItems={['flex-start', 'center']}
@@ -215,7 +215,7 @@ const AccountOrderDetail = () => {
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
                     <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={5} py={{xl: 6}}>
-                        {isOrderLoading ? (
+                        {isLoading ? (
                             <>
                                 <Stack>
                                     <Skeleton h="20px" w="84px" />
@@ -347,7 +347,7 @@ const AccountOrderDetail = () => {
                         )}
                     </SimpleGrid>
 
-                    {!isOrderLoading ? (
+                    {!isLoading ? (
                         <Box
                             py={{base: 6}}
                             px={{base: 6, xl: 8}}
@@ -363,7 +363,7 @@ const AccountOrderDetail = () => {
             </Box>
 
             <Stack spacing={4}>
-                {!isOrderLoading && (
+                {!isLoading && (
                     <Text>
                         <FormattedMessage
                             defaultMessage="{count} items"
@@ -374,7 +374,7 @@ const AccountOrderDetail = () => {
                 )}
 
                 <Stack spacing={4}>
-                    {!isOrderLoading && (
+                    {!isLoading && (
                         <OrderProducts
                             productItems={order?.productItems}
                             currency={order?.currency}
