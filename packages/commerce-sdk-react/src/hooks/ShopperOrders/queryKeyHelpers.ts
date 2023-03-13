@@ -10,22 +10,28 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperOrders<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
-    getOrder: ['/organizations/', string, '/orders/', string, Params<'getOrder'>]
+    getOrder: [
+        '/organizations/',
+        string | undefined,
+        '/orders/',
+        string | undefined,
+        Params<'getOrder'>
+    ]
     getPaymentMethodsForOrder: [
         '/organizations/',
-        string,
+        string | undefined,
         '/orders/',
-        string,
+        string | undefined,
         '/payment-methods',
         Params<'getPaymentMethodsForOrder'>
     ]
     getTaxesFromOrder: [
         '/organizations/',
-        string,
+        string | undefined,
         '/orders/',
-        string,
+        string | undefined,
         '/taxes',
         Params<'getTaxesFromOrder'>
     ]

@@ -10,13 +10,13 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperContexts<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
     getShopperContext: [
         '/organizations/',
-        string,
+        string | undefined,
         '/shopper-context/',
-        string,
+        string | undefined,
         Params<'getShopperContext'>
     ]
 }
