@@ -62,10 +62,13 @@ const OrderProducts = ({productItems, currency}) => {
             </Box>
         ))
     }
+
+    const productItemsMap = productItems.reduce((map, item) => ({...map, [item.productId]: item}), {})
+
     const variants =
         products &&
         products.map((product) => {
-            const productItem = productItems.find((item) => item.productId === product.id)
+            const productItem = productItemsMap[product.id]
             return {
                 ...productItem,
                 ...product,
