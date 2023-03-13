@@ -31,6 +31,22 @@ interface JWTHeaders {
     iat: number
 }
 
+interface SlasJwtPayload {
+        aut: string
+        scp: string
+        sub: string
+        ctx: string
+        iss: string
+        ist: number
+        aud: string
+        nbf: number
+        sty: string
+        isb: string
+        exp: number
+        iat: number
+        jti: string
+      }
+
 /**
  * The extended field is not from api response, we manually store the auth type,
  * so we don't need to make another API call when we already have the data.
@@ -288,8 +304,12 @@ class Auth {
      */
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
-            
-            this.pendingToken = Promise.resolve({...this.data, access_token: this.fetchedToken})
+            const {isGuest, customerId, usid} = this.decodeSlasJWT(this.fetchedToken)
+            this.set('access_token', this.fetchedToken)
+            this.set('customer_id', customerId)
+            this.set('usid', usid)
+            this.set('customer_type', isGuest ? 'guest' : 'registered')
+            this.pendingToken = Promise.resolve(this.data)
             return this.pendingToken
         }
         if (this.pendingToken) {
@@ -411,25 +431,21 @@ class Auth {
      * Decode SLAS JWT and extract information such as customer id, usid, etc.
      *
      */
-    async decodeSlasJWT(jwt: string) {
-        const payload = jwtDecode(jwt)
-        const {sub, isb}
-        // {
-            //     aut: 'GUID',
-            //     scp: 'sfcc.shopper-myaccount.baskets sfcc.shopper-myaccount.addresses sfcc.shopper-products sfcc.shopper-discovery-search sfcc.shopper-myaccount.rw sfcc.shopper-myaccount.paymentinstruments sfcc.shopper-customers.login sfcc.shopper-experience sfcc.shopper-myaccount.orders sfcc.shopper-customers.register sfcc.shopper-baskets-orders sfcc.shopper-myaccount.addresses.rw sfcc.shopper-myaccount.productlists.rw sfcc.shopper-productlists sfcc.shopper-promotions sfcc.shopper-baskets-orders.rw sfcc.shopper-myaccount.paymentinstruments.rw sfcc.shopper-gift-certificates sfcc.shopper-product-search sfcc.shopper-myaccount.productlists sfcc.shopper-categories sfcc.shopper-myaccount',
-            //     sub: 'cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-9971-40f88962b836::usid:b4865233-de92-4039-b944-aa2dfc8c1ea5',
-            //     ctx: 'slas',
-            //     iss: 'slas/prod/zzrf_001',
-            //     ist: 1,
-            //     aud: 'commercecloud/prod/zzrf_001',
-            //     nbf: 1678681064,
-            //     sty: 'User',
-            //     isb: 'uido:ecom::upn:arayanavarro@salesforce.com::uidn:FirstName LastName::gcid:abwHo2lHsWkXkRxes3kGYYkbk3::rcid:abjbeMlITbrgoyAC6MdyGGR9C5::chid:RefArchGlobal',
-            //     exp: 1678682894,
-            //     iat: 1678681094,
-            //     jti: 'C2C4856201860-18906789034652625635569919'
-            //   }
-            console.error(jwtDecode(this.fetchedToken))
+    decodeSlasJWT(jwt: string) {
+        const payload = jwtDecode(jwt) as SlasJwtPayload
+        const {sub, isb} = payload
+        // ISB format
+        // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
+        const isGuest = isb.split('::')[1].replace('upn:', '') === 'Guest'
+        const customerId = isGuest ? isb.split('::')[3].replace('gcid:', '') : isb.split('::')[4].replace('rcid:', '')
+        // SUB format
+        // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
+        const usid = sub.split('::')[3].replace('usid:', '')
+        return {
+            isGuest,
+            customerId,
+            usid
+        }
     }
 }
 
