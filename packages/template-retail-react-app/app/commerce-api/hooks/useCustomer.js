@@ -10,6 +10,12 @@ import {useCommerceAPI, CustomerContext} from '../contexts'
 
 const AuthTypes = Object.freeze({GUEST: 'guest', REGISTERED: 'registered'})
 
+// This value represents the max age in milliseconds a customer can be before they are
+// no longer considered a "new" customer.
+// E.g. If a customers creation date is older than 2 seconds it will no longer be considered
+// a new customer.
+const NEW_CUSTOMER_MAX_AGE = 2 * 1000 // 2 seconds in milliseconds
+
 export default function useCustomer() {
     const api = useCommerceAPI()
     const {customer, setCustomer} = useContext(CustomerContext)
@@ -39,19 +45,29 @@ export default function useCustomer() {
                 return customer?.authType === AuthTypes.GUEST
             },
 
+            /**
+             * Returns if this customer is newly registered.
+             */
+            get isNew() {
+                if (!customer || customer.authType !== 'registered') return false
+                const lastLoginTimeStamp = Date.parse(customer.lastLoginTime)
+                const creationTimeStamp = Date.parse(customer.creationDate)
+                return lastLoginTimeStamp - creationTimeStamp < NEW_CUSTOMER_MAX_AGE
+            },
+
             /** Returns the customer's saved addresses with the 'preferred' address in the first index */
             get addresses() {
+                // TODO: This performs array manipulation every time it is accessed; should it be
+                // changed to only execute once and save the result?
                 if (!customer?.addresses) {
                     return undefined
                 }
-                const preferredAddressIndex = customer.addresses.find((addr) => addr.preferred)
-                if (preferredAddressIndex > -1) {
-                    return [
-                        customer.addresses[preferredAddressIndex],
-                        customer.addresses.slice(preferredAddressIndex, preferredAddressIndex + 1)
-                    ]
-                }
-                return customer.addresses
+                // Cloned so that we can manipulate the order
+                const addresses = [...customer.addresses]
+                const preferredIndex = addresses.findIndex((addr) => addr.preferred)
+                if (preferredIndex === -1) return addresses
+                const [preferred] = addresses.splice(preferredIndex, 1)
+                return [preferred, ...addresses]
             },
 
             /**
