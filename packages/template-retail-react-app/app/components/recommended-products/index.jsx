@@ -47,7 +47,6 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     const [_products, setProducts] = useState(products)
 
     useEffect(() => {
-        // Return early if we have no Einstein API instance
         if (!isInitialized) {
             return
         }
