@@ -293,25 +293,25 @@ export const resolveLocaleFromUrl = (url) => {
     )
 }
 
-const toCamel = (str) => {
+const safeToCamel = (str) => {
     if (str.startsWith('_') || str.startsWith('c_')) {
         return str
     }
     return str.replace(/([-_][a-z])/gi, ($1) => {
-        return $1.toUpperCase().replace('-', '').replace('_', '')
+        return $1[1].toUpperCase()
     })
 }
 
-const isObject = (obj) => {
+const isPlainObject = (obj) => {
     return obj === Object(obj) && !Array.isArray(obj) && typeof obj !== 'function'
 }
 
 export const keysToCamel = (obj) => {
-    if (isObject(obj)) {
+    if (isPlainObject(obj)) {
         const n = {}
 
         Object.keys(obj).forEach((k) => {
-            n[toCamel(k)] = keysToCamel(obj[k])
+            n[safeToCamel(k)] = keysToCamel(obj[k])
         })
 
         return n
