@@ -59,9 +59,14 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
         'deleteCustomerProductListItem'
     )
 
-    const handleItemRemove = async () => {
+    const startRemoval = () => {
         onClick(variant.id)
-
+    }
+    const endRemoval = () => {
+        onClick('')
+    }
+    const handleItemRemove = async () => {
+        startRemoval()
         deleteCustomerProductListItem.mutate(
             {
                 parameters: {
@@ -84,7 +89,7 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
                     toast({title: formatMessage(API_ERROR_MESSAGE), status: 'error'})
                 },
                 onSettled: () => {
-                    onClick('')
+                    endRemoval()
                 }
             }
         )
