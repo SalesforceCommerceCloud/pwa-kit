@@ -51,7 +51,7 @@ const WishlistPrimaryAction = () => {
               ]
 
         addItemToBasket.mutate(
-            {body: productItems, parameters: {basketId: basket.basketId}},
+            {body: productItems, parameters: {basketId: basket?.basketId}},
             {
                 onSuccess: () => {
                     showToast({

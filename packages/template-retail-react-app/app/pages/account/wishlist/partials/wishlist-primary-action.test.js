@@ -12,6 +12,8 @@ import WishlistPrimaryAction from './wishlist-primary-action'
 import userEvent from '@testing-library/user-event'
 import {screen, waitFor} from '@testing-library/react'
 import PropTypes from 'prop-types'
+import {rest} from 'msw'
+import {basketWithProductSet} from '../../../product-detail/index.mock'
 
 const MockedComponent = ({variant}) => {
     return (
@@ -24,26 +26,35 @@ MockedComponent.propTypes = {
     variant: PropTypes.object
 }
 
-jest.mock('../../../../commerce-api/hooks/useBasket', () => {
-    return () => {
-        return {
-            addItemToBasket: jest.fn()
+jest.mock('../../../../hooks/use-current-basket', () => {
+    return {
+        useCurrentBasket: () => {
+            return {
+                data: {basketId: 'basket_id'},
+                derivedData: {totalItems: 5}
+            }
         }
     }
 })
 
 beforeEach(() => {
     jest.resetModules()
+
+    global.server.use(
+        // For adding items to basket
+        rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
+            return res(ctx.json(basketWithProductSet))
+        })
+    )
 })
 
 test('the Add To Cart button', async () => {
     const variant = mockWishListDetails.data[3]
-    const {getByRole} = renderWithProviders(<MockedComponent variant={variant} />)
+    renderWithProviders(<MockedComponent variant={variant} />)
 
-    const addToCartButton = getByRole('button', {
+    const addToCartButton = await screen.findByRole('button', {
         name: /add to cart/i
     })
-    expect(addToCartButton).toBeInTheDocument()
     userEvent.click(addToCartButton)
 
     await waitFor(() => {
@@ -57,7 +68,7 @@ test('the Add Set To Cart button', async () => {
     const productSetWithoutVariants = mockWishListDetails.data[1]
     renderWithProviders(<MockedComponent variant={productSetWithoutVariants} />)
 
-    const button = screen.getByRole('button', {name: /add set to cart/i})
+    const button = await screen.findByRole('button', {name: /add set to cart/i})
     userEvent.click(button)
 
     await waitFor(() => {
@@ -65,11 +76,11 @@ test('the Add Set To Cart button', async () => {
     })
 })
 
-test('the View Full Details button', () => {
+test('the View Full Details button', async () => {
     const productSetWithVariants = mockWishListDetails.data[0]
     renderWithProviders(<MockedComponent variant={productSetWithVariants} />)
 
-    const link = screen.getByRole('link', {name: /view full details/i})
+    const link = await screen.findByRole('link', {name: /view full details/i})
     expect(link).toBeInTheDocument()
 })
 
@@ -77,7 +88,7 @@ test('the View Options button', async () => {
     const masterProduct = mockWishListDetails.data[2]
     renderWithProviders(<MockedComponent variant={masterProduct} />)
 
-    const button = screen.getByRole('button', {name: /view options/i})
+    const button = await screen.findByRole('button', {name: /view options/i})
     userEvent.click(button)
 
     await waitFor(
