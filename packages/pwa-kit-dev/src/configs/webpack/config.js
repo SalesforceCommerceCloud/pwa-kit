@@ -22,8 +22,6 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 import {
     sdkReplacementPlugin,
-    importFromExtendsPlugin,
-    importFromLocalPlugin,
     extendedTemplateReplacementPlugin,
     allFiles
 } from './plugins'

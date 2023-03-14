@@ -34,7 +34,6 @@ import {createUrlTemplate} from '../../utils/url'
  * as Redux, or Mobx, if you like.
  */
 const AppConfig = ({children, locals = {}}) => {
-    console.log('~hello from template-retail-react-app/app/components/_app-config')
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
 
