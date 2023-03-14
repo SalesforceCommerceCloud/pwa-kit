@@ -173,7 +173,7 @@ const Cart = () => {
                     quantity,
                     price: variant.price
                 }
-                return await updateItemInBasketMutation.mutate({
+                return await updateItemInBasketMutation.mutateAsync({
                     parameters: {
                         basketId: basket.basketId,
                         itemId: selectedItem.itemId
@@ -185,7 +185,7 @@ const Cart = () => {
             // The user is selecting different variant, and it has existed in basket
             // remove this item in the basket, change the quantity for the new selected variant in the basket
             if (selectedItem.id !== variant.productId && productIds.includes(variant.productId)) {
-                await removeItemFromBasketMutation.mutate({
+                await removeItemFromBasketMutation.mutateAsync({
                     parameters: {
                         basketId: basket.basketId,
                         itemId: selectedItem.itemId
@@ -220,7 +220,7 @@ const Cart = () => {
         setCartItemLoading(true)
         setSelectedItem(product)
 
-        await updateItemInBasketMutation.mutate(
+        await updateItemInBasketMutation.mutateAsync(
             {
                 parameters: {basketId: basket?.basketId, itemId: product.itemId},
                 body: {
@@ -283,7 +283,7 @@ const Cart = () => {
     const handleRemoveItem = async (product) => {
         setSelectedItem(product)
         setCartItemLoading(true)
-        await removeItemFromBasketMutation.mutate(
+        await removeItemFromBasketMutation.mutateAsync(
             {
                 parameters: {basketId: basket.basketId, itemId: product.itemId}
             },
