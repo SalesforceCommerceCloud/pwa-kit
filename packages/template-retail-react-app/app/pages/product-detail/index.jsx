@@ -119,7 +119,7 @@ const ProductDetail = () => {
     )
 
     // TODO: DRY this handler when intl provider is available globally
-    const handleAddToWishlist = (quantity) => {
+    const handleAddToWishlist = (product, variant, quantity) => {
         createCustomerProductListItem.mutate(
             {
                 parameters: {
@@ -260,9 +260,7 @@ const ProductDetail = () => {
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={handleProductSetAddToCart}
-                            addToWishlist={(product, variant, quantity) =>
-                                handleAddToWishlist(product, variant, quantity)
-                            }
+                            addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
                             isWishlistLoading={isWishlistLoading}
                             validateOrderability={handleProductSetValidation}
@@ -292,9 +290,7 @@ const ProductDetail = () => {
                                                 {product: childProduct, variant, quantity}
                                             ])
                                         }
-                                        addToWishlist={(product, variant, quantity) =>
-                                            handleAddToWishlist(product, variant, quantity)
-                                        }
+                                        addToWishlist={handleAddToWishlist}
                                         onVariantSelected={(product, variant, quantity) => {
                                             if (quantity) {
                                                 setProductSetSelection((previousState) => ({
@@ -331,9 +327,7 @@ const ProductDetail = () => {
                             addToCart={(variant, quantity) =>
                                 handleAddToCart([{product, variant, quantity}])
                             }
-                            addToWishlist={(product, variant, quantity) =>
-                                handleAddToWishlist(product, variant, quantity)
-                            }
+                            addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
                             isWishlistLoading={isWishlistLoading}
                         />
