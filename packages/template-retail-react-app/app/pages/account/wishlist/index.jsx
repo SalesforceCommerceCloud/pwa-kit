@@ -75,7 +75,7 @@ const AccountWishlist = () => {
                 parameters: {
                     customerId: customer.customerId,
                     itemId: item.id,
-                    listId: wishListData.id
+                    listId: wishListData?.id
                 }
             },
             {
