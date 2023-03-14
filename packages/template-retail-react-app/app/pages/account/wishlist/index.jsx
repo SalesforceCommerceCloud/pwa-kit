@@ -38,7 +38,7 @@ const AccountWishlist = () => {
 
     const {data: productsData, isLoading: isProductsLoading} = useProducts(
         {parameters: {ids: productIds?.join(','), allImages: true}},
-        {enabled: Boolean(productIds)}
+        {enabled: productIds?.length > 0}
     )
 
     const wishListItems = wishListData?.customerProductListItems?.map((item, i) => {

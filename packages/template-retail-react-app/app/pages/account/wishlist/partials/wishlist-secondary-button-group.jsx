@@ -65,7 +65,7 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
     const endRemoval = () => {
         onClick('')
     }
-    const handleItemRemove = async () => {
+    const handleItemRemove = () => {
         startRemoval()
         deleteCustomerProductListItem.mutate(
             {
