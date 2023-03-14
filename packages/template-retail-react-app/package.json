@@ -40,6 +40,9 @@
 		"nanoid": "^3.1.31",
 		"njwt": "^1.2.0",
 		"prop-types": "^15.6.0",
+		"pwa-kit-dev": "^2.8.0-dev.0",
+		"pwa-kit-react-sdk": "^2.8.0-dev.0",
+		"pwa-kit-runtime": "^2.8.0-dev.0",
 		"query-string": "^7.0.1",
 		"raf": "^3.4.0",
 		"randomstring": "^1.2.1",
@@ -67,5 +70,10 @@
 		"iOS >= 9.0",
 		"Android >= 4.4.4",
 		"last 4 ChromeAndroid versions"
-	]
+	],
+	"dependencies": {
+		"pwa-kit-dev": "2.8.0-dev.0",
+		"pwa-kit-react-sdk": "2.8.0-dev.0",
+		"pwa-kit-runtime": "2.8.0-dev.0"
+	}
 }
