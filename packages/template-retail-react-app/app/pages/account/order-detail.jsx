@@ -51,21 +51,6 @@ const OrderProducts = ({productItems, currency}) => {
         }
     )
 
-    if (isLoading) {
-        return [1, 2, 3].map((i) => (
-            <Box key={i} p={[4, 6]} border="1px solid" borderColor="gray.100" borderRadius="base">
-                <Flex width="full" align="flex-start">
-                    <Skeleton boxSize={['88px', 36]} mr={4} />
-                    <Stack spacing={2}>
-                        <Skeleton h="20px" w="112px" />
-                        <Skeleton h="20px" w="84px" />
-                        <Skeleton h="20px" w="140px" />
-                    </Stack>
-                </Flex>
-            </Box>
-        ))
-    }
-
     const variants = products?.map((product) => {
         const productItem = productItemsMap[product.id]
         return {
@@ -117,6 +102,7 @@ OrderProducts.propTypes = {
     productItems: PropTypes.array.isRequired,
     currency: PropTypes.string
 }
+
 const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
     const history = useHistory()
@@ -374,10 +360,30 @@ const AccountOrderDetail = () => {
                 )}
 
                 <Stack spacing={4}>
-                    {!isLoading && (
+                    {isLoading ? (
+                        [1, 2, 3].map((i) => (
+                            <Box
+                                key={i}
+                                p={[4, 6]}
+                                border="1px solid"
+                                borderColor="gray.100"
+                                borderRadius="base"
+                            >
+                                <Flex width="full" align="flex-start">
+                                    <Skeleton boxSize={['88px', 36]} mr={4} />
+
+                                    <Stack spacing={2}>
+                                        <Skeleton h="20px" w="112px" />
+                                        <Skeleton h="20px" w="84px" />
+                                        <Skeleton h="20px" w="140px" />
+                                    </Stack>
+                                </Flex>
+                            </Box>
+                        ))
+                    ) : (
                         <OrderProducts
-                            productItems={order?.productItems}
-                            currency={order?.currency}
+                            productItems={order.productItems}
+                            currency={order.currency}
                         />
                     )}
                 </Stack>

@@ -20,12 +20,14 @@ import Account from './index'
 import Login from '../login'
 import mockConfig from '../../../config/mocks/default'
 import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 jest.mock('../../commerce-api/einstein')
 
 const MockedComponent = () => {
     const {isRegistered} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const {data: customer} = useCurrentCustomer()
 
     useEffect(() => {
         if (!isRegistered) {
@@ -39,6 +41,10 @@ const MockedComponent = () => {
             )
         }
     }, [])
+
+    if (!customer.isRegistered) {
+        return null
+    }
 
     return (
         <Switch>
@@ -56,8 +62,6 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
-    jest.resetAllMocks()
     global.server.use(
         rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
         rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
@@ -70,6 +74,7 @@ beforeEach(() => {
     window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
 })
 
@@ -101,7 +106,7 @@ describe('Test redirects', function () {
 })
 
 //TODO: wait until other pages are integrated with hook to fix this test
-test.skip('Provides navigation for subpages', async () => {
+test('Provides navigation for subpages', async () => {
     global.server.use(
         rest.get('*/products', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderProducts))
