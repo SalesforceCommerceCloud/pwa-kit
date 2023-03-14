@@ -266,7 +266,7 @@ const AccountOrderDetail = () => {
                                                 }[shippingStatus]
                                             }
                                         </Text>
-                                        <Text fontSize="sm">{shippingMethod?.name}</Text>
+                                        <Text fontSize="sm">{shippingMethod.name}</Text>
                                         <Text fontSize="sm">
                                             <FormattedMessage
                                                 defaultMessage="Tracking Number"
@@ -314,12 +314,12 @@ const AccountOrderDetail = () => {
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm">
-                                            {shippingAddress?.firstName} {shippingAddress?.lastName}
+                                            {shippingAddress.firstName} {shippingAddress.lastName}
                                         </Text>
-                                        <Text fontSize="sm">{shippingAddress?.address1}</Text>
+                                        <Text fontSize="sm">{shippingAddress.address1}</Text>
                                         <Text fontSize="sm">
-                                            {shippingAddress?.city}, {shippingAddress?.stateCode}{' '}
-                                            {shippingAddress?.postalCode}
+                                            {shippingAddress.city}, {shippingAddress.stateCode}{' '}
+                                            {shippingAddress.postalCode}
                                         </Text>
                                     </Box>
                                 </Stack>
@@ -332,14 +332,14 @@ const AccountOrderDetail = () => {
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm">
-                                            {order?.billingAddress?.firstName}{' '}
-                                            {order?.billingAddress?.lastName}
+                                            {order.billingAddress.firstName}{' '}
+                                            {order.billingAddress.lastName}
                                         </Text>
-                                        <Text fontSize="sm">{order?.billingAddress?.address1}</Text>
+                                        <Text fontSize="sm">{order.billingAddress.address1}</Text>
                                         <Text fontSize="sm">
-                                            {order?.billingAddress?.city},{' '}
-                                            {order?.billingAddress?.stateCode}{' '}
-                                            {order?.billingAddress?.postalCode}
+                                            {order.billingAddress.city},{' '}
+                                            {order.billingAddress.stateCode}{' '}
+                                            {order.billingAddress.postalCode}
                                         </Text>
                                     </Box>
                                 </Stack>
