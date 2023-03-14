@@ -54,12 +54,11 @@ const AccountWishlist = () => {
     const {data: customer} = useCurrentCustomer()
 
     const handleActionClicked = (itemId) => {
-        setWishlistItemLoading(!!itemId)
+        setWishlistItemLoading(Boolean(itemId))
         setSelectedItem(itemId)
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
-        setWishlistItemLoading(true)
         setSelectedItem(item.productId)
 
         const body = {
@@ -87,7 +86,6 @@ const AccountWishlist = () => {
                     })
                 },
                 onSuccess: () => {
-                    setWishlistItemLoading(false)
                     setSelectedItem(undefined)
                 }
             }
@@ -157,7 +155,10 @@ const AccountWishlist = () => {
                             ...item.product,
                             quantity: item.quantity
                         }}
-                        showLoading={isWishlistItemLoading && selectedItem === item.productId}
+                        showLoading={
+                            (updateCustomerProductListItem.isLoading || isWishlistItemLoading) &&
+                            selectedItem === item.productId
+                        }
                         primaryAction={<WishlistPrimaryAction />}
                         onItemQuantityChange={(quantity) =>
                             handleItemQuantityChanged(quantity, item)
