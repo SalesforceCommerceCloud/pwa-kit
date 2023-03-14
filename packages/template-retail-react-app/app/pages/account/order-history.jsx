@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -22,30 +22,84 @@ import {
     Img,
     Skeleton
 } from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useCustomerOrders, useProducts} from 'commerce-sdk-react-preview'
 import useNavigation from '../../hooks/use-navigation'
 import {usePageUrls, useSearchParams} from '../../hooks'
-import {useAccountOrders} from './util/order-context'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import Link from '../../components/link'
 import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
 import Pagination from '../../components/pagination'
+import PropTypes from 'prop-types'
+import {DEFAULT_ORDERS_SEARCH_PARAMS} from '../../constants'
 
+const OrderProductImages = ({productItems}) => {
+    const ids = productItems.map((item) => item.productId).join(',') ?? ''
+    const {data: {data: products} = {}, isLoading} = useProducts({
+        parameters: {
+            ids: ids
+        }
+    })
+
+    const images = products?.map((product) => {
+        return product?.imageGroups?.find((group) => group.viewType === 'small').images[0]
+    })
+
+    return (
+        <>
+            {!isLoading && products
+                ? images.map((image, index) => {
+                      return (
+                          <AspectRatio
+                              key={index}
+                              ratio={1}
+                              width="88px"
+                              w="88px"
+                              borderRadius="base"
+                              overflow="hidden"
+                          >
+                              <Img
+                                  alt={image?.alt}
+                                  src={image?.disBaseLink || image?.link}
+                                  fallback={<Box background="gray.100" boxSize="full" />}
+                              />
+                          </AspectRatio>
+                      )
+                  })
+                : productItems.map((item, index) => {
+                      return <Skeleton key={index} h="88px" w="88px" />
+                  })}
+        </>
+    )
+}
+OrderProductImages.propTypes = {
+    productItems: PropTypes.array
+}
+
+const onClient = typeof window !== 'undefined'
 const AccountOrderHistory = () => {
     const location = useLocation()
     const {formatMessage, formatDate} = useIntl()
-    const searchParams = useSearchParams({limit: 10, offset: 0})
     const navigate = useNavigation()
-    const customer = useCustomer()
-    const {orderIdsByOffset, ordersById, productsById, isLoading, fetchOrders, paging} =
-        useAccountOrders()
-    const pageUrls = usePageUrls({total: paging.total, limit: paging.limit})
 
-    const orders =
-        orderIdsByOffset[searchParams.offset || 0]?.map((orderId) => ordersById[orderId]) || []
+    const {data: customer} = useCurrentCustomer()
+    const {customerId} = customer
+
+    const searchParams = useSearchParams(DEFAULT_ORDERS_SEARCH_PARAMS)
+    const {limit, offset} = searchParams[0]
+
+    const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders(
+        {
+            parameters: {customerId, limit, offset}
+        },
+        {enabled: onClient}
+    )
+
+    const hasOrders = orders?.length > 0
+
+    const pageUrls = usePageUrls({total: paging.total, limit})
 
     useEffect(() => {
-        fetchOrders(searchParams)
         window.scrollTo(0, 0)
     }, [customer, searchParams.offset])
 
@@ -60,7 +114,7 @@ const AccountOrderHistory = () => {
                 </Heading>
             </Stack>
 
-            {isLoading &&
+            {isLoading ? (
                 [1, 2, 3].map((i) => (
                     <Stack key={i} spacing={4} layerStyle="cardBordered">
                         <Stack spacing={2}>
@@ -74,11 +128,10 @@ const AccountOrderHistory = () => {
                         </Grid>
                         <Skeleton h="20px" w="200px" />
                     </Stack>
-                ))}
-
-            {orders.length > 0 && !isLoading && (
+                ))
+            ) : (
                 <Stack spacing={4}>
-                    {orders.map((order) => {
+                    {orders?.map((order) => {
                         return (
                             <Stack key={order.orderNo} spacing={4} layerStyle="cardBordered">
                                 <Box>
@@ -124,33 +177,8 @@ const AccountOrderHistory = () => {
                                         <Badge colorScheme="green">{order.status}</Badge>
                                     </Stack>
                                 </Box>
-
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
-                                    {order.productItems.map((item) => {
-                                        const productDetail = productsById[item.productId]
-                                        const image = productDetail?.imageGroups?.find(
-                                            (group) => group.viewType === 'small'
-                                        ).images[0]
-
-                                        return (
-                                            <AspectRatio
-                                                key={item.itemId}
-                                                ratio={1}
-                                                width="88px"
-                                                w="88px"
-                                                borderRadius="base"
-                                                overflow="hidden"
-                                            >
-                                                <Img
-                                                    alt={image?.alt}
-                                                    src={image?.disBaseLink || image?.link}
-                                                    fallback={
-                                                        <Box background="gray.100" boxSize="full" />
-                                                    }
-                                                />
-                                            </AspectRatio>
-                                        )
-                                    })}
+                                    <OrderProductImages productItems={order.productItems} />
                                 </Grid>
 
                                 <Stack
@@ -194,7 +222,7 @@ const AccountOrderHistory = () => {
                         )
                     })}
 
-                    {orders.length > 0 && orders.length < paging.total && (
+                    {hasOrders && orders?.length < paging.total && (
                         <Box pt={4}>
                             <Pagination
                                 currentURL={`${location.pathname}${location.search}`}
@@ -205,24 +233,27 @@ const AccountOrderHistory = () => {
                 </Stack>
             )}
 
-            {orders.length < 1 && !isLoading && (
-                <PageActionPlaceHolder
-                    icon={<ReceiptIcon boxSize={8} />}
-                    heading={formatMessage({
-                        defaultMessage: "You haven't placed an order yet.",
-                        id: 'account_order_history.heading.no_order_yet'
-                    })}
-                    text={formatMessage({
-                        defaultMessage: 'Once you place an order the details will show up here.',
-                        id: 'account_order_history.description.once_you_place_order'
-                    })}
-                    buttonText={formatMessage({
-                        defaultMessage: 'Continue Shopping',
-                        id: 'account_order_history.button.continue_shopping'
-                    })}
-                    buttonProps={{leftIcon: undefined}}
-                    onButtonClick={() => navigate('/')}
-                />
+            {!hasOrders && !isLoading && (
+                <Stack data-testid="account-order-history-place-holder">
+                    <PageActionPlaceHolder
+                        icon={<ReceiptIcon boxSize={8} />}
+                        heading={formatMessage({
+                            defaultMessage: "You haven't placed an order yet.",
+                            id: 'account_order_history.heading.no_order_yet'
+                        })}
+                        text={formatMessage({
+                            defaultMessage:
+                                'Once you place an order the details will show up here.',
+                            id: 'account_order_history.description.once_you_place_order'
+                        })}
+                        buttonText={formatMessage({
+                            defaultMessage: 'Continue Shopping',
+                            id: 'account_order_history.button.continue_shopping'
+                        })}
+                        buttonProps={{leftIcon: undefined}}
+                        onButtonClick={() => navigate('/')}
+                    />
+                </Stack>
             )}
         </Stack>
     )
