@@ -54,13 +54,9 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     global.server.use(
-        rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.json(mockOrderHistory))
-        ),
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
             res(ctx.delay(0), ctx.json(mockCustomerBaskets))
-        ),
-        rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts)))
+        )
     )
 
     window.history.pushState({}, 'Account', createPathWithDefaults('/account/orders'))
@@ -104,4 +100,17 @@ test('Renders order history and details', async () => {
     expect(
         await screen.findByAltText(/Long Sleeve Crew Neck, Fire Red, small/i)
     ).toBeInTheDocument()
+})
+
+test('Renders order history place holder when no orders', async () => {
+    global.server.use(
+        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json({limit: 0, offset: 0, total: 0}))
+        })
+    )
+    await renderWithProviders(<MockedComponent history={history} />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    expect(await screen.findByTestId('account-order-history-place-holder')).toBeInTheDocument()
 })

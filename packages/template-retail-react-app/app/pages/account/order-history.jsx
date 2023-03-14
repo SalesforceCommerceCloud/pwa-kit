@@ -234,23 +234,26 @@ const AccountOrderHistory = () => {
             )}
 
             {!hasOrders && !isLoading && (
-                <PageActionPlaceHolder
-                    icon={<ReceiptIcon boxSize={8} />}
-                    heading={formatMessage({
-                        defaultMessage: "You haven't placed an order yet.",
-                        id: 'account_order_history.heading.no_order_yet'
-                    })}
-                    text={formatMessage({
-                        defaultMessage: 'Once you place an order the details will show up here.',
-                        id: 'account_order_history.description.once_you_place_order'
-                    })}
-                    buttonText={formatMessage({
-                        defaultMessage: 'Continue Shopping',
-                        id: 'account_order_history.button.continue_shopping'
-                    })}
-                    buttonProps={{leftIcon: undefined}}
-                    onButtonClick={() => navigate('/')}
-                />
+                <Stack data-testid="account-order-history-place-holder">
+                    <PageActionPlaceHolder
+                        icon={<ReceiptIcon boxSize={8} />}
+                        heading={formatMessage({
+                            defaultMessage: "You haven't placed an order yet.",
+                            id: 'account_order_history.heading.no_order_yet'
+                        })}
+                        text={formatMessage({
+                            defaultMessage:
+                                'Once you place an order the details will show up here.',
+                            id: 'account_order_history.description.once_you_place_order'
+                        })}
+                        buttonText={formatMessage({
+                            defaultMessage: 'Continue Shopping',
+                            id: 'account_order_history.button.continue_shopping'
+                        })}
+                        buttonProps={{leftIcon: undefined}}
+                        onButtonClick={() => navigate('/')}
+                    />
+                </Stack>
             )}
         </Stack>
     )
