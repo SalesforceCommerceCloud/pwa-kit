@@ -70,10 +70,5 @@
 		"iOS >= 9.0",
 		"Android >= 4.4.4",
 		"last 4 ChromeAndroid versions"
-	],
-	"dependencies": {
-		"pwa-kit-dev": "2.8.0-dev.0",
-		"pwa-kit-react-sdk": "2.8.0-dev.0",
-		"pwa-kit-runtime": "2.8.0-dev.0"
-	}
+	]
 }
