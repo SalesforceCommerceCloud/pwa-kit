@@ -66,7 +66,7 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
             {
                 parameters: {
                     customerId: customer.customerId,
-                    listId: wishList.id,
+                    listId: wishList?.id,
                     itemId: productListItemId
                 }
             },
