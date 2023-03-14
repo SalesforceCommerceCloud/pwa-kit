@@ -149,6 +149,24 @@
       "value": "Back to Order History"
     }
   ],
+  "account_order_detail.shipping_status.not_shipped": [
+    {
+      "type": 0,
+      "value": "Not shipped"
+    }
+  ],
+  "account_order_detail.shipping_status.part_shipped": [
+    {
+      "type": 0,
+      "value": "Partially shipped"
+    }
+  ],
+  "account_order_detail.shipping_status.shipped": [
+    {
+      "type": 0,
+      "value": "Shipped"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,
