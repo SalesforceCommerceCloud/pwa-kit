@@ -135,32 +135,9 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     },
     updateCustomerPassword: noop,
     updateCustomerProductList: TODO('updateCustomerProductList'),
-    updateCustomerProductListItem(customerId, {parameters}, response) {
-        const {itemId, listId} = parameters
+    updateCustomerProductListItem(customerId, {parameters}) {
         return {
-            update: [
-                {queryKey: getCustomerProductListItem.queryKey(parameters)},
-                {
-                    // Also selectively update the lists
-                    queryKey: getCustomerProductLists.queryKey(parameters),
-                    updater: (oldData: ShopperCustomersTypes.CustomerProductListResult) => {
-                        return {
-                            ...oldData,
-                            data: oldData.data.map((list) =>
-                                list.id !== listId
-                                    ? list
-                                    : {
-                                          ...list,
-                                          customerProductListItems:
-                                              list.customerProductListItems?.map((item) =>
-                                                  item.id !== itemId ? item : response
-                                              )
-                                      }
-                            )
-                        }
-                    }
-                }
-            ],
+            update: [{queryKey: getCustomerProductListItem.queryKey(parameters)}],
             // TODO: Rather than invalidate, can we selectively update?
             invalidate: [
                 {queryKey: getCustomerProductList.queryKey(parameters)},

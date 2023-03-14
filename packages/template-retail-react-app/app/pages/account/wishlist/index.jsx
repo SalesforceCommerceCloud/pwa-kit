@@ -59,6 +59,7 @@ const AccountWishlist = () => {
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
+        let isValidChange = false
         setSelectedItem(item.productId)
 
         const body = {
@@ -66,30 +67,29 @@ const AccountWishlist = () => {
             quantity: parseInt(quantity)
         }
         // To meet expected schema, remove the custom `product` we added
-        // TODO: better way?
         delete body.product
 
-        updateCustomerProductListItem.mutate(
-            {
+        try {
+            await updateCustomerProductListItem.mutateAsync({
                 body,
                 parameters: {
                     customerId: customer.customerId,
                     itemId: item.id,
                     listId: wishListData?.id
                 }
-            },
-            {
-                onError: () => {
-                    toast({
-                        title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
-                    })
-                },
-                onSuccess: () => {
-                    setSelectedItem(undefined)
-                }
-            }
-        )
+            })
+            isValidChange = true
+            setSelectedItem(undefined)
+        } catch (err) {
+            toast({
+                title: formatMessage(API_ERROR_MESSAGE),
+                status: 'error'
+            })
+        }
+
+        // If true, the quantity picker would immediately update its number
+        // without waiting for the invalidated lists data to finish refetching
+        return isValidChange
     }
 
     const isPageLoading = wishListItems ? isProductsLoading : isWishListLoading
