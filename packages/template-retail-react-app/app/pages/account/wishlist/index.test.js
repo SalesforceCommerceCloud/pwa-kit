@@ -43,7 +43,7 @@ beforeEach(() => {
     )
 })
 
-test.only('Renders wishlist page', async () => {
+test('Renders wishlist page', async () => {
     renderWithProviders(<AccountWishlist />)
     await waitFor(() => {
         expect(screen.getByTestId('account-wishlist-page')).toBeInTheDocument()
@@ -51,29 +51,39 @@ test.only('Renders wishlist page', async () => {
     })
 })
 
-// TODO
-test('renders no wishlist items for empty wishlist', () => {
-    useWishlist.mockReturnValue({
-        isInitialized: true,
-        isEmpty: true,
-        hasDetail: true
-    })
-    renderWithProviders(<AccountWishlist />)
+test('renders no wishlist items for empty wishlist', async () => {
+    global.server.use(
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedEmptyWishList))
+        })
+    )
 
-    expect(screen.getByText(/no wishlist items/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', {name: /continue shopping/i})).toBeInTheDocument()
+    renderWithProviders(<AccountWishlist />)
+    await waitFor(() => {
+        expect(screen.getByText(/no wishlist items/i)).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /continue shopping/i})).toBeInTheDocument()
+    })
 })
 
 test('renders skeleton when product list is loading', () => {
-    useWishlist.mockReturnValue({
-        isInitialized: false,
-        isEmpty: true
-    })
-
     renderWithProviders(<AccountWishlist />)
     expect(screen.getByTestId('sf-wishlist-skeleton')).toBeInTheDocument()
 })
 
+const mockedEmptyWishList = {
+    limit: 1,
+    data: [
+        {
+            creationDate: '2023-03-07T19:57:28.000Z',
+            event: {},
+            id: 'e41812c0545ec3cafcbae8c6e8',
+            lastModified: '2023-03-07T19:57:28.000Z',
+            public: false,
+            type: 'wish_list'
+        }
+    ],
+    total: 1
+}
 const mockedProductLists = {
     limit: 1,
     data: [
