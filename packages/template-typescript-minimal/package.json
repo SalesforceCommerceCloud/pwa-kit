@@ -5,14 +5,11 @@
         "node": "^14.0.0 || ^16.0.0",
         "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
     },
-    "private": true,
     "devDependencies": {
         "@loadable/component": "^5.15.0",
         "@tanstack/react-query": "^4.0.10",
         "@types/react": "^17.0.2",
         "@types/react-dom": "^17.0.2",
-        "cross-env": "^5.2.0",
-        "cross-fetch": "^3.1.5",
         "pwa-kit-dev": "^2.8.0-dev.0",
         "pwa-kit-react-sdk": "^2.8.0-dev.0",
         "pwa-kit-runtime": "^2.8.0-dev.0",

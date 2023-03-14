@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, FormattedNumber} from 'react-intl'
+import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {Stack, Text} from '@chakra-ui/react'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {useItemVariant} from '.'
@@ -45,8 +45,10 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
     const variant = useItemVariant()
     const basket = useBasket()
     const {currency: activeCurrency} = useCurrency()
+    const intl = useIntl()
 
     const {price, basePrice, priceAfterItemDiscount} = variant
+    const isProductASet = variant?.type?.set
 
     const displayPrice = priceAfterItemDiscount ? Math.min(price, priceAfterItemDiscount) : price
 
@@ -68,6 +70,12 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                 </HideOnDesktop>
             )}
             <Text fontWeight="bold" lineHeight={{base: '0.5', lg: '24px'}}>
+                {isProductASet &&
+                    `${intl.formatMessage({
+                        defaultMessage: 'Starting at',
+                        id: 'item_price.label.starting_at'
+                    })} `}
+
                 <FormattedNumber
                     style="currency"
                     currency={currency || basket.currency || activeCurrency}

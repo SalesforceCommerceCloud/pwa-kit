@@ -1,9 +1,5 @@
-## v2.8.0-dev.0 (Feb 16, 2023)
-## v2.8.0-dev.0 (Feb 16, 2023)
-## v2.8.0-dev.0 (Feb 15, 2023)
-## v2.8.0-dev (Feb 15, 2023)
-## v2.8.0-dev (Feb 15, 2023)
-## v2.7.0-dev (Jan 25, 2023)
+## v2.8.0-dev (Mar 03, 2023)
+## v2.7.0 (Mar 03, 2023)
 - Add explicit `ws` dependency [#865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/865)
 
 ## v2.6.0 (Jan 25, 2023)

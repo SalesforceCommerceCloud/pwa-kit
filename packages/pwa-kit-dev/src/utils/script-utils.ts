@@ -9,7 +9,7 @@ import path from 'path'
 import archiver from 'archiver'
 import _fetch from 'node-fetch'
 import {URL} from 'url'
-import {readFile, stat, mkdtemp, rmdir} from 'fs/promises'
+import {readFile, stat, mkdtemp, rm} from 'fs/promises'
 import {createWriteStream} from 'fs'
 import {readJson} from 'fs-extra'
 import {Minimatch} from 'minimatch'
@@ -258,7 +258,7 @@ export const createBundle = async ({
                 ssr_shared: filesInArchive.filter(glob(ssr_shared))
             }
         })
-        .finally(() => rmdir(tmpDir, {recursive: true}))
+        .finally(() => rm(tmpDir, {recursive: true}))
 }
 
 type MatchFn = (a: string) => boolean

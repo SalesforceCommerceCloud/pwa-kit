@@ -16,7 +16,9 @@ const UseShopperProducts = () => {
         error,
         data: result
     } = useProducts({
-        ids
+        parameters: {
+            ids
+        }
     })
     if (isLoading) {
         return (

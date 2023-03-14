@@ -64,11 +64,21 @@ export const Carousel = (props = {}) => {
         }
     }, [hasOverflow])
 
+    const itemSpacing = 4
+    // Calculate the width of each item in the carousel, accounting for the spacing between the items.
     const itemWidth = {
-        base: `calc(${100 / xsCarouselSlidesToDisplay}%)`,
-        sm: `calc(${100 / xsCarouselSlidesToDisplay}%)`,
-        md: `calc(${100 / smCarouselSlidesToDisplay}%)`,
-        lg: `calc(${100 / mdCarouselSlidesToDisplay}%)`
+        base: `calc(${100 / xsCarouselSlidesToDisplay}% - ${
+            ((xsCarouselSlidesToDisplay - 1) * (itemSpacing * 4)) / xsCarouselSlidesToDisplay
+        }px)`,
+        sm: `calc(${100 / xsCarouselSlidesToDisplay}% - ${
+            ((xsCarouselSlidesToDisplay - 1) * (itemSpacing * 4)) / xsCarouselSlidesToDisplay
+        }px)`,
+        md: `calc(${100 / smCarouselSlidesToDisplay}% - ${
+            ((smCarouselSlidesToDisplay - 1) * (itemSpacing * 4)) / smCarouselSlidesToDisplay
+        }px)`,
+        lg: `calc(${100 / mdCarouselSlidesToDisplay}% - ${
+            ((mdCarouselSlidesToDisplay - 1) * (itemSpacing * 4)) / mdCarouselSlidesToDisplay
+        }px)`
     }
 
     const overflowXScroll = {
@@ -126,7 +136,7 @@ export const Carousel = (props = {}) => {
                     className={'carousel-container-items scroll-indicator'}
                     data-testid="carousel-container-items"
                     direction="row"
-                    spacing={0}
+                    spacing={itemSpacing}
                     wrap="nowrap"
                     overflowX="scroll"
                     sx={{
@@ -142,7 +152,7 @@ export const Carousel = (props = {}) => {
                             width={itemWidth}
                             style={{scrollSnapAlign: 'start'}}
                         >
-                            <AspectRatio ratio={1}>
+                            <AspectRatio ratio={0.75}>
                                 <Component component={component} />
                             </AspectRatio>
                         </Box>
@@ -156,15 +166,17 @@ export const Carousel = (props = {}) => {
                     display={controlDisplay}
                     position="absolute"
                     top="50%"
-                    left={{base: 0, lg: 4}}
+                    left={{base: 1, lg: 4}}
                     transform="translateY(-50%)"
                 >
+                    {/* boxShadow requires !important --> https://github.com/chakra-ui/chakra-ui/issues/3553 */}
                     <IconButton
                         data-testid="carousel-nav-left"
                         aria-label="Scroll carousel left"
                         icon={<ChevronLeftIcon color="black" />}
                         borderRadius="full"
                         colorScheme="whiteAlpha"
+                        boxShadow={'0 3px 10px rgb(0 0 0 / 20%) !important'}
                         onClick={() => scroll(-1)}
                     />
                 </Box>
@@ -173,15 +185,17 @@ export const Carousel = (props = {}) => {
                     display={controlDisplay}
                     position="absolute"
                     top="50%"
-                    right={{base: 0, lg: 4}}
+                    right={{base: 1, lg: 4}}
                     transform="translateY(-50%)"
                 >
+                    {/* boxShadow requires !important --> https://github.com/chakra-ui/chakra-ui/issues/3553 */}
                     <IconButton
                         data-testid="carousel-nav-right"
                         aria-label="Scroll carousel right"
                         icon={<ChevronRightIcon color="black" />}
                         borderRadius="full"
                         colorScheme="whiteAlpha"
+                        boxShadow={'0 3px 10px rgb(0 0 0 / 20%) !important'}
                         onClick={() => scroll(1)}
                     />
                 </Box>
