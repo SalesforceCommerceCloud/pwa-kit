@@ -15,8 +15,6 @@ import {renderWithProviders} from '../../utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
-jest.mock('../../commerce-api/einstein')
-
 const MockComponent = (props) => {
     const {data: customer} = useCurrentCustomer()
     return (

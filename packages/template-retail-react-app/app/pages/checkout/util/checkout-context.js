@@ -6,7 +6,7 @@
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import useEinstein from '../../../commerce-api/hooks/useEinstein'
+import useEinstein from '../../../hooks/use-einstein'
 import {useCommerceAPI} from '../../../commerce-api/contexts'
 import {getPaymentInstrumentCardType} from '../../../utils/cc-utils'
 import {isMatchingAddress} from '../../../utils/utils'

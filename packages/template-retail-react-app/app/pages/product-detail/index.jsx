@@ -24,7 +24,7 @@ import {
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {useVariant} from '../../hooks'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../commerce-api/hooks/useEinstein'
+import useEinstein from '../../hooks/use-einstein'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '../../components/recommended-products'
@@ -180,6 +180,8 @@ const ProductDetail = () => {
                 parameters: {basketId: basket.basketId},
                 body: productItems
             })
+
+            einstein.sendAddToCart(productItems)
 
             // If the items were successfully added, set the return value to be used
             // by the add to cart modal.
