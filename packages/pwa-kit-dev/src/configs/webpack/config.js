@@ -20,13 +20,7 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {
-    sdkReplacementPlugin,
-    importFromExtendsPlugin,
-    importFromLocalPlugin,
-    extendedTemplateReplacementPlugin,
-    allFiles
-} from './plugins'
+import {sdkReplacementPlugin, extendedTemplateReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()

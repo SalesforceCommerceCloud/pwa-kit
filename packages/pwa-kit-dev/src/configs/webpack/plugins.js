@@ -13,6 +13,8 @@ import {inspect} from 'util'
 const projectDir = process.cwd()
 const pkg = require(resolve(projectDir, 'package.json'))
 
+const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
+
 const getOverridePath = (path) => {
     const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
     // order matters here, we perform look ups starting in the following order:
@@ -23,7 +25,7 @@ const getOverridePath = (path) => {
                 projectDir,
                 pkg?.mobify?.overridesDir,
                 ...path
-            )}.${OVERRIDES_EXTENSIONS}`
+            )}${OVERRIDES_EXTENSIONS}`
         )
         if (overrideFile?.length) {
             return overrideFile?.[0]
@@ -102,15 +104,7 @@ export const sdkReplacementPlugin = (projectDir) => {
     })
 }
 
-const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
-
 export const extendedTemplateReplacementPlugin = (projectDir) => {
-    // EXAMPLE:
-    // file: overrides/app/icons/index.jsx
-    // now we manipulate this string to be
-    // --> /app/icons/index.jsx
-    // PROBLEM: ^ prefixed files would look like `^app/icons/index.jsx`
-    // which is not a regex match
     const globPattern = `${pkg?.mobify?.overridesDir?.replace(
         /\//,
         ''
@@ -164,8 +158,6 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             return patterns
         })
     ]
-    // TODO: manually push a false positive e.g. chakra-ui/whatever/icons to make sure we don't override that
-
     const overridesRegex = makeRegExp(
         `(${overridesMap
             ?.map((override) =>
@@ -180,9 +172,14 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
+        // NOTE: the way the Template Extensibility feature works, the order in which
+        // we check for file rewrites / aliases is important
+
         if (resource.request.match(/\^/)) {
             const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
-            resource.request = path.resolve(projectDir, 'node_modules', relativePath)
+            const newPath = path.resolve(projectDir, 'node_modules', relativePath)
+            // NOTE: overriding either of these alone does not work, both must be set
+            resource.request = newPath
             return
         }
 
@@ -200,11 +197,13 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
         }
         const matchRegex = makeRegExp(pkg?.mobify?.extends)
         const relativePathNoExt = resolved?.split?.(matchRegex)?.[1]?.split?.('.')?.[0]
-
         const has = _overridesHashMap.has(relativePathNoExt)
         if (_overridesHashMap.has(relativePathNoExt)) {
+            const depth = pkg?.mobify?.overridesDir?.replace?.(/^\//, '')?.split('/') || []
             const relativePath = resolved?.split?.(matchRegex)?.[1]
-            resource.request = projectDir + pkg?.mobify?.overridesDir + relativePath
+            const newPath = projectDir + pkg?.mobify?.overridesDir + relativePath
+            // NOTE: overriding either of these alone does not work, both must be set
+            resource.request = newPath
         }
     })
 }
