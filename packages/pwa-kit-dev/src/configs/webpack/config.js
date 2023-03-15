@@ -203,15 +203,6 @@ const baseConfig = (target) => {
                         ? extendedTemplateReplacementPlugin(projectDir)
                         : () => null,
 
-                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                    //     ? importFromExtendsPlugin(projectDir)
-                    //     : () => null,
-
-                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                    //     ? importFromLocalPlugin(projectDir)
-                    //     : () => null,
-
-                    allFiles(),
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
                 ].filter(Boolean),
