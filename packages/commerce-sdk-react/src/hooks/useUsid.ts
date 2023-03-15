@@ -11,16 +11,16 @@ import useConfig from './useConfig'
 const onClient = typeof window !== 'undefined'
 
 /**
- * Hook that returns the customer ID.
+ * Hook that returns the usid associated with the current access token.
  *
  */
-const useCustomerId = (): string | null => {
+const useUsid = (): string | null => {
     if (onClient) {
         const config = useConfig()
-        return useLocalStorage(`${config.siteId}_customer_id`)
+        return useLocalStorage(`${config.siteId}_usid`)
     }
     const auth = useAuthContext()
-    return auth.get('customer_id')
+    return auth.get('usid')
 }
 
-export default useCustomerId
+export default useUsid

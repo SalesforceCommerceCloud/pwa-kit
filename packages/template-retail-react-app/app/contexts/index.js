@@ -9,7 +9,6 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useCommerceAPI} from '../commerce-api/contexts'
 import {CAT_MENU_STALE_TIME} from '../constants'
-import {useCustomer, useCustomerId, useCustomerType} from 'commerce-sdk-react-preview'
 
 /**
  * This is the global state for categories, we use this for navigation and for
@@ -191,30 +190,4 @@ export const CurrencyProvider = ({currency: initialCurrency, children}) => {
 CurrencyProvider.propTypes = {
     children: PropTypes.node.isRequired,
     currency: PropTypes.string
-}
-/**
- * Provider that manages the customer data
- * @type {React.Context<unknown>}
- */
-export const CustomerContext = React.createContext()
-export const CustomerProvider = ({children}) => {
-    const customerId = useCustomerId()
-    const {isRegistered, isGuest, customerType} = useCustomerType()
-    const query = useCustomer({parameters: {customerId}}, {enabled: !!customerId && isRegistered})
-    const value = {
-        ...query,
-        data: {
-            ...query.data,
-            customerType,
-            customerId,
-            isRegistered,
-            isGuest
-        }
-    }
-
-    return <CustomerContext.Provider value={value}>{children}</CustomerContext.Provider>
-}
-
-CustomerProvider.propTypes = {
-    children: PropTypes.node.isRequired
 }

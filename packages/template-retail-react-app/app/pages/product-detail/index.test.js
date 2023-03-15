@@ -18,8 +18,6 @@ jest.setTimeout(60000)
 
 jest.useFakeTimers()
 
-jest.mock('../../commerce-api/einstein')
-
 const MockedComponent = () => {
     return (
         <Switch>

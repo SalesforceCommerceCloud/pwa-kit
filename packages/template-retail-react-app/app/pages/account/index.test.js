@@ -20,8 +20,6 @@ import Account from './index'
 import Login from '../login'
 import mockConfig from '../../../config/mocks/default'
 
-jest.mock('../../commerce-api/einstein')
-
 const MockedComponent = () => {
     return (
         <Switch>

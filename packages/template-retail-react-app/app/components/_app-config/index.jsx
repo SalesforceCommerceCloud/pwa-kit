@@ -20,7 +20,7 @@ import {
     //TODO: Remove when integration is finished
     CustomerProvider as _CustomerProvider
 } from '../../commerce-api/contexts'
-import {CustomerProvider, MultiSiteProvider} from '../../contexts'
+import {MultiSiteProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
@@ -66,17 +66,15 @@ const AppConfig = ({children, locals = {}}) => {
             headers={headers}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-                <CustomerProvider>
-                    <_CommerceAPIProvider value={locals.api}>
-                        <_CustomerProvider value={{customer, setCustomer}}>
-                            <BasketProvider value={{basket, setBasket}}>
-                                <CustomerProductListsProvider>
-                                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                                </CustomerProductListsProvider>
-                            </BasketProvider>
-                        </_CustomerProvider>
-                    </_CommerceAPIProvider>
-                </CustomerProvider>
+                <_CommerceAPIProvider value={locals.api}>
+                    <_CustomerProvider value={{customer, setCustomer}}>
+                        <BasketProvider value={{basket, setBasket}}>
+                            <CustomerProductListsProvider>
+                                <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                            </CustomerProductListsProvider>
+                        </BasketProvider>
+                    </_CustomerProvider>
+                </_CommerceAPIProvider>
             </MultiSiteProvider>
         </CommerceApiProvider>
     )

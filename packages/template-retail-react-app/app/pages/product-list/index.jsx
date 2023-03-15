@@ -61,7 +61,7 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
 import {useToast} from '../../hooks/use-toast'
 // import {parse as parseSearchParams} from '../../hooks/use-search-params'
-import useEinstein from '../../commerce-api/hooks/useEinstein'
+import useEinstein from '../../hooks/use-einstein'
 
 // Others
 import {HTTPNotFound, HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'

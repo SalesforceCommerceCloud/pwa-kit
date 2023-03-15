@@ -14,7 +14,7 @@ import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
-import useEinstein from '../../commerce-api/hooks/useEinstein'
+import useEinstein from '../../hooks/use-einstein'
 import LoginForm from '../../components/login'
 import {API_ERROR_MESSAGE} from '../../constants'
 const LOGIN_ERROR_MESSAGE = defineMessage({
