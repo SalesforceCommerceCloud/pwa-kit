@@ -129,7 +129,7 @@ const ProductDetail = () => {
                 body: {
                     // NOTE: APi does not respect quantity, it always adds 1
                     quantity,
-                    productId: urlParams.get('pid') || productId,
+                    productId: variant?.productId || product?.id,
                     public: false,
                     priority: 1,
                     type: 'product'
