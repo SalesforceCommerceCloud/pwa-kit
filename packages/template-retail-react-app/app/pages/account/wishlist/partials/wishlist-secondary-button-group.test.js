@@ -353,8 +353,10 @@ beforeEach(() => {
 })
 
 test('can remove item', async () => {
-    const removeItemMock = jest.fn()
-    renderWithProviders(<MockedComponent onClick={removeItemMock} />)
+    const mockedHandler = jest.fn()
+    renderWithProviders(
+        <MockedComponent onActionStart={mockedHandler} onActionEnd={mockedHandler} />
+    )
 
     const removeButton = await screen.findByRole('button', {
         name: /remove/i
@@ -365,6 +367,6 @@ test('can remove item', async () => {
     user.click(confirmButton)
 
     await waitFor(() => {
-        expect(removeItemMock).toHaveBeenCalled()
+        expect(mockedHandler).toHaveBeenCalledTimes(2)
     })
 })
