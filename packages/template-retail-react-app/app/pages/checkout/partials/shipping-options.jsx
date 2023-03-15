@@ -11,22 +11,28 @@ import {useForm, Controller} from 'react-hook-form'
 import {useCheckout} from '../util/checkout-context'
 import {ChevronDownIcon} from '../../../components/icons'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
+import {useShippingMethodsForShipment, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
+    const {step, checkoutSteps, setCheckoutStep, goToNextStep} = useCheckout()
+    const {data: basket} = useCurrentBasket()
+    const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
+    const {data: shippingMethods} = useShippingMethodsForShipment(
+        {
+            parameters: {
+                basketId: basket.basketId,
+                shipmentId: 'me'
+            }
+        },
+        {
+            enabled: Boolean(basket.basketId) && step === checkoutSteps.ShippingOptions
+        }
+    )
 
-    const {
-        basket,
-        step,
-        checkoutSteps,
-        shippingMethods,
-        getShippingMethods,
-        setCheckoutStep,
-        selectedShippingMethod,
-        selectedShippingAddress,
-        setShippingMethod,
-        goToNextStep
-    } = useCheckout()
+    const selectedShippingMethod = basket?.shipments?.[0]?.shippingMethod
+    const selectedShippingAddress = basket?.shipments?.[0]?.shippingAddress
 
     const form = useForm({
         shouldUnregister: false,
@@ -34,12 +40,6 @@ export default function ShippingOptions() {
             shippingMethodId: selectedShippingMethod?.id || shippingMethods?.defaultShippingMethodId
         }
     })
-
-    useEffect(() => {
-        if (step === checkoutSteps.Shipping_Options) {
-            getShippingMethods()
-        }
-    }, [step])
 
     useEffect(() => {
         const defaultMethodId = shippingMethods?.defaultShippingMethodId
@@ -53,7 +53,15 @@ export default function ShippingOptions() {
     }, [selectedShippingMethod, shippingMethods])
 
     const submitForm = async ({shippingMethodId}) => {
-        await setShippingMethod(shippingMethodId)
+        await updateShippingMethod.mutateAsync({
+            parameters: {
+                basketId: basket.basketId,
+                shipmentId: 'me'
+            },
+            body: {
+                id: shippingMethodId
+            }
+        })
         goToNextStep()
     }
 
