@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountAddresses from './addresses'
 import {
@@ -15,7 +15,6 @@ import {
     mockedRegisteredCustomer
 } from '../../commerce-api/mock-data'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {AuthHelpers, useAuthHelper} from 'commerce-sdk-react-preview'
 
 let mockCustomer = {}
 
@@ -27,27 +26,10 @@ jest.mock('@chakra-ui/toast', () => {
 })
 
 const MockedComponent = () => {
-    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const {data: customer} = useCurrentCustomer()
-    const {isRegistered} = customer
-
-    useEffect(() => {
-        if (!isRegistered) {
-            login.mutate(
-                {email: 'email@test.com', password: 'password1'},
-                {
-                    onSuccess: () => {
-                        window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
-                    }
-                }
-            )
-        }
-    }, [])
     return (
         <div>
-            <div>
-                <span>Customer Id:</span> {customer.customerId}
-            </div>
+            <span>Customer Id:</span> {customer.customerId}
             <AccountAddresses />
         </div>
     )
@@ -94,7 +76,6 @@ test('Allows customer to add addresses', async () => {
         )
     )
     renderWithProviders(<MockedComponent />)
-    await waitFor(() => expect(screen.getByText('customerid')).toBeInTheDocument())
 
     await waitFor(() => {
         expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()

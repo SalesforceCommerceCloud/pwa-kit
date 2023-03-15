@@ -423,6 +423,11 @@ class Auth {
     parseSlasJWT(jwt: string) {
         const payload = jwtDecode(jwt) as SlasJwtPayload
         const {sub, isb} = payload
+
+        if (!sub || !isb) {
+            throw new Error('Unable to parse access token payload: missing sub and isb.')
+        }
+
         // ISB format
         // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
         const isbParts = isb.split('::')
