@@ -1,4 +1,5 @@
 ## v2.8.0-dev (Mar 03, 2023)
+- Add optional parameter to override configuration folder used in `getConfig` [#1049](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1049)
 ## v2.7.0 (Mar 03, 2023)
 - Support Node 16 [#965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/965)
 

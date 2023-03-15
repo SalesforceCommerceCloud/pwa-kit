@@ -5,7 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {Query, QueryClient} from '@tanstack/react-query'
-import {ApiClient, ApiOptions, ApiParameter, CacheUpdate, MergedOptions} from './types'
+import {
+    ApiClient,
+    ApiOptions,
+    ApiParameter,
+    CacheUpdate,
+    MergedOptions,
+    NullToOptional,
+    OmitNullableParameters
+} from './types'
 
 /** Applies the set of cache updates to the query client. */
 export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate, data: unknown) => {
@@ -38,17 +46,17 @@ export const isObject = (obj: unknown): obj is Record<string, unknown> =>
 
 /** Determines whether a value has all of the given keys. */
 export const hasAllKeys = <T>(object: T, keys: ReadonlyArray<keyof T>): boolean =>
-    keys.every((key) => object[key] !== undefined)
+    keys.every((key) => object[key] !== undefined && object[key] !== null)
 
 /** Creates a query predicate that determines whether a query key starts with the given path segments. */
 export const pathStartsWith =
-    (search: readonly string[]) =>
+    (search: readonly (string | undefined)[]) =>
     ({queryKey}: Query): boolean =>
         queryKey.length >= search.length && search.every((lookup, idx) => queryKey[idx] === lookup)
 
 /** Creates a query predicate that determines whether a query key fully matches the given path segments. */
 export const matchesPath =
-    (search: readonly string[]) =>
+    (search: readonly (string | undefined)[]) =>
     ({queryKey}: Query): boolean =>
         // ApiQueryKey = [...path, parameters]
         queryKey.length === 1 + search.length &&
@@ -99,18 +107,6 @@ export const matchParameters = (
     return matchParametersStrict(search)
 }
 
-/** Creates a query predicate that matches against common API config parameters. */
-export const matchesApiConfig = (parameters: Record<string, ApiParameter | undefined>) =>
-    matchParameters(parameters, [
-        // NOTE: `shortCode` and `version` are omitted, as query keys are constructed from endpoint
-        // paths, but the two paarameters are only used to construct the base URI.
-        'clientId',
-        'currency', // TODO: maybe?
-        'locale', // TODO: maybe?
-        'organizationId',
-        'siteId'
-    ])
-
 /** Creates a query predicate that returns true if all of the given predicates return true. */
 export const and =
     <Args extends unknown[]>(...funcs: Array<(...args: Args) => boolean>) =>
@@ -134,7 +130,8 @@ export const mergeOptions = <Client extends ApiClient, Options extends ApiOption
             : ({} as {body: never})),
         parameters: {
             ...client.clientConfig.parameters,
-            ...options.parameters
+            // If we pass a blank override, don't actually override it.
+            ...(options.parameters ? omitNullable(options.parameters) : {})
         },
         headers: {
             ...client.clientConfig.parameters,
@@ -149,11 +146,35 @@ export const pick = <T extends object, K extends keyof T>(
     obj: T,
     keys: readonly K[]
 ): Pick<T, K> => {
-    const picked = {} as Pick<T, K> // Assertion is not true, yet, but we make it so!
+    // Assertion is not true, yet, but we make it so!
+    const picked = {} as Pick<T, K>
     keys.forEach((key) => {
         if (key in obj) {
+            // Skip assigning optional/missing parameters
             picked[key] = obj[key]
         }
     })
     return picked
 }
+
+/** Removes keys with `null` or `undefined` values from the given object. */
+export const omitNullable = <T extends object>(obj: T): NullToOptional<T> => {
+    // Assertion is not true, yet, but we make it so!
+    const stripped = {} as NullToOptional<T>
+    // Assertion because `Object.entries` is limited :\
+    const entries = Object.entries(obj) as Array<[keyof T, T[keyof T]]>
+    for (const [key, value] of entries) {
+        if (value !== null && value !== undefined) stripped[key] = value
+    }
+    return stripped
+}
+
+/** Removes keys with `null` or `undefined` values from the `parameters` of the given object. */
+export const omitNullableParameters = <T extends {parameters: object}>(
+    obj: T
+): OmitNullableParameters<T> => ({
+    ...obj,
+    // Without the explicit generic parameter, the generic is inferred as `object`,
+    // the connection to `T` is lost, and TypeScript complains.
+    parameters: omitNullable<T['parameters']>(obj.parameters)
+})

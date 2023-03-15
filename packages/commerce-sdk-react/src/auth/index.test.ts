@@ -190,11 +190,52 @@ describe('Auth', () => {
         expect(auth.ready()).resolves.toEqual(result)
     })
     test('ready - use `fetchedToken` and short circuit network request', async () => {
-        const auth = new Auth({...config, fetchedToken: 'fake-token'})
+        const fetchedToken = jwt.sign(
+            {
+                sub: `cc-slas::zzrf_001::scid:xxxxxx::usid:usid`,
+                isb: `uido:ecom::upn:test@gmail.com::uidn:firstname lastname::gcid:guestuserid::rcid:rcid::chid:siteId`
+            },
+            'secret'
+        )
+        const auth = new Auth({...config, fetchedToken})
         jest.spyOn(auth, 'queueRequest')
-        await auth.ready().then(() => {
-            expect(auth.queueRequest).not.toHaveBeenCalled()
-        })
+        await auth.ready()
+        expect(auth.queueRequest).not.toHaveBeenCalled()
+    })
+    test('ready - use `fetchedToken` and auth data is populated for registered user', async () => {
+        const usid = 'usidddddd'
+        const customerId = 'customerIddddddd'
+        const fetchedToken = jwt.sign(
+            {
+                sub: `cc-slas::zzrf_001::scid:xxxxxx::usid:${usid}`,
+                isb: `uido:ecom::upn:test@gmail.com::uidn:firstname lastname::gcid:guestuserid::rcid:${customerId}::chid:siteId`
+            },
+            'secret'
+        )
+        const auth = new Auth({...config, fetchedToken})
+        await auth.ready()
+        expect(auth.get('access_token')).toBe(fetchedToken)
+        expect(auth.get('customer_id')).toBe(customerId)
+        expect(auth.get('usid')).toBe(usid)
+        expect(auth.get('customer_type')).toBe('registered')
+    })
+    test('ready - use `fetchedToken` and auth data is populated for guest user', async () => {
+        // isb: `uido:slas::upn:Guest::uidn:Guest User::gcid:bclrdGlbIZlHaRxHsZlWYYxHwZ::chid: `
+        const usid = 'usidddddd'
+        const customerId = 'customerIddddddd'
+        const fetchedToken = jwt.sign(
+            {
+                sub: `cc-slas::zzrf_001::scid:xxxxxx::usid:${usid}`,
+                isb: `uido:ecom::upn:Guest::uidn:firstname lastname::gcid:${customerId}::rcid:registeredCid::chid:siteId`
+            },
+            'secret'
+        )
+        const auth = new Auth({...config, fetchedToken})
+        await auth.ready()
+        expect(auth.get('access_token')).toBe(fetchedToken)
+        expect(auth.get('customer_id')).toBe(customerId)
+        expect(auth.get('usid')).toBe(usid)
+        expect(auth.get('customer_type')).toBe('guest')
     })
     test('ready - use refresh token when access token is expired', async () => {
         const auth = new Auth(config)
@@ -220,34 +261,29 @@ describe('Auth', () => {
             auth.set(key, data[key])
         })
 
-        await auth.ready().then(() => {
-            expect(helpers.refreshAccessToken).toBeCalled()
-        })
+        await auth.ready()
+        expect(helpers.refreshAccessToken).toBeCalled()
     })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
 
-        await auth.ready().then(() => {
-            expect(helpers.loginGuestUser).toBeCalled()
-        })
+        await auth.ready()
+        expect(helpers.loginGuestUser).toBeCalled()
     })
     test('loginGuestUser', async () => {
         const auth = new Auth(config)
-        await auth.loginGuestUser().then(() => {
-            expect(helpers.loginGuestUser).toBeCalled()
-        })
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUser).toBeCalled()
     })
     test('loginRegisteredUserB2C', async () => {
         const auth = new Auth(config)
-        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'}).then(() => {
-            expect(helpers.loginRegisteredUserB2C).toBeCalled()
-        })
+        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+        expect(helpers.loginRegisteredUserB2C).toBeCalled()
     })
     test('logout', async () => {
         const auth = new Auth(config)
-        await auth.logout().then(() => {
-            expect(helpers.loginGuestUser).toBeCalled()
-        })
+        await auth.logout()
+        expect(helpers.loginGuestUser).toBeCalled()
     })
     test('running on the server uses a shared context memory store', async () => {
         const refreshTokenGuest = 'guest'
