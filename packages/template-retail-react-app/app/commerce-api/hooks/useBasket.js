@@ -193,38 +193,6 @@ export default function useBasket(opts = {}) {
             },
 
             /**
-             * Set the shipping address for the current basket.
-             * @external Address
-             * @see https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shopperbaskets.html#orderaddress
-             */
-            async setShippingAddress(address) {
-                const response = await api.shopperBaskets.updateShippingAddressForShipment({
-                    body: address,
-                    parameters: {
-                        basketId: basket.basketId,
-                        shipmentId: 'me',
-                        useAsBilling: !basket.billingAddress
-                    }
-                })
-
-                setBasket(response)
-            },
-
-            /**
-             * Set the shipping method for the current basket.
-             *
-             * @param {string} id - The id of the shipping method.
-             */
-            async setShippingMethod(id) {
-                const response = await api.shopperBaskets.updateShippingMethodForShipment({
-                    body: {id},
-                    parameters: {basketId: basket.basketId, shipmentId: 'me'}
-                })
-
-                setBasket(response)
-            },
-
-            /**
              * Set the billing address for the current basket.
              * @external Address
              * @see https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shopperbaskets.html#orderaddress
@@ -381,16 +349,6 @@ export default function useBasket(opts = {}) {
                 // it on the confirmation page. The basket is automatically deleted
                 // in SF so we need to make sure a new one is created when leaving the confirmation.
                 setBasket(response)
-            },
-
-            /**
-             * Fetches the applicable shipping methods for the current basket
-             * @returns {Object} - API response containing data
-             */
-            getShippingMethods() {
-                return api.shopperBaskets.getShippingMethodsForShipment({
-                    parameters: {basketId: basket.basketId, shipmentId: 'me'}
-                })
             },
 
             /**

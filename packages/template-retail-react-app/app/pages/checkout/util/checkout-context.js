@@ -100,7 +100,7 @@ export const CheckoutProvider = ({children}) => {
     /**************** Einstein ****************/
     // Run this once when checkout begins
     useEffect(() => {
-        if (basket && basket.productItems) {
+        if (basket?.productItems) {
             einstein.sendBeginCheckout(basket)
         }
     }, [])
@@ -135,10 +135,6 @@ export const CheckoutProvider = ({children}) => {
 
             get selectedShippingAddress() {
                 return basket.shipments && basket.shipments[0].shippingAddress
-            },
-
-            get selectedShippingMethod() {
-                return basket.shipments && basket.shipments[0].shippingMethod
             },
 
             get selectedPayment() {
@@ -189,57 +185,6 @@ export const CheckoutProvider = ({children}) => {
             // @TODO: ALL METHODS BELOW SHOULD BE REMOVED BY THE END OF HOOK INTEGRATION
             //
             // ----------------
-
-            /**
-             * Applies the given address to the basket's shipment. Accepts CustomerAddress and OrderAddress.
-             * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shoppercustomers.html#customeraddress}
-             * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shoppercustomers.html#orderaddress}
-             * @param {Object} addressData
-             */
-            async setShippingAddress(addressData) {
-                const {
-                    id,
-                    preferred,
-                    creationDate,
-                    lastModified,
-                    addressId,
-                    addressName,
-                    ...address
-                } = addressData
-
-                await basket.setShippingAddress(address)
-
-                // Add/Update the address to the customer's account if they are registered.
-                if (!state.isGuestCheckout) {
-                    !addressId
-                        ? customer.addSavedAddress(address)
-                        : customer.updateSavedAddress({...address, addressId: addressId})
-                }
-            },
-
-            /**
-             * Removes a customer's saved address from their account.
-             * @param {string} addressId - The name/identifier of the address to be removed
-             */
-            async removeSavedAddress(addressId) {
-                await customer.removeSavedAddress(addressId)
-            },
-
-            /**
-             * Gets the applicable shipping methods for the basket's items and stores it in local state.
-             */
-            async getShippingMethods() {
-                const shippingMethods = await basket.getShippingMethods()
-                mergeState({shippingMethods})
-            },
-
-            /**
-             * Sets the shipment's shipping method on the basket.
-             * @param {string} id - The shipping method id from applicable shipping methods
-             */
-            async setShippingMethod(id) {
-                await basket.setShippingMethod(id)
-            },
 
             /**
              * Gets the applicable payment methods for the order.

@@ -11,7 +11,7 @@ import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from './util/checkout-context'
 import ContactInfo from './partials/contact-info'
 import ShippingAddress from './partials/shipping-address'
-// import ShippingOptions from './partials/shipping-options'
+import ShippingOptions from './partials/shipping-options'
 // import Payment from './partials/payment'
 import OrderSummary from '../../components/order-summary'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
@@ -60,7 +60,7 @@ const Checkout = () => {
 
                             <ContactInfo />
                             <ShippingAddress />
-                            {/* <ShippingOptions /> */}
+                            <ShippingOptions />
                             {/* <Payment /> */}
 
                             {step === 4 && (
