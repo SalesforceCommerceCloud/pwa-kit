@@ -8,7 +8,6 @@ import webpack from 'webpack'
 import path, {resolve} from 'path'
 import glob from 'glob'
 import minimatch from 'minimatch'
-import {inspect} from 'util'
 
 const projectDir = process.cwd()
 const pkg = require(resolve(projectDir, 'package.json'))

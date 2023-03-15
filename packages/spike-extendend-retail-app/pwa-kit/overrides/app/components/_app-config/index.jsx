@@ -34,7 +34,6 @@ import {createUrlTemplate} from '^retail-react-app/app/utils/url'
  * as Redux, or Mobx, if you like.
  */
 const AppConfig = ({children, locals = {}}) => {
-    console.log('~hello from overrides _app-config')
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
 
