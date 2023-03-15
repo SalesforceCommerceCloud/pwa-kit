@@ -56,13 +56,17 @@ const AccountWishlist = () => {
     )
     const {data: customer} = useCurrentCustomer()
 
-    const handleSecondaryActionStart = (itemId) => {
+    const handleSecondaryAction = async (itemId, promise) => {
         setWishlistItemLoading(true)
         setSelectedItem(itemId)
-    }
-    const handleSecondaryActionEnd = () => {
-        setWishlistItemLoading(false)
-        setSelectedItem(undefined)
+
+        try {
+            await promise
+            // No need to handle error here, as the inner component will take care of it
+        } finally {
+            setWishlistItemLoading(false)
+            setSelectedItem(undefined)
+        }
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
@@ -179,8 +183,7 @@ const AccountWishlist = () => {
                         secondaryActions={
                             <WishlistSecondaryButtonGroup
                                 productListItemId={item.id}
-                                onActionStart={handleSecondaryActionStart}
-                                onActionEnd={handleSecondaryActionEnd}
+                                onClick={handleSecondaryAction}
                             />
                         }
                     />
