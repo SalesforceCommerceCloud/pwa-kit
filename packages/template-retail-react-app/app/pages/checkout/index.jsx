@@ -23,7 +23,7 @@ const Checkout = () => {
     const {globalError, step, placeOrder} = useCheckout()
     const {data: basket} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
-
+    const {data: basket} = useCurrentBasket()
     // Scroll to the top when we get a global error
     useEffect(() => {
         if (globalError || step === 4) {

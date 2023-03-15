@@ -68,6 +68,15 @@
   "account_order_detail.link.back_to_history": {
     "defaultMessage": "Back to Order History"
   },
+  "account_order_detail.shipping_status.not_shipped": {
+    "defaultMessage": "Not shipped"
+  },
+  "account_order_detail.shipping_status.part_shipped": {
+    "defaultMessage": "Partially shipped"
+  },
+  "account_order_detail.shipping_status.shipped": {
+    "defaultMessage": "Shipped"
+  },
   "account_order_detail.title.order_details": {
     "defaultMessage": "Order Details"
   },

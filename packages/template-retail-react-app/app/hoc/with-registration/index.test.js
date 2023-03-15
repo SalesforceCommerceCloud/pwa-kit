@@ -4,29 +4,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useEffect} from 'react'
+import React from 'react'
 import {Button} from '@chakra-ui/react'
 import {screen, waitFor} from '@testing-library/react'
-import React from 'react'
 import withRegistration from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {mockedGuestCustomer, mockedRegisteredCustomer} from '../../commerce-api/mock-data'
+import {mockedGuestCustomer} from '../../commerce-api/mock-data'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 
 const ButtonWithRegistration = withRegistration(Button)
 
 const MockedComponent = (props) => {
-    const {isRegistered} = useCustomerType()
-    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const {data: customer} = useCurrentCustomer()
-    useEffect(() => {
-        if (!isRegistered) {
-            login.mutate({email: 'email@test.com', password: 'password1'})
-        }
-    }, [])
     return (
         <div>
             <div>firstName: {customer?.firstName}</div>
@@ -49,16 +40,9 @@ afterEach(() => {
 })
 
 describe('Registered users tests', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.get('*/customers/:customerId', (req, res, ctx) =>
-                res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-            )
-        )
-    })
     test('should execute onClick for registered users', async () => {
         const onClick = jest.fn()
-        await renderWithProviders(<MockedComponent onClick={onClick} />)
+        renderWithProviders(<MockedComponent onClick={onClick} />)
 
         await waitFor(() => {
             // we wait for login to complete and user's firstName to show up on screen.
@@ -85,7 +69,7 @@ describe('Guest user tests', function () {
     })
     test.skip('should show login modal if user not registered', async () => {
         const onClick = jest.fn()
-        await renderWithProviders(
+        renderWithProviders(
             <ButtonWithRegistration onClick={onClick}>Button</ButtonWithRegistration>
         )
 

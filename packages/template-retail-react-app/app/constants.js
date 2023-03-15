@@ -12,9 +12,12 @@ export const DEFAULT_LOCALE = 'en-US'
 export const DEFAULT_SITE_TITLE = 'Retail React App'
 export const MAX_CACHE_AGE = 60 * 15 // 15 min
 
-// Constants used in the used for product searching.
+// Constants used for product searching.
 export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
 export const DEFAULT_LIMIT_VALUES = [25, 50, 100] // Page sizes
+
+//Constants for customer orders searching.
+export const DEFAULT_ORDERS_SEARCH_PARAMS = {limit: 10, offset: 0, sort: 'best-matches', refine: []}
 
 // Constants for Search Component
 export const RECENT_SEARCH_LIMIT = 5
@@ -61,8 +64,6 @@ export const API_ERROR_MESSAGE = defineMessage({
 })
 
 export const HOME_HREF = '/'
-
-export const MAX_ORDER_QUANTITY = 10
 
 export const urlPartPositions = {
     PATH: 'path',

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within, act} from '@testing-library/react'
 import user from '@testing-library/user-event'
@@ -19,25 +19,8 @@ import {
 import Account from './index'
 import Login from '../login'
 import mockConfig from '../../../config/mocks/default'
-import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 
 const MockedComponent = () => {
-    const {isRegistered} = useCustomerType()
-    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
-
-    useEffect(() => {
-        if (!isRegistered) {
-            login.mutate(
-                {email: 'email@test.com', password: 'password1'},
-                {
-                    onSuccess: () => {
-                        window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
-                    }
-                }
-            )
-        }
-    }, [])
-
     return (
         <Switch>
             <Route
@@ -54,8 +37,6 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
-    jest.resetAllMocks()
     global.server.use(
         rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
         rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
@@ -68,6 +49,7 @@ beforeEach(() => {
     window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
 })
 
@@ -98,8 +80,7 @@ describe('Test redirects', function () {
     })
 })
 
-//TODO: wait until other pages are integrated with hook to fix this test
-test.skip('Provides navigation for subpages', async () => {
+test('Provides navigation for subpages', async () => {
     global.server.use(
         rest.get('*/products', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderProducts))
