@@ -332,7 +332,7 @@ const Cart = () => {
                         >
                             <GridItem>
                                 <Stack spacing={4}>
-                                    {basket.productItems.map((productItem, idx) => {
+                                    {basket.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem
                                                 key={productItem.productId}
