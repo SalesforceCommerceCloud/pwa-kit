@@ -1,11 +1,12 @@
 {
   "name": "client",
-  "hash": "0273be7cdfcccc6111b3",
+  "hash": "77ad083efd8cdd360e5e",
   "publicPath": "/mobify/bundle/development/",
   "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
     "main": [
-      "main.js"
+      "main.js",
+      "main.1b6e4be3376fc2911e65.hot-update.js"
     ],
     "pages-home": [
       "pages-home.js"
@@ -550,6 +551,33 @@
     },
     {
       "type": "asset",
+      "name": "main.1b6e4be3376fc2911e65.hot-update.js",
+      "size": 41850,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "1b6e4be3376fc2911e65",
+        "related": {
+          "sourceMap": "main.1b6e4be3376fc2911e65.hot-update.js.map"
+        }
+      },
+      "chunkNames": [
+        "main"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "main"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
       "name": "^retail-react-app-app-pages-account-wishlist.js",
       "size": 41469,
       "emitted": false,
@@ -816,6 +844,25 @@
         "_cc12"
       ],
       "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "main.1b6e4be3376fc2911e65.hot-update.json",
+      "size": 28,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "1b6e4be3376fc2911e65"
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [],
+      "auxiliaryChunks": []
     }
   ],
   "namedChunkGroups": {
@@ -831,11 +878,14 @@
         },
         {
           "name": "main.js"
+        },
+        {
+          "name": "main.1b6e4be3376fc2911e65.hot-update.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 2,
+      "filteredAuxiliaryAssets": 3,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -1151,7 +1201,8 @@
     {
       "id": "main",
       "files": [
-        "main.js"
+        "main.js",
+        "main.1b6e4be3376fc2911e65.hot-update.js"
       ]
     },
     {
