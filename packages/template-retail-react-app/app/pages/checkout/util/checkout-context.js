@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -33,17 +33,16 @@ export const CheckoutProvider = ({children}) => {
         sectionError: undefined
     })
 
-    const CheckoutSteps = {
-        Contact_Info: 0,
-        Shipping_Address: 1,
-        Shipping_Options: 2,
-        Payment: 3,
-        Review_Order: 4
-    }
+    const CheckoutStepsList = [
+        'Contact_Info',
+        'Shipping_Address',
+        'Shipping_Options',
+        'Payment',
+        'Review_Order'
+    ]
+    const CheckoutSteps = CheckoutStepsList.reduce((acc, step, idx) => ({...acc, [step]: idx}), {})
 
-    const getCheckoutStepName = (step) => {
-        return Object.keys(CheckoutSteps).find((key) => CheckoutSteps[key] === step)
-    }
+    const getCheckoutStepName = (step) => CheckoutStepsList[step]
 
     const mergeState = useCallback((data) => {
         // If we become unmounted during an async call that results in updating state, we
