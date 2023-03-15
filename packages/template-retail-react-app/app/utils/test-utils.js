@@ -29,12 +29,7 @@ import {mockCategories as initialMockCategories} from '../commerce-api/mock-data
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
 // Contexts
-import {
-    CustomerProvider,
-    CategoriesProvider,
-    CurrencyProvider,
-    MultiSiteProvider
-} from '../contexts'
+import {CategoriesProvider, CurrencyProvider, MultiSiteProvider} from '../contexts'
 
 import {createUrlTemplate} from './url'
 import {getSiteByReference} from './site-utils'
@@ -152,25 +147,23 @@ export const TestProviders = ({
                             redirectURI={`${window.location.origin}/testcallback`}
                             fetchedToken={bypassAuth ? JWTThatNeverExpires : ''}
                         >
-                            <CustomerProvider>
-                                <CategoriesProvider treeRoot={initialCategories}>
-                                    <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                                        <_CustomerProvider value={{customer, setCustomer}}>
-                                            <BasketProvider value={{basket, setBasket}}>
-                                                <CustomerProductListsProvider>
-                                                    <Router>
-                                                        <ChakraProvider theme={theme}>
-                                                            <AddToCartModalProvider>
-                                                                {children}
-                                                            </AddToCartModalProvider>
-                                                        </ChakraProvider>
-                                                    </Router>
-                                                </CustomerProductListsProvider>
-                                            </BasketProvider>
-                                        </_CustomerProvider>
-                                    </CurrencyProvider>
-                                </CategoriesProvider>
-                            </CustomerProvider>
+                            <CategoriesProvider treeRoot={initialCategories}>
+                                <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                                    <_CustomerProvider value={{customer, setCustomer}}>
+                                        <BasketProvider value={{basket, setBasket}}>
+                                            <CustomerProductListsProvider>
+                                                <Router>
+                                                    <ChakraProvider theme={theme}>
+                                                        <AddToCartModalProvider>
+                                                            {children}
+                                                        </AddToCartModalProvider>
+                                                    </ChakraProvider>
+                                                </Router>
+                                            </CustomerProductListsProvider>
+                                        </BasketProvider>
+                                    </_CustomerProvider>
+                                </CurrencyProvider>
+                            </CategoriesProvider>
                         </CommerceApiProvider>
                     </_CommerceAPIProvider>
                 </MultiSiteProvider>
