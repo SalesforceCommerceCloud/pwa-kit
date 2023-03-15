@@ -259,3 +259,29 @@ export const removeQueryParamsFromPath = (path, keys) => {
 
     return `${pathname}${paramStr && '?'}${paramStr}`
 }
+
+/*
+ * Remove site alias and locale from a given url, to be used for "navigate" urls
+ *
+ * @param {string} pathName - The part of url to have site alias and locale removed from
+ * @returns {string} - the path after site alias and locale have been removed
+ * @example
+ * import {removeSiteLocaleFromPath} from /path/to/util/url
+ *
+ * removeSiteLocaleFromPath(/RefArch/en-US/account/wishlist)
+ * // returns '/account/wishlist'
+ */
+export const removeSiteLocaleFromPath = (pathName) => {
+    let {siteRef, localeRef} = getParamsFromPath(`${pathName}`)
+
+    // remove the site alias from the current pathName
+    if (siteRef) {
+        pathName = pathName.replace(`/${siteRef}`, '')
+    }
+    // remove the locale from the current pathName
+    if (localeRef) {
+        pathName = pathName.replace(`/${localeRef}`, '')
+    }
+
+    return pathName
+}

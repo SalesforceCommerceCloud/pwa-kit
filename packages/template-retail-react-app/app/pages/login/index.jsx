@@ -15,7 +15,7 @@ import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
-
+import {removeSiteLocaleFromPath} from '../../utils/url'
 import LoginForm from '../../components/login'
 
 const Login = () => {
@@ -45,7 +45,7 @@ const Login = () => {
     useEffect(() => {
         if (customer.authType != null && customer.isRegistered) {
             if (location?.state?.directedFrom) {
-                navigate(location.state.directedFrom)
+                navigate(removeSiteLocaleFromPath(location.state.directedFrom))
             } else {
                 navigate('/account')
             }
