@@ -66,15 +66,15 @@ const AppConfig = ({children, locals = {}}) => {
             headers={headers}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-                    <_CommerceAPIProvider value={locals.api}>
-                        <_CustomerProvider value={{customer, setCustomer}}>
-                            <BasketProvider value={{basket, setBasket}}>
-                                <CustomerProductListsProvider>
-                                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                                </CustomerProductListsProvider>
-                            </BasketProvider>
-                        </_CustomerProvider>
-                    </_CommerceAPIProvider>
+                <_CommerceAPIProvider value={locals.api}>
+                    <_CustomerProvider value={{customer, setCustomer}}>
+                        <BasketProvider value={{basket, setBasket}}>
+                            <CustomerProductListsProvider>
+                                <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                            </CustomerProductListsProvider>
+                        </BasketProvider>
+                    </_CustomerProvider>
+                </_CommerceAPIProvider>
             </MultiSiteProvider>
         </CommerceApiProvider>
     )
