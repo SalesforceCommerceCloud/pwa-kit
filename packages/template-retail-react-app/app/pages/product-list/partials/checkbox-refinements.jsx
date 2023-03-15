@@ -21,9 +21,7 @@ const CheckboxRefinements = ({filter, toggleFilter, selectedFilters}) => {
                         <Box key={value.value}>
                             <Checkbox
                                 isChecked={isChecked}
-                                onChange={() =>
-                                    toggleFilter(value, filter.attributeId, isChecked, false)
-                                }
+                                onChange={() => toggleFilter(value, filter.attributeId, isChecked)}
                             >
                                 {value.label}
                             </Checkbox>
