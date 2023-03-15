@@ -30,7 +30,6 @@ import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
 // Contexts
 import {
-    CustomerProvider,
     CategoriesProvider,
     CurrencyProvider,
     MultiSiteProvider
@@ -152,7 +151,6 @@ export const TestProviders = ({
                             redirectURI={`${window.location.origin}/testcallback`}
                             fetchedToken={bypassAuth ? JWTThatNeverExpires : ''}
                         >
-                            <CustomerProvider>
                                 <CategoriesProvider treeRoot={initialCategories}>
                                     <CurrencyProvider currency={DEFAULT_CURRENCY}>
                                         <_CustomerProvider value={{customer, setCustomer}}>
@@ -170,7 +168,6 @@ export const TestProviders = ({
                                         </_CustomerProvider>
                                     </CurrencyProvider>
                                 </CategoriesProvider>
-                            </CustomerProvider>
                         </CommerceApiProvider>
                     </_CommerceAPIProvider>
                 </MultiSiteProvider>
