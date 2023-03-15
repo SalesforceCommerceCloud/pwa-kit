@@ -51,6 +51,9 @@ const AccountWishlist = () => {
     const updateCustomerProductListItem = useShopperCustomersMutation(
         'updateCustomerProductListItem'
     )
+    const deleteCustomerProductListItem = useShopperCustomersMutation(
+        'deleteCustomerProductListItem'
+    )
     const {data: customer} = useCurrentCustomer()
 
     const handleActionClicked = (itemId) => {
@@ -69,15 +72,19 @@ const AccountWishlist = () => {
         // To meet expected schema, remove the custom `product` we added
         delete body.product
 
+        const parameters = {
+            customerId: customer.customerId,
+            itemId: item.id,
+            listId: wishListData?.id
+        }
+
+        const mutation =
+            parseInt(quantity) > 0
+                ? updateCustomerProductListItem.mutateAsync({body, parameters})
+                : deleteCustomerProductListItem.mutateAsync({parameters})
+
         try {
-            await updateCustomerProductListItem.mutateAsync({
-                body,
-                parameters: {
-                    customerId: customer.customerId,
-                    itemId: item.id,
-                    listId: wishListData?.id
-                }
-            })
+            await mutation
             isValidChange = true
             setSelectedItem(undefined)
         } catch (err) {
@@ -156,7 +163,9 @@ const AccountWishlist = () => {
                             quantity: item.quantity
                         }}
                         showLoading={
-                            (updateCustomerProductListItem.isLoading || isWishlistItemLoading) &&
+                            (updateCustomerProductListItem.isLoading ||
+                                deleteCustomerProductListItem.isLoading ||
+                                isWishlistItemLoading) &&
                             selectedItem === item.productId
                         }
                         primaryAction={<WishlistPrimaryAction />}
