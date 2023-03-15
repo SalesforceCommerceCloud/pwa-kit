@@ -12,8 +12,6 @@ import {createPathWithDefaults, renderWithProviders} from '../../utils/test-util
 import ResetPassword from '.'
 import mockConfig from '../../../config/mocks/default'
 
-jest.mock('../../commerce-api/einstein')
-
 const mockRegisteredCustomer = {
     authType: 'registered',
     customerId: 'registeredCustomerId',

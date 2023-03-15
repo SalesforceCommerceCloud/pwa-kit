@@ -14,7 +14,8 @@ const {rest} = require('msw')
 const {
     mockCategory,
     mockedRegisteredCustomer,
-    exampleTokenReponse
+    exampleTokenReponse,
+    mockCustomerBaskets
 } = require('./app/commerce-api/mock-data')
 
 /**
@@ -33,6 +34,9 @@ export const setupMockServer = () => {
         ),
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        ),
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         ),
         rest.post('*/customers/action/login', (req, res, ctx) => {
             return res(
@@ -143,16 +147,20 @@ Object.defineProperty(window, 'scrollTo', {
     value: () => null
 })
 
-Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: jest.fn().mockImplementation((query) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: jest.fn(), // deprecated
-        removeListener: jest.fn(), // deprecated
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn()
-    }))
-})
+if (typeof window.matchMedia !== 'function') {
+    Object.defineProperty(window, 'matchMedia', {
+        enumerable: true,
+        configurable: true,
+        writable: true,
+        value: jest.fn().mockImplementation((query) => ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: jest.fn(), // Deprecated
+            removeListener: jest.fn(), // Deprecated
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            dispatchEvent: jest.fn()
+        }))
+    })
+}

@@ -14,8 +14,6 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
 import {rest} from 'msw'
 
-jest.mock('../commerce-api/einstein')
-
 const mockPasswordToken = {
     email: 'foo@test.com',
     expiresInMinutes: 10,

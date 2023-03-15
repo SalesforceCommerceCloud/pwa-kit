@@ -4,14 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import {screen, waitFor, act} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import PaymentMethods from './payments'
 import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
-import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 const mockToastSpy = jest.fn()
 
@@ -22,21 +21,7 @@ jest.mock('@chakra-ui/toast', () => {
 })
 
 const MockedComponent = () => {
-    const {isRegistered} = useCustomerType()
-    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const {data: customer} = useCurrentCustomer()
-    useEffect(() => {
-        if (!isRegistered) {
-            login.mutate(
-                {email: 'email@test.com', password: 'password1'},
-                {
-                    onSuccess: () => {
-                        window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
-                    }
-                }
-            )
-        }
-    }, [])
     return (
         <div>
             <div>
@@ -91,7 +76,6 @@ afterEach(() => {
 
 test('Allows customer to add and remove payment methods', async () => {
     renderWithProviders(<MockedComponent />)
-    await waitFor(() => expect(screen.getByText('customerid')).toBeInTheDocument())
 
     const newPayment = {
         creationDate: '2021-04-01T14:34:56.000Z',

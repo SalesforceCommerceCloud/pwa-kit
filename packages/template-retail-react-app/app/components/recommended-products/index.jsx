@@ -11,7 +11,7 @@ import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
 import ProductScroller from '../../components/product-scroller'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
-import useEinstein from '../../commerce-api/hooks/useEinstein'
+import useEinstein from '../../hooks/use-einstein'
 import useIntersectionObserver from '../../hooks/use-intersection-observer'
 import useWishlist from '../../hooks/use-wishlist'
 import {useToast} from '../../hooks/use-toast'
@@ -29,7 +29,6 @@ import {
  */
 const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, ...props}) => {
     const {
-        api,
         loading,
         recommendations,
         getZoneRecommendations,
@@ -48,8 +47,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     const [_products, setProducts] = useState(products)
 
     useEffect(() => {
-        // Return early if we have no Einstein API instance
-        if (!api || !isInitialized) {
+        if (!isInitialized) {
             return
         }
 
@@ -72,11 +70,6 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     }, [zone, recommender, _products, isInitialized])
 
     useEffect(() => {
-        // Return early if we have no Einstein API instance
-        if (!api) {
-            return
-        }
-
         // This is an optimization that eliminates superfluous rerenders/fetching by
         // keeping a copy of the `products` array prop in state for shallow comparison.
         if (!Array.isArray(products)) {
@@ -101,11 +94,6 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             )
         }
     }, [isOnScreen, recommendations])
-
-    // Check if we have an Einstein API instance before attempting to render anything
-    if (!api) {
-        return null
-    }
 
     // The component should remove itself altogether if it has no recommendations
     // and we aren't loading any.

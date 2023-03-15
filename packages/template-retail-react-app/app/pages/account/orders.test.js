@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
@@ -15,33 +15,10 @@ import {
     mockOrderHistory,
     mockOrderProducts
 } from '../../commerce-api/mock-data'
-import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
 
 const MockedComponent = () => {
-    const {isRegistered} = useCustomerType()
-    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
-    const {data: customer} = useCurrentCustomer()
-
-    useEffect(() => {
-        if (!isRegistered) {
-            login.mutate(
-                {email: 'email@test.com', password: 'password1'},
-                {
-                    onSuccess: () => {
-                        window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
-                    }
-                }
-            )
-        }
-    }, [])
-
-    if (!customer.isRegistered) {
-        return null
-    }
-
     return (
         <Switch>
             <Route path={createPathWithDefaults('/account/orders')}>

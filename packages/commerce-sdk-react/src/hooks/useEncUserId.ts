@@ -11,16 +11,18 @@ import useConfig from './useConfig'
 const onClient = typeof window !== 'undefined'
 
 /**
- * Hook that returns the customer ID.
+ * Hook that returns the ecom user ID.
+ *
+ * This is sometimes used as the user ID for Einstein.
  *
  */
-const useCustomerId = (): string | null => {
+const useEncUserId = (): string | null => {
     if (onClient) {
         const config = useConfig()
-        return useLocalStorage(`${config.siteId}_customer_id`)
+        return useLocalStorage(`${config.siteId}_enc_user_id`)
     }
     const auth = useAuthContext()
-    return auth.get('customer_id')
+    return auth.get('enc_user_id')
 }
 
-export default useCustomerId
+export default useEncUserId
