@@ -20,11 +20,7 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {
-    sdkReplacementPlugin,
-    extendedTemplateReplacementPlugin,
-    allFiles
-} from './plugins'
+import {sdkReplacementPlugin, extendedTemplateReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
@@ -201,15 +197,6 @@ const baseConfig = (target) => {
                         ? extendedTemplateReplacementPlugin(projectDir)
                         : () => null,
 
-                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                    //     ? importFromExtendsPlugin(projectDir)
-                    //     : () => null,
-
-                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                    //     ? importFromLocalPlugin(projectDir)
-                    //     : () => null,
-
-                    allFiles(),
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
                 ].filter(Boolean),
@@ -377,8 +364,18 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional('loader', './app/loader.js'),
-                ...optional('worker', './worker/main.js'),
+                ...optional(
+                    'loader',
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? `.${pkg?.mobify?.overridesDir}/app/request-processor.js`
+                        : './app/loader.js'
+                ),
+                ...optional(
+                    'worker',
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? `.${pkg?.mobify?.overridesDir}/app/request-processor.js`
+                        : './app/main.js'
+                ),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
@@ -450,7 +447,11 @@ const ssr = (() => {
                     ...config,
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
-                    entry: './app/ssr.js',
+                    // entry: './app/ssr.js',
+                    entry:
+                        pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                            ? `.${pkg?.mobify?.overridesDir}/app/ssr.js`
+                            : './app/ssr.js',
                     output: {
                         path: buildDir,
                         filename: 'ssr.js',
@@ -479,7 +480,11 @@ const requestProcessor =
             return {
                 ...config,
                 name: REQUEST_PROCESSOR,
-                entry: './app/request-processor.js',
+                // entry: './app/request-processor.js',
+                entry:
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? `.${pkg?.mobify?.overridesDir}/app/request-processor.js`
+                        : './app/request-processor.js',
                 output: {
                     path: buildDir,
                     filename: 'request-processor.js',

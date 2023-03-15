@@ -12,6 +12,8 @@ import minimatch from 'minimatch'
 const projectDir = process.cwd()
 const pkg = require(resolve(projectDir, 'package.json'))
 
+const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
+
 const getOverridePath = (path) => {
     const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
     // order matters here, we perform look ups starting in the following order:
@@ -22,20 +24,20 @@ const getOverridePath = (path) => {
                 projectDir,
                 pkg?.mobify?.overridesDir,
                 ...path
-            )}.+(js|jsx|ts|tsx|svg|jpg|jpeg)`
+            )}${OVERRIDES_EXTENSIONS}`
         )
         if (overrideFile?.length) {
             return overrideFile?.[0]
         }
         const extendFile = glob.sync(
-            `${projectDir}${resolve(projectDir, extendPath, ...path)}.+(js|jsx|ts|tsx|svg|jpg|jpeg)`
+            `${projectDir}${resolve(projectDir, extendPath, ...path)}${OVERRIDES_EXTENSIONS}`
         )
         if (extendFile?.length) {
             return extendFile?.[0]
         }
     }
     const generatedProjectOverride = glob.sync(
-        `${projectDir}${resolve(projectDir, ...path)}.+(js|jsx|ts|tsx|svg|jpg|jpeg)`
+        `${projectDir}${resolve(projectDir, ...path)}${OVERRIDES_EXTENSIONS}`
     )
 
     return generatedProjectOverride?.length ? generatedProjectOverride?.[0] : null
@@ -101,17 +103,11 @@ export const sdkReplacementPlugin = (projectDir) => {
     })
 }
 
-export const allFiles = (projectDir) => {
-    return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
-        const resolved = path.resolve(resource.context, resource.request)
-    })
-}
-
 export const extendedTemplateReplacementPlugin = (projectDir) => {
     const globPattern = `${pkg?.mobify?.overridesDir?.replace(
         /\//,
         ''
-    )}/**/*.+(js|jsx|ts|tsx|svg|jpg|jpeg)`
+    )}/**/*${OVERRIDES_EXTENSIONS}`
     // push a copy of overrides array with the extends path as base
     const _og_overrides = glob.sync(globPattern)
     const overrides = _og_overrides?.flatMap((item) => {
@@ -131,13 +127,11 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
         )
     })
 
-
     const overridesMap = [
         ...overrides,
         ...overrides.flatMap((item) => {
-            console.log('each item', item)
             const patterns = []
-            const EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
+            patterns.push(item)
 
             // matches '.jsx', '.js', '.tsx', '.ts'
             const extRe = /\.\w+$/
@@ -156,24 +150,13 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
                     .slice(0, -1)
                     .join('/')
 
-                if (item === 'pwa-kit/overrides/app/components/icons/index.jsx') {
-                    console.log('no ext', noExt)
-                    console.log('path with no file', pathNoFile)
-                    console.log('----++++++', minimatch.makeRe('**/*' + noExt + EXTENSIONS))
-                }
-                patterns.push(minimatch.makeRe('**/*' + noExt + EXTENSIONS))
-                patterns.push(minimatch.makeRe('**/*' + noExt))
+                patterns.push(minimatch.makeRe('**/*' + noExt + OVERRIDES_EXTENSIONS))
                 patterns.push(minimatch.makeRe('**/*' + pathNoFile))
             }
 
             return patterns
         })
     ]
-    console.log('~~~~overridesMAP', overridesMap)
-    // TODO: manually push a false positive e.g. chakra-ui/whatever/icons to make sure we don't override that
-
-    // TODO: filter regex already generated above out of this map
-    // this includes the "**/*" magic path so will match "blah-blah/blah/pwa-kit/..."
     const overridesRegex = makeRegExp(
         `(${overridesMap
             ?.map((override) =>
@@ -185,52 +168,41 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             )
             ?.join('|')})`
     )
-    console.log('++++++overridesregex++++++', overridesRegex)
-
-    // TODO: maybe parse the whole dependency tree and rewrite it with this
-    //  https://github.com/dependents/node-dependency-tree
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
+        // NOTE: the way the Template Extensibility feature works, the order in which
+        // we check for file rewrites / aliases is important
 
         if (resource.request.match(/\^/)) {
             const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
             const newPath = path.resolve(projectDir, 'node_modules', relativePath)
-
             // NOTE: overriding either of these alone does not work, both must be set
             resource.request = newPath
-            resource.createData.resource = newPath
             return
         }
 
-        // for now, let's early return any file that doesn't match what's expected from overrides
-        // if there IS a match -> this is false and skips
-        // if there IS NOT a match -> this is true and prints NO MATCH
         if (!resolved?.match(overridesRegex)?.length) {
             return
         }
 
         if (
-            // TODO: this array appears to always contain object where the `dependency[x].request
-            // holds reference to the original request, which is what we want to introspect on
-            // whether magic characters like `^` were used
+            // NOTE: this array appears to always contain object where the `dependency[x].request
+            // holds reference to the original request, which is what we want to use for
+            // introspecting whether magic characters like `^` were used
             resource?.dependencies?.[0]?.request?.match?.(/\^/)?.[0]
         ) {
             return
         }
         const matchRegex = makeRegExp(pkg?.mobify?.extends)
-
-        if (
-            resolved?.match?.(matchRegex) &&
-            _overrides?.filter((override) => override?.match(/\.(?=[^\/]+$)/))?.length
-        ) {
+        const relativePathNoExt = resolved?.split?.(matchRegex)?.[1]?.split?.('.')?.[0]
+        const has = _overridesHashMap.has(relativePathNoExt)
+        if (_overridesHashMap.has(relativePathNoExt)) {
             const depth = pkg?.mobify?.overridesDir?.replace?.(/^\//, '')?.split('/') || []
             const relativePath = resolved?.split?.(matchRegex)?.[1]
             const newPath = projectDir + pkg?.mobify?.overridesDir + relativePath
-
             // NOTE: overriding either of these alone does not work, both must be set
             resource.request = newPath
-
         }
     })
 }

@@ -10,10 +10,10 @@
 		"extends": "retail-react-app",
 		"overridesDir": "/pwa-kit/overrides"
 	},
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start"
-    },
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start"
+	},
 	"devDependencies": {
 		"@chakra-ui/icons": "^1.0.6",
 		"@chakra-ui/react": "^1.7.1",
@@ -48,6 +48,9 @@
 		"nanoid": "^3.1.31",
 		"njwt": "^1.2.0",
 		"prop-types": "^15.6.0",
+        "pwa-kit-dev": "2.8.0-dev.0",
+		"pwa-kit-react-sdk": "2.8.0-dev.0",
+		"pwa-kit-runtime": "2.8.0-dev.0",
 		"query-string": "^7.0.1",
 		"raf": "^3.4.0",
 		"randomstring": "^1.2.1",
@@ -57,7 +60,7 @@
 		"react-hook-form": "^6.15.5",
 		"react-intl": "^5.13.1",
 		"react-router-dom": "^5.1.2",
-        "retail-react-app": "2.8.0-dev.0"
+		"retail-react-app": "2.8.0-dev.0"
 	},
 	"peerDependencies": {
 		"@chakra-ui/system": "^1.12.1"
