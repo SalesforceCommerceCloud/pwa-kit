@@ -56,9 +56,13 @@ const AccountWishlist = () => {
     )
     const {data: customer} = useCurrentCustomer()
 
-    const handleActionClicked = (itemId) => {
-        setWishlistItemLoading(Boolean(itemId))
+    const handleSecondaryActionStart = (itemId) => {
+        setWishlistItemLoading(true)
         setSelectedItem(itemId)
+    }
+    const handleSecondaryActionEnd = () => {
+        setWishlistItemLoading(false)
+        setSelectedItem(undefined)
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
@@ -175,7 +179,8 @@ const AccountWishlist = () => {
                         secondaryActions={
                             <WishlistSecondaryButtonGroup
                                 productListItemId={item.id}
-                                onClick={handleActionClicked}
+                                onActionStart={handleSecondaryActionStart}
+                                onActionEnd={handleSecondaryActionEnd}
                             />
                         }
                     />

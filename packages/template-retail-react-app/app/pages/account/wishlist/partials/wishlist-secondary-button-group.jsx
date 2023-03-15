@@ -43,7 +43,11 @@ export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
  * Renders secondary actions on a product-item card in the form of a button group.
  * Represents other actions you want the user to perform with the product-item (eg.: Remove or Edit)
  */
-const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
+const WishlistSecondaryButtonGroup = ({
+    productListItemId,
+    onActionStart = noop,
+    onActionEnd = noop
+}) => {
     const variant = useItemVariant()
     const {data: customer} = useCurrentCustomer()
     const {data: wishList} = useWishList()
@@ -59,14 +63,9 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
         'deleteCustomerProductListItem'
     )
 
-    const startRemoval = () => {
-        onClick(variant.id)
-    }
-    const endRemoval = () => {
-        onClick('')
-    }
     const handleItemRemove = () => {
-        startRemoval()
+        onActionStart(variant.id)
+
         deleteCustomerProductListItem.mutate(
             {
                 parameters: {
@@ -89,7 +88,7 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
                     toast({title: formatMessage(API_ERROR_MESSAGE), status: 'error'})
                 },
                 onSettled: () => {
-                    endRemoval()
+                    onActionEnd()
                 }
             }
         )
@@ -125,7 +124,8 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
 
 WishlistSecondaryButtonGroup.propTypes = {
     productListItemId: PropTypes.string,
-    onClick: PropTypes.func
+    onActionStart: PropTypes.func,
+    onActionEnd: PropTypes.func
 }
 
 export default WishlistSecondaryButtonGroup
