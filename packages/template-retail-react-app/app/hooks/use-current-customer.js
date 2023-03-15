@@ -5,16 +5,25 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {useCustomer, useCustomerId, useCustomerType} from 'commerce-sdk-react-preview'
+
 /**
- * A hook that returns the current state of the app.
- * It is a combination of many commerce-sdk-react hooks that needs to be used together in many places.
+ * A hook that returns the current customer.
+ *
  */
-import {useContext} from 'react'
-import {CustomerContext} from '../contexts'
 export const useCurrentCustomer = () => {
-    const context = useContext(CustomerContext)
-    if (context === undefined) {
-        throw new Error('useCurrentCustomer must be used within CustomerProvider')
+    const customerId = useCustomerId()
+    const {isRegistered, isGuest, customerType} = useCustomerType()
+    const query = useCustomer({parameters: {customerId}}, {enabled: !!customerId && isRegistered})
+    const value = {
+        ...query,
+        data: {
+            ...query.data,
+            customerType,
+            customerId,
+            isRegistered,
+            isGuest
+        }
     }
-    return context
+    return value
 }

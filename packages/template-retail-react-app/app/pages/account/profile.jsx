@@ -71,15 +71,13 @@ const ProfileCard = () => {
     })
 
     useEffect(() => {
-        if (customer) {
-            form.reset({
-                firstName: customer.firstName,
-                lastName: customer.lastName,
-                email: customer.email,
-                phone: customer.phoneHome
-            })
-        }
-    }, [customer])
+        form.reset({
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            email: customer.email,
+            phone: customer.phoneHome
+        })
+    }, [customer?.firstName, customer?.lastName, customer?.email, customer?.phoneHome])
 
     const submit = async (values) => {
         try {
