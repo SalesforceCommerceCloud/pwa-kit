@@ -59,31 +59,29 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
         'deleteCustomerProductListItem'
     )
 
-    const handleItemRemove = () => {
-        const promise = deleteCustomerProductListItem.mutateAsync(
-            {
+    const handleItemRemove = async () => {
+        try {
+            const promise = deleteCustomerProductListItem.mutateAsync({
                 parameters: {
                     customerId: customer.customerId,
                     listId: wishList?.id,
                     itemId: productListItemId
                 }
-            },
-            {
-                onSuccess: () => {
-                    toast({
-                        title: formatMessage({
-                            defaultMessage: 'Item removed from wishlist',
-                            id: 'wishlist_secondary_button_group.info.item_removed'
-                        }),
-                        status: 'success'
-                    })
-                },
-                onError: () => {
-                    toast({title: formatMessage(API_ERROR_MESSAGE), status: 'error'})
-                }
-            }
-        )
-        onClick(variant.id, promise)
+            })
+            onClick(variant.id, promise)
+
+            await promise
+
+            toast({
+                title: formatMessage({
+                    defaultMessage: 'Item removed from wishlist',
+                    id: 'wishlist_secondary_button_group.info.item_removed'
+                }),
+                status: 'success'
+            })
+        } catch {
+            toast({title: formatMessage(API_ERROR_MESSAGE), status: 'error'})
+        }
     }
 
     return (

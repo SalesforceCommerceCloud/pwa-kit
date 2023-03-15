@@ -10,6 +10,8 @@ import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistSecondaryButtonGroup from './wishlist-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
+import {rest} from 'msw'
+import {mockedProductLists, mockedWishListProducts} from '../index.mock'
 
 const mockData = {
     creationDate: '2021-09-13T23:29:23.396Z',
@@ -343,20 +345,34 @@ const MockedComponent = (props) => {
     const product = mockData.customerProductListItems[0].product
     return (
         <ItemVariantProvider variant={{...product, productName: product.name}}>
-            <WishlistSecondaryButtonGroup {...props} />
+            <WishlistSecondaryButtonGroup productListItemId="some_id" {...props} />
         </ItemVariantProvider>
     )
 }
 
 beforeEach(() => {
     jest.resetModules()
+
+    global.server.use(
+        // For `useWishList`
+        rest.get('*/products', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedWishListProducts))
+        }),
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductLists))
+        }),
+        rest.delete(
+            '*/customers/:customerId/product-lists/:listId/items/:itemId',
+            (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(204))
+            }
+        )
+    )
 })
 
 test('can remove item', async () => {
     const mockedHandler = jest.fn()
-    renderWithProviders(
-        <MockedComponent onActionStart={mockedHandler} onActionEnd={mockedHandler} />
-    )
+    renderWithProviders(<MockedComponent onClick={mockedHandler} />)
 
     const removeButton = await screen.findByRole('button', {
         name: /remove/i
@@ -367,6 +383,6 @@ test('can remove item', async () => {
     user.click(confirmButton)
 
     await waitFor(() => {
-        expect(mockedHandler).toHaveBeenCalledTimes(2)
+        expect(mockedHandler).toHaveBeenCalled()
     })
 })
