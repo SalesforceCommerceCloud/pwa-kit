@@ -15,6 +15,10 @@ const onClient = typeof window !== 'undefined'
  *
  */
 const useUsid = (): string | null => {
+    if (onClient) {
+        const config = useConfig()
+        return useLocalStorage(`${config.siteId}_usid`)
+    }
     const auth = useAuthContext()
     return auth.get('usid')
 }

@@ -17,6 +17,10 @@ const onClient = typeof window !== 'undefined'
  *
  */
 const useEncUserId = (): string | null => {
+    if (onClient) {
+        const config = useConfig()
+        return useLocalStorage(`${config.siteId}_enc_user_id`)
+    }
     const auth = useAuthContext()
     return auth.get('enc_user_id')
 }

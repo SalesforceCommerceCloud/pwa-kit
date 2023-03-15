@@ -15,6 +15,10 @@ const onClient = typeof window !== 'undefined'
  *
  */
 const useAccessToken = (): string | null => {
+    if (onClient) {
+        const config = useConfig()
+        return useLocalStorage(`${config.siteId}_access_token`)
+    }
     const auth = useAuthContext()
     return auth.get('access_token')
 }
