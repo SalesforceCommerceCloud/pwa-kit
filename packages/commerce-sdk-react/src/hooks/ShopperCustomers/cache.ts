@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {Query} from '@tanstack/react-query'
-import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {getCustomerProductListItem, QueryKeys} from './queryKeyHelpers'
 import {ApiClients, CacheUpdate, CacheUpdateMatrix, Tail} from '../types'
 import {
