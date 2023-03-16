@@ -50,7 +50,7 @@ const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products, isLoading: isProductsLoading} = useProducts(
+    const {data: products} = useProducts(
         {
             parameters: {
                 ids: productIds,
@@ -311,7 +311,7 @@ const Cart = () => {
         return <CartSkeleton />
     }
 
-    if (!isLoading && !isProductsLoading && !basket?.productItems?.length) {
+    if (!isLoading && !basket?.productItems?.length) {
         return <EmptyCart isRegistered={isRegistered} />
     }
     return (
@@ -332,7 +332,7 @@ const Cart = () => {
                         >
                             <GridItem>
                                 <Stack spacing={4}>
-                                    {basket.productItems.map((productItem, idx) => {
+                                    {basket.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem
                                                 key={productItem.productId}
