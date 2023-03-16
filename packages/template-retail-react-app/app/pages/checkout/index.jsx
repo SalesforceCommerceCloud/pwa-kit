@@ -12,7 +12,7 @@ import {CheckoutProvider, useCheckout} from './util/checkout-context'
 import ContactInfo from './partials/contact-info'
 import ShippingAddress from './partials/shipping-address'
 import ShippingOptions from './partials/shipping-options'
-// import Payment from './partials/payment'
+import Payment from './partials/payment'
 import OrderSummary from '../../components/order-summary'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {useCurrentBasket} from '../../hooks/use-current-basket'
@@ -61,7 +61,7 @@ const Checkout = () => {
                             <ContactInfo />
                             <ShippingAddress />
                             <ShippingOptions />
-                            {/* <Payment /> */}
+                            <Payment />
 
                             {step === 4 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>

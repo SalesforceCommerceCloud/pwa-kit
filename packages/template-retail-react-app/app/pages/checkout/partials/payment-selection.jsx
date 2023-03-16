@@ -20,14 +20,16 @@ import {
     Tooltip
 } from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
+import { useCurrentBasket } from '../../../hooks/use-current-basket'
+import { useCurrentCustomer } from '../../../hooks/use-current-customer'
 import {LockIcon, PaypalIcon} from '../../../components/icons'
-import {useCheckout} from '../util/checkout-context'
 import CreditCardFields from '../../../components/forms/credit-card-fields'
 import CCRadioGroup from './cc-radio-group'
 
 const PaymentSelection = ({form, hideSubmitButton, onSubmit = () => null}) => {
     const {formatMessage} = useIntl()
-    const {customer, basket} = useCheckout()
+    const {data: basket} = useCurrentBasket()
+    const {data: customer} = useCurrentCustomer()
 
     const hasSavedCards = customer?.paymentInstruments?.length > 0
 

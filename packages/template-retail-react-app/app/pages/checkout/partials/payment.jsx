@@ -8,6 +8,8 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
+import {usePaymentMethodsForBasket} from 'commerce-sdk-react-preview'
+import { useCurrentBasket } from '../../../hooks/use-current-basket'
 import {useCheckout} from '../util/checkout-context'
 import usePaymentForms from '../util/usePaymentForms'
 import {getCreditCardIcon} from '../../../utils/cc-utils'
@@ -19,15 +21,19 @@ import {PromoCode, usePromoCode} from '../../../components/promo-code'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
+    const {data: basket} = useCurrentBasket()
+    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+    const selectedBillingAddress = basket?.billingAddress
+    const selectedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
     const {
         step,
         checkoutSteps,
         setCheckoutStep,
-        selectedShippingAddress,
-        selectedBillingAddress,
-        selectedPayment,
-        getPaymentMethods,
+        // selectedShippingAddress,
+        // selectedBillingAddress,
+        // selectedPayment,
+        // getPaymentMethods,
         removePayment
     } = useCheckout()
 
@@ -41,9 +47,21 @@ const Payment = () => {
 
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
 
-    useEffect(() => {
-        getPaymentMethods()
-    }, [])
+    // const {data: shippingMethods} = useShippingMethodsForShipment(
+    //     {
+    //         parameters: {
+    //             basketId: basket.basketId,
+    //             shipmentId: 'me'
+    //         }
+    //     },
+    //     {
+    //         enabled: Boolean(basket.basketId) && step === checkoutSteps.ShippingOptions
+    //     }
+    // )
+
+    // useEffect(() => {
+    //     getPaymentMethods()
+    // }, [])
 
     return (
         <ToggleCard

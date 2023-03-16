@@ -7,16 +7,21 @@
 import {useEffect, useState} from 'react'
 import {useForm} from 'react-hook-form'
 import {useCheckout} from '../util/checkout-context'
+import { useCurrentBasket } from '../../../hooks/use-current-basket'
 
 /**
  * A hook for managing and coordinating the billing address and payment method forms.
  * @returns {Object}
  */
 const usePaymentForms = () => {
+    const {data: basket} = useCurrentBasket()
+    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+    const selectedBillingAddress = basket?.billingAddress
+    const selectedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
     const {
-        selectedPayment,
-        selectedBillingAddress,
-        selectedShippingAddress,
+        // selectedPayment,
+        // selectedBillingAddress,
+        // selectedShippingAddress,
         setPayment,
         setBillingAddress,
         isBillingSameAsShipping,
