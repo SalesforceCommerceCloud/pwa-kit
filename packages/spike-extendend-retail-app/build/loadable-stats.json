@@ -1,11 +1,12 @@
 {
   "name": "client",
-  "hash": "1b6e4be3376fc2911e65",
+  "hash": "129669c624f70028bb79",
   "publicPath": "/mobify/bundle/development/",
-  "outputPath": "/Users/bfeister/dev/pwa-kit/packages/spike-extendend-retail-app/build",
+  "outputPath": "/Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
     "main": [
-      "main.js"
+      "main.js",
+      "main.6691015a7312e284a4a5.hot-update.js"
     ],
     "pages-home": [
       "pages-home.js"
@@ -34,8 +35,9 @@
     "^retail-react-app-app-pages-login-redirect": [
       "^retail-react-app-app-pages-login-redirect.js"
     ],
-    "^retail-react-app-app-pages-product-detail": [
-      "^retail-react-app-app-pages-product-detail.js"
+    "pages-product-detail": [
+      "pages-product-detail.js",
+      "pages-product-detail.6691015a7312e284a4a5.hot-update.js"
     ],
     "^retail-react-app-app-pages-product-list": [
       "^retail-react-app-app-pages-product-list.js"
@@ -81,7 +83,7 @@
     {
       "type": "asset",
       "name": "main.js",
-      "size": 1168115,
+      "size": 1167971,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -623,26 +625,53 @@
     },
     {
       "type": "asset",
-      "name": "^retail-react-app-app-pages-product-detail.js",
-      "size": 33911,
+      "name": "pages-product-detail.js",
+      "size": 35299,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "^retail-react-app-app-pages-product-detail.js.map"
+          "sourceMap": "pages-product-detail.js.map"
         }
       },
       "chunkNames": [
-        "^retail-react-app-app-pages-product-detail"
+        "pages-product-detail"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "^retail-react-app-app-pages-product-detail"
+        "pages-product-detail"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-product-detail.6691015a7312e284a4a5.hot-update.js",
+      "size": 26290,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "6691015a7312e284a4a5",
+        "related": {
+          "sourceMap": "pages-product-detail.6691015a7312e284a4a5.hot-update.js.map"
+        }
+      },
+      "chunkNames": [
+        "pages-product-detail"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "pages-product-detail"
       ],
       "auxiliaryChunks": []
     },
@@ -773,6 +802,33 @@
     },
     {
       "type": "asset",
+      "name": "main.6691015a7312e284a4a5.hot-update.js",
+      "size": 370,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "6691015a7312e284a4a5",
+        "related": {
+          "sourceMap": "main.6691015a7312e284a4a5.hot-update.js.map"
+        }
+      },
+      "chunkNames": [
+        "main"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "main"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
       "name": "_8dba.js",
       "size": 284,
       "emitted": false,
@@ -816,6 +872,25 @@
         "_cc12"
       ],
       "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "main.6691015a7312e284a4a5.hot-update.json",
+      "size": 51,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "6691015a7312e284a4a5"
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [],
+      "auxiliaryChunks": []
     }
   ],
   "namedChunkGroups": {
@@ -831,11 +906,14 @@
         },
         {
           "name": "main.js"
+        },
+        {
+          "name": "main.6691015a7312e284a4a5.hot-update.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 2,
+      "filteredAuxiliaryAssets": 3,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -1057,23 +1135,26 @@
       "children": {},
       "childAssets": {}
     },
-    "^retail-react-app-app-pages-product-detail": {
-      "name": "^retail-react-app-app-pages-product-detail",
+    "pages-product-detail": {
+      "name": "pages-product-detail",
       "chunks": [
         "template-retail-react-app_app_partials_product-view_index_jsx",
-        "^retail-react-app-app-pages-product-detail"
+        "pages-product-detail"
       ],
       "assets": [
         {
           "name": "template-retail-react-app_app_partials_product-view_index_jsx.js"
         },
         {
-          "name": "^retail-react-app-app-pages-product-detail.js"
+          "name": "pages-product-detail.js"
+        },
+        {
+          "name": "pages-product-detail.6691015a7312e284a4a5.hot-update.js"
         }
       ],
       "filteredAssets": 0,
       "assetsSize": null,
-      "filteredAuxiliaryAssets": 2,
+      "filteredAuxiliaryAssets": 3,
       "auxiliaryAssetsSize": null,
       "children": {},
       "childAssets": {}
@@ -1151,7 +1232,8 @@
     {
       "id": "main",
       "files": [
-        "main.js"
+        "main.js",
+        "main.6691015a7312e284a4a5.hot-update.js"
       ]
     },
     {
@@ -1293,9 +1375,10 @@
       ]
     },
     {
-      "id": "^retail-react-app-app-pages-product-detail",
+      "id": "pages-product-detail",
       "files": [
-        "^retail-react-app-app-pages-product-detail.js"
+        "pages-product-detail.js",
+        "pages-product-detail.6691015a7312e284a4a5.hot-update.js"
       ]
     },
     {
