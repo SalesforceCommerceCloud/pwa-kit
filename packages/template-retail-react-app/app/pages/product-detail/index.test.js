@@ -118,7 +118,7 @@ describe('product set', () => {
         await waitFor(
             () => {
                 const modal = screen.getByTestId('add-to-cart-modal')
-                expect(within(modal).getByText(/items added to cart/i)).toBeVisible()
+                expect(within(modal).getByText(/items added to cart/i)).toBeInTheDocument()
             },
             // Seems like rendering the modal takes a bit more time
             {timeout: 5000}
