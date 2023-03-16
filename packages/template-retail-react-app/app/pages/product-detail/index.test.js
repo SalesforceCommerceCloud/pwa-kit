@@ -39,13 +39,16 @@ beforeEach(() => {
     global.server.use(
         // By default, the page will be rendered with a product set
         rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(mockedProductSet))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductSet))
         }),
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         }),
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.json(mockedCustomerProductLists))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedCustomerProductLists))
+        }),
+        rest.post('*/v3/activities/EinsteinTestSite/*', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
         })
     )
 
@@ -57,8 +60,6 @@ beforeEach(() => {
 afterEach(() => {
     jest.resetModules()
 })
-
-// TODO: fix "Einstein request failed"
 
 test('should render product details page', async () => {
     global.server.use(
