@@ -10,7 +10,8 @@ import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistSecondaryButtonGroup from './wishlist-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import useWishlist from '../../../../hooks/use-wishlist'
+import {rest} from 'msw'
+import {mockedProductLists, mockedWishListProducts} from '../index.mock'
 
 const mockData = {
     creationDate: '2021-09-13T23:29:23.396Z',
@@ -340,44 +341,48 @@ const mockData = {
     type: 'wish_list'
 }
 
-jest.mock('../../../../hooks/use-wishlist')
-
-const MockedComponent = () => {
+const MockedComponent = (props) => {
     const product = mockData.customerProductListItems[0].product
     return (
         <ItemVariantProvider variant={{...product, productName: product.name}}>
-            <WishlistSecondaryButtonGroup />
+            <WishlistSecondaryButtonGroup productListItemId="some_id" {...props} />
         </ItemVariantProvider>
     )
 }
 
 beforeEach(() => {
     jest.resetModules()
+
+    global.server.use(
+        // For `useWishList`
+        rest.get('*/products', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedWishListProducts))
+        }),
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductLists))
+        }),
+        rest.delete(
+            '*/customers/:customerId/product-lists/:listId/items/:itemId',
+            (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(204))
+            }
+        )
+    )
 })
 
 test('can remove item', async () => {
-    const removeItemMock = jest.fn().mockResolvedValue(true)
-    useWishlist.mockReturnValue({
-        isInitialized: true,
-        isEmpty: false,
-        hasDetail: true,
-        data: mockData,
-        removeListItem: removeItemMock
-    })
-    renderWithProviders(<MockedComponent />)
-    const removeButton = screen.getByRole('button', {
+    const mockedHandler = jest.fn()
+    renderWithProviders(<MockedComponent onClick={mockedHandler} />)
+
+    const removeButton = await screen.findByRole('button', {
         name: /remove/i
     })
-    expect(removeButton).toBeInTheDocument()
     user.click(removeButton)
 
-    const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
-    await waitFor(() => {
-        // Chakra UI renders multiple elements with toast title in DOM for accessibility.
-        // We need to assert the actual text within the alert
-        expect(confirmButton).toBeInTheDocument()
-    })
-
+    const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
     user.click(confirmButton)
-    expect(removeItemMock).toHaveBeenCalled()
+
+    await waitFor(() => {
+        expect(mockedHandler).toHaveBeenCalled()
+    })
 })
