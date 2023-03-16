@@ -39,9 +39,11 @@ import useEinstein from '^retail-react-app/app/commerce-api/hooks/useEinstein'
 // Constants
 import {
     MAX_CACHE_AGE,
-    HOME_SHOP_PRODUCTS_CATEGORY_ID,
+    HOME_SHOP_PRODUCTS_CATEGORY_ID as categoryBase,
     HOME_SHOP_PRODUCTS_LIMIT,
 } from '^retail-react-app/app/constants'
+
+import {HOME_SHOP_PRODUCTS_CATEGORY_ID as categoryOverride} from '../../constants.js'
 
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
@@ -307,10 +309,12 @@ Home.getProps = async ({res, api}) => {
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
+    console.log('CATEGORY FROM BASELINE', categoryBase)
+    console.log('CATEGORY FROM OVERRIDES', categoryOverride)
 
     const productSearchResult = await api.shopperSearch.productSearch({
         parameters: {
-            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+            refine: [`cgid=${categoryOverride}`, 'htype=master'],
             limit: HOME_SHOP_PRODUCTS_LIMIT,
         },
     })
