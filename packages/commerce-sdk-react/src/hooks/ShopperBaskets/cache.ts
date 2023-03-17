@@ -133,10 +133,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 ...(customerId && basketId
                     ? [
                           {
-                              // @ts-ignore
                               queryKey: getCustomerBaskets.queryKey({
                                   ...parameters,
-                                  basketId,
                                   customerId
                               }),
                               updater: (oldData: CustomerBasketsResult | undefined) =>
