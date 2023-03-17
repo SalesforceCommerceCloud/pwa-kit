@@ -268,15 +268,19 @@ class Auth {
      */
     async queueRequest(fn: () => Promise<TokenResponse>, isGuest: boolean) {
         const queue = this.pendingToken ?? Promise.resolve()
-        this.pendingToken = queue.then(async () => {
-            const token = await fn()
-            this.handleTokenResponse(token, isGuest)
+        this.pendingToken = queue
+            .then(async () => {
+                const token = await fn()
+                this.handleTokenResponse(token, isGuest)
 
-            // Q: Why don't we just return token? Why re-construct the same object again?
-            // A: because a user could open multiple tabs and the data in memory could be out-dated
-            // We must always grab the data from the storage (cookie/localstorage) directly
-            return this.data
-        })
+                // Q: Why don't we just return token? Why re-construct the same object again?
+                // A: because a user could open multiple tabs and the data in memory could be out-dated
+                // We must always grab the data from the storage (cookie/localstorage) directly
+                return this.data
+            })
+            .finally(() => {
+                this.pendingToken = undefined
+            })
         return this.pendingToken
     }
 
@@ -293,27 +297,31 @@ class Auth {
      */
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
+            console.log('--- fetched token:', this.fetchedToken)
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
             this.set('usid', usid)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
-            this.pendingToken = Promise.resolve(this.data)
-            return this.pendingToken
+            return Promise.resolve(this.data)
         }
+        // TODO: in my scenario, the code exits early here. It should continue on and refresh the token.
         if (this.pendingToken) {
+            console.log('--- return pending token')
             return this.pendingToken
         }
         const accessToken = this.get('access_token')
+        console.log('--- got access token:', accessToken)
 
         if (accessToken && !this.isTokenExpired(accessToken)) {
-            this.pendingToken = Promise.resolve(this.data)
-            return this.pendingToken
+            console.log('--- has access token that is not expired')
+            return Promise.resolve(this.data)
         }
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
         if (refreshToken) {
+            console.log('--- using refresh token:', refreshToken)
             try {
                 return this.queueRequest(
                     () => helpers.refreshAccessToken(this.client, {refreshToken}),
@@ -324,6 +332,7 @@ class Auth {
                 // we continue with the PKCE guest user flow.
             }
         }
+        console.log('--- logging in')
         return this.queueRequest(
             () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
             true
