@@ -17,18 +17,6 @@ import mockConfig from '../../../config/mocks/default'
 import {rest} from 'msw'
 import {mockCustomerBaskets} from '../../commerce-api/mock-data'
 
-//TODO: Remove this when fetchedToken bug is fixed. The bug caused customerId to be null, hence basket is never available.
-jest.mock('commerce-sdk-react-preview', () => {
-    const originModule = jest.requireActual('commerce-sdk-react-preview')
-    return {
-        ...originModule,
-        useCustomerId: jest.fn().mockReturnValue('customer_id'),
-        useCustomerType: jest
-            .fn()
-            .mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
-    }
-})
-
 beforeEach(() => {
     clearSessionJSONItem(RECENT_SEARCH_KEY)
     jest.resetModules()
