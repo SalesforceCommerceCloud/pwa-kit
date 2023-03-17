@@ -23,4 +23,10 @@ const useAccessToken = (): string | null => {
     return auth.get('access_token')
 }
 
+export const useAccessTokenAsync = async () => {
+    const auth = useAuthContext()
+    const {access_token} = await auth.ready()
+    return access_token
+}
+
 export default useAccessToken

@@ -7,7 +7,12 @@
 import {useMemo, useState} from 'react'
 import fetch from 'cross-fetch'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {useCommerceApi, useAccessToken, useUsid, useEncUserId} from 'commerce-sdk-react-preview'
+import {
+    useCommerceApi,
+    useAccessTokenAsync,
+    useUsid,
+    useEncUserId
+} from 'commerce-sdk-react-preview'
 import {keysToCamel} from '../utils/utils'
 
 export class EinsteinAPI {
@@ -389,7 +394,7 @@ export class EinsteinAPI {
 
 const useEinstein = () => {
     const api = useCommerceApi()
-    const token = useAccessToken()
+    const tokenPromise = useAccessTokenAsync()
     const {
         app: {einsteinAPI: config}
     } = getConfig()
@@ -415,6 +420,7 @@ const useEinstein = () => {
     const fetchRecProductDetails = async (reco) => {
         const ids = reco.recs?.map((rec) => rec.id)
         if (ids?.length > 0) {
+            const token = await tokenPromise
             // Fetch the product details for the recommendations
             const products = await api.shopperProducts.getProducts({
                 parameters: {ids: ids.join(',')},
