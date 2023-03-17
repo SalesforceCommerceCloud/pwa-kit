@@ -8,7 +8,6 @@ import {Query, QueryClient} from '@tanstack/react-query'
 import {
     ApiClient,
     ApiOptions,
-    ApiParameter,
     CacheUpdate,
     MergedOptions,
     NullToOptional,
@@ -53,59 +52,6 @@ export const pathStartsWith =
     (search: readonly (string | undefined)[]) =>
     ({queryKey}: Query): boolean =>
         queryKey.length >= search.length && search.every((lookup, idx) => queryKey[idx] === lookup)
-
-/** Creates a query predicate that determines whether a query key fully matches the given path segments. */
-export const matchesPath =
-    (search: readonly (string | undefined)[]) =>
-    ({queryKey}: Query): boolean =>
-        // ApiQueryKey = [...path, parameters]
-        queryKey.length === 1 + search.length &&
-        search.every((lookup, idx) => queryKey[idx] === lookup)
-
-/** Does an equality check for two API parameter values */
-const matchParameter = (search: ApiParameter, param: unknown): boolean => {
-    // 1. Are they matching primitives?
-    if (search === param) return true
-    // 2. They're not both primitives. Are they both arrays?
-    if (!Array.isArray(search) || !Array.isArray(param)) return false
-    // 3. They're both arrays. Are they the same length?
-    if (search.length !== param.length) return false
-    // 4. They're the same length. Do all of the values match?
-    return param.every((value, index) => search[index] === value)
-}
-
-/**
- * Creates a query predicate that determines whether the parameters of the query key exactly match
- * the search object. NOTE: This returns `true` even when the query key has additional properties.
- */
-export const matchParametersStrict =
-    (search: Record<string, ApiParameter>) =>
-    ({queryKey}: Query): boolean => {
-        const parameters = queryKey[queryKey.length - 1]
-        if (!isObject(parameters)) return false
-        const searchEntries = Object.entries(search)
-        return (
-            // Can't be a match if we're looking for more values than we have
-            searchEntries.length <= Object.keys(parameters).length &&
-            searchEntries.every(([key, lookup]) => matchParameter(lookup, parameters[key]))
-        )
-    }
-
-/**
- * Creates a query predicate that determines whether the parameters of the query key match the
- * search object, if the value on the search object is not `undefined`.
- */
-export const matchParameters = (
-    parameters: Record<string, ApiParameter | undefined>,
-    keys = Object.keys(parameters)
-) => {
-    const search: Record<string, ApiParameter> = {}
-    for (const key of keys) {
-        const value = parameters[key]
-        if (value !== undefined) search[key] = value
-    }
-    return matchParametersStrict(search)
-}
 
 /** Creates a query predicate that returns true if all of the given predicates return true. */
 export const and =

@@ -66,7 +66,6 @@ export type NullToOptional<T> = Omit<T, NullKeys<T>> & {
 }
 
 // --- API CLIENTS --- //
-export type ApiParameter = string | number | boolean | string[] | number[]
 
 export type ApiClientConfigParams = {
     clientId: string
