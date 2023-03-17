@@ -146,7 +146,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                           }
                       ]
                     : [])
-            ]
+            ],
+            ...(!basketId && invalidateCustomerBasketsQuery(customerId, parameters))
         }
     },
     createShipmentForBasket: TODO('createShipmentForBasket'),
@@ -170,10 +171,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 ...(customerId && basketId
                     ? [
                           {
-                              // @ts-ignore
                               queryKey: getCustomerBaskets.queryKey({
                                   ...parameters,
-                                  basketId,
                                   customerId
                               }),
                               updater: (oldData: CustomerBasketsResult | undefined) =>
