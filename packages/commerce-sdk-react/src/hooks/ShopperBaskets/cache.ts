@@ -129,7 +129,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
 
         return {
             update: [
-                {queryKey: getBasket.queryKey(parameters)},
+                {queryKey: getBasket.queryKey({...parameters, basketId})},
                 ...(customerId && basketId
                     ? [
                           {
@@ -167,7 +167,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         const {basketId} = response
         return {
             update: [
-                {queryKey: getBasket.queryKey(parameters)},
+                {queryKey: getBasket.queryKey({...parameters, basketId})},
                 ...(customerId && basketId
                     ? [
                           {
