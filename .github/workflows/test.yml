@@ -13,6 +13,7 @@ on:
   # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
   # https://docs.github.com/en/actions/managing-workflow-runs/approving-workflow-runs-from-public-forks
   pull_request: # Default: opened, reopened, synchronize (head branch updated)
+  merge_group: # Trigger GA workflow when a pull request is added to a merge queue.
   push:
     branches:
       - develop
