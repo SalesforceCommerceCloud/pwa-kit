@@ -271,7 +271,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * removeSiteLocaleFromPath(/RefArch/en-US/account/wishlist)
  * // returns '/account/wishlist'
  */
-export const removeSiteLocaleFromPath = (pathName) => {
+export const removeSiteLocaleFromPath = (pathName = '') => {
     let {siteRef, localeRef} = getParamsFromPath(`${pathName}`)
 
     // remove the site alias from the current pathName
