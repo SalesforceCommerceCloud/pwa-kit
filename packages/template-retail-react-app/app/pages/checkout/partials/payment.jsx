@@ -4,17 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
-import {usePaymentMethodsForBasket} from 'commerce-sdk-react-preview'
-import { useCurrentBasket } from '../../../hooks/use-current-basket'
+import {useForm} from 'react-hook-form'
+import {useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {useCheckout} from '../util/checkout-context'
 import usePaymentForms from '../util/usePaymentForms'
-import {getCreditCardIcon} from '../../../utils/cc-utils'
+import {getPaymentInstrumentCardType, getCreditCardIcon} from '../../../utils/cc-utils'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
-import PaymentSelection from './payment-selection'
+import PaymentForm from './payment-form'
 import ShippingAddressSelection from './shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
 import {PromoCode, usePromoCode} from '../../../components/promo-code'
@@ -25,6 +26,10 @@ const Payment = () => {
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const selectedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
+
+    const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
+        'addPaymentInstrumentToBasket'
+    )
 
     const {
         step,
@@ -38,15 +43,81 @@ const Payment = () => {
     } = useCheckout()
 
     const {
-        paymentMethodForm,
+        // paymentMethodForm,
         billingAddressForm,
         billingSameAsShipping,
-        setBillingSameAsShipping,
-        reviewOrder
+        setBillingSameAsShipping
+        // reviewOrder
     } = usePaymentForms()
 
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
 
+    const paymentMethodForm = useForm()
+
+    const onPaymentSubmit = async () => {
+        console.log('onPaymentSubmit')
+        const isFormValid = await paymentMethodForm.trigger()
+
+        if (!isFormValid) {
+            return
+        }
+
+        const formValue = paymentMethodForm.getValues()
+        //         cardType
+        // :
+        // "visa"
+        // expiry
+        // :
+        // "12/26"
+        // holder
+        // :
+        // "test"
+        // number
+        // :
+        // "4111 1111 1111 1111"
+        // securityCode
+        // :
+        // "265"
+
+                // The form gives us the expiration date as `MM/YY` - so we need to split it into
+                // month and year to submit them as individual fields.
+                const [expirationMonth, expirationYear] = formValue.expiry.split('/')
+
+                const paymentInstrument = {
+                    paymentMethodId: 'CREDIT_CARD',
+                    paymentCard: {
+                        holder: formValue.holder,
+                        // maskedNumber: formValue.number.replace(/ /g, ''),
+                        // TODO: SCAPI only takes masked cc number ?
+                        maskedNumber: "*********1234",
+                        cardType: getPaymentInstrumentCardType(formValue.cardType),
+                        expirationMonth: parseInt(expirationMonth),
+                        expirationYear: parseInt(`20${expirationYear}`),
+
+                        // TODO: These fields are required for saving the card to the customer's
+                        // account. Im not sure what they are for or how to get them, so for now
+                        // we're just passing some values to make it work. Need to investigate.
+                        issueNumber: '',
+                        validFromMonth: 1,
+                        validFromYear: 2020
+                    }
+                }
+
+        await addPaymentInstrumentToBasket({parameters: {basketId: basket.basketId}, body: paymentInstrument})
+    }
+    const onBillingSubmit = async () => {
+        console.log('onBillingSubmit')
+        console.log()
+        // function delay(milliseconds) {
+        //     return new Promise(resolve => setTimeout(resolve, milliseconds));
+        //   }
+        //   await delay(1000)
+    }
+
+    const onSubmit = async () => {
+        await onPaymentSubmit()
+        await onBillingSubmit()
+    }
     // const {data: shippingMethods} = useShippingMethodsForShipment(
     //     {
     //         parameters: {
@@ -82,7 +153,7 @@ const Payment = () => {
 
                 <Stack spacing={6}>
                     {!selectedPayment?.paymentCard ? (
-                        <PaymentSelection form={paymentMethodForm} hideSubmitButton />
+                        <PaymentForm form={paymentMethodForm} onSubmit={onPaymentSubmit} />
                     ) : (
                         <Stack spacing={3}>
                             <Heading as="h3" fontSize="md">
@@ -148,7 +219,7 @@ const Payment = () => {
 
                     <Box pt={3}>
                         <Container variant="form">
-                            <Button w="full" onClick={reviewOrder}>
+                            <Button w="full" onClick={onSubmit}>
                                 <FormattedMessage
                                     defaultMessage="Review Order"
                                     id="checkout_payment.button.review_order"

@@ -6,6 +6,7 @@
  */
 import {useEffect, useState} from 'react'
 import {useForm} from 'react-hook-form'
+import {useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 import {useCheckout} from '../util/checkout-context'
 import { useCurrentBasket } from '../../../hooks/use-current-basket'
 
@@ -15,6 +16,9 @@ import { useCurrentBasket } from '../../../hooks/use-current-basket'
  */
 const usePaymentForms = () => {
     const {data: basket} = useCurrentBasket()
+    console.log(basket)
+    const hasPayment = !!basket?.paymentInstruments?.length
+    console.log(hasPayment)
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const selectedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
@@ -22,7 +26,7 @@ const usePaymentForms = () => {
         // selectedPayment,
         // selectedBillingAddress,
         // selectedShippingAddress,
-        setPayment,
+        // setPayment,
         setBillingAddress,
         isBillingSameAsShipping,
         goToNextStep
@@ -32,6 +36,7 @@ const usePaymentForms = () => {
     // checkbox for `Same as shipping address`. We initialize its value by checking if the
     // currently applied billing address matches the currently applied shipping address.
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(isBillingSameAsShipping)
+    const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation('addPaymentInstrumentToBasket')
 
     const paymentMethodForm = useForm()
 
@@ -53,16 +58,40 @@ const usePaymentForms = () => {
     }, [isBillingSameAsShipping])
 
     const submitPaymentMethodForm = async (payment) => {
-        // Make sure we only apply the payment if there isnt already one applied.
-        // This works because a payment cannot be edited, only removed. In the UI,
-        // we ensure that the any applied payment is removed before showing the
-        // the payment form.
-        if (!selectedPayment) {
-            await setPayment(payment)
+        console.log(payment)
+        // const {expiry, paymentInstrumentId, ...selectedPayment} = payment
+
+
+        if (paymentInstrumentId && !selectedPayment) {
+            // get customer payment instrument values?
+            // addPaymentInstrumentToBasket
+            // return
+        }
+        if (paymentInstrumentId && selectedPayment) {
+            // updatePaymentInstrumentToBasket
+            // return
         }
 
-        // Once the payment is applied to the basket, we submit the billing address.
-        return billingAddressForm.handleSubmit(submitBillingAddressForm)()
+        // addPaymentInstrumentToBasket
+        // return
+        
+
+
+        // if (paymentInstrumentId) {
+        //     // Customer selected a saved card
+        //     await addPaymentInstrumentToBasket({
+        //         parameters: {
+        //             basketId: basket.basketId
+        //         },
+        //         body: payment
+        //     })
+        // }
+        // if (!selectedPayment) {
+        //     await setPayment(payment)
+        // }
+
+        // // Once the payment is applied to the basket, we submit the billing address.
+        // return billingAddressForm.handleSubmit(submitBillingAddressForm)()
     }
 
     const submitBillingAddressForm = async (address) => {
