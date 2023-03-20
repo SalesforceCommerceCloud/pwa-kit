@@ -67,7 +67,6 @@ const Home = () => {
             limit: HOME_SHOP_PRODUCTS_LIMIT
         }
     })
-    console.log('productSearchResult', productSearchResult)
 
     /**************** Einstein ****************/
     useEffect(() => {
