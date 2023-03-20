@@ -154,10 +154,11 @@ describe('Auth', () => {
     })
     test('ready - re-use valid access token', () => {
         const auth = new Auth(config)
+        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
 
         const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
-            access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret'),
+            access_token: JWTNotExpired,
             customer_id: 'customer_id',
             enc_user_id: 'enc_user_id',
             expires_in: 1800,
@@ -177,6 +178,8 @@ describe('Auth', () => {
         })
 
         expect(auth.ready()).resolves.toEqual(result)
+        // @ts-expect-error private method
+        expect(auth.pendingToken).toBeUndefined()
     })
     test('ready - use `fetchedToken` and short circuit network request', async () => {
         const fetchedToken = jwt.sign(
@@ -190,6 +193,8 @@ describe('Auth', () => {
         jest.spyOn(auth, 'queueRequest')
         await auth.ready()
         expect(auth.queueRequest).not.toHaveBeenCalled()
+        // @ts-expect-error private method
+        expect(auth.pendingToken).toBeUndefined()
     })
     test('ready - use `fetchedToken` and auth data is populated for registered user', async () => {
         const usid = 'usidddddd'
@@ -228,10 +233,13 @@ describe('Auth', () => {
     })
     test('ready - use refresh token when access token is expired', async () => {
         const auth = new Auth(config)
+        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
+        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
 
+        // To simulate real-world scenario, let's first test with a good valid token
         const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
-            access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret'),
+            access_token: JWTNotExpired,
             customer_id: 'customer_id',
             enc_user_id: 'enc_user_id',
             expires_in: 1800,
@@ -241,14 +249,18 @@ describe('Auth', () => {
             usid: 'usid',
             customer_type: 'guest'
         }
-        // Convert stored format to exposed format
-        const result = {...data, refresh_token: 'refresh_token_guest'}
-        delete result.refresh_token_guest
 
         Object.keys(data).forEach((key) => {
             // @ts-expect-error private method
             auth.set(key, data[key])
         })
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).not.toBeCalled()
+
+        // And then now test with an _expired_ token
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
 
         await auth.ready()
         expect(helpers.refreshAccessToken).toBeCalled()
