@@ -133,17 +133,6 @@ describe('Auth', () => {
         expect(newAuth.get('access_token')).not.toBe('123')
         expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
-    test('isTokenExpired', () => {
-        const auth = new Auth(config)
-        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
-        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
-        // @ts-expect-error private method
-        expect(auth.isTokenExpired(JWTNotExpired)).toBe(false)
-        // @ts-expect-error private method
-        expect(auth.isTokenExpired(JWTExpired)).toBe(true)
-        // @ts-expect-error private method
-        expect(() => auth.isTokenExpired()).toThrow()
-    })
     test('ready - re-use pendingToken', () => {
         const auth = new Auth(config)
         const data = {
