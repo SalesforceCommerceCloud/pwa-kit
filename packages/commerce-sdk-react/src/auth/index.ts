@@ -297,7 +297,6 @@ class Auth {
      */
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
-            console.log('--- fetched token:', this.fetchedToken)
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
@@ -305,23 +304,18 @@ class Auth {
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return Promise.resolve(this.data)
         }
-        // TODO: in my scenario, the code exits early here. It should continue on and refresh the token.
         if (this.pendingToken) {
-            console.log('--- return pending token')
             return this.pendingToken
         }
         const accessToken = this.get('access_token')
-        console.log('--- got access token:', accessToken)
 
         if (accessToken && !this.isTokenExpired(accessToken)) {
-            console.log('--- has access token that is not expired')
             return Promise.resolve(this.data)
         }
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
         if (refreshToken) {
-            console.log('--- using refresh token:', refreshToken)
             try {
                 return this.queueRequest(
                     () => helpers.refreshAccessToken(this.client, {refreshToken}),
@@ -332,7 +326,6 @@ class Auth {
                 // we continue with the PKCE guest user flow.
             }
         }
-        console.log('--- logging in')
         return this.queueRequest(
             () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
             true
