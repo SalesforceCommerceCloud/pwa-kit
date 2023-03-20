@@ -123,7 +123,7 @@ describe('product set', () => {
             // Seems like rendering the modal takes a bit more time
             {timeout: 5000}
         )
-    })
+    }, 30000)
 
     test('add the set to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
