@@ -192,6 +192,7 @@ export type CacheUpdate = {
     update?: CacheUpdateUpdate<unknown>[]
     invalidate?: CacheUpdateInvalidate[]
     remove?: CacheUpdateRemove[]
+    clear?: boolean
 }
 
 /** Generates a collection of cache updates to make for a given request. */

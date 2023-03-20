@@ -84,7 +84,13 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             remove: [{queryKey: getCustomerPaymentInstrument.queryKey(parameters)}]
         }
     },
-    deleteCustomerProductList: TODO('deleteCustomerProductList'),
+    deleteCustomerProductList(customerId, {parameters}) {
+        return {
+            // TODO: Rather than invalidate, can we selectively update?
+            invalidate: [{queryKey: getCustomerProductLists.queryKey(parameters)}],
+            remove: [{queryKey: getCustomerProductList.queryKey(parameters)}]
+        }
+    },
     deleteCustomerProductListItem(customerId, {parameters}) {
         return {
             // TODO: Rather than invalidate, can we selectively update?
@@ -96,7 +102,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         }
     },
     getResetPasswordToken: noop,
-    invalidateCustomerAuth: TODO('invalidateCustomerAuth'),
     // TODO: Should this update the `getCustomer` cache?
     registerCustomer: noop,
     // TODO: Implement when the endpoint exits closed beta.
@@ -133,7 +138,13 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         }
     },
     updateCustomerPassword: noop,
-    updateCustomerProductList: TODO('updateCustomerProductList'),
+    updateCustomerProductList(customerId, {parameters}) {
+        return {
+            update: [{queryKey: getCustomerProductList.queryKey(parameters)}],
+            // TODO: Rather than invalidate, can we selectively update?
+            invalidate: [{queryKey: getCustomerProductLists.queryKey(parameters)}]
+        }
+    },
     updateCustomerProductListItem(customerId, {parameters}) {
         return {
             update: [{queryKey: getCustomerProductListItem.queryKey(parameters)}],

@@ -4,17 +4,33 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {ShopperContextsTypes} from 'commerce-sdk-isomorphic'
 import {ApiClients, CacheUpdateMatrix} from '../types'
+import {getShopperContext} from './queryKeyHelpers'
 
 type Client = ApiClients['shopperContexts']
 
-/** Logs a warning to console (on startup) and returns nothing (method is unimplemented). */
-const TODO = (method: keyof Client) => {
-    console.warn(`Cache logic for '${method}' is not yet implemented.`)
-    return undefined
-}
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
-    updateShopperContext: TODO('updateShopperContext'),
-    createShopperContext: TODO('createShopperContext'),
-    deleteShopperContext: TODO('deleteShopperContext')
+    createShopperContext(customerId, {parameters}) {
+        return {
+            invalidate: [{queryKey: getShopperContext.queryKey(parameters)}]
+        }
+    },
+    updateShopperContext(_customerId, {parameters}, response) {
+        return {
+            update: [
+                {
+                    queryKey: getShopperContext.queryKey(parameters),
+                    updater: (): ShopperContextsTypes.ShopperContext | undefined => ({...response})
+                }
+            ]
+        }
+    },
+    deleteShopperContext(_customerId, {parameters}) {
+        return {
+            remove: [{
+                queryKey: getShopperContext.queryKey(parameters)
+            }]
+        }
+    }
 }

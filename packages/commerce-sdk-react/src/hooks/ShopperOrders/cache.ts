@@ -5,16 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {getCustomerBaskets} from '../ShopperCustomers/queryKeyHelpers'
-import {ApiClients, CacheUpdateMatrix, CacheUpdateUpdate, CacheUpdateInvalidate} from '../types'
+import {ApiClients, Argument, CacheUpdateMatrix, CacheUpdate, CacheUpdateUpdate, CacheUpdateInvalidate, MergedOptions} from '../types'
 import {getOrder} from './queryKeyHelpers'
 
 type Client = ApiClients['shopperOrders']
+/** Parameters that get passed around, includes client config and possible parameters from other endpoints */
+type GetOrderParameters = MergedOptions<Client, Argument<Client['getOrder']>>['parameters']
 
-/** Logs a warning to console (on startup) and returns nothing (method is unimplemented). */
-const TODO = (method: keyof Client) => {
-    console.warn(`Cache logic for '${method}' is not yet implemented.`)
-    return undefined
-}
+const invalidateOrderQuery = (customerId: string | null, {parameters}: {parameters: GetOrderParameters},): CacheUpdate => ({
+    invalidate: [{queryKey: getOrder.queryKey(parameters)}]
+})
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     createOrder(customerId, {parameters}, response) {
@@ -31,7 +31,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             : [{queryKey: getCustomerBaskets.queryKey({...parameters, customerId})}]
         return {update, invalidate}
     },
-    createPaymentInstrumentForOrder: TODO('createPaymentInstrumentForOrder'),
-    removePaymentInstrumentFromOrder: TODO('removePaymentInstrumentFromOrder'),
-    updatePaymentInstrumentForOrder: TODO('updatePaymentInstrumentForOrder')
+    createPaymentInstrumentForOrder: invalidateOrderQuery,
+    removePaymentInstrumentFromOrder: invalidateOrderQuery,
+    updatePaymentInstrumentForOrder: invalidateOrderQuery
 }
