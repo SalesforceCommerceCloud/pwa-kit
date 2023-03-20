@@ -137,19 +137,24 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             const extRe = /\.\w+$/
 
             // returns true if there is a match for the above
-            const hasExt = item?.test?.(extRe)
+            const hasExt = item?.match?.(extRe)
 
             // returns true if the string ends with a '/'
             const hasSlash = item?.endsWith('/')
 
+            // returns true if path ends with file name of 'index'
+            const endsWithIndex = item?.split(extRe)?.[0]?.endsWith?.('index')
+            const noExt = item.replace(extRe, '')
+            if (!endsWithIndex) {
+                patterns.push(noExt)
+                return patterns
+            }
             if (hasExt || !hasSlash) {
-                const noExt = item.replace(extRe, '')
                 const pathNoFile = item
                     .split(/\.\w+$/)[0]
                     .split('/')
                     .slice(0, -1)
                     .join('/')
-
                 patterns.push(minimatch.makeRe('**/*' + noExt + OVERRIDES_EXTENSIONS))
                 patterns.push(minimatch.makeRe('**/*' + pathNoFile))
             }
@@ -168,7 +173,6 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             )
             ?.join('|')})`
     )
-
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
         // NOTE: the way the Template Extensibility feature works, the order in which
