@@ -6,7 +6,6 @@
  */
 
 import React, {useEffect} from 'react'
-import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 
@@ -43,6 +42,8 @@ import {
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
     HOME_SHOP_PRODUCTS_LIMIT
 } from '../../constants'
+import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import {useProductSearch} from 'commerce-sdk-react-preview'
 
 /**
  * This is the home page for Retail React App.
@@ -50,10 +51,22 @@ import {
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = ({productSearchResult, isLoading}) => {
+const Home = () => {
     const intl = useIntl()
     const einstein = useEinstein()
     const {pathname} = useLocation()
+
+    const {res} = useServerContext()
+    if (res) {
+        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+    }
+
+    const {data: productSearchResult, isLoading} = useProductSearch({
+        parameters: {
+            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+            limit: HOME_SHOP_PRODUCTS_LIMIT
+        }
+    })
 
     /**************** Einstein ****************/
     useEffect(() => {
@@ -284,36 +297,5 @@ const Home = ({productSearchResult, isLoading}) => {
 }
 
 Home.getTemplateName = () => 'home'
-
-Home.shouldGetProps = ({previousLocation, location}) =>
-    !previousLocation || previousLocation.pathname !== location.pathname
-
-Home.getProps = async ({res, api}) => {
-    if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-    }
-
-    const productSearchResult = await api.shopperSearch.productSearch({
-        parameters: {
-            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
-            limit: HOME_SHOP_PRODUCTS_LIMIT
-        }
-    })
-
-    return {productSearchResult}
-}
-
-Home.propTypes = {
-    /**
-     * The search result object showing all the product hits, that belong
-     * in the supplied category.
-     */
-    productSearchResult: PropTypes.object,
-    /**
-     * The current state of `getProps` when running this value is `true`, otherwise it's
-     * `false`. (Provided internally)
-     */
-    isLoading: PropTypes.bool
-}
 
 export default Home
