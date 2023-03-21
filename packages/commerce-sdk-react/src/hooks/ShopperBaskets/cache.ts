@@ -4,12 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {
-    ShopperBaskets,
-    ShopperBasketsTypes,
-    ShopperCustomers,
-    ShopperCustomersTypes
-} from 'commerce-sdk-isomorphic'
+import {ShopperBasketsTypes, ShopperCustomers, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {ApiClients, Argument, CacheUpdate, CacheUpdateMatrix, MergedOptions} from '../types'
 import {
     getBasket,
@@ -27,8 +22,6 @@ type Basket = ShopperBasketsTypes.Basket
 type CustomerBasketsResult = ShopperCustomersTypes.BasketsResult
 /** Parameters that get passed around, includes client config and possible parameters from other endpoints */
 type BasketParameters = MergedOptions<Client, Argument<Client['getBasket']>>['parameters']
-/** Parameters that we actually send to the API for `getBasket` */
-type GetBasketParameters = Argument<ShopperBaskets<{shortCode: string}>['getBasket']>['parameters']
 /** Parameters that we actually send to the API for `getCustomerBaskets` */
 type GetCustomerBasketsParameters = Argument<
     ShopperCustomers<{shortCode: string}>['getCustomerBaskets']
@@ -65,12 +58,6 @@ const invalidateCustomerBasketsQuery = (
     }
 }
 
-/** Logs a warning to console (on startup) and returns nothing (method is unimplemented). */
-const TODO = (method: keyof Client) => {
-    console.warn(`Cache logic for '${method}' is not yet implemented.`)
-    return undefined
-}
-
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     addCouponToBasket(customerId, {parameters}, response) {
         return {
@@ -88,7 +75,22 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ]
         }
     },
-    addGiftCertificateItemToBasket: TODO('addGiftCertificateItemToBasket'),
+    addGiftCertificateItemToBasket(customerId, {parameters}, response) {
+        return {
+            update: [
+                {queryKey: getBasket.queryKey(parameters)},
+                ...(customerId
+                    ? [
+                          {
+                              queryKey: getCustomerBaskets.queryKey({...parameters, customerId}),
+                              updater: (oldData: CustomerBasketsResult | undefined) =>
+                                  customerBasketsUpdater(parameters, response, oldData)
+                          }
+                      ]
+                    : [])
+            ]
+        }
+    },
     addItemToBasket(customerId, {parameters}, response) {
         return {
             update: [
@@ -121,9 +123,32 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ]
         }
     },
-    addPriceBooksToBasket: TODO('addPriceBooksToBasket'),
-    addTaxesForBasket: TODO('addTaxesForBasket'),
-    addTaxesForBasketItem: TODO('addTaxesForBasketItem'),
+    addPriceBooksToBasket(customerId, {parameters}) {
+        // TODO: Convert invalidate to an update that removes the matching basket
+        const invalidations = invalidateCustomerBasketsQuery(customerId, parameters)
+        invalidations?.invalidate?.push({queryKey: getPriceBooksForBasket.queryKey(parameters)})
+        return {
+            ...invalidations,
+            update: [{queryKey: getBasket.queryKey(parameters)}]
+        }
+    },
+    addTaxesForBasket(customerId, {parameters}) {
+        return {
+            // TODO: Convert invalidate to an update that removes the matching basket
+            ...invalidateCustomerBasketsQuery(customerId, parameters),
+            update: [
+                {queryKey: getBasket.queryKey(parameters)},
+                {queryKey: getTaxesFromBasket.queryKey(parameters)}
+            ]
+        }
+    },
+    addTaxesForBasketItem(customerId, {parameters}) {
+        return {
+            // TODO: Convert invalidate to an update that removes the matching basket
+            ...invalidateCustomerBasketsQuery(customerId, parameters),
+            update: [{queryKey: getBasket.queryKey(parameters)}]
+        }
+    },
     createBasket(customerId, {parameters}, response) {
         const {basketId} = response
 
@@ -150,16 +175,29 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ...(!basketId && invalidateCustomerBasketsQuery(customerId, parameters))
         }
     },
-    createShipmentForBasket: TODO('createShipmentForBasket'),
+    createShipmentForBasket(customerId, {parameters}, response) {
+        return {
+            update: [
+                {queryKey: getBasket.queryKey(parameters)},
+                ...(customerId
+                    ? [
+                          {
+                              queryKey: getCustomerBaskets.queryKey({...parameters, customerId}),
+                              updater: (oldData: CustomerBasketsResult | undefined) =>
+                                  customerBasketsUpdater(parameters, response, oldData)
+                          }
+                      ]
+                    : [])
+            ]
+        }
+    },
     deleteBasket(customerId, {parameters}) {
         return {
             // TODO: Convert invalidate to an update that removes the matching basket
             ...invalidateCustomerBasketsQuery(customerId, parameters),
             remove: [
                 {queryKey: getBasket.queryKey(parameters)},
-                ...(customerId
-                    ? [{queryKey: getCustomerBaskets.queryKey({...parameters, customerId})}]
-                    : [])
+                {queryKey: getPaymentMethodsForBasket.queryKey(parameters)}
             ]
         }
     },
@@ -203,7 +241,22 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ]
         }
     },
-    removeGiftCertificateItemFromBasket: TODO('removeGiftCertificateItemFromBasket'),
+    removeGiftCertificateItemFromBasket(customerId, {parameters}, response) {
+        return {
+            update: [
+                {queryKey: getBasket.queryKey(parameters)},
+                ...(customerId
+                    ? [
+                          {
+                              queryKey: getCustomerBaskets.queryKey({...parameters, customerId}),
+                              updater: (oldData: CustomerBasketsResult | undefined) =>
+                                  customerBasketsUpdater(parameters, response, oldData)
+                          }
+                      ]
+                    : [])
+            ]
+        }
+    },
     removeItemFromBasket(customerId, {parameters}, response) {
         return {
             update: [
@@ -224,6 +277,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         return {
             update: [
                 {queryKey: getBasket.queryKey(parameters)},
+                {queryKey: getPaymentMethodsForBasket.queryKey(parameters)},
                 ...(customerId
                     ? [
                           {
@@ -236,8 +290,29 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ]
         }
     },
-    removeShipmentFromBasket: TODO('removeShipmentFromBasket'),
-    transferBasket: TODO('transferBasket'),
+    removeShipmentFromBasket(customerId, {parameters}, response) {
+        return {
+            update: [
+                {queryKey: getBasket.queryKey(parameters)},
+                ...(customerId
+                    ? [
+                          {
+                              queryKey: getCustomerBaskets.queryKey({...parameters, customerId}),
+                              updater: (oldData: CustomerBasketsResult | undefined) =>
+                                  customerBasketsUpdater(parameters, response, oldData)
+                          }
+                      ]
+                    : [])
+            ]
+        }
+    },
+    transferBasket(customerId, {parameters}) {
+        return {
+            // TODO: Convert invalidate to an update that removes the matching basket
+            ...invalidateCustomerBasketsQuery(customerId, parameters),
+            update: [{queryKey: getBasket.queryKey(parameters)}]
+        }
+    },
     updateBasket(customerId, {parameters}, response) {
         return {
             update: [
@@ -286,7 +361,22 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ]
         }
     },
-    updateGiftCertificateItemInBasket: TODO('updateGiftCertificateItemInBasket'),
+    updateGiftCertificateItemInBasket(customerId, {parameters}, response) {
+        return {
+            update: [
+                {queryKey: getBasket.queryKey(parameters)},
+                ...(customerId
+                    ? [
+                          {
+                              queryKey: getCustomerBaskets.queryKey({...parameters, customerId}),
+                              updater: (oldData: CustomerBasketsResult | undefined) =>
+                                  customerBasketsUpdater(parameters, response, oldData)
+                          }
+                      ]
+                    : [])
+            ]
+        }
+    },
     updateItemInBasket(customerId, {parameters}, response) {
         return {
             update: [
@@ -307,6 +397,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         return {
             update: [
                 {queryKey: getBasket.queryKey(parameters)},
+                {queryKey: getPaymentMethodsForBasket.queryKey(parameters)},
                 ...(customerId
                     ? [
                           {
@@ -319,11 +410,27 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ]
         }
     },
-    updateShipmentForBasket: TODO('updateShipmentForBasket'),
+    updateShipmentForBasket(customerId, {parameters}, response) {
+        return {
+            update: [
+                {queryKey: getBasket.queryKey(parameters)},
+                ...(customerId
+                    ? [
+                          {
+                              queryKey: getCustomerBaskets.queryKey({...parameters, customerId}),
+                              updater: (oldData: CustomerBasketsResult | undefined) =>
+                                  customerBasketsUpdater(parameters, response, oldData)
+                          }
+                      ]
+                    : [])
+            ]
+        }
+    },
     updateShippingAddressForShipment(customerId, {parameters}, response) {
         return {
             update: [
                 {queryKey: getBasket.queryKey(parameters)},
+                {queryKey: getShippingMethodsForShipment.queryKey(parameters)},
                 ...(customerId
                     ? [
                           {
@@ -340,6 +447,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         return {
             update: [
                 {queryKey: getBasket.queryKey(parameters)},
+                {queryKey: getShippingMethodsForShipment.queryKey(parameters)},
                 ...(customerId
                     ? [
                           {
