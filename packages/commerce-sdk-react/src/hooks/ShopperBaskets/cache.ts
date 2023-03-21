@@ -196,8 +196,12 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             // TODO: Convert invalidate to an update that removes the matching basket
             ...invalidateCustomerBasketsQuery(customerId, parameters),
             remove: [
-                {queryKey: getBasket.queryKey(parameters)},
-                {queryKey: getPaymentMethodsForBasket.queryKey(parameters)}
+                // We want to fuzzy match all query keys that contain starting with the  path
+                // `["/organizations/",${organization},"/baskets/",${basketId}]`
+                {queryKey: getBasket.path(parameters)},
+                ...(customerId
+                    ? [{queryKey: getCustomerBaskets.queryKey({...parameters, customerId})}]
+                    : [])
             ]
         }
     },
