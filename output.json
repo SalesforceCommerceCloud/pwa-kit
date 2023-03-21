@@ -1,0 +1,74 @@
+{
+  "commerce-sdk-react": {
+    "deps": [],
+    "devDeps": [
+      "internal-lib-build"
+    ]
+  },
+  "internal-lib-build": {
+    "deps": [],
+    "devDeps": []
+  },
+  "pwa-kit-create-app": {
+    "deps": [],
+    "devDeps": [
+      "internal-lib-build"
+    ]
+  },
+  "pwa-kit-dev": {
+    "deps": [
+      "pwa-kit-runtime"
+    ],
+    "devDeps": [
+      "internal-lib-build"
+    ]
+  },
+  "pwa-kit-react-sdk": {
+    "deps": [
+      "pwa-kit-runtime"
+    ],
+    "devDeps": [
+      "internal-lib-build"
+    ]
+  },
+  "pwa-kit-runtime": {
+    "deps": [],
+    "devDeps": [
+      "internal-lib-build"
+    ]
+  },
+  "template-express-minimal": {
+    "devDeps": [
+      "pwa-kit-dev",
+      "pwa-kit-runtime"
+    ]
+  },
+  "template-mrt-reference-app": {
+    "devDeps": [
+      "pwa-kit-dev",
+      "pwa-kit-runtime"
+    ]
+  },
+  "template-retail-react-app": {
+    "devDeps": [
+      "pwa-kit-dev",
+      "pwa-kit-react-sdk",
+      "pwa-kit-runtime"
+    ]
+  },
+  "template-typescript-minimal": {
+    "devDeps": [
+      "pwa-kit-dev",
+      "pwa-kit-react-sdk",
+      "pwa-kit-runtime"
+    ]
+  },
+  "test-commerce-sdk-react": {
+    "devDeps": [
+      "internal-lib-build",
+      "pwa-kit-dev",
+      "pwa-kit-react-sdk",
+      "pwa-kit-runtime"
+    ]
+  }
+}

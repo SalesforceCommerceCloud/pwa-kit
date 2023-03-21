@@ -88,7 +88,6 @@
     "minimatch": "3.0.5",
     "open": "^8.4.0",
     "prettier": "^2.8.3",
-    "pwa-kit-runtime": "^2.8.0-dev",
     "react-refresh": "^0.13.0",
     "replace-in-file": "^6.2.0",
     "request": "^2.88.0",
@@ -109,7 +108,6 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.0",
-    "internal-lib-build": "^2.8.0-dev",
     "nock": "^13.1.1",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
