@@ -29,7 +29,6 @@ export const CheckoutProvider = ({children}) => {
         isGuestCheckout: false,
         shippingMethods: undefined,
         paymentMethods: undefined,
-        globalError: undefined,
         sectionError: undefined
     })
 
@@ -276,7 +275,6 @@ export const CheckoutProvider = ({children}) => {
             },
 
             async placeOrder() {
-                mergeState({globalError: undefined})
                 try {
                     await basket.createOrder()
                 } catch (error) {
@@ -287,7 +285,6 @@ export const CheckoutProvider = ({children}) => {
                         id: 'checkout.message.generic_error',
                         defaultMessage: 'An unexpected error occurred during checkout.'
                     })
-                    mergeState({globalError: message})
                     throw error
                 }
             }

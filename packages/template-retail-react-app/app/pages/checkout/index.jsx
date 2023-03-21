@@ -17,25 +17,44 @@ import OrderSummary from '../../components/order-summary'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 import CheckoutSkeleton from './partials/checkout-skeleton'
+import { useUsid, useShopperOrdersMutation } from 'commerce-sdk-react-preview'
 
 const Checkout = () => {
     const navigate = useNavigation()
-    const {globalError, step, placeOrder} = useCheckout()
+    const usid = useUsid()
+    const {step} = useCheckout()
+    const [error, setError] = useState()
     const {data: basket} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
+    const {mutateAsync: createOrder} = useShopperOrdersMutation(
+        'createOrder'
+    )
     // Scroll to the top when we get a global error
     useEffect(() => {
-        if (globalError || step === 4) {
+        if (error || step === 4) {
             window.scrollTo({top: 0})
         }
-    }, [globalError, step])
+    }, [error, step])
 
     const submitOrder = async () => {
         setIsLoading(true)
         try {
-            await placeOrder()
+            await createOrder({
+                // We send the SLAS usid via this header. This is required by ECOM to map
+                // Einstein events sent via the API with the finishOrder event fired by ECOM
+                // when an Order transitions from Created to New status.
+                // Without this, various order conversion metrics will not appear on reports and dashboards
+                headers: {_sfdc_customer_id: usid},
+                body: {basketId: basket.basketId}
+            })
             navigate('/checkout/confirmation')
         } catch (error) {
+            const message = formatMessage({
+                id: 'checkout.message.generic_error',
+                defaultMessage: 'An unexpected error occurred during checkout.'
+            })
+            setError(message)
+        } finally {
             setIsLoading(false)
         }
     }
@@ -51,10 +70,10 @@ const Checkout = () => {
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, xl: 20}}>
                     <GridItem>
                         <Stack spacing={4}>
-                            {globalError && (
+                            {error && (
                                 <Alert status="error" variant="left-accent">
                                     <AlertIcon />
-                                    {globalError}
+                                    {error}
                                 </Alert>
                             )}
 
