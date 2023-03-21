@@ -12,7 +12,7 @@ const onClient = typeof window !== 'undefined'
 
 interface AccessToken {
     token: string | null
-    tokenWhenReady: Promise<string>
+    getTokenWhenReady: () => Promise<string>
 }
 
 /**
@@ -27,9 +27,9 @@ const useAccessToken = (): AccessToken => {
         ? useLocalStorage(`${config.siteId}_access_token`)
         : auth.get('access_token')
 
-    const tokenWhenReady = auth.ready().then(({access_token}) => access_token)
+    const getTokenWhenReady = () => auth.ready().then(({access_token}) => access_token)
 
-    return {token, tokenWhenReady}
+    return {token, getTokenWhenReady}
 }
 
 export default useAccessToken
