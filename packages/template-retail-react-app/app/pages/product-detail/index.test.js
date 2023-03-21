@@ -46,9 +46,6 @@ beforeEach(() => {
         }),
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedCustomerProductLists))
-        }),
-        rest.post('*/v3/activities/EinsteinTestSite/*', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
         })
     )
 
