@@ -11,7 +11,7 @@ import {Box, Button, Stack, Text, SimpleGrid, FormControl, FormErrorMessage} fro
 import {PlusIcon} from '../../../components/icons'
 import {RadioCard, RadioCardGroup} from '../../../components/radio-card'
 import {getCreditCardIcon} from '../../../utils/cc-utils'
-import { useCurrentCustomer } from '../../../hooks/use-current-customer'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 
 const CCRadioGroup = ({
     form,

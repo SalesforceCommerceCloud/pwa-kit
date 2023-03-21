@@ -21,7 +21,7 @@ export const CheckoutProvider = ({children}) => {
 
     const [state, setState] = useState({
         // step: undefined,
-        isGuestCheckout: false,
+        isGuestCheckout: false
     })
 
     const CheckoutStepsList = [

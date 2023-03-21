@@ -22,7 +22,7 @@ import {
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
-import {useOrder} from 'commerce-sdk-react-preview'
+import {useOrder, useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
 import {getCreditCardIcon} from '../../utils/cc-utils'
 import useNavigation from '../../hooks/use-navigation'
 import Link from '../../components/link'
@@ -40,6 +40,7 @@ const CheckoutConfirmation = () => {
     const {orderNo} = useParams()
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
+    const register = useAuthHelper(AuthHelpers.Register)
     const {data: order} = useOrder({
         parameters: {orderNo}
     })
@@ -61,8 +62,16 @@ const CheckoutConfirmation = () => {
 
     const submitForm = async (data) => {
         try {
-            // TODO: use hook
-            await customer.registerCustomer(data)
+            const body = {
+                customer: {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    email: data.email,
+                    login: data.email
+                },
+                password: data.password
+            }
+            return register.mutateAsync({body})
         } catch (error) {
             const existingAccountMessage = (
                 <Fragment>

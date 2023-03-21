@@ -26,14 +26,7 @@ export default function ShippingAddress() {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
-    const {
-        step,
-        checkoutSteps,
-        isGuestCheckout,
-        setCheckoutStep,
-        goToNextStep
-    } = useCheckout()
-    
+    const {step, checkoutSteps, isGuestCheckout, setCheckoutStep, goToNextStep} = useCheckout()
 
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
