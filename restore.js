@@ -9,13 +9,18 @@ const depMap = require("./output.json");
 const packages = fs.readdirSync("./packages/");
 const { version } = require("./package.json");
 for (const name of packages) {
-  const path = `./packages/${name}/package.json`;
-  const file = fs.readFileSync(path, "utf8");
-  const spaces = file.match(/ +/)[0].length;
-  const pkg = JSON.parse(file);
-  if (pkg.build) pkg.build = pkg.build.replace(/^echo '(.*)'$/, "$1");
-  const { deps = [], devDeps = [] } = depMap[name] ?? {};
-  for (const dep of deps) pkg.dependencies[dep] = version;
-  for (const dep of devDeps) pkg.devDependencies[dep] = version;
-  fs.writeFileSync(path, JSON.stringify(pkg, null, spaces));
+  try {
+    const path = `./packages/${name}/package.json`;
+    const file = fs.readFileSync(path, "utf8");
+    const spaces = file.match(/ +/)[0].length;
+    const pkg = JSON.parse(file);
+    if (pkg.build) pkg.build = pkg.build.replace(/^echo '(.*)'$/, "$1");
+    const { deps = [], devDeps = [] } = depMap[name] ?? {};
+    for (const dep of deps) pkg.dependencies[dep] = version;
+    for (const dep of devDeps) pkg.devDependencies[dep] = version;
+    fs.writeFileSync(path, JSON.stringify(pkg, null, spaces));
+  } catch (err) {
+    err.message += ` [${name}]`;
+    throw err;
+  }
 }
