@@ -74,13 +74,13 @@ const deletedCustomerBaskets: BasketsResult = {
 }
 
 // --- TEST CASES --- //
-/** All Shopper Baskets mutations except these ones have the same cache update logic. */
-type NonResponseMutations = Exclude<
+/** All Shopper Baskets mutations except these have the same cache update logic. */
+type EmptyResponseMutations = Exclude<
     ShopperBasketsMutation,
     'deleteBasket' | 'addPriceBooksToBasket' | 'addTaxesForBasket' | 'addTaxesForBasketItem'
 >
 // This is an object rather than an array to more easily ensure we cover all mutations
-type TestMap = {[Mut in NonResponseMutations]: Argument<Client[Mut]>}
+type TestMap = {[Mut in EmptyResponseMutations]: Argument<Client[Mut]>}
 const testMap: TestMap = {
     addGiftCertificateItemToBasket: createOptions<'addGiftCertificateItemToBasket'>(
         {recipientEmail: 'customer@email', amount: 100},
@@ -142,8 +142,6 @@ const testMap: TestMap = {
     )
 }
 const deleteTestCase = ['deleteBasket', createOptions<'deleteBasket'>(undefined, {})] as const
-
-// TODO: Implement test cases for mutations returning void
 const addPriceBooksToBasketTestCase = [
     'addPriceBooksToBasket',
     createOptions<'addPriceBooksToBasket'>([], {})
@@ -160,14 +158,20 @@ const addTaxesForBasketTestCase = [
 const addTaxesForBasketItemTestCase = [
     'addTaxesForBasketItem',
     createOptions<'addTaxesForBasketItem'>({}, {itemId: 'itemId'})
-]
+] as const
 
 // Type assertion because the built-in type definition for `Object.entries` is limited :\
-const nonDeleteTestCases = Object.entries(testMap) as Array<
-    [NonResponseMutations, Argument<Client[NonResponseMutations]>]
+const emptyResponseTestCases = Object.entries(testMap) as Array<
+    [EmptyResponseMutations, Argument<Client[EmptyResponseMutations]>]
 >
 // Most test cases only apply to non-delete test cases, some (error handling) can include deleteBasket
-const allTestCases = [...nonDeleteTestCases, deleteTestCase]
+const allTestCases = [
+    ...emptyResponseTestCases,
+    deleteTestCase,
+    addPriceBooksToBasketTestCase,
+    addTaxesForBasketTestCase,
+    addTaxesForBasketItemTestCase
+]
 
 describe('ShopperBaskets mutations', () => {
     const storedCustomerIdKey = `${DEFAULT_TEST_CONFIG.siteId}_customer_id`
@@ -181,16 +185,19 @@ describe('ShopperBaskets mutations', () => {
     })
 
     beforeEach(() => nock.cleanAll())
-    test.each(nonDeleteTestCases)('`%s` returns data on success', async (mutationName, options) => {
-        mockMutationEndpoints(basketsEndpoint, oldBasket)
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
-            return useShopperBasketsMutation(mutationName)
-        })
-        expect(result.current.data).toBeUndefined()
-        act(() => result.current.mutate(options))
-        await waitAndExpectSuccess(wait, () => result.current)
-        expect(result.current.data).toEqual(oldBasket)
-    })
+    test.each(emptyResponseTestCases)(
+        '`%s` returns data on success',
+        async (mutationName, options) => {
+            mockMutationEndpoints(basketsEndpoint, oldBasket)
+            const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+                return useShopperBasketsMutation(mutationName)
+            })
+            expect(result.current.data).toBeUndefined()
+            act(() => result.current.mutate(options))
+            await waitAndExpectSuccess(wait, () => result.current)
+            expect(result.current.data).toEqual(oldBasket)
+        }
+    )
     test.each(allTestCases)('`%s` returns error on error', async (mutationName, options) => {
         mockMutationEndpoints(basketsEndpoint, {error: true}, 400)
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
@@ -203,7 +210,7 @@ describe('ShopperBaskets mutations', () => {
         // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
         expect(result.current.error).toHaveProperty('response')
     })
-    test.each(nonDeleteTestCases)(
+    test.each(emptyResponseTestCases)(
         '`%s` updates the cache on success',
         async (mutationName, options) => {
             mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
@@ -247,7 +254,12 @@ describe('ShopperBaskets mutations', () => {
             assertUpdateQuery(result.current.customerBaskets, oldCustomerBaskets)
         }
     )
-    test('`deleteBasket` returns void on success', async () => {
+    test.each([
+        deleteTestCase,
+        addPriceBooksToBasketTestCase,
+        addTaxesForBasketTestCase,
+        addTaxesForBasketItemTestCase
+    ])('`%s` returns void on success', async () => {
         // Almost the standard 'returns data' test, just a different return type
         const [mutationName, options] = deleteTestCase
         mockMutationEndpoints(basketsEndpoint, oldBasket)
