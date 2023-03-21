@@ -21,7 +21,6 @@ export type AuthHelper = (typeof AuthHelpers)[keyof typeof AuthHelpers]
 const noop = () => ({})
 
 type CacheUpdateMatrix = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [Method in AuthHelper]?: (
         options: Argument<Auth[Method]> | void,
         response: ReturnType<Auth[Method]> extends Promise<infer D> ? D : never
