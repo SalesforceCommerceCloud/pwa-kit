@@ -50,7 +50,7 @@ const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products, isLoading: isProductsLoading} = useProducts(
+    const {data: products} = useProducts(
         {
             parameters: {
                 ids: productIds,
@@ -310,6 +310,7 @@ const Cart = () => {
     if (isLoading || isProductsLoading) {
         return <CartSkeleton />
     }
+
     if (!basket?.productItems?.length) {
         return <EmptyCart isRegistered={isRegistered} />
     }

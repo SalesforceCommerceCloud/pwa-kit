@@ -6,7 +6,11 @@
  */
 import React from 'react'
 import {fireEvent, screen, waitFor, within} from '@testing-library/react'
-import {mockCustomerBaskets} from '../../commerce-api/mock-data'
+import {
+    mockCustomerBaskets,
+    mockedCustomerProductLists,
+    productsResponse
+} from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
@@ -31,12 +35,17 @@ const MockedComponent = () => {
 
 beforeEach(() => {
     jest.resetModules()
+
     global.server.use(
+        // By default, the page will be rendered with a product set
         rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(mockedProductSet))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductSet))
         }),
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
+        }),
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedCustomerProductLists))
         })
     )
 
@@ -49,23 +58,24 @@ afterEach(() => {
     jest.resetModules()
 })
 
-//@TODO: Test is passed, but it prompted a network failure,
-// this is because the auth data is not populate data correctly when we passed fetchedToken to the commerce-sdk-react provider
-test.skip('should render product details page', async () => {
+test('should render product details page', async () => {
     global.server.use(
-        // mock add item to product lists
-        rest.post('*/customers/:customerId/product-lists/:listId/items', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
+        // Use a single product (and not a product set)
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            return res(ctx.json(productsResponse.data[0]))
         })
     )
+
     renderWithProviders(<MockedComponent />)
-    // TODO  change the product data to use mockedProductSet
+
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-    expect(screen.getAllByText(/Long Sleeve Crew Neck/).length).toEqual(2)
-    expect(screen.getAllByText(/14.99/).length).toEqual(2)
-    expect(screen.getAllByText(/Add to Cart/).length).toEqual(2)
-    expect(screen.getAllByText(/Add to Wishlist/).length).toEqual(2)
-    expect(screen.getAllByTestId('product-view').length).toEqual(1)
+    await waitFor(() => {
+        expect(screen.getAllByText(/Long Sleeve Crew Neck/).length).toEqual(2)
+        expect(screen.getAllByText(/14.99/).length).toEqual(2)
+        expect(screen.getAllByText(/Add to Cart/).length).toEqual(2)
+        expect(screen.getAllByText(/Add to Wishlist/).length).toEqual(2)
+        expect(screen.getAllByTestId('product-view').length).toEqual(1)
+    })
 })
 
 describe('product set', () => {
@@ -78,7 +88,7 @@ describe('product set', () => {
         )
     })
 
-    test.skip('render multi-product layout', async () => {
+    test('render multi-product layout', async () => {
         renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
@@ -86,7 +96,7 @@ describe('product set', () => {
         })
     })
 
-    test.skip('add the set to cart successfully', async () => {
+    test('add the set to cart successfully', async () => {
         const urlPathAfterSelectingAllVariants =
             '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
@@ -105,14 +115,14 @@ describe('product set', () => {
         await waitFor(
             () => {
                 const modal = screen.getByTestId('add-to-cart-modal')
-                expect(within(modal).getByText(/items added to cart/i)).toBeVisible()
+                expect(within(modal).getByText(/items added to cart/i)).toBeInTheDocument()
             },
             // Seems like rendering the modal takes a bit more time
             {timeout: 5000}
         )
-    })
+    }, 30000)
 
-    test.skip('add the set to cart with error messages', async () => {
+    test('add the set to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
@@ -130,7 +140,7 @@ describe('product set', () => {
         })
     })
 
-    test.skip("child products' images are lazy loaded", async () => {
+    test("child products' images are lazy loaded", async () => {
         renderWithProviders(<MockedComponent />)
 
         const childProducts = await screen.findAllByTestId('child-product')

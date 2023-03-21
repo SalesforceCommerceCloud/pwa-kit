@@ -389,7 +389,7 @@ export class EinsteinAPI {
 
 const useEinstein = () => {
     const api = useCommerceApi()
-    const token = useAccessToken()
+    const {getTokenWhenReady} = useAccessToken()
     const {
         app: {einsteinAPI: config}
     } = getConfig()
@@ -415,6 +415,7 @@ const useEinstein = () => {
     const fetchRecProductDetails = async (reco) => {
         const ids = reco.recs?.map((rec) => rec.id)
         if (ids?.length > 0) {
+            const token = await getTokenWhenReady()
             // Fetch the product details for the recommendations
             const products = await api.shopperProducts.getProducts({
                 parameters: {ids: ids.join(',')},
