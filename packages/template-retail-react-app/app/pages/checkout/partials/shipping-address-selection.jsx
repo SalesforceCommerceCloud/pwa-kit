@@ -8,7 +8,7 @@ import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {Box, Button, Container, Heading, SimpleGrid, Stack} from '@chakra-ui/react'
-import {useForm, Controller} from 'react-hook-form'
+import {Controller} from 'react-hook-form'
 import {shallowEquals} from '../../../utils/utils'
 import {RadioCard, RadioCardGroup} from '../../../components/radio-card'
 import ActionCard from '../../../components/action-card'
@@ -110,16 +110,6 @@ const ShippingAddressSelection = ({
     const hasSavedAddresses = customer.addresses && customer.addresses.length > 0
     const [isEditingAddress, setIsEditingAddress] = useState(!hasSavedAddresses)
     const [selectedAddressId, setSelectedAddressId] = useState(false)
-
-    form =
-        form ||
-        useForm({
-            mode: 'onChange',
-            shouldUnregister: false,
-            defaultValues: {
-                ...selectedAddress
-            }
-        })
 
     const matchedAddress =
         hasSavedAddresses &&

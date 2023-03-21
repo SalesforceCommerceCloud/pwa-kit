@@ -41,6 +41,7 @@ export const watchOnlineStatus = (callback, win = window) => {
  * @returns {boolean}
  */
 export const isMatchingAddress = (addr1, addr2) => {
+    if (!addr1 || !addr2) return false
     const normalize = (addr) => {
         // eslint-disable-next-line no-unused-vars
         const {id, addressId, _type, preferred, creationDate, lastModified, ...normalized} = addr
