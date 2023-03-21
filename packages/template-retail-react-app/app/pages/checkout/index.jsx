@@ -39,7 +39,7 @@ const Checkout = () => {
     const submitOrder = async () => {
         setIsLoading(true)
         try {
-            await createOrder({
+            const order = await createOrder({
                 // We send the SLAS usid via this header. This is required by ECOM to map
                 // Einstein events sent via the API with the finishOrder event fired by ECOM
                 // when an Order transitions from Created to New status.
@@ -47,7 +47,7 @@ const Checkout = () => {
                 headers: {_sfdc_customer_id: usid},
                 body: {basketId: basket.basketId}
             })
-            navigate('/checkout/confirmation')
+            navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
             const message = formatMessage({
                 id: 'checkout.message.generic_error',

@@ -21,9 +21,9 @@ import {
     Divider
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
+import {useParams} from 'react-router-dom'
+import { useOrder } from 'commerce-sdk-react-preview'
 import {getCreditCardIcon} from '../../utils/cc-utils'
-import useBasket from '../../commerce-api/hooks/useBasket'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useNavigation from '../../hooks/use-navigation'
 import Link from '../../components/link'
 import AddressDisplay from '../../components/address-display'
@@ -34,16 +34,18 @@ import CartItemVariantImage from '../../components/item-variant/item-image'
 import CartItemVariantName from '../../components/item-variant/item-name'
 import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
 import CartItemVariantPrice from '../../components/item-variant/item-price'
+import { useCurrentBasket } from '../../hooks/use-current-basket'
+import { useCurrentCustomer } from '../../hooks/use-current-customer'
 
 const CheckoutConfirmation = () => {
+    const {orderNo} = useParams()
     const navigate = useNavigation()
-    const basket = useBasket()
-    const customer = useCustomer()
-
-    // The order data will initially be stored as our basket when first coming to this
-    // page. We capture it in local state to use for our UI. A new basket will be automatically
-    // created so we should only reference our captured order data here.
-    const [order] = useState(basket)
+    const {data: customer} = useCurrentCustomer()
+    const {data: order} = useOrder(
+        {
+            parameters: {orderNo}
+        }
+    )
 
     const form = useForm({
         defaultValues: {
@@ -54,14 +56,6 @@ const CheckoutConfirmation = () => {
         }
     })
 
-    // If we don't have an order object on first render we need to transition back to a
-    // different page. Fow now, we push to the homepage.
-    useEffect(() => {
-        if (!order || order._type !== 'order') {
-            navigate('/')
-        }
-    }, [order])
-
     if (!order || !order.orderNo) {
         return null
     }
@@ -70,6 +64,7 @@ const CheckoutConfirmation = () => {
 
     const submitForm = async (data) => {
         try {
+            // TODO: use hook
             await customer.registerCustomer(data)
         } catch (error) {
             const existingAccountMessage = (
