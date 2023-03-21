@@ -302,7 +302,7 @@ class Auth {
             this.set('customer_id', customerId)
             this.set('usid', usid)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
-            return Promise.resolve(this.data)
+            return this.data
         }
         if (this.pendingToken) {
             return this.pendingToken
@@ -310,7 +310,7 @@ class Auth {
         const accessToken = this.get('access_token')
 
         if (accessToken && !this.isTokenExpired(accessToken)) {
-            return Promise.resolve(this.data)
+            return this.data
         }
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
