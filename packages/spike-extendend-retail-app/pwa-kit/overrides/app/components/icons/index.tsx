@@ -86,12 +86,14 @@ VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
 
 const overrideIcons = ['brand-logo', 'heart']
 
+type ViewBox = { viewBox: string }
+
 /**
  * A helper for creating a Chakra-wrapped icon from our own SVG imports via sprite sheet.
  * @param {string} name - the filename of the imported svg (does not include extension)
  */
 /* istanbul ignore next */
-const icon = (name, passProps) => {
+const icon = (name: string, passProps?: ViewBox) => {
     const displayName = name
         .toLowerCase()
         .replace(/(?:^|[\s-/])\w/g, (match) => match.toUpperCase())
