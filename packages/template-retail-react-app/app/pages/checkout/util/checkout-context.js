@@ -7,10 +7,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import useEinstein from '../../../hooks/use-einstein'
-import {useCommerceAPI} from '../../../commerce-api/contexts'
-import {getPaymentInstrumentCardType} from '../../../utils/cc-utils'
 import {isMatchingAddress} from '../../../utils/utils'
-import {useIntl} from 'react-intl'
 import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
@@ -18,10 +15,8 @@ const CheckoutContext = React.createContext()
 
 export const CheckoutProvider = ({children}) => {
     const mounted = useRef()
-    const api = useCommerceAPI()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
-    const {formatMessage} = useIntl()
     const einstein = useEinstein()
 
     const [state, setState] = useState({
@@ -176,117 +171,6 @@ export const CheckoutProvider = ({children}) => {
 
             setIsGuestCheckout(isGuestCheckout) {
                 mergeState({isGuestCheckout})
-            },
-
-            // Async functions
-            // Convenience methods for interacting with remote customer and basket data.
-            //
-            // @TODO: ALL METHODS BELOW SHOULD BE REMOVED BY THE END OF HOOK INTEGRATION
-            //
-            // ----------------
-
-            /**
-             * Gets the applicable payment methods for the order.
-             */
-            async getPaymentMethods() {
-                const paymentMethods = await api.shopperBaskets.getPaymentMethodsForBasket({
-                    parameters: {basketId: basket.basketId}
-                })
-                mergeState({paymentMethods})
-            },
-
-            /**
-             * Applies the given payment instrument to the basket.
-             * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shoppercustomers.html#orderpaymentinstrument}
-             * @param {Object} payment
-             */
-            async setPayment(payment) {
-                const {expiry, paymentInstrumentId, ...selectedPayment} = payment
-
-                if (paymentInstrumentId) {
-                    // Customer selected a saved card
-                    await basket.setPaymentInstrument({
-                        customerPaymentInstrumentId: paymentInstrumentId
-                    })
-                    return
-                }
-
-                // The form gives us the expiration date as `MM/YY` - so we need to split it into
-                // month and year to submit them as individual fields.
-                const [expirationMonth, expirationYear] = expiry.split('/')
-
-                const paymentInstrument = {
-                    paymentMethodId: 'CREDIT_CARD',
-                    paymentCard: {
-                        ...selectedPayment,
-                        number: selectedPayment.number.replace(/ /g, ''),
-                        cardType: getPaymentInstrumentCardType(selectedPayment.cardType),
-                        expirationMonth: parseInt(expirationMonth),
-                        expirationYear: parseInt(`20${expirationYear}`),
-
-                        // TODO: These fields are required for saving the card to the customer's
-                        // account. Im not sure what they are for or how to get them, so for now
-                        // we're just passing some values to make it work. Need to investigate.
-                        issueNumber: '',
-                        validFromMonth: 1,
-                        validFromYear: 2020
-                    }
-                }
-
-                await basket.setPaymentInstrument(paymentInstrument)
-
-                // Save the payment instrument to the customer's account if they are registered
-                if (!state.isGuestCheckout && !selectedPayment.id) {
-                    customer.addSavedPaymentInstrument(paymentInstrument)
-                }
-            },
-
-            /**
-             * Removes the currently applied payment instrument from the basket. Multiple payment
-             * instruments can be applied to the basket, however we are only dealing with one.
-             */
-            async removePayment() {
-                await basket.removePaymentInstrument()
-            },
-
-            /**
-             * Applies the given address to the basket's billing address. Accepts CustomerAddress and OrderAddress.
-             * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shoppercustomers.html#customeraddress}
-             * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shoppercustomers.html#orderaddress}
-             * @param {Object} addressData
-             */
-            async setBillingAddress(addressData) {
-                const {
-                    id,
-                    preferred,
-                    creationDate,
-                    lastModified,
-                    addressId,
-                    addressName,
-                    ...address
-                } = addressData
-
-                await basket.setBillingAddress(address)
-
-                // Save the address to the customer's account if they are registered and its a new address
-                if (!state.isGuestCheckout && !id && !addressId) {
-                    customer.addSavedAddress(address)
-                }
-            },
-
-            async placeOrder() {
-                try {
-                    await basket.createOrder()
-                } catch (error) {
-                    // Note: It is possible to get localized error messages from OCAPI, but this
-                    // is not available for all locales or all error messages. Therefore, we
-                    // recommend using your own error messages, rather than those provided by OCAPI.
-                    const message = formatMessage({
-                        id: 'checkout.message.generic_error',
-                        defaultMessage: 'An unexpected error occurred during checkout.'
-                    })
-                    throw error
-                }
             }
         }
     }, [state, customer, basket, mergeState])

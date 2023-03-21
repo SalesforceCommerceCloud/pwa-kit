@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState, Fragment} from 'react'
+import React, {Fragment} from 'react'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {
     Box,
@@ -22,7 +22,7 @@ import {
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
-import { useOrder } from 'commerce-sdk-react-preview'
+import {useOrder} from 'commerce-sdk-react-preview'
 import {getCreditCardIcon} from '../../utils/cc-utils'
 import useNavigation from '../../hooks/use-navigation'
 import Link from '../../components/link'
@@ -34,18 +34,15 @@ import CartItemVariantImage from '../../components/item-variant/item-image'
 import CartItemVariantName from '../../components/item-variant/item-name'
 import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
 import CartItemVariantPrice from '../../components/item-variant/item-price'
-import { useCurrentBasket } from '../../hooks/use-current-basket'
-import { useCurrentCustomer } from '../../hooks/use-current-customer'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 const CheckoutConfirmation = () => {
     const {orderNo} = useParams()
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
-    const {data: order} = useOrder(
-        {
-            parameters: {orderNo}
-        }
-    )
+    const {data: order} = useOrder({
+        parameters: {orderNo}
+    })
 
     const form = useForm({
         defaultValues: {

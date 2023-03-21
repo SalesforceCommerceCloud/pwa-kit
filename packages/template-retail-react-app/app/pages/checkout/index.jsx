@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from './util/checkout-context'
@@ -17,19 +17,18 @@ import OrderSummary from '../../components/order-summary'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 import CheckoutSkeleton from './partials/checkout-skeleton'
-import { useUsid, useShopperOrdersMutation } from 'commerce-sdk-react-preview'
+import {useUsid, useShopperOrdersMutation} from 'commerce-sdk-react-preview'
 
 const Checkout = () => {
+    const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const usid = useUsid()
     const {step} = useCheckout()
     const [error, setError] = useState()
     const {data: basket} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
-    const {mutateAsync: createOrder} = useShopperOrdersMutation(
-        'createOrder'
-    )
-    // Scroll to the top when we get a global error
+    const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
+
     useEffect(() => {
         if (error || step === 4) {
             window.scrollTo({top: 0})

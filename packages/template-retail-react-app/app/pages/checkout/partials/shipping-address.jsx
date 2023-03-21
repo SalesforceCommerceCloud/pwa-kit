@@ -27,6 +27,8 @@ export default function ShippingAddress() {
         step,
         checkoutSteps,
         isGuestCheckout,
+
+        // TODO: replace with use current basket
         selectedShippingAddress,
         setCheckoutStep,
         goToNextStep

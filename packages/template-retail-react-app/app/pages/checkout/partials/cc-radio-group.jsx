@@ -20,6 +20,7 @@ const CCRadioGroup = ({
     togglePaymentEdit = () => null,
     onPaymentIdChange = () => null
 }) => {
+    // TODO: replace with use current customer
     const {customer} = useCheckout()
 
     return (
