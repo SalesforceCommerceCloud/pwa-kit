@@ -20,7 +20,6 @@ import {
 } from '../../test-utils'
 import {useCustomerBaskets} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
-import {NotImplementedError} from '../utils'
 import {ShopperBasketsMutation, useShopperBasketsMutation} from './mutation'
 import * as queries from './query'
 
@@ -75,12 +74,38 @@ const deletedCustomerBaskets: BasketsResult = {
 }
 
 // --- TEST CASES --- //
-/** All Shopper Baskets mutations except `deleteBasket` have the same cache update logic. */
-type NonDeleteMutation = Exclude<ShopperBasketsMutation, 'deleteBasket'>
+/** All Shopper Baskets mutations except these ones have the same cache update logic. */
+type NonResponseMutations = Exclude<
+    ShopperBasketsMutation,
+    'deleteBasket' | 'addPriceBooksToBasket' | 'addTaxesForBasket' | 'addTaxesForBasketItem'
+>
 // This is an object rather than an array to more easily ensure we cover all mutations
-// TODO: Remove optional flag when all mutations are implemented
-type TestMap = {[Mut in NonDeleteMutation]?: Argument<Client[Mut]>}
+type TestMap = {[Mut in NonResponseMutations]: Argument<Client[Mut]>}
 const testMap: TestMap = {
+    addGiftCertificateItemToBasket: createOptions<'addGiftCertificateItemToBasket'>(
+        {recipientEmail: 'customer@email', amount: 100},
+        {}
+    ),
+    createShipmentForBasket: createOptions<'createShipmentForBasket'>({}, {}),
+    removeGiftCertificateItemFromBasket: createOptions<'removeGiftCertificateItemFromBasket'>(
+        undefined,
+        {giftCertificateItemId: 'giftCertificateItemId'}
+    ),
+    removeShipmentFromBasket: createOptions<'removeShipmentFromBasket'>(undefined, {
+        shipmentId: 'shipmentId'
+    }),
+    transferBasket: createOptions<'transferBasket'>(undefined, {}),
+    updateGiftCertificateItemInBasket: createOptions<'updateGiftCertificateItemInBasket'>(
+        {
+            amount: 100,
+            recipientEmail: 'customer@email'
+        },
+        {giftCertificateItemId: 'giftCertificateItemId'}
+    ),
+    updateShipmentForBasket: createOptions<'updateShipmentForBasket'>(
+        {},
+        {shipmentId: 'shipmentId'}
+    ),
     addCouponToBasket: createOptions<'addCouponToBasket'>({code: 'coupon'}, {}),
     addItemToBasket: createOptions<'addItemToBasket'>([], {}),
     addPaymentInstrumentToBasket: createOptions<'addPaymentInstrumentToBasket'>({}, {}),
@@ -118,29 +143,31 @@ const testMap: TestMap = {
 }
 const deleteTestCase = ['deleteBasket', createOptions<'deleteBasket'>(undefined, {})] as const
 
+// TODO: Implement test cases for mutations returning void
+const addPriceBooksToBasketTestCase = [
+    'addPriceBooksToBasket',
+    createOptions<'addPriceBooksToBasket'>([], {})
+] as const
+const addTaxesForBasketTestCase = [
+    'addTaxesForBasket',
+    createOptions<'addTaxesForBasket'>(
+        {
+            taxes: {}
+        },
+        {}
+    )
+] as const
+const addTaxesForBasketItemTestCase = [
+    'addTaxesForBasketItem',
+    createOptions<'addTaxesForBasketItem'>({}, {itemId: 'itemId'})
+]
+
 // Type assertion because the built-in type definition for `Object.entries` is limited :\
 const nonDeleteTestCases = Object.entries(testMap) as Array<
-    [NonDeleteMutation, Argument<Client[NonDeleteMutation]>]
+    [NonResponseMutations, Argument<Client[NonResponseMutations]>]
 >
 // Most test cases only apply to non-delete test cases, some (error handling) can include deleteBasket
 const allTestCases = [...nonDeleteTestCases, deleteTestCase]
-
-// Not implemented checks are temporary to make sure we don't forget to add tests when adding
-// implentations. When all mutations are added, the "not implemented" tests can be removed,
-// and the `TestMap` type can be changed from optional keys to required keys. Doing so will
-// leverage TypeScript to enforce having tests for all mutations.
-const notImplTestCases: NonDeleteMutation[] = [
-    'addGiftCertificateItemToBasket',
-    'addPriceBooksToBasket',
-    'addTaxesForBasket',
-    'addTaxesForBasketItem',
-    'createShipmentForBasket',
-    'removeGiftCertificateItemFromBasket',
-    'removeShipmentFromBasket',
-    'transferBasket',
-    'updateGiftCertificateItemInBasket',
-    'updateShipmentForBasket'
-]
 
 describe('ShopperBaskets mutations', () => {
     const storedCustomerIdKey = `${DEFAULT_TEST_CONFIG.siteId}_customer_id`
@@ -251,8 +278,5 @@ describe('ShopperBaskets mutations', () => {
         await waitAndExpectSuccess(wait, () => result.current.mutation)
         assertRemoveQuery(result.current.basket)
         assertInvalidateQuery(result.current.customerBaskets, oldCustomerBaskets)
-    })
-    test.only.each(notImplTestCases)('`%s` is not yet implemented', (mutationName) => {
-        expect(() => useShopperBasketsMutation(mutationName)).toThrow(NotImplementedError)
     })
 })
