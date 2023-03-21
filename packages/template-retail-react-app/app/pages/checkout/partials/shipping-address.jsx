@@ -26,8 +26,7 @@ export default function ShippingAddress() {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
-    const {step, checkoutSteps, isGuestCheckout, setCheckoutStep, goToNextStep} = useCheckout()
-
+    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
     const updateShippingAddressForShipment = useShopperBasketsMutation(
@@ -65,7 +64,7 @@ export default function ShippingAddress() {
             }
         })
 
-        if (!isGuestCheckout && !addressId) {
+        if (customer.isRegistered && !addressId) {
             const body = {
                 address1,
                 city,
@@ -83,7 +82,7 @@ export default function ShippingAddress() {
             })
         }
 
-        if (!isGuestCheckout && addressId) {
+        if (customer.isRegistered && addressId) {
             await updateCustomerAddress.mutateAsync({
                 body: address,
                 parameters: {
@@ -104,10 +103,10 @@ export default function ShippingAddress() {
                 defaultMessage: 'Shipping Address',
                 id: 'shipping_address.title.shipping_address'
             })}
-            editing={step === checkoutSteps.Shipping_Address}
+            editing={step === STEPS.SHIPPING_ADDRESS}
             isLoading={isLoading}
-            disabled={selectedShippingAddress == null}
-            onEdit={() => setCheckoutStep(checkoutSteps.Shipping_Address)}
+            disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
+            onEdit={() => goToStep(STEPS.SHIPPING_ADDRESS)}
         >
             <ToggleCardEdit>
                 <ShippingAddressSelection

@@ -482,7 +482,6 @@ const useEinstein = () => {
             return einstein.getRecommenders(...args)
         },
         async getRecommendations(recommenderName, products, args) {
-            console.log('getRecommendations')
             setIsLoading(true)
             const reco = await einstein.getRecommendations(recommenderName, products, args)
             reco.recommenderName = recommenderName

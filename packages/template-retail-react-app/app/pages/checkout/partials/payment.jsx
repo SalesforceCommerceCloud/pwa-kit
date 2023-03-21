@@ -48,7 +48,7 @@ const Payment = () => {
         })
     }
 
-    const {step, checkoutSteps, setCheckoutStep, goToNextStep} = useCheckout()
+    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
     const billingAddressForm = useForm({
         mode: 'onChange',
@@ -150,13 +150,13 @@ const Payment = () => {
         <ToggleCard
             id="step-3"
             title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
-            editing={step === checkoutSteps.Payment}
+            editing={step === STEPS.PAYMENT}
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
                 billingAddressForm.formState.isSubmitting
             }
             disabled={appliedPayment == null}
-            onEdit={() => setCheckoutStep(checkoutSteps.Payment)}
+            onEdit={() => goToStep(STEPS.PAYMENT)}
         >
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>

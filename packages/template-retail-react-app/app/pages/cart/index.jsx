@@ -307,11 +307,10 @@ const Cart = () => {
     }
 
     /********* Rendering  UI **********/
-    if (isLoading) {
+    if (isLoading || isProductsLoading) {
         return <CartSkeleton />
     }
-
-    if (!isLoading && !isProductsLoading && !basket?.productItems?.length) {
+    if (!basket?.productItems?.length) {
         return <EmptyCart isRegistered={isRegistered} />
     }
     return (
@@ -332,7 +331,7 @@ const Cart = () => {
                         >
                             <GridItem>
                                 <Stack spacing={4}>
-                                    {basket.productItems.map((productItem, idx) => {
+                                    {basket?.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem
                                                 key={productItem.productId}

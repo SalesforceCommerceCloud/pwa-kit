@@ -71,7 +71,11 @@ const CheckoutConfirmation = () => {
                 },
                 password: data.password
             }
-            return register.mutateAsync({body})
+            await register.mutateAsync({body})
+            // Customer is successfully registered with a new account,
+            // and the recent order would be associated with this account too.
+            // Now redirect to the Account page.
+            navigate(`/account`)
         } catch (error) {
             const existingAccountMessage = (
                 <Fragment>
@@ -96,11 +100,6 @@ const CheckoutConfirmation = () => {
             form.setError('global', {type: 'manual', message})
             return
         }
-
-        // Customer is successfully registered with a new account,
-        // and the recent order would be associated with this account too.
-        // Now redirect to the Account page.
-        navigate(`/account`)
     }
 
     return (
