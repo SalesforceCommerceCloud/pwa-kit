@@ -7,7 +7,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import useEinstein from '../../../hooks/use-einstein'
-import {isMatchingAddress} from '../../../utils/utils'
 import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
@@ -18,9 +17,10 @@ export const CheckoutProvider = ({children}) => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const einstein = useEinstein()
+    const [step, setStep] = useState()
 
     const [state, setState] = useState({
-        step: undefined,
+        // step: undefined,
         isGuestCheckout: false,
     })
 
@@ -68,23 +68,25 @@ export const CheckoutProvider = ({children}) => {
         // A failed condition sets the current step and returns early (order matters).
         if (customer.customerId && basket?.basketId && state.step === undefined) {
             if (!basket.customerInfo?.email) {
-                mergeState({step: CheckoutSteps.Contact_Info})
+                // mergeState({step: CheckoutSteps.Contact_Info})
+                setStep(CheckoutSteps.Contact_Info)
                 return
             }
             if (basket.shipments && !basket.shipments[0]?.shippingAddress) {
-                mergeState({step: CheckoutSteps.Shipping_Address})
+                // mergeState({step: CheckoutSteps.Shipping_Address})
+                setStep(CheckoutSteps.Shipping_Address)
                 return
             }
             if (basket.shipments && !basket.shipments[0]?.shippingMethod) {
-                mergeState({step: CheckoutSteps.Shipping_Options})
+                setStep(CheckoutSteps.Shipping_Options)
                 return
             }
             if (!basket.paymentInstruments || !basket.billingAddress) {
-                mergeState({step: CheckoutSteps.Payment})
+                setStep(CheckoutSteps.Payment)
                 return
             }
 
-            mergeState({step: CheckoutSteps.Review_Order})
+            setStep(CheckoutSteps.Review_Order)
         }
     }, [customer, basket])
 
@@ -98,10 +100,10 @@ export const CheckoutProvider = ({children}) => {
 
     // Run this every time checkout steps change
     useEffect(() => {
-        if (state.step != undefined) {
-            einstein.sendCheckoutStep(getCheckoutStepName(state.step), state.step, basket)
+        if (step != undefined) {
+            einstein.sendCheckoutStep(getCheckoutStepName(step), step, basket)
         }
-    }, [state.step])
+    }, [step])
 
     // We combine our state and actions into a single context object. This is much more
     // convenient than having to import and bind actions seprately. State updates will
@@ -112,16 +114,18 @@ export const CheckoutProvider = ({children}) => {
         return {
             ...state,
 
+            step,
+
             get checkoutSteps() {
                 return CheckoutSteps
             },
 
             goToNextStep() {
-                mergeState({step: state.step + 1})
+                setStep(step + 1)
             },
 
             setCheckoutStep(step) {
-                mergeState({step})
+                setStep(step)
             },
 
             setIsGuestCheckout(isGuestCheckout) {

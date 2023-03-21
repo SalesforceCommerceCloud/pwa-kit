@@ -52,6 +52,15 @@ const ContactInfo = () => {
         goToNextStep
     } = useCheckout()
 
+    console.log({
+        isGuestCheckout,
+        setIsGuestCheckout,
+        step,
+        checkoutSteps,
+        setCheckoutStep,
+        goToNextStep
+    })
+
     const form = useForm({
         defaultValues: {email: customer?.email || basket?.customerInfo?.email || '', password: ''}
     })
