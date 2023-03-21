@@ -22,20 +22,18 @@ const submitButtonMessage = defineMessage({
 
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
-
+    const [isLoading, setIsLoading] = useState()
+    const {data: customer} = useCurrentCustomer()
+    const {data: basket} = useCurrentBasket()
+    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const {
         step,
         checkoutSteps,
         isGuestCheckout,
-
-        // TODO: replace with use current basket
-        selectedShippingAddress,
         setCheckoutStep,
         goToNextStep
     } = useCheckout()
-    const [isLoading, setIsLoading] = useState()
-    const {data: customer} = useCurrentCustomer()
-    const {data: basket} = useCurrentBasket()
+    
 
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
@@ -60,8 +58,6 @@ export default function ShippingAddress() {
             parameters: {
                 basketId: basket.basketId,
                 shipmentId: 'me',
-
-                // TODO
                 useAsBilling: false
             },
             body: {

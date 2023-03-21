@@ -22,9 +22,6 @@ export const CheckoutProvider = ({children}) => {
     const [state, setState] = useState({
         step: undefined,
         isGuestCheckout: false,
-        shippingMethods: undefined,
-        paymentMethods: undefined,
-        sectionError: undefined
     })
 
     const CheckoutStepsList = [
@@ -115,51 +112,9 @@ export const CheckoutProvider = ({children}) => {
         return {
             ...state,
 
-            // Getter functions
-            // Provides convenient access to various data points and derivations.
-            // ----------------
-
-            get customer() {
-                return customer
-            },
-
-            get basket() {
-                return basket
-            },
-
-            get selectedShippingAddress() {
-                return basket.shipments && basket.shipments[0].shippingAddress
-            },
-
-            get selectedPayment() {
-                return basket.paymentInstruments && basket.paymentInstruments[0]
-            },
-
-            get selectedBillingAddress() {
-                return basket.billingAddress
-            },
-
-            get isBillingSameAsShipping() {
-                if (!ctx.selectedShippingAddress) {
-                    return false
-                }
-                if (!ctx.selectedBillingAddress && ctx.selectedShippingAddress) {
-                    return true
-                }
-                const result = isMatchingAddress(
-                    ctx.selectedBillingAddress,
-                    ctx.selectedShippingAddress
-                )
-                return result
-            },
-
             get checkoutSteps() {
                 return CheckoutSteps
             },
-
-            // Local state setters
-            // Callbacks/functions for setting local state data
-            // ----------------
 
             goToNextStep() {
                 mergeState({step: state.step + 1})
