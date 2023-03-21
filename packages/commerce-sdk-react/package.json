@@ -31,7 +31,7 @@
   },
   "scripts": {
     "prepare": "npm run build",
-    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
+    "build": "echo 'cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly'",
     "build:watch": "watch 'npm run build' src/",
     "build:docs": "typedoc",
     "lint": "npm run lint:js && tsc --noEmit",

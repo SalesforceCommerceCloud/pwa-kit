@@ -18,7 +18,7 @@
   },
   "scripts": {
     "prepare": "npm run build",
-    "build": "cross-env NODE_ENV=production internal-lib-build build",
+    "build": "echo 'cross-env NODE_ENV=production internal-lib-build build'",
     "build:watch": "watch 'npm run build' src/",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
