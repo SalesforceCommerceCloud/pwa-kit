@@ -27,6 +27,8 @@ const useAccessToken = (): AccessToken => {
         ? useLocalStorage(`${config.siteId}_access_token`)
         : auth.get('access_token')
 
+    // NOTE: auth.ready() is to be called later. If you call it immediately in this hook,
+    // it'll cause infinite re-renders during testing.
     const getTokenWhenReady = () => auth.ready().then(({access_token}) => access_token)
 
     return {token, getTokenWhenReady}
