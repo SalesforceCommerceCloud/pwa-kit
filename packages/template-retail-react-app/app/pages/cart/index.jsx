@@ -50,7 +50,7 @@ const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products} = useProducts(
+    const {data: products, isLoading: isProductsLoading} = useProducts(
         {
             parameters: {
                 ids: productIds,

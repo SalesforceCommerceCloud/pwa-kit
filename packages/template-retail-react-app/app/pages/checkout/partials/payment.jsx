@@ -85,7 +85,6 @@ const Payment = () => {
             paymentMethodId: 'CREDIT_CARD',
             paymentCard: {
                 holder: formValue.holder,
-                // TODO: SCAPI only takes masked cc number ?
                 maskedNumber: maskNumber(formValue.number),
                 cardType: getPaymentInstrumentCardType(formValue.cardType),
                 expirationMonth: parseInt(expirationMonth),
