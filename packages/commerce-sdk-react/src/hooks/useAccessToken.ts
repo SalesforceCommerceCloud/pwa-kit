@@ -10,17 +10,28 @@ import useConfig from './useConfig'
 
 const onClient = typeof window !== 'undefined'
 
+interface AccessToken {
+    token: string | null
+    getTokenWhenReady: () => Promise<string>
+}
+
 /**
  * Hook that returns the access token.
  *
  */
-const useAccessToken = (): string | null => {
-    if (onClient) {
-        const config = useConfig()
-        return useLocalStorage(`${config.siteId}_access_token`)
-    }
+const useAccessToken = (): AccessToken => {
+    const config = useConfig()
     const auth = useAuthContext()
-    return auth.get('access_token')
+
+    const token = onClient
+        ? useLocalStorage(`${config.siteId}_access_token`)
+        : auth.get('access_token')
+
+    // NOTE: auth.ready() is to be called later. If you call it immediately in this hook,
+    // it'll cause infinite re-renders during testing.
+    const getTokenWhenReady = () => auth.ready().then(({access_token}) => access_token)
+
+    return {token, getTokenWhenReady}
 }
 
 export default useAccessToken

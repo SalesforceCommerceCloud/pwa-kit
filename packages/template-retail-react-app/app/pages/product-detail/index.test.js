@@ -46,9 +46,6 @@ beforeEach(() => {
         }),
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedCustomerProductLists))
-        }),
-        rest.post('*/v3/activities/EinsteinTestSite/*', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
         })
     )
 
@@ -123,7 +120,7 @@ describe('product set', () => {
             // Seems like rendering the modal takes a bit more time
             {timeout: 5000}
         )
-    })
+    }, 30000)
 
     test('add the set to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
