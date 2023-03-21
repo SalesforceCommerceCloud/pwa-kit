@@ -72,9 +72,6 @@ const CheckoutConfirmation = () => {
                 password: data.password
             }
             await register.mutateAsync({body})
-            // Customer is successfully registered with a new account,
-            // and the recent order would be associated with this account too.
-            // Now redirect to the Account page.
             navigate(`/account`)
         } catch (error) {
             const existingAccountMessage = (
@@ -98,7 +95,6 @@ const CheckoutConfirmation = () => {
                 : error.message
 
             form.setError('global', {type: 'manual', message})
-            return
         }
     }
 
