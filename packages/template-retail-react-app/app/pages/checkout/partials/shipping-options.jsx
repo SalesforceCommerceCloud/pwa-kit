@@ -22,12 +22,12 @@ export default function ShippingOptions() {
     const {data: shippingMethods} = useShippingMethodsForShipment(
         {
             parameters: {
-                basketId: basket.basketId,
+                basketId: basket?.basketId,
                 shipmentId: 'me'
             }
         },
         {
-            enabled: Boolean(basket.basketId) && step === STEPS.ShippingOptions
+            enabled: Boolean(basket?.basketId) && step === STEPS.ShippingOptions
         }
     )
 
