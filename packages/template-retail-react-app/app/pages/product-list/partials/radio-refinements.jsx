@@ -12,7 +12,11 @@ import PropTypes from 'prop-types'
 const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {
     return (
         <Box>
-            <RadioGroup value={selectedFilters}>
+            <RadioGroup
+                // The following `false` fallback is required to avoid the radio group
+                // from switching to "uncontrolled mode" when `selectedFilters` is empty.
+                value={selectedFilters[0] ?? false}
+            >
                 <Stack spacing={1}>
                     {filter.values
                         .filter((refinementValue) => refinementValue.hitCount > 0)
@@ -28,7 +32,7 @@ const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                             toggleFilter(
                                                 value,
                                                 filter.attributeId,
-                                                selectedFilters?.includes(value.value),
+                                                selectedFilters.includes(value.value),
                                                 false
                                             )
                                         }

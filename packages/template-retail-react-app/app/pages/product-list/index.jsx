@@ -302,25 +302,34 @@ const ProductList = (props) => {
         // If we aren't allowing for multiple selections, simply clear any value set for the
         // attribute, and apply a new one if required.
         if (!allowMultiple) {
+            const previousValue = searchParamsCopy.refine[attributeId]
             delete searchParamsCopy.refine[attributeId]
 
-            if (!selected) {
+            // Note the loose comparison, for "string != number" checks.
+            if (!selected && value.value != previousValue) {
                 searchParamsCopy.refine[attributeId] = value.value
             }
         } else {
             // Get the attibute value as an array.
             let attributeValue = searchParamsCopy.refine[attributeId] || []
-            let values = Array.isArray(attributeValue) ? attributeValue : attributeValue.split('|')
+
+            // Ensure that the value is still converted into an array if it's a `string` or `number`.
+            if (typeof attributeValue === 'string') {
+                attributeValue = attributeValue.split('|')
+            } else if (typeof attributeValue === 'number') {
+                attributeValue = [attributeValue]
+            }
 
             // Either set the value, or filter the value out.
             if (!selected) {
-                values.push(value.value)
+                attributeValue.push(value.value)
             } else {
-                values = values?.filter((v) => v !== value.value)
+                // Note the loose comparison, for "string != number" checks.
+                attributeValue = attributeValue?.filter((v) => v != value.value)
             }
 
             // Update the attribute value in the new search params.
-            searchParamsCopy.refine[attributeId] = values
+            searchParamsCopy.refine[attributeId] = attributeValue
 
             // If the update value is an empty array, remove the current attribute key.
             if (searchParamsCopy.refine[attributeId].length === 0) {
