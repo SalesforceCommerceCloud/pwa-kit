@@ -77,7 +77,13 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
                     {filters?.map((filter, idx) => {
                         // Render the appropriate component for the refinement type, fallback to checkboxes
                         const Values = componentMap[filter.attributeId] || CheckboxRefinements
-                        const selectedFiltersArray = selectedFilters?.[filter.attributeId]
+                        let selectedFiltersArray = selectedFilters?.[filter.attributeId] ?? []
+
+                        // Catch any non-array values and wrap them in an array
+                        if (!Array.isArray(selectedFiltersArray)) {
+                            selectedFiltersArray = [selectedFiltersArray]
+                        }
+
                         if (filter.values) {
                             return (
                                 <Stack key={filter.attributeId} divider={<Divider />}>

@@ -1,11 +1,11 @@
 {
     "name": "template-express-minimal",
-    "version": "2.7.0-dev",
+    "version": "2.8.0-dev",
     "license": "See license in LICENSE",
     "private": true,
     "devDependencies": {
-        "pwa-kit-dev": "^2.7.0-dev",
-        "pwa-kit-runtime": "^2.7.0-dev",
+        "pwa-kit-dev": "^2.8.0-dev",
+        "pwa-kit-runtime": "^2.8.0-dev",
         "supertest": "^4.0.2"
     },
     "scripts": {
@@ -22,7 +22,7 @@
     "mobify": {
         "ssrEnabled": true,
         "ssrParameters": {
-            "ssrFunctionNodeVersion": "14.x"
+            "ssrFunctionNodeVersion": "16.x"
         },
         "ssrOnly": [
             "ssr.js",

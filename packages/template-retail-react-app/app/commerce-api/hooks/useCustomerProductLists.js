@@ -263,6 +263,24 @@ export default function useCustomerProductLists() {
                         allImages: true
                     }
                 })
+
+                // `getProducts` endpoint does not include `setProducts` data
+                // so for each product set, we'll fetch it and append it to existing data
+                const productSetFetches = productDetails.data
+                    .filter((product) => product.type.set)
+                    .map((product) => {
+                        return api.shopperProducts
+                            .getProduct({
+                                parameters: {
+                                    id: product.id
+                                }
+                            })
+                            .then((data) => {
+                                product.setProducts = data.setProducts
+                            })
+                    })
+                await Promise.all(productSetFetches)
+
                 const result = self.mergeProductDetailsIntoList(list, productDetails)
 
                 // hasDetail is a flag to indicate

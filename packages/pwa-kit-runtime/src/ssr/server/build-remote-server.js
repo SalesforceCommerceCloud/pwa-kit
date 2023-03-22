@@ -19,7 +19,6 @@ import {
     isRemote,
     MetricsSender,
     outgoingRequestHook,
-    PerformanceTimer,
     processLambdaResponse,
     responseSend,
     configureProxyConfigs,
@@ -87,6 +86,9 @@ export const RemoteServerFactory = {
          * testing, or to handle non-standard projects.
          */
         const defaults = {
+            // For test only – allow the project dir to be overridden.
+            projectDir: process.cwd(),
+
             // Absolute path to the build directory
             buildDir: path.resolve(process.cwd(), BUILD),
 
@@ -495,14 +497,10 @@ export const RemoteServerFactory = {
             locals.afterResponseCalled = false
             locals.responseCaching = {}
 
-            locals.timer = new PerformanceTimer(`req${locals.requestId}`)
             locals.originalUrl = req.originalUrl
 
             // Track this response
             req.app._requestMonitor._responseStarted(res)
-
-            // Start timing
-            locals.timer.start('express-overall')
 
             // If the path is /, we enforce that the only methods
             // allowed are GET, HEAD or OPTIONS. This is a restriction
@@ -519,8 +517,6 @@ export const RemoteServerFactory = {
             const afterResponse = () => {
                 /* istanbul ignore else */
                 if (!locals.afterResponseCalled) {
-                    locals.timer.end('express-overall')
-                    locals.timingResponse && locals.timer.end('express-response')
                     locals.afterResponseCalled = true
                     // Emit timing unless the request is for a proxy
                     // or bundle path. We don't want to emit metrics
@@ -547,9 +543,6 @@ export const RemoteServerFactory = {
                         }
                         req.app.sendMetric(metricName)
                     }
-                    locals.timer.finish()
-                    // Release reference to timer
-                    locals.timer = null
                 }
             }
 
@@ -751,15 +744,23 @@ export const RemoteServerFactory = {
      */
     serveStaticFile(filePath, opts = {}) {
         return (req, res) => {
-            const options = req.app.options
-            const file = path.resolve(options.buildDir, filePath)
-            res.sendFile(file, {
-                headers: {
-                    [CACHE_CONTROL]: options.defaultCacheControl
-                },
-                ...opts
-            })
+            const baseDir = req.app.options.buildDir
+            return this._serveStaticFile(req, res, baseDir, filePath, opts)
         }
+    },
+
+    /**
+     * @private
+     */
+    _serveStaticFile(req, res, baseDir, filePath, opts = {}) {
+        const options = req.app.options
+        const file = path.resolve(baseDir, filePath)
+        res.sendFile(file, {
+            headers: {
+                [CACHE_CONTROL]: options.defaultCacheControl
+            },
+            ...opts
+        })
     },
 
     /**
@@ -969,16 +970,12 @@ const prepNonProxyRequest = (req, res, next) => {
  * @private
  */
 const ssrMiddleware = (req, res, next) => {
-    const timer = res.locals.timer
-    timer.start('ssr-overall')
-
     setDefaultHeaders(req, res)
     const renderStartTime = Date.now()
 
     const done = () => {
         const elapsedRenderTime = Date.now() - renderStartTime
         req.app.sendMetric('RenderTime', elapsedRenderTime, 'Milliseconds')
-        timer.end('ssr-overall')
     }
 
     res.on('finish', done)
