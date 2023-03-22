@@ -42,7 +42,7 @@
     "morgan": "^1.10.0",
     "semver": "^7.3.8",
     "set-cookie-parser": "^2.6.0",
-    "ua-parser-js": "^0.8.1",
+    "ua-parser-js": "^1.0.34",
     "whatwg-encoding": "^1.0.5"
   },
   "devDependencies": {
