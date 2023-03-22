@@ -18,9 +18,9 @@ import {getOrder} from './queryKeyHelpers'
 
 type Client = ApiClients['shopperOrders']
 /** Parameters that get passed around, includes client config and possible parameters from other endpoints */
-type GetOrderOptions = MergedOptions<Client, Argument<Client['getOrder']>>
+type GetOrderParameters = MergedOptions<Client, Argument<Client['getOrder']>>['parameters']
 
-const invalidateOrderQuery = (customerId: string | null, {parameters}: GetOrderOptions): CacheUpdate => ({
+const invalidateOrderQuery = (customerId: string | null, {parameters}: {parameters: GetOrderParameters}): CacheUpdate => ({
     invalidate: [{queryKey: getOrder.queryKey(parameters)}]
 })
 

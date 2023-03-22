@@ -31,10 +31,6 @@ export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate,
         // If an updater isn't given, fall back to just setting the data
         queryClient.setQueryData(queryKey, updater ?? data)
     )
-
-    if (cacheUpdates.clear) {
-        queryClient.clear()
-    }
 }
 
 /** Error thrown when a method is not implemented. */
