@@ -15,17 +15,7 @@ import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
 import mockConfig from '../../../config/mocks/default'
-
-const mockRegisteredCustomer = {
-    authType: 'registered',
-    customerId: 'registeredCustomerId',
-    customerNo: 'testno',
-    email: 'darek@test.com',
-    firstName: 'Tester',
-    lastName: 'Testing',
-    login: 'darek@test.com'
-}
-
+import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
     currency: 'USD',
@@ -60,8 +50,7 @@ beforeEach(() => {
     jest.resetModules()
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
-            console.log('login.....................................')
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         }),
         rest.get('*/customers/:customerId', (req, res, ctx) => {
             const {customerId} = req.params
@@ -75,7 +64,7 @@ beforeEach(() => {
                     })
                 )
             }
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         })
     )
 })
@@ -119,7 +108,6 @@ describe('Logging in tests', function () {
         // enter credentials and submit
         user.type(screen.getByLabelText('Email'), 'customer@test.com')
         user.type(screen.getByLabelText('Password'), 'Password!1')
-
         // login with credentials
         global.server.use(
             rest.post('*/oauth2/token', (req, res, ctx) =>
@@ -146,36 +134,60 @@ describe('Logging in tests', function () {
     })
 })
 
-test.skip('Renders error when given incorrect log in credentials', async () => {
-    renderWithProviders(<MockedComponent />, {
-        wrapperProps: {
-            siteAlias: 'uk',
-            locale: {id: 'en-GB'},
-            appConfig: mockConfig.app,
-            isGuest: true
-        }
+describe('Error while logging in', function () {
+    beforeEach(() => {
+        global.server.use(
+            rest.post('*/oauth2/token', (req, res, ctx) =>
+                res(
+                    ctx.delay(0),
+                    ctx.json({
+                        customer_id: 'customerid',
+                        access_token:
+                            'eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJraWQiOiJiMjNkZTU5YS1iMTk3LTQyNTAtODdkNy1mNDFmNmUzNjcwNzciLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJIUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLWV4cGVyaWVuY2Ugc2ZjYy5zaG9wcGVyLWNvbnRleHQucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOjAyY2NhYjMyLWQwMWUtNGFiYy04MDlhLWE0NTdmYTA1MTJjMiIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY3OTAxMzcwOCwic3R5IjoiVXNlciIsImlzYiI6InVpZG86c2xhczo6dXBuOkd1ZXN0Ojp1aWRuOkd1ZXN0IFVzZXI6OmdjaWQ6YmNrYmhIdzBkR2tYZ1J4YmFWeHFZWXd1aEg6OmNoaWQ6ICIsImV4cCI6MTkyNDkwNTYwMDAwMCwiaWF0IjoxNjc5MDEzNzM4LCJqdGkiOiJDMkM0ODU2MjAxODYwLTE4OTA2Nzg5MDM0OTg1MjcwNDEzOTY1MjIyIn0.o9XBf1TiGmNhEkFsVsFKGkDODuk1zK8ovE8GRnVTZWw',
+                        refresh_token: 'testrefeshtoken',
+                        usid: 'testusid',
+                        enc_user_id: 'testEncUserId',
+                        id_token: 'testIdToken'
+                    })
+                )
+            ),
+            rest.post('*/baskets/actions/merge', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockMergedBasket))
+            })
+        )
     })
 
-    // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'foo@test.com')
-    user.type(screen.getByLabelText('Password'), 'SomeFakePassword1!')
+    test.skip('Renders error when given incorrect log in credentials', async () => {
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app,
+                bypassAuth: false
+            }
+        })
 
-    // mock failed auth request
-    global.server.use(
-        console.log('token......................................') ||
+        // enter credentials and submit
+        user.type(screen.getByLabelText('Email'), 'foo@test.com')
+        user.type(screen.getByLabelText('Password'), 'SomeFakePassword1!')
+
+        // mock failed auth request
+        global.server.use(
             rest.post('*/oauth2/login', (req, res, ctx) =>
                 res(ctx.delay(0), ctx.status(401), ctx.json({message: 'Unauthorized Credentials.'}))
-            )
-    )
+            ),
+            rest.post('*/customers', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(404), ctx.json({message: 'Not Found.'}))
+            })
+        )
 
-    user.click(screen.getByText(/sign in/i))
-
-    // wait for login error alert to appear
-    expect(
-        await screen.findByText(/Incorrect username or password, please try again./i)
-    ).toBeInTheDocument()
+        user.click(screen.getByText(/sign in/i))
+        // wait for login error alert to appear
+        expect(
+            await screen.findByText(/Incorrect username or password, please try again./i)
+        ).toBeInTheDocument()
+    })
 })
-
 describe('Navigate away from login page tests', function () {
     test('should navigate to sign up page when the user clicks Create Account', async () => {
         renderWithProviders(<MockedComponent />, {
