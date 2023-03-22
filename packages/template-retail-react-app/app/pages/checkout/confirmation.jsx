@@ -43,18 +43,17 @@ const CheckoutConfirmation = () => {
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
     const register = useAuthHelper(AuthHelpers.Register)
-    const {data: order} = useOrder({
-        parameters: {orderNo}
-    },
-    {
-        enabled: !!orderNo && onClient
-    })
+    const {data: order} = useOrder(
+        {
+            parameters: {orderNo}
+        },
+        {
+            enabled: !!orderNo && onClient
+        }
+    )
     const itemIds = order?.productItems.map((item) => item.productId)
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
-    const productItemsMap = products?.data.reduce(
-        (map, item) => ({...map, [item.id]: item}),
-        {}
-    )
+    const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
     const form = useForm()
 
     useEffect(() => {
@@ -288,7 +287,8 @@ const CheckoutConfirmation = () => {
                                             divider={<Divider />}
                                         >
                                             {order.productItems?.map((product, idx) => {
-                                                const productDetail = productItemsMap?.[product.productId] || {}
+                                                const productDetail =
+                                                    productItemsMap?.[product.productId] || {}
                                                 const variant = {
                                                     ...product,
                                                     ...productDetail,

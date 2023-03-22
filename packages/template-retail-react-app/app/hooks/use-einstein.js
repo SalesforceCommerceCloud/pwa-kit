@@ -489,16 +489,13 @@ const useEinstein = () => {
             const recommendations = await fetchRecProductDetails(reco)
             setIsLoading(false)
             setRecommendations(recommendations)
-            console.log(recommendations)
         },
         async getZoneRecommendations(zoneName, products, args) {
-            console.log('getZoneRecommendations')
             setIsLoading(true)
             const reco = await einstein.getZoneRecommendations(zoneName, products, args)
             const recommendations = await fetchRecProductDetails(reco)
             setIsLoading(false)
             setRecommendations(recommendations)
-            console.log(recommendations)
         }
     }
 }
