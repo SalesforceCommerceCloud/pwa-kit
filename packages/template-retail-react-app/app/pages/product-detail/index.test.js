@@ -96,7 +96,7 @@ describe('product set', () => {
         })
     })
 
-    test('add the set to cart successfully', async () => {
+    test.only('add the set to cart successfully', async () => {
         const urlPathAfterSelectingAllVariants =
             '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
@@ -105,13 +105,18 @@ describe('product set', () => {
         const initialBasket = {basketId: 'valid_id'}
         renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
+        console.time('wait for page to render')
         await waitFor(() => {
             expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
         })
+        console.timeEnd('wait for page to render')
 
+        console.time('wait for button to click')
         const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
         fireEvent.click(buttons[0])
+        console.timeEnd('wait for button to click')
 
+        console.time('wait for modal')
         await waitFor(
             () => {
                 const modal = screen.getByTestId('add-to-cart-modal')
@@ -120,6 +125,7 @@ describe('product set', () => {
             // Seems like rendering the modal takes a bit more time
             {timeout: 5000}
         )
+        console.timeEnd('wait for modal')
     }, 30000)
 
     test('add the set to cart with error messages', async () => {
