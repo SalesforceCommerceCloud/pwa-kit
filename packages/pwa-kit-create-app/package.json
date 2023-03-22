@@ -30,15 +30,15 @@
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
   "dependencies": {
-    "commander": "^2.20.0",
+    "commander": "^2.20.3",
     "deepmerge": "2.2.1",
-    "inquirer": "7.0.5",
-    "semver": "^7.3.2",
+    "inquirer": "7.3.3",
+    "semver": "^7.3.8",
     "shelljs": "^0.8.5",
     "slugify": "^1.6.5",
-    "tar": "^6.1.11"
+    "tar": "^6.1.13"
   },
   "devDependencies": {
-    "verdaccio": "^5.9.0"
+    "verdaccio": "^5.22.1"
   }
 }
