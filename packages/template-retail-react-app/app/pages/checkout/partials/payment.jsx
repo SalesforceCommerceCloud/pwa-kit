@@ -60,19 +60,7 @@ const Payment = () => {
 
     const paymentMethodForm = useForm()
 
-    // This is internal error, it is not visible to users.
-    // We don't need to translate it
-    const invalidFormErrorMessage = 'Form is not valid'
-
-    const onPaymentSubmit = async () => {
-        const isFormValid = await paymentMethodForm.trigger()
-
-        if (!isFormValid) {
-            throw new Error(invalidFormErrorMessage)
-        }
-
-        const formValue = paymentMethodForm.getValues()
-
+    const onPaymentSubmit = async (formValue) => {
         // The form gives us the expiration date as `MM/YY` - so we need to split it into
         // month and year to submit them as individual fields.
         const [expirationMonth, expirationYear] = formValue.expiry.split('/')
@@ -97,7 +85,7 @@ const Payment = () => {
         const isFormValid = await billingAddressForm.trigger()
 
         if (!isFormValid) {
-            throw new Error(invalidFormErrorMessage)
+            return
         }
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
@@ -122,24 +110,13 @@ const Payment = () => {
         }
     }
 
-    const onSubmit = async () => {
-        try {
-            if (!appliedPayment) {
-                await onPaymentSubmit()
-            }
-            await onBillingSubmit()
-            goToNextStep()
-        } catch (e) {
-            if (e.message === invalidFormErrorMessage) {
-                // Form validation is already triggered
-                // Input fields are highlighted, no need for
-                // toast feedback
-                return
-            }
-            console.error(e)
-            showError()
+    const onSubmit = paymentMethodForm.handleSubmit(async (paymentFormValues) => {
+        if (!appliedPayment) {
+            await onPaymentSubmit(paymentFormValues)
         }
-    }
+        await onBillingSubmit()
+        goToNextStep()
+    })
 
     return (
         <ToggleCard
