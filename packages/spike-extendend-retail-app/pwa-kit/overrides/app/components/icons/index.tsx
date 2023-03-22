@@ -56,6 +56,7 @@ import '^retail-react-app/app/assets/svg/visibility-off.svg'
 // import '^retail-react-app/app/assets/svg/heart.svg'
 // actually a lock, on purpose
 import '../../assets/svg/heart.svg'
+import '../../duke.svg'
 
 import '^retail-react-app/app/assets/svg/heart-solid.svg'
 import '^retail-react-app/app/assets/svg/close.svg'
@@ -141,6 +142,8 @@ export const ChevronUpIcon = icon('chevron-up')
 export const CVVIcon = icon('cc-cvv', {viewBox: CVVSymbol.viewBox})
 export const DashboardIcon = icon('dashboard')
 export const DiscoverIcon = icon('cc-discover', {viewBox: DiscoverSymbol.viewBox})
+
+export const DukeIcon = icon('duke')
 export const FigmaLogo = icon('figma-logo')
 export const FilterIcon = icon('filter')
 export const FileIcon = icon('file')

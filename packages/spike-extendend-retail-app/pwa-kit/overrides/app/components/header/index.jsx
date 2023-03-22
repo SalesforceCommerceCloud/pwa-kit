@@ -43,6 +43,7 @@ import {
     ChevronDownIcon,
     SignoutIcon,
     HamburgerIcon,
+    DukeIcon
 } from '../icons'
 
 import {noop} from '^retail-react-app/app/utils/utils'
@@ -258,7 +259,7 @@ const Header = ({
                         })}
                         icon={
                             <>
-                                <BasketIcon />
+                                <DukeIcon />
                                 {basket?.loaded && (
                                     <Badge variant="notification">
                                         {basket.itemAccumulatedCount}

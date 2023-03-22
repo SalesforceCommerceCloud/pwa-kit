@@ -128,7 +128,6 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
     })
 
     const overridesMap = [
-        ...overrides,
         ...overrides.flatMap((item) => {
             const patterns = []
             patterns.push(item)
@@ -162,6 +161,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             return patterns
         })
     ]
+    console.log('overridesmap', overridesMap)
     const overridesRegex = makeRegExp(
         `(${overridesMap
             ?.map((override) =>
@@ -173,6 +173,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             )
             ?.join('|')})`
     )
+    console.log('overridesregex', overridesRegex)
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
         // NOTE: the way the Template Extensibility feature works, the order in which
