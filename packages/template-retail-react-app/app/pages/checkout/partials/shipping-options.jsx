@@ -13,7 +13,7 @@ import {ChevronDownIcon} from '../../../components/icons'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import {useShippingMethodsForShipment, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
-import { useCurrency } from '../../../hooks'
+import {useCurrency} from '../../../hooks'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
