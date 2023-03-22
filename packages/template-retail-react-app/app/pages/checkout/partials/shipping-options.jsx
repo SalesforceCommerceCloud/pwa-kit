@@ -13,11 +13,13 @@ import {ChevronDownIcon} from '../../../components/icons'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import {useShippingMethodsForShipment, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import { useCurrency } from '../../../hooks'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
+    const {currency} = useCurrency
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
     const {data: shippingMethods} = useShippingMethodsForShipment(
         {
@@ -123,7 +125,7 @@ export default function ShippingOptions() {
                                                                 <FormattedNumber
                                                                     value={opt.price}
                                                                     style="currency"
-                                                                    currency={basket.currency}
+                                                                    currency={currency}
                                                                 />
                                                             </Text>
                                                         </Flex>
@@ -182,7 +184,7 @@ export default function ShippingOptions() {
                                     <FormattedNumber
                                         value={selectedMethodDisplayPrice}
                                         style="currency"
-                                        currency={basket.currency}
+                                        currency={currency}
                                     />
                                 )}
                             </Text>
@@ -195,7 +197,7 @@ export default function ShippingOptions() {
                                 >
                                     <FormattedNumber
                                         style="currency"
-                                        currency={basket.currency}
+                                        currency={currency}
                                         value={shippingItem.price}
                                     />
                                 </Text>
