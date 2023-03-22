@@ -19,11 +19,6 @@ import {and, pathStartsWith} from '../utils'
 type Client = ApiClients['shopperCustomers']
 
 const noop = () => ({})
-/** Logs a warning to console (on startup) and returns nothing (method is unimplemented). */
-const TODO = (method: keyof Client) => {
-    console.warn(`Cache logic for '${method}' is not yet implemented.`)
-    return undefined
-}
 
 /** Invalidates the customer endpoint, but not derivative endpoints. */
 const invalidateCustomer = (parameters: Tail<QueryKeys['getCustomer']>): CacheUpdate => ({

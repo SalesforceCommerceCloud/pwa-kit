@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {MutationFunction, useMutation, UseMutationResult, useQueryClient} from '@tanstack/react-query'
+import {
+    MutationFunction,
+    useMutation,
+    UseMutationResult,
+    useQueryClient
+} from '@tanstack/react-query'
 import useAuthContext from './useAuthContext'
 import Auth from '../auth'
 import {Argument, CacheUpdate} from './types'
@@ -76,7 +81,9 @@ const cacheUpdateMatrix: CacheUpdateMatrix = {
     loginGuestUser: noop,
     logout() {
         return {
-            clear: true
+            remove: [
+                {queryKey: ['/commerce-sdk-react']}
+            ]
         }
     }
 }

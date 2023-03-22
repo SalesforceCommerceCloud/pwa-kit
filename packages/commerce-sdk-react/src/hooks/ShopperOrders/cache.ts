@@ -5,14 +5,25 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {getCustomerBaskets} from '../ShopperCustomers/queryKeyHelpers'
-import {ApiClients, Argument, CacheUpdateMatrix, CacheUpdate, CacheUpdateUpdate, CacheUpdateInvalidate, MergedOptions} from '../types'
+import {
+    ApiClients,
+    Argument,
+    CacheUpdateMatrix,
+    CacheUpdate,
+    CacheUpdateUpdate,
+    CacheUpdateInvalidate,
+    MergedOptions
+} from '../types'
 import {getOrder} from './queryKeyHelpers'
 
 type Client = ApiClients['shopperOrders']
 /** Parameters that get passed around, includes client config and possible parameters from other endpoints */
 type GetOrderParameters = MergedOptions<Client, Argument<Client['getOrder']>>['parameters']
 
-const invalidateOrderQuery = (customerId: string | null, {parameters}: {parameters: GetOrderParameters},): CacheUpdate => ({
+const invalidateOrderQuery = (
+    customerId: string | null,
+    {parameters}: {parameters: GetOrderParameters}
+): CacheUpdate => ({
     invalidate: [{queryKey: getOrder.queryKey(parameters)}]
 })
 

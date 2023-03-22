@@ -28,9 +28,11 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     },
     deleteShopperContext(_customerId, {parameters}) {
         return {
-            remove: [{
-                queryKey: getShopperContext.queryKey(parameters)
-            }]
+            remove: [
+                {
+                    queryKey: getShopperContext.queryKey(parameters)
+                }
+            ]
         }
     }
 }

@@ -29,6 +29,7 @@ type GetCustomerBasketsParameters = Argument<
 
 // Path helpers to avoid typos!
 const getBasePath = (parameters: {organizationId: string}) => [
+    '/commerce-sdk-react',
     '/organizations/',
     parameters.organizationId
 ]
