@@ -14,7 +14,7 @@
         "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
         "lint:fix": "npm run lint -- --fix",
         "start": "pwa-kit-dev start",
-        "build": "echo 'pwa-kit-dev build'",
+        "build": "pwa-kit-dev build",
         "push": "npm run build && pwa-kit-dev push",
         "save-credentials": "pwa-kit-dev save-credentials",
         "tail-logs": "pwa-kit-dev tail-logs"

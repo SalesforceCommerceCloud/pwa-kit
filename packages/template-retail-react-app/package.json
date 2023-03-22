@@ -66,7 +66,7 @@
         "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
         "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
         "lint:fix": "npm run lint -- --fix",
-        "build": "echo 'npm run build-translations && pwa-kit-dev build'",
+        "build": "npm run build-translations && pwa-kit-dev build",
         "push": "npm run build && pwa-kit-dev push",
         "save-credentials": "pwa-kit-dev save-credentials",
         "start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
