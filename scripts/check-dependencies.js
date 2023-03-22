@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 /* eslint-env node */
-/* eslint-disable */
 /**
  * This script sanity checks the package.json files in the monorepo.
  *
