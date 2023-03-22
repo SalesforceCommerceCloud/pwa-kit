@@ -39,6 +39,7 @@
     "tar": "^6.1.13"
   },
   "devDependencies": {
+    "internal-lib-build": "2.8.0-dev",
     "verdaccio": "^5.22.1"
   }
 }
