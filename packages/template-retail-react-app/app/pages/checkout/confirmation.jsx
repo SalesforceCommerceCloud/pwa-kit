@@ -22,7 +22,7 @@ import {
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
-import {useOrder, useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
+import {useOrder, useProducts, useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
 import {getCreditCardIcon} from '../../utils/cc-utils'
 import useNavigation from '../../hooks/use-navigation'
 import Link from '../../components/link'
@@ -36,6 +36,8 @@ import CartItemVariantAttributes from '../../components/item-variant/item-attrib
 import CartItemVariantPrice from '../../components/item-variant/item-price'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
+const onClient = typeof window !== 'undefined'
+
 const CheckoutConfirmation = () => {
     const {orderNo} = useParams()
     const navigate = useNavigation()
@@ -43,7 +45,16 @@ const CheckoutConfirmation = () => {
     const register = useAuthHelper(AuthHelpers.Register)
     const {data: order} = useOrder({
         parameters: {orderNo}
+    },
+    {
+        enabled: !!orderNo && onClient
     })
+    const itemIds = order?.productItems.map((item) => item.productId)
+    const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
+    const productItemsMap = products?.data.reduce(
+        (map, item) => ({...map, [item.id]: item}),
+        {}
+    )
     const form = useForm()
 
     useEffect(() => {
@@ -277,14 +288,13 @@ const CheckoutConfirmation = () => {
                                             divider={<Divider />}
                                         >
                                             {order.productItems?.map((product, idx) => {
+                                                const productDetail = productItemsMap?.[product.productId] || {}
                                                 const variant = {
                                                     ...product,
-                                                    ...(order._productItemsDetail &&
-                                                        order._productItemsDetail[
-                                                            product.productId
-                                                        ]),
+                                                    ...productDetail,
                                                     price: product.price
                                                 }
+
                                                 return (
                                                     <ItemVariantProvider
                                                         key={product.productId}
