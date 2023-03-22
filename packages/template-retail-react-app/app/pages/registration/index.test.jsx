@@ -93,7 +93,6 @@ test('Allows customer to create an account', async () => {
     // login with credentials
     global.server.use(
         rest.post('*/oauth2/token', (req, res, ctx) => {
-            console.log('token registered......')
             return res(
                 ctx.delay(0),
                 ctx.json({

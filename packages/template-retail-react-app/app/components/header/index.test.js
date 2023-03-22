@@ -151,7 +151,6 @@ test('route to account page when an authenticated users click on account icon', 
     })
 
     fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
-    console.log('history.location', history.location)
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
     })
