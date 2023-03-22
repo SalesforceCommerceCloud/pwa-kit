@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {Fragment} from 'react'
+import React, {Fragment, useEffect} from 'react'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {
     Box,
@@ -44,15 +44,16 @@ const CheckoutConfirmation = () => {
     const {data: order} = useOrder({
         parameters: {orderNo}
     })
+    const form = useForm()
 
-    const form = useForm({
-        defaultValues: {
-            email: customer?.email || order?.customerInfo?.email || '',
+    useEffect(() => {
+        form.reset({
+            email: order?.customerInfo?.email || '',
             password: '',
-            firstName: customer.firstName || order?.billingAddress?.firstName,
-            lastName: customer.lastName || order?.billingAddress?.lastName
-        }
-    })
+            firstName: order?.billingAddress?.firstName,
+            lastName: order?.billingAddress?.lastName
+        })
+    }, [order])
 
     if (!order || !order.orderNo) {
         return null
@@ -71,9 +72,12 @@ const CheckoutConfirmation = () => {
                 },
                 password: data.password
             }
-            await register.mutateAsync({body})
+            await register.mutateAsync(body)
+
             navigate(`/account`)
         } catch (error) {
+            const json = await error.response.json()
+
             const existingAccountMessage = (
                 <Fragment>
                     <FormattedMessage
@@ -90,9 +94,9 @@ const CheckoutConfirmation = () => {
                 </Fragment>
             )
 
-            const message = /the login is already in use/i.test(error.message)
+            const message = /the login is already in use/i.test(json.detail)
                 ? existingAccountMessage
-                : error.message
+                : json.detail
 
             form.setError('global', {type: 'manual', message})
         }
