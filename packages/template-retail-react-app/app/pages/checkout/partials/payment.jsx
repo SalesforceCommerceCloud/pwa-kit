@@ -77,15 +77,11 @@ const Payment = () => {
         // month and year to submit them as individual fields.
         const [expirationMonth, expirationYear] = formValue.expiry.split('/')
 
-        const maskNumber = (cc) => {
-            return cc.replace(/ /g, '').replace(/^.{12}/g, '*'.repeat(12))
-        }
-
         const paymentInstrument = {
             paymentMethodId: 'CREDIT_CARD',
             paymentCard: {
                 holder: formValue.holder,
-                maskedNumber: maskNumber(formValue.number),
+                issueNumber: formValue.number.replace(/ /g, ''),
                 cardType: getPaymentInstrumentCardType(formValue.cardType),
                 expirationMonth: parseInt(expirationMonth),
                 expirationYear: parseInt(`20${expirationYear}`)
