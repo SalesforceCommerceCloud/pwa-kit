@@ -75,12 +75,12 @@ const deletedCustomerBaskets: BasketsResult = {
 
 // --- TEST CASES --- //
 /** All Shopper Baskets mutations except these have the same cache update logic. */
-type EmptyResponseMutations = Exclude<
+type NonEmptyResponseMutations = Exclude<
     ShopperBasketsMutation,
     'deleteBasket' | 'addPriceBooksToBasket' | 'addTaxesForBasket' | 'addTaxesForBasketItem'
 >
 // This is an object rather than an array to more easily ensure we cover all mutations
-type TestMap = {[Mut in EmptyResponseMutations]: Argument<Client[Mut]>}
+type TestMap = {[Mut in NonEmptyResponseMutations]: Argument<Client[Mut]>}
 const testMap: TestMap = {
     addGiftCertificateItemToBasket: createOptions<'addGiftCertificateItemToBasket'>(
         {recipientEmail: 'customer@email', amount: 100},
@@ -161,12 +161,12 @@ const addTaxesForBasketItemTestCase = [
 ] as const
 
 // Type assertion because the built-in type definition for `Object.entries` is limited :\
-const emptyResponseTestCases = Object.entries(testMap) as Array<
-    [EmptyResponseMutations, Argument<Client[EmptyResponseMutations]>]
+const nonEmptyResponseTestCases = Object.entries(testMap) as Array<
+    [NonEmptyResponseMutations, Argument<Client[NonEmptyResponseMutations]>]
 >
 // Most test cases only apply to non-delete test cases, some (error handling) can include deleteBasket
 const allTestCases = [
-    ...emptyResponseTestCases,
+    ...nonEmptyResponseTestCases,
     deleteTestCase,
     addPriceBooksToBasketTestCase,
     addTaxesForBasketTestCase,
@@ -185,7 +185,7 @@ describe('ShopperBaskets mutations', () => {
     })
 
     beforeEach(() => nock.cleanAll())
-    test.each(emptyResponseTestCases)(
+    test.each(nonEmptyResponseTestCases)(
         '`%s` returns data on success',
         async (mutationName, options) => {
             mockMutationEndpoints(basketsEndpoint, oldBasket)
@@ -210,7 +210,7 @@ describe('ShopperBaskets mutations', () => {
         // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
         expect(result.current.error).toHaveProperty('response')
     })
-    test.each(emptyResponseTestCases)(
+    test.each(nonEmptyResponseTestCases)(
         '`%s` updates the cache on success',
         async (mutationName, options) => {
             mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
