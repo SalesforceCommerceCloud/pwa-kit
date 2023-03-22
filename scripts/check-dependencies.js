@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /* eslint-env node */
+/* eslint-disable */
 /**
  * This script sanity checks the package.json files in the monorepo.
  *
@@ -58,7 +59,10 @@ const commonConfigs = [
 // We are going to copy these devDependencies into each package from this script,
 // in order to standardize them.
 const commonDevDeps = {
-    'cross-env': '^5.2.0',
+    'cross-env': require('../packages/internal-lib-build/package.json').dependencies['cross-env'],
+}
+if (!commonDevDeps['cross-env']) {
+    throw new Error('Expected `internal-lib-build` to have `cross-env` as a dependency. You should revisit the assumptions in `./scripts/check-dependencies.js`.')
 }
 
 const readJSON = (path) => JSON.parse(fs.readFileSync(path))
