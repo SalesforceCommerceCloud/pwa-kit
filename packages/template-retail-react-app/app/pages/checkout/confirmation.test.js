@@ -233,7 +233,6 @@ test('Create Account form - renders error message', async () => {
     const createAccountButton = await screen.findByRole('button', {name: /create account/i})
     const passwordEl = await screen.findByLabelText('Password')
     user.type(passwordEl, 'P4ssword!')
-    screen.logTestingPlaygroundURL()
     user.click(createAccountButton)
     const alert = await screen.findByRole('alert')
     expect(alert).toBeInTheDocument()
