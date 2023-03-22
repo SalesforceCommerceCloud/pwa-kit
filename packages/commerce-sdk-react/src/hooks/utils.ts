@@ -49,12 +49,6 @@ export const pathStartsWith =
     ({queryKey}: Query): boolean =>
         queryKey.length >= search.length && search.every((lookup, idx) => queryKey[idx] === lookup)
 
-/** Creates a query predicate that returns true if all of the given predicates return true. */
-export const and =
-    <Args extends unknown[]>(...funcs: Array<(...args: Args) => boolean>) =>
-    (...args: Args) =>
-        funcs.every((fn) => fn(...args))
-
 /**
  * Merges headers and parameters from client config into the options, mimicking the behavior
  * of commerce-sdk-isomorphic.
