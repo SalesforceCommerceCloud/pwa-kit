@@ -243,42 +243,6 @@
       "value": "Order History"
     }
   ],
-  "account_payment_methods.button.add_method": [
-    {
-      "type": 0,
-      "value": "Add Payment Method"
-    }
-  ],
-  "account_payment_methods.description.add_method_for_faster_checkout": [
-    {
-      "type": 0,
-      "value": "Add a new payment method for faster checkout."
-    }
-  ],
-  "account_payment_methods.heading.no_saved_methods": [
-    {
-      "type": 0,
-      "value": "No Saved Payment Methods"
-    }
-  ],
-  "account_payment_methods.info.new_method_saved": [
-    {
-      "type": 0,
-      "value": "New Payment Method Saved"
-    }
-  ],
-  "account_payment_methods.info.payment_method_removed": [
-    {
-      "type": 0,
-      "value": "Payment Method Removed"
-    }
-  ],
-  "account_payment_methods.title.payment_methods": [
-    {
-      "type": 0,
-      "value": "Payment Methods"
-    }
-  ],
   "account_wishlist.button.continue_shopping": [
     {
       "type": 0,
@@ -447,12 +411,6 @@
     {
       "type": 0,
       "value": "Password Reset"
-    }
-  ],
-  "card_payment_form.heading.new_payment_method": [
-    {
-      "type": 0,
-      "value": "Add New Payment Method"
     }
   ],
   "cart.info.removed_from_cart": [
@@ -1007,12 +965,6 @@
       "value": "Order History"
     }
   ],
-  "drawer_menu.button.payment_methods": [
-    {
-      "type": 0,
-      "value": "Payment Methods"
-    }
-  ],
   "drawer_menu.link.about_us": [
     {
       "type": 0,
@@ -1307,12 +1259,6 @@
     {
       "type": 0,
       "value": "Order History"
-    }
-  ],
-  "global.account.link.payment_methods": [
-    {
-      "type": 0,
-      "value": "Payment Methods"
     }
   ],
   "global.account.link.wishlist": [

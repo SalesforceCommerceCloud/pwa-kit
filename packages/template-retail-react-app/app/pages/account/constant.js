@@ -6,19 +6,12 @@
  */
 
 import {defineMessages} from 'react-intl'
-import {
-    AccountIcon,
-    LocationIcon,
-    PaymentIcon,
-    ReceiptIcon,
-    HeartIcon
-} from '../../components/icons'
+import {AccountIcon, LocationIcon, ReceiptIcon, HeartIcon} from '../../components/icons'
 
 export const messages = defineMessages({
     profile: {defaultMessage: 'Account Details', id: 'global.account.link.account_details'},
     addresses: {defaultMessage: 'Addresses', id: 'global.account.link.addresses'},
     orders: {defaultMessage: 'Order History', id: 'global.account.link.order_history'},
-    payments: {defaultMessage: 'Payment Methods', id: 'global.account.link.payment_methods'},
     wishlist: {defaultMessage: 'Wishlist', id: 'global.account.link.wishlist'}
 })
 
@@ -42,11 +35,6 @@ export const navLinks = [
         name: 'addresses',
         path: '/addresses',
         icon: LocationIcon
-    },
-    {
-        name: 'payments',
-        path: '/payments',
-        icon: PaymentIcon
     }
 ]
 
