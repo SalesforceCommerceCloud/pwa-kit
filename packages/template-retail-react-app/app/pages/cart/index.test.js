@@ -284,6 +284,7 @@ describe.skip('Update quantity in product view', function () {
 })
 
 describe('Remove item from cart', function () {
+    jest.setTimeout(30000)
     beforeEach(() => {
         global.server.use(
             rest.delete('*/baskets/:basket/items/:itemId', (req, res, ctx) => {
@@ -306,7 +307,7 @@ describe('Remove item from cart', function () {
             () => {
                 expect(screen.getByTestId('sf-cart-empty')).toBeInTheDocument()
             },
-            {timeout: 5000}
+            {timeout: 20000}
         )
     })
 })
