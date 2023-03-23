@@ -180,7 +180,12 @@ const main = async () => {
 
     const appSSRpath = p.join(process.cwd(), 'app', 'ssr.js')
     const appSSRjs = fse.pathExistsSync(appSSRpath)
-    const overrideSSRpath = p.join(process.cwd(), projectPkg?.mobify?.overridesDir, 'app', 'ssr.js')
+    const overrideSSRpath = p.join(
+        process.cwd(),
+        projectPkg?.mobify?.overridesDir ?? '',
+        'app',
+        'ssr.js'
+    )
     const overrideSSRjs = fse.pathExistsSync(overrideSSRpath)
     const resolvedSSRPath = appSSRjs ? appSSRpath : overrideSSRjs ? overrideSSRpath : null
 
