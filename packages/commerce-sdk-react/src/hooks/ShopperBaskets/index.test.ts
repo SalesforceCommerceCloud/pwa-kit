@@ -26,17 +26,6 @@ describe('Shopper Baskets hooks', () => {
         })
         // If this test fails: add cache update logic, remove the endpoint from the mutations enum,
         // or add it to the `expected` array to indicate that it is still a TODO.
-        expect([...unimplemented]).toEqual([
-            'transferBasket',
-            'addGiftCertificateItemToBasket',
-            'removeGiftCertificateItemFromBasket',
-            'updateGiftCertificateItemInBasket',
-            'addTaxesForBasketItem',
-            'addPriceBooksToBasket',
-            'createShipmentForBasket',
-            'removeShipmentFromBasket',
-            'updateShipmentForBasket',
-            'addTaxesForBasket'
-        ])
+        expect([...unimplemented]).toEqual([])
     })
 })
