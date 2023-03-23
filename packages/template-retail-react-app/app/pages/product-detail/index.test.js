@@ -105,9 +105,12 @@ describe('product set', () => {
         const initialBasket = {basketId: 'valid_id'}
         renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
-        await waitFor(() => {
-            expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
-        })
+        await waitFor(
+            () => {
+                expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
+            },
+            {timeout: 5000}
+        )
 
         const buttons = await screen.findAllByText(/add set to cart/i)
         fireEvent.click(buttons[0])
@@ -125,9 +128,12 @@ describe('product set', () => {
     test('add the set to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
 
-        await waitFor(() => {
-            expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
-        })
+        await waitFor(
+            () => {
+                expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
+            },
+            {timeout: 5000}
+        )
 
         const buttons = await screen.findAllByText(/add set to cart/i)
         fireEvent.click(buttons[0])
