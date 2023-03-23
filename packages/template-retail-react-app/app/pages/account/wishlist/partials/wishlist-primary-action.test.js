@@ -97,6 +97,6 @@ test('the View Options button', async () => {
             expect(modal).toBeVisible()
         },
         // Seems like rendering the modal takes a bit more time
-        {timeout: 10000}
+        {timeout: 5000}
     )
 }, 30000)
