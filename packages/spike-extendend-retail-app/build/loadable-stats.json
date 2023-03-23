@@ -1,12 +1,12 @@
 {
   "name": "client",
-  "hash": "09c8431d6a25840d5f4a",
+  "hash": "dfc00bae6eb5631722f0",
   "publicPath": "/mobify/bundle/development/",
   "outputPath": "/Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/build",
   "assetsByChunkName": {
     "main": [
       "main.js",
-      "main.411d6873a67d4fb69781.hot-update.js"
+      "main.7b7409a9109c0f525610.hot-update.js"
     ],
     "pages-home": [
       "pages-home.js"
@@ -35,9 +35,9 @@
     "^retail-react-app-app-pages-login-redirect": [
       "^retail-react-app-app-pages-login-redirect.js"
     ],
-    "pages-product-detail": [
-      "pages-product-detail.js",
-      "pages-product-detail.411d6873a67d4fb69781.hot-update.js"
+    "^retail-react-app-app-pages-product-detail": [
+      "^retail-react-app-app-pages-product-detail.js",
+      "^retail-react-app-app-pages-product-detail.7b7409a9109c0f525610.hot-update.js"
     ],
     "^retail-react-app-app-pages-product-list": [
       "^retail-react-app-app-pages-product-list.js"
@@ -83,7 +83,7 @@
     {
       "type": "asset",
       "name": "main.js",
-      "size": 1175723,
+      "size": 1175867,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
@@ -602,26 +602,26 @@
     },
     {
       "type": "asset",
-      "name": "pages-product-detail.js",
-      "size": 38066,
+      "name": "^retail-react-app-app-pages-product-detail.js",
+      "size": 39793,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "javascriptModule": false,
         "related": {
-          "sourceMap": "pages-product-detail.js.map"
+          "sourceMap": "^retail-react-app-app-pages-product-detail.js.map"
         }
       },
       "chunkNames": [
-        "pages-product-detail"
+        "^retail-react-app-app-pages-product-detail"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1,
       "chunks": [
-        "pages-product-detail"
+        "^retail-react-app-app-pages-product-detail"
       ],
       "auxiliaryChunks": []
     },
@@ -645,33 +645,6 @@
       "filteredRelated": 1,
       "chunks": [
         "template-retail-react-app_app_components_confirmation-modal_index_jsx-template-retail-react-a-7530a1"
-      ],
-      "auxiliaryChunks": []
-    },
-    {
-      "type": "asset",
-      "name": "pages-product-detail.411d6873a67d4fb69781.hot-update.js",
-      "size": 29057,
-      "emitted": false,
-      "comparedForEmit": false,
-      "cached": true,
-      "info": {
-        "hotModuleReplacement": true,
-        "immutable": true,
-        "fullhash": "411d6873a67d4fb69781",
-        "related": {
-          "sourceMap": "pages-product-detail.411d6873a67d4fb69781.hot-update.js.map"
-        }
-      },
-      "chunkNames": [
-        "pages-product-detail"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1,
-      "chunks": [
-        "pages-product-detail"
       ],
       "auxiliaryChunks": []
     },
@@ -777,6 +750,33 @@
     },
     {
       "type": "asset",
+      "name": "^retail-react-app-app-pages-product-detail.7b7409a9109c0f525610.hot-update.js",
+      "size": 5590,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "hotModuleReplacement": true,
+        "immutable": true,
+        "fullhash": "7b7409a9109c0f525610",
+        "related": {
+          "sourceMap": "^retail-react-app-app-pages-product-detail.7b7409a9109c0f525610.hot-update.js.map"
+        }
+      },
+      "chunkNames": [
+        "^retail-react-app-app-pages-product-detail"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        "^retail-react-app-app-pages-product-detail"
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
       "name": "^retail-react-app-app-pages-login-redirect.js",
       "size": 3058,
       "emitted": false,
@@ -802,7 +802,7 @@
     },
     {
       "type": "asset",
-      "name": "main.411d6873a67d4fb69781.hot-update.js",
+      "name": "main.7b7409a9109c0f525610.hot-update.js",
       "size": 370,
       "emitted": false,
       "comparedForEmit": false,
@@ -810,9 +810,9 @@
       "info": {
         "hotModuleReplacement": true,
         "immutable": true,
-        "fullhash": "411d6873a67d4fb69781",
+        "fullhash": "7b7409a9109c0f525610",
         "related": {
-          "sourceMap": "main.411d6873a67d4fb69781.hot-update.js.map"
+          "sourceMap": "main.7b7409a9109c0f525610.hot-update.js.map"
         }
       },
       "chunkNames": [
@@ -875,15 +875,15 @@
     },
     {
       "type": "asset",
-      "name": "main.411d6873a67d4fb69781.hot-update.json",
-      "size": 51,
+      "name": "main.7b7409a9109c0f525610.hot-update.json",
+      "size": 73,
       "emitted": false,
       "comparedForEmit": false,
       "cached": true,
       "info": {
         "hotModuleReplacement": true,
         "immutable": true,
-        "fullhash": "411d6873a67d4fb69781"
+        "fullhash": "7b7409a9109c0f525610"
       },
       "chunkNames": [],
       "chunkIdHints": [],
@@ -908,7 +908,7 @@
           "name": "main.js"
         },
         {
-          "name": "main.411d6873a67d4fb69781.hot-update.js"
+          "name": "main.7b7409a9109c0f525610.hot-update.js"
         }
       ],
       "filteredAssets": 0,
@@ -1135,21 +1135,21 @@
       "children": {},
       "childAssets": {}
     },
-    "pages-product-detail": {
-      "name": "pages-product-detail",
+    "^retail-react-app-app-pages-product-detail": {
+      "name": "^retail-react-app-app-pages-product-detail",
       "chunks": [
         "template-retail-react-app_app_partials_product-view_index_jsx",
-        "pages-product-detail"
+        "^retail-react-app-app-pages-product-detail"
       ],
       "assets": [
         {
           "name": "template-retail-react-app_app_partials_product-view_index_jsx.js"
         },
         {
-          "name": "pages-product-detail.js"
+          "name": "^retail-react-app-app-pages-product-detail.js"
         },
         {
-          "name": "pages-product-detail.411d6873a67d4fb69781.hot-update.js"
+          "name": "^retail-react-app-app-pages-product-detail.7b7409a9109c0f525610.hot-update.js"
         }
       ],
       "filteredAssets": 0,
@@ -1233,7 +1233,7 @@
       "id": "main",
       "files": [
         "main.js",
-        "main.411d6873a67d4fb69781.hot-update.js"
+        "main.7b7409a9109c0f525610.hot-update.js"
       ]
     },
     {
@@ -1375,10 +1375,10 @@
       ]
     },
     {
-      "id": "pages-product-detail",
+      "id": "^retail-react-app-app-pages-product-detail",
       "files": [
-        "pages-product-detail.js",
-        "pages-product-detail.411d6873a67d4fb69781.hot-update.js"
+        "^retail-react-app-app-pages-product-detail.js",
+        "^retail-react-app-app-pages-product-detail.7b7409a9109c0f525610.hot-update.js"
       ]
     },
     {
