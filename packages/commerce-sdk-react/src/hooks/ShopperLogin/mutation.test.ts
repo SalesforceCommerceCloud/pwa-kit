@@ -29,7 +29,7 @@ const loginEndpoint = '/shopper/auth/'
 const OPTIONS = {
     parameters: {
         client_id: 'client_id',
-        refresh_token: 'token',
+        refresh_token: 'token'
     },
     body: {
         agent_id: 'agent_id',

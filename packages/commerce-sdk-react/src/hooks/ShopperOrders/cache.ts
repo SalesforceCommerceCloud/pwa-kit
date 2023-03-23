@@ -20,11 +20,11 @@ type Client = ApiClients['shopperOrders']
 /** Parameters that get passed around, includes client config and possible parameters from other endpoints */
 type GetOrderParameters = MergedOptions<Client, Argument<Client['getOrder']>>['parameters']
 
-const invalidateOrderQuery = (
+const updateOrderQuery = (
     customerId: string | null,
     {parameters}: {parameters: GetOrderParameters}
 ): CacheUpdate => ({
-    invalidate: [{queryKey: getOrder.queryKey(parameters)}]
+    update: [{queryKey: getOrder.queryKey(parameters)}]
 })
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
@@ -42,7 +42,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             : [{queryKey: getCustomerBaskets.queryKey({...parameters, customerId})}]
         return {update, invalidate}
     },
-    createPaymentInstrumentForOrder: invalidateOrderQuery,
-    removePaymentInstrumentFromOrder: invalidateOrderQuery,
-    updatePaymentInstrumentForOrder: invalidateOrderQuery
+    createPaymentInstrumentForOrder: updateOrderQuery,
+    updatePaymentInstrumentForOrder: updateOrderQuery,
+    removePaymentInstrumentFromOrder: updateOrderQuery
 }
