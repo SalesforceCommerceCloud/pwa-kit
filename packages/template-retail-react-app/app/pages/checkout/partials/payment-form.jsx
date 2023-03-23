@@ -11,7 +11,7 @@ import {Box, Flex, Radio, RadioGroup, Stack, Text, Tooltip} from '@chakra-ui/rea
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {LockIcon, PaypalIcon} from '../../../components/icons'
 import CreditCardFields from '../../../components/forms/credit-card-fields'
-import { useCurrency } from '../../../hooks'
+import {useCurrency} from '../../../hooks'
 
 const PaymentForm = ({form, onSubmit}) => {
     const {formatMessage} = useIntl()
