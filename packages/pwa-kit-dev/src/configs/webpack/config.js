@@ -20,7 +20,11 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {sdkReplacementPlugin, extendedTemplateReplacementPlugin} from './plugins'
+import {
+    sdkReplacementPlugin,
+    caretOverrideReplacementPlugin,
+    extendedTemplateReplacementPlugin
+} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
@@ -192,6 +196,10 @@ const baseConfig = (target) => {
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     sdkReplacementPlugin(projectDir),
+
+                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? caretOverrideReplacementPlugin(projectDir)
+                        : () => null,
 
                     pkg?.mobify?.extends && pkg?.mobify?.overridesDir
                         ? extendedTemplateReplacementPlugin(projectDir)
