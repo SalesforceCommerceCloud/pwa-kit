@@ -20,7 +20,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         return {
             update: [
                 {
-                    queryKey: getShopperContext.queryKey(parameters),
+                    queryKey: getShopperContext.queryKey(parameters)
                 }
             ]
         }
