@@ -35,10 +35,10 @@ module.exports = {
     //@TODO: Revert this threshold back to original numbers stattements: 80, branches: 72, functions: 78, lines: 83
     coverageThreshold: {
         global: {
-            statements: 69,
-            branches: 55,
-            functions: 60,
-            lines: 70
+            statements: 74,
+            branches: 60,
+            functions: 65,
+            lines: 75
         }
     }
 }
