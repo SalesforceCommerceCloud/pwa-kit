@@ -70,8 +70,8 @@ export default function ShippingOptions() {
     const shippingItem = basket?.shippingItems?.[0]
 
     const selectedMethodDisplayPrice = Math.min(
-        shippingItem.price || 0,
-        shippingItem.priceAfterItemDiscount || 0
+        shippingItem?.price || 0,
+        shippingItem?.priceAfterItemDiscount || 0
     )
 
     // Note that this card is disabled when there is no shipping address as well as no shipping method.
