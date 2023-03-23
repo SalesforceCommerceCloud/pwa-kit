@@ -12,7 +12,8 @@ import minimatch from 'minimatch'
 const projectDir = process.cwd()
 const pkg = require(resolve(projectDir, 'package.json'))
 
-const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
+// TODO: Do we want this to just catch all types of file extensions? 
+const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg|png)'
 
 const getOverridePath = (path) => {
     const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
