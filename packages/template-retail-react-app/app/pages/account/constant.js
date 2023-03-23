@@ -6,12 +6,7 @@
  */
 
 import {defineMessages} from 'react-intl'
-import {
-    AccountIcon,
-    LocationIcon,
-    ReceiptIcon,
-    HeartIcon
-} from '../../components/icons'
+import {AccountIcon, LocationIcon, ReceiptIcon, HeartIcon} from '../../components/icons'
 
 export const messages = defineMessages({
     profile: {defaultMessage: 'Account Details', id: 'global.account.link.account_details'},
