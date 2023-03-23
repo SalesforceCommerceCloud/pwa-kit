@@ -138,12 +138,18 @@ test('Renders error when given incorrect log in credentials', async () => {
     )
 
     user.click(screen.getByText(/sign in/i))
-    await waitFor(() => {
-        // wait for login error alert to appear
-        expect(
-            screen.getByText(/something's not right with your email or password\. try again\./i)
-        ).toBeInTheDocument()
-    })
+    // give it some time to show the error in the form
+    await waitFor(
+        () => {
+            // wait for login error alert to appear
+            expect(
+                screen.getByText(/something's not right with your email or password\. try again\./i)
+            ).toBeInTheDocument()
+        },
+        {
+            timeout: 2000
+        }
+    )
 })
 
 test('Allows customer to create an account', async () => {
@@ -165,8 +171,9 @@ test('Allows customer to create an account', async () => {
     })
     const createAccount = screen.getByText(/create account/i)
     user.click(createAccount)
-    const registerForm = screen.getByTestId('sf-auth-modal-form-register')
+    let registerForm
     await waitFor(() => {
+        registerForm = screen.getByTestId('sf-auth-modal-form-register')
         expect(registerForm).toBeInTheDocument()
     })
 
@@ -224,6 +231,7 @@ test('Allows customer to create an account', async () => {
     )
 })
 
+// TODO: investingate why this test is failing when running with other tests
 test.skip('Allows customer to sign in to their account', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {

@@ -79,7 +79,7 @@ test('Allows customer to create an account', async () => {
         }
     })
 
-    const form = await screen.findByTestId('sf-auth-modal-form')
+    const form = await screen.findByTestId('sf-auth-modal-form-register')
     expect(form).toBeInTheDocument()
 
     // fill out form and submit
