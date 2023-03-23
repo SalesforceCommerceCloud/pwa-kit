@@ -217,8 +217,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             // NOTE: overriding either of these alone does not work, both must be set
             resource.request = newPath
             const end = _overridesHashMap.get(relativePathNoExt)?.[1]
-            resource.createData.resource =
-                newPath + (end[0] === '.' ? end?.join('') : '/' + end?.join(''))
+            resource.createData.resource = newPath + (end[0] !== '.' ? '/' : '') + end?.join('')
         }
     })
 }
