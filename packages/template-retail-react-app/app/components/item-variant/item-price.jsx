@@ -19,7 +19,7 @@ const PricePerItem = ({currency, basket, basePrice}) => {
         <Text fontSize={{base: '12px', lg: '14px'}}>
             <FormattedNumber
                 style="currency"
-                currency={currency || basket.currency || activeCurrency}
+                currency={currency || basket?.currency || activeCurrency}
                 value={basePrice}
             />
             <FormattedMessage
@@ -92,7 +92,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                     >
                         <FormattedNumber
                             style="currency"
-                            currency={currency || basket.currency || activeCurrency}
+                            currency={currency || basket?.currency || activeCurrency}
                             value={price}
                         />
                     </Text>

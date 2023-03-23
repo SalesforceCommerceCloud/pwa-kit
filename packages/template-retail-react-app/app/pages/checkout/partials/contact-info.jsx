@@ -43,14 +43,7 @@ const ContactInfo = () => {
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
 
-    const {
-        isGuestCheckout,
-        setIsGuestCheckout,
-        step,
-        checkoutSteps,
-        setCheckoutStep,
-        goToNextStep
-    } = useCheckout()
+    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
     const form = useForm({
         defaultValues: {email: customer?.email || basket?.customerInfo?.email || '', password: ''}
@@ -88,12 +81,11 @@ const ContactInfo = () => {
         }
     }
 
-    const toggleGuestCheckout = () => {
+    const togglePasswordField = () => {
         if (error) {
             setError(null)
         }
         setShowPasswordField(!showPasswordField)
-        setIsGuestCheckout(!isGuestCheckout)
     }
 
     const onForgotPasswordClick = () => {
@@ -107,17 +99,17 @@ const ContactInfo = () => {
                 defaultMessage: 'Contact Info',
                 id: 'contact_info.title.contact_info'
             })}
-            editing={step === checkoutSteps.Contact_Info}
+            editing={step === STEPS.CONTACT_INFO}
             isLoading={form.formState.isSubmitting}
             onEdit={() => {
-                if (!isGuestCheckout) {
+                if (customer.isRegistered) {
                     setSignOutConfirmDialogIsOpen(true)
                 } else {
-                    setCheckoutStep(checkoutSteps.Contact_Info)
+                    goToStep(STEPS.CONTACT_INFO)
                 }
             }}
             editLabel={
-                !isGuestCheckout ? (
+                customer.isRegistered ? (
                     <FormattedMessage defaultMessage="Sign Out" id="contact_info.action.sign_out" />
                 ) : undefined
             }
@@ -168,7 +160,7 @@ const ContactInfo = () => {
                                         />
                                     )}
                                 </Button>
-                                <Button variant="outline" onClick={toggleGuestCheckout}>
+                                <Button variant="outline" onClick={togglePasswordField}>
                                     {!showPasswordField ? (
                                         <FormattedMessage
                                             defaultMessage="Already have an account? Log in"

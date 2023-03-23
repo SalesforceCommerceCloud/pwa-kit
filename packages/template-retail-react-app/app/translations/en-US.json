@@ -929,17 +929,8 @@
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
   },
-  "payment_selection.button.save_and_continue": {
-    "defaultMessage": "Save & Continue"
-  },
-  "payment_selection.heading.add_new_card": {
-    "defaultMessage": "Add New Card"
-  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Credit Card"
-  },
-  "payment_selection.message.select_payment_method": {
-    "defaultMessage": "Please select a payment method."
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "This is a secure SSL encrypted payment."
