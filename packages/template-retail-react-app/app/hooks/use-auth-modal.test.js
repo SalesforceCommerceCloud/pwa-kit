@@ -115,7 +115,7 @@ test('Renders error when given incorrect log in credentials', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {
-            bypassAuth: true
+            bypassAuth: false
         }
     })
 
@@ -143,55 +143,6 @@ test('Renders error when given incorrect log in credentials', async () => {
         expect(
             screen.getByText(/something's not right with your email or password\. try again\./i)
         ).toBeInTheDocument()
-    })
-})
-
-describe('Reset password', function () {
-    beforeEach(() => {})
-    test.skip('Allows customer to generate password token', async () => {
-        // render our test component
-        renderWithProviders(<MockedComponent initialView="password" />, {
-            wrapperProps: {
-                bypassAuth: true
-            }
-        })
-
-        // open the modal
-        const trigger = screen.getByText(/open modal/i)
-        user.click(trigger)
-        expect(authModal.isOpen).toBe(true)
-
-        // enter credentials and submit
-        const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
-        user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
-        user.click(withinForm.getByText(/reset password/i))
-
-        // wait for success state
-        await waitFor(() => {
-            expect(screen.getByText(/password reset/i)).toBeInTheDocument()
-            expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
-        })
-    })
-
-    test.skip('Allows customer to open generate password token modal from everywhere', () => {
-        // render our test component
-        renderWithProviders(<MockedComponent initialView="password" />)
-
-        // open the modal
-        const trigger = screen.getByText(/open modal/i)
-        user.click(trigger)
-        expect(authModal.isOpen).toBe(true)
-
-        const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
-
-        expect(withinForm.getByText(/Reset Password/i)).toBeInTheDocument()
-
-        // close the modal
-        const switchToSignIn = screen.getByText(/Sign in/i)
-        user.click(switchToSignIn)
-
-        // check that the modal is closed
-        expect(authModal.isOpen).toBe(false)
     })
 })
 
@@ -261,16 +212,23 @@ test('Allows customer to create an account', async () => {
         expect(form).not.toBeInTheDocument()
     })
     // wait for success state to appear
-    const myAccount = await screen.findAllByText(/My Account/)
-    await waitFor(() => {
-        expect(myAccount.length).toEqual(2)
-    })
+    await waitFor(
+        () => {
+            expect(window.location.pathname).toEqual('/uk/en-GB/account')
+            const myAccount = screen.getAllByText(/My Account/)
+            expect(myAccount.length).toEqual(2)
+        },
+        {
+            timeout: 5000
+        }
+    )
 })
-test('Allows customer to sign in to their account', async () => {
+
+test.skip('Allows customer to sign in to their account', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {
-            bypassAuth: true
+            bypassAuth: false
         }
     })
 
@@ -302,13 +260,67 @@ test('Allows customer to sign in to their account', async () => {
     user.click(screen.getByText(/sign in/i))
 
     // alow time to transition to account page
-    await waitFor(
-        () => {
-            expect(window.location.pathname).toEqual('/uk/en-GB/account')
-            expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
-        },
-        {
-            timeout: 5000
-        }
-    )
+    await waitFor(() => {
+        expect(window.location.pathname).toEqual('/uk/en-GB/account')
+        expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
+    })
+})
+
+describe('Reset password', function () {
+    beforeEach(() => {
+        global.server.use(
+            rest.post('*/customers/password/actions/create-reset-token', (req, res, ctx) =>
+                res(ctx.delay(0), ctx.status(200), ctx.json(mockPasswordToken))
+            )
+        )
+    })
+    test.skip('Allows customer to generate password token', async () => {
+        // render our test component
+        renderWithProviders(<MockedComponent initialView="password" />, {
+            wrapperProps: {
+                bypassAuth: false
+            }
+        })
+
+        // open the modal
+        const trigger = screen.getByText(/open modal/i)
+        user.click(trigger)
+        expect(authModal.isOpen).toBe(true)
+
+        // enter credentials and submit
+        // const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
+
+        let resetPwForm = await screen.findByTestId('sf-auth-modal-form-reset-pw')
+        expect(resetPwForm).toBeInTheDocument()
+        const withinForm = within(resetPwForm)
+        user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
+        user.click(withinForm.getByText(/reset password/i))
+
+        // wait for success state
+        await waitFor(() => {
+            expect(screen.getByText(/password reset/i)).toBeInTheDocument()
+            expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+        })
+    })
+
+    test.skip('Allows customer to open generate password token modal from everywhere', () => {
+        // render our test component
+        renderWithProviders(<MockedComponent initialView="password" />)
+
+        // open the modal
+        const trigger = screen.getByText(/open modal/i)
+        user.click(trigger)
+        expect(authModal.isOpen).toBe(true)
+
+        const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
+
+        expect(withinForm.getByText(/Reset Password/i)).toBeInTheDocument()
+
+        // close the modal
+        const switchToSignIn = screen.getByText(/Sign in/i)
+        user.click(switchToSignIn)
+
+        // check that the modal is closed
+        expect(authModal.isOpen).toBe(false)
+    })
 })

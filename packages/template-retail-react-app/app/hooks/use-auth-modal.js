@@ -98,42 +98,41 @@ export const AuthModal = ({
                     form.setError('global', {type: 'manual', message})
                 }
             },
-            register: (data) => {
-                const body = {
-                    customer: {
-                        firstName: data.firstName,
-                        lastName: data.lastName,
-                        email: data.email,
-                        login: data.email
-                    },
-                    password: data.password
-                }
+            register: async (data) => {
+                try {
+                    const body = {
+                        customer: {
+                            firstName: data.firstName,
+                            lastName: data.lastName,
+                            email: data.email,
+                            login: data.email
+                        },
+                        password: data.password
+                    }
 
-                return register.mutateAsync(body, {
-                    onSuccess: onLoginSuccess,
-                    onError: () => {
-                        form.setError('global', {
-                            type: 'manual',
-                            message: formatMessage(API_ERROR_MESSAGE)
-                        })
+                    const res = await register.mutateAsync(body)
+                    if (res) {
+                        onLoginSuccess()
                     }
-                })
-            },
-            password: (data) => {
-                const body = {
-                    login: data.email
+                } catch (error) {
+                    form.setError('global', {
+                        type: 'manual',
+                        message: formatMessage(API_ERROR_MESSAGE)
+                    })
                 }
-                return getResetPasswordToken.mutateAsync(
-                    {body},
-                    {
-                        onError: () => {
-                            form.setError('global', {
-                                type: 'manual',
-                                message: formatMessage(API_ERROR_MESSAGE)
-                            })
-                        }
+            },
+            password: async (data) => {
+                try {
+                    const body = {
+                        login: data.email
                     }
-                )
+                    await getResetPasswordToken.mutateAsync({body})
+                } catch (e) {
+                    form.setError('global', {
+                        type: 'manual',
+                        message: formatMessage(API_ERROR_MESSAGE)
+                    })
+                }
             }
         }[currentView](data)
     }
@@ -242,7 +241,6 @@ export const AuthModal = ({
             </Stack>
         </Stack>
     )
-
     return (
         <Modal
             size="sm"
