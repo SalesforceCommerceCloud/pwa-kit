@@ -174,10 +174,7 @@ const emptyResponseTestCases = [
 ]
 
 // Most test cases only apply to non-empty response test cases, some (error handling) can include deleteBasket
-const allTestCases = [
-    ...nonEmptyResponseTestCases,
-    ...emptyResponseTestCases
-]
+const allTestCases = [...nonEmptyResponseTestCases, ...emptyResponseTestCases]
 
 describe('ShopperBaskets mutations', () => {
     const storedCustomerIdKey = `${DEFAULT_TEST_CONFIG.siteId}_customer_id`
@@ -260,17 +257,20 @@ describe('ShopperBaskets mutations', () => {
             assertUpdateQuery(result.current.customerBaskets, oldCustomerBaskets)
         }
     )
-    test.each(emptyResponseTestCases)('`%s` returns void on success', async (mutationName, options) => {
-        // Almost the standard 'returns data' test, just a different return type
-        mockMutationEndpoints(basketsEndpoint, oldBasket)
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
-            return useShopperBasketsMutation(mutationName)
-        })
-        expect(result.current.data).toBeUndefined()
-        act(() => result.current.mutate(options))
-        await waitAndExpectSuccess(wait, () => result.current)
-        expect(result.current.data).toBeUndefined()
-    })
+    test.each(emptyResponseTestCases)(
+        '`%s` returns void on success',
+        async (mutationName, options) => {
+            // Almost the standard 'returns data' test, just a different return type
+            mockMutationEndpoints(basketsEndpoint, oldBasket)
+            const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+                return useShopperBasketsMutation(mutationName)
+            })
+            expect(result.current.data).toBeUndefined()
+            act(() => result.current.mutate(options))
+            await waitAndExpectSuccess(wait, () => result.current)
+            expect(result.current.data).toBeUndefined()
+        }
+    )
     test('`deleteBasket` removes the basket from the cache on success', async () => {
         // Almost the standard 'updates cache' test, but the cache changes are different
         const [mutationName, options] = deleteTestCase
