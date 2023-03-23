@@ -13,21 +13,23 @@ import {ChevronDownIcon} from '../../../components/icons'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import {useShippingMethodsForShipment, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCurrency} from '../../../hooks'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
-    const {step, checkoutSteps, setCheckoutStep, goToNextStep} = useCheckout()
+    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
+    const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
     const {data: shippingMethods} = useShippingMethodsForShipment(
         {
             parameters: {
-                basketId: basket.basketId,
+                basketId: basket?.basketId,
                 shipmentId: 'me'
             }
         },
         {
-            enabled: Boolean(basket.basketId) && step === checkoutSteps.ShippingOptions
+            enabled: Boolean(basket?.basketId) && step === STEPS.ShippingOptions
         }
     )
 
@@ -68,8 +70,8 @@ export default function ShippingOptions() {
     const shippingItem = basket?.shippingItems?.[0]
 
     const selectedMethodDisplayPrice = Math.min(
-        shippingItem.price || 0,
-        shippingItem.priceAfterItemDiscount || 0
+        shippingItem?.price || 0,
+        shippingItem?.priceAfterItemDiscount || 0
     )
 
     // Note that this card is disabled when there is no shipping address as well as no shipping method.
@@ -83,10 +85,10 @@ export default function ShippingOptions() {
                 defaultMessage: 'Shipping & Gift Options',
                 id: 'shipping_options.title.shipping_gift_options'
             })}
-            editing={step === checkoutSteps.Shipping_Options}
+            editing={step === STEPS.SHIPPING_OPTIONS}
             isLoading={form.formState.isSubmitting}
             disabled={selectedShippingMethod == null || !selectedShippingAddress}
-            onEdit={() => setCheckoutStep(checkoutSteps.Shipping_Options)}
+            onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
         >
             <ToggleCardEdit>
                 <form
@@ -123,7 +125,7 @@ export default function ShippingOptions() {
                                                                 <FormattedNumber
                                                                     value={opt.price}
                                                                     style="currency"
-                                                                    currency={basket.currency}
+                                                                    currency={currency}
                                                                 />
                                                             </Text>
                                                         </Flex>
@@ -182,7 +184,7 @@ export default function ShippingOptions() {
                                     <FormattedNumber
                                         value={selectedMethodDisplayPrice}
                                         style="currency"
-                                        currency={basket.currency}
+                                        currency={currency}
                                     />
                                 )}
                             </Text>
@@ -195,7 +197,7 @@ export default function ShippingOptions() {
                                 >
                                     <FormattedNumber
                                         style="currency"
-                                        currency={basket.currency}
+                                        currency={currency}
                                         value={shippingItem.price}
                                     />
                                 </Text>
