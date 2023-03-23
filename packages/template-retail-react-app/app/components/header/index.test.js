@@ -202,7 +202,6 @@ test('shows dropdown menu when an authenticated users hover on the account icon'
 
     await waitFor(() => {
         expect(screen.getByText(/account details/i)).toBeInTheDocument()
-        expect(screen.getByText(/payment methods/i)).toBeInTheDocument()
         expect(screen.getByText(/addresses/i)).toBeInTheDocument()
         expect(screen.getByText(/wishlist/i)).toBeInTheDocument()
         expect(screen.getByText(/order history/i)).toBeInTheDocument()

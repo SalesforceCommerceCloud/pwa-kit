@@ -103,10 +103,6 @@ test('Provides navigation for subpages', async () => {
     await waitFor(() =>
         expect(window.location.pathname).toEqual(`${expectedBasePath}/account/orders`)
     )
-    user.click(nav.getByText('Payment Methods'))
-    await waitFor(() =>
-        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/payments`)
-    )
 })
 
 describe('Render and logs out', function () {

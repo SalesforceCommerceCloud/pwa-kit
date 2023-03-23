@@ -29,7 +29,6 @@ import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../components/icon
 import AccountDetail from './profile'
 import AccountAddresses from './addresses'
 import AccountOrders from './orders'
-import AccountPaymentMethods from './payments'
 import AccountWishlist from './wishlist/index'
 import {useLocation} from 'react-router-dom'
 
@@ -218,9 +217,6 @@ const Account = () => {
                     </Route>
                     <Route path={`${path}/orders`}>
                         <AccountOrders />
-                    </Route>
-                    <Route exact path={`${path}/payments`}>
-                        <AccountPaymentMethods />
                     </Route>
                 </Switch>
             </Grid>
