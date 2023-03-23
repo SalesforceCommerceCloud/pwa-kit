@@ -21,7 +21,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             update: [
                 {
                     queryKey: getShopperContext.queryKey(parameters),
-                    updater: (): ShopperContextsTypes.ShopperContext | undefined => ({...response})
                 }
             ]
         }
