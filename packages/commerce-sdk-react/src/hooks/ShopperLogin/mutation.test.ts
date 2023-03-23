@@ -8,13 +8,13 @@ import {act} from '@testing-library/react'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
 import {
+    mockQueryEndpoint,
     mockMutationEndpoints,
     renderHookWithProviders,
     waitAndExpectError,
     waitAndExpectSuccess
 } from '../../test-utils'
 import {ApiClients, Argument, DataType} from '../types'
-import {NotImplementedError} from '../utils'
 import {ShopperLoginMutation, useShopperLoginMutation} from './mutation'
 
 jest.mock('../../auth/index.ts', () => {
@@ -27,6 +27,10 @@ type Client = ApiClients['shopperLogin']
 const loginEndpoint = '/shopper/auth/'
 // Additional properties are ignored, so we can use this mega-options object for all endpoints
 const OPTIONS = {
+    parameters: {
+        client_id: 'client_id',
+        refresh_token: 'token',
+    },
     body: {
         agent_id: 'agent_id',
         channel_id: 'channel_id',
@@ -60,7 +64,7 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
 }
 
 // --- TEST CASES --- //
-type Implemented = Exclude<ShopperLoginMutation, 'logoutCustomer'>
+type Implemented = ShopperLoginMutation
 // This is an object rather than an array to more easily ensure we cover all mutations
 type TestMap = {[Mut in Implemented]: [Argument<Client[Mut]>, DataType<Client[Mut]>]}
 const testMap: TestMap = {
@@ -72,21 +76,18 @@ const testMap: TestMap = {
     getTrustedSystemAccessToken: [OPTIONS, TOKEN_RESPONSE],
     introspectToken: [OPTIONS, {}],
     resetPassword: [OPTIONS, undefined],
-    revokeToken: [OPTIONS, TOKEN_RESPONSE]
+    revokeToken: [OPTIONS, TOKEN_RESPONSE],
+    logoutCustomer: [OPTIONS, TOKEN_RESPONSE]
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[Implemented, TestMap[Implemented]]>
-
-// Not implemented checks are temporary to make sure we don't forget to add tests when adding
-// implentations. When all mutations are added, the "not implemented" tests can be removed,
-// and the `TestMap` type can be changed from optional keys to required keys. Doing so will
-// leverage TypeScript to enforce having tests for all mutations.
-const notImplTestCases = ['logoutCustomer'] as const
 
 describe('ShopperLogin mutations', () => {
     beforeEach(() => nock.cleanAll())
     test.each(testCases)('`%s` returns data on success', async (mutationName, [options, data]) => {
         mockMutationEndpoints(loginEndpoint, data ?? {}) // Fallback for `void` endpoints
+        mockQueryEndpoint(loginEndpoint, data ?? {}) // `customerLogout` uses GET
+
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
             return useShopperLoginMutation(mutationName)
         })
@@ -97,6 +98,8 @@ describe('ShopperLogin mutations', () => {
     })
     test.each(testCases)('`%s` returns error on error', async (mutationName, [options]) => {
         mockMutationEndpoints(loginEndpoint, {error: true}, 400)
+        mockQueryEndpoint(loginEndpoint, {error: true}, 400)
+
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
             return useShopperLoginMutation(mutationName)
         })
@@ -106,8 +109,5 @@ describe('ShopperLogin mutations', () => {
         // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
         // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
         expect(result.current.error).toHaveProperty('response')
-    })
-    test.each(notImplTestCases)('`%s` is not yet implemented', (mutationName) => {
-        expect(() => useShopperLoginMutation(mutationName)).toThrow(NotImplementedError)
     })
 })
