@@ -35,6 +35,7 @@ import CartItemVariantName from '../../components/item-variant/item-name'
 import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
 import CartItemVariantPrice from '../../components/item-variant/item-price'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 const onClient = typeof window !== 'undefined'
 
@@ -106,7 +107,7 @@ const CheckoutConfirmation = () => {
 
             const message = /the login is already in use/i.test(json.detail)
                 ? existingAccountMessage
-                : json.detail
+                : API_ERROR_MESSAGE
 
             form.setError('global', {type: 'manual', message})
         }

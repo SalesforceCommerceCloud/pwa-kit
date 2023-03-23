@@ -105,7 +105,6 @@ const Payment = () => {
                 }
             })
         } catch (e) {
-            console.error(e)
             showError()
         }
     }
