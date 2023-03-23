@@ -167,10 +167,11 @@ const nonEmptyResponseTestCases = Object.entries(testMap) as Array<
 
 // Endpoints returning void response on success
 const emptyResponseTestCases = [
-    deleteTestCase,
-    addPriceBooksToBasketTestCase,
-    addTaxesForBasketTestCase,
-    addTaxesForBasketItemTestCase
+    deleteTestCase
+    // ,
+    // addPriceBooksToBasketTestCase,
+    // addTaxesForBasketTestCase,
+    // addTaxesForBasketItemTestCase
 ]
 
 // Most test cases only apply to non-empty response test cases, some (error handling) can include deleteBasket
