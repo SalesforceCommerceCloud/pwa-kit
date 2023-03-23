@@ -84,13 +84,11 @@ export const AuthModal = ({
         return {
             login: async (data) => {
                 try {
-                    const res = await login.mutateAsync({
+                    await login.mutateAsync({
                         username: data.email,
                         password: data.password
                     })
-                    if (res) {
-                        onLoginSuccess()
-                    }
+                    onLoginSuccess()
                 } catch (error) {
                     const message = /Unauthorized/i.test(error.message)
                         ? formatMessage(LOGIN_ERROR)
@@ -110,10 +108,8 @@ export const AuthModal = ({
                         password: data.password
                     }
 
-                    const res = await register.mutateAsync(body)
-                    if (res) {
-                        onLoginSuccess()
-                    }
+                    await register.mutateAsync(body)
+                    onLoginSuccess()
                 } catch (error) {
                     form.setError('global', {
                         type: 'manual',
