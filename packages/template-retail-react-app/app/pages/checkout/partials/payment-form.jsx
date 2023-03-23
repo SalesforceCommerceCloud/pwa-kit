@@ -11,10 +11,12 @@ import {Box, Flex, Radio, RadioGroup, Stack, Text, Tooltip} from '@chakra-ui/rea
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {LockIcon, PaypalIcon} from '../../../components/icons'
 import CreditCardFields from '../../../components/forms/credit-card-fields'
+import { useCurrency } from '../../../hooks'
 
 const PaymentForm = ({form, onSubmit}) => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
+    const {currency} = useCurrency()
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -54,7 +56,7 @@ const PaymentForm = ({form, onSubmit}) => {
                                             <FormattedNumber
                                                 value={basket.orderTotal}
                                                 style="currency"
-                                                currency={basket.currency}
+                                                currency={currency}
                                             />
                                         </Text>
                                     </Flex>

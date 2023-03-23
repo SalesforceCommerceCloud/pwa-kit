@@ -19,7 +19,7 @@ export default function ShippingOptions() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
-    const {currency} = useCurrency
+    const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
     const {data: shippingMethods} = useShippingMethodsForShipment(
         {
