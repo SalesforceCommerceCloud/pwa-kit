@@ -87,6 +87,10 @@ const CheckoutConfirmation = () => {
 
             navigate(`/account`)
         } catch (error) {
+            if (!error.response) {
+                form.setError('global', {type: 'manual', message: API_ERROR_MESSAGE})
+                return
+            }
             const json = await error.response.json()
 
             const existingAccountMessage = (
