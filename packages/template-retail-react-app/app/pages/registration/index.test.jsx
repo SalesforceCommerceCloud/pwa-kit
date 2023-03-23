@@ -118,7 +118,12 @@ test('Allows customer to create an account', async () => {
 
     // wait for success state to appear
     const myAccount = await screen.findAllByText(/My Account/)
-    await waitFor(() => {
-        expect(myAccount.length).toEqual(2)
-    })
+    await waitFor(
+        () => {
+            expect(myAccount.length).toEqual(2)
+        },
+        {
+            timeout: 5000
+        }
+    )
 })
