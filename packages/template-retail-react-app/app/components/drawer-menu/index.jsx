@@ -234,14 +234,6 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
                                                                 id: 'drawer_menu.button.addresses',
                                                                 defaultMessage: 'Addresses'
                                                             })
-                                                        },
-                                                        {
-                                                            id: 'payments',
-                                                            path: '/payments',
-                                                            name: intl.formatMessage({
-                                                                id: 'drawer_menu.button.payment_methods',
-                                                                defaultMessage: 'Payment Methods'
-                                                            })
                                                         }
                                                     ]
                                                 }
