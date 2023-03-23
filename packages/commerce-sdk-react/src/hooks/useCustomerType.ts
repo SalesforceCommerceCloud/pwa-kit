@@ -38,7 +38,6 @@ const useCustomerType = (): useCustomerType => {
     const isRegistered = customerType === 'registered'
 
     if (customerType !== null && customerType !== 'guest' && customerType !== 'registered') {
-        console.warn(`Unrecognized customer type found in storage: ${customerType}`)
         customerType = null
     }
 
