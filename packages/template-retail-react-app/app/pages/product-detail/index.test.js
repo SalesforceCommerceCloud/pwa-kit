@@ -109,7 +109,7 @@ describe('product set', () => {
             expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
         })
 
-        const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
+        const buttons = await screen.findAllByText(/add set to cart/i)
         fireEvent.click(buttons[0])
 
         await waitFor(
@@ -129,7 +129,7 @@ describe('product set', () => {
             expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
         })
 
-        const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
+        const buttons = await screen.findAllByText(/add set to cart/i)
         fireEvent.click(buttons[0])
 
         await waitFor(() => {
