@@ -15,7 +15,7 @@ import {
     waitAndExpectError,
     waitAndExpectSuccess
 } from '../../test-utils'
-import {ApiClients, Argument, DataType} from '../types'
+import {ApiClients, Argument} from '../types'
 import {ShopperOrdersMutation, useShopperOrdersMutation} from './mutation'
 import * as queries from './query'
 

@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperContextsTypes} from 'commerce-sdk-isomorphic'
 import {ApiClients, CacheUpdateMatrix} from '../types'
 import {getShopperContext} from './queryKeyHelpers'
 
@@ -16,7 +15,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             invalidate: [{queryKey: getShopperContext.queryKey(parameters)}]
         }
     },
-    updateShopperContext(_customerId, {parameters}, response) {
+    updateShopperContext(_customerId, {parameters}) {
         return {
             update: [
                 {
