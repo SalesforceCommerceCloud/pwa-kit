@@ -29,31 +29,32 @@ export const CheckoutProvider = ({children}) => {
 
     const getCheckoutStepName = (step) => CHECKOUT_STEPS_LIST[step]
 
-    useEffect(
-        () => {
-            if (!customer || !basket) {
-                return
-            }
+    useEffect(() => {
+        if (!customer || !basket) {
+            return
+        }
 
-            let step = STEPS.REVIEW_ORDER
+        let step = STEPS.REVIEW_ORDER
 
-            if (customer.isGuest && !basket.customerInfo?.email) {
-                step = STEPS.CONTACT_INFO
-            } else if (!basket.shipments[0]?.shippingAddress) {
-                step = STEPS.SHIPPING_ADDRESS
-            } else if (!basket.shipments[0]?.shippingMethod) {
-                step = STEPS.SHIPPING_OPTIONS
-            } else if (!basket.paymentInstruments || !basket.billingAddress) {
-                step = STEPS.PAYMENT
-            }
+        if (customer.isGuest && !basket.customerInfo?.email) {
+            step = STEPS.CONTACT_INFO
+        } else if (!basket.shipments[0]?.shippingAddress) {
+            step = STEPS.SHIPPING_ADDRESS
+        } else if (!basket.shipments[0]?.shippingMethod) {
+            step = STEPS.SHIPPING_OPTIONS
+        } else if (!basket.paymentInstruments || !basket.billingAddress) {
+            step = STEPS.PAYMENT
+        }
 
-            setStep(step)
-        },
-        [customer?.isGuest, basket?.customerInfo?.email, basket?.shipments[0]?.shippingAddress],
+        setStep(step)
+    }, [
+        customer?.isGuest,
+        basket?.customerInfo?.email,
+        basket?.shipments[0]?.shippingAddress,
         basket?.shipments[0]?.shippingMethod,
         basket?.paymentInstruments,
         basket?.billingAddress
-    )
+    ])
 
     /**************** Einstein ****************/
     // Run this once when checkout begins
