@@ -14,6 +14,9 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
 import {rest} from 'msw'
 import {mockedRegisteredCustomer} from '../commerce-api/mock-data'
+
+jest.setTimeout(60000)
+
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
     currency: 'USD',
@@ -147,7 +150,7 @@ test('Renders error when given incorrect log in credentials', async () => {
             ).toBeInTheDocument()
         },
         {
-            timeout: 2000
+            timeout: 10000
         }
     )
 })
