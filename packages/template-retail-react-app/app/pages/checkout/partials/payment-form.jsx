@@ -87,7 +87,7 @@ const PaymentForm = ({form, onSubmit}) => {
 }
 
 PaymentForm.propTypes = {
-    /** The form object returnd from `useForm` */
+    /** The form object returned from `useForm` */
     form: PropTypes.object,
 
     /** Callback for form submit */
