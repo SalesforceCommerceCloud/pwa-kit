@@ -26,6 +26,13 @@ jest.mock('../../commerce-api/auth', () => {
     }
 })
 
+jest.mock('../../utils/url', () => {
+    return {
+        ...jest.requireActual('../../utils/url'),
+        removeSiteLocaleFromPath: jest.fn()
+    }
+})
+
 const mockOrder = keysToCamel({
     basket_id: 'testorderbasket',
     ...ocapiOrderResponse

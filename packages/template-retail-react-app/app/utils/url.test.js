@@ -14,7 +14,8 @@ import {
     rebuildPathWithParams,
     removeQueryParamsFromPath,
     absoluteUrl,
-    createUrlTemplate
+    createUrlTemplate,
+    removeSiteLocaleFromPath
 } from './url'
 import {getUrlConfig} from './utils'
 import mockConfig from '../../config/mocks/default'
@@ -387,5 +388,27 @@ describe('absoluteUrl', function () {
     test('return expected when path is an absolute url', () => {
         const url = absoluteUrl('https://www.example.com/uk/en/women/dresses')
         expect(url).toEqual('https://www.example.com/uk/en/women/dresses')
+    })
+})
+
+describe('removeSiteLocaleFromPath', function () {
+    test('return path without site alias and locale', () => {
+        const pathName = removeSiteLocaleFromPath('/uk/en-GB/account/wishlist')
+        expect(pathName).toEqual('/account/wishlist')
+    })
+
+    test('return path without site alias if they appear multiple times', () => {
+        const pathName = removeSiteLocaleFromPath('/uk/en-GB/uk/en-GB/account/wishlist')
+        expect(pathName).toEqual('/account/wishlist')
+    })
+
+    test('return expected path name when no locale or site alias appear', () => {
+        const pathName = removeSiteLocaleFromPath('/account/wishlist')
+        expect(pathName).toEqual('/account/wishlist')
+    })
+
+    test('return empty string when no path name is passed', () => {
+        const pathName = removeSiteLocaleFromPath()
+        expect(pathName).toEqual('')
     })
 })

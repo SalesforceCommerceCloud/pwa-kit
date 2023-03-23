@@ -272,15 +272,15 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * // returns '/account/wishlist'
  */
 export const removeSiteLocaleFromPath = (pathName = '') => {
-    let {siteRef, localeRef} = getParamsFromPath(`${pathName}`)
+    let {siteRef, localeRef} = getParamsFromPath(pathName)
 
     // remove the site alias from the current pathName
     if (siteRef) {
-        pathName = pathName.replace(`/${siteRef}`, '')
+        pathName = pathName.replace(new RegExp(`/${siteRef}`, 'g'), '')
     }
     // remove the locale from the current pathName
     if (localeRef) {
-        pathName = pathName.replace(`/${localeRef}`, '')
+        pathName = pathName.replace(new RegExp(`/${localeRef}`, 'g'), '')
     }
 
     return pathName
