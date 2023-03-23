@@ -14,33 +14,40 @@ const pkg = require(resolve(projectDir, 'package.json'))
 
 const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
 
-const getOverridePath = (path) => {
+const getOverridePath = (relativePath) => {
     const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
     // order matters here, we perform look ups starting in the following order:
     // pkg.mobify.overridesDir => pkg.mobify.extends => current projectDir
     if (pkg?.mobify?.extends && pkg?.mobify?.overridesDir) {
         const overrideFile = glob.sync(
-            `${projectDir}${resolve(
+            `${resolve(
                 projectDir,
                 pkg?.mobify?.overridesDir,
-                ...path
+                ...relativePath
             )}${OVERRIDES_EXTENSIONS}`
         )
         if (overrideFile?.length) {
             return overrideFile?.[0]
         }
         const extendFile = glob.sync(
-            `${projectDir}${resolve(projectDir, extendPath, ...path)}${OVERRIDES_EXTENSIONS}`
+            `${resolve(projectDir, extendPath, ...relativePath)}${OVERRIDES_EXTENSIONS}`
         )
         if (extendFile?.length) {
             return extendFile?.[0]
         }
     }
     const generatedProjectOverride = glob.sync(
-        `${projectDir}${resolve(projectDir, ...path)}${OVERRIDES_EXTENSIONS}`
+        `${resolve(projectDir, ...relativePath)}${OVERRIDES_EXTENSIONS}`
     )
-
-    return generatedProjectOverride?.length ? generatedProjectOverride?.[0] : null
+    return generatedProjectOverride?.length
+        ? generatedProjectOverride?.[0]
+        : resolve(
+              'node_modules',
+              'pwa-kit-react-sdk',
+              'ssr',
+              'universal',
+              ...relativePath.filter((item) => item !== 'app')
+          )
 }
 
 const makeRegExp = (str, sep = path.sep) => {
@@ -60,8 +67,6 @@ const makeRegExp = (str, sep = path.sep) => {
  */
 
 export const sdkReplacementPlugin = (projectDir) => {
-    const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
-
     const overridables = [
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app-config$'),
