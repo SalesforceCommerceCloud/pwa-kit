@@ -311,7 +311,7 @@ const Cart = () => {
         return <CartSkeleton />
     }
 
-    if (!basket.productItems.length) {
+    if (!isLoading && !basket?.productItems?.length) {
         return <EmptyCart isRegistered={isRegistered} />
     }
     return (
