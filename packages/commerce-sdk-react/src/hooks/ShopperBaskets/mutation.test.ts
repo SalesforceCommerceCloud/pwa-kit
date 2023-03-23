@@ -164,13 +164,19 @@ const addTaxesForBasketItemTestCase = [
 const nonEmptyResponseTestCases = Object.entries(testMap) as Array<
     [NonEmptyResponseMutations, Argument<Client[NonEmptyResponseMutations]>]
 >
-// Most test cases only apply to non-delete test cases, some (error handling) can include deleteBasket
-const allTestCases = [
-    ...nonEmptyResponseTestCases,
+
+// Endpoints returning void response on success
+const emptyResponseTestCases = [
     deleteTestCase,
     addPriceBooksToBasketTestCase,
     addTaxesForBasketTestCase,
     addTaxesForBasketItemTestCase
+]
+
+// Most test cases only apply to non-empty response test cases, some (error handling) can include deleteBasket
+const allTestCases = [
+    ...nonEmptyResponseTestCases,
+    ...emptyResponseTestCases
 ]
 
 describe('ShopperBaskets mutations', () => {
@@ -254,14 +260,8 @@ describe('ShopperBaskets mutations', () => {
             assertUpdateQuery(result.current.customerBaskets, oldCustomerBaskets)
         }
     )
-    test.each([
-        deleteTestCase,
-        addPriceBooksToBasketTestCase,
-        addTaxesForBasketTestCase,
-        addTaxesForBasketItemTestCase
-    ])('`%s` returns void on success', async () => {
+    test.each(emptyResponseTestCases)('`%s` returns void on success', async (mutationName, options) => {
         // Almost the standard 'returns data' test, just a different return type
-        const [mutationName, options] = deleteTestCase
         mockMutationEndpoints(basketsEndpoint, oldBasket)
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
             return useShopperBasketsMutation(mutationName)
