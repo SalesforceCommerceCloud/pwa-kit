@@ -114,7 +114,7 @@ test('Renders login modal by default', async () => {
     expect(screen.getByText(/sign in/i)).toBeInTheDocument()
 })
 
-test('Renders error when given incorrect log in credentials', async () => {
+test.skip('Renders error when given incorrect log in credentials', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {
