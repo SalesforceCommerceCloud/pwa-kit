@@ -284,7 +284,6 @@ describe.skip('Update quantity in product view', function () {
 })
 
 describe('Remove item from cart', function () {
-    jest.setTimeout(30000)
     beforeEach(() => {
         global.server.use(
             rest.delete('*/baskets/:basket/items/:itemId', (req, res, ctx) => {
@@ -293,6 +292,8 @@ describe('Remove item from cart', function () {
         )
     })
     test('Can remove item from the cart', async () => {
+        jest.setTimeout(30000)
+
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
