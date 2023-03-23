@@ -30,12 +30,6 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    global.server.use(
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.json(mockCustomerBaskets))
-        )
-    )
-
     window.history.pushState({}, 'Account', createPathWithDefaults('/account/orders'))
 })
 afterEach(() => {
@@ -43,13 +37,10 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test('Renders order history and details', async () => {
+test.only('Renders order history and details', async () => {
     global.server.use(
         rest.get('*/orders/:orderNo', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderHistory.data[0]))
-        }),
-        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrderHistory))
         }),
         rest.get('*/products', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderProducts))

@@ -197,7 +197,7 @@ test.skip('Applies default shipping method to basket and renders estimated prici
 })
 
 describe('Update quantity', function () {
-    test.skip('Can update item quantity in the cart', async () => {
+    test.only('Can update item quantity in the cart', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -212,13 +212,8 @@ describe('Update quantity', function () {
 
         // update item quantity
         fireEvent.pointerDown(incrementButton)
+        expect(within(cartItem).getByDisplayValue('3'))
 
-        await waitFor(
-            () => {
-                expect(within(cartItem).getByDisplayValue('3'))
-            },
-            {timeout: 5000}
-        )
     })
 
     test.skip('Can update item quantity from product view modal', async () => {

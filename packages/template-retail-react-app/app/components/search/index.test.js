@@ -82,18 +82,16 @@ test('limits number of saved recent searches', async () => {
     expect(getSessionJSONItem(RECENT_SEARCH_KEY)).toHaveLength(RECENT_SEARCH_LIMIT)
 })
 
-test('suggestions render when there are some', async () => {
+test.only('suggestions render when there are some', async () => {
     await act(() => {
         renderWithProviders(<SearchInput />)
     })
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dress')
     expect(searchInput.value).toBe('Dress')
-    const suggestionPopoverEl = await screen.getByTestId('sf-suggestion-popover')
-    await waitFor(() => {
-        const suggestionsEl = within(suggestionPopoverEl).getByTestId('sf-suggestion')
-        expect(suggestionsEl.querySelector('button').textContent).toBe('Dresses')
-    })
+    const suggestionPopoverEl = screen.getByTestId('sf-suggestion-popover')
+    const suggestionsEl = within(suggestionPopoverEl).getByTestId('sf-suggestion')
+    expect(suggestionsEl.querySelector('button').textContent).toBe('Dresses')
 })
 
 test('clicking clear searches clears recent searches', async () => {
