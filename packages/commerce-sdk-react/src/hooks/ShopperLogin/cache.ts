@@ -12,9 +12,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<ApiClients['shopperLogin']> = 
     authorizePasswordlessCustomer: noop,
     logoutCustomer: () => {
         return {
-            remove: [
-                {queryKey: ['/commerce-sdk-react']}
-            ]
+            remove: [{queryKey: ['/commerce-sdk-react']}]
         }
     },
     getAccessToken: noop,

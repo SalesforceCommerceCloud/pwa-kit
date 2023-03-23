@@ -80,9 +80,7 @@ const cacheUpdateMatrix: CacheUpdateMatrix = {
     loginGuestUser: noop,
     logout() {
         return {
-            remove: [
-                {queryKey: ['/commerce-sdk-react']}
-            ]
+            remove: [{queryKey: ['/commerce-sdk-react']}]
         }
     }
 }
