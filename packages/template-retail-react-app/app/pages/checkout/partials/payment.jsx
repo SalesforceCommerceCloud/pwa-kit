@@ -77,7 +77,7 @@ const Payment = () => {
         }
 
         return addPaymentInstrumentToBasket({
-            parameters: {basketId: basket.basketId},
+            parameters: {basketId: basket?.basketId},
             body: paymentInstrument
         })
     }
