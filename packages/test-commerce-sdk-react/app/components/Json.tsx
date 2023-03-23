@@ -12,7 +12,8 @@ const Json = ({data}: {data: any}) => {
     const style = {
         body: {
             position: 'relative',
-            height: expanded ? 'inherit' : '100px',
+            cursor: expanded ? 'zoom-out' : 'zoom-in',
+            height: expanded ? 'inherit' : '150px',
             overflow: 'hidden'
         },
         button: {
@@ -31,8 +32,8 @@ const Json = ({data}: {data: any}) => {
         }
     }
     return (
-        <div style={style.body}>
-            <a style={style.button} onClick={() => setExpanded(!expanded)}>
+        <div style={style.body} onClick={() => setExpanded(!expanded)}>
+            <a style={style.button}>
                 {expanded ? '[-]' : '[+]'}
             </a>
             <pre>{JSON.stringify(data, null, 2)}</pre>
