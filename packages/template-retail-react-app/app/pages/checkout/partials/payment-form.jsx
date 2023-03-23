@@ -54,7 +54,7 @@ const PaymentForm = ({form, onSubmit}) => {
                                         </Stack>
                                         <Text fontWeight="bold">
                                             <FormattedNumber
-                                                value={basket.orderTotal}
+                                                value={basket?.orderTotal}
                                                 style="currency"
                                                 currency={currency}
                                             />
