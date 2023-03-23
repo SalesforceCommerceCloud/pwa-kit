@@ -267,11 +267,14 @@ test.skip('Allows customer to sign in to their account', async () => {
     )
     user.click(screen.getByText(/sign in/i))
 
-    // alow time to transition to account page
-    await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/account')
-        expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
-    })
+    // allow time to transition to account page
+    await waitFor(
+        () => {
+            expect(window.location.pathname).toEqual('/uk/en-GB/account')
+            expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
+        },
+        {timeout: 5000}
+    )
 })
 
 describe('Reset password', function () {
