@@ -33,9 +33,7 @@ const Json = ({data}: {data: any}) => {
     }
     return (
         <div style={style.body} onClick={() => setExpanded(!expanded)}>
-            <a style={style.button}>
-                {expanded ? '[-]' : '[+]'}
-            </a>
+            <a style={style.button}>{expanded ? '[-]' : '[+]'}</a>
             <pre>{JSON.stringify(data, null, 2)}</pre>
             {!expanded && <div style={style.shadow} />}
         </div>
