@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useState} from 'react'
 import {
     AuthHelpers,
     useCustomer,
@@ -12,6 +12,7 @@ import {
     useCustomerBaskets,
     useCustomerOrders,
     useCustomerProductList,
+    useCustomerProductLists,
     useShopperCustomersMutation,
     useAuthHelper,
     ShopperCustomersMutation
@@ -47,7 +48,7 @@ const renderQueryHook = (name: string, {data, isLoading, error}: any) => {
             <h2 id={name}>{name}</h2>
             <h3>{data?.name}</h3>
             <hr />
-            <h3>Returning data</h3>
+            <h3>Returned data</h3>
             <Json data={{isLoading, error, data}} />
         </div>
     )
@@ -140,6 +141,16 @@ function UseCustomer() {
             parameters: {customerId: CUSTOMER_ID}
         },
         {
+            action: 'updateCustomerProductList',
+            body: {description: `List was editied on ${new Date().toLocaleString()}`},
+            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID}
+        },
+        {
+            action: 'deleteCustomerProductList',
+            body: {},
+            parameters: {customerId: CUSTOMER_ID, listId: LIST_ID}
+        },
+        {
             action: 'createCustomerProductListItem',
             body: {priority: 2, public: true, quantity: 3, type: 'product', productId: PRODUCT_ID},
             parameters: {customerId: CUSTOMER_ID, listId: LIST_ID}
@@ -212,6 +223,12 @@ function UseCustomer() {
         {
             name: 'useCustomerBaskets',
             hook: useCustomerBaskets({
+                parameters: {customerId: CUSTOMER_ID}
+            })
+        },
+        {
+            name: 'useCustomerProductLists',
+            hook: useCustomerProductLists({
                 parameters: {customerId: CUSTOMER_ID}
             })
         },
