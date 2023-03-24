@@ -9,6 +9,7 @@ import {getShopperContext} from './queryKeyHelpers'
 
 type Client = ApiClients['shopperContexts']
 
+// TODO: Complete cache invalidation https://gus.lightning.force.com/lightning/_classic/%2Fa07EE00001NoYplYAF
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     createShopperContext(customerId, {parameters}) {
         return {
