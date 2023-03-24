@@ -83,7 +83,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         return {
             // TODO: Rather than invalidate, can we selectively update?
             invalidate: [{queryKey: getCustomerProductLists.queryKey(parameters)}],
-            remove: [{queryKey: getCustomerProductList.queryKey(parameters)}]
+            remove: [{queryKey: getCustomerProductList.path(parameters)}]
         }
     },
     deleteCustomerProductListItem(customerId, {parameters}) {
