@@ -21,7 +21,6 @@ import {
     outgoingRequestHook,
     parseCacheControl,
     parseEndParameters,
-    PerformanceTimer,
     processExpressResponse,
     processLambdaResponse,
     updateGlobalAgentOptions,
@@ -81,26 +80,20 @@ const userAgents = {
             'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
         iphoneX:
             'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
-        nexus4:
-            'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
-        nexus5:
-            'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
-        nexus6:
-            'Mozilla/5.0 (Linux; Android 7.1.1; Nexus 6 Build/N6F26U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
+        nexus4: 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
+        nexus5: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
+        nexus6: 'Mozilla/5.0 (Linux; Android 7.1.1; Nexus 6 Build/N6F26U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
         galaxyS5:
             'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
-        pixel2:
-            'Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
+        pixel2: 'Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
         pixel2XL:
             'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36'
     },
     tablet: {
-        nexus7:
-            'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 7 Build/MOB30X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Safari/537.36',
+        nexus7: 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 7 Build/MOB30X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Safari/537.36',
         nexus10:
             'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 10 Build/MOB31T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Safari/537.36',
-        ipad:
-            'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1',
+        ipad: 'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1',
         ipadAir:
             'Mozilla/5.0 (iPad; CPU OS 11_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.0 Mobile/15E148 Safari/604.1',
         ipadPro:
@@ -113,8 +106,7 @@ const userAgents = {
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:63.0) Gecko/20100101 Firefox/63.0',
         safari11:
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.2 Safari/605.1.15',
-        edge17:
-            'Mozilla/5.0 (Windows NT 10.0; WebView/3.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134',
+        edge17: 'Mozilla/5.0 (Windows NT 10.0; WebView/3.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134',
         ie11: 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'
     }
 }
@@ -964,41 +956,6 @@ describe('updateGlobalAgentOptions', () => {
         Object.entries(from.options).forEach(([key, value]) =>
             expect(to.options[key]).toEqual(value)
         )
-    })
-})
-
-describe('PerformanceTimer tests', () => {
-    let timer
-    beforeEach(() => (timer = new PerformanceTimer('')))
-    afterEach(() => timer?._observer.disconnect())
-
-    test('time() function', () => {
-        const func = sinon.stub()
-        timer.time('test1', func, 1)
-        expect(func.callCount).toBe(1)
-        expect(func.calledWith(1)).toBe(true)
-
-        func.reset()
-        func.throws('Error', 'intentional error')
-        expect(() => timer.time('test2', func, 1)).toThrow('intentional error')
-        expect(func.callCount).toBe(1)
-    })
-
-    test('start() and end()', async () => {
-        timer.start('test3')
-        await new Promise((resolve) => setTimeout(resolve, 10))
-        timer.end('test3')
-        const summary = timer.summary
-        expect(summary.length).toBe(1)
-        const entry = summary[0]
-        expect(entry.name).toEqual('test3')
-        expect(entry.duration).toBeGreaterThanOrEqual(5)
-        expect(entry.duration).toBeLessThanOrEqual(30)
-    })
-
-    test('accessing operationId auto-increments the counter', () => {
-        expect(timer.operationId).toBe(1)
-        expect(timer.operationId).toBe(2)
     })
 })
 

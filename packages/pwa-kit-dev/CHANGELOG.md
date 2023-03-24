@@ -1,4 +1,14 @@
-## v2.5.0-dev (Dec 01, 2022)
+## v2.8.0-dev (Mar 03, 2023)
+## v2.7.0 (Mar 03, 2023)
+- Add explicit `ws` dependency [#865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/865)
+
+## v2.6.0 (Jan 25, 2023)
+- Upgrade prettier to v2 [#926](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/926)
+- Security package updates
+
+## v2.5.0 (Jan 05, 2023)
+- Logging cid from res header isntead of req in local development [#821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/821)
+
 ## v2.4.0 (Dec 01, 2022)
 -   Add `tail-logs` command [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
 -   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793)

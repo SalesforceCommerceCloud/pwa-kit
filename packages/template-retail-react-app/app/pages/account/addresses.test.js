@@ -7,7 +7,7 @@
 import React, {useEffect} from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountAddresses from './addresses'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
@@ -15,37 +15,6 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 let mockCustomer = {}
 
 jest.setTimeout(30000)
-
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
-            async createCustomerAddress(address) {
-                mockCustomer.addresses = [address.body]
-                return {}
-            }
-
-            async updateCustomerAddress(address) {
-                mockCustomer.addresses[0] = address.body
-                return {}
-            }
-
-            async removeCustomerAddress() {
-                mockCustomer.addresses = undefined
-                return {}
-            }
-        }
-    }
-})
 
 const mockToastSpy = jest.fn()
 jest.mock('@chakra-ui/toast', () => {
@@ -67,16 +36,9 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupMockServer(
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.json(mockCustomer))
-    )
-)
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
     mockCustomer = {
         authType: 'registered',
         customerId: 'registeredCustomerId',
@@ -86,12 +48,27 @@ beforeEach(() => {
         lastName: 'Keane',
         login: 'jkeane@64labs.com'
     }
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockCustomer))
+        }),
+        rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
+            mockCustomer.addresses = [req.body]
+            return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
+        }),
+        rest.patch('*/customers/:customerId/addresses/:addressName', (req, res, ctx) => {
+            mockCustomer.addresses[0] = req.body
+            return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
+        }),
+        rest.delete('*/customers/:customerId/addresses/:addressName', (req, res, ctx) => {
+            mockCustomer.addresses = undefined
+            return res(ctx.delay(0), ctx.status(200))
+        })
+    )
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
 })
-afterAll(() => server.close())
 
 test('Allows customer to add/edit/remove addresses', async () => {
     renderWithProviders(<MockedComponent />)

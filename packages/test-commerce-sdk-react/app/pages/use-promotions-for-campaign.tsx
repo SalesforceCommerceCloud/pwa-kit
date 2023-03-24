@@ -13,8 +13,14 @@ const UsePromotionsForCampaign = () => {
     // campaign id need to be encoded before sent off, it could have special char.
     // e.g "50% off order"
     const campaignId = encodeURI('promotion-campaign')
-    const {data: result, isLoading, error} = usePromotionsForCampaign({
-        campaignId
+    const {
+        data: result,
+        isLoading,
+        error
+    } = usePromotionsForCampaign({
+        parameters: {
+            campaignId
+        }
     })
     if (isLoading) {
         return (

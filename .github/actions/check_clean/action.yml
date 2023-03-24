@@ -1,0 +1,12 @@
+name: check_clean
+runs:
+  using: composite
+  steps:
+  - name: Check Repository Clean
+    run: |-
+      # Print status for debugging on CircleCI.
+      git status
+      # Fail the build if any step leaves uncommitted changes in the repo
+      # that would prevent Lerna from publishing (Lerna gets this right).
+      git diff --exit-code
+    shell: bash

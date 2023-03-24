@@ -7,16 +7,9 @@
 
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useLocation, useParams} from 'react-router-dom'
+import {useHistory, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
-import {
-    useCategory,
-    useCustomerId,
-    useProductSearch,
-    useShopperCustomersMutation
-} from 'commerce-sdk-react-preview'
-import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 // Components
 import {
@@ -61,10 +54,11 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
 import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
+import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Others
-import {HTTPNotFound, HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
+import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
 import {
@@ -89,191 +83,107 @@ const REFINEMENT_DISALLOW_LIST = ['c_isNew']
  */
 const ProductList = (props) => {
     const {
-        // eslint-disable-next-line react/prop-types
-        isLoading: _isLoading, // NOTE: Ignore `getProps` isLoading state.
+        searchQuery,
+        productSearchResult,
+        category,
         // eslint-disable-next-line react/prop-types
         staticContext,
+        location,
+        isLoading,
         ...rest
     } = props
+    const {total, sortingOptions} = productSearchResult || {}
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const [sortOpen, setSortOpen] = useState(false)
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const history = useHistory()
     const params = useParams()
-    const location = useLocation()
     const toast = useToast()
     const einstein = useEinstein()
-    const {res} = useServerContext()
-    const wishlist = useWishlist()
-    const customerId = useCustomerId()
-    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
 
-    /**************** Page State ****************/
-    const [filtersLoading, setFiltersLoading] = useState(false)
-    const [wishlistLoading, setWishlistLoading] = useState([])
-    const [sortOpen, setSortOpen] = useState(false)
-
-    const urlParams = new URLSearchParams(location.search)
-    let searchQuery = urlParams.get('q')
-    const isSearch = !!searchQuery
-
-    if (params.categoryId) {
-        searchParams._refine.push(`cgid=${params.categoryId}`)
-    }
-
-    /**************** Mutation Actions ****************/
-    const {mutate: createCustomerProductListItem} = useShopperCustomersMutation({
-        action: 'createCustomerProductListItem'
-    })
-    const {mutate: deleteCustomerProductListItem} = useShopperCustomersMutation({
-        action: 'deleteCustomerProductListItem'
-    })
-
-    /**************** Query Actions ****************/
-    const {isLoading, isFetching, data: productSearchResult} = useProductSearch(
-        {
-            ...searchParams,
-            refine: searchParams._refine
-        },
-        {
-            keepPreviousData: true
-        }
-    )
-
-    const {error, data: category} = useCategory(
-        {
-            id: params.categoryId
-        },
-        {
-            enabled: !isSearch
-            // TODO: Why isn't this working?
-            // onError: (error) => {
-            //     const errorStatus = error.response?.status
-            //     switch (errorStatus) {
-            //         case 404:
-            //             throw new HTTPNotFound('Category Not Found.')
-            //         default:
-            //             throw new HTTPError('Unknown Error Occured.')
-            //     }
-            // }
-        }
-    )
-
-    // Apply disallow list to refinements.
-    if (productSearchResult?.refinements) {
-        productSearchResult.refinements = productSearchResult.refinements.filter(
-            ({attributeId}) => !REFINEMENT_DISALLOW_LIST.includes(attributeId)
-        )
-    }
-
-    /**************** Error Handling ****************/
-    const errorStatus = error?.response?.status
-    switch (errorStatus) {
-        case undefined:
-            // No Error.
-            break
-        case 404:
-            throw new HTTPNotFound('Category Not Found.')
-        default:
-            throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
-    }
-
-    /**************** Response Handling ****************/
-    if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-    }
-
+    const basePath = `${location.pathname}${location.search}`
     // Reset scroll position when `isLoaded` becomes `true`.
     useEffect(() => {
-        isFetching && window.scrollTo(0, 0)
-        setFiltersLoading(isFetching)
-    }, [isFetching])
-
-    /**************** Render Variables ****************/
-    const basePath = `${location.pathname}${location.search}`
-    const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
-    const {total, sortingOptions} = productSearchResult || {}
-    const selectedSortingOptionLabel = sortingOptions?.find(
-        (option) => option.id === productSearchResult?.selectedSortingOption
-    ) ?? sortingOptions?.[0]
+        isLoading && window.scrollTo(0, 0)
+        setFiltersLoading(isLoading)
+    }, [isLoading])
 
     // Get urls to be used for pagination, page size changes, and sorting.
     const pageUrls = usePageUrls({total})
     const sortUrls = useSortUrls({options: sortingOptions})
     const limitUrls = useLimitUrls()
 
-    /**************** Action Handlers ****************/
+    // If we are loaded and still have no products, show the no results component.
+    const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
+
+    /**************** Wishlist ****************/
+    const wishlist = useWishlist()
+    // keep track of the items has been add/remove to/from wishlist
+    const [wishlistLoading, setWishlistLoading] = useState([])
+    // TODO: DRY this handler when intl provider is available globally
     const addItemToWishlist = async (product) => {
-        setWishlistLoading([...wishlistLoading, product.productId])
-
-        // TODO: This wishlist object is from an old API, we need to replace it with the new one.
-        const listId = wishlist.data.id
-        const itemId = product.productId
-
-        createCustomerProductListItem(
-            {
-                parameters: {customerId, listId, itemId}
-            },
-            {
-                onError: () => {
-                    toast({
-                        title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
-                    })
-                },
-                onSuccess: () => {
-                    toast({
-                        title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                        status: 'success',
-                        action: (
-                            // it would be better if we could use <Button as={Link}>
-                            // but unfortunately the Link component is not compatible
-                            // with Chakra Toast, since the ToastManager is rendered via portal
-                            // and the toast doesn't have access to intl provider, which is a
-                            // requirement of the Link component.
-                            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                                {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                            </Button>
-                        )
-                    })
-                },
-                onSettled: () => {
-                    setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-                }
-            }
-        )
+        try {
+            setWishlistLoading([...wishlistLoading, product.productId])
+            await wishlist.createListItem({
+                id: product.productId,
+                quantity: 1
+            })
+            toast({
+                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
+                status: 'success',
+                action: (
+                    // it would be better if we could use <Button as={Link}>
+                    // but unfortunately the Link component is not compatible
+                    // with Chakra Toast, since the ToastManager is rendered via portal
+                    // and the toast doesn't have access to intl provider, which is a
+                    // requirement of the Link component.
+                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                    </Button>
+                )
+            })
+        } catch {
+            toast({
+                title: formatMessage(API_ERROR_MESSAGE),
+                status: 'error'
+            })
+        } finally {
+            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+        }
     }
 
+    // TODO: DRY this handler when intl provider is available globally
     const removeItemFromWishlist = async (product) => {
-        setWishlistLoading([...wishlistLoading, product.productId])
-
-        const listId = wishlist.data.id
-        const itemId = ''
-
-        deleteCustomerProductListItem(
-            {
-                body: {},
-                parameters: {customerId, listId, itemId}
-            },
-            {
-                onError: () => {
-                    toast({
-                        title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
-                    })
-                },
-                onSuccess: () => {
-                    toast({
-                        title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
-                        status: 'success'
-                    })
-                },
-                onSettled: () => {
-                    setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-                }
-            }
-        )
+        try {
+            setWishlistLoading([...wishlistLoading, product.productId])
+            await wishlist.removeListItemByProductId(product.productId)
+            toast({
+                title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
+                status: 'success'
+            })
+        } catch {
+            toast({
+                title: formatMessage(API_ERROR_MESSAGE),
+                status: 'error'
+            })
+        } finally {
+            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+        }
     }
+
+    /**************** Einstein ****************/
+    useEffect(() => {
+        if (productSearchResult) {
+            searchQuery
+                ? einstein.sendViewSearch(searchQuery, productSearchResult)
+                : einstein.sendViewCategory(category, productSearchResult)
+        }
+    }, [productSearchResult])
+
+    /**************** Filters ****************/
+    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
+    const [filtersLoading, setFiltersLoading] = useState(false)
 
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
@@ -285,25 +195,34 @@ const ProductList = (props) => {
         // If we aren't allowing for multiple selections, simply clear any value set for the
         // attribute, and apply a new one if required.
         if (!allowMultiple) {
+            const previousValue = searchParamsCopy.refine[attributeId]
             delete searchParamsCopy.refine[attributeId]
 
-            if (!selected) {
+            // Note the loose comparison, for "string != number" checks.
+            if (!selected && value.value != previousValue) {
                 searchParamsCopy.refine[attributeId] = value.value
             }
         } else {
             // Get the attibute value as an array.
             let attributeValue = searchParamsCopy.refine[attributeId] || []
-            let values = Array.isArray(attributeValue) ? attributeValue : attributeValue.split('|')
+
+            // Ensure that the value is still converted into an array if it's a `string` or `number`.
+            if (typeof attributeValue === 'string') {
+                attributeValue = attributeValue.split('|')
+            } else if (typeof attributeValue === 'number') {
+                attributeValue = [attributeValue]
+            }
 
             // Either set the value, or filter the value out.
             if (!selected) {
-                values.push(value.value)
+                attributeValue.push(value.value)
             } else {
-                values = values?.filter((v) => v !== value.value)
+                // Note the loose comparison, for "string != number" checks.
+                attributeValue = attributeValue?.filter((v) => v != value.value)
             }
 
             // Update the attribute value in the new search params.
-            searchParamsCopy.refine[attributeId] = values
+            searchParamsCopy.refine[attributeId] = attributeValue
 
             // If the update value is an empty array, remove the current attribute key.
             if (searchParamsCopy.refine[attributeId].length === 0) {
@@ -311,34 +230,26 @@ const ProductList = (props) => {
             }
         }
 
-        if (isSearch) {
-            navigate(`/search?${stringifySearchParams(searchParamsCopy)}`)
-        } else {
+        if (!searchQuery) {
             navigate(`/category/${params.categoryId}?${stringifySearchParams(searchParamsCopy)}`)
+        } else {
+            navigate(`/search?${stringifySearchParams(searchParamsCopy)}`)
         }
     }
 
     // Clears all filters
     const resetFilters = () => {
-        const newSearchParams = {
-            ...searchParams,
-            refine: []
-        }
-        const newPath = isSearch
-            ? `/search?${stringifySearchParams(newSearchParams)}`
-            : `/category/${params.categoryId}?${stringifySearchParams(newSearchParams)}`
-
-        navigate(newPath)
+        navigate(window.location.pathname)
     }
 
-    /**************** Einstein ****************/
-    useEffect(() => {
-        if (productSearchResult) {
-            isSearch
-                ? einstein.sendViewSearch(searchQuery, productSearchResult)
-                : einstein.sendViewCategory(category, productSearchResult)
-        }
-    }, [productSearchResult])
+    let selectedSortingOptionLabel = productSearchResult?.sortingOptions?.find(
+        (option) => option.id === productSearchResult?.selectedSortingOption
+    )
+
+    // API does not always return a selected sorting order
+    if (!selectedSortingOptionLabel) {
+        selectedSortingOptionLabel = productSearchResult?.sortingOptions?.[0]
+    }
 
     return (
         <Box
@@ -348,8 +259,6 @@ const ProductList = (props) => {
             paddingTop={{base: 6, lg: 8}}
             {...rest}
         >
-            {/* <div>isLoading: {isLoading ? 'Loading' : 'Loaded'}</div>
-            <div>isFetching: {isFetching ? 'Fetching' : 'Fetched'}</div> */}
             <Helmet>
                 <title>{category?.pageTitle}</title>
                 <meta name="description" content={category?.pageDescription} />
@@ -382,7 +291,6 @@ const ProductList = (props) => {
                             <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
-                                handleReset={() => resetFilters()}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
                             />
                         </Box>
@@ -477,7 +385,7 @@ const ProductList = (props) => {
                                 spacingX={4}
                                 spacingY={{base: 12, lg: 16}}
                             >
-                                {isFetching || !productSearchResult
+                                {isLoading || !productSearchResult
                                     ? new Array(searchParams.limit)
                                           .fill(0)
                                           .map((value, index) => (
@@ -485,9 +393,8 @@ const ProductList = (props) => {
                                           ))
                                     : productSearchResult.hits.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
-                                          const isInWishlist = !!wishlist.findItemByProductId(
-                                              productId
-                                          )
+                                          const isInWishlist =
+                                              !!wishlist.findItemByProductId(productId)
 
                                           return (
                                               <ProductTile
@@ -667,9 +574,85 @@ const ProductList = (props) => {
 
 ProductList.getTemplateName = () => 'product-list'
 
+ProductList.shouldGetProps = ({previousLocation, location}) =>
+    !previousLocation ||
+    previousLocation.pathname !== location.pathname ||
+    previousLocation.search !== location.search
+
+ProductList.getProps = async ({res, params, location, api}) => {
+    const {categoryId} = params
+    const urlParams = new URLSearchParams(location.search)
+    let searchQuery = urlParams.get('q')
+    let isSearch = false
+
+    if (searchQuery) {
+        isSearch = true
+    }
+    // In case somebody navigates to /search without a param
+    if (!categoryId && !isSearch) {
+        // We will simulate search for empty string
+        return {searchQuery: ' ', productSearchResult: {}}
+    }
+
+    const searchParams = parseSearchParams(location.search, false)
+
+    if (!searchParams.refine.includes(`cgid=${categoryId}`) && categoryId) {
+        searchParams.refine.push(`cgid=${categoryId}`)
+    }
+
+    // Set the `cache-control` header values to align with the Commerce API settings.
+    if (res) {
+        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+    }
+
+    const [category, productSearchResult] = await Promise.all([
+        isSearch
+            ? Promise.resolve()
+            : api.shopperProducts.getCategory({
+                  parameters: {id: categoryId, levels: 0}
+              }),
+        api.shopperSearch.productSearch({
+            parameters: searchParams
+        })
+    ])
+
+    // Apply disallow list to refinements.
+    productSearchResult.refinements = productSearchResult?.refinements?.filter(
+        ({attributeId}) => !REFINEMENT_DISALLOW_LIST.includes(attributeId)
+    )
+
+    // The `isomorphic-sdk` returns error objects when they occur, so we
+    // need to check the category type and throw if required.
+    if (category?.type?.endsWith('category-not-found')) {
+        throw new HTTPNotFound(category.detail)
+    }
+
+    return {searchQuery: searchQuery, productSearchResult, category}
+}
+
 ProductList.propTypes = {
+    /**
+     * The search result object showing all the product hits, that belong
+     * in the supplied category.
+     */
+    productSearchResult: PropTypes.object,
+    /*
+     * Indicated that `getProps` has been called but has yet to complete.
+     *
+     * Notes: This prop is internally provided.
+     */
+    isLoading: PropTypes.bool,
+    /*
+     * Object that represents the current location, it consists of the `pathname`
+     * and `search` values.
+     *
+     * Notes: This prop is internally provided.
+     */
+    location: PropTypes.object,
+    searchQuery: PropTypes.string,
     onAddToWishlistClick: PropTypes.func,
-    onRemoveWishlistClick: PropTypes.func
+    onRemoveWishlistClick: PropTypes.func,
+    category: PropTypes.object
 }
 
 export default ProductList
@@ -705,7 +688,6 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
         </FormControl>
     )
 }
-
 Sort.propTypes = {
     sortUrls: PropTypes.array,
     productSearchResult: PropTypes.object,

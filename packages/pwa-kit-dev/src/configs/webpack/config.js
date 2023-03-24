@@ -9,7 +9,7 @@
 
 // For more information on these settings, see https://webpack.js.org/configuration
 import fs from 'fs'
-import path, {resolve} from 'path'
+import {resolve} from 'path'
 
 import webpack from 'webpack'
 import WebpackNotifierPlugin from 'webpack-notifier'
@@ -23,7 +23,6 @@ import {createModuleReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
-const sdkDir = resolve(path.join(__dirname, '..', '..', '..'))
 
 const pkg = require(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
@@ -65,8 +64,21 @@ const entryPointExists = (segments) => {
 }
 
 const findInProjectThenSDK = (pkg) => {
-    const projectPath = resolve(projectDir, 'node_modules', pkg)
-    return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
+    // Look for the SDK node_modules in two places because in CI,
+    // pwa-kit-dev is published under a 'dist' directory, which
+    // changes this file's location relative to the package root.
+    const candidates = [
+        resolve(projectDir, 'node_modules', pkg),
+        resolve(__dirname, '..', '..', 'node_modules', pkg),
+        resolve(__dirname, '..', '..', '..', 'node_modules', pkg)
+    ]
+    let candidate
+    for (candidate of candidates) {
+        if (fs.existsSync(candidate)) {
+            return candidate
+        }
+    }
+    return candidate
 }
 
 const baseConfig = (target) => {
@@ -354,12 +366,6 @@ const renderer =
                         excludeWarnings: true,
                         skipFirstNotification: true
                     }),
-
-                    // Must only appear on one config – this one is the only mandatory one.
-                    new CopyPlugin({
-                        patterns: [{from: 'app/static/', to: 'static/'}]
-                    }),
-
                     analyzeBundle && getBundleAnalyzerPlugin('server-renderer')
                 ].filter(Boolean)
             }
@@ -383,6 +389,10 @@ const ssr = (() => {
                     },
                     plugins: [
                         ...config.plugins,
+                        // This must only appear on one config – this one is the only mandatory one.
+                        new CopyPlugin({
+                            patterns: [{from: 'app/static/', to: 'static/'}]
+                        }),
                         analyzeBundle && getBundleAnalyzerPlugin(SSR)
                     ].filter(Boolean)
                 }

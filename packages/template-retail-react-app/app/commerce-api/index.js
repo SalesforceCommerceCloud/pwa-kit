@@ -79,6 +79,9 @@ class CommerceAPI {
                 sendLocale: false,
                 sendCurrency: ['createBasket']
             },
+            shopperExperience: {
+                api: sdk.ShopperExperience
+            },
             shopperGiftCertificates: {
                 api: sdk.ShopperGiftCertificates
             },
@@ -107,7 +110,7 @@ class CommerceAPI {
             self._sdkInstances = {
                 ...self._sdkInstances,
                 [key]: new Proxy(new SdkClass(this._config), {
-                    get: function(obj, prop) {
+                    get: function (obj, prop) {
                         if (typeof obj[prop] === 'function') {
                             return (...args) => {
                                 const fetchOptions = args[0]

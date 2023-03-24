@@ -34,10 +34,7 @@ export const generateCodeChallenge = async (codeVerifier) => {
     if (isServer) {
         await import('crypto').then((module) => {
             const crypto = module.default
-            base64Digest = crypto
-                .createHash('sha256')
-                .update(codeVerifier)
-                .digest('base64')
+            base64Digest = crypto.createHash('sha256').update(codeVerifier).digest('base64')
         })
     } else {
         const encoder = new TextEncoder()
@@ -47,8 +44,5 @@ export const generateCodeChallenge = async (codeVerifier) => {
         base64Digest = base64encode(digest)
     }
 
-    return base64Digest
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=/g, '')
+    return base64Digest.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
 }

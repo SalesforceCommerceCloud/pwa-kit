@@ -1,244 +1,294 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
 import {act} from '@testing-library/react'
+import {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
 import {
     assertInvalidateQuery,
     assertRemoveQuery,
     assertUpdateQuery,
-    DEFAULT_TEST_HOST,
+    DEFAULT_TEST_CONFIG,
     mockMutationEndpoints,
-    NEW_DATA,
-    OLD_DATA,
-    renderHookWithProviders
+    mockQueryEndpoint,
+    renderHookWithProviders,
+    waitAndExpectError,
+    waitAndExpectSuccess
 } from '../../test-utils'
-import {
-    getCacheUpdateMatrix,
-    ShopperBasketsMutationType,
-    useShopperBasketsMutation
-} from './mutation'
-import {useBasket} from './query'
-import {useCustomerBaskets} from '../ShopperCustomers/query'
-import {CacheUpdateMatrixElement} from '../utils'
-
-const CUSTOMER_ID = 'CUSTOMER_ID'
-const BASKET_ID = 'BASKET_ID'
-const COUPON_ID = 'COUPON_ID'
-const PRODUCT_ID = 'PRODUCT_ID'
-const ITEM_ID = 'ITEM_ID'
-const PAYMENT_INSTRUMENT_ID = 'PAYMENT_INSTRUMENT_ID'
-const SHIPMENT_ID = 'SHIPMENT_ID'
+import {useCustomerBaskets} from '../ShopperCustomers'
+import {ApiClients, Argument} from '../types'
+import {ShopperBasketsMutation, useShopperBasketsMutation} from './mutation'
+import * as queries from './query'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
-        ready: jest.fn().mockResolvedValue({access_token: '123'})
+        ready: jest.fn().mockResolvedValue({access_token: 'access_token'})
     }))
 })
 
-jest.mock('../useCustomerId.ts', () => {
-    return jest.fn().mockReturnValue(CUSTOMER_ID)
+type Client = ApiClients['shopperBaskets']
+type Basket = ShopperBasketsTypes.Basket
+type BasketsResult = ShopperCustomersTypes.BasketsResult
+
+/** Create an options object for Shopper Baskets endpoints, with `basketId` pre-filled. */
+const createOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
+    body: Argument<Client[Method]> extends {body: infer B} ? B : undefined,
+    parameters: Omit<Argument<Client[Method]>['parameters'], 'basketId'>
+): Argument<Client[Method]> => ({
+    body,
+    parameters: {basketId: BASKET_ID, ...parameters}
 })
 
-type MutationPayloads = {
-    [key in ShopperBasketsMutationType]?: {body: any; parameters: any}
-}
-const mutationPayloads: MutationPayloads = {
-    updateBasket: {
-        parameters: {basketId: BASKET_ID},
-        body: {}
-    },
-    updateBillingAddressForBasket: {
-        parameters: {basketId: BASKET_ID},
-        body: {}
-    },
-    deleteBasket: {
-        parameters: {basketId: BASKET_ID},
-        body: {}
-    },
-    addCouponToBasket: {
-        parameters: {basketId: BASKET_ID},
-        body: {code: COUPON_ID}
-    },
-    addItemToBasket: {
-        parameters: {basketId: BASKET_ID},
-        body: {productId: PRODUCT_ID}
-    },
-    removeItemFromBasket: {
-        parameters: {basketId: BASKET_ID, itemId: ITEM_ID},
-        body: {}
-    },
-    addPaymentInstrumentToBasket: {
-        parameters: {basketId: BASKET_ID},
-        body: {paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
-    },
-    createBasket: {
-        parameters: {},
-        body: {}
-    },
-    mergeBasket: {
-        parameters: {},
-        body: {}
-    },
-    removeCouponFromBasket: {
-        parameters: {basketId: BASKET_ID, couponItemId: COUPON_ID},
-        body: {}
-    },
-    removePaymentInstrumentFromBasket: {
-        parameters: {basketId: BASKET_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID},
-        body: {}
-    },
-    updateCustomerForBasket: {
-        parameters: {basketId: BASKET_ID},
-        body: {email: 'alex@test.com'}
-    },
-    updateItemInBasket: {
-        parameters: {basketId: BASKET_ID, itemId: ITEM_ID},
-        body: {}
-    },
-    updatePaymentInstrumentInBasket: {
-        parameters: {basketId: BASKET_ID, paymentInstrumentId: PAYMENT_INSTRUMENT_ID},
-        body: {}
-    },
-    updateShippingAddressForShipment: {
-        parameters: {basketId: BASKET_ID, shipmentId: SHIPMENT_ID},
-        body: {}
-    },
-    updateShippingMethodForShipment: {
-        parameters: {basketId: BASKET_ID, shipmentId: SHIPMENT_ID},
-        body: {id: '001'}
+// --- getBasket constants --- //
+const basketsEndpoint = '/checkout/shopper-baskets/'
+const BASKET_ID = 'basket_id'
+const getBasketOptions = createOptions<'getBasket'>(undefined, {})
+const oldBasket: Basket = {basketId: BASKET_ID, mockData: 'old basket'}
+const newBasket: Basket = {basketId: BASKET_ID, mockData: 'new basket'}
+// --- getCustomerBaskets constants --- //
+const customersEndpoint = '/customer/shopper-customers/'
+const CUSTOMER_ID = 'customer_id'
+// Can't use `makeOptions()` here because it's Shopper Customers, not Shopper Baskets
+const getCustomerBasketsOptions: Argument<ApiClients['shopperCustomers']['getCustomerBaskets']> = {
+    parameters: {
+        customerId: CUSTOMER_ID
     }
 }
+const oldCustomerBaskets: BasketsResult = {
+    // We aren't implementing the full basket, so we assert to pretend we are
+    baskets: [{basketId: 'other_basket'}, oldBasket] as BasketsResult['baskets'],
+    total: 2
+}
+const newCustomerBaskets: BasketsResult = {
+    // We aren't implementing the full basket, so we assert to pretend we are
+    baskets: [{basketId: 'other_basket'}, newBasket] as BasketsResult['baskets'],
+    total: 2
+}
+const deletedCustomerBaskets: BasketsResult = {
+    // We aren't implementing the full basket, so we assert to pretend we are
+    baskets: [{basketId: 'other_basket'}] as BasketsResult['baskets'],
+    total: 1
+}
 
-const tests = (Object.keys(mutationPayloads) as ShopperBasketsMutationType[]).map(
-    (mutationName) => {
-        const payload = mutationPayloads[mutationName]
-
-        return {
-            hook: mutationName,
-            cases: [
-                {
-                    name: 'success',
-                    assertions: async () => {
-                        mockMutationEndpoints('/checkout/shopper-baskets/')
-                        mockRelatedQueries()
-
-                        const {result, waitForValueToChange} = renderHookWithProviders(() => {
-                            const action = mutationName as ShopperBasketsMutationType
-                            const mutation = useShopperBasketsMutation({action})
-
-                            // All of the necessary query hooks needed to verify the cache-update logic
-                            const queries = {
-                                basket: useBasket({basketId: BASKET_ID}),
-                                customerBaskets: useCustomerBaskets({customerId: CUSTOMER_ID})
-                            }
-
-                            return {
-                                queries,
-                                mutation
-                            }
-                        })
-
-                        await waitForValueToChange(() => result.current.queries.basket.data)
-
-                        act(() => {
-                            result.current.mutation.mutate(payload)
-                        })
-
-                        await waitForValueToChange(() => result.current.mutation.isSuccess)
-                        expect(result.current.mutation.isSuccess).toBe(true)
-
-                        // On successful mutation, the query cache gets updated too. Let's assert it.
-                        const cacheUpdateMatrix = getCacheUpdateMatrix(CUSTOMER_ID)
-                        // @ts-ignore
-                        const matrixElement = cacheUpdateMatrix[mutationName](payload, {})
-                        const {invalidate, update, remove}: CacheUpdateMatrixElement = matrixElement
-
-                        update?.forEach(({name}) => {
-                            // @ts-ignore
-                            assertUpdateQuery(result.current.queries[name], NEW_DATA)
-                        })
-
-                        invalidate?.forEach(({name}) => {
-                            // @ts-ignore
-                            assertInvalidateQuery(result.current.queries[name], OLD_DATA)
-                        })
-
-                        remove?.forEach(({name}) => {
-                            // @ts-ignore
-                            assertRemoveQuery(result.current.queries[name])
-                        })
-                    }
-                },
-                {
-                    name: 'error',
-                    assertions: async () => {
-                        mockMutationEndpoints('/checkout/shopper-baskets/', {errorResponse: 500})
-
-                        const {result, waitForNextUpdate} = renderHookWithProviders(() => {
-                            const action = mutationName as ShopperBasketsMutationType
-                            return useShopperBasketsMutation({action})
-                        })
-
-                        act(() => {
-                            result.current.mutate(payload)
-                        })
-
-                        await waitForNextUpdate()
-
-                        expect(result.current.error).toBeDefined()
-                    }
-                }
-            ]
+// --- TEST CASES --- //
+/** All Shopper Baskets mutations except these have the same cache update logic. */
+type NonEmptyResponseMutations = Exclude<
+    ShopperBasketsMutation,
+    'deleteBasket' | 'addPriceBooksToBasket' | 'addTaxesForBasket' | 'addTaxesForBasketItem'
+>
+// This is an object rather than an array to more easily ensure we cover all mutations
+type TestMap = {[Mut in NonEmptyResponseMutations]: Argument<Client[Mut]>}
+const testMap: TestMap = {
+    addGiftCertificateItemToBasket: createOptions<'addGiftCertificateItemToBasket'>(
+        {recipientEmail: 'customer@email', amount: 100},
+        {}
+    ),
+    createShipmentForBasket: createOptions<'createShipmentForBasket'>({}, {}),
+    removeGiftCertificateItemFromBasket: createOptions<'removeGiftCertificateItemFromBasket'>(
+        undefined,
+        {giftCertificateItemId: 'giftCertificateItemId'}
+    ),
+    removeShipmentFromBasket: createOptions<'removeShipmentFromBasket'>(undefined, {
+        shipmentId: 'shipmentId'
+    }),
+    transferBasket: createOptions<'transferBasket'>(undefined, {}),
+    updateGiftCertificateItemInBasket: createOptions<'updateGiftCertificateItemInBasket'>(
+        {
+            amount: 100,
+            recipientEmail: 'customer@email'
+        },
+        {giftCertificateItemId: 'giftCertificateItemId'}
+    ),
+    updateShipmentForBasket: createOptions<'updateShipmentForBasket'>(
+        {},
+        {shipmentId: 'shipmentId'}
+    ),
+    addCouponToBasket: createOptions<'addCouponToBasket'>({code: 'coupon'}, {}),
+    addItemToBasket: createOptions<'addItemToBasket'>([], {}),
+    addPaymentInstrumentToBasket: createOptions<'addPaymentInstrumentToBasket'>({}, {}),
+    createBasket: createOptions<'createBasket'>({}, {}),
+    mergeBasket: createOptions<'mergeBasket'>(undefined, {}),
+    removeCouponFromBasket: createOptions<'removeCouponFromBasket'>(undefined, {
+        couponItemId: 'couponIemId'
+    }),
+    removeItemFromBasket: createOptions<'removeItemFromBasket'>(undefined, {itemId: 'itemId'}),
+    removePaymentInstrumentFromBasket: createOptions<'removePaymentInstrumentFromBasket'>(
+        undefined,
+        {
+            paymentInstrumentId: 'paymentInstrumentId'
         }
-    }
-)
+    ),
+    updateBasket: createOptions<'updateBasket'>({}, {}),
+    updateBillingAddressForBasket: createOptions<'updateBillingAddressForBasket'>({}, {}),
+    updateCustomerForBasket: createOptions<'updateCustomerForBasket'>(
+        {email: 'customer@email'},
+        {}
+    ),
+    updateItemInBasket: createOptions<'updateItemInBasket'>({}, {itemId: 'itemId'}),
+    updatePaymentInstrumentInBasket: createOptions<'updatePaymentInstrumentInBasket'>(
+        {},
+        {paymentInstrumentId: 'paymentInstrumentId'}
+    ),
+    updateShippingAddressForShipment: createOptions<'updateShippingAddressForShipment'>(
+        {},
+        {shipmentId: 'shipmentId'}
+    ),
+    updateShippingMethodForShipment: createOptions<'updateShippingMethodForShipment'>(
+        {id: 'ship'},
+        {shipmentId: 'shipmentId'}
+    )
+}
+const deleteTestCase = ['deleteBasket', createOptions<'deleteBasket'>(undefined, {})] as const
+const addPriceBooksToBasketTestCase = [
+    'addPriceBooksToBasket',
+    createOptions<'addPriceBooksToBasket'>([], {})
+] as const
+const addTaxesForBasketTestCase = [
+    'addTaxesForBasket',
+    createOptions<'addTaxesForBasket'>(
+        {
+            taxes: {}
+        },
+        {}
+    )
+] as const
+const addTaxesForBasketItemTestCase = [
+    'addTaxesForBasketItem',
+    createOptions<'addTaxesForBasketItem'>({}, {itemId: 'itemId'})
+] as const
 
-tests.forEach(({hook, cases}) => {
-    describe(hook, () => {
-        beforeEach(() => {
-            jest.clearAllMocks()
+// Type assertion because the built-in type definition for `Object.entries` is limited :\
+const nonEmptyResponseTestCases = Object.entries(testMap) as Array<
+    [NonEmptyResponseMutations, Argument<Client[NonEmptyResponseMutations]>]
+>
+
+// Endpoints returning void response on success
+const emptyResponseTestCases = [
+    deleteTestCase,
+    addPriceBooksToBasketTestCase,
+    addTaxesForBasketTestCase,
+    addTaxesForBasketItemTestCase
+]
+
+// Most test cases only apply to non-empty response test cases, some (error handling) can include deleteBasket
+const allTestCases = [...nonEmptyResponseTestCases, ...emptyResponseTestCases]
+
+describe('ShopperBaskets mutations', () => {
+    const storedCustomerIdKey = `${DEFAULT_TEST_CONFIG.siteId}_customer_id`
+    beforeAll(() => {
+        // Make sure we don't accidentally overwrite something before setting up our test state
+        if (window.localStorage.length > 0) throw new Error('Unexpected data in local storage.')
+        window.localStorage.setItem(storedCustomerIdKey, CUSTOMER_ID)
+    })
+    afterAll(() => {
+        window.localStorage.removeItem(storedCustomerIdKey)
+    })
+
+    beforeEach(() => nock.cleanAll())
+    test.each(nonEmptyResponseTestCases)(
+        '`%s` returns data on success',
+        async (mutationName, options) => {
+            mockMutationEndpoints(basketsEndpoint, oldBasket)
+            const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+                return useShopperBasketsMutation(mutationName)
+            })
+            expect(result.current.data).toBeUndefined()
+            act(() => result.current.mutate(options))
+            await waitAndExpectSuccess(wait, () => result.current)
+            expect(result.current.data).toEqual(oldBasket)
+        }
+    )
+    test.each(allTestCases)('`%s` returns error on error', async (mutationName, options) => {
+        mockMutationEndpoints(basketsEndpoint, {error: true}, 400)
+        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+            return useShopperBasketsMutation(mutationName)
         })
-        cases.forEach(({name, assertions}) => {
-            test(name, assertions)
-        })
+        expect(result.current.error).toBeNull()
+        act(() => result.current.mutate(options))
+        await waitAndExpectError(wait, () => result.current)
+        // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
+        // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
+        expect(result.current.error).toHaveProperty('response')
+    })
+    test.each(nonEmptyResponseTestCases)(
+        '`%s` updates the cache on success',
+        async (mutationName, options) => {
+            mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
+            mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
+            mockMutationEndpoints(basketsEndpoint, newBasket) // this mutation
+            const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
+                basket: queries.useBasket(getBasketOptions),
+                customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
+                mutation: useShopperBasketsMutation(mutationName)
+            }))
+            await waitAndExpectSuccess(wait, () => result.current.basket)
+            expect(result.current.basket.data).toEqual(oldBasket)
+            expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectSuccess(wait, () => result.current.mutation)
+            assertUpdateQuery(result.current.basket, newBasket)
+            assertUpdateQuery(result.current.customerBaskets, newCustomerBaskets)
+        }
+    )
+    test.each(allTestCases)(
+        '`%s` does not change cache on error',
+        async (mutationName, options) => {
+            mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
+            mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
+            mockMutationEndpoints(basketsEndpoint, {error: true}, 400) // this mutation
+            const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
+                basket: queries.useBasket(getBasketOptions),
+                customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
+                mutation: useShopperBasketsMutation(mutationName)
+            }))
+            await waitAndExpectSuccess(wait, () => result.current.basket)
+            expect(result.current.basket.data).toEqual(oldBasket)
+            expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
+            expect(result.current.mutation.error).toBeNull()
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectError(wait, () => result.current.mutation)
+            // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
+            // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
+            expect(result.current.mutation.error).toHaveProperty('response')
+            assertUpdateQuery(result.current.basket, oldBasket)
+            assertUpdateQuery(result.current.customerBaskets, oldCustomerBaskets)
+        }
+    )
+    test.each(emptyResponseTestCases)(
+        '`%s` returns void on success',
+        async (mutationName, options) => {
+            // Almost the standard 'returns data' test, just a different return type
+            mockMutationEndpoints(basketsEndpoint, oldBasket)
+            const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+                return useShopperBasketsMutation(mutationName)
+            })
+            expect(result.current.data).toBeUndefined()
+            act(() => result.current.mutate(options))
+            await waitAndExpectSuccess(wait, () => result.current)
+            expect(result.current.data).toBeUndefined()
+        }
+    )
+    test('`deleteBasket` removes the basket from the cache on success', async () => {
+        // Almost the standard 'updates cache' test, but the cache changes are different
+        const [mutationName, options] = deleteTestCase
+        mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
+        mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
+        mockMutationEndpoints(basketsEndpoint, newBasket) // this mutation
+        mockQueryEndpoint(customersEndpoint, deletedCustomerBaskets) // getCustomerBaskets refetch
+        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
+            basket: queries.useBasket(getBasketOptions),
+            customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
+            mutation: useShopperBasketsMutation(mutationName)
+        }))
+        await waitAndExpectSuccess(wait, () => result.current.basket)
+        expect(result.current.basket.data).toEqual(oldBasket)
+        expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
+        act(() => result.current.mutation.mutate(options))
+        await waitAndExpectSuccess(wait, () => result.current.mutation)
+        assertRemoveQuery(result.current.basket)
+        assertInvalidateQuery(result.current.customerBaskets, oldCustomerBaskets)
     })
 })
-
-const mockRelatedQueries = () => {
-    const basketEndpoint = '/checkout/shopper-baskets/'
-    const customerEndpoint = '/customer/shopper-customers/'
-
-    // The queries would initially respond with 'old data'.
-    // And then subsequent responses would have 'new data' because of the cache updates.
-
-    // For get basket
-    nock(DEFAULT_TEST_HOST)
-        .get((uri) => {
-            return uri.includes(basketEndpoint)
-        })
-        .reply(200, OLD_DATA)
-    nock(DEFAULT_TEST_HOST)
-        .persist()
-        .get((uri) => {
-            return uri.includes(basketEndpoint)
-        })
-        .reply(200, NEW_DATA)
-
-    // For get customer basket
-    nock(DEFAULT_TEST_HOST)
-        .get((uri) => {
-            return uri.includes(customerEndpoint)
-        })
-        .reply(200, OLD_DATA)
-    nock(DEFAULT_TEST_HOST)
-        .persist()
-        .get((uri) => {
-            return uri.includes(customerEndpoint)
-        })
-        .reply(200, NEW_DATA)
-}

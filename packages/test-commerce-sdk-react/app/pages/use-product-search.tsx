@@ -13,9 +13,15 @@ const searchQuery = 'shirt'
 const refinement = ['price=(0..50)']
 
 function UseProductSearch() {
-    const {isLoading, error, data: result} = useProductSearch({
-        q: searchQuery,
-        refine: refinement
+    const {
+        isLoading,
+        error,
+        data: result
+    } = useProductSearch({
+        parameters: {
+            q: searchQuery,
+            refine: refinement
+        }
     })
     if (isLoading) {
         return (

@@ -17,7 +17,6 @@ describe('useCommerceApi', () => {
             'shopperBaskets',
             'shopperContexts',
             'shopperCustomers',
-            'shopperDiscoverySearch',
             'shopperGiftCertificates',
             'shopperLogin',
             'shopperOrders',

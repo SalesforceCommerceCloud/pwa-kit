@@ -11,8 +11,14 @@ import {Link} from 'react-router-dom'
 const ids = '25502228M,25503045M'
 
 const UseShopperProducts = () => {
-    const {isLoading, error, data: result} = useProducts({
-        ids
+    const {
+        isLoading,
+        error,
+        data: result
+    } = useProducts({
+        parameters: {
+            ids
+        }
     })
     if (isLoading) {
         return (

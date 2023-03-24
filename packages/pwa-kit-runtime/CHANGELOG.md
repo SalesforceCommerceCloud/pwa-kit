@@ -1,4 +1,15 @@
-## v2.5.0-dev (Dec 01, 2022)
+## v2.8.0-dev (Mar 03, 2023)
+- Add optional parameter to override configuration folder used in `getConfig` [#1049](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1049)
+## v2.7.0 (Mar 03, 2023)
+- Support Node 16 [#965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/965)
+
+## v2.6.0 (Jan 25, 2023)
+- Security package updates
+
+## v2.5.0 (Jan 05, 2023)
+- Logging cid from res header isntead of req in local development [#821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/821)
+- Replace morgan stream to use console.log [#847](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/847)
+
 ## v2.4.0 (Dec 01, 2022)
 ## v2.3.0 (Oct 27, 2022)
 - Performance: Skip retries when flushing CloudWatch metrics, prioritize returning a response instead. [720](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/720)

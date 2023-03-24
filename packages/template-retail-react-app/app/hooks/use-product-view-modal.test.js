@@ -8,46 +8,31 @@
 import React from 'react'
 import {Router} from 'react-router-dom'
 import PropTypes from 'prop-types'
-import {screen, render, fireEvent, waitFor} from '@testing-library/react'
+import {screen, fireEvent, waitFor} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
 import {IntlProvider} from 'react-intl'
 
 import mockProductDetail from '../commerce-api/mocks/variant-750518699578M'
 import {useProductViewModal} from './use-product-view-modal'
-import {DEFAULT_LOCALE} from '../utils/test-utils'
-import {renderWithProviders} from '../utils/test-utils'
+import {DEFAULT_LOCALE, renderWithProviders} from '../utils/test-utils'
 import messages from '../translations/compiled/en-GB.json'
-jest.mock('../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-jest.mock('commerce-sdk-isomorphic', () => {
-    const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    return {
-        ...sdk,
-        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
-            async getProduct() {
-                return {
-                    ...mockProductDetail,
-                    id: '750518699660M',
-                    variationValues: {
-                        color: 'BLACKFB',
-                        size: '050',
-                        width: 'V'
-                    },
-                    c_color: 'BLACKFB',
-                    c_isNew: true,
-                    c_refinementColor: 'black',
-                    c_size: '050',
-                    c_width: 'V'
-                }
-            }
-        }
-    }
-})
+import {rest} from 'msw'
+
+const mockProduct = {
+    ...mockProductDetail,
+    id: '750518699660M',
+    variationValues: {
+        color: 'BLACKFB',
+        size: '050',
+        width: 'V'
+    },
+    c_color: 'BLACKFB',
+    c_isNew: true,
+    c_refinementColor: 'black',
+    c_size: '050',
+    c_width: 'V'
+}
+
 const MockComponent = ({product}) => {
     const productViewModalData = useProductViewModal(product)
     const [isShown, setIsShown] = React.useState(false)
@@ -70,6 +55,14 @@ MockComponent.propTypes = {
     product: PropTypes.object
 }
 
+beforeEach(() => {
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockProduct))
+        })
+    )
+})
+
 describe('useProductViewModal hook', () => {
     test('return proper data', () => {
         const history = createMemoryHistory()
@@ -90,7 +83,7 @@ describe('useProductViewModal hook', () => {
         const history = createMemoryHistory()
         history.push('/test/path?color=BLACKFB')
 
-        render(
+        renderWithProviders(
             <Router history={history}>
                 <IntlProvider
                     locale={DEFAULT_LOCALE}
@@ -114,7 +107,7 @@ describe('useProductViewModal hook', () => {
         const history = createMemoryHistory()
         history.push('/test/path')
 
-        render(
+        renderWithProviders(
             <Router history={history}>
                 <IntlProvider
                     locale={DEFAULT_LOCALE}
@@ -144,7 +137,7 @@ describe('useProductViewModal hook', () => {
         const history = createMemoryHistory()
         history.push('/test/path')
 
-        render(
+        renderWithProviders(
             <Router history={history}>
                 <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
                     <MockComponent product={mockProductDetail} />

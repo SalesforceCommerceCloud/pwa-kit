@@ -6,14 +6,15 @@
  */
 import React from 'react'
 import {
-    ShopperLoginHelpers,
+    AuthHelpers,
     useCustomer,
     useCustomerAddress,
     useCustomerBaskets,
     useCustomerOrders,
     useCustomerProductList,
     useShopperCustomersMutation,
-    useShopperLoginHelper
+    useAuthHelper,
+    ShopperCustomersMutation
 } from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 import {useQueryClient} from '@tanstack/react-query'
@@ -24,9 +25,7 @@ const LIST_ID = 'bcd08be6f883120b4960ca8a0b'
 const ITEM_ID = '60ee899e9305de0df5b0fcade5'
 const PAYMENT_INSTRUMENT_ID = '060e03df91c98e72c21086e0e2'
 const PRODUCT_ID = '25518823M'
-const RANDOM_STR = Math.random()
-    .toString(36)
-    .slice(2, 7)
+const RANDOM_STR = Math.random().toString(36).slice(2, 7)
 
 const renderQueryHook = (name: string, {data, isLoading, error}: any) => {
     if (isLoading) {
@@ -80,11 +79,11 @@ const renderMutationHook = ({name, hook, body, parameters}: any) => {
 
 function UseCustomer() {
     const queryClient = useQueryClient()
-    const loginRegisteredUser = useShopperLoginHelper(ShopperLoginHelpers.LoginRegisteredUserB2C)
+    const loginRegisteredUser = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
     // TODO: Implement the flow - Login as a guest user and then registered that user.
     //  Currently Login as a guest doesn't work in packages/test-commerce-sdk-react/app/pages/use-shopper-login-helper.tsx
-    // const loginGuestUser = useShopperLoginHelper('loginGuestUser')
+    // const loginGuestUser = useAuthHelper(AuthHelpers.LoginGuestUser)
     // const guestUserMutationHooks = [
     //     {
     //         action: 'registerCustomer',
@@ -107,19 +106,19 @@ function UseCustomer() {
             body: {firstName: `Kobe${RANDOM_STR}`},
             parameters: {customerId: CUSTOMER_ID}
         },
-        {
-            action: 'updateCustomerPassword',
-            body: {currentPassword: 'Test12345!', password: 'Test1234!'},
-            parameters: {customerId: CUSTOMER_ID}
-        },
+        // {
+        //     action: 'updateCustomerPassword',
+        //     body: {currentPassword: 'Test12345!', password: 'Test1234!'},
+        //     parameters: {customerId: CUSTOMER_ID}
+        // },
         // TODO: Not working in PWA Kit Today. Potentially related to the issue scoping tokens
         //  https://pwa-kit.mobify-storefront.com/global/en-GB/reset-password
         //  {"type":"https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized","title":"Unauthorized","detail":"Your access-token is invalid and could not be used to identify the API client."}
-        {
-            action: 'getResetPasswordToken',
-            body: {login: 'kobe@test.com'},
-            parameters: {}
-        },
+        // {
+        //     action: 'getResetPasswordToken',
+        //     body: {login: 'kobe@test.com'},
+        //     parameters: {}
+        // },
         {
             action: 'createCustomerAddress',
             body: {addressId: `TestAddress${RANDOM_STR}`, countryCode: 'CA', lastName: 'Murphy'},
@@ -182,7 +181,7 @@ function UseCustomer() {
     ].map(({action, body, parameters}) => {
         return {
             name: action,
-            hook: useShopperCustomersMutation({action}),
+            hook: useShopperCustomersMutation(action as ShopperCustomersMutation),
             body,
             parameters
         }
@@ -191,28 +190,44 @@ function UseCustomer() {
     const queryHooks = [
         {
             name: 'useCustomer',
-            hook: useCustomer({customerId: CUSTOMER_ID})
+            hook: useCustomer({
+                parameters: {customerId: CUSTOMER_ID}
+            })
         },
         {
             name: 'useCustomerAddress',
             hook: useCustomerAddress({
-                customerId: CUSTOMER_ID,
-                addressName: ADDRESS_NAME
+                parameters: {
+                    customerId: CUSTOMER_ID,
+                    addressName: ADDRESS_NAME
+                }
             })
         },
         {
             name: 'useCustomerOrders',
-            hook: useCustomerOrders({customerId: CUSTOMER_ID})
+            hook: useCustomerOrders({
+                parameters: {customerId: CUSTOMER_ID}
+            })
         },
         {
             name: 'useCustomerBaskets',
-            hook: useCustomerBaskets({customerId: CUSTOMER_ID})
+            hook: useCustomerBaskets({
+                parameters: {customerId: CUSTOMER_ID}
+            })
         },
         {
             name: 'useCustomerProductList',
-            hook: useCustomerProductList({customerId: CUSTOMER_ID, listId: LIST_ID})
+            hook: useCustomerProductList({
+                parameters: {customerId: CUSTOMER_ID, listId: LIST_ID}
+            })
         }
     ]
+
+    const loginError = loginRegisteredUser.error
+    const loginErrorMessage =
+        typeof loginError === 'object' && loginError !== null && 'message' in loginError
+            ? loginError.message
+            : loginError
 
     return (
         <>
@@ -232,9 +247,7 @@ function UseCustomer() {
                     >
                         loginRegisteredUser
                     </button>
-                    {loginRegisteredUser.error?.message && (
-                        <p style={{color: 'red'}}>Error: {loginRegisteredUser.error?.message}</p>
-                    )}
+                    {loginError && <p style={{color: 'red'}}>Error: {loginErrorMessage}</p>}
                 </>
             ) : (
                 <>
