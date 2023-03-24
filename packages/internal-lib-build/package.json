@@ -71,6 +71,9 @@
   "devDependencies": {
     "npm-packlist": "^4.0.0"
   },
+  "peerDependencies": {
+    "typescript": "^4.7.2"
+  },
   "scripts": {
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
