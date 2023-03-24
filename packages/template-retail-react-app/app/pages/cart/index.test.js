@@ -169,6 +169,7 @@ beforeEach(() => {
 afterEach(() => {
     localStorage.clear()
 })
+jest.setTimeout(30000)
 
 describe('Empty cart tests', function () {
     beforeEach(() => {
@@ -292,8 +293,6 @@ describe('Remove item from cart', function () {
         )
     })
     test('Can remove item from the cart', async () => {
-        jest.setTimeout(30000)
-
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
