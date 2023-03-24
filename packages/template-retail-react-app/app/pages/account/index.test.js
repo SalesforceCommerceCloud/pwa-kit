@@ -15,7 +15,7 @@ import {
     mockedGuestCustomer,
     mockedRegisteredCustomer,
     mockOrderProducts
-} from '../../commerce-api/mock-data'
+} from '../../mocks/mock-data'
 import Account from './index'
 import Login from '../login'
 import mockConfig from '../../../config/mocks/default'

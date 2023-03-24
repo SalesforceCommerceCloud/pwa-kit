@@ -9,7 +9,7 @@ import React from 'react'
 import {renderHook} from '@testing-library/react-hooks'
 import {useCategories} from './use-categories'
 import {CategoriesProvider} from '../contexts'
-import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
+import {mockCategories as initialMockCategories} from '../mocks/mock-data'
 
 const wrapper = ({children}) => <CategoriesProvider>{children}</CategoriesProvider>
 

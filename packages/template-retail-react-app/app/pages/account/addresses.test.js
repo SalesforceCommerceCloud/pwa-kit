@@ -13,7 +13,7 @@ import AccountAddresses from './addresses'
 import {
     mockedRegisteredCustomerWithNoAddress,
     mockedRegisteredCustomer
-} from '../../commerce-api/mock-data'
+} from '../../mocks/mock-data'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 let mockCustomer = {}

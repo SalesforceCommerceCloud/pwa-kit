@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {
     mockedCustomerProductLists,
     mockedCustomerProductListsDetails
-} from '../../../commerce-api/mock-data'
+} from '../../../mocks/mock-data'
 import ItemVariantProvider from '../../../components/item-variant'
 import {renderWithProviders} from '../../../utils/test-utils'
 import CartSecondaryButtonGroup from './cart-secondary-button-group'

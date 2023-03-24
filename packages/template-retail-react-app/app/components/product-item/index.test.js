@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import ProductItem from './index'
-import {mockedCustomerProductListsDetails} from '../../commerce-api/mock-data'
+import {mockedCustomerProductListsDetails} from '../../mocks/mock-data'
 import {renderWithProviders} from '../../utils/test-utils'
 import {screen} from '@testing-library/react'
 

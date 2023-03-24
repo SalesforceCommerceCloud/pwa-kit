@@ -12,7 +12,7 @@ import Header from './index'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {rest} from 'msw'
 import {createMemoryHistory} from 'history'
-import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../commerce-api/mock-data'
+import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
 
 jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual('@chakra-ui/react')

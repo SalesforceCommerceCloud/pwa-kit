@@ -16,7 +16,7 @@ const {
     mockedRegisteredCustomer,
     exampleTokenReponse,
     mockCustomerBaskets
-} = require('./app/commerce-api/mock-data')
+} = require('./app/mocks/mock-data')
 
 /**
  * Set up an API mocking server for testing purposes.
