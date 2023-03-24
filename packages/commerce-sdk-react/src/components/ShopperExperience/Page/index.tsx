@@ -6,7 +6,7 @@
  */
 import React, {useContext, useEffect, useState} from 'react'
 import {Helmet} from 'react-helmet'
-import {Component as ComponentType, Page as PageType} from '../types'
+import type {Component as ComponentType, Page as PageType} from '../types'
 import {Region} from '../Region'
 
 type ComponentMap = {
