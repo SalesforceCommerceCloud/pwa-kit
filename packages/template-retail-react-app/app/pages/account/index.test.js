@@ -62,7 +62,7 @@ describe('Test redirects', function () {
             })
         )
     })
-    test.skip('Redirects to login page if the customer is not logged in', async () => {
+    test('Redirects to login page if the customer is not logged in', async () => {
         const Component = () => {
             return (
                 <Switch>
@@ -74,7 +74,7 @@ describe('Test redirects', function () {
             )
         }
         renderWithProviders(<Component />, {
-            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app, isGuest: true}
         })
         await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
     })
@@ -106,10 +106,9 @@ test('Provides navigation for subpages', async () => {
 })
 
 describe('Render and logs out', function () {
-    test.skip('Renders account detail page by default for logged-in customer, and can log out', async () => {
+    test('Renders account detail page by default for logged-in customer, and can log out', async () => {
         renderWithProviders(<MockedComponent />)
 
-        await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
         // Render user profile page
         await waitFor(() => {
             expect(window.location.pathname).toEqual(`${expectedBasePath}/account`)
@@ -140,7 +139,7 @@ describe('updating profile', function () {
             })
         )
     })
-    test.skip('Allows customer to edit profile details', async () => {
+    test('Allows customer to edit profile details', async () => {
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
@@ -172,7 +171,7 @@ describe('updating password', function () {
             })
         )
     })
-    test.skip('Allows customer to update password', async () => {
+    test('Allows customer to update password', async () => {
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
