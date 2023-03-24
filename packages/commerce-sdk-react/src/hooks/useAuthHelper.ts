@@ -18,7 +18,8 @@ import {updateCache} from './utils'
 export const AuthHelpers = {
     LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
-    Logout: 'logout'
+    Logout: 'logout',
+    Register: 'register'
 } as const
 
 export type AuthHelper = (typeof AuthHelpers)[keyof typeof AuthHelpers]
@@ -82,5 +83,6 @@ const cacheUpdateMatrix: CacheUpdateMatrix = {
         return {
             remove: [{queryKey: ['/commerce-sdk-react']}]
         }
-    }
+    },
+    register: noop
 }
