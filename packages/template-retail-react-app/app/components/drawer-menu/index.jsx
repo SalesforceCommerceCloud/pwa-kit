@@ -13,7 +13,6 @@ import {useIntl} from 'react-intl'
 import LocaleSelector from '../locale-selector'
 import NestedAccordion from '../nested-accordion'
 import SocialIcons from '../social-icons'
-import {useCategories} from '../../hooks/use-categories'
 // Components
 import {
     Box,
@@ -77,8 +76,8 @@ const STORE_LOCATOR_HREF = '/store-locator'
  * main usage is to navigate from one category to the next, but also homes links to
  * support, log in and out actions, as support links.
  */
-const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop}) => {
-    const {root, itemsKey} = useCategories()
+const DrawerMenu = ({root, isOpen, onClose = noop, onLogoClick = noop}) => {
+    const itemsKey = 'categories'
     const intl = useIntl()
     const {isRegistered} = useCustomerType()
     const navigate = useNavigation()

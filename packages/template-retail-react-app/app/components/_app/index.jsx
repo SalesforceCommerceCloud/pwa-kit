@@ -16,7 +16,7 @@ import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CategoriesProvider, CurrencyProvider} from '../../contexts'
+import {CurrencyProvider} from '../../contexts'
 
 // Local Project Components
 import Header from '../../components/header'
@@ -47,7 +47,8 @@ import {
     DEFAULT_SITE_TITLE,
     HOME_HREF,
     THEME_COLOR,
-    CAT_MENU_DEFAULT_NAV_DEPTH,
+    CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
+    CAT_MENU_DEFAULT_NAV_CLIENT_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE
 } from '../../constants'
@@ -57,27 +58,38 @@ import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
 import {useCategory, useCustomerType} from 'commerce-sdk-react-preview'
 
-const App = (props) => {
-    const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
-    const {data: allCategories} = useCategory(
-        {parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_DEPTH}},
+const onClient = typeof window !== 'undefined'
+
+/* 
+The categories tree can be really large! For performance reasons,
+we only load the level 0 categories on server side, and load the rest
+on client side to reduce SSR page size.
+*/
+const useLazyLoadCategories = () => {
+    const allCategoriesQuery = useCategory(
+        {parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_CLIENT_DEPTH}},
         {
-            select: (categories) => {
-                // Note: What is the best to handle special case like this?? Should commerce sdk handles this?
-                if (categories.isError) {
-                    const message =
-                        categories.title === 'Unsupported Locale'
-                            ? `
-It looks like the locale “${categories.locale}” isn’t set up, yet. The locale settings in your package.json must match what is enabled in your Business Manager instance.
-Learn more with our localization guide. https://sfdc.co/localization-guide
-`
-                            : categories.detail
-                    throw new Error(message)
-                }
-                return flatten(categories, 'categories')
-            }
+            enabled: onClient
         }
     )
+
+    const levelZeroCategoriesQuery = useCategory({
+        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH},
+    }, {
+        enabled: !allCategoriesQuery.isFetched
+    })
+
+    if (onClient && allCategoriesQuery.data) {
+        return allCategoriesQuery
+    }
+
+    return levelZeroCategoriesQuery
+}
+
+const App = (props) => {
+    const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
+    const {data: categoriesTree} = useLazyLoadCategories()
+    const categories = flatten(categoriesTree || {}, 'categories')
 
     const appOrigin = getAppOrigin()
 
@@ -184,7 +196,6 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
                 // - "compile-translations:pseudo"
                 defaultLocale={DEFAULT_LOCALE}
             >
-                <CategoriesProvider treeRoot={allCategories} locale={targetLocale}>
                     <CurrencyProvider currency={currency}>
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
@@ -234,19 +245,13 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
                                                 isOpen={isOpen}
                                                 onClose={onClose}
                                                 onLogoClick={onLogoClick}
-                                                root={
-                                                    allCategories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
-                                                }
-                                                locale={locale}
+                                                root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
                                             />
                                         </HideOnDesktop>
 
                                         <HideOnMobile>
                                             <ListMenu
-                                                root={
-                                                    allCategories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
-                                                }
-                                                locale={locale}
+                                                root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
                                             />
                                         </HideOnMobile>
                                     </Header>
@@ -285,7 +290,6 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>
-                </CategoriesProvider>
             </IntlProvider>
         </Box>
     )

@@ -9,7 +9,6 @@ import React, {Fragment, useRef, forwardRef, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
-import {useCategories} from '../../hooks/use-categories'
 
 // Project Components
 import LinksList from '../links-list'
@@ -80,7 +79,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
                 {...baseStyle.listMenuTriggerLinkIcon}
             >
                 <PopoverTrigger>
-                    <Fade in={hasItems && item.loaded}>
+                    <Fade in={hasItems}>
                         <ChevronIconTrigger {...baseStyle.selectedButtonIcon} />
                     </Fade>
                 </PopoverTrigger>
@@ -220,8 +219,8 @@ ListMenuPopover.propTypes = {
  *
  * @param maxColumns The maximum number of columns that we want to use per row inside the ListMenu.
  */
-const ListMenu = ({maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
-    const {root, itemsKey} = useCategories()
+const ListMenu = ({root, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
+    const itemsKey = 'categories'
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
     const [ariaBusy, setAriaBusy] = useState('true')

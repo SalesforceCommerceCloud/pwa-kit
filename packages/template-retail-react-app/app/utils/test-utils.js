@@ -29,7 +29,7 @@ import {mockCategories as initialMockCategories} from '../commerce-api/mock-data
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
 // Contexts
-import {CategoriesProvider, CurrencyProvider, MultiSiteProvider} from '../contexts'
+import {CurrencyProvider, MultiSiteProvider} from '../contexts'
 
 import {createUrlTemplate} from './url'
 import {getSiteByReference} from './site-utils'
@@ -79,7 +79,6 @@ export const TestProviders = ({
     children,
     initialBasket = null,
     initialCustomer = null,
-    initialCategories = initialMockCategories,
     locale = {id: DEFAULT_LOCALE},
     messages = fallbackMessages,
     appConfig = mockConfig.app,
@@ -155,7 +154,6 @@ export const TestProviders = ({
                                     : ''
                             }
                         >
-                            <CategoriesProvider treeRoot={initialCategories}>
                                 <CurrencyProvider currency={DEFAULT_CURRENCY}>
                                     <_CustomerProvider value={{customer, setCustomer}}>
                                         <BasketProvider value={{basket, setBasket}}>
@@ -171,7 +169,6 @@ export const TestProviders = ({
                                         </BasketProvider>
                                     </_CustomerProvider>
                                 </CurrencyProvider>
-                            </CategoriesProvider>
                         </CommerceApiProvider>
                     </_CommerceAPIProvider>
                 </MultiSiteProvider>
@@ -184,7 +181,6 @@ TestProviders.propTypes = {
     children: PropTypes.element,
     initialBasket: PropTypes.object,
     initialCustomer: PropTypes.object,
-    initialCategories: PropTypes.element,
     initialProductLists: PropTypes.object,
     messages: PropTypes.object,
     locale: PropTypes.object,
