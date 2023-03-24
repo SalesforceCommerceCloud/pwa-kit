@@ -170,7 +170,7 @@ const emptyResponseTestCases = [
     addPriceBooksToBasketTestCase,
     addTaxesForBasketTestCase,
     addTaxesForBasketItemTestCase,
-    // FIXME: This test only passed it fun last.
+    // FIXME: This test only passed if run last.
     deleteTestCase
 ]
 
