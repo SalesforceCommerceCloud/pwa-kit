@@ -10,10 +10,11 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
 import ProductScroller from '../../components/product-scroller'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useEinstein from '../../hooks/use-einstein'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import useIntersectionObserver from '../../hooks/use-intersection-observer'
-import useWishlist from '../../hooks/use-wishlist'
+import {useWishList} from '../../hooks/use-wish-list'
+
 import {useToast} from '../../hooks/use-toast'
 import useNavigation from '../../hooks/use-navigation'
 import {
@@ -22,6 +23,7 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST
 } from '../../constants'
+import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 
 /**
  * A component for fetching and rendering product recommendations from the Einstein API
@@ -36,8 +38,16 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         sendClickReco,
         sendViewReco
     } = useEinstein()
-    const {isInitialized} = useCustomer()
-    const wishlist = useWishlist()
+    const {data: customer} = useCurrentCustomer()
+    const {customerId} = customer
+    const {data: wishlist} = useWishList()
+
+    const createCustomerProductListItem = useShopperCustomersMutation(
+        'createCustomerProductListItem'
+    )
+    const deleteCustomerProductListItem = useShopperCustomersMutation(
+        'deleteCustomerProductListItem'
+    )
     const toast = useToast()
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
@@ -47,10 +57,6 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     const [_products, setProducts] = useState(products)
 
     useEffect(() => {
-        if (!isInitialized) {
-            return
-        }
-
         // Check if the component should fetch results or not. This is useful
         // when you are still waiting on additional data, like `products`.
         if (typeof shouldFetch === 'function' && !shouldFetch()) {
@@ -67,7 +73,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             getRecommendations(recommender, _products)
             return
         }
-    }, [zone, recommender, _products, isInitialized])
+    }, [zone, recommender, _products])
 
     useEffect(() => {
         // This is an optimization that eliminates superfluous rerenders/fetching by
@@ -104,10 +110,20 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     // TODO: DRY this handler when intl provider is available globally
     const addItemToWishlist = async (product) => {
         try {
-            await wishlist.createListItem({
-                id: product.productId,
-                quantity: 1
+            await createCustomerProductListItem.mutateAsync({
+                parameters: {
+                    listId: wishlist.id,
+                    customerId
+                },
+                body: {
+                    quantity: 1,
+                    productId: product.productId,
+                    public: false,
+                    priority: 1,
+                    type: 'product'
+                }
             })
+
             toast({
                 title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
                 status: 'success',
@@ -130,10 +146,18 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         }
     }
 
-    // TODO: DRY this handler when intl provider is available globally
     const removeItemFromWishlist = async (product) => {
         try {
-            await wishlist.removeListItemByProductId(product.productId)
+            const wishlistItem = wishlist?.customerProductListItems?.find(
+                (item) => item.productId === product.productId
+            )
+            await deleteCustomerProductListItem.mutateAsync({
+                parameters: {
+                    customerId,
+                    itemId: wishlistItem.id,
+                    listId: wishlist.id
+                }
+            })
             toast({
                 title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
                 status: 'success',
@@ -164,7 +188,9 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                     )
                 },
                 enableFavourite: true,
-                isFavourite: !!wishlist.findItemByProductId(product?.productId),
+                isFavourite: !!wishlist?.customerProductListItems?.find(
+                    (item) => item.productId === product?.productId
+                ),
                 onFavouriteToggle: (isFavourite) => {
                     const action = isFavourite ? addItemToWishlist : removeItemFromWishlist
                     return action(product)

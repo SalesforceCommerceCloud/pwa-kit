@@ -118,7 +118,6 @@ const ProductDetail = () => {
         'createCustomerProductListItem'
     )
 
-    // TODO: DRY this handler when intl provider is available globally
     const handleAddToWishlist = (product, variant, quantity) => {
         createCustomerProductListItem.mutate(
             {
@@ -242,7 +241,7 @@ const ProductDetail = () => {
             einstein.sendViewProduct(product)
         }
     }, [product])
-
+    console.log('isWishlistLoading', isWishlistLoading)
     return (
         <Box
             className="sf-product-detail-page"
