@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {getSites} from './site-utils'
 import {
     buildUrlSet,
     categoryUrlBuilder,
@@ -15,7 +16,9 @@ import {
     removeQueryParamsFromPath,
     absoluteUrl,
     createUrlTemplate,
-    removeSiteLocaleFromPath
+    removeSiteLocaleFromPath,
+    getParamsFromPath,
+    resolveLocaleFromUrl
 } from './url'
 import {getUrlConfig} from './utils'
 import mockConfig from '../../config/mocks/default'
@@ -29,6 +32,13 @@ jest.mock('pwa-kit-react-sdk/utils/url', () => {
     return {
         ...original,
         getAppOrigin: jest.fn(() => 'https://www.example.com')
+    }
+})
+jest.mock('./site-utils', () => {
+    const original = jest.requireActual('./site-utils')
+    return {
+        ...original,
+        getSites: jest.spyOn(original, 'getSites')
     }
 })
 jest.mock('./utils', () => {
@@ -193,6 +203,7 @@ describe('createUrlTemplate tests', () => {
     const configValues = ['path', 'query_param', 'none']
 
     let cases = []
+    // TODO: This is hard to understand. Can the cases be hard-coded (or the logic simplified)?
     for (let i = 0; i < configValues.length; i++) {
         for (let j = 0; j < configValues.length; j++) {
             for (let showDefaultsValues = 0; showDefaultsValues < 2; showDefaultsValues++) {
@@ -244,6 +255,8 @@ describe('createUrlTemplate tests', () => {
     }
 
     const paths = ['/testpath', '/']
+    // TODO: This is hard to understand and adds a _lot_ of lines to the file. Can these results be
+    // added directly to the test cases (or otherwise simplified)?
     const expectedResults = (path) => {
         return path !== '/'
             ? [
@@ -410,5 +423,207 @@ describe('removeSiteLocaleFromPath', function () {
     test('return empty string when no path name is passed', () => {
         const pathName = removeSiteLocaleFromPath()
         expect(pathName).toEqual('')
+    })
+})
+
+describe('getParamsFromPath', function () {
+    afterAll(() => getSites.mockReset())
+    beforeAll(() => {
+        getSites.mockImplementation(() => {
+            return [
+                {
+                    id: 'RefArch',
+                    alias: 'us',
+                    l10n: {
+                        supportedCurrencies: ['USD'],
+                        defaultCurrency: 'USD',
+                        defaultLocale: 'en-US',
+                        supportedLocales: [
+                            {
+                                id: 'en-US',
+                                alias: 'en',
+                                preferredCurrency: 'USD'
+                            },
+                            {
+                                id: 'en-CA',
+                                alias: 'ca',
+                                preferredCurrency: 'USD'
+                            }
+                        ]
+                    }
+                },
+                {
+                    id: 'RefArchGlobal',
+                    alias: 'global',
+                    l10n: {
+                        supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
+                        defaultCurrency: 'GBP',
+                        supportedLocales: [
+                            {
+                                id: 'de-DE',
+                                preferredCurrency: 'EUR'
+                            },
+                            {
+                                id: 'en-GB',
+                                alias: 'uk',
+                                preferredCurrency: 'GBP'
+                            }
+                        ],
+                        defaultLocale: 'en-GB'
+                    }
+                }
+            ]
+        })
+    })
+
+    const cases = [
+        {path: '/us/en-US/', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {path: '/us/en-US', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {path: '/us/en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {path: '/us/en/', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {path: '/RefArch/en-US/', expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}},
+        {path: '/RefArch/en/', expectedRes: {siteRef: 'RefArch', localeRef: 'en'}},
+        {path: '/us/en-US/category/womens', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {
+            path: '/RefArch/en-US/category/womens',
+            expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}
+        },
+        {path: '/en-US/category/womens', expectedRes: {siteRef: undefined, localeRef: 'en-US'}},
+        {path: '/en/category/womens', expectedRes: {siteRef: undefined, localeRef: 'en'}},
+        {path: '/category/womens', expectedRes: {siteRef: undefined, localeRef: undefined}},
+        {path: '/en/', expectedRes: {siteRef: undefined, localeRef: 'en'}},
+        {path: '/en', expectedRes: {siteRef: undefined, localeRef: 'en'}},
+        {path: '/ca/', expectedRes: {siteRef: undefined, localeRef: 'ca'}},
+        {path: '/ca', expectedRes: {siteRef: undefined, localeRef: 'ca'}},
+        {path: '/', expectedRes: {site: undefined, localeRef: undefined}},
+        {path: '/?site=us', expectedRes: {siteRef: 'us', localeRef: undefined}},
+        {path: '/?site=us&locale=en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {path: '/en-US/category/womens?site=us', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {
+            path: '/us/category/womens?locale=en-US',
+            expectedRes: {siteRef: 'us', localeRef: 'en-US'}
+        },
+        {path: '/us/category/womens?locale=en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {
+            path: '/category/womens?site=us&locale=en-US',
+            expectedRes: {siteRef: 'us', localeRef: 'en-US'}
+        },
+        {
+            path: '/category/womens?site=RefArch&locale=en-US',
+            expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}
+        }
+    ]
+    cases.forEach(({path, expectedRes}) => {
+        test(`gets params from path ${path}`, () => {
+            expect(getParamsFromPath(path)).toEqual(expectedRes)
+        })
+    })
+})
+
+describe('resolveLocaleFromUrl', function () {
+    afterAll(() => getSites.mockReset())
+    beforeAll(() => {
+        getSites.mockImplementation(() => {
+            return [
+                {
+                    id: 'site-1',
+                    alias: 'uk',
+                    l10n: {
+                        defaultLocale: 'en-GB',
+                        supportedLocales: [
+                            {
+                                id: 'en-GB',
+                                preferredCurrency: 'GBP'
+                            },
+                            {
+                                id: 'fr-FR',
+                                alias: 'fr',
+                                preferredCurrency: 'EUR'
+                            },
+                            {
+                                id: 'it-IT',
+                                preferredCurrency: 'EUR'
+                            }
+                        ]
+                    }
+                },
+                {
+                    id: 'site-2',
+                    alias: 'us',
+                    l10n: {
+                        defaultLocale: 'en-US',
+                        supportedLocales: [
+                            {
+                                id: 'en-US',
+                                preferredCurrency: 'USD'
+                            },
+                            {
+                                id: 'en-CA',
+                                preferredCurrency: 'USD'
+                            }
+                        ]
+                    }
+                }
+            ]
+        })
+    })
+
+    const cases = [
+        {
+            path: '/',
+            expectedRes: {
+                id: 'en-GB',
+                preferredCurrency: 'GBP'
+            }
+        },
+        {
+            path: '/uk/en-GB/women/dresses',
+            expectedRes: {
+                id: 'en-GB',
+                preferredCurrency: 'GBP'
+            }
+        },
+        {
+            path: '/women/dresses/?site=uk&locale=en-GB',
+            expectedRes: {
+                id: 'en-GB',
+                preferredCurrency: 'GBP'
+            }
+        },
+        {
+            path: '/uk/fr/women/dresses',
+            expectedRes: {
+                id: 'fr-FR',
+                alias: 'fr',
+                preferredCurrency: 'EUR'
+            }
+        },
+        {
+            path: '/women/dresses/?site=uk&locale=fr',
+            expectedRes: {
+                id: 'fr-FR',
+                alias: 'fr',
+                preferredCurrency: 'EUR'
+            }
+        },
+        {
+            path: '/us/en-US/women/dresses',
+            expectedRes: {
+                id: 'en-US',
+                preferredCurrency: 'USD'
+            }
+        },
+        {
+            path: '/women/dresses/?site=us&locale=en-US',
+            expectedRes: {
+                id: 'en-US',
+                preferredCurrency: 'USD'
+            }
+        }
+    ]
+    cases.forEach(({path, expectedRes}) => {
+        test(`resolves locale from url ${path}`, () => {
+            expect(resolveLocaleFromUrl(path)).toEqual(expectedRes)
+        })
     })
 })
