@@ -110,6 +110,9 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     // TODO: DRY this handler when intl provider is available globally
     const addItemToWishlist = async (product) => {
         try {
+            if (!wishlist || !customerId) {
+                return
+            }
             await createCustomerProductListItem.mutateAsync({
                 parameters: {
                     listId: wishlist.id,
@@ -151,7 +154,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             const wishlistItem = wishlist?.customerProductListItems?.find(
                 (item) => item.productId === product.productId
             )
-            if (!wishlistItem) {
+            if (!wishlistItem || !wishlist || !customerId) {
                 return
             }
             await deleteCustomerProductListItem.mutateAsync({
@@ -195,7 +198,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                     (item) => item.productId === product?.productId
                 ),
                 onFavouriteToggle: (isFavourite) => {
-                    const action = isFavourite ? addItemToWishlist : removeItemFromWishlist
+                    const action = isFavourite ? removeItemFromWishlist : addItemToWishlist
                     return action(product)
                 }
             })}
