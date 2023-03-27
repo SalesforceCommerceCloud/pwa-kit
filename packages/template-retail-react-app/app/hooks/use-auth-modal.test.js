@@ -13,7 +13,7 @@ import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
 import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '../commerce-api/mock-data'
+import {mockedRegisteredCustomer} from '../mocks/mock-data'
 
 jest.setTimeout(60000)
 

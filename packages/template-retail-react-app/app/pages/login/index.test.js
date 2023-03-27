@@ -15,7 +15,7 @@ import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
 import mockConfig from '../../../config/mocks/default'
-import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
+import {mockedRegisteredCustomer} from '../../mocks/mock-data'
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
     currency: 'USD',
