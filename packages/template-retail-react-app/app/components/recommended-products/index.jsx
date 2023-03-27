@@ -151,6 +151,9 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             const wishlistItem = wishlist?.customerProductListItems?.find(
                 (item) => item.productId === product.productId
             )
+            if (!wishlistItem) {
+                return
+            }
             await deleteCustomerProductListItem.mutateAsync({
                 parameters: {
                     customerId,
@@ -188,7 +191,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                     )
                 },
                 enableFavourite: true,
-                isFavourite: !!wishlist?.customerProductListItems?.find(
+                isFavourite: wishlist?.customerProductListItems?.some(
                     (item) => item.productId === product?.productId
                 ),
                 onFavouriteToggle: (isFavourite) => {

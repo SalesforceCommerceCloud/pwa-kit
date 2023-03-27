@@ -28,8 +28,7 @@ export const useWishList = ({listId = ''} = {}) => {
                     })
                 }
             },
-            // only registered user can have product lists
-            enabled: onClient
+            enabled: onClient && Boolean(customerId)
         }
     )
 

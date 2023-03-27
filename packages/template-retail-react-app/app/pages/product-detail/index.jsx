@@ -241,7 +241,7 @@ const ProductDetail = () => {
             einstein.sendViewProduct(product)
         }
     }, [product])
-    console.log('isWishlistLoading', isWishlistLoading)
+
     return (
         <Box
             className="sf-product-detail-page"
