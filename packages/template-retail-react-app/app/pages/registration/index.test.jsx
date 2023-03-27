@@ -13,7 +13,7 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import mockConfig from '../../../config/mocks/default'
 import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
+import {mockedRegisteredCustomer} from '../../mocks/mock-data'
 
 const MockedComponent = () => {
     const match = {

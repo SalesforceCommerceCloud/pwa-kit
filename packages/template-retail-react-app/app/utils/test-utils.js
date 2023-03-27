@@ -25,7 +25,7 @@ import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
+import {mockCategories as initialMockCategories} from '../mocks/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
 // Contexts

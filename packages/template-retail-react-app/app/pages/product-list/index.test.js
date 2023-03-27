@@ -8,7 +8,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
-import {mockProductSearch, mockedEmptyCustomerProductList} from '../../commerce-api/mock-data'
+import {mockProductSearch, mockedEmptyCustomerProductList} from '../../mocks/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'

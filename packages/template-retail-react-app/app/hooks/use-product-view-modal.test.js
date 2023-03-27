@@ -12,7 +12,7 @@ import {screen, fireEvent, waitFor} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
 import {IntlProvider} from 'react-intl'
 
-import mockProductDetail from '../commerce-api/mocks/variant-750518699578M'
+import mockProductDetail from '../mocks/variant-750518699578M'
 import {useProductViewModal} from './use-product-view-modal'
 import {DEFAULT_LOCALE, renderWithProviders} from '../utils/test-utils'
 import messages from '../translations/compiled/en-GB.json'

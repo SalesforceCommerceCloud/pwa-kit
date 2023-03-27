@@ -22,7 +22,7 @@ import {
     mockedRegisteredCustomer,
     mockedCustomerProductLists,
     productsResponse
-} from '../../commerce-api/mock-data'
+} from '../../mocks/mock-data'
 import mockConfig from '../../../config/mocks/default'
 
 jest.mock('commerce-sdk-react-preview', () => {

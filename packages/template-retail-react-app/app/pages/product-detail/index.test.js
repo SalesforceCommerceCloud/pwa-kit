@@ -10,13 +10,13 @@ import {
     mockCustomerBaskets,
     mockedCustomerProductLists,
     productsResponse
-} from '../../commerce-api/mock-data'
+} from '../../mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
 import {renderWithProviders} from '../../utils/test-utils'
 import {basketWithProductSet} from './index.mock'
-import mockedProductSet from '../../commerce-api/mocks/product-set-winter-lookM'
+import mockedProductSet from '../../mocks/product-set-winter-lookM'
 
 jest.setTimeout(60000)
 

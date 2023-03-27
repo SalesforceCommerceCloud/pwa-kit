@@ -12,10 +12,10 @@ import SearchInput from './index'
 import Suggestions from './partials/suggestions'
 import {clearSessionJSONItem, getSessionJSONItem, setSessionJSONItem, noop} from '../../utils/utils'
 import {RECENT_SEARCH_KEY, RECENT_SEARCH_LIMIT} from '../../constants'
-import mockSearchResults from '../../commerce-api/mocks/searchResults'
+import mockSearchResults from '../../mocks/searchResults'
 import mockConfig from '../../../config/mocks/default'
 import {rest} from 'msw'
-import {mockCustomerBaskets} from '../../commerce-api/mock-data'
+import {mockCustomerBaskets} from '../../mocks/mock-data'
 
 beforeEach(() => {
     clearSessionJSONItem(RECENT_SEARCH_KEY)

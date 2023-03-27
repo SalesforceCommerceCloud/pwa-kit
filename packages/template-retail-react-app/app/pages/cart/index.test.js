@@ -16,8 +16,8 @@ import {
     mockCustomerBaskets,
     mockEmptyBasket,
     mockCartVariant
-} from '../../commerce-api/mock-data'
-import mockVariant from '../../commerce-api/mocks/variant-750518699578M'
+} from '../../mocks/mock-data'
+import mockVariant from '../../mocks/variant-750518699578M'
 import {rest} from 'msw'
 
 const mockProduct = {
