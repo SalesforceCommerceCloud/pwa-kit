@@ -101,24 +101,24 @@ describe('getDefaultSite', function () {
                 ]
             }
         }
-        getConfig.mockImplementation(() => ({
+        getConfig.mockReturnValue({
             app: {
                 ...mockConfig.app,
                 sites: [siteMock]
             }
-        }))
+        })
 
         const defaultSite = getDefaultSite()
         expect(defaultSite).toEqual(siteMock)
     })
 
     test('returns site-2 as the default site according to the config', () => {
-        getConfig.mockImplementation(() => ({
+        getConfig.mockReturnValue({
             app: {
                 ...mockConfig.app,
                 defaultSite: 'site-2'
             }
-        }))
+        })
 
         const expectedRes = {
             alias: 'us',
@@ -146,7 +146,7 @@ describe('getDefaultSite', function () {
 
 describe('getSites', function () {
     test('returns site list with alias', () => {
-        getConfig.mockImplementation(() => mockConfig)
+        getConfig.mockReturnValue(mockConfig)
         const sites = getSites()
         const expectedRes = [
             {
@@ -195,13 +195,11 @@ describe('getSites', function () {
     })
 
     test('throw error when there is no sites in the config', () => {
-        getConfig.mockImplementation(() => ({
+        getConfig.mockReturnValue({
             ...mockConfig.app,
             sites: []
-        }))
+        })
 
-        expect(() => {
-            getSites()
-        }).toThrow()
+        expect(() => getSites()).toThrow()
     })
 })

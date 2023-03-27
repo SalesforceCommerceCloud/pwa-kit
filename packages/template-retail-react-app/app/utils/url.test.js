@@ -45,9 +45,17 @@ jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
     return {
         ...original,
-        getConfig: jest.fn(() => mockConfig),
+        getConfig: jest.fn(),
         getUrlConfig: jest.fn()
     }
+})
+
+beforeEach(() => {
+    getConfig.mockReset().mockReturnValue(mockConfig)
+})
+
+afterEach(() => {
+    jest.clearAllMocks()
 })
 
 describe('buildUrlSet returns the expected set of urls', () => {
@@ -141,7 +149,7 @@ describe('url builder test', () => {
 })
 
 describe('getPathWithLocale', () => {
-    getUrlConfig.mockImplementation(() => mockConfig.app.url)
+    getUrlConfig.mockReturnValue(mockConfig.app.url)
 
     test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
@@ -429,51 +437,49 @@ describe('removeSiteLocaleFromPath', function () {
 describe('getParamsFromPath', function () {
     afterAll(() => getSites.mockReset())
     beforeAll(() => {
-        getSites.mockImplementation(() => {
-            return [
-                {
-                    id: 'RefArch',
-                    alias: 'us',
-                    l10n: {
-                        supportedCurrencies: ['USD'],
-                        defaultCurrency: 'USD',
-                        defaultLocale: 'en-US',
-                        supportedLocales: [
-                            {
-                                id: 'en-US',
-                                alias: 'en',
-                                preferredCurrency: 'USD'
-                            },
-                            {
-                                id: 'en-CA',
-                                alias: 'ca',
-                                preferredCurrency: 'USD'
-                            }
-                        ]
-                    }
-                },
-                {
-                    id: 'RefArchGlobal',
-                    alias: 'global',
-                    l10n: {
-                        supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
-                        defaultCurrency: 'GBP',
-                        supportedLocales: [
-                            {
-                                id: 'de-DE',
-                                preferredCurrency: 'EUR'
-                            },
-                            {
-                                id: 'en-GB',
-                                alias: 'uk',
-                                preferredCurrency: 'GBP'
-                            }
-                        ],
-                        defaultLocale: 'en-GB'
-                    }
+        getSites.mockReturnValue([
+            {
+                id: 'RefArch',
+                alias: 'us',
+                l10n: {
+                    supportedCurrencies: ['USD'],
+                    defaultCurrency: 'USD',
+                    defaultLocale: 'en-US',
+                    supportedLocales: [
+                        {
+                            id: 'en-US',
+                            alias: 'en',
+                            preferredCurrency: 'USD'
+                        },
+                        {
+                            id: 'en-CA',
+                            alias: 'ca',
+                            preferredCurrency: 'USD'
+                        }
+                    ]
                 }
-            ]
-        })
+            },
+            {
+                id: 'RefArchGlobal',
+                alias: 'global',
+                l10n: {
+                    supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
+                    defaultCurrency: 'GBP',
+                    supportedLocales: [
+                        {
+                            id: 'de-DE',
+                            preferredCurrency: 'EUR'
+                        },
+                        {
+                            id: 'en-GB',
+                            alias: 'uk',
+                            preferredCurrency: 'GBP'
+                        }
+                    ],
+                    defaultLocale: 'en-GB'
+                }
+            }
+        ])
     })
 
     const cases = [
@@ -523,49 +529,47 @@ describe('getParamsFromPath', function () {
 describe('resolveLocaleFromUrl', function () {
     afterAll(() => getSites.mockReset())
     beforeAll(() => {
-        getSites.mockImplementation(() => {
-            return [
-                {
-                    id: 'site-1',
-                    alias: 'uk',
-                    l10n: {
-                        defaultLocale: 'en-GB',
-                        supportedLocales: [
-                            {
-                                id: 'en-GB',
-                                preferredCurrency: 'GBP'
-                            },
-                            {
-                                id: 'fr-FR',
-                                alias: 'fr',
-                                preferredCurrency: 'EUR'
-                            },
-                            {
-                                id: 'it-IT',
-                                preferredCurrency: 'EUR'
-                            }
-                        ]
-                    }
-                },
-                {
-                    id: 'site-2',
-                    alias: 'us',
-                    l10n: {
-                        defaultLocale: 'en-US',
-                        supportedLocales: [
-                            {
-                                id: 'en-US',
-                                preferredCurrency: 'USD'
-                            },
-                            {
-                                id: 'en-CA',
-                                preferredCurrency: 'USD'
-                            }
-                        ]
-                    }
+        getSites.mockReturnValue([
+            {
+                id: 'site-1',
+                alias: 'uk',
+                l10n: {
+                    defaultLocale: 'en-GB',
+                    supportedLocales: [
+                        {
+                            id: 'en-GB',
+                            preferredCurrency: 'GBP'
+                        },
+                        {
+                            id: 'fr-FR',
+                            alias: 'fr',
+                            preferredCurrency: 'EUR'
+                        },
+                        {
+                            id: 'it-IT',
+                            preferredCurrency: 'EUR'
+                        }
+                    ]
                 }
-            ]
-        })
+            },
+            {
+                id: 'site-2',
+                alias: 'us',
+                l10n: {
+                    defaultLocale: 'en-US',
+                    supportedLocales: [
+                        {
+                            id: 'en-US',
+                            preferredCurrency: 'USD'
+                        },
+                        {
+                            id: 'en-CA',
+                            preferredCurrency: 'USD'
+                        }
+                    ]
+                }
+            }
+        ])
     })
 
     const cases = [
