@@ -6,8 +6,9 @@
  */
 import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten, getParamsFromPath, resolveLocaleFromUrl, shallowEquals} from './utils'
+import {flatten, shallowEquals} from './utils'
 import {getSites} from './site-utils'
+import {getParamsFromPath, resolveLocaleFromUrl} from './url' // TODO: Move tests to ./url.test.js
 
 afterEach(() => {
     jest.clearAllMocks()

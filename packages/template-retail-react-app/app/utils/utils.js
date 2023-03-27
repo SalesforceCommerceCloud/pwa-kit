@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {absoluteUrl} from './url'
-import {getSites, resolveSiteFromUrl} from './site-utils'
+
+import {getSites} from './site-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 /**
@@ -166,28 +166,6 @@ export const capitalize = (text) => {
 }
 
 /**
- * This function return the identifiers (site and locale) from the given url
- * The site will always go before locale if both of them are presented in the pathname
- * @param path {string}
- * @returns {{siteRef: string, localeRef: string}} - site and locale reference (it could either be id or alias)
- */
-export const getParamsFromPath = (path) => {
-    const {pathname, search} = new URL(absoluteUrl(path))
-
-    const config = getConfig()
-    const {pathMatcher, searchMatcherForSite, searchMatcherForLocale} = getConfigMatcher(config)
-    const pathMatch = pathname.match(pathMatcher)
-    const searchMatchForSite = search.match(searchMatcherForSite)
-    const searchMatchForLocale = search.match(searchMatcherForLocale)
-
-    // the value can only either in the path or search query param, there will be no overridden
-    const siteRef = pathMatch?.groups.site || searchMatchForSite?.groups.site
-
-    const localeRef = pathMatch?.groups.locale || searchMatchForLocale?.groups.locale
-    return {siteRef, localeRef}
-}
-
-/**
  * This function returns the url config from the current configuration
  * @return {object} - url config
  */
@@ -244,51 +222,4 @@ export const getConfigMatcher = (config) => {
         searchMatcherForSite,
         searchMatcherForLocale
     }
-}
-
-/**
- * Given a site and a locale reference, return the locale object
- * @param site - site to look for the locale
- * @param localeRef - the locale ref to look for in site supported locales
- * @return {object|undefined}
- */
-export const getLocaleByReference = (site, localeRef) => {
-    if (!site) {
-        throw new Error('Site is not defined. It is required to look for locale object')
-    }
-    return site.l10n.supportedLocales.find(
-        (locale) => locale.id === localeRef || locale.alias === localeRef
-    )
-}
-
-/**
- * Determine the locale object from an url
- * If the localeRef is not found from the url, set it to default locale of the current site
- * and use it to find the locale object
- *
- * @param url
- * @return {Object} locale object
- */
-export const resolveLocaleFromUrl = (url) => {
-    if (!url) {
-        throw new Error('URL is required to look for the locale object')
-    }
-    let {localeRef} = getParamsFromPath(url)
-    const site = resolveSiteFromUrl(url)
-    const {supportedLocales} = site.l10n
-    // if no localeRef is found, use the default value of the current site
-    if (!localeRef) {
-        localeRef = site.l10n.defaultLocale
-    }
-    const locale = supportedLocales.find(
-        (locale) => locale.alias === localeRef || locale.id === localeRef
-    )
-    if (locale) {
-        return locale
-    }
-    // if locale is not defined, use default locale as fallback value
-    const defaultLocale = site.l10n.defaultLocale
-    return supportedLocales.find(
-        (locale) => locale.alias === defaultLocale || locale.id === defaultLocale
-    )
 }

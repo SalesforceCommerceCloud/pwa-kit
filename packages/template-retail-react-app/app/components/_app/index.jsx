@@ -36,13 +36,12 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import useWishlist from '../../hooks/use-wishlist'
+import useMultiSite from '../../hooks/use-multi-site'
 
 // Localization
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {
     DEFAULT_SITE_TITLE,
     HOME_HREF,
@@ -51,10 +50,10 @@ import {
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE
 } from '../../constants'
-
 import Seo from '../seo'
-import {resolveSiteFromUrl} from '../../utils/site-utils'
-import useMultiSite from '../../hooks/use-multi-site'
+import {watchOnlineStatus, flatten} from '../../utils/utils'
+import {getTargetLocale, fetchTranslations} from '../../utils/locale'
+import {resolveSiteFromUrl} from '../../utils/url'
 
 const App = (props) => {
     const {
