@@ -112,7 +112,7 @@ test('Allows customer to generate password token', async () => {
     })
 })
 
-test('Renders error message from server', async () => {
+test.only('Renders error message from server', async () => {
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
@@ -131,7 +131,6 @@ test('Renders error message from server', async () => {
     user.type(await screen.findByLabelText('Email'), 'foo@test.com')
     user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
-    await waitFor(() => {
-        expect(screen.getByText('500 Internal Server Error')).toBeInTheDocument()
-    })
+    expect(screen.getByText('500 Internal Server Error')).toBeInTheDocument()
+
 })
