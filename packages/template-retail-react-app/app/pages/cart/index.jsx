@@ -138,6 +138,9 @@ const Cart = () => {
     )
     const handleAddToWishlist = async (product) => {
         try {
+            if (!customerId || !wishlist) {
+                return
+            }
             await createCustomerProductListItem.mutateAsync({
                 parameters: {
                     listId: wishlist.id,
