@@ -24,8 +24,8 @@ import RecommendedProducts from '../../components/recommended-products'
 
 // Hooks
 import {useToast} from '../../hooks/use-toast'
-import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
+import {useWishList} from '../../hooks/use-wish-list'
 
 // Constants
 import {
@@ -40,11 +40,12 @@ import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from './partials/cart-secon
 import debounce from 'lodash/debounce'
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {
-    useCustomerType,
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
-    useProducts
+    useProducts,
+    useShopperCustomersMutation
 } from 'commerce-sdk-react-preview'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
@@ -69,7 +70,8 @@ const Cart = () => {
             }
         }
     )
-    const {isRegistered} = useCustomerType()
+    const {data: customer} = useCurrentCustomer()
+    const {customerId, isRegistered} = customer
 
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
@@ -129,13 +131,29 @@ const Cart = () => {
     /************************* Error handling ***********************/
 
     /**************** Wishlist ****************/
-    const wishlist = useWishlist()
-    // TODO: DRY this handler when intl provider is available globally
+    const {data: wishlist} = useWishList()
+
+    const createCustomerProductListItem = useShopperCustomersMutation(
+        'createCustomerProductListItem'
+    )
     const handleAddToWishlist = async (product) => {
         try {
-            await wishlist.createListItem({
-                id: product.productId,
-                quantity: product.quantity
+            if (!customerId || !wishlist) {
+                return
+            }
+            await createCustomerProductListItem.mutateAsync({
+                parameters: {
+                    listId: wishlist.id,
+                    customerId
+                },
+                body: {
+                    // NOTE: APi does not respect quantity, it always adds 1
+                    quantity: product.quantity,
+                    productId: product.productId,
+                    public: false,
+                    priority: 1,
+                    type: 'product'
+                }
             })
             toast({
                 title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
