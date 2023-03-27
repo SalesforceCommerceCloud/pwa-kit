@@ -32,10 +32,8 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 
 // Hooks
 import useShopper from '../../commerce-api/hooks/useShopper'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
-import useWishlist from '../../hooks/use-wishlist'
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -84,7 +82,6 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
-    const customer = useCustomer()
     const {isRegistered} = useCustomerType()
     const {site, locale, buildUrl} = useMultiSite()
 
@@ -102,19 +99,6 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
 
     // Set up customer and basket
     useShopper({currency})
-
-    const wishlist = useWishlist()
-    useEffect(() => {
-        if (!customer.isInitialized) {
-            return
-        }
-        if (customer.isRegistered) {
-            wishlist.init()
-        }
-        if (customer.isGuest) {
-            wishlist.reset()
-        }
-    }, [customer.authType])
 
     useEffect(() => {
         // Listen for online status changes.

@@ -20,7 +20,7 @@ import {defineMessage, FormattedMessage} from 'react-intl'
 import {useItemVariant} from '../../../components/item-variant'
 import ConfirmationModal from '../../../components/confirmation-modal/index'
 import {noop} from '../../../utils/utils'
-import useCustomer from '../../../commerce-api/hooks/useCustomer'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 
 export const REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG = {
     dialogTitle: defineMessage({
@@ -54,7 +54,7 @@ const CartSecondaryButtonGroup = ({
 }) => {
     const variant = useItemVariant()
 
-    const customer = useCustomer()
+    const {data: customer} = useCurrentCustomer()
     const modalProps = useDisclosure()
 
     const showRemoveItemConfirmation = () => {

@@ -20,8 +20,6 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 jest.setTimeout(60000)
 let mockProductListSearchResponse = mockProductSearch
 
-jest.mock('../../hooks/use-wishlist')
-
 const MockedComponent = ({isLoading, isLoggedIn = false}) => {
     const customer = useCustomer()
     useEffect(() => {

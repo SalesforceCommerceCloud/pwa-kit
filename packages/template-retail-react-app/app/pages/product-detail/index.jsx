@@ -118,7 +118,6 @@ const ProductDetail = () => {
         'createCustomerProductListItem'
     )
 
-    // TODO: DRY this handler when intl provider is available globally
     const handleAddToWishlist = (product, variant, quantity) => {
         createCustomerProductListItem.mutate(
             {
