@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten, shallowEquals} from './utils'
+import * as utils from './utils'
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -84,7 +83,7 @@ describe('session storage tests', () => {
 
 describe('flatten', () => {
     test('return a an array', () => {
-        const result = flatten({
+        const result = utils.flatten({
             id: 1,
             item: 1,
             children: [{id: 2, item: 2, children: [{id: 3, item: 3}]}]
@@ -100,7 +99,7 @@ describe('shallowEquals', function () {
     test('should return false', () => {
         const a = {a: '123'}
         const b = {a: '123', b: '456'}
-        const result = shallowEquals(a, b)
+        const result = utils.shallowEquals(a, b)
         expect(result).toBeFalsy()
     })
 })
