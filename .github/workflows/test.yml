@@ -31,8 +31,8 @@ jobs:
   pwa-kit:
     strategy:
       matrix:
-        node: [14, 16]
-        npm: [6, 7, 8]
+        node: [14, 16, 18]
+        npm: [6, 7, 8, 9]
         exclude:
           - node: 16
             npm: 6
@@ -123,8 +123,8 @@ jobs:
   pwa-kit-windows:
     strategy:
       matrix:
-        node: [14, 16]
-        npm: [6, 7, 8]
+        node: [14, 16, 18]
+        npm: [6, 7, 8, 9]
         exclude:
           - node: 16
             npm: 6
@@ -171,7 +171,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
@@ -261,7 +261,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Setup Windows Machine
         uses: "./.github/actions/setup_windows"
