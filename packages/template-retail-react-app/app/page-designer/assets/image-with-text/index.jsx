@@ -6,8 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Image, Text} from '@chakra-ui/react'
-import Link from '../../../components/link'
+import {Box, Image, Link, Text} from '@chakra-ui/react'
 
 /**
  * Image with text component
@@ -35,7 +34,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                 <picture>
                     <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
                     <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
-                    <Link to={ITCLink}>
+                    <Link href={ITCLink}>
                         <Image
                             className={'image-with-text-image'}
                             data-testid={'image-with-text-image'}
