@@ -8,7 +8,6 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 
-
 /**
  * This is the global state for the multiples sites and locales supported in the App.
  *

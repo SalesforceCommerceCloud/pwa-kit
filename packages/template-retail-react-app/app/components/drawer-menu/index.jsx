@@ -382,6 +382,7 @@ const DrawerMenu = ({root, isOpen, onClose = noop, onLogoClick = noop}) => {
 DrawerMenu.displayName = 'DrawerMenu'
 
 DrawerMenu.propTypes = {
+    root: PropTypes.object,
     /**
      * The opened state of the drawer.
      */

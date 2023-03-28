@@ -25,7 +25,6 @@ import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {mockCategories as initialMockCategories} from '../mocks/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
 // Contexts
@@ -181,21 +180,21 @@ export const TestProviders = ({
                                 bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''
                             }
                         >
-                                <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                                    <_CustomerProvider value={{customer, setCustomer}}>
-                                        <BasketProvider value={{basket, setBasket}}>
-                                            <CustomerProductListsProvider>
-                                                <Router>
-                                                    <ChakraProvider theme={theme}>
-                                                        <AddToCartModalProvider>
-                                                            {children}
-                                                        </AddToCartModalProvider>
-                                                    </ChakraProvider>
-                                                </Router>
-                                            </CustomerProductListsProvider>
-                                        </BasketProvider>
-                                    </_CustomerProvider>
-                                </CurrencyProvider>
+                            <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                                <_CustomerProvider value={{customer, setCustomer}}>
+                                    <BasketProvider value={{basket, setBasket}}>
+                                        <CustomerProductListsProvider>
+                                            <Router>
+                                                <ChakraProvider theme={theme}>
+                                                    <AddToCartModalProvider>
+                                                        {children}
+                                                    </AddToCartModalProvider>
+                                                </ChakraProvider>
+                                            </Router>
+                                        </CustomerProductListsProvider>
+                                    </BasketProvider>
+                                </_CustomerProvider>
+                            </CurrencyProvider>
                         </CommerceApiProvider>
                     </_CommerceAPIProvider>
                 </MultiSiteProvider>

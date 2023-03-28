@@ -269,6 +269,7 @@ const ListMenu = ({root, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
 ListMenu.displayName = 'ListMenu'
 
 ListMenu.propTypes = {
+    root: PropTypes.object,
     /**
      * The maximum number of columns that we want to use per row in the menu.
      */
