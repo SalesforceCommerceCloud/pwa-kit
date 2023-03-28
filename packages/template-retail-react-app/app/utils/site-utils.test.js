@@ -6,14 +6,13 @@
  */
 
 import {getDefaultSite, getSites} from './site-utils'
-import {resolveSiteFromUrl} from './url' // TODO: Move tests to ./url.test.js
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import mockConfig from '../../config/mocks/default'
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
-    const origin = jest.requireActual('pwa-kit-react-sdk/ssr/universal/utils')
+    const original = jest.requireActual('pwa-kit-react-sdk/ssr/universal/utils')
     return {
-        ...origin,
+        ...original,
         getConfig: jest.fn()
     }
 })
@@ -24,58 +23,6 @@ beforeEach(() => {
 
 afterEach(() => {
     jest.resetAllMocks()
-})
-
-describe('resolveSiteFromUrl', function () {
-    test('throw an error without an arg', () => {
-        expect(() => {
-            resolveSiteFromUrl()
-        }).toThrow()
-    })
-
-    test('return site based on the site alias in the url', () => {
-        getConfig.mockImplementation(() => mockConfig)
-        const result = resolveSiteFromUrl('https://www.example-site.com/us/en-US/women/dress')
-        expect(result.id).toEqual('site-2')
-    })
-
-    test('return default site for home page', () => {
-        getConfig.mockImplementation(() => mockConfig)
-        const result = resolveSiteFromUrl('https://www.example-site.com/')
-        expect(result.id).toEqual('site-1')
-    })
-
-    test('throw an error when no matching site can be found', () => {
-        // Mock the  `default` config to the window global
-        const newConfig = {
-            ...mockConfig,
-            app: {
-                ...mockConfig.app,
-                defaultSite: 'site-3'
-            }
-        }
-
-        getConfig.mockImplementation(() => newConfig)
-        expect(() => {
-            resolveSiteFromUrl('https://www.example-site.com/site-3')
-        }).toThrow()
-    })
-
-    test('returns correct site when aliases are not declared in the config', () => {
-        getConfig.mockImplementation(() => {
-            return {
-                ...mockConfig,
-                app: {
-                    ...mockConfig.app,
-                    siteAliases: {},
-                    defaultSite: 'site-2'
-                }
-            }
-        })
-
-        const result = resolveSiteFromUrl('https://www.example-site.com/')
-        expect(result.id).toEqual('site-2')
-    })
 })
 
 describe('getDefaultSite', function () {

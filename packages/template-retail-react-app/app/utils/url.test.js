@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {getSites} from './site-utils'
 import {
     buildUrlSet,
@@ -18,20 +19,23 @@ import {
     createUrlTemplate,
     removeSiteLocaleFromPath,
     getParamsFromPath,
-    resolveLocaleFromUrl
+    resolveLocaleFromUrl,
+    resolveSiteFromUrl
 } from './url'
-import {getUrlConfig} from './utils'
 import mockConfig from '../../config/mocks/default'
-
-afterEach(() => {
-    jest.clearAllMocks()
-})
 
 jest.mock('pwa-kit-react-sdk/utils/url', () => {
     const original = jest.requireActual('pwa-kit-react-sdk/utils/url')
     return {
         ...original,
         getAppOrigin: jest.fn(() => 'https://www.example.com')
+    }
+})
+jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('pwa-kit-react-sdk/ssr/universal/utils')
+    return {
+        ...original,
+        getConfig: jest.fn()
     }
 })
 jest.mock('./site-utils', () => {
@@ -41,21 +45,10 @@ jest.mock('./site-utils', () => {
         getSites: jest.spyOn(original, 'getSites')
     }
 })
-jest.mock('./utils', () => {
-    const original = jest.requireActual('./utils')
-    return {
-        ...original,
-        getConfig: jest.fn(),
-        getUrlConfig: jest.fn()
-    }
-})
 
 beforeEach(() => {
+    getSites.mockClear()
     getConfig.mockReset().mockReturnValue(mockConfig)
-})
-
-afterEach(() => {
-    jest.clearAllMocks()
 })
 
 describe('buildUrlSet returns the expected set of urls', () => {
@@ -149,8 +142,6 @@ describe('url builder test', () => {
 })
 
 describe('getPathWithLocale', () => {
-    getUrlConfig.mockReturnValue(mockConfig.app.url)
-
     test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
         const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
@@ -435,9 +426,11 @@ describe('removeSiteLocaleFromPath', function () {
 })
 
 describe('getParamsFromPath', function () {
-    afterAll(() => getSites.mockReset())
-    beforeAll(() => {
-        getSites.mockReturnValue([
+    beforeEach(() => {
+        // Most tests use the original implementation; with the current test setup, we don't have
+        // access to the original, so we can't restore it, so we must use *Once mocks to avoid
+        // permanently overwriting it.
+        getSites.mockReturnValueOnce([
             {
                 id: 'RefArch',
                 alias: 'us',
@@ -519,6 +512,7 @@ describe('getParamsFromPath', function () {
             expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}
         }
     ]
+    // Can't use test.each(cases)('get params from path $path', () => ...) until we upgrade jest
     cases.forEach(({path, expectedRes}) => {
         test(`gets params from path ${path}`, () => {
             expect(getParamsFromPath(path)).toEqual(expectedRes)
@@ -527,9 +521,11 @@ describe('getParamsFromPath', function () {
 })
 
 describe('resolveLocaleFromUrl', function () {
-    afterAll(() => getSites.mockReset())
     beforeAll(() => {
-        getSites.mockReturnValue([
+        // Most tests use the original implementation; with the current test setup, we don't have
+        // access to the original, so we can't restore it, so we must use *Once mocks to avoid
+        // permanently overwriting it.
+        getSites.mockReturnValueOnce([
             {
                 id: 'site-1',
                 alias: 'uk',
@@ -625,9 +621,51 @@ describe('resolveLocaleFromUrl', function () {
             }
         }
     ]
+    // Can't use test.each(cases)('resolves locale from url $path', () => ...) until we upgrade jest
     cases.forEach(({path, expectedRes}) => {
         test(`resolves locale from url ${path}`, () => {
             expect(resolveLocaleFromUrl(path)).toEqual(expectedRes)
         })
+    })
+})
+
+describe('resolveSiteFromUrl', function () {
+    test('throw an error without an arg', () => {
+        expect(() => resolveSiteFromUrl()).toThrow()
+    })
+
+    test('return site based on the site alias in the url', () => {
+        const result = resolveSiteFromUrl('https://www.example-site.com/us/en-US/women/dress')
+        expect(result.id).toEqual('site-2')
+    })
+
+    test('return default site for home page', () => {
+        const result = resolveSiteFromUrl('https://www.example-site.com/')
+        expect(result.id).toEqual('site-1')
+    })
+
+    test('throw an error when no matching site can be found', () => {
+        // Mock the  `default` config to the window global
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                defaultSite: 'site-3'
+            }
+        })
+        expect(() => resolveSiteFromUrl('https://www.example-site.com/site-3')).toThrow()
+    })
+
+    test('returns correct site when aliases are not declared in the config', () => {
+        getConfig.mockReset().mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                siteAliases: {},
+                defaultSite: 'site-2'
+            }
+        })
+        const result = resolveSiteFromUrl('https://www.example-site.com/')
+        expect(result.id).toEqual('site-2')
     })
 })
