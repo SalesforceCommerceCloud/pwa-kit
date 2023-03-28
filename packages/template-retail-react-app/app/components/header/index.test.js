@@ -12,7 +12,7 @@ import Header from './index'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {rest} from 'msw'
 import {createMemoryHistory} from 'history'
-import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../commerce-api/mock-data'
+import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
 
 jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual('@chakra-ui/react')
@@ -151,7 +151,6 @@ test('route to account page when an authenticated users click on account icon', 
     })
 
     fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
-    console.log('history.location', history.location)
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
     })

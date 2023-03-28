@@ -8,7 +8,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
-import {mockProductSearch, mockedEmptyCustomerProductList} from '../../commerce-api/mock-data'
+import {mockProductSearch, mockedEmptyCustomerProductList} from '../../mocks/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
@@ -16,12 +16,9 @@ import {createPathWithDefaults, renderWithProviders} from '../../utils/test-util
 import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
-import useWishlist from '../../hooks/use-wishlist'
 
 jest.setTimeout(60000)
 let mockProductListSearchResponse = mockProductSearch
-
-jest.mock('../../hooks/use-wishlist')
 
 const MockedComponent = ({isLoading, isLoggedIn = false}) => {
     const customer = useCustomer()
@@ -58,12 +55,6 @@ const MockedEmptyPage = () => {
 }
 
 beforeEach(() => {
-    useWishlist.mockReturnValue({
-        isInitialized: true,
-        isEmpty: false,
-        data: {},
-        findItemByProductId: () => {}
-    })
     global.server.use(
         rest.get('*/product-search', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))

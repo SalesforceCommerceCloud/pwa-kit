@@ -11,16 +11,13 @@ import withRegistration from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {mockedGuestCustomer} from '../../commerce-api/mock-data'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {mockedGuestCustomer} from '../../mocks/mock-data'
 
 const ButtonWithRegistration = withRegistration(Button)
 
 const MockedComponent = (props) => {
-    const {data: customer} = useCurrentCustomer()
     return (
         <div>
-            <div>firstName: {customer?.firstName}</div>
             <ButtonWithRegistration {...props}>Button</ButtonWithRegistration>
         </div>
     )
@@ -35,7 +32,6 @@ beforeAll(() => {
 
 afterEach(() => {
     jest.resetModules()
-    jest.resetAllMocks()
     sessionStorage.clear()
 })
 
@@ -44,12 +40,8 @@ describe('Registered users tests', function () {
         const onClick = jest.fn()
         renderWithProviders(<MockedComponent onClick={onClick} />)
 
-        await waitFor(() => {
-            // we wait for login to complete and user's firstName to show up on screen.
-            expect(screen.getByText(/Testing/)).toBeInTheDocument()
-        })
-
         const trigger = screen.getByText(/button/i)
+        expect(trigger).toBeInTheDocument()
         user.click(trigger)
 
         await waitFor(() => {
@@ -58,7 +50,6 @@ describe('Registered users tests', function () {
     })
 })
 
-//TODO: revisit when fechtedToken is fixed
 describe('Guest user tests', function () {
     beforeEach(() => {
         global.server.use(
@@ -67,25 +58,26 @@ describe('Guest user tests', function () {
             })
         )
     })
-    test.skip('should show login modal if user not registered', async () => {
+    test('should show login modal if user not registered', async () => {
         const onClick = jest.fn()
         renderWithProviders(
-            <ButtonWithRegistration onClick={onClick}>Button</ButtonWithRegistration>
+            <ButtonWithRegistration onClick={onClick}>Button</ButtonWithRegistration>,
+            {
+                wrapperProps: {
+                    isGuest: true
+                }
+            }
         )
 
         const trigger = await screen.findByText(/button/i)
         await waitFor(() => {
             user.click(trigger)
         })
-
-        await waitFor(
-            () => {
-                expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-                expect(screen.getByLabelText(/Password/)).toBeInTheDocument()
-                expect(screen.getByText(/forgot password/i)).toBeInTheDocument()
-                expect(screen.getByText(/sign in/i)).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
+        await waitFor(() => {
+            expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
+            expect(screen.getByLabelText(/Password/)).toBeInTheDocument()
+            expect(screen.getByText(/forgot password/i)).toBeInTheDocument()
+            expect(screen.getByText(/sign in/i)).toBeInTheDocument()
+        })
     })
 })

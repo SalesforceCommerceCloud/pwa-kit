@@ -9,7 +9,7 @@ import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
 import {screen} from '@testing-library/react'
 import {rest} from 'msw'
-import {mockCustomerBaskets} from '../commerce-api/mock-data'
+import {mockCustomerBaskets} from '../mocks/mock-data'
 
 const MOCK_PRODUCT = {
     currency: 'USD',

@@ -24,6 +24,10 @@ export const createModuleReplacementPlugin = (projectDir) => {
         }
         return new RegExp(str)
     }
+
+    // List of overridable paths
+    // path: The RegExp that matches the path to the overridable file
+    // newPath: The corresponding path in the project directory
     const overridables = [
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app-config$'),
@@ -48,6 +52,7 @@ export const createModuleReplacementPlugin = (projectDir) => {
     ]
     const extensions = ['.ts', '.tsx', '.js', '.jsx']
 
+    // Find the replacement for each overridable path by checking if the file exists
     const replacements = []
     overridables.forEach(({path, newPath}) => {
         extensions.forEach((ext) => {
@@ -59,19 +64,22 @@ export const createModuleReplacementPlugin = (projectDir) => {
     })
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
-        const resolved = path.resolve(resource.context, resource.request)
-
-        const replacement = replacements.find(({path}) => resolved.match(path))
-
         const sdkPaths = [
             path.join('packages', 'pwa-kit-react-sdk'),
             path.join('node_modules', 'pwa-kit-react-sdk')
         ]
 
-        const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))
+        if (
+            resource.context.includes('pwa-kit-react-sdk') &&
+            sdkPaths.some((p) => resource.context.includes(p))
+        ) {
+            const resolved = path.resolve(resource.context, resource.request)
 
-        if (requestedFromSDK && replacement) {
-            resource.request = replacement.newPath
+            const replacement = replacements.find(({path}) => resolved.match(path))
+
+            if (replacement) {
+                resource.request = replacement.newPath
+            }
         }
     })
 }

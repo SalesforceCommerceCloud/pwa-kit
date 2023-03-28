@@ -11,7 +11,7 @@ import PropTypes from 'prop-types'
 import {screen} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
 import {useDerivedProduct} from './use-derived-product'
-import mockProductDetail from '../commerce-api/mocks/variant-750518699578M'
+import mockProductDetail from '../mocks/variant-750518699578M'
 import {renderWithProviders} from '../utils/test-utils'
 
 const MockComponent = ({product}) => {

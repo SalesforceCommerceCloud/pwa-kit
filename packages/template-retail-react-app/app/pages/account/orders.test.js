@@ -10,11 +10,7 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import {
-    mockCustomerBaskets,
-    mockOrderHistory,
-    mockOrderProducts
-} from '../../commerce-api/mock-data'
+import {mockCustomerBaskets, mockOrderHistory, mockOrderProducts} from '../../mocks/mock-data'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
 

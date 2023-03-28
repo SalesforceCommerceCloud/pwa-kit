@@ -25,7 +25,7 @@ import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
+import {mockCategories as initialMockCategories} from '../mocks/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
 // Contexts
@@ -33,6 +33,45 @@ import {CurrencyProvider, MultiSiteProvider} from '../contexts'
 
 import {createUrlTemplate} from './url'
 import {getSiteByReference} from './site-utils'
+import jwt from 'jsonwebtoken'
+
+// This JWT's payload is special
+// it includes 3 fields that commerce-sdk-react cares:
+// exp, isb and sub
+// The lib decodes the jwt and extract information such as customerId and customerType
+const guestPayload = {
+    aut: 'GUID',
+    scp: 'sfcc.shopper-myaccount.baskets sfcc.shopper-myaccount.addresses sfcc.shopper-products sfcc.shopper-discovery-search sfcc.shopper-myaccount.rw sfcc.shopper-myaccount.paymentinstruments sfcc.shopper-customers.login sfcc.shopper-experience sfcc.shopper-context.rw sfcc.shopper-myaccount.orders sfcc.shopper-customers.register sfcc.shopper-baskets-orders sfcc.shopper-myaccount.addresses.rw sfcc.shopper-myaccount.productlists.rw sfcc.shopper-productlists sfcc.shopper-promotions sfcc.shopper-baskets-orders.rw sfcc.shopper-myaccount.paymentinstruments.rw sfcc.shopper-gift-certificates sfcc.shopper-product-search sfcc.shopper-myaccount.productlists sfcc.shopper-categories sfcc.shopper-myaccount',
+    sub: 'cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-9971-40f88962b836::usid:02ccab32-d01e-4abc-809a-a457fa0512c2',
+    ctx: 'slas',
+    iss: 'slas/prod/zzrf_001',
+    ist: 1,
+    aud: 'commercecloud/prod/zzrf_001',
+    nbf: 1679013708,
+    sty: 'User',
+    isb: 'uido:slas::upn:Guest::uidn:Guest User::gcid:bckbhHw0dGkXgRxbaVxqYYwuhH::chid: ',
+    exp: 1924905600000,
+    iat: 1679013738,
+    jti: 'C2C4856201860-18906789034985270413965222'
+}
+
+const registeredUserPayload = {
+    aut: 'GUID',
+    scp: 'sfcc.shopper-myaccount.baskets sfcc.shopper-myaccount.addresses sfcc.shopper-products sfcc.shopper-discovery-search sfcc.shopper-myaccount.rw sfcc.shopper-myaccount.paymentinstruments sfcc.shopper-customers.login sfcc.shopper-experience sfcc.shopper-myaccount.orders sfcc.shopper-customers.register sfcc.shopper-baskets-orders sfcc.shopper-myaccount.addresses.rw sfcc.shopper-myaccount.productlists.rw sfcc.shopper-productlists sfcc.shopper-promotions sfcc.shopper-baskets-orders.rw sfcc.shopper-myaccount.paymentinstruments.rw sfcc.shopper-gift-certificates sfcc.shopper-product-search sfcc.shopper-myaccount.productlists sfcc.shopper-categories sfcc.shopper-myaccount',
+    sub: 'cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-9971-40f88962b836::usid:8e883973-68eb-41fe-a3c5-756232652ff5',
+    ctx: 'slas',
+    iss: 'slas/prod/zzrf_001',
+    ist: 1,
+    aud: 'commercecloud/prod/zzrf_001',
+    nbf: 1678834271,
+    sty: 'User',
+    isb: 'uido:ecom::upn:kev5@test.com::uidn:kevin he::gcid:abmes2mbk3lXkRlHFJwGYYkuxJ::rcid:abUMsavpD9Y6jW00di2SjxGCMU::chid:RefArchGlobal',
+    exp: 2678836101,
+    iat: 1678834301,
+    jti: 'C2C4856201860-18906789034805832570666542'
+}
+export const guestToken = jwt.sign(guestPayload, 'secret')
+export const registerUserToken = jwt.sign(registeredUserPayload, 'secret')
 export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
 export const SUPPORTED_LOCALES = [
@@ -126,14 +165,6 @@ export const TestProviders = ({
         locale.alias || locale.id
     )
 
-    // This JWT's payload is special
-    // it includes 3 fields that commerce-sdk-react cares:
-    // exp, isb and sub
-    // The lib decodes the jwt and extract information such as customerId and customerType
-    const JWTThatNeverExpires =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLWV4cGVyaWVuY2Ugc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOjhlODgzOTczLTY4ZWItNDFmZS1hM2M1LTc1NjIzMjY1MmZmNSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY3ODgzNDI3MSwic3R5IjoiVXNlciIsImlzYiI6InVpZG86ZWNvbTo6dXBuOmtldjVAdGVzdC5jb206OnVpZG46a2V2aW4gaGU6OmdjaWQ6YWJtZXMybWJrM2xYa1JsSEZKd0dZWWt1eEo6OnJjaWQ6YWJVTXNhdnBEOVk2alcwMGRpMlNqeEdDTVU6OmNoaWQ6UmVmQXJjaEdsb2JhbCIsImV4cCI6MjY3ODgzNjEwMSwiaWF0IjoxNjc4ODM0MzAxLCJqdGkiOiJDMkM0ODU2MjAxODYwLTE4OTA2Nzg5MDM0ODA1ODMyNTcwNjY2NTQyIn0._tUrxeXdFYPj6ZoY-GILFRd3-aD1RGPkZX6TqHeS494'
-    const guestJWTNeverExpires =
-        'eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJraWQiOiJiMjNkZTU5YS1iMTk3LTQyNTAtODdkNy1mNDFmNmUzNjcwNzciLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJIUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLWV4cGVyaWVuY2Ugc2ZjYy5zaG9wcGVyLWNvbnRleHQucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOjAyY2NhYjMyLWQwMWUtNGFiYy04MDlhLWE0NTdmYTA1MTJjMiIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY3OTAxMzcwOCwic3R5IjoiVXNlciIsImlzYiI6InVpZG86c2xhczo6dXBuOkd1ZXN0Ojp1aWRuOkd1ZXN0IFVzZXI6OmdjaWQ6YmNrYmhIdzBkR2tYZ1J4YmFWeHFZWXd1aEg6OmNoaWQ6ICIsImV4cCI6MTkyNDkwNTYwMDAwMCwiaWF0IjoxNjc5MDEzNzM4LCJqdGkiOiJDMkM0ODU2MjAxODYwLTE4OTA2Nzg5MDM0OTg1MjcwNDEzOTY1MjIyIn0.o9XBf1TiGmNhEkFsVsFKGkDODuk1zK8ovE8GRnVTZWw'
     return (
         <ServerContext.Provider value={{}}>
             <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
@@ -147,11 +178,7 @@ export const TestProviders = ({
                             locale={locale.id}
                             redirectURI={`${window.location.origin}/testcallback`}
                             fetchedToken={
-                                bypassAuth
-                                    ? isGuest
-                                        ? guestJWTNeverExpires
-                                        : JWTThatNeverExpires
-                                    : ''
+                                bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''
                             }
                         >
                                 <CurrencyProvider currency={DEFAULT_CURRENCY}>

@@ -7,21 +7,19 @@
 
 /* eslint-disable no-unused-vars */
 import React from 'react'
-import {screen, within, fireEvent, waitFor} from '@testing-library/react'
+import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Cart from './index'
 import userEvent from '@testing-library/user-event'
 import {
-    mockedGuestCustomer,
     mockShippingMethods,
     mockCustomerBaskets,
     mockEmptyBasket,
     mockCartVariant
-} from '../../commerce-api/mock-data'
-import mockVariant from '../../commerce-api/mocks/variant-750518699578M'
+} from '../../mocks/mock-data'
+import mockVariant from '../../mocks/variant-750518699578M'
 import {rest} from 'msw'
 
-//TODO: Unskip this test when fetchedToken bugs are fixed. All the tests should pass when customerId is defined!
 const mockProduct = {
     ...mockVariant,
     id: '750518699660M',
@@ -51,16 +49,9 @@ const mockPromotions = {
     total: 1
 }
 
-jest.mock('../../commerce-api/auth', () => {
-    return class AuthMock {
-        login() {
-            return mockedGuestCustomer
-        }
-    }
-})
-
 // Set up and clean up
 beforeEach(() => {
+    jest.clearAllMocks()
     jest.resetModules()
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
@@ -107,7 +98,29 @@ beforeEach(() => {
         }),
 
         rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockShippingMethods))
+            const basketWithShipment = {
+                ...mockCustomerBaskets.baskets[0],
+                shipments: [
+                    {
+                        ...mockCustomerBaskets.baskets[0].shipments[0],
+                        shippingMethod: {
+                            description: 'Order received within 7-10 business days',
+                            id: 'GBP001',
+                            name: 'Ground',
+                            price: 7.99,
+                            shippingPromotions: [
+                                {
+                                    calloutMsg: 'Free Shipping Amount Above 50',
+                                    promotionId: 'FreeShippingAmountAbove50',
+                                    promotionName: 'Free Shipping Amount Above 50'
+                                }
+                            ],
+                            c_estimatedArrivalTime: '7-10 Business Days'
+                        }
+                    }
+                ]
+            }
+            return res(ctx.delay(0), ctx.json(basketWithShipment))
         }),
 
         rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
@@ -156,12 +169,7 @@ beforeEach(() => {
 afterEach(() => {
     localStorage.clear()
 })
-
-test('Renders skeleton until customer and basket are loaded', () => {
-    const {getByTestId, queryByTestId} = renderWithProviders(<Cart />)
-    expect(getByTestId('sf-cart-skeleton')).toBeInTheDocument()
-    expect(queryByTestId('sf-cart-container')).not.toBeInTheDocument()
-})
+jest.setTimeout(30000)
 
 describe('Empty cart tests', function () {
     beforeEach(() => {
@@ -172,57 +180,73 @@ describe('Empty cart tests', function () {
         )
     })
 
-    test.skip('Renders empty cart when there are no items', async () => {
+    test('Renders empty cart when there are no items', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
     })
 })
 
-test.skip('Renders cart components when there are items', async () => {
+describe('Rendering tests', function () {
+    test('Renders skeleton before rendering cart items, shipping info', async () => {
+        renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-skeleton')).toBeInTheDocument()
+            expect(screen.queryByTestId('sf-cart-container')).not.toBeInTheDocument()
+        })
+        await waitFor(async () => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+        })
+        const summary = screen.getByTestId('sf-order-summary')
+        expect(await within(summary).findByText(/promotion applied/i)).toBeInTheDocument()
+        expect(within(summary).getByText(/free/i)).toBeInTheDocument()
+        expect(within(summary).getAllByText(/61.43/i).length).toEqual(2)
+    })
+})
+
+test.skip('Can update item quantity in the cart', async () => {
     renderWithProviders(<Cart />)
     await waitFor(async () => {
         expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
     })
-})
 
-test.skip('Applies default shipping method to basket and renders estimated pricing', async () => {
-    renderWithProviders(<Cart />)
-    expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
+    const cartItem = await screen.findByTestId(
+        `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
+    )
 
-    const summary = screen.getByTestId('sf-order-summary')
-    expect(await within(summary).findByText(/promotion applied/i)).toBeInTheDocument()
-    expect(within(summary).getByText(/free/i)).toBeInTheDocument()
-    expect(within(summary).getAllByText(/61.43/i).length).toEqual(2)
-})
+    expect(await within(cartItem).getByDisplayValue('2'))
 
-describe('Update quantity', function () {
-    test.skip('Can update item quantity in the cart', async () => {
-        renderWithProviders(<Cart />)
-        expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
-        expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
-
-        const cartItem = await screen.findByTestId(
-            `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
-        )
-
-        expect(await within(cartItem).getByDisplayValue('2'))
-
+    await act(async () => {
         const incrementButton = await within(cartItem).findByTestId('quantity-increment')
 
         // update item quantity
         fireEvent.pointerDown(incrementButton)
+    })
 
-        await waitFor(
-            () => {
-                expect(within(cartItem).getByDisplayValue('3'))
-            },
-            {timeout: 5000}
+    await waitFor(() => {
+        expect(screen.getByTestId('loading')).toBeInTheDocument()
+    })
+
+    await waitFor(() => {
+        expect(within(cartItem).getByDisplayValue('3'))
+    })
+
+    await waitFor(() => {
+        expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+    })
+})
+
+describe.skip('Update quantity in product view', function () {
+    beforeEach(() => {
+        global.server.use(
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockCartVariant))
+            })
         )
     })
 
-    test.skip('Can update item quantity from product view modal', async () => {
-        jest.setTimeout(30000)
+    test('Can update item quantity from product view modal', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -232,19 +256,30 @@ describe('Update quantity', function () {
         )
 
         const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
-        userEvent.click(editCartButton)
-        const productView = screen.getByTestId('product-view')
-        expect(productView).toBeInTheDocument()
-        // update item quantity
-        expect(await within(cartItem).getByDisplayValue('2'))
+        await act(async () => {
+            userEvent.click(editCartButton)
+        })
 
-        const incrementButton = await within(cartItem).findByTestId('quantity-increment')
+        const productView = screen.queryByTestId('product-view')
 
-        // update item quantity
-        fireEvent.pointerDown(incrementButton)
+        await act(async () => {
+            const incrementButton = await within(productView).findByTestId('quantity-increment')
+            // update item quantity
+            fireEvent.pointerDown(incrementButton)
+            expect(within(productView).getByDisplayValue('3'))
 
+            const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
+            userEvent.click(updateCartButtons[0])
+        })
+        await waitFor(() => {
+            expect(productView).not.toBeInTheDocument()
+        })
         await waitFor(() => {
             expect(within(cartItem).getByDisplayValue('3'))
+        })
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
         })
     })
 })
@@ -257,7 +292,7 @@ describe('Remove item from cart', function () {
             })
         )
     })
-    test.skip('Can remove item from the cart', async () => {
+    test('Can remove item from the cart', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -272,7 +307,7 @@ describe('Remove item from cart', function () {
             () => {
                 expect(screen.getByTestId('sf-cart-empty')).toBeInTheDocument()
             },
-            {timeout: 5000}
+            {timeout: 20000}
         )
     })
 })
@@ -285,6 +320,25 @@ describe('Coupons tests', function () {
             taxTotal: 9.14,
             taxation: 'gross',
             currency: 'USD',
+            shipments: [
+                {
+                    ...mockCustomerBaskets.baskets[0].shipments[0],
+                    shippingMethod: {
+                        description: 'Order received within 7-10 business days',
+                        id: 'GBP001',
+                        name: 'Ground',
+                        price: 7.99,
+                        shippingPromotions: [
+                            {
+                                calloutMsg: 'Free Shipping Amount Above 50',
+                                promotionId: 'FreeShippingAmountAbove50',
+                                promotionName: 'Free Shipping Amount Above 50'
+                            }
+                        ],
+                        c_estimatedArrivalTime: '7-10 Business Days'
+                    }
+                }
+            ],
             productItems: [
                 {
                     adjustedTax: 9.14,
@@ -307,6 +361,10 @@ describe('Coupons tests', function () {
                 }
             ]
         }
+        const mockSuitProduct = {
+            ...mockVariant,
+            id: '750518699585M'
+        }
 
         global.server.use(
             rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
@@ -314,6 +372,9 @@ describe('Coupons tests', function () {
                     ctx.delay(0),
                     ctx.json({total: 1, baskets: [mockCustomerBasketsWithSuit]})
                 )
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({data: [mockSuitProduct]}))
             }),
             rest.post('*/baskets/:basketId/coupons', (req, res, ctx) => {
                 const basketWithCoupon = {
@@ -373,7 +434,7 @@ describe('Coupons tests', function () {
             })
         )
     })
-    test.skip('Can apply and remove product-level coupon code with promotion', async () => {
+    test('Can apply and remove product-level coupon code with promotion', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
@@ -383,6 +444,7 @@ describe('Coupons tests', function () {
         userEvent.click(screen.getByText('Apply'))
 
         expect(await screen.findByText('Promotion applied')).toBeInTheDocument()
+
         expect(await screen.findByText(/MENSSUITS/i)).toBeInTheDocument()
 
         const cartItem = await screen.findByTestId('sf-cart-item-750518699585M')

@@ -7,7 +7,7 @@
 import fetch from 'jest-fetch-mock'
 import {app as appConfig} from '../../config/default'
 import OcapiShopperOrders from './ocapi-shopper-orders'
-import {ocapiOrderResponse} from './mock-data'
+import {ocapiOrderResponse} from '../mocks/mock-data'
 
 jest.mock('cross-fetch', () => jest.requireActual('jest-fetch-mock'))
 
