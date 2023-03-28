@@ -46,7 +46,7 @@ import {
     HOME_HREF,
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
-    CAT_MENU_DEFAULT_NAV_CLIENT_DEPTH,
+    // CAT_MENU_DEFAULT_NAV_CLIENT_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE
 } from '../../constants'
@@ -54,7 +54,7 @@ import {
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
-import {useCategory, useCustomerType} from 'commerce-sdk-react-preview'
+import {useCategory, useCustomerType, useCategoryBulk} from 'commerce-sdk-react-preview'
 
 const onClient = typeof window !== 'undefined'
 
@@ -64,30 +64,39 @@ we only load the level 0 categories on server side, and load the rest
 on client side to reduce SSR page size.
 */
 const useLazyLoadCategories = () => {
-    const allCategoriesQuery = useCategory(
-        {
-            parameters: {
-                id: CAT_MENU_DEFAULT_ROOT_CATEGORY,
-                levels: CAT_MENU_DEFAULT_NAV_CLIENT_DEPTH
-            }
-        },
-        {
-            enabled: onClient
-        }
-    )
+    const itemsKey = 'categories'
+    const [categoriesTree, setCategoriesTree] = useState(null)
 
     const levelZeroCategoriesQuery = useCategory(
         {
             parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
         },
         {
-            enabled: !allCategoriesQuery.isFetched
+            onSuccess: (data) => {
+                setCategoriesTree(data[itemsKey])
+            }
         }
     )
 
-    if (onClient && allCategoriesQuery.data) {
-        return allCategoriesQuery
-    }
+    const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
+    console.log('ids', ids)
+    console.log('categoriesTree', categoriesTree)
+    // fetch multiple useCategory using useQueries under the hood
+    const queries = useCategoryBulk(
+        {
+            parameters: {
+                levels: 2
+            }
+        },
+        ids,
+        {enabled: onClient && Boolean(ids), onSuccess: (data) => console.log('data', data)}
+    )
+    console.log('levelZeroCategoriesQuery', levelZeroCategoriesQuery.data)
+    console.log('queries', queries)
+    // make sure all queries is successful before returning
+    // if (onClient && queries.every((query) => query.isSuccess)) {
+    //     return queries
+    // }
 
     return levelZeroCategoriesQuery
 }
