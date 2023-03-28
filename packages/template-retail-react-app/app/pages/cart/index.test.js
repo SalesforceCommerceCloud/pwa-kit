@@ -18,7 +18,10 @@ import {
     mockCartVariant
 } from '../../mocks/mock-data'
 import mockVariant from '../../mocks/variant-750518699578M'
-import {rest} from 'msw'
+// import {rest} from 'msw'
+import {createServer} from '../../../jest-setup'
+import {mockProductLists} from '../../mocks/product-lists'
+import {mockCustomerBasketsWithSuit, mockSuitProduct} from '../../mocks/basket-with-suit'
 
 const mockProduct = {
     ...mockVariant,
@@ -53,18 +56,34 @@ const mockPromotions = {
 beforeEach(() => {
     jest.clearAllMocks()
     jest.resetModules()
-    global.server.use(
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockProduct))
-        }),
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json({data: [mockCartVariant]}))
-        }),
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockCustomerBaskets))
-        }),
+})
+afterEach(() => {
+    localStorage.clear()
+})
 
-        rest.put('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
+const cartHandlers = [
+    {
+        path: '*/products/:productId',
+        res: () => {
+            return mockProduct
+        }
+    },
+    {
+        path: '*/products',
+        res: () => {
+            return {data: [mockCartVariant]}
+        }
+    },
+    {
+        path: '*/product-lists',
+        res: () => {
+            return mockProductLists
+        }
+    },
+    {
+        path: '*/baskets/:basketId/shipments/:shipmentId',
+        method: 'put',
+        res: () => {
             const basket = mockCustomerBaskets.baskets[0]
             const updatedBasketWithShippingMethod = {
                 ...basket,
@@ -91,13 +110,19 @@ beforeEach(() => {
                     }
                 ]
             }
-            return res(ctx.delay(0), ctx.json(updatedBasketWithShippingMethod))
-        }),
-        rest.get('*/baskets/:basketId/shipments', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockShippingMethods))
-        }),
-
-        rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
+            return updatedBasketWithShippingMethod
+        }
+    },
+    {
+        path: '*/baskets/:basketId/shipments',
+        res: () => {
+            return mockShippingMethods
+        }
+    },
+    {
+        path: '*/shipments/me/shipping-method',
+        method: 'put',
+        res: () => {
             const basketWithShipment = {
                 ...mockCustomerBaskets.baskets[0],
                 shipments: [
@@ -120,18 +145,25 @@ beforeEach(() => {
                     }
                 ]
             }
-            return res(ctx.delay(0), ctx.json(basketWithShipment))
-        }),
-
-        rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockShippingMethods))
-        }),
-
-        rest.get('*/promotions', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockPromotions))
-        }),
-
-        rest.patch('*/baskets/:basketId/items/:itemId', (req, res, ctx) => {
+            return basketWithShipment
+        }
+    },
+    {
+        path: '*/shipments/me/shipping-methods',
+        res: () => {
+            return mockShippingMethods
+        }
+    },
+    {
+        path: '*/promotions',
+        res: () => {
+            return mockPromotions
+        }
+    },
+    {
+        path: '*/baskets/:basketId/items/:itemId',
+        method: 'patch',
+        res: () => {
             const basket = mockCustomerBaskets.baskets[0]
             const updatedQuantityCustomerBasket = {
                 ...basket,
@@ -162,23 +194,22 @@ beforeEach(() => {
                     }
                 ]
             }
-            return res(ctx.json(updatedQuantityCustomerBasket))
-        })
-    )
-})
-afterEach(() => {
-    localStorage.clear()
-})
+            return updatedQuantityCustomerBasket
+        }
+    }
+]
 jest.setTimeout(30000)
 
 describe('Empty cart tests', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockEmptyBasket))
-            })
-        )
-    })
+    createServer([
+        ...cartHandlers,
+        {
+            path: '*/customers/:customerId/baskets',
+            res: () => {
+                return mockEmptyBasket
+            }
+        }
+    ])
 
     test('Renders empty cart when there are no items', async () => {
         renderWithProviders(<Cart />)
@@ -187,6 +218,15 @@ describe('Empty cart tests', function () {
 })
 
 describe('Rendering tests', function () {
+    createServer([
+        ...cartHandlers,
+        {
+            path: '*/customers/:customerId/baskets',
+            res: () => {
+                return mockCustomerBaskets
+            }
+        }
+    ])
     test('Renders skeleton before rendering cart items, shipping info', async () => {
         renderWithProviders(<Cart />)
         await waitFor(() => {
@@ -203,49 +243,57 @@ describe('Rendering tests', function () {
         expect(within(summary).getAllByText(/61.43/i).length).toEqual(2)
     })
 })
+// describe('Update item in cart', function () {
+// test.skip('Can update item quantity in the cart', async () => {
+//     renderWithProviders(<Cart />)
+//     await waitFor(async () => {
+//         expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+//         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+//     })
+//
+//     const cartItem = await screen.findByTestId(
+//         `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
+//     )
+//
+//     expect(await within(cartItem).getByDisplayValue('2'))
+//
+//     await act(async () => {
+//         const incrementButton = await within(cartItem).findByTestId('quantity-increment')
+//
+//         // update item quantity
+//         fireEvent.pointerDown(incrementButton)
+//     })
+//
+//     await waitFor(() => {
+//         expect(screen.getByTestId('loading')).toBeInTheDocument()
+//     })
+//
+//     await waitFor(() => {
+//         expect(within(cartItem).getByDisplayValue('3'))
+//     })
+//
+//     await waitFor(() => {
+//         expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+//     })
+// })
+// })
 
-test.skip('Can update item quantity in the cart', async () => {
-    renderWithProviders(<Cart />)
-    await waitFor(async () => {
-        expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-        expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
-    })
-
-    const cartItem = await screen.findByTestId(
-        `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
-    )
-
-    expect(await within(cartItem).getByDisplayValue('2'))
-
-    await act(async () => {
-        const incrementButton = await within(cartItem).findByTestId('quantity-increment')
-
-        // update item quantity
-        fireEvent.pointerDown(incrementButton)
-    })
-
-    await waitFor(() => {
-        expect(screen.getByTestId('loading')).toBeInTheDocument()
-    })
-
-    await waitFor(() => {
-        expect(within(cartItem).getByDisplayValue('3'))
-    })
-
-    await waitFor(() => {
-        expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
-    })
-})
-
-describe.skip('Update quantity in product view', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockCartVariant))
-            })
-        )
-    })
-
+describe('Update quantity in product view', function () {
+    createServer([
+        ...cartHandlers,
+        {
+            path: '*/products/:productId',
+            res: () => {
+                return mockCartVariant
+            }
+        },
+        {
+            path: '*/customers/:customerId/baskets',
+            res: () => {
+                return mockCustomerBaskets
+            }
+        }
+    ])
     test('Can update item quantity from product view modal', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
@@ -283,15 +331,30 @@ describe.skip('Update quantity in product view', function () {
         })
     })
 })
-
+//
 describe('Remove item from cart', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.delete('*/baskets/:basket/items/:itemId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockEmptyBasket.baskets[0]))
-            })
-        )
-    })
+    createServer([
+        ...cartHandlers,
+        {
+            path: '*/products/:productId',
+            res: () => {
+                return mockCartVariant
+            }
+        },
+        {
+            path: '*/customers/:customerId/baskets',
+            res: () => {
+                return mockCustomerBaskets
+            }
+        },
+        {
+            path: '*/baskets/:basket/items/:itemId',
+            method: 'delete',
+            res: () => {
+                return mockEmptyBasket.baskets[0]
+            }
+        }
+    ])
     test('Can remove item from the cart', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
@@ -313,70 +376,18 @@ describe('Remove item from cart', function () {
 })
 
 describe('Coupons tests', function () {
-    beforeEach(() => {
-        const mockCustomerBasketsWithSuit = {
-            ...mockCustomerBaskets.baskets[0],
-            shippingTotalTax: 0.38,
-            taxTotal: 9.14,
-            taxation: 'gross',
-            currency: 'USD',
-            shipments: [
-                {
-                    ...mockCustomerBaskets.baskets[0].shipments[0],
-                    shippingMethod: {
-                        description: 'Order received within 7-10 business days',
-                        id: 'GBP001',
-                        name: 'Ground',
-                        price: 7.99,
-                        shippingPromotions: [
-                            {
-                                calloutMsg: 'Free Shipping Amount Above 50',
-                                promotionId: 'FreeShippingAmountAbove50',
-                                promotionName: 'Free Shipping Amount Above 50'
-                            }
-                        ],
-                        c_estimatedArrivalTime: '7-10 Business Days'
-                    }
-                }
-            ],
-            productItems: [
-                {
-                    adjustedTax: 9.14,
-                    basePrice: 191.99,
-                    bonusProductLineItem: false,
-                    gift: false,
-                    itemId: '54c599fdace475d97aeec72453',
-                    itemText: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
-                    price: 191.99,
-                    priceAfterItemDiscount: 191.99,
-                    priceAfterOrderDiscount: 191.99,
-                    productId: '750518699585M',
-                    productName: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
-                    quantity: 1,
-                    shipmentId: 'me',
-                    tax: 9.14,
-                    taxBasis: 191.99,
-                    taxClassId: 'standard',
-                    taxRate: 0.05
-                }
-            ]
-        }
-        const mockSuitProduct = {
-            ...mockVariant,
-            id: '750518699585M'
-        }
-
-        global.server.use(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(
-                    ctx.delay(0),
-                    ctx.json({total: 1, baskets: [mockCustomerBasketsWithSuit]})
-                )
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json({data: [mockSuitProduct]}))
-            }),
-            rest.post('*/baskets/:basketId/coupons', (req, res, ctx) => {
+    createServer([
+        ...cartHandlers,
+        {
+            path: '*/customers/:customerId/baskets',
+            res: () => {
+                return {baskets: [mockCustomerBasketsWithSuit], total: 1}
+            }
+        },
+        {
+            path: '*/baskets/:basketId/coupons',
+            method: 'post',
+            res: () => {
                 const basketWithCoupon = {
                     ...mockCustomerBasketsWithSuit,
                     couponItems: [
@@ -427,13 +438,17 @@ describe('Coupons tests', function () {
                         }
                     ]
                 }
-                return res(ctx.delay(0), ctx.json(basketWithCoupon))
-            }),
-            rest.delete('*/baskets/:basketId/coupons/:couponId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockCustomerBasketsWithSuit))
-            })
-        )
-    })
+                return basketWithCoupon
+            }
+        },
+        {
+            path: '*/baskets/:basketId/coupons/:couponId',
+            method: 'delete',
+            res: () => {
+                return mockCustomerBasketsWithSuit
+            }
+        }
+    ])
     test('Can apply and remove product-level coupon code with promotion', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
