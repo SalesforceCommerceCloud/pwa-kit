@@ -36,6 +36,10 @@ jobs:
         exclude:
           - node: 16
             npm: 6
+          - node: 18
+            npm: 6
+          - node: 14
+            npm: 9
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
@@ -128,6 +132,10 @@ jobs:
         exclude:
           - node: 16
             npm: 6
+          - node: 18
+            npm: 6
+          - node: 14
+            npm: 9
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
