@@ -111,13 +111,13 @@ const OrderSummary = ({
     isEstimate = false,
     fontSize = 'md'
 }) => {
-    const {removePromoCode, ...promoCodeProps} = usePromoCode()
-    const shippingItem = basket.shippingItems?.[0]
-    const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
-
     if (!basket?.basketId && !basket?.orderNo) {
         return null
     }
+
+    const {removePromoCode, ...promoCodeProps} = usePromoCode()
+    const shippingItem = basket.shippingItems?.[0]
+    const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
     return (
         <Stack data-testid="sf-order-summary" spacing={5}>
