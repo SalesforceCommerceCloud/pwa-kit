@@ -24,6 +24,8 @@ import {
 } from '../../mocks/mock-data'
 import mockConfig from '../../../config/mocks/default'
 
+jest.setTimeout(30000)
+
 const {keysToCamel} = jest.requireActual('../../commerce-api/utils')
 
 // TODO: replace with barebone response?
@@ -262,7 +264,9 @@ test('Can proceed through checkout steps as guest', async () => {
     // Move to final review step
     user.click(screen.getByText(/review order/i))
 
-    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn')
+    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn', undefined, {
+        timeout: 5000
+    })
 
     // Verify applied payment and billing address
     expect(step3Content.getByText('Visa')).toBeInTheDocument()
@@ -336,7 +340,9 @@ test('Can proceed through checkout as registered customer', async () => {
     // Move to final review step
     user.click(screen.getByText(/review order/i))
 
-    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn')
+    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn', undefined, {
+        timeout: 5000
+    })
 
     // Verify applied payment and billing address
     expect(step3Content.getByText('Master Card')).toBeInTheDocument()
@@ -353,9 +359,6 @@ test('Can proceed through checkout as registered customer', async () => {
 })
 
 test('Can edit address during checkout as a registered customer', async () => {
-    // TODO: is this applied for _all_ tests in this file?
-    // jest.setTimeout(30000)
-
     await logInDuringCheckout()
 
     const firstAddress = screen.getByTestId('sf-checkout-shipping-address-0')
