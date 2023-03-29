@@ -342,7 +342,7 @@ test('Can proceed through checkout steps as guest', async () => {
     expect(await screen.findByText(/success/i)).toBeInTheDocument()
 })
 
-test.only('Can proceed through checkout as registered customer', async () => {
+test('Can proceed through checkout as registered customer', async () => {
     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
@@ -463,7 +463,7 @@ test.only('Can proceed through checkout as registered customer', async () => {
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />, {
         wrapperProps: {
-            // Bypassing auth to test the guest-to-registered flow
+            // Not bypassing auth as usual, so we can test the guest-to-registered flow
             bypassAuth: false,
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
@@ -478,6 +478,7 @@ test.only('Can proceed through checkout as registered customer', async () => {
     // Wait for checkout to load and display first step
     const loginBtn = await screen.findByText(/log in/i)
 
+    // Planning to log in
     global.server.use(
         rest.post('*/oauth2/token', (req, res, ctx) => {
             return res(
@@ -492,12 +493,6 @@ test.only('Can proceed through checkout as registered customer', async () => {
                 })
             )
         })
-        // rest.post('*/oauth2/login', (req, res, ctx) => {
-        //     return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        // }),
-        // rest.get('*/customers/:customerId', (req, res, ctx) => {
-        //     return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        // })
     )
 
     // Provide customer email and submit
@@ -508,13 +503,8 @@ test.only('Can proceed through checkout as registered customer', async () => {
     user.click(loginBtn)
 
     // Wait for next step to render
-    await waitFor(
-        () =>
-            expect(
-                // TODO: why can't this be found? It's as if the previous step is shown and reset
-                screen.getByTestId('sf-toggle-card-step-1-content')
-            ).not.toBeEmptyDOMElement(),
-        {timeout: 3000}
+    await waitFor(() =>
+        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
     )
 
     // Email should be displayed in previous step summary
@@ -587,13 +577,11 @@ test.only('Can proceed through checkout as registered customer', async () => {
 
     // Should now be on our mocked confirmation route/page
     expect(await screen.findByText(/success/i)).toBeInTheDocument()
-    // await waitFor(() => {
-    //     expect(window.location.pathname).toEqual('/uk/en-GB/checkout/confirmation')
-    // })
-}, 30000)
+})
 
 // @TODO: fix in hook integration checkout address ticket
 test('Can edit address during checkout as a registered customer', async () => {
+    // TODO: is this applied for _all_ tests in this file?
     jest.setTimeout(30000)
     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
