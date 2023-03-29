@@ -17,7 +17,6 @@ import {
 } from '../../utils/test-utils'
 import {
     scapiBasketWithItem,
-    ocapiOrderResponse,
     mockShippingMethods,
     mockedRegisteredCustomer,
     mockedCustomerProductLists
@@ -26,10 +25,15 @@ import mockConfig from '../../../config/mocks/default'
 
 jest.setTimeout(30000)
 
-const {keysToCamel} = jest.requireActual('../../commerce-api/utils')
-
-// TODO: replace with barebone response?
-const scapiOrderResponse = keysToCamel(ocapiOrderResponse)
+// Minimal subset of `ocapiOrderResponse` in app/mocks/mock-data.js
+const scapiOrderResponse = {
+    orderNo: '00000101',
+    customerInfo: {
+        customerId: 'customerid',
+        customerNo: 'jlebowski',
+        email: 'jeff@lebowski.com'
+    }
+}
 
 // This is our wrapped component for testing. It handles initialization of the customer
 // and basket the same way it would be when rendered in the real app. We also set up
