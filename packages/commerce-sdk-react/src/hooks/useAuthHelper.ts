@@ -4,9 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {MutationFunction, useMutation, UseMutationResult} from '@tanstack/react-query'
+import {
+    MutationFunction,
+    useMutation,
+    UseMutationResult,
+    useQueryClient
+} from '@tanstack/react-query'
 import useAuthContext from './useAuthContext'
 import Auth from '../auth'
+import {Argument, CacheUpdate} from './types'
+import {updateCache} from './utils'
 
 export const AuthHelpers = {
     LoginGuestUser: 'loginGuestUser',
@@ -16,6 +23,15 @@ export const AuthHelpers = {
 } as const
 
 export type AuthHelper = (typeof AuthHelpers)[keyof typeof AuthHelpers]
+
+const noop = () => ({})
+
+type CacheUpdateMatrix = {
+    [Method in AuthHelper]?: (
+        options: Argument<Auth[Method]> | void,
+        response: ReturnType<Auth[Method]> extends Promise<infer D> ? D : never
+    ) => CacheUpdate
+}
 
 /**
  * A hook for Public Client OAuth helpers.
@@ -40,7 +56,7 @@ export function useAuthHelper<Mutation extends AuthHelper>(
 > {
     const auth = useAuthContext()
     if (!auth[mutation]) throw new Error(`Unknown login helper mutation: ${mutation}`)
-
+    const queryClient = useQueryClient()
     // I'm not sure if there's a way to avoid this type assertion, but, I'm fairly confident that
     // it is safe to do, as it seems to be simply re-asserting what we already know.
     type Method = Auth[Mutation]
@@ -48,5 +64,25 @@ export function useAuthHelper<Mutation extends AuthHelper>(
     type Data = PromisedData extends Promise<infer D> ? D : never
     type Variables = [] extends Parameters<Method> ? void : Parameters<Method>[0]
     const method = auth[mutation].bind(auth) as MutationFunction<Data, Variables>
-    return useMutation(auth.whenReady(method))
+    return useMutation(auth.whenReady(method), {
+        onSuccess(data, options) {
+            const getCacheUpdates = cacheUpdateMatrix[mutation]
+
+            if (getCacheUpdates) {
+                const cacheUpdates = getCacheUpdates(options, data)
+                updateCache(queryClient, cacheUpdates, data)
+            }
+        }
+    })
+}
+
+const cacheUpdateMatrix: CacheUpdateMatrix = {
+    loginRegisteredUserB2C: noop,
+    loginGuestUser: noop,
+    logout() {
+        return {
+            remove: [{queryKey: ['/commerce-sdk-react']}]
+        }
+    },
+    register: noop
 }
