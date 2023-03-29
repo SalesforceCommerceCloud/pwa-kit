@@ -54,6 +54,9 @@ const Home = () => {
                 <li>
                     <Link to="/orders">useShopperOrders & useShopperOrdersMutation</Link>
                 </li>
+                <li>
+                    <Link to="/context">useShopperContext & useShopperContextsMutation</Link>
+                </li>
             </ul>
 
             <h2>Miscellaneous</h2>
