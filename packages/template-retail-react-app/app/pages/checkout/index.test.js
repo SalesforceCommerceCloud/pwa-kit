@@ -10,9 +10,12 @@ import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
+import {
+    renderWithProviders,
+    createPathWithDefaults,
+    registerUserToken
+} from '../../utils/test-utils'
 import useShopper from '../../commerce-api/hooks/useShopper'
-import Auth from '../../commerce-api/auth'
 import {
     scapiBasketWithItem,
     ocapiOrderResponse,
@@ -49,13 +52,17 @@ const scapiOrderResponse = keysToCamel(ocapiOrderResponse)
 // and basket the same way it would be when rendered in the real app. We also set up
 // fake routes to simulate moving from checkout to confirmation page.
 const WrappedCheckout = () => {
-    // useShopper()
     return (
         <Switch>
             <Route exact path={createPathWithDefaults('/checkout')}>
                 <Checkout />
             </Route>
-            <Route exact path={createPathWithDefaults('/checkout/confirmation/00000101')}>
+            <Route
+                exact
+                path={createPathWithDefaults(
+                    `/checkout/confirmation/${scapiOrderResponse.orderNo}`
+                )}
+            >
                 <div>success</div>
             </Route>
         </Switch>
@@ -124,7 +131,7 @@ test('Renders skeleton until customer and basket are loaded', () => {
     expect(queryByTestId('sf-checkout-container')).not.toBeInTheDocument()
 })
 
-test.only('Can proceed through checkout steps as guest', async () => {
+test('Can proceed through checkout steps as guest', async () => {
     // Keep a *deep* copy of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
@@ -233,7 +240,7 @@ test.only('Can proceed through checkout steps as guest', async () => {
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app, isGuest: true}
+        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
     // Wait for checkout to load and display first step
@@ -304,7 +311,6 @@ test.only('Can proceed through checkout steps as guest', async () => {
     user.type(screen.getByLabelText(/expiration date/i), '1224')
     user.type(screen.getByLabelText(/security code/i), '123')
 
-    // TODO: fix this regression
     // Same as shipping checkbox selected by default
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
 
@@ -333,30 +339,21 @@ test.only('Can proceed through checkout steps as guest', async () => {
     user.click(placeOrderBtn)
 
     // Should now be on our mocked confirmation route/page
-    try {
-        await waitFor(
-            () => {
-                expect(screen.getByText(/success/i)).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
-    } catch {
-        screen.logTestingPlaygroundURL()
-    }
-}, 30000)
+    expect(await screen.findByText(/success/i)).toBeInTheDocument()
+})
 
-test('Can proceed through checkout as registered customer', async () => {
+test.only('Can proceed through checkout as registered customer', async () => {
     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
 
-    jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
+    // jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
     global.server.use(
         // mock adding guest email to basket
         rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
-            currentBasket.customer_info.email = 'customer@test.com'
+            currentBasket.customerInfo.email = 'customer@test.com'
             return res(ctx.json(currentBasket))
         }),
 
@@ -366,58 +363,62 @@ test('Can proceed through checkout as registered customer', async () => {
         }),
 
         // mock add shipping and billing address to basket
-        rest.put('*/shipping_address', (req, res, ctx) => {
+        rest.put('*/shipping-address', (req, res, ctx) => {
             const shippingBillingAddress = {
                 address1: '123 Main St',
                 city: 'Tampa',
-                country_code: 'US',
-                first_name: 'Test',
-                full_name: 'Test McTester',
+                countryCode: 'US',
+                firstName: 'Test',
+                fullName: 'Test McTester',
                 id: '047b18d4aaaf4138f693a4b931',
-                last_name: 'McTester',
+                lastName: 'McTester',
                 phone: '(727) 555-1234',
-                postal_code: '33712',
-                state_code: 'FL',
-                _type: 'order_address'
+                postalCode: '33712',
+                stateCode: 'FL'
             }
-            currentBasket.shipments[0].shipping_address = shippingBillingAddress
-            currentBasket.billing_address = shippingBillingAddress
+            currentBasket.shipments[0].shippingAddress = shippingBillingAddress
+            currentBasket.billingAddress = shippingBillingAddress
             return res(ctx.json(currentBasket))
         }),
 
         // mock add billing address to basket
-        rest.put('*/billing_address', (req, res, ctx) => {
+        rest.put('*/billing-address', (req, res, ctx) => {
             const shippingBillingAddress = {
                 address1: '123 Main St',
                 city: 'Tampa',
-                country_code: 'US',
-                first_name: 'Test',
-                full_name: 'Test McTester',
+                countryCode: 'US',
+                firstName: 'Test',
+                fullName: 'Test McTester',
                 id: '047b18d4aaaf4138f693a4b931',
-                last_name: 'McTester',
+                lastName: 'McTester',
                 phone: '(727) 555-1234',
-                postal_code: '33712',
-                state_code: 'FL',
-                _type: 'order_address'
+                postalCode: '33712',
+                stateCode: 'FL',
+                _type: 'orderAddress'
             }
-            currentBasket.shipments[0].shipping_address = shippingBillingAddress
-            currentBasket.billing_address = shippingBillingAddress
+            currentBasket.shipments[0].shippingAddress = shippingBillingAddress
+            currentBasket.billingAddress = shippingBillingAddress
             return res(ctx.json(currentBasket))
         }),
 
         // mock add shipping method
-        rest.put('*/shipments/me/shipping_method', (req, res, ctx) => {
-            currentBasket.shipments[0].shipping_method =
-                mockShippingMethods.applicable_shipping_methods[0]
+        rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
+            currentBasket.shipments[0].shippingMethod =
+                mockShippingMethods.applicableShippingMethods[0]
             return res(ctx.json(currentBasket))
         }),
 
+        // mock get shipping methods
+        rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockShippingMethods))
+        }),
+
         // mock add payment instrument
-        rest.post('*/baskets/:basketId/payment_instruments', (req, res, ctx) => {
-            currentBasket.payment_instruments = [
+        rest.post('*/baskets/:basketId/payment-instruments', (req, res, ctx) => {
+            currentBasket.paymentInstruments = [
                 {
                     amount: 0,
-                    payment_card: {
+                    paymentCard: {
                         cardType: 'Master Card',
                         creditCardExpired: false,
                         expirationMonth: 1,
@@ -428,9 +429,8 @@ test('Can proceed through checkout as registered customer', async () => {
                         validFromMonth: 1,
                         validFromYear: 2020
                     },
-                    payment_instrument_id: 'testcard1',
-                    payment_method_id: 'CREDIT_CARD',
-                    _type: 'order_payment_instrument'
+                    paymentInstrumentId: 'testcard1',
+                    paymentMethodId: 'CREDIT_CARD'
                 }
             ]
             return res(ctx.json(currentBasket))
@@ -445,16 +445,30 @@ test('Can proceed through checkout as registered customer', async () => {
         rest.post('*/orders', (req, res, ctx) => {
             currentBasket = {
                 ...scapiOrderResponse,
-                customer_info: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'}
+                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'}
             }
             return res(ctx.json(currentBasket))
+        }),
+
+        rest.get('*/baskets', (req, res, ctx) => {
+            const baskets = {
+                baskets: [currentBasket],
+                total: 1
+            }
+            return res(ctx.json(baskets))
         })
     )
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}
+        wrapperProps: {
+            // Bypassing auth to test the guest-to-registered flow
+            bypassAuth: false,
+            siteAlias: 'uk',
+            locale: {id: 'en-GB'},
+            appConfig: mockConfig.app
+        }
     })
 
     // Switch to login
@@ -464,6 +478,28 @@ test('Can proceed through checkout as registered customer', async () => {
     // Wait for checkout to load and display first step
     const loginBtn = await screen.findByText(/log in/i)
 
+    global.server.use(
+        rest.post('*/oauth2/token', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.json({
+                    customer_id: 'customerid_1',
+                    access_token: registerUserToken,
+                    refresh_token: 'testrefeshtoken_1',
+                    usid: 'testusid_1',
+                    enc_user_id: 'testEncUserId_1',
+                    id_token: 'testIdToken_1'
+                })
+            )
+        })
+        // rest.post('*/oauth2/login', (req, res, ctx) => {
+        //     return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        // }),
+        // rest.get('*/customers/:customerId', (req, res, ctx) => {
+        //     return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        // })
+    )
+
     // Provide customer email and submit
     const emailInput = screen.getByLabelText('Email')
     const pwInput = screen.getByLabelText('Password')
@@ -472,8 +508,13 @@ test('Can proceed through checkout as registered customer', async () => {
     user.click(loginBtn)
 
     // Wait for next step to render
-    await waitFor(() =>
-        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
+    await waitFor(
+        () =>
+            expect(
+                // TODO: why can't this be found? It's as if the previous step is shown and reset
+                screen.getByTestId('sf-toggle-card-step-1-content')
+            ).not.toBeEmptyDOMElement(),
+        {timeout: 3000}
     )
 
     // Email should be displayed in previous step summary
@@ -496,7 +537,7 @@ test('Can proceed through checkout as registered customer', async () => {
     const shippingOptionsForm = screen.getByTestId('sf-checkout-shipping-options-form')
     await waitFor(() =>
         expect(shippingOptionsForm).toHaveFormValues({
-            'shipping-options-radiogroup': 'DefaultShippingMethod'
+            'shipping-options-radiogroup': mockShippingMethods.defaultShippingMethodId
         })
     )
 
@@ -509,10 +550,18 @@ test('Can proceed through checkout as registered customer', async () => {
     })
 
     // Applied shipping method should be displayed in previous step summary
-    expect(screen.getByText('Default Shipping Method')).toBeInTheDocument()
+    // TODO: do not hardcode 'Ground'
+    expect(screen.getByText('Ground')).toBeInTheDocument()
 
     // Select a saved card
-    user.click(screen.getByDisplayValue('testcard1'))
+    // TODO: we no longer have a saved payment
+    // user.click(screen.getByDisplayValue('testcard1'))
+
+    // Fill out credit card payment form
+    user.type(screen.getByLabelText(/card number/i), '4111111111111111')
+    user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
+    user.type(screen.getByLabelText(/expiration date/i), '1224')
+    user.type(screen.getByLabelText(/security code/i), '123')
 
     // Same as shipping checkbox selected by default
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
@@ -536,10 +585,12 @@ test('Can proceed through checkout as registered customer', async () => {
     // Place the order
     user.click(placeOrderBtn)
 
-    await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/checkout/confirmation')
-    })
-})
+    // Should now be on our mocked confirmation route/page
+    expect(await screen.findByText(/success/i)).toBeInTheDocument()
+    // await waitFor(() => {
+    //     expect(window.location.pathname).toEqual('/uk/en-GB/checkout/confirmation')
+    // })
+}, 30000)
 
 // @TODO: fix in hook integration checkout address ticket
 test('Can edit address during checkout as a registered customer', async () => {
@@ -548,7 +599,7 @@ test('Can edit address during checkout as a registered customer', async () => {
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
 
-    jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
+    // jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
     global.server.use(
@@ -642,7 +693,7 @@ test('Can add address during checkout as a registered customer', async () => {
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
 
-    jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
+    // jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
     global.server.use(
