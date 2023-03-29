@@ -31,7 +31,7 @@ import ListMenu from '../list-menu'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 
 // Hooks
-import useShopper from '../../commerce-api/hooks/useShopper'
+// import useShopper from '../../commerce-api/hooks/useShopper'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 
@@ -65,22 +65,12 @@ on client side to reduce SSR page size.
 */
 const useLazyLoadCategories = () => {
     const itemsKey = 'categories'
-    const [categoriesTree, setCategoriesTree] = useState(null)
 
-    const levelZeroCategoriesQuery = useCategory(
-        {
-            parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
-        },
-        {
-            onSuccess: (data) => {
-                setCategoriesTree(data[itemsKey])
-            }
-        }
-    )
+    const levelZeroCategoriesQuery = useCategory({
+        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
+    })
 
     const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
-    console.log('ids', ids)
-    console.log('categoriesTree', categoriesTree)
     // fetch multiple useCategory using useQueries under the hood
     const queries = useCategoryBulk(
         {
@@ -91,12 +81,21 @@ const useLazyLoadCategories = () => {
         ids,
         {enabled: onClient && Boolean(ids), onSuccess: (data) => console.log('data', data)}
     )
-    console.log('levelZeroCategoriesQuery', levelZeroCategoriesQuery.data)
-    console.log('queries', queries)
     // make sure all queries is successful before returning
-    // if (onClient && queries.every((query) => query.isSuccess)) {
-    //     return queries
-    // }
+    if (onClient && queries.every((query) => query.isSuccess)) {
+        //  what is the best way to extract all the queries result into one? or should we
+        const dataArray = queries.map((queries) => queries.data)
+        const isLoading = queries.some((query) => query.isLoading)
+        const isError = queries.some((query) => query.isError)
+        return {
+            isLoading,
+            isError,
+            data: {
+                ...levelZeroCategoriesQuery.data,
+                [itemsKey]: dataArray
+            }
+        }
+    }
 
     return levelZeroCategoriesQuery
 }
@@ -127,7 +126,7 @@ const App = (props) => {
     const currency = locale.preferredCurrency || l10n.defaultCurrency
 
     // Set up customer and basket
-    useShopper({currency})
+    // useShopper({currency})
 
     useEffect(() => {
         // Listen for online status changes.

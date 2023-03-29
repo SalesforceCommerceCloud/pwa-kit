@@ -12,7 +12,7 @@ import * as queryKeyHelpers from './queryKeyHelpers'
 import {useAuthorizationHeader} from '../useAuthorizationHeader'
 
 type Client = ApiClients['shopperProducts']
-//TODO: What is the better signature for this api
+//TODO: What are the better signature for this api
 export const useCategoryBulk = (
     apiOptions: NullableParameters<Argument<Client['getCategory']>>,
     ids: string[],
@@ -51,7 +51,6 @@ export const useCategoryBulk = (
             queryKey: queryKeyHelpers[methodName].queryKey({
                 ...netOptions.parameters,
                 id,
-                // @ts-ignore
                 levels: apiOptions.parameters.levels || 1
             }),
             queryFn: wrappedMethod,
