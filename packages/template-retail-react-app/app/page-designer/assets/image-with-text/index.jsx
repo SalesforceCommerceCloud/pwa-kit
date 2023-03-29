@@ -8,7 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Image, Link as ChakraLink, Text} from '@chakra-ui/react'
 import Link from '../../../components/link'
-import {isAbsoluteURL} from '../utils'
+import {isAbsoluteURL} from '../../utils'
 
 const LinkWrapper = ({ITCLink, children}) => {
     const chakraLinkWrapper = (children) => <ChakraLink href={ITCLink}>{children}</ChakraLink>
