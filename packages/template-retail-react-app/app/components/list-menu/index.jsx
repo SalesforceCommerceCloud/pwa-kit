@@ -218,15 +218,16 @@ ListMenuPopover.propTypes = {
  * users use the keyboard Tab key to focus over the chevron icon and press Enter.
  *
  * @param maxColumns The maximum number of columns that we want to use per row inside the ListMenu.
+ * @param root
  */
 const ListMenu = ({root, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
     const itemsKey = 'categories'
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
-    const [ariaBusy, setAriaBusy] = useState('true')
+    const [ariaBusy, setAriaBusy] = useState(true)
 
     useEffect(() => {
-        setAriaBusy('false')
+        setAriaBusy(false)
     }, [])
 
     return (

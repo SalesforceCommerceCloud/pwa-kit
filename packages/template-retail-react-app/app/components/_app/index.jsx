@@ -54,7 +54,8 @@ import {
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
-import {useCategory, useCustomerType, useCategoryBulk} from 'commerce-sdk-react-preview'
+import {useCategory, useCustomerType} from 'commerce-sdk-react-preview'
+import {useCategoryBulk} from '../../hooks/use-category-bulk'
 
 const onClient = typeof window !== 'undefined'
 
@@ -72,15 +73,10 @@ const useLazyLoadCategories = () => {
 
     const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
     // fetch multiple useCategory using useQueries under the hood
-    const queries = useCategoryBulk(
-        {
-            parameters: {
-                levels: 2
-            }
-        },
-        ids,
-        {enabled: onClient && Boolean(ids), onSuccess: (data) => console.log('data', data)}
-    )
+    const queries = useCategoryBulk(ids, {
+        enabled: onClient && Boolean(ids),
+        onSuccess: (data) => console.log('data', data)
+    })
     // make sure all queries is successful before returning
     if (onClient && queries.every((query) => query.isSuccess)) {
         //  what is the best way to extract all the queries result into one? or should we
@@ -103,6 +99,7 @@ const useLazyLoadCategories = () => {
 const App = (props) => {
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
     const {data: categoriesTree} = useLazyLoadCategories()
+    console.log('categoriesTree', categoriesTree)
     const categories = flatten(categoriesTree || {}, 'categories')
 
     const appOrigin = getAppOrigin()
