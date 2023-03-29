@@ -5,16 +5,33 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ApiClients, CacheUpdateMatrix} from '../types'
+import {getShopperContext} from './queryKeyHelpers'
 
 type Client = ApiClients['shopperContexts']
 
-/** Logs a warning to console (on startup) and returns nothing (method is unimplemented). */
-const TODO = (method: keyof Client) => {
-    console.warn(`Cache logic for '${method}' is not yet implemented.`)
-    return undefined
-}
+// TODO: Complete cache invalidation https://gus.lightning.force.com/lightning/_classic/%2Fa07EE00001NoYplYAF
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
-    updateShopperContext: TODO('updateShopperContext'),
-    createShopperContext: TODO('createShopperContext'),
-    deleteShopperContext: TODO('deleteShopperContext')
+    createShopperContext(customerId, {parameters}) {
+        return {
+            invalidate: [{queryKey: getShopperContext.queryKey(parameters)}]
+        }
+    },
+    updateShopperContext(_customerId, {parameters}) {
+        return {
+            update: [
+                {
+                    queryKey: getShopperContext.queryKey(parameters)
+                }
+            ]
+        }
+    },
+    deleteShopperContext(_customerId, {parameters}) {
+        return {
+            remove: [
+                {
+                    queryKey: getShopperContext.queryKey(parameters)
+                }
+            ]
+        }
+    }
 }

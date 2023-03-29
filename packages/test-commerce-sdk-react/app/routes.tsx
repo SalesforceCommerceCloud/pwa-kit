@@ -24,6 +24,7 @@ const UseGetOrder = loadable(() => import('./pages/use-shopper-get-order'))
 const UsePaymentMethods = loadable(() => import('./pages/use-payment-methods'))
 const UseShopperOrders = loadable(() => import('./pages/use-shopper-orders'))
 const UseCustomerId = loadable(() => import('./pages/use-customer-id'))
+const UseShopperContext = loadable(() => import('./pages/use-shopper-context'))
 
 const routes = [
     {
@@ -98,6 +99,10 @@ const routes = [
     {
         path: '/customerId',
         component: UseCustomerId
+    },
+    {
+        path: '/context',
+        component: UseShopperContext
     }
 ]
 
