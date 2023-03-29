@@ -33,6 +33,7 @@ jobs:
       matrix:
         node: [14, 16, 18]
         npm: [6, 7, 8, 9]
+        # We exclude the less likely Node and NPM combinations to reduce the number of GA builds.
         exclude:
           - node: 16
             npm: 6
@@ -129,6 +130,7 @@ jobs:
       matrix:
         node: [14, 16, 18]
         npm: [6, 7, 8, 9]
+        # We exclude the less likely Node and NPM combinations to reduce the number of GA builds.
         exclude:
           - node: 16
             npm: 6
