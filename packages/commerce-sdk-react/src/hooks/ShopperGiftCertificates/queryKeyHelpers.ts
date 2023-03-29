@@ -13,6 +13,7 @@ type Client = ShopperGiftCertificates<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
     getGiftCertificate: [
+        '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
         '/gift-certificate',
@@ -36,7 +37,12 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 
 export const getGiftCertificate: QueryKeyHelper<'getGiftCertificate'> = {
     parameters: (params) => pick(params, ['organizationId', 'siteId']),
-    path: (params) => ['/organizations/', params.organizationId, '/gift-certificate'],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/gift-certificate'
+    ],
     queryKey: (params: Params<'getGiftCertificate'>) => [
         ...getGiftCertificate.path(params),
         getGiftCertificate.parameters(params)

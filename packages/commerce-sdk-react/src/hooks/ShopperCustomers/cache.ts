@@ -19,11 +19,6 @@ import {and, pathStartsWith} from '../utils'
 type Client = ApiClients['shopperCustomers']
 
 const noop = () => ({})
-/** Logs a warning to console (on startup) and returns nothing (method is unimplemented). */
-const TODO = (method: keyof Client) => {
-    console.warn(`Cache logic for '${method}' is not yet implemented.`)
-    return undefined
-}
 
 /** Invalidates the customer endpoint, but not derivative endpoints. */
 const invalidateCustomer = (parameters: Tail<QueryKeys['getCustomer']>): CacheUpdate => ({
@@ -84,7 +79,13 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             remove: [{queryKey: getCustomerPaymentInstrument.queryKey(parameters)}]
         }
     },
-    deleteCustomerProductList: TODO('deleteCustomerProductList'),
+    deleteCustomerProductList(customerId, {parameters}) {
+        return {
+            // TODO: Rather than invalidate, can we selectively update?
+            invalidate: [{queryKey: getCustomerProductLists.queryKey(parameters)}],
+            remove: [{queryKey: getCustomerProductList.path(parameters)}]
+        }
+    },
     deleteCustomerProductListItem(customerId, {parameters}) {
         return {
             // TODO: Rather than invalidate, can we selectively update?
@@ -96,7 +97,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         }
     },
     getResetPasswordToken: noop,
-    invalidateCustomerAuth: TODO('invalidateCustomerAuth'),
     // TODO: Should this update the `getCustomer` cache?
     registerCustomer: noop,
     // TODO: Implement when the endpoint exits closed beta.
@@ -133,7 +133,13 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         }
     },
     updateCustomerPassword: noop,
-    updateCustomerProductList: TODO('updateCustomerProductList'),
+    updateCustomerProductList(customerId, {parameters}) {
+        return {
+            update: [{queryKey: getCustomerProductList.queryKey(parameters)}],
+            // TODO: Rather than invalidate, can we selectively update?
+            invalidate: [{queryKey: getCustomerProductLists.queryKey(parameters)}]
+        }
+    },
     updateCustomerProductListItem(customerId, {parameters}) {
         return {
             update: [{queryKey: getCustomerProductListItem.queryKey(parameters)}],
