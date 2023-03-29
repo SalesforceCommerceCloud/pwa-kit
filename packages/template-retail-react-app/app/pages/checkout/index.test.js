@@ -72,50 +72,9 @@ const WrappedCheckout = () => {
 // Set up and clean up
 beforeEach(() => {
     global.server.use(
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            return res(
-                ctx.json({
-                    baskets: [scapiBasketWithItem]
-                })
-            )
-        }),
-
-        // mock product variant detail
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.json(productsResponse))
-        }),
-
-        // TODO: are these OCAPI calls (not SCAPI)?
-        // mock available shipping methods
-        rest.get('*/shipments/me/shipping_methods', (req, res, ctx) => {
-            return res(ctx.json(mockShippingMethods))
-        }),
-
-        // mock available payment methods
-        rest.get('*/baskets/:basketId/payment_methods', (req, res, ctx) => {
-            return res(ctx.json(mockPaymentMethods))
-        }),
-
         // mock product details
         rest.get('*/products', (req, res, ctx) => {
             return res(ctx.json({data: [{id: '701642811398M'}]}))
-        }),
-
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(
-                ctx.delay(0),
-                ctx.status(200),
-                ctx.json({
-                    authType: 'guest',
-                    preferredLocale: 'en_US',
-                    ...mockedRegisteredCustomer,
-                    // Mocked customer ID should match the mocked basket's customer ID as
-                    // it would with real usage, otherwise, the useShopper hook will detect
-                    // the mismatch and attempt to refetch a new basket for the customer.
-                    // customerId: scapiBasketWithItem.customer_info.customer_id
-                    customerId: scapiBasketWithItem.customerInfo.customerId
-                })
-            )
         })
     )
 })
