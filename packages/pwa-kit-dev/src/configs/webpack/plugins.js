@@ -16,22 +16,31 @@ const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
 
 const getOverridePath = (relativePath) => {
     const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
+    const overridePath = pkg?.mobify?.overridesDir?.replace(/^\//, '')
+    console.log('extendPath', extendPath)
     // order matters here, we perform look ups starting in the following order:
     // pkg.mobify.overridesDir => pkg.mobify.extends => current projectDir
+    console.log('relativePath', relativePath)
+    console.log('projectDir', projectDir)
     if (pkg?.mobify?.extends && pkg?.mobify?.overridesDir) {
+        const filePath = `${resolve(
+            projectDir,
+            overridePath,
+            ...relativePath
+        )}${OVERRIDES_EXTENSIONS}`
+        console.log('filePath', filePath)
+
         const overrideFile = glob.sync(
-            `${resolve(
-                projectDir,
-                pkg?.mobify?.overridesDir,
-                ...relativePath
-            )}${OVERRIDES_EXTENSIONS}`
+            filePath
         )
+        console.log('overrideFile', overrideFile)
         if (overrideFile?.length) {
             return overrideFile?.[0]
         }
         const extendFile = glob.sync(
             `${resolve(projectDir, extendPath, ...relativePath)}${OVERRIDES_EXTENSIONS}`
         )
+        console.log('extendFile', `${resolve(projectDir, extendPath, ...relativePath)}${OVERRIDES_EXTENSIONS}`)
         if (extendFile?.length) {
             return extendFile?.[0]
         }
@@ -91,6 +100,7 @@ export const sdkReplacementPlugin = (projectDir) => {
     ]
 
     const replacements = overridables?.filter?.((item) => item?.newPath)
+    console.log('replacements', replacements)
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
