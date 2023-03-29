@@ -8,10 +8,11 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import ListMenu from './index'
 import {renderWithProviders} from '../../utils/test-utils'
+import {mockCategories} from '../../mocks/mock-data'
 
 describe('ListMenu', () => {
     test('ListMenu renders without errors', async () => {
-        renderWithProviders(<ListMenu />)
+        renderWithProviders(<ListMenu root={mockCategories.root} />)
 
         const drawer = document.getElementById('chakra-toast-portal')
 

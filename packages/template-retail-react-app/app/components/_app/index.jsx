@@ -10,6 +10,14 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {useQueries} from '@tanstack/react-query'
+import {
+    useAccessToken,
+    useCategory,
+    useCommerceApi,
+    useCustomerType
+} from 'commerce-sdk-react-preview'
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
@@ -31,9 +39,9 @@ import ListMenu from '../list-menu'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 
 // Hooks
-// import useShopper from '../../commerce-api/hooks/useShopper'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
+import useMultiSite from '../../hooks/use-multi-site'
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -46,16 +54,12 @@ import {
     HOME_HREF,
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
-    // CAT_MENU_DEFAULT_NAV_CLIENT_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE
 } from '../../constants'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import useMultiSite from '../../hooks/use-multi-site'
-import {useCategory, useCustomerType} from 'commerce-sdk-react-preview'
-import {useCategoryBulk} from '../../hooks/use-category-bulk'
 
 const onClient = typeof window !== 'undefined'
 
@@ -72,13 +76,11 @@ const useLazyLoadCategories = () => {
     })
 
     const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
-    // fetch multiple useCategory using useQueries under the hood
     const queries = useCategoryBulk(ids, {
-        enabled: onClient && Boolean(ids),
-        onSuccess: (data) => console.log('data', data)
+        enabled: onClient && Boolean(ids)
     })
     // make sure all queries is successful before returning
-    if (onClient && queries.every((query) => query.isSuccess)) {
+    if (onClient && queries?.every((query) => query.isSuccess)) {
         //  what is the best way to extract all the queries result into one? or should we
         const dataArray = queries.map((queries) => queries.data)
         const isLoading = queries.some((query) => query.isLoading)
@@ -99,7 +101,6 @@ const useLazyLoadCategories = () => {
 const App = (props) => {
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
     const {data: categoriesTree} = useLazyLoadCategories()
-    console.log('categoriesTree', categoriesTree)
     const categories = flatten(categoriesTree || {}, 'categories')
 
     const appOrigin = getAppOrigin()
@@ -340,6 +341,52 @@ App.propTypes = {
     messages: PropTypes.object,
     categories: PropTypes.object,
     config: PropTypes.object
+}
+
+/**
+ * a hook that parallelly and individually fetches category based on the given ids
+ * @param ids - list of categories ids to fetch
+ * @param queryOptions -  react query options
+ * @return list of react query results
+ */
+export const useCategoryBulk = (ids, queryOptions) => {
+    if (!ids || ids.length === 0) {
+        return
+    }
+    const api = useCommerceApi()
+    const {getTokenWhenReady} = useAccessToken()
+    const {
+        app: {commerceAPI}
+    } = getConfig()
+    const {
+        parameters: {organizationId}
+    } = commerceAPI
+    const {site} = useMultiSite()
+
+    const queries = ids.map((id) => {
+        return {
+            queryKey: [
+                '/organizations/',
+                organizationId,
+                '/categories/',
+                id,
+                {id, levels: 2, organizationId, siteId: site.id}
+            ],
+            queryFn: async () => {
+                const token = await getTokenWhenReady()
+                const res = await api.shopperProducts.getCategory({
+                    parameters: {id, levels: 2},
+                    headers: {
+                        authorization: `Bearer ${token}`
+                    }
+                })
+                return res
+            },
+            ...queryOptions
+        }
+    })
+    const res = useQueries({queries})
+    return res
 }
 
 export default App

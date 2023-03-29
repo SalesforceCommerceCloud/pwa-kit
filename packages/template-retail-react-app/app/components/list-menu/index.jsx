@@ -221,7 +221,9 @@ ListMenuPopover.propTypes = {
  * @param root
  */
 const ListMenu = ({root, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
+    console.log('root', root)
     const itemsKey = 'categories'
+    console.log('root?.[itemsKey]', root?.[itemsKey])
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
     const [ariaBusy, setAriaBusy] = useState(true)
