@@ -38,16 +38,6 @@ export const setupMockServer = () => {
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         ),
-        // rest.post('*/customers/action/login', (req, res, ctx) => {
-        //     return res(
-        //         ctx.delay(0),
-        //         ctx.status(200),
-        //         ctx.json({
-        //             authType: 'guest',
-        //             customerId: 'customerid'
-        //         })
-        //     )
-        // }),
         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
         rest.post('*/oauth2/token', (req, res, ctx) =>
             res(
