@@ -6,7 +6,16 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Image, Link, Text} from '@chakra-ui/react'
+import {Box, Image, Link as ChakraLink, Text} from '@chakra-ui/react'
+import Link from '../../../components/link'
+import {isAbsoluteURL} from '../utils'
+
+const LinkWrapper = ({ITCLink, children}) => {
+    const chakraLinkWrapper = (children) => <ChakraLink href={ITCLink}>{children}</ChakraLink>
+    const linkWrapper = (children) => <Link to={ITCLink}>{children}</Link>
+
+    return isAbsoluteURL(ITCLink) ? chakraLinkWrapper(children) : linkWrapper(children)
+}
 
 /**
  * Image with text component
@@ -34,7 +43,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                 <picture>
                     <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
                     <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
-                    <Link href={ITCLink}>
+                    <LinkWrapper ITCLink={ITCLink}>
                         <Image
                             className={'image-with-text-image'}
                             data-testid={'image-with-text-image'}
@@ -44,7 +53,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                             title={alt}
                             filter={'brightness(40%)'}
                         />
-                    </Link>
+                    </LinkWrapper>
                 </picture>
                 {hasCaption && (
                     <Text as="figcaption">

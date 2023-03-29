@@ -12,10 +12,9 @@
 // we don't want it to count toward coverage until we figure out how to cover the `functions`
 // metric for this file in its test.
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import loadable from '@loadable/component'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {withRouter} from 'react-router-dom'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
