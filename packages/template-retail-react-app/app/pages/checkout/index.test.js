@@ -15,33 +15,14 @@ import {
     createPathWithDefaults,
     registerUserToken
 } from '../../utils/test-utils'
-import useShopper from '../../commerce-api/hooks/useShopper'
 import {
     scapiBasketWithItem,
     ocapiOrderResponse,
     mockShippingMethods,
-    mockPaymentMethods,
-    mockedGuestCustomer,
     mockedRegisteredCustomer,
-    mockedCustomerProductLists,
-    productsResponse
+    mockedCustomerProductLists
 } from '../../mocks/mock-data'
 import mockConfig from '../../../config/mocks/default'
-
-// jest.mock('commerce-sdk-react-preview', () => {
-//     const originalModule = jest.requireActual('commerce-sdk-react-preview')
-//     return {
-//         ...originalModule,
-//         useCustomerBaskets: jest
-//             .fn()
-//             .mockReturnValue({data: {baskets: [{shippingItems: [{}], currency: 'GBP'}]}})
-//     }
-// })
-
-// Make sure fetch is defined in test env
-// Object.defineProperty(window, 'fetch', {
-//     value: require('cross-fetch')
-// })
 
 const {keysToCamel} = jest.requireActual('../../commerce-api/utils')
 
@@ -94,8 +75,6 @@ test('Can proceed through checkout steps as guest', async () => {
     // Keep a *deep* copy of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
-
-    // jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedGuestCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
     global.server.use(
@@ -436,8 +415,6 @@ const logInDuringCheckout = async () => {
     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
-
-    // jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
     global.server.use(
