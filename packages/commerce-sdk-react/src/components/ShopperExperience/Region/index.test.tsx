@@ -46,7 +46,6 @@ test('Region renders without errors', () => {
     const component = <Region region={SAMPLE_REGION} />
 
     const {container} = render(component, {
-        // eslint-disable-next-line react/display-name
         wrapper: () => (
             <PageContext.Provider value={{components: {}}}>{component}</PageContext.Provider>
         )

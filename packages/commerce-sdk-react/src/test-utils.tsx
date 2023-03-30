@@ -72,7 +72,6 @@ export const renderWithProviders = (
     options?: Omit<RenderOptions, 'wrapper'>
 ): void => {
     render(children, {
-        // eslint-disable-next-line react/display-name
         wrapper: ({children}: {children?: React.ReactNode}) => (
             <TestProviders {...props}>{children}</TestProviders>
         ),
@@ -92,7 +91,6 @@ export function renderHookWithProviders<TProps, TResult>(
     props?: TestProviderProps
 ) {
     return renderHook(callback, {
-        // eslint-disable-next-line react/display-name
         wrapper: ({children}: {children?: React.ReactNode}) => (
             <TestProviders {...props}>{children}</TestProviders>
         )
