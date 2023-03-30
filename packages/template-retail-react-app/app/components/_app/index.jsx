@@ -47,7 +47,7 @@ import useMultiSite from '../../hooks/use-multi-site'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten} from '../../utils/utils'
+import {watchOnlineStatus, flatten, mergeArrays} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -62,14 +62,6 @@ import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
-
-const mergeArrays = (arr1, arr2) => {
-    const merged = arr1.map((item) => {
-        const match = arr2.find((item2) => item2?.id === item?.id)
-        return match ? {...item, ...match} : item
-    })
-    return merged
-} 
 
 /* 
 The categories tree can be really large! For performance reasons,
@@ -87,7 +79,7 @@ const useLazyLoadCategories = () => {
     const queries = useCategoryBulk(ids, {
         enabled: onClient && ids?.length > 0
     })
-    const dataArray = queries.map((queries) => queries.data)
+    const dataArray = queries.map((queries) => queries.data).filter(Boolean)
     const isLoading = queries.some((query) => query.isLoading)
     const isError = queries.some((query) => query.isError)
     return {

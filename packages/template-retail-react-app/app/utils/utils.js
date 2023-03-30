@@ -322,3 +322,11 @@ export const keysToCamel = (obj) => {
 
     return obj
 }
+
+export const mergeArrays = (arr1 = [], arr2 = []) => {
+    const merged = arr1.map((item) => {
+        const match = arr2.find((item2) => item2.id === item.id)
+        return match ? {...item, ...match} : item
+    })
+    return merged
+}
