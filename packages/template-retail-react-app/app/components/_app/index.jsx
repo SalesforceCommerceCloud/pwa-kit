@@ -77,11 +77,10 @@ const useLazyLoadCategories = () => {
 
     const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
     const queries = useCategoryBulk(ids, {
-        enabled: onClient && Boolean(ids)
+        enabled: onClient && ids?.length > 0
     })
     // make sure all queries is successful before returning
     if (onClient && queries?.every((query) => query.isSuccess)) {
-        //  what is the best way to extract all the queries result into one? or should we
         const dataArray = queries.map((queries) => queries.data)
         const isLoading = queries.some((query) => query.isLoading)
         const isError = queries.some((query) => query.isError)
