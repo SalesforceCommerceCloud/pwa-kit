@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const base = require('internal-lib-build/configs/jest/jest.config')
+import base from 'internal-lib-build/configs/jest/jest.config.js'
 
-module.exports = {
+export default {
     ...base,
     setupFilesAfterEnv: ['./setup-jest.js'],
     transformIgnorePatterns: [],
