@@ -839,45 +839,47 @@ export const RemoteServerFactory = {
                 lambdaContainerReused = true
                 app.sendMetric('LambdaCreated')
             }
+
+            const _serverlessExpressHandler = serverlessExpress({
+                app,
+                // handler,
+                // binarySettings: {
+                //     // isBinary: ({headers}) => true,
+                //     contentTypes: binaryMimeTypes
+                //     // contentEncodings: []
+                // },
+                resolutionMode: 'CALLBACK',
+                callback: (err, response) => {
+                    // The 'response' parameter here is NOT the same response
+                    // object handled by ExpressJS code. The serverlessExpress
+                    // middleware works by sending an http.Request to the Express
+                    // server and parsing the HTTP response that it returns.
+                    // Wait util all pending metrics have been sent, and any pending
+                    // response caching to complete. We have to do this now, before
+                    // sending the response; there's no way to do it afterwards
+                    // because the Lambda container is frozen inside the callback.
+
+                    // We return this Promise, but the serverlessExpress object
+                    // doesn't make any use of it.
+                    return (
+                        app._requestMonitor
+                            ._waitForResponses()
+                            .then(() => app.metrics.flush())
+                            // Now call the Lambda callback to complete the response
+                            .then(() => callback(err, processLambdaResponse(response)))
+                        // DON'T add any then() handlers here, after the callback.
+                        // They won't be called after the response is sent, but they
+                        // *might* be called if the Lambda container running this code
+                        // is reused, which can lead to odd and unpredictable
+                        // behaviour.
+                    )
+                }
+            })
+
+            app.use(_serverlessExpressHandler)
         }
 
-        const server = serverlessExpress({
-            app,
-            // handler,
-            // binarySettings: {
-            //     // isBinary: ({headers}) => true,
-            //     contentTypes: binaryMimeTypes
-            //     // contentEncodings: []
-            // },
-            resolutionMode: 'CALLBACK',
-            callback: (err, response) => {
-                // The 'response' parameter here is NOT the same response
-                // object handled by ExpressJS code. The serverlessExpress
-                // middleware works by sending an http.Request to the Express
-                // server and parsing the HTTP response that it returns.
-                // Wait util all pending metrics have been sent, and any pending
-                // response caching to complete. We have to do this now, before
-                // sending the response; there's no way to do it afterwards
-                // because the Lambda container is frozen inside the callback.
-
-                // We return this Promise, but the serverlessExpress object
-                // doesn't make any use of it.
-                return (
-                    app._requestMonitor
-                        ._waitForResponses()
-                        .then(() => app.metrics.flush())
-                        // Now call the Lambda callback to complete the response
-                        .then(() => callback(err, processLambdaResponse(response)))
-                    // DON'T add any then() handlers here, after the callback.
-                    // They won't be called after the response is sent, but they
-                    // *might* be called if the Lambda container running this code
-                    // is reused, which can lead to odd and unpredictable
-                    // behaviour.
-                )
-            }
-        })
-
-        return {handler, server, app}
+        return {handler, app}
     },
 
     /**
@@ -909,7 +911,7 @@ export const RemoteServerFactory = {
         process.on('unhandledRejection', catchAndLog)
         const app = this._createApp(options)
         customizeApp(app)
-        return this._createHandler(app)
+        this._createHandler(app)
     },
 
     /**

@@ -202,7 +202,7 @@ const options = {
 
 const runtime = getRuntime()
 
-const {handler, app, server} = runtime.createHandler(options, (app) => {
+const {handler, app} = runtime.createHandler(options, (app) => {
     app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
 
     // Add middleware to explicitly suppress caching on all responses (done
@@ -241,6 +241,4 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
 exports.get = handler
-exports.server = server
-
 exports.app = app
