@@ -22,17 +22,21 @@ module.exports = {
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
         'plugin:react/recommended',
-        'plugin:react-hooks/recommended',
         'plugin:jsx-a11y/recommended',
         'plugin:prettier/recommended'
     ],
-    plugins: ['jsx-a11y', 'prettier', 'react', 'react-hooks'],
+    plugins: ['jsx-a11y', 'prettier', 'react', 'react-hooks', 'use-effect-no-deps'],
     settings: {
         react: {
             version: 'detect'
         }
     },
     reportUnusedDisableDirectives: true,
+    rules: {
+        'react-hooks/rules-of-hooks': 'error',
+        // react-hooks/exhaustive-deps has too many false positives; use-effect-no-deps is nicer
+        'use-effect-no-deps/use-effect-no-deps': 'warn'
+    },
     overrides: [
         {
             files: ['**/*.{spec,test}.{js,jsx,ts,tsx}'],
