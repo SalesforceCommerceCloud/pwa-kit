@@ -114,14 +114,12 @@ export type ApiMethod<Options extends ApiOptions, Data> = {
 /**
  * The first argument of a function.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Argument<T extends (arg: any) => unknown> = NonNullable<Parameters<T>[0]>
 
 /**
  * The data type returned by a commerce-sdk-isomorphic method when the raw response
  * flag is not set.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type DataType<T> = T extends ApiMethod<any, Response | infer R> ? R : never
 
 /**
@@ -144,7 +142,6 @@ export type ApiQueryKey<Params extends Record<string, unknown> = Record<string, 
     readonly [...path: (string | undefined)[], parameters: Params]
 
 /** Query options for endpoint hooks. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ApiQueryOptions<Method extends ApiMethod<any, unknown>> = Prettify<
     Omit<
         UseQueryOptions<DataType<Method>, unknown, DataType<Method>, ApiQueryKey>,
@@ -200,7 +197,6 @@ export type CacheUpdateGetter<Options, Data> = (
 export type CacheUpdateMatrix<Client extends ApiClient> = {
     // It feels like we should be able to do <infer Arg, infer Data>, but that
     // results in some methods being `never`, so we just use Argument<> later
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [Method in keyof Client]?: Client[Method] extends ApiMethod<any, Response | infer Data>
         ? CacheUpdateGetter<MergedOptions<Client, Argument<Client[Method]>>, Data>
         : never
