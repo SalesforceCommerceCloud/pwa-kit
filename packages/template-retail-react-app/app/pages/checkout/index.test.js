@@ -35,6 +35,10 @@ const scapiOrderResponse = {
     }
 }
 
+const defaultShippingMethod = mockShippingMethods.applicableShippingMethods.find(
+    (method) => method.id === mockShippingMethods.defaultShippingMethodId
+)
+
 // This is our wrapped component for testing. It handles initialization of the customer
 // and basket the same way it would be when rendered in the real app. We also set up
 // fake routes to simulate moving from checkout to confirmation page.
@@ -130,8 +134,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
         // mock add shipping method
         rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
-            currentBasket.shipments[0].shippingMethod =
-                mockShippingMethods.applicableShippingMethods[0]
+            currentBasket.shipments[0].shippingMethod = defaultShippingMethod
             return res(ctx.json(currentBasket))
         }),
 
@@ -246,8 +249,7 @@ test('Can proceed through checkout steps as guest', async () => {
     })
 
     // Applied shipping method should be displayed in previous step summary
-    // TODO: do not hardcode 'Ground'
-    expect(screen.getByText('Ground')).toBeInTheDocument()
+    expect(screen.getByText(defaultShippingMethod.name)).toBeInTheDocument()
 
     // Fill out credit card payment form
     user.type(screen.getByLabelText(/card number/i), '4111111111111111')
@@ -324,8 +326,7 @@ test('Can proceed through checkout as registered customer', async () => {
     })
 
     // Applied shipping method should be displayed in previous step summary
-    // TODO: do not hardcode 'Ground'
-    expect(screen.getByText('Ground')).toBeInTheDocument()
+    expect(screen.getByText(defaultShippingMethod.name)).toBeInTheDocument()
 
     // Fill out credit card payment form
     // (we no longer have saved payment methods)
@@ -477,8 +478,7 @@ const logInDuringCheckout = async () => {
 
         // mock add shipping method
         rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
-            currentBasket.shipments[0].shippingMethod =
-                mockShippingMethods.applicableShippingMethods[0]
+            currentBasket.shipments[0].shippingMethod = defaultShippingMethod
             return res(ctx.json(currentBasket))
         }),
 
@@ -538,7 +538,6 @@ const logInDuringCheckout = async () => {
     renderWithProviders(<WrappedCheckout history={history} />, {
         wrapperProps: {
             // Not bypassing auth as usual, so we can test the guest-to-registered flow
-            // TODO: remember why this was hard to discover -> share with the team
             bypassAuth: false,
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
