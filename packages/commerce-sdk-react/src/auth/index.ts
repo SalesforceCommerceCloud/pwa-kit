@@ -421,7 +421,7 @@ class Auth {
      *
      */
     parseSlasJWT(jwt: string) {
-        const payload = jwtDecode(jwt) as SlasJwtPayload
+        const payload: SlasJwtPayload = jwtDecode(jwt)
         const {sub, isb} = payload
         // ISB format
         // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',

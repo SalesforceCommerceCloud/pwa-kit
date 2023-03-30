@@ -127,9 +127,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchedToken
     ])
 
-    useEffect(() => {
-        auth.ready()
-    }, [auth])
+    useEffect(() => void auth.ready(), [auth])
 
     return (
         <ConfigContext.Provider

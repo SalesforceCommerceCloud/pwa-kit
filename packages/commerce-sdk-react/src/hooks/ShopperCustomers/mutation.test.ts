@@ -94,7 +94,7 @@ const notImplTestCases: ShopperCustomersMutation[][] = [
 
 describe('ShopperCustomers mutations', () => {
     beforeEach(() => nock.cleanAll())
-    test.each(notImplTestCases)('`%s` is not yet implemented', async (mutationName) => {
+    test.each(notImplTestCases)('`%s` is not yet implemented', (mutationName) => {
         expect(() => useShopperCustomersMutation(mutationName)).toThrow(NotImplementedError)
     })
     describe('modify a customer', () => {
@@ -126,7 +126,7 @@ describe('ShopperCustomers mutations', () => {
             assertInvalidateQuery(result.current.customer, customer)
 
             // 3. Re-render to validate the created resource was added to cache
-            await rerender({enabled: true})
+            rerender({enabled: true})
             await waitForValueToChange(() => result.current.query)
             assertUpdateQuery(result.current.query, data)
         })
@@ -168,7 +168,7 @@ describe('ShopperCustomers mutations', () => {
             assertInvalidateQuery(result.current.customer, customer)
 
             // 3. Re-render to validate the created resource was added to cache
-            await rerender({enabled: true})
+            rerender({enabled: true})
             await waitForValueToChange(() => result.current.query)
             assertUpdateQuery(result.current.query, data)
         })
@@ -321,7 +321,7 @@ describe('ShopperCustomers mutations', () => {
             assertInvalidateQuery(result.current.lists, listResult)
 
             // 3. Re-render to validate the created resource was added to cache
-            await rerender({enabled: true})
+            rerender({enabled: true})
             await waitForValueToChange(() => result.current.query)
             assertUpdateQuery(result.current.query, data)
         })
@@ -359,7 +359,7 @@ describe('ShopperCustomers mutations', () => {
             assertInvalidateQuery(result.current.lists, listResult)
 
             // 3. Re-render to validate the created resource was added to cache
-            await rerender({enabled: true})
+            rerender({enabled: true})
             await waitForValueToChange(() => result.current.query)
             assertUpdateQuery(result.current.query, data)
         })

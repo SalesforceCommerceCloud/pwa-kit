@@ -31,9 +31,14 @@ type useCustomerType = {
 const useCustomerType = (): useCustomerType => {
     let customerType = null
     if (onClient) {
+        // `onClient` is a constant, so the hooks will always have the same execution order,
+        // despite technically being inside a conditional.
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         const {siteId} = useConfig()
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         customerType = useLocalStorage(`${siteId}_customer_type`)
     } else {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         const auth = useAuthContext()
         customerType = auth.get('customer_type')
     }

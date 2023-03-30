@@ -144,7 +144,7 @@ describe('Auth', () => {
         // @ts-expect-error private method
         expect(() => auth.isTokenExpired()).toThrow()
     })
-    test('ready - re-use pendingToken', () => {
+    test('ready - re-use pendingToken', async () => {
         const auth = new Auth(config)
         const data = {
             refresh_token: 'refresh_token_guest',
@@ -161,9 +161,9 @@ describe('Auth', () => {
         // @ts-expect-error private method
         auth.pendingToken = Promise.resolve(data)
 
-        expect(auth.ready()).resolves.toEqual(data)
+        await expect(auth.ready()).resolves.toEqual(data)
     })
-    test('ready - re-use valid access token', () => {
+    test('ready - re-use valid access token', async () => {
         const auth = new Auth(config)
 
         const data: StoredAuthData = {
@@ -187,7 +187,7 @@ describe('Auth', () => {
             auth.set(key, data[key])
         })
 
-        expect(auth.ready()).resolves.toEqual(result)
+        await expect(auth.ready()).resolves.toEqual(result)
     })
     test('ready - use `fetchedToken` and short circuit network request', async () => {
         const fetchedToken = jwt.sign(
@@ -200,6 +200,8 @@ describe('Auth', () => {
         const auth = new Auth({...config, fetchedToken})
         jest.spyOn(auth, 'queueRequest')
         await auth.ready()
+        // The "unbound method" isn't being called, so the rule isn't applicable
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(auth.queueRequest).not.toHaveBeenCalled()
     })
     test('ready - use `fetchedToken` and auth data is populated for registered user', async () => {
@@ -285,7 +287,7 @@ describe('Auth', () => {
         await auth.logout()
         expect(helpers.loginGuestUser).toBeCalled()
     })
-    test('running on the server uses a shared context memory store', async () => {
+    test('running on the server uses a shared context memory store', () => {
         const refreshTokenGuest = 'guest'
 
         // Mock running on the server so shared context storage is used.
