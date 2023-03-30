@@ -111,11 +111,11 @@ const OrderSummary = ({
     isEstimate = false,
     fontSize = 'md'
 }) => {
+    const {removePromoCode, ...promoCodeProps} = usePromoCode()
+
     if (!basket?.basketId && !basket?.orderNo) {
         return null
     }
-
-    const {removePromoCode, ...promoCodeProps} = usePromoCode()
     const shippingItem = basket.shippingItems?.[0]
     const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
