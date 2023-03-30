@@ -96,7 +96,6 @@ export const sdkReplacementPlugin = (projectDir) => {
     ]
 
     const replacements = overridables?.filter?.((item) => item?.newPath)
-    console.log('replacements', replacements)
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
@@ -117,6 +116,9 @@ export const sdkReplacementPlugin = (projectDir) => {
 export const caretOverrideReplacementPlugin = (projectDir) => {
     return new webpack.NormalModuleReplacementPlugin(/\^/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
+        console.log('resolvedCARET', resolved)
+        console.log('resource.context', resource.context)
+        console.log('resource.request', resource.request)
         // NOTE: the way the Template Extensibility feature works, the order in which
         // we check for file rewrites / aliases is important
 
@@ -145,7 +147,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             [pathArr[pathArr?.length - 2], pathArr[pathArr?.length - 1]]?.join('/')
         ]
     })
-    const _overrides = [...overrides]
+
     const _overridesHashMap = new Map()
     overridesFsRead.forEach((item) => {
         const end = item.substr(item.lastIndexOf('/index'))
