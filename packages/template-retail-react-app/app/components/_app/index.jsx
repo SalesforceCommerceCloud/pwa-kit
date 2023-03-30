@@ -74,12 +74,13 @@ const useLazyLoadCategories = () => {
     const levelZeroCategoriesQuery = useCategory({
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
+    console.log('levelZeroCategoriesQuery', levelZeroCategoriesQuery)
 
     const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
     const queries = useCategoryBulk(ids, {
         enabled: onClient && ids?.length > 0
     })
-    const dataArray = queries.map((queries) => queries.data).filter(Boolean)
+    const dataArray = queries.map((query) => query.data).filter(Boolean)
     const isLoading = queries.some((query) => query.isLoading)
     const isError = queries.some((query) => query.isError)
     return {
