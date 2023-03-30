@@ -13,7 +13,7 @@ const RadioCardGroupContext = React.createContext()
 
 export const RadioCard = (props) => {
     const getRadioProps = React.useContext(RadioCardGroupContext)
-    const {getInputProps, getCheckboxProps} = useRadio(getRadioProps(props))
+    const {state, getInputProps, getCheckboxProps} = useRadio(getRadioProps(props))
 
     const input = getInputProps()
     const checkbox = getCheckboxProps()
@@ -38,7 +38,7 @@ export const RadioCard = (props) => {
                 px={4}
                 py={4}
             >
-                {input.checked && (
+                {state.isChecked && (
                     <Box
                         position="absolute"
                         top={0}

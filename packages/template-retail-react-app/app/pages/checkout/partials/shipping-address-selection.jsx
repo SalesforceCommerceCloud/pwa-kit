@@ -107,6 +107,7 @@ const ShippingAddressSelection = ({
     const {formatMessage} = useIntl()
     const {data: customer} = useCurrentCustomer()
 
+    // TODO: it's possible that the customer addresses have not loaded yet
     const hasSavedAddresses = customer.addresses && customer.addresses.length > 0
     const [isEditingAddress, setIsEditingAddress] = useState(!hasSavedAddresses)
     const [selectedAddressId, setSelectedAddressId] = useState(false)
@@ -225,7 +226,7 @@ const ShippingAddressSelection = ({
                 {hasSavedAddresses && (
                     <Controller
                         name="addressId"
-                        defaultValue=""
+                        defaultValue={customer.addresses?.[0]?.addressId || ''}
                         control={form.control}
                         rules={{required: !isEditingAddress}}
                         render={({value}) => (
@@ -320,6 +321,7 @@ const ShippingAddressSelection = ({
                     />
                 )}
 
+                {/* TODO */}
                 {isEditingAddress && !selectedAddressId && (
                     <ShippingAddressEditForm
                         title={formatMessage({
