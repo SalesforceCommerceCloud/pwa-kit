@@ -14,7 +14,6 @@ import {useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {useCheckout} from '../util/checkout-context'
 import {getPaymentInstrumentCardType, getCreditCardIcon} from '../../../utils/cc-utils'
-import {isMatchingAddress} from '../../../utils/utils'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import PaymentForm from './payment-form'
 import ShippingAddressSelection from './shipping-address-selection'
@@ -28,9 +27,7 @@ const Payment = () => {
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
-    const [billingSameAsShipping, setBillingSameAsShipping] = useState(
-        isMatchingAddress(selectedBillingAddress, selectedShippingAddress)
-    )
+    const [billingSameAsShipping, setBillingSameAsShipping] = useState(true) // By default, have billing addr to be the same as shipping
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
