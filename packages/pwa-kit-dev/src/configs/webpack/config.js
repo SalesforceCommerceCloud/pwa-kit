@@ -161,8 +161,8 @@ const baseConfig = (target) => {
                 resolve: {
                     plugins: [
                         pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                        ? new OverridesResolverPlugin(projectDir)
-                        : () => null,
+                            ? new OverridesResolverPlugin(projectDir)
+                            : () => null
                     ],
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {

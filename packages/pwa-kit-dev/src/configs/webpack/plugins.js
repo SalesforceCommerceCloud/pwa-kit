@@ -27,9 +27,7 @@ const getOverridePath = (relativePath) => {
             ...relativePath
         )}${OVERRIDES_EXTENSIONS}`
 
-        const overrideFile = glob.sync(
-            filePath
-        )
+        const overrideFile = glob.sync(filePath)
 
         if (overrideFile?.length) {
             return overrideFile?.[0]
@@ -157,6 +155,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             [end, rest]
         )
     })
+    console.log('_overridesHashMap', _overridesHashMap)
 
     const overridesMap = [
         ...overrides.flatMap((item) => {

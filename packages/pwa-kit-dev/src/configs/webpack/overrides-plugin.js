@@ -15,19 +15,16 @@ class OverridesResolverPlugin {
         )}/**/*${OVERRIDES_EXTENSIONS}`
         const overridesFsRead = glob.sync(globPattern)
         
-        const overridesHashMap = new Map()
+        this.overridesHashMap = new Map()
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
-            // console.log('end', end)
             const [l, ...rest] = item?.split(/(index|\.)/)
-            // console.log('l', l)
-            // console.log('rest', rest)
-            overridesHashMap.set(
+            this.overridesHashMap.set(
                 l.replace(/\/$/, '')?.replace(pkg?.mobify?.overridesDir?.replace(/\//, ''), ''),
                 [end, rest]
             )
         })
-        console.log('overridesHashMap', overridesHashMap)
+        console.log('overridesHashMap', this.overridesHashMap)
 
 
     }
@@ -42,22 +39,32 @@ class OverridesResolverPlugin {
                 const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
                 const newPath = path.resolve(this.projectDir, 'node_modules', relativePath)
                 
-                requestContext.request = newPath
-
-                return
+                const target = resolver.ensureHook('resolved')
+                requestContext.path = newPath
+                resolver.doResolve(
+                    target, requestContext, 'extending from template', resolveContext, callback)
 
             } else if (requestContext.request.startsWith('.')) {
                 //something in here to deal with RELATIVE IMPORTS
                 //everything that does NOT come from node modules starts with a .
                 //request with a . is not an external dependency
+                const resolved = path.resolve(requestContext.path, requestContext.request)
+                const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
+
+                if (this.overridesHashMap.has(relativePath)) {
+                    const target = resolver.ensureHoo('resolved')
+                    resolver.doResolve(
+                        target, requestContext, 'relative import override', resolveContext, callback
+                    )
+                }
+            } else {
+                callback()
             }
 
             //TODO: overwrite just 1 file to get it to load
             // get these files to resolve and route correctly
             //findfile ==== our glob sync algorithm (_overridesmap)
 
-
-            callback()
         })
     }
 }
