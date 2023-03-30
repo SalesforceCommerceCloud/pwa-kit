@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
@@ -15,18 +15,11 @@ import {Route, Switch} from 'react-router-dom'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 jest.setTimeout(60000)
 let mockProductListSearchResponse = mockProductSearch
 
-const MockedComponent = ({isLoading, isLoggedIn = false}) => {
-    const customer = useCustomer()
-    useEffect(() => {
-        if (isLoggedIn) {
-            customer.login('test@test.com', 'password')
-        }
-    }, [])
+const MockedComponent = ({isLoading}) => {
     return (
         <Switch>
             <Route
@@ -36,7 +29,6 @@ const MockedComponent = ({isLoading, isLoggedIn = false}) => {
                 ]}
                 render={(props) => (
                     <div>
-                        <div>{customer.customerId}</div>
                         <ProductList {...props} isLoading={isLoading} />
                     </div>
                 )}
@@ -46,8 +38,7 @@ const MockedComponent = ({isLoading, isLoggedIn = false}) => {
 }
 
 MockedComponent.propTypes = {
-    isLoading: PropTypes.bool,
-    isLoggedIn: PropTypes.bool
+    isLoading: PropTypes.bool
 }
 
 const MockedEmptyPage = () => {
@@ -111,16 +102,16 @@ test('should display Selected refinements as there are some in the response', as
     expect(countOfRefinements.length).toEqual(2)
 })
 
-// test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
-//     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
-//     renderWithProviders(<MockedComponent />)
-//     expect(await screen.findAllByText('Black'))
-//     const wishlistButton = await screen.getAllByLabelText('Wishlist')
-//     expect(wishlistButton.length).toBe(25)
-//     user.click(wishlistButton[0])
-//     expect(await screen.findByText(/Email/)).toBeInTheDocument()
-//     expect(await screen.findByText(/Password/)).toBeInTheDocument()
-// })
+test.skip('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    renderWithProviders(<MockedComponent />)
+    expect(await screen.findAllByText('Black'))
+    const wishlistButton = await screen.getAllByLabelText('Wishlist')
+    expect(wishlistButton.length).toBe(25)
+    user.click(wishlistButton[0])
+    expect(await screen.findByText(/Email/)).toBeInTheDocument()
+    expect(await screen.findByText(/Password/)).toBeInTheDocument()
+})
 
 test('clicking a filter will change url', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')

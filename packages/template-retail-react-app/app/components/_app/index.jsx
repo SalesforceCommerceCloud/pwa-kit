@@ -18,7 +18,7 @@ import {
     useCommerceApi,
     useCustomerType
 } from 'commerce-sdk-react-preview'
-
+import * as queryKeyHelpers from 'commerce-sdk-react-preview/hooks/ShopperProducts/queryKeyHelpers'
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
@@ -122,9 +122,6 @@ const App = (props) => {
     const {l10n} = site
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
-
-    // Set up customer and basket
-    // useShopper({currency})
 
     useEffect(() => {
         // Listen for online status changes.
@@ -349,10 +346,7 @@ App.propTypes = {
  * @param queryOptions -  react query options
  * @return list of react query results
  */
-export const useCategoryBulk = (ids, queryOptions) => {
-    if (!ids || ids.length === 0) {
-        return
-    }
+export const useCategoryBulk = (ids = [], queryOptions) => {
     const api = useCommerceApi()
     const {getTokenWhenReady} = useAccessToken()
     const {
@@ -365,13 +359,12 @@ export const useCategoryBulk = (ids, queryOptions) => {
 
     const queries = ids.map((id) => {
         return {
-            queryKey: [
-                '/organizations/',
-                organizationId,
-                '/categories/',
+            queryKey: queryKeyHelpers.getCategory.queryKey({
                 id,
-                {id, levels: 2, organizationId, siteId: site.id}
-            ],
+                levels: 2,
+                organizationId,
+                siteId: site.id
+            }),
             queryFn: async () => {
                 const token = await getTokenWhenReady()
                 const res = await api.shopperProducts.getCategory({
@@ -382,6 +375,7 @@ export const useCategoryBulk = (ids, queryOptions) => {
                 })
                 return res
             },
+            enabled: queryOptions.enabled && !!id,
             ...queryOptions
         }
     })
