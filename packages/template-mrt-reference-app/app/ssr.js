@@ -167,14 +167,17 @@ const tlsVersionTest = async (_, res) => {
  * Logging middleware; logs request and response headers (and response status).
  */
 const loggingMiddleware = (req, res, next) => {
+    console.log('==== 170 loggingMiddleware')
     // Log request headers
     console.log(`Request: ${req.method} ${req.originalUrl}`)
     console.log(`Request headers: ${JSON.stringify(req.headers, null, 2)}`)
     // Arrange to log response status and headers
     res.on('finish', () => {
+        console.log('==== 176 loggingMiddleware on finish')
         const statusCode = res._header ? String(res.statusCode) : String(-1)
         console.log(`Response status: ${statusCode}`)
         if (res.headersSent) {
+            console.log('==== 180 loggingMiddleware headersSent')
             const headers = JSON.stringify(res.getHeaders(), null, 2)
             console.log(`Response headers: ${headers}`)
         }

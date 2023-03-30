@@ -279,20 +279,28 @@ export const RemoteServerFactory = {
         // this._addEventContext(app)
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
+        console.log('=== 282')
         this._addSDKInternalHandlers(app)
+        console.log('=== 284')
         this._setupSSRRequestProcessorMiddleware(app)
-
+        console.log('=== 286')
         this._setupLogging(app)
+        console.log('=== 288')
         this._setupMetricsFlushing(app)
+        console.log('=== 290')
         this._setupHealthcheck(app)
+        console.log('=== 292')
         this._setupProxying(app, options)
 
         // Beyond this point, we know that this is not a proxy request
         // and not a bundle request, so we can apply specific
         // processing.
+        console.log('=== 299')
         this._setupCommonMiddleware(app, options)
 
+        console.log('=== 302')
         this._addStaticAssetServing(app)
+        console.log('=== 304')
         this._addDevServerGarbageCollection(app)
         return app
     },
@@ -401,7 +409,8 @@ export const RemoteServerFactory = {
             // with Lambda log entries. Generally we avoid logging
             // because it increases the volume of log data, but this
             // is important for log analysis.
-            const cloudfrontId = req.headers['x-amz-cf-id']
+            const {event} = getCurrentInvoke()
+            const cloudfrontId = event['X-Amz-Cf-Id']
             if (cloudfrontId) {
                 // Log the Express app request id plus the cloudfront
                 // x-edge-request-id value. The resulting line in the logs
@@ -411,29 +420,42 @@ export const RemoteServerFactory = {
             }
 
             // Apply the request processor
+            console.log(
+                `======= 423 processIncomingRequest,  res.locals.requestId`,
+                res.locals.requestId
+            )
             const requestProcessor = that._getRequestProcessor(req)
+            console.log(`======= 428 processIncomingRequest,  requestProcessor`, requestProcessor)
             const parsed = URL.parse(req.url)
+            console.log(`======= 430 processIncomingRequest,  parsed`, parsed)
             const originalQuerystring = parsed.query
+            console.log(
+                `======= 432 processIncomingRequest,  originalQuerystring`,
+                originalQuerystring
+            )
             let updatedQuerystring = originalQuerystring
             let updatedPath = req.path
-
+            console.log(`======= 435 processIncomingRequest,  updatedPath`, updatedPath)
             // If there's an x-querystring header, use that as the definitive
             // querystring. This header is used in production, not in local dev,
             // but we always handle it here to allow for testing.
             const xQueryString = req.headers[X_MOBIFY_QUERYSTRING]
+            console.log(`======= 440 processIncomingRequest,  xQueryString`, xQueryString)
             if (xQueryString) {
+                console.log(`======= 445 processIncomingRequest,  swap queryString`, xQueryString)
                 updatedQuerystring = xQueryString
                 // Hide the header from any other code
                 delete req.headers[X_MOBIFY_QUERYSTRING]
             }
 
             if (requestProcessor) {
+                console.log(`======= 452 processIncomingRequest,  if requestProcessor`)
                 // Allow the processor to handle this request. Because this code
                 // runs only in the local development server, we intentionally do
                 // not swallow errors - we want them to happen and show up on the
                 // console because that's how developers can test the processor.
                 const headers = new Headers(req.headers, 'http')
-
+                console.log(`======= 458 processIncomingRequest,  headers`)
                 const processed = requestProcessor.processRequest({
                     headers,
                     path: req.path,
@@ -450,7 +472,7 @@ export const RemoteServerFactory = {
                         proxyConfigs
                     }
                 })
-
+                console.log(`======= 475 processIncomingRequest,  processed`, processed)
                 // Aid debugging by checking the return value
                 assert(
                     processed && 'path' in processed && 'querystring' in processed,
@@ -464,19 +486,24 @@ export const RemoteServerFactory = {
                 updatedPath = processed.path
 
                 if (headers.modified) {
+                    console.log(`======= 489 headers.modified`, headers.modified)
                     req.headers = headers.toObject()
+                    console.log(`======= 491 new req.headers`, req.headers)
                 }
             }
 
             // Update the request.
             if (updatedQuerystring !== originalQuerystring) {
+                console.log(`======= 497 updatedQuerystring`, updatedQuerystring)
                 // Update the string in the parsed URL
                 parsed.search = updatedQuerystring ? `?${updatedQuerystring}` : ''
-
+                console.log(`======= 500 parsed.search`, parsed.search)
                 // Let Express re-parse the parameters
                 if (updatedQuerystring) {
+                    console.log(`======= 503 updatedQuerystring`, updatedQuerystring)
                     const queryStringParser = req.app.set('query parser fn')
                     req.query = queryStringParser(updatedQuerystring)
+                    console.log(`======= 506 req.query`, req.query)
                 } else {
                     req.query = {}
                 }
@@ -486,12 +513,14 @@ export const RemoteServerFactory = {
 
             // This will update the request's URL with the new path
             // and querystring.
+            console.log(`======= 516 about to parse`)
             req.url = URL.format(parsed)
-
+            console.log(`======= 518 req.url parsed`, req.url)
             // Get the request class and store it for general use. We
             // must do this AFTER the request-processor, because that's
             // what may set the request class.
             res.locals.requestClass = req.headers[X_MOBIFY_REQUEST_CLASS]
+            console.log(`======= 523 res.locals.requestClass`, res.locals.requestClass)
         }
 
         const ssrRequestProcessorMiddleware = (req, res, next) => {
@@ -802,6 +831,7 @@ export const RemoteServerFactory = {
         // This flag is initially false, and is set true on the first request
         // handled by a Lambda. If it is true on entry to the handler function,
         // it indicates that the Lambda container has been reused.
+        console.log('=== 814 _createHandler')
         let lambdaContainerReused = false
 
         // const server = serverlessExpress.createServer(app, null, binaryMimeTypes)
@@ -816,6 +846,7 @@ export const RemoteServerFactory = {
             // },
             resolutionMode: 'CALLBACK',
             callback: (err, response) => {
+                console.log('=== 829 _serverlessExpressHandler callback')
                 // The 'response' parameter here is NOT the same response
                 // object handled by ExpressJS code. The serverlessExpress
                 // middleware works by sending an http.Request to the Express
@@ -833,6 +864,9 @@ export const RemoteServerFactory = {
                         .then(() => app.metrics.flush())
                         // Now call the Lambda callback to complete the response
                         .then(() => callback(err, processLambdaResponse(response)))
+                        // TODO: this is debug code, we might need it, to handle
+                        // uncaught exceptions, but maybe not
+                        .catch((err) => console.log('=== 869 err', err))
                     // DON'T add any then() handlers here, after the callback.
                     // They won't be called after the response is sent, but they
                     // *might* be called if the Lambda container running this code
@@ -860,23 +894,26 @@ export const RemoteServerFactory = {
             // will wait for the Lambda invocation to complete before sending
             // the response to the browser.
             context.callbackWaitsForEmptyEventLoop = false
-
             if (lambdaContainerReused) {
+                console.log('=== 875 lambdaContainerReused')
                 // DESKTOP-434 If this Lambda container is being reused,
                 // clean up memory now, so that we start with low usage.
                 // These regular GC calls take about 80-100 mS each, as opposed
                 // to forced GC calls, which occur randomly and can take several
                 // hundred mS.
                 app._collectGarbage()
+                console.log('=== 882')
                 app.sendMetric('LambdaReused')
             } else {
                 // This is the first use of this container, so set the
                 // reused flag for next time.
                 lambdaContainerReused = true
                 app.sendMetric('LambdaCreated')
+                console.log('=== 889')
             }
 
             _serverlessExpressHandler(event, context, callback)
+            console.log('=== 893 _serverlessExpressHandler called')
         }
 
         return {handler, app}
@@ -911,7 +948,7 @@ export const RemoteServerFactory = {
         process.on('unhandledRejection', catchAndLog)
         const app = this._createApp(options)
         customizeApp(app)
-        this._createHandler(app)
+        return this._createHandler(app)
     },
 
     /**
@@ -968,6 +1005,7 @@ const prepNonProxyRequest = (req, res, next) => {
             )
         }
     }
+    console.log(`===== 1008 `)
     next()
 }
 
@@ -977,6 +1015,7 @@ const prepNonProxyRequest = (req, res, next) => {
  * @private
  */
 const ssrMiddleware = (req, res, next) => {
+    console.log(`====== 1018 ssrMiddleware`)
     setDefaultHeaders(req, res)
     const renderStartTime = Date.now()
 
@@ -984,9 +1023,11 @@ const ssrMiddleware = (req, res, next) => {
         const elapsedRenderTime = Date.now() - renderStartTime
         req.app.sendMetric('RenderTime', elapsedRenderTime, 'Milliseconds')
     }
-
+    console.log(`====== 10126 ssrMiddleware`)
     res.on('finish', done)
+    console.log(`====== 1028 ssrMiddleware`)
     res.on('close', done)
+    console.log(`====== 1030 ssrMiddleware`)
     next()
 }
 
@@ -1114,15 +1155,19 @@ class RequestMonitor {
      * @returns {Promise}
      */
     _waitForResponses() {
+        console.log(`====== 1158 _waitForResponses`)
         const pending = this._pendingResponses
         if (pending.ids.length === 0) {
             return RESOLVED_PROMISE
         }
         if (!pending.promise) {
+            console.log(`====== 1164 _waitForResponses`)
             pending.promise = new Promise((resolve) => {
+                console.log(`====== 1166 promise _waitForResponses`)
                 pending.resolve = resolve
             })
         }
+        console.log(`====== 1170 _waitForResponses`)
         return pending.promise
     }
 
@@ -1133,13 +1178,17 @@ class RequestMonitor {
      * @private
      */
     _responseStarted(res) {
+        console.log(`====== 1181 _responseStarted`)
         this._pendingResponses.ids.push(res.locals.requestId)
+        console.log(`====== 1183 _responseStarted`)
         const finish = () => this._responseFinished(res)
         // We hook both the 'finished' and 'close' events, so that
         // we properly complete any responses that fail (in which case
         // 'close' will fire, but 'finish' may not).
         res.once('finish', finish)
+        console.log(`====== 1189 _responseStarted`)
         res.once('close', finish)
+        console.log(`====== 1191 _responseStarted`)
     }
 
     /**
@@ -1153,10 +1202,13 @@ class RequestMonitor {
      */
     _responseFinished(res) {
         const pending = this._pendingResponses
+        console.log(`====== 1205 _responseFinished`)
         if (pending.ids.length) {
+            console.log(`====== 1207 _responseFinished`)
             const requestId = res.locals.requestId
             pending.ids = pending.ids.filter((id) => id !== requestId)
             if (pending.ids.length === 0 && pending.resolve) {
+                console.log(`====== 1211 _responseFinished`)
                 pending.resolve()
                 pending.resolve = pending.promise = null
             }
