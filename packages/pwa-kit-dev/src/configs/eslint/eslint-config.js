@@ -26,7 +26,7 @@ module.exports = {
         'plugin:jsx-a11y/recommended',
         'plugin:prettier/recommended'
     ],
-    plugins: ['header', 'jsx-a11y', 'prettier', 'react', 'react-hooks'],
+    plugins: ['jsx-a11y', 'prettier', 'react', 'react-hooks'],
     settings: {
         react: {
             version: 'detect'
