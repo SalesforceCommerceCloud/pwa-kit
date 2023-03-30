@@ -63,6 +63,14 @@ import {resolveSiteFromUrl} from '../../utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 
+const mergeArrays = (arr1, arr2) => {
+    const merged = arr1.map((item) => {
+        const match = arr2.find((item2) => item2?.id === item?.id)
+        return match ? {...item, ...match} : item
+    })
+    return merged
+} 
+
 /* 
 The categories tree can be really large! For performance reasons,
 we only load the level 0 categories on server side, and load the rest
@@ -80,7 +88,7 @@ const useLazyLoadCategories = () => {
         enabled: onClient && ids?.length > 0
     })
     // make sure all queries is successful before returning
-    if (onClient && queries?.every((query) => query.isSuccess)) {
+    if (onClient) {
         const dataArray = queries.map((queries) => queries.data)
         const isLoading = queries.some((query) => query.isLoading)
         const isError = queries.some((query) => query.isError)
@@ -89,7 +97,7 @@ const useLazyLoadCategories = () => {
             isError,
             data: {
                 ...levelZeroCategoriesQuery.data,
-                [itemsKey]: dataArray
+                [itemsKey]: mergeArrays(levelZeroCategoriesQuery.data.categories, dataArray)
             }
         }
     }
