@@ -62,18 +62,16 @@ const renderMutationHook = ({name, hook, body, parameters}: any) => {
 }
 
 function UseShopperContext() {
-    const usid = localStorage.getItem('RefArchGlobal_usid') || ''
+    const usid = localStorage.getItem('RefArch_usid') || ''
 
     const mutationHooks = [
         {
             action: 'createShopperContext',
             body: {
-                effectiveDateTime: '2020-12-20T00:00:00Z',
                 customQualifiers: {
-                    deviceType: 'mobile'
+                    tester: 'yes'
                 },
                 assignmentQualifiers: {
-                    store: 'boston'
                 }
             },
             parameters: {usid}

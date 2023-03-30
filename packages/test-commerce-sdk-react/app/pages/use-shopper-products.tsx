@@ -8,7 +8,7 @@ import React from 'react'
 import {useProducts} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 import {Link} from 'react-router-dom'
-const ids = '701642889823M,25503045M'
+const ids = '701644153083M,701644043858M,883360541082M'
 
 const UseShopperProducts = () => {
     const {

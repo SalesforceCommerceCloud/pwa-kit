@@ -18,7 +18,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     const headers = {
         'correlation-id': correlationId
     }
-    const defaultSiteId = 'RefArchGlobal'
+    const defaultSiteId = 'RefArch'
     const defaultLocale = 'en-US'
     const [siteId, setSiteId] = useState(defaultSiteId)
     const [locale, setLocale] = useState(defaultLocale)
@@ -27,9 +27,9 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     return (
         <CommerceApiProvider
             siteId={siteId}
-            shortCode="8o7m175y"
-            clientId="c9c45bfd-0ed3-4aa2-9971-40f88962b836"
-            organizationId="f_ecom_zzrf_001"
+            shortCode="performance-001"
+            clientId="bf7fc8bf-3ca9-45f9-9c73-7dbb5dff08b1"
+            organizationId="f_ecom_bjnl_dev"
             redirectURI="http://localhost:3000/callback"
             proxy="http://localhost:3000/mobify/proxy/api"
             locale={locale}

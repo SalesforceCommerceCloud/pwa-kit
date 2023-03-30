@@ -9,7 +9,7 @@ import {usePage, usePages} from 'commerce-sdk-react-preview'
 import {Page, Region} from 'commerce-sdk-react-preview/components'
 import Json from '../components/Json'
 
-const PAGE_ID = 'homepage-example'
+const PAGE_ID = 'scenario1'
 const ASPECT_TYPE_ID_PDP = 'pdp'
 const ASPECT_TYPE_ID_PLP = 'plp'
 const PRODUCT_ID = '69309284M'
