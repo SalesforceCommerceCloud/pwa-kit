@@ -251,8 +251,9 @@ describe('SSRServer Lambda integration', () => {
                 app.get('/*', testCase.route)
             })
 
+            console.log('~~~~app', app)
             server = srv
-
+            console.log('~~~~server', server)
             // Set up the mock proxy
             nock('http://test.proxy.com')
                 .get('/test1')
@@ -331,7 +332,7 @@ describe('SSRServer Lambda integration', () => {
             }
         }
 
-        const {handler, server: srv} = RemoteServerFactory.createHandler(options, (app) => {
+        const {server: srv} = RemoteServerFactory.createHandler(options, (app) => {
             const route = (req, res) => {
                 // Return the request headers as JSON
                 res.status(200)

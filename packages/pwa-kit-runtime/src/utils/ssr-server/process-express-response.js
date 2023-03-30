@@ -41,7 +41,7 @@ export const processExpressResponse = (response) => {
             // to restore the header.
             setHeader(X_ORIGINAL_CONTENT_TYPE, contentType)
             // Set the content-type header to application/octet-stream
-            // so that aws-serverless-express will treat this as
+            // so that @vendia/serverless-express will treat this as
             // binary.
             setHeader(CONTENT_TYPE, APPLICATION_OCTET_STREAM)
         }

@@ -38,13 +38,14 @@ import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
-import awsServerlessExpress from 'aws-serverless-express'
+import serverlessExpress from '@vendia/serverless-express'
+import awsServerlessExpressMiddleware, {getCurrentInvoke} from '@vendia/serverless-express'
 import expressLogging from 'morgan'
 import {morganStream} from '../../utils/morgan-stream'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
- * as binary by awsServerlessExpress when processing responses.
+ * as binary by serverlessExpress when processing responses.
  * We intentionally exclude all text/* values since we assume UTF8
  * encoding and there's no reason to bulk up the response by base64
  * encoding the result.
@@ -211,17 +212,19 @@ export const RemoteServerFactory = {
      * @private
      */
     _setRequestId(app) {
+        const currentInvoke = getCurrentInvoke()
         app.use((req, res, next) => {
-            if (!req.headers['x-apigateway-event']) {
-                console.error('Missing x-apigateway-event')
+            console.log(
+                '~~~~~~currentInvoke.event.requestContext',
+                currentInvoke.event.requestContext
+            )
+            console.log('~~~~~~currentInvoke', currentInvoke)
+            if (!currentInvoke?.event) {
+                console.error('Request event does not originate from AWS Lambda')
                 next()
                 return
             }
-            const apiGatewayEvent = JSON.parse(
-                decodeURIComponent(req.headers['x-apigateway-event'])
-            )
-            const {requestId} = apiGatewayEvent.requestContext
-            res.locals.requestId = requestId
+            res.locals.requestId = currentInvoke.event?.requestContext?.requestId
             next()
         })
     },
@@ -801,7 +804,7 @@ export const RemoteServerFactory = {
         // it indicates that the Lambda container has been reused.
         let lambdaContainerReused = false
 
-        const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes)
+        // const server = serverlessExpress.createServer(app, null, binaryMimeTypes)
 
         const handler = (event, context, callback) => {
             // We don't want to wait for an empty event loop once the response
@@ -836,42 +839,44 @@ export const RemoteServerFactory = {
                 lambdaContainerReused = true
                 app.sendMetric('LambdaCreated')
             }
-
-            // Proxy the request through to the server. When the response
-            // is done, context.succeed will be called with the response
-            // data.
-            awsServerlessExpress.proxy(
-                server,
-                event, // The incoming event
-                context, // The event context
-                'CALLBACK', // How the proxy signals completion
-                (err, response) => {
-                    // The 'response' parameter here is NOT the same response
-                    // object handled by ExpressJS code. The awsServerlessExpress
-                    // middleware works by sending an http.Request to the Express
-                    // server and parsing the HTTP response that it returns.
-                    // Wait util all pending metrics have been sent, and any pending
-                    // response caching to complete. We have to do this now, before
-                    // sending the response; there's no way to do it afterwards
-                    // because the Lambda container is frozen inside the callback.
-
-                    // We return this Promise, but the awsServerlessExpress object
-                    // doesn't make any use of it.
-                    return (
-                        app._requestMonitor
-                            ._waitForResponses()
-                            .then(() => app.metrics.flush())
-                            // Now call the Lambda callback to complete the response
-                            .then(() => callback(err, processLambdaResponse(response)))
-                        // DON'T add any then() handlers here, after the callback.
-                        // They won't be called after the response is sent, but they
-                        // *might* be called if the Lambda container running this code
-                        // is reused, which can lead to odd and unpredictable
-                        // behaviour.
-                    )
-                }
-            )
         }
+
+        const server = serverlessExpress({
+            app,
+            // handler,
+            // binarySettings: {
+            //     // isBinary: ({headers}) => true,
+            //     contentTypes: binaryMimeTypes
+            //     // contentEncodings: []
+            // },
+            resolutionMode: 'CALLBACK',
+            callback: (err, response) => {
+                // The 'response' parameter here is NOT the same response
+                // object handled by ExpressJS code. The serverlessExpress
+                // middleware works by sending an http.Request to the Express
+                // server and parsing the HTTP response that it returns.
+                // Wait util all pending metrics have been sent, and any pending
+                // response caching to complete. We have to do this now, before
+                // sending the response; there's no way to do it afterwards
+                // because the Lambda container is frozen inside the callback.
+
+                // We return this Promise, but the serverlessExpress object
+                // doesn't make any use of it.
+                return (
+                    app._requestMonitor
+                        ._waitForResponses()
+                        .then(() => app.metrics.flush())
+                        // Now call the Lambda callback to complete the response
+                        .then(() => callback(err, processLambdaResponse(response)))
+                    // DON'T add any then() handlers here, after the callback.
+                    // They won't be called after the response is sent, but they
+                    // *might* be called if the Lambda container running this code
+                    // is reused, which can lead to odd and unpredictable
+                    // behaviour.
+                )
+            }
+        })
+
         return {handler, server, app}
     },
 
@@ -1027,7 +1032,7 @@ const applyPatches = once((options) => {
 
     // Patch the ExpressJS Response class's redirect function to suppress
     // the creation of a body (DESKTOP-485). Including the body may
-    // trigger a parsing error in aws-serverless-express.
+    // trigger a parsing error in @vendia/serverless-express.
     express.response.redirect = function (status, url) {
         let workingStatus = status
         let workingUrl = url

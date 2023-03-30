@@ -106,10 +106,12 @@ export class Headers {
                 if (key === SET_COOKIE) {
                     this.headers[key] = values.slice()
                 } else {
-                    this.headers[key] = values.split(/,\s*/).map((value) => value.trim())
+                    console.log('~109 values', values)
+                    this.headers[key] = values.split(/,\s*/).map((value) => value?.trim())
                 }
             } else {
-                this.headers[key] = values.map((value) => value.value.trim())
+                console.log('~113 values', values)
+                this.headers[key] = values.map((value) => value?.value?.trim())
             }
         }
 
