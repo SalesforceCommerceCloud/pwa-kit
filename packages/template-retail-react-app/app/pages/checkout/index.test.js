@@ -66,6 +66,10 @@ beforeEach(() => {
         // mock product details
         rest.get('*/products', (req, res, ctx) => {
             return res(ctx.json({data: [{id: '701642811398M'}]}))
+        }),
+        // mock the available shipping methods
+        rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockShippingMethods))
         })
     )
 })
@@ -136,11 +140,6 @@ test('Can proceed through checkout steps as guest', async () => {
         rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
             currentBasket.shipments[0].shippingMethod = defaultShippingMethod
             return res(ctx.json(currentBasket))
-        }),
-
-        // mock get shipping methods
-        rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockShippingMethods))
         }),
 
         // mock add payment instrument
@@ -480,11 +479,6 @@ const logInDuringCheckout = async () => {
         rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
             currentBasket.shipments[0].shippingMethod = defaultShippingMethod
             return res(ctx.json(currentBasket))
-        }),
-
-        // mock get shipping methods
-        rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockShippingMethods))
         }),
 
         // mock add payment instrument
