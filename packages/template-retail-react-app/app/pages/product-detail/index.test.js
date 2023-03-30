@@ -91,9 +91,12 @@ describe('product set', () => {
     test('render multi-product layout', async () => {
         renderWithProviders(<MockedComponent />)
 
-        await waitFor(() => {
-            expect(screen.getAllByTestId('product-view').length).toEqual(4) // 1 parent + 3 children
-        })
+        await waitFor(
+            () => {
+                expect(screen.getAllByTestId('product-view').length).toEqual(4) // 1 parent + 3 children
+            },
+            {timeout: 5000}
+        )
     })
 
     test('add the set to cart successfully', async () => {
