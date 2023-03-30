@@ -22,10 +22,11 @@ module.exports = {
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
         'plugin:react/recommended',
+        'plugin:react-hooks/recommended',
         'plugin:jsx-a11y/recommended',
         'plugin:prettier/recommended'
     ],
-    plugins: ['header', 'jsx-a11y', 'prettier', 'react'],
+    plugins: ['header', 'jsx-a11y', 'prettier', 'react', 'react-hooks'],
     settings: {
         react: {
             version: 'detect'
