@@ -87,22 +87,17 @@ const useLazyLoadCategories = () => {
     const queries = useCategoryBulk(ids, {
         enabled: onClient && ids?.length > 0
     })
-    // make sure all queries is successful before returning
-    if (onClient) {
-        const dataArray = queries.map((queries) => queries.data)
-        const isLoading = queries.some((query) => query.isLoading)
-        const isError = queries.some((query) => query.isError)
-        return {
-            isLoading,
-            isError,
-            data: {
-                ...levelZeroCategoriesQuery.data,
-                [itemsKey]: mergeArrays(levelZeroCategoriesQuery.data.categories, dataArray)
-            }
+    const dataArray = queries.map((queries) => queries.data)
+    const isLoading = queries.some((query) => query.isLoading)
+    const isError = queries.some((query) => query.isError)
+    return {
+        isLoading,
+        isError,
+        data: {
+            ...levelZeroCategoriesQuery.data,
+            [itemsKey]: mergeArrays(levelZeroCategoriesQuery.data.categories, dataArray)
         }
     }
-
-    return levelZeroCategoriesQuery
 }
 
 const App = (props) => {
