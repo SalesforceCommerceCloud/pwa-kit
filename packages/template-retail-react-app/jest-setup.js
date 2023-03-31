@@ -17,8 +17,8 @@ const {
     mockCategory,
     mockedRegisteredCustomer,
     exampleTokenReponse
-    // mockCustomerBaskets
 } = require('./app/mocks/mock-data')
+
 /**
  * Set up an API mocking server for testing purposes.
  * This mock server includes the basic oauth flow endpoints.
@@ -39,23 +39,15 @@ const {
 //         rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
 //             res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
 //         ),
-//         rest.post('*/customers/action/login', (req, res, ctx) => {
-//             return res(
-//                 ctx.delay(0),
-//                 ctx.status(200),
-//                 ctx.json({
-//                     authType: 'guest',
-//                     customerId: 'customerid'
-//                 })
-//             )
-//         }),
 //         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
 //         rest.post('*/oauth2/token', (req, res, ctx) =>
 //             res(
 //                 ctx.delay(0),
 //                 ctx.json({
 //                     customer_id: 'customerid',
-//                     access_token: registerUserToken,
+//                     // Is this token for guest or registered user?
+//                     access_token:
+//                         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjF9.BDAp9G8nmArdBqAbsE5GUWZ3fiv2LwQKClEFDCGIyy8',
 //                     refresh_token: 'testrefeshtoken',
 //                     usid: 'testusid',
 //                     enc_user_id: 'testEncUserId',
@@ -82,7 +74,6 @@ const {
 //     })
 // })
 // afterEach(() => {
-//     queryCache.clear()
 //     global.server.resetHandlers()
 // })
 // afterAll(() => {
@@ -230,9 +221,17 @@ const defaultHandlers = [
         res: () => {
             return {}
         }
+    },
+    {
+        path: '*/v3/personalization/recs/EinsteinTestSite/*',
+        method: 'post',
+        res: () => {
+            return {}
+        }
     }
 ]
 
+// Never initialize the server in the global scope.
 export function createServer(handlerConfig) {
     // console.log('handlerConfig', handlerConfig)
     const handlers = [...defaultHandlers, ...handlerConfig].map((config) => {

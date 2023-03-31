@@ -199,6 +199,81 @@ export const ocapiBasketWithItem = {
     tax_total: null
 }
 
+export const scapiBasketWithItem = {
+    adjustedMerchandizeTotalTax: 0.91,
+    adjustedShippingTotalTax: 0.29,
+    agentBasket: false,
+    basketId: 'e4547d1b21d01bf5ad92d30c9d',
+    channelType: 'storefront',
+    creationDate: '2023-03-28T17:29:43.704Z',
+    currency: 'GBP',
+    customerInfo: {
+        customerId: 'ablXcZlbAXmewRledJmqYYlKk0'
+    },
+    lastModified: '2023-03-28T18:04:25.483Z',
+    merchandizeTotalTax: 0.91,
+    notes: {},
+    orderTotal: 25.17,
+    productItems: [
+        {
+            adjustedTax: 0.91,
+            basePrice: 9.59,
+            bonusProductLineItem: false,
+            gift: false,
+            itemId: '7f9637386161502d31f4563db5',
+            itemText: 'Long Sleeve Crew Neck',
+            price: 19.18,
+            priceAfterItemDiscount: 19.18,
+            priceAfterOrderDiscount: 19.18,
+            productId: '701643070725M',
+            productName: 'Long Sleeve Crew Neck',
+            quantity: 2,
+            shipmentId: 'me',
+            tax: 0.91,
+            taxBasis: 19.18,
+            taxClassId: 'standard',
+            taxRate: 0.05
+        }
+    ],
+    productSubTotal: 19.18,
+    productTotal: 19.18,
+    shipments: [
+        {
+            adjustedMerchandizeTotalTax: 0.91,
+            adjustedShippingTotalTax: 0.29,
+            gift: false,
+            merchandizeTotalTax: 0.91,
+            productSubTotal: 19.18,
+            productTotal: 19.18,
+            shipmentId: 'me',
+            shipmentTotal: 25.17,
+            shippingStatus: 'not_shipped',
+            shippingTotal: 5.99,
+            shippingTotalTax: 0.29,
+            taxTotal: 1.2
+        }
+    ],
+    shippingItems: [
+        {
+            adjustedTax: 0.29,
+            basePrice: 5.99,
+            itemId: '2922238c5ed059a3041062cf0c',
+            itemText: 'Shipping',
+            price: 5.99,
+            priceAfterItemDiscount: 5.99,
+            shipmentId: 'me',
+            tax: 0.29,
+            taxBasis: 5.99,
+            taxClassId: 'standard',
+            taxRate: 0.05
+        }
+    ],
+    shippingTotal: 5.99,
+    shippingTotalTax: 0.29,
+    taxation: 'gross',
+    taxTotal: 1.2
+}
+
 export const ocapiBasketWithPaymentInstrumentAndBillingAddress = {
     _v: '21.3',
     _type: 'basket',

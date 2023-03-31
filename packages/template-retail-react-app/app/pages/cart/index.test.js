@@ -331,7 +331,7 @@ describe('Update quantity in product view', function () {
         })
     })
 })
-//
+
 describe('Remove item from cart', function () {
     createServer([
         ...cartHandlers,
