@@ -87,7 +87,7 @@ const useLazyLoadCategories = () => {
         isError,
         data: {
             ...levelZeroCategoriesQuery.data,
-            [itemsKey]: mergeArrays(levelZeroCategoriesQuery.data.categories, dataArray)
+            [itemsKey]: mergeArrays(levelZeroCategoriesQuery.data?.categories || [], dataArray)
         }
     }
 }
