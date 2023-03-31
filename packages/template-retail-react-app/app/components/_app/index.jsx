@@ -119,7 +119,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
                 body: {}
             })
         }
-    }, [baskets])
+    }, [baskets?.total])
 
     // Set up customer and basket
     useShopper({currency})
