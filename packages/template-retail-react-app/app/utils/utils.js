@@ -322,3 +322,21 @@ export const keysToCamel = (obj) => {
 
     return obj
 }
+
+/**
+ * Merge two arrays (arr1 and arr2) into one array
+ * and merge the matched items (objects with the same id)
+ * into one object. There is an assumption where arr2 is
+ * always a subset of arr1.
+ *
+ * @param arr1 - array of objects
+ * @param arr2
+ * @return {Array}
+ */
+export const mergeMatchedItems = (arr1 = [], arr2 = []) => {
+    const merged = arr1.map((item) => {
+        const match = arr2.find((item2) => item2.id === item.id)
+        return match ? {...item, ...match} : item
+    })
+    return merged
+}

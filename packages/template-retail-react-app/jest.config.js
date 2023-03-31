@@ -24,7 +24,9 @@ module.exports = {
         'scripts/generator/*.{js,jsx}',
         '!app/pages/test-container/**/*.{js,jsx}',
         '!app/utils/test-utils.js',
-        '!app/commerce-api/mocks/*js',
+        '!app/mocks/*.js',
+        // TODO: This is no longer necessary when the commerce-api folder is removed.
+        '!app/commerce-api/**/*.js',
         '!app/main.jsx',
         '!app/loader.js',
         '!app/ssr.js',
