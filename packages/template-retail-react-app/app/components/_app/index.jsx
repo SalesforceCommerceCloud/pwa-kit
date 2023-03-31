@@ -10,6 +10,12 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {
+    useCategory,
+    useCustomerType,
+    useCustomerBaskets,
+    useShopperBasketsMutation
+} from 'commerce-sdk-react-preview'
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
@@ -39,7 +45,7 @@ import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten} from '../../utils/utils'
+import {watchOnlineStatus, flatten, isServer} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -53,7 +59,7 @@ import {
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
-import {useCategory, useCustomerType} from 'commerce-sdk-react-preview'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 const App = (props) => {
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
@@ -96,6 +102,24 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     const {l10n} = site
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
+
+    // Handle creating a new pasket if there isn't one already assigned to the current
+    // customer.
+    const {data: customer} = useCurrentCustomer()
+    const {data: baskets} = useCustomerBaskets(
+        {parameters: {customerId: customer.customerId}},
+        {enabled: !!customer.customerId && !isServer}
+    )
+    const createBasket = useShopperBasketsMutation('createBasket')
+
+    // Create a new basket if the current customer doesn't have one.
+    useEffect(() => {
+        if (baskets?.total === 0) {
+            createBasket.mutate({
+                body: {}
+            })
+        }
+    }, [baskets])
 
     // Set up customer and basket
     useShopper({currency})
