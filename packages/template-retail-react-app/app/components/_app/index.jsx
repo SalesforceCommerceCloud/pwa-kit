@@ -369,8 +369,8 @@ export const useCategoryBulk = (ids = [], queryOptions) => {
                 })
                 return res
             },
-            enabled: queryOptions.enabled && !!id,
-            ...queryOptions
+            ...queryOptions,
+            enabled: queryOptions.enabled !== false && Boolean(id)
         }
     })
     const res = useQueries({queries})
