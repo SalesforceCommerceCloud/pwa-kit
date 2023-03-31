@@ -25,11 +25,10 @@ import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {mockCategories as initialMockCategories} from '../mocks/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
 // Contexts
-import {CategoriesProvider, CurrencyProvider, MultiSiteProvider} from '../contexts'
+import {CurrencyProvider, MultiSiteProvider} from '../contexts'
 
 import {createUrlTemplate} from './url'
 import {getSiteByReference} from './site-utils'
@@ -118,7 +117,6 @@ export const TestProviders = ({
     children,
     initialBasket = null,
     initialCustomer = null,
-    initialCategories = initialMockCategories,
     locale = {id: DEFAULT_LOCALE},
     messages = fallbackMessages,
     appConfig = mockConfig.app,
@@ -182,23 +180,21 @@ export const TestProviders = ({
                                 bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''
                             }
                         >
-                            <CategoriesProvider treeRoot={initialCategories}>
-                                <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                                    <_CustomerProvider value={{customer, setCustomer}}>
-                                        <BasketProvider value={{basket, setBasket}}>
-                                            <CustomerProductListsProvider>
-                                                <Router>
-                                                    <ChakraProvider theme={theme}>
-                                                        <AddToCartModalProvider>
-                                                            {children}
-                                                        </AddToCartModalProvider>
-                                                    </ChakraProvider>
-                                                </Router>
-                                            </CustomerProductListsProvider>
-                                        </BasketProvider>
-                                    </_CustomerProvider>
-                                </CurrencyProvider>
-                            </CategoriesProvider>
+                            <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                                <_CustomerProvider value={{customer, setCustomer}}>
+                                    <BasketProvider value={{basket, setBasket}}>
+                                        <CustomerProductListsProvider>
+                                            <Router>
+                                                <ChakraProvider theme={theme}>
+                                                    <AddToCartModalProvider>
+                                                        {children}
+                                                    </AddToCartModalProvider>
+                                                </ChakraProvider>
+                                            </Router>
+                                        </CustomerProductListsProvider>
+                                    </BasketProvider>
+                                </_CustomerProvider>
+                            </CurrencyProvider>
                         </CommerceApiProvider>
                     </_CommerceAPIProvider>
                 </MultiSiteProvider>
@@ -211,7 +207,6 @@ TestProviders.propTypes = {
     children: PropTypes.element,
     initialBasket: PropTypes.object,
     initialCustomer: PropTypes.object,
-    initialCategories: PropTypes.element,
     initialProductLists: PropTypes.object,
     messages: PropTypes.object,
     locale: PropTypes.object,
