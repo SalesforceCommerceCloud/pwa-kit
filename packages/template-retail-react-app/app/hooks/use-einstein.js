@@ -484,18 +484,28 @@ const useEinstein = () => {
         },
         async getRecommendations(recommenderName, products, args) {
             setIsLoading(true)
-            const reco = await einstein.getRecommendations(recommenderName, products, args)
-            reco.recommenderName = recommenderName
-            const recommendations = await fetchRecProductDetails(reco)
-            setIsLoading(false)
-            setRecommendations(recommendations)
+            try {
+                const reco = await einstein.getRecommendations(recommenderName, products, args)
+                reco.recommenderName = recommenderName
+                const recommendations = await fetchRecProductDetails(reco)
+                setRecommendations(recommendations)
+            } catch (err) {
+                console.error(err)
+            } finally {
+                setIsLoading(false)
+            }
         },
         async getZoneRecommendations(zoneName, products, args) {
             setIsLoading(true)
-            const reco = await einstein.getZoneRecommendations(zoneName, products, args)
-            const recommendations = await fetchRecProductDetails(reco)
-            setIsLoading(false)
-            setRecommendations(recommendations)
+            try {
+                const reco = await einstein.getZoneRecommendations(zoneName, products, args)
+                const recommendations = await fetchRecProductDetails(reco)
+                setRecommendations(recommendations)
+            } catch (err) {
+                console.error(err)
+            } finally {
+                setIsLoading(false)
+            }
         }
     }
 }

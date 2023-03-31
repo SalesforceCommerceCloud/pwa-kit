@@ -31,7 +31,7 @@ import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
  */
 const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, ...props}) => {
     const {
-        loading,
+        isLoading,
         recommendations,
         getZoneRecommendations,
         getRecommendations,
@@ -103,7 +103,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
 
     // The component should remove itself altogether if it has no recommendations
     // and we aren't loading any.
-    if (!loading && (!recommendations || recommendations.length < 1)) {
+    if (!isLoading && (!recommendations || recommendations.length < 1)) {
         return null
     }
 
@@ -182,7 +182,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             ref={ref}
             title={title || recommendations?.displayMessage}
             products={recommendations.recs}
-            isLoading={loading}
+            isLoading={isLoading}
             productTileProps={(product) => ({
                 onClick: () => {
                     sendClickReco(
