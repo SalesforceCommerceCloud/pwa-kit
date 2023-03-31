@@ -49,6 +49,5 @@ describe('Components', function () {
         expect(screen.getByText(/beige/i)).toBeInTheDocument()
 
         expect(screen.getByText(/blue/i)).toBeInTheDocument()
-        expect(screen.getByText(/blue/i)).toBeInTheDocument()
     })
 })
