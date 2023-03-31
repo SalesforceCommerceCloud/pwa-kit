@@ -11,7 +11,7 @@ import useConfig from './useConfig'
 const onClient = typeof window !== 'undefined'
 
 /**
- * TBD
+ * Hook that returns the customer ID.
  *
  */
 const useCustomerId = (): string | null => {

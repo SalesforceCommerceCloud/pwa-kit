@@ -16,28 +16,72 @@ import {
     waitAndExpectSuccess
 } from '../../test-utils'
 import {ApiClients, Argument} from '../types'
-import {NotImplementedError} from '../utils'
 import {ShopperOrdersMutation, useShopperOrdersMutation} from './mutation'
 import * as queries from './query'
 
 jest.mock('../../auth/index.ts', () => {
-    return jest.fn().mockImplementation(() => ({
-        ready: jest.fn().mockResolvedValue({access_token: 'access_token'})
-    }))
+    const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
+    mockAuth.prototype.ready = jest.fn().mockResolvedValue({access_token: 'access_token'})
+    return mockAuth
 })
 
 type Client = ApiClients['shopperOrders']
 const ordersEndpoint = '/checkout/shopper-orders/'
-const OPTIONS: Argument<Client[ShopperOrdersMutation]> = {body: {basketId: 'basketId'}}
+const OPTIONS: Argument<Client[ShopperOrdersMutation]> = {
+    parameters: {orderNo: ''},
+    body: {basketId: 'basketId'}
+}
 const ORDER: ShopperOrdersTypes.Order = {orderNo: '123', productItems: []}
+const ORDER_NO = '123'
+const PAYMENT_INSTRUMENT_ID = '123'
+const PAYMENT_INSTRUMENT_REQUEST = {
+    amount: 10,
+    bankRoutingNumber: '',
+    giftCertificateCode: '',
+    paymentCard: {
+        cardType: 'visa',
+        creditCardToken: '',
+        expirationMonth: 9,
+        expirationYear: 2099,
+        holder: '',
+        issueNumber: '',
+        maskedNumber: '',
+        validFromMonth: 9,
+        validFromYear: 2000
+    },
+    paymentMethodId: ''
+}
+
+const createOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
+    body: Argument<Client[Method]> extends {body: infer B} ? B : undefined,
+    parameters: Omit<Argument<Client[Method]>['parameters'], 'orderNo'>
+): Argument<Client[Method]> => ({
+    body,
+    parameters: {orderNo: ORDER_NO, ...parameters}
+})
+
+const createPaymentOptions = createOptions<'createPaymentInstrumentForOrder'>(
+    PAYMENT_INSTRUMENT_REQUEST,
+    {}
+)
+const updatePaymentOptions = createOptions<'updatePaymentInstrumentForOrder'>(
+    PAYMENT_INSTRUMENT_REQUEST,
+    {paymentInstrumentId: PAYMENT_INSTRUMENT_ID}
+)
+const removePaymentOptions = createOptions<'removePaymentInstrumentFromOrder'>(undefined, {
+    paymentInstrumentId: PAYMENT_INSTRUMENT_ID
+})
 
 // --- TEST CASES --- //
 /** Every mutation modifies an existing order, except `createOrder`, which creates one. */
 type NonCreateMutation = Exclude<ShopperOrdersMutation, 'createOrder'>
 // This is an object rather than an array to more easily ensure we cover all mutations
-// TODO: Remove optional flag when all mutations are implemented
 type TestMap = {[Mut in NonCreateMutation]?: Argument<Client[Mut]>}
-const testMap: TestMap = {}
+const testMap: TestMap = {
+    createPaymentInstrumentForOrder: createPaymentOptions,
+    updatePaymentInstrumentForOrder: updatePaymentOptions,
+    removePaymentInstrumentFromOrder: removePaymentOptions
+}
 
 // Type assertion because the built-in type definition for `Object.entries` is limited :\
 const nonCreateTestCases = Object.entries(testMap) as ReadonlyArray<
@@ -45,16 +89,6 @@ const nonCreateTestCases = Object.entries(testMap) as ReadonlyArray<
 >
 const createTestCase = ['createOrder', OPTIONS] as const
 const allTestCases = [...nonCreateTestCases, createTestCase]
-
-// Not implemented checks are temporary to make sure we don't forget to add tests when adding
-// implentations. When all mutations are added, the "not implemented" tests can be removed,
-// and the `TestMap` type can be changed from optional keys to required keys. Doing so will
-// leverage TypeScript to enforce having tests for all mutations.
-const notImplTestCases: ShopperOrdersMutation[][] = [
-    ['createPaymentInstrumentForOrder'],
-    ['removePaymentInstrumentFromOrder'],
-    ['updatePaymentInstrumentForOrder']
-]
 
 describe('ShopperOrders mutations', () => {
     beforeEach(() => nock.cleanAll())
@@ -72,13 +106,16 @@ describe('ShopperOrders mutations', () => {
         await waitAndExpectSuccess(wait, () => result.current)
         expect(result.current.data).toEqual(ORDER)
     })
-    test.each(allTestCases)('`%s` returns error on error', async (mutationName) => {
+    test.each(allTestCases)('`%s` returns error on error', async (mutationName, options) => {
         mockMutationEndpoints(ordersEndpoint, {error: true}, 400)
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
             return useShopperOrdersMutation(mutationName)
         })
         expect(result.current.error).toBeNull()
-        act(() => result.current.mutate({body: {}}))
+        act(() => {
+            type Opts = Parameters<typeof result.current.mutate>[0]
+            result.current.mutate(options as Opts)
+        })
         await waitAndExpectError(wait, () => result.current)
         // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
         // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
@@ -119,8 +156,5 @@ describe('ShopperOrders mutations', () => {
         await waitAndExpectError(wait, () => result.current.mutation)
         // The query cache should not have changed
         expect(getQueries()).toEqual([])
-    })
-    test.each(notImplTestCases)('`%s` is not yet implemented', async (mutationName) => {
-        expect(() => useShopperOrdersMutation(mutationName)).toThrow(NotImplementedError)
     })
 })

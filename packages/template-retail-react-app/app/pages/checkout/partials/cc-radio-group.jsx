@@ -8,10 +8,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Stack, Text, SimpleGrid, FormControl, FormErrorMessage} from '@chakra-ui/react'
-import {useCheckout} from '../util/checkout-context'
 import {PlusIcon} from '../../../components/icons'
 import {RadioCard, RadioCardGroup} from '../../../components/radio-card'
 import {getCreditCardIcon} from '../../../utils/cc-utils'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 
 const CCRadioGroup = ({
     form,
@@ -20,7 +20,7 @@ const CCRadioGroup = ({
     togglePaymentEdit = () => null,
     onPaymentIdChange = () => null
 }) => {
-    const {customer} = useCheckout()
+    const {data: customer} = useCurrentCustomer()
 
     return (
         <FormControl

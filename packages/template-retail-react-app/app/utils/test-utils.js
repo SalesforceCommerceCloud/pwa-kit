@@ -12,19 +12,66 @@ import PropTypes from 'prop-types'
 import {PageContext, Region} from '../page-designer/core'
 
 import theme from '../theme'
-import CommerceAPI from '../commerce-api'
+import _CommerceAPI from '../commerce-api'
 import {
     BasketProvider,
-    CommerceAPIProvider,
-    CustomerProvider,
+    CommerceAPIProvider as _CommerceAPIProvider,
+    CustomerProvider as _CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
-import {AddToCartModal, AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
+import {AddToCartModalProvider} from '../hooks/use-add-to-cart-modal'
+import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
-import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
+import {CommerceApiProvider} from 'commerce-sdk-react-preview'
+import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
+import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+import {mockCategories as initialMockCategories} from '../mocks/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
+// Contexts
+import {CategoriesProvider, CurrencyProvider, MultiSiteProvider} from '../contexts'
 
+import {createUrlTemplate} from './url'
+import {getSiteByReference} from './site-utils'
+import jwt from 'jsonwebtoken'
+
+// This JWT's payload is special
+// it includes 3 fields that commerce-sdk-react cares:
+// exp, isb and sub
+// The lib decodes the jwt and extract information such as customerId and customerType
+const guestPayload = {
+    aut: 'GUID',
+    scp: 'sfcc.shopper-myaccount.baskets sfcc.shopper-myaccount.addresses sfcc.shopper-products sfcc.shopper-discovery-search sfcc.shopper-myaccount.rw sfcc.shopper-myaccount.paymentinstruments sfcc.shopper-customers.login sfcc.shopper-experience sfcc.shopper-context.rw sfcc.shopper-myaccount.orders sfcc.shopper-customers.register sfcc.shopper-baskets-orders sfcc.shopper-myaccount.addresses.rw sfcc.shopper-myaccount.productlists.rw sfcc.shopper-productlists sfcc.shopper-promotions sfcc.shopper-baskets-orders.rw sfcc.shopper-myaccount.paymentinstruments.rw sfcc.shopper-gift-certificates sfcc.shopper-product-search sfcc.shopper-myaccount.productlists sfcc.shopper-categories sfcc.shopper-myaccount',
+    sub: 'cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-9971-40f88962b836::usid:02ccab32-d01e-4abc-809a-a457fa0512c2',
+    ctx: 'slas',
+    iss: 'slas/prod/zzrf_001',
+    ist: 1,
+    aud: 'commercecloud/prod/zzrf_001',
+    nbf: 1679013708,
+    sty: 'User',
+    isb: 'uido:slas::upn:Guest::uidn:Guest User::gcid:bckbhHw0dGkXgRxbaVxqYYwuhH::chid: ',
+    exp: 1924905600000,
+    iat: 1679013738,
+    jti: 'C2C4856201860-18906789034985270413965222'
+}
+
+const registeredUserPayload = {
+    aut: 'GUID',
+    scp: 'sfcc.shopper-myaccount.baskets sfcc.shopper-myaccount.addresses sfcc.shopper-products sfcc.shopper-discovery-search sfcc.shopper-myaccount.rw sfcc.shopper-myaccount.paymentinstruments sfcc.shopper-customers.login sfcc.shopper-experience sfcc.shopper-myaccount.orders sfcc.shopper-customers.register sfcc.shopper-baskets-orders sfcc.shopper-myaccount.addresses.rw sfcc.shopper-myaccount.productlists.rw sfcc.shopper-productlists sfcc.shopper-promotions sfcc.shopper-baskets-orders.rw sfcc.shopper-myaccount.paymentinstruments.rw sfcc.shopper-gift-certificates sfcc.shopper-product-search sfcc.shopper-myaccount.productlists sfcc.shopper-categories sfcc.shopper-myaccount',
+    sub: 'cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-9971-40f88962b836::usid:8e883973-68eb-41fe-a3c5-756232652ff5',
+    ctx: 'slas',
+    iss: 'slas/prod/zzrf_001',
+    ist: 1,
+    aud: 'commercecloud/prod/zzrf_001',
+    nbf: 1678834271,
+    sty: 'User',
+    isb: 'uido:ecom::upn:kev5@test.com::uidn:kevin he::gcid:abmes2mbk3lXkRlHFJwGYYkuxJ::rcid:abUMsavpD9Y6jW00di2SjxGCMU::chid:RefArchGlobal',
+    exp: 2678836101,
+    iat: 1678834301,
+    jti: 'C2C4856201860-18906789034805832570666542'
+}
+export const guestToken = jwt.sign(guestPayload, 'secret')
+export const registerUserToken = jwt.sign(registeredUserPayload, 'secret')
 export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
 export const SUPPORTED_LOCALES = [
@@ -38,11 +85,6 @@ export const SUPPORTED_LOCALES = [
     }
 ]
 export const DEFAULT_SITE = 'global'
-// Contexts
-import {CategoriesProvider, CurrencyProvider, MultiSiteProvider} from '../contexts'
-
-import {createUrlTemplate} from './url'
-import {getSiteByReference} from './site-utils'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -55,40 +97,16 @@ export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
 export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Router>)
 
 export const renderWithRouterAndCommerceAPI = (node) => {
-    const api = new CommerceAPI({
+    const api = new _CommerceAPI({
         ...mockConfig.app.commerceAPI,
         einsteinConfig: mockConfig.app.einsteinAPI,
         proxy: undefined
     })
     return renderWithReactIntl(
-        <CommerceAPIProvider value={api}>
+        <_CommerceAPIProvider value={api}>
             <Router>{node}</Router>
-        </CommerceAPIProvider>
+        </_CommerceAPIProvider>
     )
-}
-
-const useAddToCartModal = () => {
-    const [state, setState] = useState({
-        isOpen: false,
-        data: null
-    })
-
-    return {
-        isOpen: state.isOpen,
-        data: state.data,
-        onOpen: (data) => {
-            setState({
-                isOpen: true,
-                data
-            })
-        },
-        onClose: () => {
-            setState({
-                isOpen: false,
-                data: null
-            })
-        }
-    }
 }
 
 /**
@@ -104,7 +122,9 @@ export const TestProviders = ({
     locale = {id: DEFAULT_LOCALE},
     messages = fallbackMessages,
     appConfig = mockConfig.app,
-    siteAlias = DEFAULT_SITE
+    siteAlias = DEFAULT_SITE,
+    isGuest = false,
+    bypassAuth = true
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -121,12 +141,13 @@ export const TestProviders = ({
     // @TODO: make this dynamic (getting from package.json during CI tests fails, so hardcoding for now)
     const ocapiHost = 'zzrf-001.dx.commercecloud.salesforce.com'
 
-    const api = new CommerceAPI({
+    const api = new _CommerceAPI({
         ...appConfig.commerceAPI,
         einsteinConfig: appConfig.einsteinAPI,
         proxy,
         ocapiHost
     })
+    const commerceApiConfig = appConfig.commerceAPI
     const [basket, _setBasket] = useState(initialBasket)
     const [customer, setCustomer] = useState(initialCustomer)
 
@@ -137,8 +158,6 @@ export const TestProviders = ({
         _setBasket(data)
     })
 
-    const addToCartModal = useAddToCartModal()
-
     const site = getSiteByReference(siteAlias || appConfig.defaultSite)
 
     const buildUrl = createUrlTemplate(
@@ -148,32 +167,43 @@ export const TestProviders = ({
     )
 
     return (
-        <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-            <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
-                <CommerceAPIProvider value={api}>
-                    <CategoriesProvider treeRoot={initialCategories}>
-                        <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                            <CustomerProvider value={{customer, setCustomer}}>
-                                <BasketProvider value={{basket, setBasket}}>
-                                    <CustomerProductListsProvider>
-                                        <Router>
-                                            <ChakraProvider theme={theme}>
-                                                <AddToCartModalContext.Provider
-                                                    value={addToCartModal}
-                                                >
-                                                    {children}
-                                                    <AddToCartModal />
-                                                </AddToCartModalContext.Provider>
-                                            </ChakraProvider>
-                                        </Router>
-                                    </CustomerProductListsProvider>
-                                </BasketProvider>
-                            </CustomerProvider>
-                        </CurrencyProvider>
-                    </CategoriesProvider>
-                </CommerceAPIProvider>
-            </MultiSiteProvider>
-        </IntlProvider>
+        <ServerContext.Provider value={{}}>
+            <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+                <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
+                    <_CommerceAPIProvider value={api}>
+                        <CommerceApiProvider
+                            shortCode={commerceApiConfig.parameters.shortCode}
+                            clientId={commerceApiConfig.parameters.clientId}
+                            organizationId={commerceApiConfig.parameters.organizationId}
+                            siteId={site?.id}
+                            locale={locale.id}
+                            redirectURI={`${window.location.origin}/testcallback`}
+                            fetchedToken={
+                                bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''
+                            }
+                        >
+                            <CategoriesProvider treeRoot={initialCategories}>
+                                <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                                    <_CustomerProvider value={{customer, setCustomer}}>
+                                        <BasketProvider value={{basket, setBasket}}>
+                                            <CustomerProductListsProvider>
+                                                <Router>
+                                                    <ChakraProvider theme={theme}>
+                                                        <AddToCartModalProvider>
+                                                            {children}
+                                                        </AddToCartModalProvider>
+                                                    </ChakraProvider>
+                                                </Router>
+                                            </CustomerProductListsProvider>
+                                        </BasketProvider>
+                                    </_CustomerProvider>
+                                </CurrencyProvider>
+                            </CategoriesProvider>
+                        </CommerceApiProvider>
+                    </_CommerceAPIProvider>
+                </MultiSiteProvider>
+            </IntlProvider>
+        </ServerContext.Provider>
     )
 }
 
@@ -186,7 +216,9 @@ TestProviders.propTypes = {
     messages: PropTypes.object,
     locale: PropTypes.object,
     appConfig: PropTypes.object,
-    siteAlias: PropTypes.string
+    siteAlias: PropTypes.string,
+    bypassAuth: PropTypes.bool,
+    isGuest: PropTypes.bool
 }
 
 /**
@@ -197,12 +229,32 @@ TestProviders.propTypes = {
  * @param {object} children
  * @param {object} options
  */
-export const renderWithProviders = (children, options) =>
-    render(children, {
+export const renderWithProviders = (children, options) => {
+    const TestProvidersWithDataAPI = withReactQuery(withLegacyGetProps(TestProviders), {
+        queryClientConfig: {
+            defaultOptions: {
+                queries: {
+                    retry: false,
+                    staleTime: 2 * 1000
+                },
+                mutations: {
+                    retry: false
+                }
+            }
+        }
+    })
+    const locals = {}
+
+    return render(children, {
         // eslint-disable-next-line react/display-name
-        wrapper: () => <TestProviders {...options?.wrapperProps}>{children}</TestProviders>,
+        wrapper: () => (
+            <TestProvidersWithDataAPI {...options?.wrapperProps} locals={locals}>
+                {children}
+            </TestProvidersWithDataAPI>
+        ),
         ...options
     })
+}
 
 /**
  * This is used to construct the URL pathname that would include

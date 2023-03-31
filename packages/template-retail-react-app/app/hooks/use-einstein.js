@@ -4,13 +4,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {useMemo, useState} from 'react'
 import fetch from 'cross-fetch'
-import {keysToCamel} from './utils'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {useCommerceApi, useAccessToken, useUsid, useEncUserId} from 'commerce-sdk-react-preview'
+import {keysToCamel} from '../utils/utils'
 
-class EinsteinAPI {
-    constructor(commerceAPI) {
-        this.commerceAPI = commerceAPI
-        this.config = commerceAPI?._config?.einsteinConfig
+export class EinsteinAPI {
+    constructor({host, einsteinId, userId, cookieId, siteId, isProduction}) {
+        this.userId = userId
+        this.cookieId = cookieId
+        this.siteId = siteId
+        this.isProduction = isProduction
+        this.host = host
+        this.einsteinId = einsteinId
     }
 
     /**
@@ -27,24 +34,24 @@ class EinsteinAPI {
 
         // If we have an encrypted user id (authenticaed users only) use it as the `userId` otherwise
         // we won't send a `userId` param for guest users.
-        if (this.commerceAPI.auth.encUserId) {
-            body.userId = this.commerceAPI.auth.encUserId
+        if (this.userId) {
+            body.userId = this.userId
         }
 
         // Append the `usid` as the `cookieId` value if present. (It should always be present as long
         // as the user is initilized)
-        if (this.commerceAPI.auth.usid) {
-            body.cookieId = this.commerceAPI.auth.usid
+        if (this.cookieId) {
+            body.cookieId = this.cookieId
         } else {
             console.warn('Missing `cookieId`. For optimal results this value must be defined.')
         }
 
         // The first part of the siteId is the realm
-        if (this.config.siteId) {
-            body.realm = this.config.siteId.split('-')[0]
+        if (this.siteId) {
+            body.realm = this.siteId.split('-')[0]
         }
 
-        if (this.config.isProduction) {
+        if (this.isProduction) {
             body.instanceType = instanceType_prd
         } else {
             body.instanceType = instanceType_sbx
@@ -112,12 +119,9 @@ class EinsteinAPI {
     }
 
     async einsteinFetch(endpoint, method, body) {
-        const config = this.config
-        const {host, einsteinId} = config
-
         const headers = {
             'Content-Type': 'application/json',
-            'x-cq-client-id': einsteinId
+            'x-cq-client-id': this.einsteinId
         }
 
         // Include `userId` and `cookieId` parameters.
@@ -127,7 +131,7 @@ class EinsteinAPI {
 
         let response
         try {
-            response = await fetch(`${host}/v3${endpoint}`, {
+            response = await fetch(`${this.host}/v3${endpoint}`, {
                 method: method,
                 headers: headers,
                 ...(body && {
@@ -152,7 +156,7 @@ class EinsteinAPI {
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendViewProduct(product, args) {
-        const endpoint = `/activities/${this.config.siteId}/viewProduct`
+        const endpoint = `/activities/${this.siteId}/viewProduct`
         const method = 'POST'
         const body = {
             product: this._constructEinsteinProduct(product),
@@ -166,7 +170,7 @@ class EinsteinAPI {
      * Tells the Einstein engine when a user views search results.
      **/
     async sendViewSearch(searchText, searchResults, args) {
-        const endpoint = `/activities/${this.config.siteId}/viewSearch`
+        const endpoint = `/activities/${this.siteId}/viewSearch`
         const method = 'POST'
 
         const products = searchResults?.hits?.map((product) =>
@@ -187,7 +191,7 @@ class EinsteinAPI {
      * Tells the Einstein engine when a user clicks on a search result.
      **/
     async sendClickSearch(searchText, product, args) {
-        const endpoint = `/activities/${this.config.siteId}/clickSearch`
+        const endpoint = `/activities/${this.siteId}/clickSearch`
         const method = 'POST'
         const body = {
             searchText,
@@ -202,7 +206,7 @@ class EinsteinAPI {
      * Tells the Einstein engine when a user views a category.
      **/
     async sendViewCategory(category, searchResults, args) {
-        const endpoint = `/activities/${this.config.siteId}/viewCategory`
+        const endpoint = `/activities/${this.siteId}/viewCategory`
         const method = 'POST'
 
         const products = searchResults?.hits?.map((product) =>
@@ -226,7 +230,7 @@ class EinsteinAPI {
      * Not meant to be used when the user clicks a category from the nav bar.
      **/
     async sendClickCategory(category, product, args) {
-        const endpoint = `/activities/${this.config.siteId}/clickCategory`
+        const endpoint = `/activities/${this.siteId}/clickCategory`
         const method = 'POST'
         const body = {
             category: {
@@ -244,7 +248,7 @@ class EinsteinAPI {
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendViewReco(recommenderDetails, products, args) {
-        const endpoint = `/activities/${this.config.siteId}/viewReco`
+        const endpoint = `/activities/${this.siteId}/viewReco`
         const method = 'POST'
         const {__recoUUID, recommenderName} = recommenderDetails
         const body = {
@@ -262,7 +266,7 @@ class EinsteinAPI {
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendClickReco(recommenderDetails, product, args) {
-        const endpoint = `/activities/${this.config.siteId}/clickReco`
+        const endpoint = `/activities/${this.siteId}/clickReco`
         const method = 'POST'
         const {__recoUUID, recommenderName} = recommenderDetails
         const body = {
@@ -280,7 +284,7 @@ class EinsteinAPI {
      * Use this only for pages where another activity does not fit. (ie. on the PDP, use viewProduct rather than this)
      **/
     async sendViewPage(path, args) {
-        const endpoint = `/activities/${this.config.siteId}/viewPage`
+        const endpoint = `/activities/${this.siteId}/viewPage`
         const method = 'POST'
         const body = {
             currentLocation: path,
@@ -294,7 +298,7 @@ class EinsteinAPI {
      * Tells the Einstein engine when a user starts the checkout process.
      **/
     async sendBeginCheckout(basket, args) {
-        const endpoint = `/activities/${this.config.siteId}/beginCheckout`
+        const endpoint = `/activities/${this.siteId}/beginCheckout`
         const method = 'POST'
         const products = basket.productItems.map((item) => this._constructEinsteinItem(item))
         const subTotal = basket.productSubTotal
@@ -312,7 +316,7 @@ class EinsteinAPI {
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendCheckoutStep(stepName, stepNumber, basket, args) {
-        const endpoint = `/activities/${this.config.siteId}/checkoutStep`
+        const endpoint = `/activities/${this.siteId}/checkoutStep`
         const method = 'POST'
         const body = {
             stepName,
@@ -328,11 +332,11 @@ class EinsteinAPI {
      * Tells the Einstein engine when a user adds an item to their cart.
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
-    async sendAddToCart(item, args) {
-        const endpoint = `/activities/${this.config.siteId}/addToCart`
+    async sendAddToCart(items, args) {
+        const endpoint = `/activities/${this.siteId}/addToCart`
         const method = 'POST'
         const body = {
-            products: [this._constructEinsteinItem(item)],
+            products: items.map((item) => this._constructEinsteinItem(item)),
             ...args
         }
 
@@ -344,7 +348,7 @@ class EinsteinAPI {
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async getRecommenders() {
-        const endpoint = `/personalization/recommenders/${this.config.siteId}`
+        const endpoint = `/personalization/recommenders/${this.siteId}`
         const method = 'GET'
         const body = null
 
@@ -356,19 +360,14 @@ class EinsteinAPI {
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async getRecommendations(recommenderName, products, args) {
-        const endpoint = `/personalization/recs/${this.config.siteId}/${recommenderName}`
+        const endpoint = `/personalization/recs/${this.siteId}/${recommenderName}`
         const method = 'POST'
         const body = {
             products: products?.map((product) => this._constructEinsteinProduct(product)),
             ...args
         }
 
-        // Fetch the recommendations
-        const reco = await this.einsteinFetch(endpoint, method, body)
-
-        reco.recommenderName = recommenderName
-
-        return this.fetchRecProductDetails(reco)
+        return this.einsteinFetch(endpoint, method, body)
     }
 
     /**
@@ -376,7 +375,7 @@ class EinsteinAPI {
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async getZoneRecommendations(zoneName, products, args) {
-        const endpoint = `/personalization/${this.config.siteId}/zones/${zoneName}/recs`
+        const endpoint = `/personalization/${this.siteId}/zones/${zoneName}/recs`
         const method = 'POST'
 
         const body = {
@@ -384,18 +383,45 @@ class EinsteinAPI {
             ...args
         }
 
-        // Fetch the recommendations
-        const reco = await this.einsteinFetch(endpoint, method, body)
-
-        return this.fetchRecProductDetails(reco)
+        return this.einsteinFetch(endpoint, method, body)
     }
+}
 
-    async fetchRecProductDetails(reco) {
+const useEinstein = () => {
+    const api = useCommerceApi()
+    const {getTokenWhenReady} = useAccessToken()
+    const {
+        app: {einsteinAPI: config}
+    } = getConfig()
+    const {host, einsteinId, siteId, isProduction} = config
+    const usid = useUsid()
+    const encUserId = useEncUserId()
+
+    const einstein = useMemo(
+        () =>
+            new EinsteinAPI({
+                host,
+                einsteinId,
+                userId: encUserId,
+                cookieId: usid,
+                siteId,
+                isProduction
+            }),
+        [host, einsteinId, encUserId, usid, siteId, isProduction]
+    )
+    const [isLoading, setIsLoading] = useState(false)
+    const [recommendations, setRecommendations] = useState([])
+
+    const fetchRecProductDetails = async (reco) => {
         const ids = reco.recs?.map((rec) => rec.id)
         if (ids?.length > 0) {
+            const token = await getTokenWhenReady()
             // Fetch the product details for the recommendations
-            const products = await this.commerceAPI.shopperProducts.getProducts({
-                parameters: {ids: ids.join(',')}
+            const products = await api.shopperProducts.getProducts({
+                parameters: {ids: ids.join(',')},
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             })
 
             // Merge the product detail into the recommendations response
@@ -414,6 +440,74 @@ class EinsteinAPI {
         }
         return reco
     }
+
+    return {
+        isLoading,
+
+        recommendations,
+
+        async sendViewProduct(...args) {
+            return einstein.sendViewProduct(...args)
+        },
+        async sendViewSearch(...args) {
+            return einstein.sendViewSearch(...args)
+        },
+        async sendClickSearch(...args) {
+            return einstein.sendClickSearch(...args)
+        },
+        async sendViewCategory(...args) {
+            return einstein.sendViewCategory(...args)
+        },
+        async sendClickCategory(...args) {
+            return einstein.sendClickCategory(...args)
+        },
+        async sendViewPage(...args) {
+            return einstein.sendViewPage(...args)
+        },
+        async sendBeginCheckout(...args) {
+            return einstein.sendBeginCheckout(...args)
+        },
+        async sendCheckoutStep(...args) {
+            return einstein.sendCheckoutStep(...args)
+        },
+        async sendViewReco(...args) {
+            return einstein.sendViewReco(...args)
+        },
+        async sendClickReco(...args) {
+            return einstein.sendClickReco(...args)
+        },
+        async sendAddToCart(...args) {
+            return einstein.sendAddToCart(...args)
+        },
+        async getRecommenders(...args) {
+            return einstein.getRecommenders(...args)
+        },
+        async getRecommendations(recommenderName, products, args) {
+            setIsLoading(true)
+            try {
+                const reco = await einstein.getRecommendations(recommenderName, products, args)
+                reco.recommenderName = recommenderName
+                const recommendations = await fetchRecProductDetails(reco)
+                setRecommendations(recommendations)
+            } catch (err) {
+                console.error(err)
+            } finally {
+                setIsLoading(false)
+            }
+        },
+        async getZoneRecommendations(zoneName, products, args) {
+            setIsLoading(true)
+            try {
+                const reco = await einstein.getZoneRecommendations(zoneName, products, args)
+                const recommendations = await fetchRecProductDetails(reco)
+                setRecommendations(recommendations)
+            } catch (err) {
+                console.error(err)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+    }
 }
 
-export default EinsteinAPI
+export default useEinstein

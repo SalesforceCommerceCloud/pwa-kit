@@ -16,7 +16,7 @@ const UseProductSearch = loadable(() => import('./pages/use-product-search'))
 const UseCustomer = loadable(() => import('./pages/use-shopper-customer'))
 const UsePromotions = loadable(() => import('./pages/use-promotions'))
 const UsePromotionsForCampaign = loadable(() => import('./pages/use-promotions-for-campaign'))
-const UseShopperLoginHelper = loadable(() => import('./pages/use-shopper-login-helper'))
+const UseAuthHelper = loadable(() => import('./pages/use-auth-helper'))
 const UseSearchSuggestions = loadable(() => import('./pages/use-search-suggestions'))
 const UseShopperBaskets = loadable(() => import('./pages/use-shopper-baskets'))
 const QueryErrors = loadable(() => import('./pages/query-errors'))
@@ -24,6 +24,7 @@ const UseGetOrder = loadable(() => import('./pages/use-shopper-get-order'))
 const UsePaymentMethods = loadable(() => import('./pages/use-payment-methods'))
 const UseShopperOrders = loadable(() => import('./pages/use-shopper-orders'))
 const UseCustomerId = loadable(() => import('./pages/use-customer-id'))
+const UseShopperContext = loadable(() => import('./pages/use-shopper-context'))
 
 const routes = [
     {
@@ -73,7 +74,7 @@ const routes = [
     },
     {
         path: '/slas-helpers',
-        component: UseShopperLoginHelper
+        component: UseAuthHelper
     },
     {
         path: '/basket',
@@ -98,6 +99,10 @@ const routes = [
     {
         path: '/customerId',
         component: UseCustomerId
+    },
+    {
+        path: '/context',
+        component: UseShopperContext
     }
 ]
 

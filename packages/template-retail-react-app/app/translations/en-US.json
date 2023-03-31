@@ -14,6 +14,9 @@
   "account_addresses.button.add_address": {
     "defaultMessage": "Add Address"
   },
+  "account_addresses.info.address_removed": {
+    "defaultMessage": "Address removed"
+  },
   "account_addresses.info.address_updated": {
     "defaultMessage": "Address updated"
   },
@@ -65,6 +68,15 @@
   "account_order_detail.link.back_to_history": {
     "defaultMessage": "Back to Order History"
   },
+  "account_order_detail.shipping_status.not_shipped": {
+    "defaultMessage": "Not shipped"
+  },
+  "account_order_detail.shipping_status.part_shipped": {
+    "defaultMessage": "Partially shipped"
+  },
+  "account_order_detail.shipping_status.shipped": {
+    "defaultMessage": "Shipped"
+  },
   "account_order_detail.title.order_details": {
     "defaultMessage": "Order Details"
   },
@@ -95,21 +107,6 @@
   },
   "account_order_history.title.order_history": {
     "defaultMessage": "Order History"
-  },
-  "account_payment_methods.button.add_method": {
-    "defaultMessage": "Add Payment Method"
-  },
-  "account_payment_methods.description.add_method_for_faster_checkout": {
-    "defaultMessage": "Add a new payment method for faster checkout."
-  },
-  "account_payment_methods.heading.no_saved_methods": {
-    "defaultMessage": "No Saved Payment Methods"
-  },
-  "account_payment_methods.info.new_method_saved": {
-    "defaultMessage": "New Payment Method Saved"
-  },
-  "account_payment_methods.title.payment_methods": {
-    "defaultMessage": "Payment Methods"
   },
   "account_wishlist.button.continue_shopping": {
     "defaultMessage": "Continue Shopping"
@@ -164,9 +161,6 @@
   },
   "auth_modal.password_reset_success.title.password_reset": {
     "defaultMessage": "Password Reset"
-  },
-  "card_payment_form.heading.new_payment_method": {
-    "defaultMessage": "Add New Payment Method"
   },
   "cart.info.removed_from_cart": {
     "defaultMessage": "Item removed from cart"
@@ -402,9 +396,6 @@
   "drawer_menu.button.order_history": {
     "defaultMessage": "Order History"
   },
-  "drawer_menu.button.payment_methods": {
-    "defaultMessage": "Payment Methods"
-  },
   "drawer_menu.link.about_us": {
     "defaultMessage": "About Us"
   },
@@ -536,9 +527,6 @@
   },
   "global.account.link.order_history": {
     "defaultMessage": "Order History"
-  },
-  "global.account.link.payment_methods": {
-    "defaultMessage": "Payment Methods"
   },
   "global.account.link.wishlist": {
     "defaultMessage": "Wishlist"
@@ -941,17 +929,8 @@
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
   },
-  "payment_selection.button.save_and_continue": {
-    "defaultMessage": "Save & Continue"
-  },
-  "payment_selection.heading.add_new_card": {
-    "defaultMessage": "Add New Card"
-  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Credit Card"
-  },
-  "payment_selection.message.select_payment_method": {
-    "defaultMessage": "Please select a payment method."
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "This is a secure SSL encrypted payment."

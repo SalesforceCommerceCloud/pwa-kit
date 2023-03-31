@@ -7,13 +7,15 @@
 import React from 'react'
 import {FormattedMessage} from 'react-intl'
 import {Badge, Box, Button, Flex, Center} from '@chakra-ui/react'
-import useBasket from '../../../commerce-api/hooks/useBasket'
 import Link from '../../../components/link'
 import {BasketIcon, BrandLogo} from '../../../components/icons'
 import {HOME_HREF} from '../../../constants'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
 const CheckoutHeader = () => {
-    const basket = useBasket()
+    const {
+        derivedData: {totalItems}
+    } = useCurrentBasket()
     return (
         <Box px={[4, 4, 8]} bg="white" borderBottom="1px" borderColor="gray.100">
             <Box maxWidth="container.xxxl" marginLeft="auto" marginRight="auto">
@@ -34,7 +36,7 @@ const CheckoutHeader = () => {
                         rightIcon={
                             <Center position="relative" width={11} height={11}>
                                 <BasketIcon position="absolute" left="0px" />
-                                <Badge variant="notification">{basket.itemAccumulatedCount}</Badge>
+                                <Badge variant="notification">{totalItems}</Badge>
                             </Center>
                         }
                     >

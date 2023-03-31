@@ -16,11 +16,10 @@ import {
 import * as queries from './query'
 
 jest.mock('../../auth/index.ts', () => {
-    return jest.fn().mockImplementation(() => ({
-        ready: jest.fn().mockResolvedValue({access_token: 'access_token'})
-    }))
+    const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
+    mockAuth.prototype.ready = jest.fn().mockResolvedValue({access_token: 'access_token'})
+    return mockAuth
 })
-
 type Queries = typeof queries
 const giftCertificatesEndpoint = '/pricing/shopper-gift-certificates/'
 // Not all endpoints use all parameters, but unused parameters are safely discarded

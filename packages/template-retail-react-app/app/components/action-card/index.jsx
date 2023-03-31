@@ -20,12 +20,11 @@ const ActionCard = ({children, onEdit, onRemove, ...props}) => {
     const [showLoading, setShowLoading] = useState(false)
 
     const handleRemove = async () => {
-        setShowLoading(!showLoading)
+        setShowLoading(true)
         try {
             return await Promise.resolve(onRemove())
-        } catch (err) {
-            setShowLoading(!showLoading)
-            throw err
+        } finally {
+            setShowLoading(false)
         }
     }
 

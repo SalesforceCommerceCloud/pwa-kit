@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useContext, useMemo} from 'react'
-import useEinstein from './useEinstein'
+// import useEinstein from './useEinstein'
 import {useCommerceAPI, BasketContext} from '../contexts'
 import useCustomer from './useCustomer'
 import {isError} from '../utils'
@@ -14,7 +14,7 @@ export default function useBasket(opts = {}) {
     const {currency} = opts
     const api = useCommerceAPI()
     const customer = useCustomer()
-    const einstein = useEinstein()
+    // const einstein = useEinstein()
     const {basket, setBasket: _setBasket} = useContext(BasketContext)
 
     const setBasket = (basketData) => {
@@ -123,7 +123,7 @@ export default function useBasket(opts = {}) {
                     throw new Error(response)
                 } else {
                     setBasket(response)
-                    item.map((eachItem) => einstein.sendAddToCart(eachItem))
+                    // item.map((eachItem) => einstein.sendAddToCart(eachItem))
                 }
             },
 
@@ -190,38 +190,6 @@ export default function useBasket(opts = {}) {
                 }
 
                 setBasket(updatedBasket)
-            },
-
-            /**
-             * Set the shipping address for the current basket.
-             * @external Address
-             * @see https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shopperbaskets.html#orderaddress
-             */
-            async setShippingAddress(address) {
-                const response = await api.shopperBaskets.updateShippingAddressForShipment({
-                    body: address,
-                    parameters: {
-                        basketId: basket.basketId,
-                        shipmentId: 'me',
-                        useAsBilling: !basket.billingAddress
-                    }
-                })
-
-                setBasket(response)
-            },
-
-            /**
-             * Set the shipping method for the current basket.
-             *
-             * @param {string} id - The id of the shipping method.
-             */
-            async setShippingMethod(id) {
-                const response = await api.shopperBaskets.updateShippingMethodForShipment({
-                    body: {id},
-                    parameters: {basketId: basket.basketId, shipmentId: 'me'}
-                })
-
-                setBasket(response)
             },
 
             /**
@@ -381,16 +349,6 @@ export default function useBasket(opts = {}) {
                 // it on the confirmation page. The basket is automatically deleted
                 // in SF so we need to make sure a new one is created when leaving the confirmation.
                 setBasket(response)
-            },
-
-            /**
-             * Fetches the applicable shipping methods for the current basket
-             * @returns {Object} - API response containing data
-             */
-            getShippingMethods() {
-                return api.shopperBaskets.getShippingMethodsForShipment({
-                    parameters: {basketId: basket.basketId, shipmentId: 'me'}
-                })
             },
 
             /**

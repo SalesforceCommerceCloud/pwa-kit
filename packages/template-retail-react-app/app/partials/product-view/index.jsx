@@ -11,7 +11,7 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 
 import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
-import {useProduct} from '../../hooks'
+import {useDerivedProduct} from '../../hooks'
 import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
 // project components
@@ -25,7 +25,8 @@ import {useCurrency} from '../../hooks'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
-import {noop} from '../../utils/utils'
+import {useToast} from '../../hooks/use-toast'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 const ProductViewHeader = ({name, price, currency, category, productType}) => {
     const intl = useIntl()
@@ -77,6 +78,7 @@ const ButtonWithRegistration = withRegistration(Button)
  * Render a product detail view that includes name, image gallery, price,
  * variant selections, action buttons
  */
+
 const ProductView = forwardRef(
     (
         {
@@ -90,6 +92,7 @@ const ProductView = forwardRef(
             addToWishlist,
             updateWishlist,
             isProductLoading,
+
             isProductPartOfSet = false,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
@@ -119,7 +122,7 @@ const ProductView = forwardRef(
             variationAttributes,
             stockLevel,
             stepQuantity
-        } = useProduct(product, isProductPartOfSet)
+        } = useDerivedProduct(product, isProductPartOfSet)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)
@@ -168,6 +171,14 @@ const ProductView = forwardRef(
                 })
             }
 
+            const showToast = useToast()
+            const showError = () => {
+                showToast({
+                    title: intl.formatMessage(API_ERROR_MESSAGE),
+                    status: 'error'
+                })
+            }
+
             const handleCartItem = async () => {
                 const hasValidSelection = validateAndShowError()
 
@@ -180,12 +191,20 @@ const ProductView = forwardRef(
                     await updateCart(variant, quantity)
                     return
                 }
-                const itemsAdded = await addToCart(variant, quantity)
-
-                onAddToCartModalOpen({
-                    product,
-                    itemsAdded
-                })
+                try {
+                    const itemsAdded = await addToCart(variant, quantity)
+                    // Open modal only when `addToCart` returns some data
+                    // It's possible that the item has been added to cart, but we don't want to open the modal.
+                    // See wishlist_primary_action for example.
+                    if (itemsAdded) {
+                        onAddToCartModalOpen({
+                            product,
+                            itemsAdded
+                        })
+                    }
+                } catch (e) {
+                    showError()
+                }
             }
 
             const handleWishlistItem = async () => {

@@ -5,25 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import mockProductDetail from '../../commerce-api/mocks/variant-750518699578M'
-import mockProductSet from '../../commerce-api/mocks/product-set-winter-lookM'
+import mockProductDetail from '../../mocks/variant-750518699578M'
+import mockProductSet from '../../mocks/product-set-winter-lookM'
 import ProductView from './index'
 import {renderWithProviders} from '../../utils/test-utils'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import userEvent from '@testing-library/user-event'
-
-jest.mock('../../commerce-api/einstein')
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 const MockComponent = (props) => {
-    const customer = useCustomer()
-    useEffect(() => {
-        if (!customer.isRegistered) {
-            customer.login('customer@test.com', 'password1')
-        }
-    }, [])
+    const {data: customer} = useCurrentCustomer()
     return (
         <div>
             <div>customer: {customer?.authType}</div>
@@ -41,13 +34,12 @@ MockComponent.propTypes = {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
-
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', '/en/account')
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
     sessionStorage.clear()
 })

@@ -7,36 +7,49 @@
 
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
+import {useIntl} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
-import Seo from '../../components/seo'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 import {useForm} from 'react-hook-form'
+import {useLocation} from 'react-router-dom'
+import Seo from '../../components/seo'
 import RegisterForm from '../../components/register'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../commerce-api/hooks/useEinstein'
-import {useLocation} from 'react-router-dom'
+import useEinstein from '../../hooks/use-einstein'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 const Registration = () => {
+    const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const customer = useCustomer()
+    const {isRegistered} = useCustomerType()
     const form = useForm()
     const einstein = useEinstein()
     const {pathname} = useLocation()
+    const register = useAuthHelper(AuthHelpers.Register)
 
-    const submitForm = async (data) => {
-        try {
-            await customer.registerCustomer(data)
-        } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
+    const submitForm = (data) => {
+        const body = {
+            customer: {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                login: data.email
+            },
+            password: data.password
         }
+
+        return register.mutateAsync(body, {
+            onError: () => {
+                form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+            }
+        })
     }
 
-    // If customer is registered push to account page
     useEffect(() => {
-        if (customer.authType != null && customer.isRegistered) {
+        if (isRegistered) {
             navigate('/account')
         }
-    }, [customer])
+    }, [isRegistered])
 
     /**************** Einstein ****************/
     useEffect(() => {

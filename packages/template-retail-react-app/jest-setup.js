@@ -14,8 +14,9 @@ const {rest} = require('msw')
 const {
     mockCategory,
     mockedRegisteredCustomer,
-    exampleTokenReponse
-} = require('./app/commerce-api/mock-data')
+    exampleTokenReponse,
+    mockCustomerBaskets
+} = require('./app/mocks/mock-data')
 
 /**
  * Set up an API mocking server for testing purposes.
@@ -34,23 +35,18 @@ export const setupMockServer = () => {
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         ),
-        rest.post('*/customers/action/login', (req, res, ctx) => {
-            return res(
-                ctx.delay(0),
-                ctx.status(200),
-                ctx.json({
-                    authType: 'guest',
-                    customerId: 'customerid'
-                })
-            )
-        }),
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
+        ),
         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
         rest.post('*/oauth2/token', (req, res, ctx) =>
             res(
                 ctx.delay(0),
                 ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
+                    customer_id: 'customerid',
+                    // Is this token for guest or registered user?
+                    access_token:
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjF9.BDAp9G8nmArdBqAbsE5GUWZ3fiv2LwQKClEFDCGIyy8',
                     refresh_token: 'testrefeshtoken',
                     usid: 'testusid',
                     enc_user_id: 'testEncUserId',
@@ -61,20 +57,32 @@ export const setupMockServer = () => {
         rest.get('*/categories/:categoryId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
         ),
-        rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200)))
+        rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
+        rest.post('*/v3/activities/EinsteinTestSite/*', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+        })
     )
 }
 
-global.server = setupMockServer()
-
 beforeAll(() => {
-    global.server.listen()
+    global.server = setupMockServer()
+    global.server.listen({
+        onUnhandledRequest(req) {
+            console.error('Found an unhandled %s request to %s', req.method, req.url.href)
+        }
+    })
 })
 afterEach(() => {
     global.server.resetHandlers()
 })
 afterAll(() => {
-    global.server.close()
+    // Intentionally not closing the server!
+    // We run into many race condition issues,
+    // that was cause by the server close too soon
+    // and the tests not well written in an proper async manner.
+    // Let's not close the server and see how things goes.
+    // We can revisit this.
+    // global.server.close()
 })
 
 // Mock the application configuration to be used in all tests.
@@ -133,16 +141,20 @@ Object.defineProperty(window, 'scrollTo', {
     value: () => null
 })
 
-Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: jest.fn().mockImplementation((query) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: jest.fn(), // deprecated
-        removeListener: jest.fn(), // deprecated
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn()
-    }))
-})
+if (typeof window.matchMedia !== 'function') {
+    Object.defineProperty(window, 'matchMedia', {
+        enumerable: true,
+        configurable: true,
+        writable: true,
+        value: jest.fn().mockImplementation((query) => ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: jest.fn(), // Deprecated
+            removeListener: jest.fn(), // Deprecated
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            dispatchEvent: jest.fn()
+        }))
+    })
+}
