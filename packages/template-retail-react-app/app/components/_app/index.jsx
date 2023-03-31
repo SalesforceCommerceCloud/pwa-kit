@@ -103,7 +103,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
 
-    // Handle creating a new pasket if there isn't one already assigned to the current
+    // Handle creating a new basket if there isn't one already assigned to the current
     // customer.
     const {data: customer} = useCurrentCustomer()
     const {data: baskets} = useCustomerBaskets(
