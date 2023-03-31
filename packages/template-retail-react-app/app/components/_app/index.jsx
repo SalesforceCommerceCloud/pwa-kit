@@ -47,7 +47,7 @@ import useMultiSite from '../../hooks/use-multi-site'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten, mergeArrays} from '../../utils/utils'
+import {watchOnlineStatus, flatten, mergeMatchedItems} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -87,7 +87,7 @@ const useLazyLoadCategories = () => {
         isError,
         data: {
             ...levelZeroCategoriesQuery.data,
-            [itemsKey]: mergeArrays(levelZeroCategoriesQuery.data?.categories || [], dataArray)
+            [itemsKey]: mergeMatchedItems(levelZeroCategoriesQuery.data?.categories || [], dataArray)
         }
     }
 }
