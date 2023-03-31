@@ -73,7 +73,7 @@ const formatSuggestions = (searchSuggestions, input) => {
  */
 const Search = (props) => {
     const [isOpen, setIsOpen] = useState(false)
-    const [searchQuery, setSearchQuery] = useState()
+    const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
     const searchSuggestion = useSearchSuggestions(
         {
