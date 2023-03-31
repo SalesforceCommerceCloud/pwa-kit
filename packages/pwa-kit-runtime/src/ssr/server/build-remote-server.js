@@ -440,6 +440,7 @@ export const RemoteServerFactory = {
             // querystring. This header is used in production, not in local dev,
             // but we always handle it here to allow for testing.
             const xQueryString = req.headers[X_MOBIFY_QUERYSTRING]
+            console.log(`====== 443 req.headers`, req.headers)
             console.log(`======= 440 processIncomingRequest,  xQueryString`, xQueryString)
             if (xQueryString) {
                 console.log(`======= 445 processIncomingRequest,  swap queryString`, xQueryString)
@@ -520,6 +521,7 @@ export const RemoteServerFactory = {
             // must do this AFTER the request-processor, because that's
             // what may set the request class.
             res.locals.requestClass = req.headers[X_MOBIFY_REQUEST_CLASS]
+            console.log('======== req.')
             console.log(`======= 523 res.locals.requestClass`, res.locals.requestClass)
         }
 
@@ -538,6 +540,8 @@ export const RemoteServerFactory = {
             // allowed are GET, HEAD or OPTIONS. This is a restriction
             // imposed by API Gateway: we enforce it here so that the
             // local dev server has the same behaviour.
+            console.log('===== 543 req.path', req.path)
+            console.log('===== 544 req.method', req.method)
             if (req.path === '/' && !['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
                 res.sendStatus(405)
                 return
@@ -836,14 +840,114 @@ export const RemoteServerFactory = {
 
         // const server = serverlessExpress.createServer(app, null, binaryMimeTypes)
 
+        function getPathWithQueryStringParams({
+            event,
+            query = event.multiValueQueryStringParameters,
+            // NOTE: Use `event.pathParameters.proxy` if available ({proxy+}); fall back to `event.path`
+            path = (event.pathParameters &&
+                event.pathParameters.proxy &&
+                `/${event.pathParameters.proxy}`) ||
+                event.path,
+            // NOTE: Strip base path for custom domains
+            stripBasePath = '',
+            replaceRegex = new RegExp(`^${stripBasePath}`)
+        }) {
+            return URL.format({
+                pathname: path.replace(replaceRegex, ''),
+                query
+            })
+        }
+
+        function getCommaDelimitedHeaders({headersMap, separator = ',', lowerCaseKey = false}) {
+            const commaDelimitedHeaders = {}
+
+            Object.entries(headersMap).forEach(([headerKey, headerValue]) => {
+                const newKey = lowerCaseKey ? headerKey.toLowerCase() : headerKey
+                if (Array.isArray(headerValue)) {
+                    commaDelimitedHeaders[newKey] = headerValue.join(separator)
+                } else {
+                    commaDelimitedHeaders[newKey] = headerValue
+                }
+            })
+
+            return commaDelimitedHeaders
+        }
+
+        function getEventBody({event, body = event.body, isBase64Encoded = event.isBase64Encoded}) {
+            return Buffer.from(body, isBase64Encoded ? 'base64' : 'utf8')
+        }
+
         const _serverlessExpressHandler = serverlessExpress({
             app,
+            // the underlying serverless-express library strips `headers`
+            // which our ssr-infrastructure expects, these mappings restore
+            // and pass through all request / response properties
+            eventSource: {
+                getRequest: ({
+                    event,
+                    method = event.httpMethod,
+                    path = getPathWithQueryStringParams({event})
+                }) => {
+                    let headers = {}
+
+                    if (event.multiValueHeaders) {
+                        headers = getCommaDelimitedHeaders({
+                            headersMap: event.multiValueHeaders,
+                            lowerCaseKey: true
+                        })
+                    } else if (event.headers) {
+                        headers = event.headers
+                    }
+
+                    let body
+
+                    if (event.body) {
+                        body = getEventBody({event})
+                        const {isBase64Encoded} = event
+                        headers['content-length'] = Buffer.byteLength(
+                            body,
+                            isBase64Encoded ? 'base64' : 'utf8'
+                        )
+                    }
+
+                    const remoteAddress =
+                        (event &&
+                            event.requestContext &&
+                            event.requestContext.identity &&
+                            event.requestContext.identity.sourceIp) ||
+                        ''
+
+                    return {
+                        method,
+                        headers,
+                        body,
+                        remoteAddress,
+                        path
+                    }
+                },
+                getResponse: ({statusCode, body, headers, isBase64Encoded}) => {
+                    const multiValueHeaders = {}
+
+                    Object.entries(headers).forEach(([headerKey, headerValue]) => {
+                        const headerArray = Array.isArray(headerValue)
+                            ? headerValue.map(String)
+                            : [String(headerValue)]
+
+                        multiValueHeaders[headerKey.toLowerCase()] = headerArray
+                    })
+
+                    return {statusCode, body, headers, multiValueHeaders, isBase64Encoded}
+                }
+            },
             // handler,
             // binarySettings: {
-            //     // isBinary: ({headers}) => true,
-            //     contentTypes: binaryMimeTypes
-            //     // contentEncodings: []
+            //     isBinary: ({headers}) => true,
+            //     contentTypes: binaryMimeTypes,
+            //     contentEncodings: []
             // },
+
+            // TODO: this is for debugging, remove
+            respondWithErrors: true,
             resolutionMode: 'CALLBACK',
             callback: (err, response) => {
                 console.log('=== 829 _serverlessExpressHandler callback')
@@ -1126,6 +1230,7 @@ const setDefaultHeaders = (req, res) => {
     if (requestClass) {
         res.set(X_MOBIFY_REQUEST_CLASS, requestClass)
     }
+    console.log('======= 1133 setDefaultHeaders res', res)
 }
 
 /**
