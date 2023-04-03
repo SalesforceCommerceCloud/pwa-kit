@@ -947,37 +947,37 @@ export const RemoteServerFactory = {
             // },
 
             // TODO: this is for debugging, remove
-            respondWithErrors: true,
-            resolutionMode: 'CALLBACK',
-            callback: (err, response) => {
-                console.log('=== 829 _serverlessExpressHandler callback')
-                // The 'response' parameter here is NOT the same response
-                // object handled by ExpressJS code. The serverlessExpress
-                // middleware works by sending an http.Request to the Express
-                // server and parsing the HTTP response that it returns.
-                // Wait util all pending metrics have been sent, and any pending
-                // response caching to complete. We have to do this now, before
-                // sending the response; there's no way to do it afterwards
-                // because the Lambda container is frozen inside the callback.
+            respondWithErrors: true
+            // resolutionMode: 'CALLBACK',
+            // callback: (err, response) => {
+            //     console.log('=== 829 _serverlessExpressHandler callback')
+            //     // The 'response' parameter here is NOT the same response
+            //     // object handled by ExpressJS code. The serverlessExpress
+            //     // middleware works by sending an http.Request to the Express
+            //     // server and parsing the HTTP response that it returns.
+            //     // Wait util all pending metrics have been sent, and any pending
+            //     // response caching to complete. We have to do this now, before
+            //     // sending the response; there's no way to do it afterwards
+            //     // because the Lambda container is frozen inside the callback.
 
-                // We return this Promise, but the serverlessExpress object
-                // doesn't make any use of it.
-                return (
-                    app._requestMonitor
-                        ._waitForResponses()
-                        .then(() => app.metrics.flush())
-                        // Now call the Lambda callback to complete the response
-                        .then(() => callback(err, processLambdaResponse(response)))
-                        // TODO: this is debug code, we might need it, to handle
-                        // uncaught exceptions, but maybe not
-                        .catch((err) => console.log('=== 869 err', err))
-                    // DON'T add any then() handlers here, after the callback.
-                    // They won't be called after the response is sent, but they
-                    // *might* be called if the Lambda container running this code
-                    // is reused, which can lead to odd and unpredictable
-                    // behaviour.
-                )
-            }
+            //     // We return this Promise, but the serverlessExpress object
+            //     // doesn't make any use of it.
+            //     return (
+            //         app._requestMonitor
+            //             ._waitForResponses()
+            //             .then(() => app.metrics.flush())
+            //             // Now call the Lambda callback to complete the response
+            //             .then(() => callback(err, processLambdaResponse(response)))
+            //             // TODO: this is debug code, we might need it, to handle
+            //             // uncaught exceptions, but maybe not
+            //             .catch((err) => console.log('=== 869 err', err))
+            //         // DON'T add any then() handlers here, after the callback.
+            //         // They won't be called after the response is sent, but they
+            //         // *might* be called if the Lambda container running this code
+            //         // is reused, which can lead to odd and unpredictable
+            //         // behaviour.
+            //     )
+            // }
         })
 
         const handler = (event, context, callback) => {
@@ -1016,7 +1016,40 @@ export const RemoteServerFactory = {
                 console.log('=== 889')
             }
 
-            _serverlessExpressHandler(event, context, callback)
+            const _callback = (err, response) => {
+                console.log('=== 1020 _serverlessExpressHandler callback')
+                // The 'response' parameter here is NOT the same response
+                // object handled by ExpressJS code. The serverlessExpress
+                // middleware works by sending an http.Request to the Express
+                // server and parsing the HTTP response that it returns.
+                // Wait util all pending metrics have been sent, and any pending
+                // response caching to complete. We have to do this now, before
+                // sending the response; there's no way to do it afterwards
+                // because the Lambda container is frozen inside the callback.
+
+                // We return this Promise, but the serverlessExpress object
+                // doesn't make any use of it.
+                return (
+                    app._requestMonitor
+                        ._waitForResponses()
+                        .then(() => app.metrics.flush())
+                        // Now call the Lambda callback to complete the response
+                        .then(() => {
+                            console.log('===== 1038 callback response', response)
+                            callback(err, processLambdaResponse(response))
+                        })
+                        // TODO: this is debug code, we might need it, to handle
+                        // uncaught exceptions, but maybe not
+                        .catch((err) => console.log('=== 869 err', err))
+                    // DON'T add any then() handlers here, after the callback.
+                    // They won't be called after the response is sent, but they
+                    // *might* be called if the Lambda container running this code
+                    // is reused, which can lead to odd and unpredictable
+                    // behaviour.
+                )
+            }
+
+            _serverlessExpressHandler(event, context, _callback)
             console.log('=== 893 _serverlessExpressHandler called')
         }
 
