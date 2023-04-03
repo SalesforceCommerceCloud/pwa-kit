@@ -6,7 +6,7 @@
  */
 import {useCustomerBaskets} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from './use-current-customer'
-import {onServer} from '../utils/utils'
+import {isServer} from '../utils/utils'
 
 /**
  * This hook combine some commerce-react-sdk hooks to provide more derived data for Retail App baskets
@@ -19,7 +19,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     const {data: basketsData, ...restOfQuery} = useCustomerBaskets(
         {parameters: {customerId}},
         {
-            enabled: !!customerId && !onServer
+            enabled: !!customerId && !isServer
         }
     )
 

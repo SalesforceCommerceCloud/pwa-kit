@@ -16,7 +16,9 @@ import {
     useAccessToken,
     useCategory,
     useCommerceApi,
-    useCustomerType
+    useCustomerType,
+    useCustomerBaskets,
+    useShopperBasketsMutation
 } from 'commerce-sdk-react-preview'
 import * as queryKeyHelpers from 'commerce-sdk-react-preview/hooks/ShopperProducts/queryKeyHelpers'
 // Chakra
@@ -42,12 +44,13 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import useMultiSite from '../../hooks/use-multi-site'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 // Localization
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten, mergeMatchedItems} from '../../utils/utils'
+import {watchOnlineStatus, flatten, mergeMatchedItems, isServer} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -119,6 +122,24 @@ const App = (props) => {
     const {l10n} = site
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
+
+    // Handle creating a new pasket if there isn't one already assigned to the current
+    // customer.
+    const {data: customer} = useCurrentCustomer()
+    const {data: baskets} = useCustomerBaskets(
+        {parameters: {customerId: customer.customerId}},
+        {enabled: !!customer.customerId && !isServer}
+    )
+    const createBasket = useShopperBasketsMutation('createBasket')
+
+    // Create a new basket if the current customer doesn't have one.
+    useEffect(() => {
+        if (baskets?.total === 0) {
+            createBasket.mutate({
+                body: {}
+            })
+        }
+    }, [baskets])
 
     useEffect(() => {
         // Listen for online status changes.
