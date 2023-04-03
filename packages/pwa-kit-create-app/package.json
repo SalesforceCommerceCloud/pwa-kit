@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-create-app",
-  "version": "2.8.0-dev.0",
+  "version": "2.8.0-dev",
   "description": "Salesforce's project generator tool",
   "author": "cc-pwa-kit@salesforce.com",
   "license": "See license in LICENSE",
@@ -27,20 +27,20 @@
     "local-npm": "node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir local-npm"
   },
   "engines": {
-    "node": "^14.0.0 || ^16.0.0",
-    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+    "node": "^14.0.0 || ^16.0.0 || ^18.0.0",
+    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0 || ^9.0.0"
   },
   "dependencies": {
-    "commander": "^2.20.0",
+    "commander": "^9.5.0",
     "deepmerge": "2.2.1",
-    "inquirer": "7.0.5",
-    "semver": "^7.3.2",
+    "inquirer": "7.3.3",
+    "semver": "^7.3.8",
     "shelljs": "^0.8.5",
     "slugify": "^1.6.5",
-    "tar": "^6.1.11"
+    "tar": "^6.1.13"
   },
   "devDependencies": {
-    "internal-lib-build": "^2.8.0-dev.0",
-    "verdaccio": "^5.9.0"
+    "internal-lib-build": "2.8.0-dev",
+    "verdaccio": "^5.22.1"
   }
 }

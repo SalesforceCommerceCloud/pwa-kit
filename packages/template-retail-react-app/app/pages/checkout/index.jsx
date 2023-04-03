@@ -5,37 +5,55 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from './util/checkout-context'
 import ContactInfo from './partials/contact-info'
 import ShippingAddress from './partials/shipping-address'
 import ShippingOptions from './partials/shipping-options'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
-import useBasket from '../../commerce-api/hooks/useBasket'
 import Payment from './partials/payment'
-import CheckoutSkeleton from './partials/checkout-skeleton'
 import OrderSummary from '../../components/order-summary'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
+import CheckoutSkeleton from './partials/checkout-skeleton'
+import {useUsid, useShopperOrdersMutation} from 'commerce-sdk-react-preview'
 
 const Checkout = () => {
+    const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {globalError, step, placeOrder} = useCheckout()
+    const usid = useUsid()
+    const {step} = useCheckout()
+    const [error, setError] = useState()
+    const {data: basket} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
+    const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
 
-    // Scroll to the top when we get a global error
     useEffect(() => {
-        if (globalError || step === 4) {
+        if (error || step === 4) {
             window.scrollTo({top: 0})
         }
-    }, [globalError, step])
+    }, [error, step])
 
     const submitOrder = async () => {
         setIsLoading(true)
         try {
-            await placeOrder()
-            navigate('/checkout/confirmation')
+            const order = await createOrder({
+                // We send the SLAS usid via this header. This is required by ECOM to map
+                // Einstein events sent via the API with the finishOrder event fired by ECOM
+                // when an Order transitions from Created to New status.
+                // Without this, various order conversion metrics will not appear on reports and dashboards
+                headers: {_sfdc_customer_id: usid},
+                body: {basketId: basket.basketId}
+            })
+            navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
+            const message = formatMessage({
+                id: 'checkout.message.generic_error',
+                defaultMessage: 'An unexpected error occurred during checkout.'
+            })
+            setError(message)
+        } finally {
             setIsLoading(false)
         }
     }
@@ -51,10 +69,10 @@ const Checkout = () => {
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, xl: 20}}>
                     <GridItem>
                         <Stack spacing={4}>
-                            {globalError && (
+                            {error && (
                                 <Alert status="error" variant="left-accent">
                                     <AlertIcon />
-                                    {globalError}
+                                    {error}
                                 </Alert>
                             )}
 
@@ -84,7 +102,11 @@ const Checkout = () => {
                     </GridItem>
 
                     <GridItem py={6} px={[4, 4, 4, 0]}>
-                        <OrderSummary showTaxEstimationForm={false} showCartItems={true} />
+                        <OrderSummary
+                            basket={basket}
+                            showTaxEstimationForm={false}
+                            showCartItems={true}
+                        />
 
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
@@ -127,8 +149,8 @@ const Checkout = () => {
 }
 
 const CheckoutContainer = () => {
-    const customer = useCustomer()
-    const basket = useBasket()
+    const {data: customer} = useCurrentCustomer()
+    const {data: basket} = useCurrentBasket()
 
     if (!customer || !customer.customerId || !basket || !basket.basketId) {
         return <CheckoutSkeleton />

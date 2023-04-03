@@ -4,18 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export const mockRecommendationsResponse = {
-    recommenderName: 'test-recommender',
-    recoUUID: '05e0bd80-64eb-4149-ad5a-dfe1996f8f57',
-    recs: [
-        {
-            id: 'prod_123',
-            product_name: 'Product ABC',
-            product_url: 'prod_abc.test.com',
-            image_url: 'prod_abc.test.com'
-        }
-    ]
-}
 
 export const mockRecommendersResponse = {
     recommenders: [
@@ -32,20 +20,6 @@ export const mockAddToCartProduct = {productId: '883360544021M', sku: '', price:
 export const mockRecommenderDetails = {
     __recoUUID: '883360544021M',
     recommenderName: 'testRecommender'
-}
-
-export const mockGetZoneRecommendationsResponse = {
-    displayMessage: 'Recently Viewed',
-    recoUUID: '05e0bd80-64eb-4149-ad5a-dfe1996f8f57',
-    recs: [
-        {
-            id: 'prod_123',
-            product_name: 'Product ABC',
-            product_url: 'prod_abc.test.com',
-            image_url: 'prod_abc.test.com'
-        }
-    ],
-    recommenderName: 'recently-viewed-products'
 }
 
 export const mockCategory = {

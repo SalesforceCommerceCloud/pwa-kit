@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router'
 import {
@@ -22,7 +22,7 @@ import {
     Skeleton
 } from '@chakra-ui/react'
 import {getCreditCardIcon} from '../../utils/cc-utils'
-import {useAccountOrders} from './util/order-context'
+import {useOrder, useProducts} from 'commerce-sdk-react-preview'
 import Link from '../../components/link'
 import {ChevronLeftIcon} from '../../components/icons'
 import OrderSummary from '../../components/order-summary'
@@ -31,23 +31,97 @@ import CartItemVariantImage from '../../components/item-variant/item-image'
 import CartItemVariantName from '../../components/item-variant/item-name'
 import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
 import CartItemVariantPrice from '../../components/item-variant/item-price'
+import PropTypes from 'prop-types'
+const onClient = typeof window !== 'undefined'
+
+const OrderProducts = ({productItems, currency}) => {
+    const productItemsMap = productItems.reduce(
+        (map, item) => ({...map, [item.productId]: item}),
+        {}
+    )
+    const ids = Object.keys(productItemsMap).join(',') ?? ''
+    const {data: {data: products} = {}, isLoading} = useProducts(
+        {
+            parameters: {
+                ids: ids
+            }
+        },
+        {
+            enabled: !!ids && onClient
+        }
+    )
+
+    const variants = products?.map((product) => {
+        const productItem = productItemsMap[product.id]
+        return {
+            ...productItem,
+            ...product,
+            price: productItem.price
+        }
+    })
+
+    return (
+        <>
+            {!isLoading &&
+                variants?.map((variant, index) => {
+                    return (
+                        <Box
+                            p={[4, 6]}
+                            key={index}
+                            border="1px solid"
+                            borderColor="gray.100"
+                            borderRadius="base"
+                        >
+                            <ItemVariantProvider variant={variant} currency={currency}>
+                                <Flex width="full" alignItems="flex-start">
+                                    <CartItemVariantImage width={['88px', 36]} mr={4} />
+                                    <Stack spacing={1} marginTop="-3px" flex={1}>
+                                        <CartItemVariantName />
+                                        <Flex
+                                            width="full"
+                                            justifyContent="space-between"
+                                            alignItems="flex-end"
+                                        >
+                                            <CartItemVariantAttributes
+                                                includeQuantity
+                                                currency={currency}
+                                            />
+                                            <CartItemVariantPrice currency={currency} />
+                                        </Flex>
+                                    </Stack>
+                                </Flex>
+                            </ItemVariantProvider>
+                        </Box>
+                    )
+                })}
+        </>
+    )
+}
+
+OrderProducts.propTypes = {
+    productItems: PropTypes.array.isRequired,
+    currency: PropTypes.string
+}
 
 const AccountOrderDetail = () => {
-    const {url, params} = useRouteMatch()
+    const {params} = useRouteMatch()
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
-    const {ordersById, productsById, isLoading, fetchOrder} = useAccountOrders()
-    const order = ordersById[params.orderNo]
 
-    useEffect(() => {
-        fetchOrder(params.orderNo)
-    }, [])
-
+    const {data: order, isLoading: isOrderLoading} = useOrder(
+        {
+            parameters: {orderNo: params.orderNo}
+        },
+        {
+            enabled: onClient && !!params.orderNo
+        }
+    )
+    const isLoading = isOrderLoading || !order
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
-    const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0)
+    const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
 
     return (
         <Stack spacing={6} data-testid="account-order-details-page">
@@ -55,7 +129,7 @@ const AccountOrderDetail = () => {
                 <Box>
                     <Button
                         as={Link}
-                        to={`${url.replace(`/${params.orderNo}`, '')}`}
+                        to={'/account/orders'}
                         variant="link"
                         leftIcon={<ChevronLeftIcon />}
                         size="sm"
@@ -127,7 +201,7 @@ const AccountOrderDetail = () => {
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
                     <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={5} py={{xl: 6}}>
-                        {isLoading && (
+                        {isLoading ? (
                             <>
                                 <Stack>
                                     <Skeleton h="20px" w="84px" />
@@ -149,9 +223,7 @@ const AccountOrderDetail = () => {
                                     <Skeleton h="20px" w="56px" />
                                 </Stack>
                             </>
-                        )}
-
-                        {!isLoading && (
+                        ) : (
                             <>
                                 <Stack spacing={1}>
                                     <Text fontWeight="bold" fontSize="sm">
@@ -162,7 +234,23 @@ const AccountOrderDetail = () => {
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm" textTransform="titlecase">
-                                            {shippingStatus.replace(/_/g, ' ')}
+                                            {
+                                                {
+                                                    not_shipped: formatMessage({
+                                                        defaultMessage: 'Not shipped',
+                                                        id: 'account_order_detail.shipping_status.not_shipped'
+                                                    }),
+
+                                                    part_shipped: formatMessage({
+                                                        defaultMessage: 'Partially shipped',
+                                                        id: 'account_order_detail.shipping_status.part_shipped'
+                                                    }),
+                                                    shipped: formatMessage({
+                                                        defaultMessage: 'Shipped',
+                                                        id: 'account_order_detail.shipping_status.shipped'
+                                                    })
+                                                }[shippingStatus]
+                                            }
                                         </Text>
                                         <Text fontSize="sm">{shippingMethod.name}</Text>
                                         <Text fontSize="sm">
@@ -272,7 +360,7 @@ const AccountOrderDetail = () => {
                 )}
 
                 <Stack spacing={4}>
-                    {isLoading &&
+                    {isLoading ? (
                         [1, 2, 3].map((i) => (
                             <Box
                                 key={i}
@@ -291,51 +379,13 @@ const AccountOrderDetail = () => {
                                     </Stack>
                                 </Flex>
                             </Box>
-                        ))}
-
-                    {!isLoading &&
-                        order.productItems?.map((product, idx) => {
-                            const variant = {
-                                ...product,
-                                ...productsById[product.productId],
-                                price: product.price
-                            }
-                            return (
-                                <Box
-                                    p={[4, 6]}
-                                    key={product.productId}
-                                    border="1px solid"
-                                    borderColor="gray.100"
-                                    borderRadius="base"
-                                >
-                                    <ItemVariantProvider
-                                        index={idx}
-                                        variant={variant}
-                                        currency={order.currency}
-                                    >
-                                        <Flex width="full" alignItems="flex-start">
-                                            <CartItemVariantImage width={['88px', 36]} mr={4} />
-                                            <Stack spacing={1} marginTop="-3px" flex={1}>
-                                                <CartItemVariantName />
-                                                <Flex
-                                                    width="full"
-                                                    justifyContent="space-between"
-                                                    alignItems="flex-end"
-                                                >
-                                                    <CartItemVariantAttributes
-                                                        includeQuantity
-                                                        currency={order.currency}
-                                                    />
-                                                    <CartItemVariantPrice
-                                                        currency={order.currency}
-                                                    />
-                                                </Flex>
-                                            </Stack>
-                                        </Flex>
-                                    </ItemVariantProvider>
-                                </Box>
-                            )
-                        })}
+                        ))
+                    ) : (
+                        <OrderProducts
+                            productItems={order.productItems}
+                            currency={order.currency}
+                        />
+                    )}
                 </Stack>
             </Stack>
         </Stack>

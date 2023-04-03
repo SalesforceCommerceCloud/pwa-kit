@@ -13,6 +13,7 @@ type Client = ShopperContexts<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
     getShopperContext: [
+        '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
         '/shopper-context/',
@@ -37,7 +38,13 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 
 export const getShopperContext: QueryKeyHelper<'getShopperContext'> = {
     parameters: (params) => pick(params, ['organizationId', 'usid']),
-    path: (params) => ['/organizations/', params.organizationId, '/shopper-context/', params.usid],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/shopper-context/',
+        params.usid
+    ],
     queryKey: (params: Params<'getShopperContext'>) => [
         ...getShopperContext.path(params),
         getShopperContext.parameters(params)

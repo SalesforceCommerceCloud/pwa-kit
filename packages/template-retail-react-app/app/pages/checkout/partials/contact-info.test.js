@@ -20,8 +20,8 @@ jest.mock('../util/checkout-context', () => {
             setIsGuestCheckout: jest.fn(),
             step: 0,
             login: null,
-            checkoutSteps: {Contact_Info: 0},
-            setCheckoutStep: null,
+            STEPS: {CONTACT_INFO: 0},
+            goToStep: null,
             goToNextStep: null
         })
     }

@@ -13,6 +13,7 @@ type Client = ShopperBaskets<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
     getBasket: [
+        '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
         '/baskets/',
@@ -20,6 +21,7 @@ export type QueryKeys = {
         Params<'getBasket'>
     ]
     getPaymentMethodsForBasket: [
+        '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
         '/baskets/',
@@ -28,6 +30,7 @@ export type QueryKeys = {
         Params<'getPaymentMethodsForBasket'>
     ]
     getPriceBooksForBasket: [
+        '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
         '/baskets/',
@@ -36,6 +39,7 @@ export type QueryKeys = {
         Params<'getPriceBooksForBasket'>
     ]
     getShippingMethodsForShipment: [
+        '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
         '/baskets/',
@@ -46,6 +50,7 @@ export type QueryKeys = {
         Params<'getShippingMethodsForShipment'>
     ]
     getTaxesFromBasket: [
+        '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
         '/baskets/',
@@ -71,7 +76,13 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 
 export const getBasket: QueryKeyHelper<'getBasket'> = {
     parameters: (params) => pick(params, ['organizationId', 'basketId', 'siteId', 'locale']),
-    path: (params) => ['/organizations/', params.organizationId, '/baskets/', params.basketId],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/baskets/',
+        params.basketId
+    ],
     queryKey: (params: Params<'getBasket'>) => [
         ...getBasket.path(params),
         getBasket.parameters(params)
@@ -81,6 +92,7 @@ export const getBasket: QueryKeyHelper<'getBasket'> = {
 export const getPaymentMethodsForBasket: QueryKeyHelper<'getPaymentMethodsForBasket'> = {
     parameters: (params) => pick(params, ['organizationId', 'basketId', 'siteId', 'locale']),
     path: (params) => [
+        '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/baskets/',
@@ -96,6 +108,7 @@ export const getPaymentMethodsForBasket: QueryKeyHelper<'getPaymentMethodsForBas
 export const getPriceBooksForBasket: QueryKeyHelper<'getPriceBooksForBasket'> = {
     parameters: (params) => pick(params, ['organizationId', 'basketId', 'siteId']),
     path: (params) => [
+        '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/baskets/',
@@ -112,6 +125,7 @@ export const getShippingMethodsForShipment: QueryKeyHelper<'getShippingMethodsFo
     parameters: (params) =>
         pick(params, ['organizationId', 'basketId', 'shipmentId', 'siteId', 'locale']),
     path: (params) => [
+        '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/baskets/',
@@ -129,6 +143,7 @@ export const getShippingMethodsForShipment: QueryKeyHelper<'getShippingMethodsFo
 export const getTaxesFromBasket: QueryKeyHelper<'getTaxesFromBasket'> = {
     parameters: (params) => pick(params, ['organizationId', 'basketId', 'siteId']),
     path: (params) => [
+        '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/baskets/',
