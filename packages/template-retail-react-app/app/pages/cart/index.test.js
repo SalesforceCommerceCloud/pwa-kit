@@ -192,7 +192,7 @@ describe('Empty cart tests', function () {
 })
 
 describe('Rendering tests', function () {
-    test.only('Renders skeleton before rendering cart items, shipping info', async () => {
+    test('Renders skeleton before rendering cart items, shipping info', async () => {
         renderWithProviders(<Cart />)
 
         await waitFor(() => {
@@ -298,14 +298,13 @@ describe('Remove item from cart', function () {
             })
         )
     })
-    test('Can remove item from the cart', async () => {
+    test.only('Can remove item from the cart', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
 
         // remove item
-        const cartItem = await screen.findByTestId('sf-cart-item-701642889830M')
-
+        const cartItem = screen.getByTestId('sf-cart-item-701642889830M')
         userEvent.click(within(cartItem).getByRole('button', {name: /remove/i}))
         userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
 
