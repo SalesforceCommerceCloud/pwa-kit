@@ -16,16 +16,19 @@ const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
 
 const getOverridePath = (relativePath) => {
     const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
+    const overridePath = pkg?.mobify?.overridesDir?.replace(/^\//, '')
+
     // order matters here, we perform look ups starting in the following order:
     // pkg.mobify.overridesDir => pkg.mobify.extends => current projectDir
     if (pkg?.mobify?.extends && pkg?.mobify?.overridesDir) {
-        const overrideFile = glob.sync(
-            `${resolve(
-                projectDir,
-                pkg?.mobify?.overridesDir,
-                ...relativePath
-            )}${OVERRIDES_EXTENSIONS}`
-        )
+        const filePath = `${resolve(
+            projectDir,
+            overridePath,
+            ...relativePath
+        )}${OVERRIDES_EXTENSIONS}`
+
+        const overrideFile = glob.sync(filePath)
+
         if (overrideFile?.length) {
             return overrideFile?.[0]
         }
@@ -139,7 +142,7 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             [pathArr[pathArr?.length - 2], pathArr[pathArr?.length - 1]]?.join('/')
         ]
     })
-    const _overrides = [...overrides]
+
     const _overridesHashMap = new Map()
     overridesFsRead.forEach((item) => {
         const end = item.substr(item.lastIndexOf('/index'))
