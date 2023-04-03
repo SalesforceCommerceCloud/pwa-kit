@@ -87,7 +87,6 @@ AppConfig.freeze = () => undefined
 
 AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
-        api: locals.api,
         buildUrl: locals.buildUrl,
         site: locals.site,
         locale: locals.locale
