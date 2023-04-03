@@ -79,7 +79,7 @@
         "tail-logs": "pwa-kit-dev tail-logs",
         "test": "pwa-kit-dev test",
         "test:lighthouse": "cross-env NODE_ENV=production lhci autorun --config=tests/lighthouserc.js",
-        "test:max-file-size": "npm run build && bundlesize"
+        "test:max-file-size": "bundlesize"
     },
 	"bundlesize": [
 		{
