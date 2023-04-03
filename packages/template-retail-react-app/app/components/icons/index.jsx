@@ -43,7 +43,6 @@ import '../../assets/svg/social-twitter.svg'
 import '../../assets/svg/social-youtube.svg'
 import '../../assets/svg/like.svg'
 import '../../assets/svg/lock.svg'
-import '../../assets/svg/payment.svg'
 import '../../assets/svg/plug.svg'
 import '../../assets/svg/plus.svg'
 import '../../assets/svg/receipt.svg'
@@ -139,7 +138,6 @@ export const InfoIcon = icon('info')
 export const LikeIcon = icon('like')
 export const LockIcon = icon('lock')
 export const LocationIcon = icon('location')
-export const PaymentIcon = icon('payment')
 export const PaypalIcon = icon('paypal', {viewBox: PaypalSymbol.viewBox})
 export const PlugIcon = icon('plug')
 export const PlusIcon = icon('plus')

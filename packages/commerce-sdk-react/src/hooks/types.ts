@@ -66,7 +66,6 @@ export type NullToOptional<T> = Omit<T, NullKeys<T>> & {
 }
 
 // --- API CLIENTS --- //
-export type ApiParameter = string | number | boolean | string[] | number[]
 
 export type ApiClientConfigParams = {
     clientId: string
@@ -177,21 +176,17 @@ export type CacheUpdateUpdate<T> = {
 }
 
 /** Query predicate for queries to invalidate */
-export type CacheUpdateInvalidate =
-    | InvalidateQueryFilters
-    // TODO: Change Shopper Baskets cache logic from using predicates to creating query filters
-    // using the query key helpers, then this 'predicate' type can be removed, as can the one in
-    // `CacheUpdateRemove`. The predicate helpers in `utils.ts` should also then be removed.
-    | NonNullable<InvalidateQueryFilters['predicate']>
+export type CacheUpdateInvalidate = InvalidateQueryFilters
 
 /** Query predicate for queries to remove */
-export type CacheUpdateRemove = QueryFilters | NonNullable<QueryFilters['predicate']>
+export type CacheUpdateRemove = QueryFilters
 
 /** Collection of updates to make to the cache when a request completes. */
 export type CacheUpdate = {
     update?: CacheUpdateUpdate<unknown>[]
     invalidate?: CacheUpdateInvalidate[]
     remove?: CacheUpdateRemove[]
+    clear?: boolean
 }
 
 /** Generates a collection of cache updates to make for a given request. */

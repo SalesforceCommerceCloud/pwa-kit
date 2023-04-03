@@ -11,7 +11,7 @@ import {
     ShopperLoginTypes,
     ShopperCustomersTypes
 } from 'commerce-sdk-isomorphic'
-import jwtDecode from 'jwt-decode'
+import jwtDecode, {JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
@@ -29,6 +29,11 @@ interface AuthConfig extends ApiClientConfigParams {
 interface JWTHeaders {
     exp: number
     iat: number
+}
+
+interface SlasJwtPayload extends JwtPayload {
+    sub: string
+    isb: string
 }
 
 /**
@@ -263,15 +268,19 @@ class Auth {
      */
     async queueRequest(fn: () => Promise<TokenResponse>, isGuest: boolean) {
         const queue = this.pendingToken ?? Promise.resolve()
-        this.pendingToken = queue.then(async () => {
-            const token = await fn()
-            this.handleTokenResponse(token, isGuest)
+        this.pendingToken = queue
+            .then(async () => {
+                const token = await fn()
+                this.handleTokenResponse(token, isGuest)
 
-            // Q: Why don't we just return token? Why re-construct the same object again?
-            // A: because a user could open multiple tabs and the data in memory could be out-dated
-            // We must always grab the data from the storage (cookie/localstorage) directly
-            return this.data
-        })
+                // Q: Why don't we just return token? Why re-construct the same object again?
+                // A: because a user could open multiple tabs and the data in memory could be out-dated
+                // We must always grab the data from the storage (cookie/localstorage) directly
+                return this.data
+            })
+            .finally(() => {
+                this.pendingToken = undefined
+            })
         return this.pendingToken
     }
 
@@ -288,8 +297,12 @@ class Auth {
      */
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
-            this.pendingToken = Promise.resolve({...this.data, access_token: this.fetchedToken})
-            return this.pendingToken
+            const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
+            this.set('access_token', this.fetchedToken)
+            this.set('customer_id', customerId)
+            this.set('usid', usid)
+            this.set('customer_type', isGuest ? 'guest' : 'registered')
+            return this.data
         }
         if (this.pendingToken) {
             return this.pendingToken
@@ -297,8 +310,7 @@ class Auth {
         const accessToken = this.get('access_token')
 
         if (accessToken && !this.isTokenExpired(accessToken)) {
-            this.pendingToken = Promise.resolve(this.data)
-            return this.pendingToken
+            return this.data
         }
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
@@ -404,6 +416,35 @@ class Auth {
         // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
         this.clearStorage()
         return this.loginGuestUser()
+    }
+
+    /**
+     * Decode SLAS JWT and extract information such as customer id, usid, etc.
+     *
+     */
+    parseSlasJWT(jwt: string) {
+        const payload = jwtDecode(jwt) as SlasJwtPayload
+        const {sub, isb} = payload
+
+        if (!sub || !isb) {
+            throw new Error('Unable to parse access token payload: missing sub and isb.')
+        }
+
+        // ISB format
+        // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
+        const isbParts = isb.split('::')
+        const isGuest = isbParts[1] === 'upn:Guest'
+        const customerId = isGuest
+            ? isbParts[3].replace('gcid:', '')
+            : isbParts[4].replace('rcid:', '')
+        // SUB format
+        // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
+        const usid = sub.split('::')[3].replace('usid:', '')
+        return {
+            isGuest,
+            customerId,
+            usid
+        }
     }
 }
 

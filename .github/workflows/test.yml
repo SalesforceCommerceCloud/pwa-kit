@@ -13,6 +13,7 @@ on:
   # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
   # https://docs.github.com/en/actions/managing-workflow-runs/approving-workflow-runs-from-public-forks
   pull_request: # Default: opened, reopened, synchronize (head branch updated)
+  merge_group: # Trigger GA workflow when a pull request is added to a merge queue.
   push:
     branches:
       - develop
@@ -30,11 +31,16 @@ jobs:
   pwa-kit:
     strategy:
       matrix:
-        node: [14, 16]
-        npm: [6, 7, 8]
+        node: [14, 16, 18]
+        npm: [6, 7, 8, 9]
+        # We exclude the less likely Node and NPM combinations to reduce the number of GA builds.
         exclude:
           - node: 16
             npm: 6
+          - node: 18
+            npm: 6
+          - node: 14
+            npm: 9
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
@@ -122,11 +128,16 @@ jobs:
   pwa-kit-windows:
     strategy:
       matrix:
-        node: [14, 16]
-        npm: [6, 7, 8]
+        node: [14, 16, 18]
+        npm: [6, 7, 8, 9]
+        # We exclude the less likely Node and NPM combinations to reduce the number of GA builds.
         exclude:
           - node: 16
             npm: 6
+          - node: 18
+            npm: 6
+          - node: 14
+            npm: 9
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
@@ -170,7 +181,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
@@ -180,7 +191,7 @@ jobs:
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 5
+        timeout-minutes: 8
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
@@ -260,7 +271,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Setup Windows Machine
         uses: "./.github/actions/setup_windows"

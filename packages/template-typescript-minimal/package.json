@@ -2,21 +2,21 @@
     "name": "typescript-minimal",
     "version": "2.8.0-dev.0",
     "engines": {
-        "node": "^14.0.0 || ^16.0.0",
-        "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+        "node": "^14.0.0 || ^16.0.0 || ^18.0.0",
+        "npm": "^6.14.4 || ^7.0.0 || ^8.0.0 || ^9.0.0"
     },
     "devDependencies": {
-        "@loadable/component": "^5.15.0",
-        "@tanstack/react-query": "^4.0.10",
-        "@types/react": "^17.0.2",
-        "@types/react-dom": "^17.0.2",
-        "pwa-kit-dev": "^2.8.0-dev.0",
-        "pwa-kit-react-sdk": "^2.8.0-dev.0",
-        "pwa-kit-runtime": "^2.8.0-dev.0",
+        "@loadable/component": "^5.15.3",
+        "@tanstack/react-query": "^4.28.0",
+        "@types/react": "^17.0.53",
+        "@types/react-dom": "^17.0.19",
+        "pwa-kit-dev": "2.8.0-dev.0",
+        "pwa-kit-react-sdk": "2.8.0-dev.0",
+        "pwa-kit-runtime": "2.8.0-dev.0",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-helmet": "^6.1.0",
-        "react-router-dom": "^5.1.2"
+        "react-router-dom": "^5.3.4"
     },
     "scripts": {
         "format": "pwa-kit-dev format \"**/*.{js,jsx,tsx}\"",

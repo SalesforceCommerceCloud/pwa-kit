@@ -199,6 +199,81 @@ export const ocapiBasketWithItem = {
     tax_total: null,
 }
 
+export const scapiBasketWithItem = {
+    adjustedMerchandizeTotalTax: 0.91,
+    adjustedShippingTotalTax: 0.29,
+    agentBasket: false,
+    basketId: 'e4547d1b21d01bf5ad92d30c9d',
+    channelType: 'storefront',
+    creationDate: '2023-03-28T17:29:43.704Z',
+    currency: 'GBP',
+    customerInfo: {
+        customerId: 'ablXcZlbAXmewRledJmqYYlKk0'
+    },
+    lastModified: '2023-03-28T18:04:25.483Z',
+    merchandizeTotalTax: 0.91,
+    notes: {},
+    orderTotal: 25.17,
+    productItems: [
+        {
+            adjustedTax: 0.91,
+            basePrice: 9.59,
+            bonusProductLineItem: false,
+            gift: false,
+            itemId: '7f9637386161502d31f4563db5',
+            itemText: 'Long Sleeve Crew Neck',
+            price: 19.18,
+            priceAfterItemDiscount: 19.18,
+            priceAfterOrderDiscount: 19.18,
+            productId: '701643070725M',
+            productName: 'Long Sleeve Crew Neck',
+            quantity: 2,
+            shipmentId: 'me',
+            tax: 0.91,
+            taxBasis: 19.18,
+            taxClassId: 'standard',
+            taxRate: 0.05
+        }
+    ],
+    productSubTotal: 19.18,
+    productTotal: 19.18,
+    shipments: [
+        {
+            adjustedMerchandizeTotalTax: 0.91,
+            adjustedShippingTotalTax: 0.29,
+            gift: false,
+            merchandizeTotalTax: 0.91,
+            productSubTotal: 19.18,
+            productTotal: 19.18,
+            shipmentId: 'me',
+            shipmentTotal: 25.17,
+            shippingStatus: 'not_shipped',
+            shippingTotal: 5.99,
+            shippingTotalTax: 0.29,
+            taxTotal: 1.2
+        }
+    ],
+    shippingItems: [
+        {
+            adjustedTax: 0.29,
+            basePrice: 5.99,
+            itemId: '2922238c5ed059a3041062cf0c',
+            itemText: 'Shipping',
+            price: 5.99,
+            priceAfterItemDiscount: 5.99,
+            shipmentId: 'me',
+            tax: 0.29,
+            taxBasis: 5.99,
+            taxClassId: 'standard',
+            taxRate: 0.05
+        }
+    ],
+    shippingTotal: 5.99,
+    shippingTotalTax: 0.29,
+    taxation: 'gross',
+    taxTotal: 1.2
+}
+
 export const ocapiBasketWithPaymentInstrumentAndBillingAddress = {
     _v: '21.3',
     _type: 'basket',
@@ -384,43 +459,34 @@ export const ocapiBasketWithPaymentInstrumentAndBillingAddress = {
 }
 
 export const mockShippingMethods = {
-    _v: '21.3',
-    _type: 'shipping_method_result',
-    applicable_shipping_methods: [
+    applicableShippingMethods: [
         {
-            _type: 'shipping_method',
-            _resource_state: '860cde3040519cce439cd99e209f8a87c3ad0b7e2813edbf6f5501f763b73bd5',
-            description: 'The default shipping method.',
-            id: 'DefaultShippingMethod',
-            name: 'Default Shipping Method',
-            price: 5.55,
-            shipping_promotions: [
-                {
-                    callout_msg: 'Free Shipping Amount Above 150',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/3184d71eea54c9d27e88dc41ca',
-                    promotion_id: 'FreeShippingAmountAbove150',
-                    promotion_name: 'Free Shipping Amount Above 150',
-                },
-            ],
+            description: 'Order received within 7-10 business days',
+            id: '001',
+            name: 'Ground',
+            price: 15.99
         },
         {
-            _type: 'shipping_method',
-            _resource_state: '847f9c3c5867f641470b3046aeec31f07757991b792d722e10079926f7a289fb',
-            description: 'The base shipping method.',
-            id: 'BaseShippingMethod',
-            name: 'Base Shipping Method',
-            price: 0.99,
+            description: 'Order received in 2 business days',
+            id: '002',
+            name: '2-Day Express',
+            price: 20.99
         },
         {
-            _type: 'shipping_method',
-            _resource_state: 'c3c5867f641470b3046aeec31f07757991b792d722e10079926f7a289fb',
-            description: 'A shipping method that contains product level shipping costs.',
-            id: 'ProductLevelShippingCostsShippingMethod',
-            name: 'Product Level Shipping Costs Shipping Method',
-            price: 0.1,
+            description: 'Order received the next business day',
+            id: '003',
+            name: 'Overnight',
+            price: 29.99
         },
+        {
+            description: 'Store Pickup',
+            id: '005',
+            name: 'Store Pickup',
+            price: 0,
+            c_storePickupEnabled: true
+        }
     ],
-    default_shipping_method_id: 'DefaultShippingMethod',
+    defaultShippingMethodId: '001'
 }
 
 export const ocapiOrderResponse = {
@@ -719,6 +785,45 @@ export const mockedRegisteredCustomer = {
     ],
     previousLoginTime: '2021-04-14T13:38:29.778Z',
     previousVisitTime: '2021-04-14T13:38:29.778Z',
+}
+
+export const mockedRegisteredCustomerWithNoAddress = {
+    addresses: [],
+    authType: 'registered',
+    creationDate: '2021-03-31T13:32:42.000Z',
+    customerId: 'customerid',
+    customerNo: '00149004',
+    email: 'customer@test.com',
+    enabled: true,
+    lastLoginTime: '2021-04-14T13:38:29.778Z',
+    lastModified: '2021-04-14T13:38:29.778Z',
+    firstName: 'Testing',
+    lastName: 'Tester',
+    phoneHome: '(727) 555-1234',
+    lastVisitTime: '2021-04-14T13:38:29.778Z',
+    login: 'customer@test.com',
+    paymentInstruments: [
+        {
+            creationDate: '2021-04-01T14:34:56.000Z',
+            lastModified: '2021-04-01T14:34:56.000Z',
+            paymentBankAccount: {},
+            paymentCard: {
+                cardType: 'Master Card',
+                creditCardExpired: false,
+                expirationMonth: 1,
+                expirationYear: 2030,
+                holder: 'Test McTester',
+                maskedNumber: '************5454',
+                numberLastDigits: '5454',
+                validFromMonth: 1,
+                validFromYear: 2020
+            },
+            paymentInstrumentId: 'testcard1',
+            paymentMethodId: 'CREDIT_CARD'
+        }
+    ],
+    previousLoginTime: '2021-04-14T13:38:29.778Z',
+    previousVisitTime: '2021-04-14T13:38:29.778Z'
 }
 
 export const mockedGuestCustomer = {
@@ -2983,19 +3088,6 @@ export const mockedCustomerProductListsDetails = {
         },
     ],
     total: 1,
-}
-
-export const mockCategory = {
-    id: 'mens',
-    name: 'Mens',
-    pageDescription:
-        "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
-    pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
-    pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
-    parentCategoryId: 'root',
-    c_showInMenu: true,
-    loaded: true,
-    image: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg'
 }
 
 export const mockCategories = {
@@ -5614,4 +5706,1003 @@ export const mockProductSearch = {
     ],
     offset: 0,
     total: 43,
+}
+
+export const mockCategory = {
+    id: 'mens-accessories-ties',
+    image: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dwd2ff3ec8/images/slot/sub_banners/cat-banner-mens-ties.jpg',
+    name: 'Ties',
+    pageDescription:
+        "Shop Mens's Ties for all occasions including business or casual at Commerce Cloud",
+    pageTitle: "Men's Casual and Business Ties",
+    parentCategoryId: 'mens-accessories',
+    parentCategoryTree: [
+        {
+            id: 'mens',
+            name: 'Mens'
+        },
+        {
+            id: 'mens-accessories',
+            name: 'Accessories'
+        },
+        {
+            id: 'mens-accessories-ties',
+            name: 'Ties'
+        }
+    ],
+    c_enableCompare: false,
+    c_showInMenu: true
+}
+
+export const mockEmptyBasket = {
+    total: 1,
+    baskets: [
+        {
+            adjustedMerchandizeTotalTax: 0,
+            adjustedShippingTotalTax: 0,
+            agentBasket: false,
+            basketId: '10cf6aa40edba4fcfcc6915594',
+            channelType: 'storefront',
+            creationDate: '2023-02-14T20:53:36.255Z',
+            currency: 'GBP',
+            customerInfo: {
+                customerId: 'abkKsUmbJIlrkRk0wVxaYYlXBI',
+                email: ''
+            },
+            lastModified: '2023-02-14T23:55:28.782Z',
+            merchandizeTotalTax: 0,
+            notes: {},
+            orderTotal: 0,
+            productSubTotal: 0,
+            productTotal: 0,
+            shipments: [
+                {
+                    adjustedMerchandizeTotalTax: 0,
+                    adjustedShippingTotalTax: 0,
+                    gift: false,
+                    merchandizeTotalTax: 0,
+                    productSubTotal: 0,
+                    productTotal: 0,
+                    shipmentId: 'me',
+                    shipmentTotal: 0,
+                    shippingMethod: {
+                        description: 'Order received within 7-10 business days',
+                        id: 'GBP001',
+                        name: 'Ground',
+                        price: 0,
+                        shippingPromotions: [
+                            {
+                                calloutMsg: 'Free Shipping Amount Above 50',
+                                promotionId: 'FreeShippingAmountAbove50',
+                                promotionName: 'Free Shipping Amount Above 50'
+                            }
+                        ],
+                        c_estimatedArrivalTime: '7-10 Business Days'
+                    },
+                    shippingStatus: 'not_shipped',
+                    shippingTotal: 0,
+                    shippingTotalTax: 0,
+                    taxTotal: 0
+                }
+            ],
+            shippingItems: [
+                {
+                    adjustedTax: 0,
+                    basePrice: 0,
+                    itemId: 'b62ed8c04cc91b2002be03dcaf',
+                    itemText: 'Shipping',
+                    price: 0,
+                    priceAfterItemDiscount: 0,
+                    shipmentId: 'me',
+                    tax: 0,
+                    taxBasis: 0,
+                    taxClassId: 'CustomRate',
+                    taxRate: 0
+                }
+            ],
+            shippingTotal: 0,
+            shippingTotalTax: 0,
+            taxation: 'gross',
+            taxTotal: 0
+        }
+    ]
+}
+export const mockCustomerBaskets = {
+    baskets: [
+        {
+            adjustedMerchandizeTotalTax: 5.123,
+            adjustedShippingTotalTax: null,
+            agentBasket: false,
+            basketId: '10cf6aa40edba4fcfcc6915594',
+            channelType: 'storefront',
+            creationDate: '2023-01-19T19:12:06.615Z',
+            currency: 'GBP',
+            customerInfo: {
+                customerId: 'abmuc2wupJxeoRxuo3wqYYmbhI'
+            },
+            lastModified: '2023-01-19T19:12:07.718Z',
+            merchandizeTotalTax: 2.93,
+            notes: {},
+            orderTotal: null,
+            productItems: [
+                {
+                    adjustedTax: 2.93,
+                    basePrice: 61.43,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: '4a9af0a24fe46c3f6d8721b371',
+                    itemText: 'Belted Cardigan With Studs',
+                    price: 61.43,
+                    priceAfterItemDiscount: 61.43,
+                    priceAfterOrderDiscount: 61.43,
+                    productId: '701642889830M',
+                    productName: 'Belted Cardigan With Studs',
+                    quantity: 2,
+                    shipmentId: 'me',
+                    tax: 2.93,
+                    taxBasis: 61.43,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
+            ],
+            productSubTotal: 61.43,
+            productTotal: 61.43,
+            shipments: [
+                {
+                    adjustedMerchandizeTotalTax: 2.93,
+                    adjustedShippingTotalTax: null,
+                    gift: false,
+                    merchandizeTotalTax: 2.93,
+                    productSubTotal: 61.43,
+                    productTotal: 61.43,
+                    shipmentId: 'me',
+                    shipmentTotal: null,
+                    shippingStatus: 'not_shipped',
+                    shippingTotal: null,
+                    shippingTotalTax: null,
+                    taxTotal: null
+                }
+            ],
+            shippingItems: [
+                {
+                    adjustedTax: 0,
+                    basePrice: 9.99,
+                    itemId: 'b62ed8c04cc91b2002be03dcaf',
+                    itemText: 'Shipping',
+                    price: 9.99,
+                    priceAdjustments: [
+                        {
+                            appliedDiscount: {
+                                amount: 1,
+                                type: 'free'
+                            },
+                            creationDate: '2023-02-15T00:18:09.801Z',
+                            custom: false,
+                            itemText: 'Free Shipping Amount Above 50',
+                            lastModified: '2023-02-15T00:18:09.804Z',
+                            manual: false,
+                            price: -9.99,
+                            priceAdjustmentId: '65253f9d5221263c604351a4e4',
+                            promotionId: 'FreeShippingAmountAbove50'
+                        }
+                    ],
+                    priceAfterItemDiscount: 0,
+                    shipmentId: 'me',
+                    tax: 0.48,
+                    taxBasis: 9.99,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
+            ],
+            shippingTotal: null,
+            shippingTotalTax: null,
+            taxation: 'gross',
+            taxTotal: null
+        }
+    ],
+    total: 1
+}
+
+export const mockMasterProduct = {
+    currency: 'GBP',
+    id: '25752235M',
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, '
+                },
+                {
+                    alt: 'Checked Silk Tie, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1abd7d2f/images/large/PG.949612424S.COBATSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1abd7d2f/images/large/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, '
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Cobalt, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe64d25bd/images/large/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                },
+                {
+                    alt: 'Checked Silk Tie, Cobalt, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1abd7d2f/images/large/PG.949612424S.COBATSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1abd7d2f/images/large/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'COBATSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Navy, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5170f98a/images/large/PG.949612424S.NAVYSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5170f98a/images/large/PG.949612424S.NAVYSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                },
+                {
+                    alt: 'Checked Silk Tie, Navy, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfdc619bd/images/large/PG.949612424S.NAVYSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfdc619bd/images/large/PG.949612424S.NAVYSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Yellow, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwad4fc053/images/large/PG.949612424S.YELLOSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwad4fc053/images/large/PG.949612424S.YELLOSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                },
+                {
+                    alt: 'Checked Silk Tie, Yellow, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd21598ea/images/large/PG.949612424S.YELLOSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd21598ea/images/large/PG.949612424S.YELLOSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'YELLOSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd5ee689c/images/medium/PG.949612424S.COBATSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd5ee689c/images/medium/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, '
+                },
+                {
+                    alt: 'Checked Silk Tie, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8bae4d60/images/medium/PG.949612424S.COBATSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8bae4d60/images/medium/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, '
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Cobalt, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd5ee689c/images/medium/PG.949612424S.COBATSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd5ee689c/images/medium/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                },
+                {
+                    alt: 'Checked Silk Tie, Cobalt, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8bae4d60/images/medium/PG.949612424S.COBATSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8bae4d60/images/medium/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'COBATSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Navy, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw244298b8/images/medium/PG.949612424S.NAVYSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw244298b8/images/medium/PG.949612424S.NAVYSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                },
+                {
+                    alt: 'Checked Silk Tie, Navy, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb389c00a/images/medium/PG.949612424S.NAVYSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb389c00a/images/medium/PG.949612424S.NAVYSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Yellow, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdce01d71/images/medium/PG.949612424S.YELLOSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdce01d71/images/medium/PG.949612424S.YELLOSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                },
+                {
+                    alt: 'Checked Silk Tie, Yellow, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4a563bde/images/medium/PG.949612424S.YELLOSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4a563bde/images/medium/PG.949612424S.YELLOSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'YELLOSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fad510c/images/small/PG.949612424S.COBATSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fad510c/images/small/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, '
+                },
+                {
+                    alt: 'Checked Silk Tie, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9a08e955/images/small/PG.949612424S.COBATSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9a08e955/images/small/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, '
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Cobalt, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fad510c/images/small/PG.949612424S.COBATSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fad510c/images/small/PG.949612424S.COBATSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                },
+                {
+                    alt: 'Checked Silk Tie, Cobalt, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9a08e955/images/small/PG.949612424S.COBATSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9a08e955/images/small/PG.949612424S.COBATSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'COBATSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Navy, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa94e3279/images/small/PG.949612424S.NAVYSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa94e3279/images/small/PG.949612424S.NAVYSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                },
+                {
+                    alt: 'Checked Silk Tie, Navy, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw73571fe7/images/small/PG.949612424S.NAVYSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw73571fe7/images/small/PG.949612424S.NAVYSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Yellow, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa9639168/images/small/PG.949612424S.YELLOSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa9639168/images/small/PG.949612424S.YELLOSI.PZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                },
+                {
+                    alt: 'Checked Silk Tie, Yellow, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbfa3e4f6/images/small/PG.949612424S.YELLOSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbfa3e4f6/images/small/PG.949612424S.YELLOSI.BZ.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'YELLOSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Cobalt, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9d87f5f6/images/swatch/PG.949612424S.COBATSI.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9d87f5f6/images/swatch/PG.949612424S.COBATSI.CP.jpg',
+                    title: 'Checked Silk Tie, Cobalt'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'COBATSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Navy, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa0a33bb5/images/swatch/PG.949612424S.NAVYSI.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa0a33bb5/images/swatch/PG.949612424S.NAVYSI.CP.jpg',
+                    title: 'Checked Silk Tie, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        },
+        {
+            images: [
+                {
+                    alt: 'Checked Silk Tie, Yellow, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw529c07c2/images/swatch/PG.949612424S.YELLOSI.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw529c07c2/images/swatch/PG.949612424S.YELLOSI.CP.jpg',
+                    title: 'Checked Silk Tie, Yellow'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'YELLOSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        }
+    ],
+    inventory: {
+        ats: 274,
+        backorderable: false,
+        id: 'inventory_m',
+        orderable: true,
+        preorderable: false,
+        stockLevel: 274
+    },
+    longDescription:
+        "This silk tie works well with a Commerce Cloud Store dress shirt and suit It's perfect for any occasion. ",
+    master: {
+        masterId: '25752235M',
+        orderable: true,
+        price: 19.19
+    },
+    minOrderQuantity: 1,
+    name: 'Checked Silk Tie',
+    pageDescription:
+        "This silk tie works well with a Commerce Cloud Store dress shirt and suit. It's perfect for any occasion. ",
+    pageTitle: 'Checked Silk Tie',
+    price: 19.19,
+    pricePerUnit: 19.19,
+    primaryCategoryId: 'mens-accessories-ties',
+    recommendations: [
+        {
+            recommendationType: {
+                displayValue: 'Product Detail Page - Cross Sell',
+                value: 1
+            },
+            recommendedItemId: '25604455M'
+        },
+        {
+            recommendationType: {
+                displayValue: 'Product Detail Page - Cross Sell',
+                value: 1
+            },
+            recommendedItemId: '25686571M'
+        },
+        {
+            recommendationType: {
+                displayValue: 'Product Detail Page - Cross Sell',
+                value: 1
+            },
+            recommendedItemId: '25752986M'
+        }
+    ],
+    shortDescription:
+        "This silk tie works well with a Commerce Cloud Store dress shirt and suit. It's perfect for any occasion. ",
+    slugUrl:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArchGlobal/checked-silk-tie/25752235M.html?lang=en_GB',
+    stepQuantity: 1,
+    type: {
+        master: true
+    },
+    validFrom: {
+        default: '2011-02-07T05:00:00.000Z'
+    },
+    variants: [
+        {
+            orderable: true,
+            price: 19.19,
+            productId: '682875090845M',
+            variationValues: {
+                color: 'COBATSI'
+            }
+        },
+        {
+            orderable: true,
+            price: 19.19,
+            productId: '682875719029M',
+            variationValues: {
+                color: 'NAVYSI'
+            }
+        },
+        {
+            orderable: true,
+            price: 19.19,
+            productId: '682875540326M',
+            variationValues: {
+                color: 'YELLOSI'
+            }
+        }
+    ],
+    variationAttributes: [
+        {
+            id: 'color',
+            name: 'Colour',
+            values: [
+                {
+                    name: 'Cobalt',
+                    orderable: true,
+                    value: 'COBATSI'
+                },
+                {
+                    name: 'Navy',
+                    orderable: true,
+                    value: 'NAVYSI'
+                },
+                {
+                    name: 'Yellow',
+                    orderable: true,
+                    value: 'YELLOSI'
+                }
+            ]
+        }
+    ]
+}
+export const mockCartVariant = {
+    currency: 'GBP',
+    id: '701642889830M',
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c2304f9/images/large/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c2304f9/images/large/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23cbdec5/images/large/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23cbdec5/images/large/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c2304f9/images/large/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c2304f9/images/large/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23cbdec5/images/large/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23cbdec5/images/large/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ0NLD0'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw521c09a6/images/medium/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw521c09a6/images/medium/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb147ee45/images/medium/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb147ee45/images/medium/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw521c09a6/images/medium/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw521c09a6/images/medium/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb147ee45/images/medium/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb147ee45/images/medium/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ0NLD0'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa5ed67ee/images/small/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa5ed67ee/images/small/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2baf85f2/images/small/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2baf85f2/images/small/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, '
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa5ed67ee/images/small/PG.10215179.JJ0NLD0.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa5ed67ee/images/small/PG.10215179.JJ0NLD0.PZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                },
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2baf85f2/images/small/PG.10215179.JJ0NLD0.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2baf85f2/images/small/PG.10215179.JJ0NLD0.BZ.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ0NLD0'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Belted Cardigan With Studs, Laurel, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw024437d3/images/swatch/PG.10215179.JJ0NLD0.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw024437d3/images/swatch/PG.10215179.JJ0NLD0.CP.jpg',
+                    title: 'Belted Cardigan With Studs, Laurel'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ0NLD0'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        }
+    ],
+    inventory: {
+        ats: 68,
+        backorderable: false,
+        id: 'inventory_m',
+        orderable: true,
+        preorderable: false,
+        stockLevel: 68
+    },
+    longDescription:
+        'Our best selling cardigan is now updated with a detachable belt and studs. Pair it with a Commerce Cloud Store shell and it is great for nine-to-five and beyond.',
+    master: {
+        masterId: '25502228M',
+        orderable: true,
+        price: 61.43
+    },
+    minOrderQuantity: 1,
+    name: 'Belted Cardigan With Studs',
+    pageDescription:
+        'Our best selling cardigan is now updated with a detachable belt and studs. Pair it with a Commerce Cloud Store shell and it is great for nine-to-five and beyond.',
+    pageTitle: 'Belted Cardigan With Studs',
+    price: 61.43,
+    pricePerUnit: 61.43,
+    productPromotions: [
+        {
+            calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+            promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+        },
+        {
+            calloutMsg: '$50 Fixed Products Amount Above 100',
+            promotionId: '$50FixedProductsAmountAbove100'
+        },
+        {
+            calloutMsg: 'Bonus Product for Order Amounts Above 250',
+            promotionId: 'BonusProductOnOrderOfAmountABove250'
+        }
+    ],
+    shortDescription:
+        'Our best selling cardigan is now updated with a detachable belt and studs. Pair it with a Commerce Cloud Store shell and it is great for nine-to-five and beyond.',
+    slugUrl:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArchGlobal/belted-cardigan-with-studs/701642889830M.html?lang=en_GB',
+    stepQuantity: 1,
+    type: {
+        variant: true
+    },
+    unitMeasure: '',
+    unitQuantity: 0,
+    upc: '701642889830',
+    validFrom: {
+        default: '2010-11-18T05:00:00.000Z'
+    },
+    variants: [
+        {
+            orderable: true,
+            price: 61.43,
+            productId: '701642889823M',
+            variationValues: {
+                color: 'JJ0NLD0',
+                size: '9LG'
+            }
+        },
+        {
+            orderable: true,
+            price: 61.43,
+            productId: '701642889847M',
+            variationValues: {
+                color: 'JJ0NLD0',
+                size: '9SM'
+            }
+        },
+        {
+            orderable: true,
+            price: 61.43,
+            productId: '701642889830M',
+            variationValues: {
+                color: 'JJ0NLD0',
+                size: '9MD'
+            }
+        },
+        {
+            orderable: true,
+            price: 61.43,
+            productId: '701642889854M',
+            variationValues: {
+                color: 'JJ0NLD0',
+                size: '9XL'
+            }
+        }
+    ],
+    variationAttributes: [
+        {
+            id: 'color',
+            name: 'Colour',
+            values: [
+                {
+                    name: 'Laurel',
+                    orderable: true,
+                    value: 'JJ0NLD0'
+                }
+            ]
+        },
+        {
+            id: 'size',
+            name: 'Size',
+            values: [
+                {
+                    name: 'S',
+                    orderable: true,
+                    value: '9SM'
+                },
+                {
+                    name: 'M',
+                    orderable: true,
+                    value: '9MD'
+                },
+                {
+                    name: 'L',
+                    orderable: true,
+                    value: '9LG'
+                },
+                {
+                    name: 'XL',
+                    orderable: true,
+                    value: '9XL'
+                }
+            ]
+        }
+    ],
+    variationValues: {
+        color: 'JJ0NLD0',
+        size: '9MD'
+    },
+    c_color: 'JJ0NLD0',
+    c_refinementColor: 'black',
+    c_size: '9MD',
+    c_width: 'Z'
 }

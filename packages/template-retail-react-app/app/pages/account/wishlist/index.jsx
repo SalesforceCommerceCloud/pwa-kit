@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {Stack, Heading} from '@chakra-ui/layout'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Flex, Skeleton} from '@chakra-ui/react'
+import {useProducts, useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 
-import useCustomer from '../../../commerce-api/hooks/useCustomer'
 import useNavigation from '../../../hooks/use-navigation'
-import useWishlist from '../../../hooks/use-wishlist'
 import {useToast} from '../../../hooks/use-toast'
+import {useWishList} from '../../../hooks/use-wish-list'
 
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
 import {HeartIcon} from '../../../components/icons'
@@ -21,69 +21,101 @@ import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
 
 import {API_ERROR_MESSAGE} from '../../../constants'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 
 const numberOfSkeletonItems = 3
 
 const AccountWishlist = () => {
-    const customer = useCustomer()
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
     const toast = useToast()
-    const [selectedItem, setSelectedItem] = useState(undefined)
-    const [localQuantity, setLocalQuantity] = useState({})
-    const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
-    const wishlist = useWishlist()
 
-    const handleActionClicked = (itemId) => {
-        setWishlistItemLoading(!!itemId)
+    const [selectedItem, setSelectedItem] = useState(undefined)
+    const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
+
+    const {data: wishListData, isLoading: isWishListLoading} = useWishList()
+    const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
+
+    const {data: productsData, isLoading: isProductsLoading} = useProducts(
+        {parameters: {ids: productIds?.join(','), allImages: true}},
+        {enabled: productIds?.length > 0}
+    )
+
+    const wishListItems = wishListData?.customerProductListItems?.map((item, i) => {
+        return {
+            ...item,
+            product: productsData?.data?.[i]
+        }
+    })
+
+    const updateCustomerProductListItem = useShopperCustomersMutation(
+        'updateCustomerProductListItem'
+    )
+    const deleteCustomerProductListItem = useShopperCustomersMutation(
+        'deleteCustomerProductListItem'
+    )
+    const {data: customer} = useCurrentCustomer()
+
+    const handleSecondaryAction = async (itemId, promise) => {
+        setWishlistItemLoading(true)
         setSelectedItem(itemId)
+
+        try {
+            await promise
+            // No need to handle error here, as the inner component will take care of it
+        } finally {
+            setWishlistItemLoading(false)
+            setSelectedItem(undefined)
+        }
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
-        // This local state allows the dropdown to show the desired quantity
-        // while the API call to update it is happening.
-        setLocalQuantity({...localQuantity, [item.productId]: quantity})
-        setWishlistItemLoading(true)
+        let isValidChange = false
         setSelectedItem(item.productId)
+
+        const body = {
+            ...item,
+            quantity: parseInt(quantity)
+        }
+        // To meet expected schema, remove the custom `product` we added
+        delete body.product
+
+        const parameters = {
+            customerId: customer.customerId,
+            itemId: item.id,
+            listId: wishListData?.id
+        }
+
+        const mutation =
+            parseInt(quantity) > 0
+                ? updateCustomerProductListItem.mutateAsync({body, parameters})
+                : deleteCustomerProductListItem.mutateAsync({parameters})
+
         try {
-            await wishlist.updateListItem({
-                ...item,
-                quantity: parseInt(quantity)
-            })
-        } catch {
+            await mutation
+            isValidChange = true
+            setSelectedItem(undefined)
+        } catch (err) {
             toast({
                 title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }
-        setWishlistItemLoading(false)
-        setSelectedItem(undefined)
-        setLocalQuantity({...localQuantity, [item.productId]: undefined})
+
+        // If true, the quantity picker would immediately update its number
+        // without waiting for the invalidated lists data to finish refetching
+        return isValidChange
     }
 
-    useEffect(() => {
-        if (customer.isRegistered) {
-            // We want to reset the wishlist here
-            // because it is possible that a user
-            // adds an item to the wishlist on another page
-            // and the wishlist page may not have enough
-            // data to render the page.
-            // Reset the wishlist will make sure the
-            // initialization state is correct.
-            if (wishlist.isInitialized) {
-                wishlist.reset()
-            }
-
-            wishlist.init({detail: true})
-        }
-    }, [customer.isRegistered])
+    const isPageLoading = wishListItems ? isProductsLoading : isWishListLoading
 
     return (
         <Stack spacing={4} data-testid="account-wishlist-page">
             <Heading as="h1" fontSize="2xl">
                 <FormattedMessage defaultMessage="Wishlist" id="account_wishlist.title.wishlist" />
             </Heading>
-            {!wishlist.hasDetail && (
+
+            {isPageLoading && (
                 <Box data-testid="sf-wishlist-skeleton">
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
@@ -108,7 +140,7 @@ const AccountWishlist = () => {
                 </Box>
             )}
 
-            {wishlist.hasDetail && wishlist.isEmpty && (
+            {!isPageLoading && !wishListItems && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<HeartIcon boxSize={8} />}
@@ -129,18 +161,21 @@ const AccountWishlist = () => {
                 />
             )}
 
-            {wishlist.hasDetail &&
-                !wishlist.isEmpty &&
-                wishlist.items.map((item) => (
+            {!isPageLoading &&
+                wishListItems &&
+                wishListItems.map((item) => (
                     <ProductItem
                         key={item.id}
                         product={{
                             ...item.product,
-                            quantity: localQuantity[item.productId]
-                                ? localQuantity[item.productId]
-                                : item.quantity
+                            quantity: item.quantity
                         }}
-                        showLoading={isWishlistItemLoading && selectedItem === item.productId}
+                        showLoading={
+                            (updateCustomerProductListItem.isLoading ||
+                                deleteCustomerProductListItem.isLoading ||
+                                isWishlistItemLoading) &&
+                            selectedItem === item.productId
+                        }
                         primaryAction={<WishlistPrimaryAction />}
                         onItemQuantityChange={(quantity) =>
                             handleItemQuantityChanged(quantity, item)
@@ -148,7 +183,7 @@ const AccountWishlist = () => {
                         secondaryActions={
                             <WishlistSecondaryButtonGroup
                                 productListItemId={item.id}
-                                onClick={handleActionClicked}
+                                onClick={handleSecondaryAction}
                             />
                         }
                     />
