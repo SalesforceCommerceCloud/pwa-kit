@@ -21,6 +21,7 @@ type Client = ApiClients['shopperCustomers']
 type CustomerAddress = ShopperCustomersTypes.CustomerAddress
 type CustomerPaymentInstrument = ShopperCustomersTypes.CustomerPaymentInstrument
 type CustomerProductList = ShopperCustomersTypes.CustomerProductList
+type CustomerProductListResult = ShopperCustomersTypes.CustomerProductListResult
 
 const noop = () => ({})
 
@@ -113,11 +114,69 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         }
     },
     deleteCustomerProductListItem(customerId, {parameters}) {
+        // TODO: Dry me up.
+        const findCustomerProductListItemIndex = (list: CustomerProductList, itemId: string) => {
+            const matchIdx = list?.customerProductListItems?.findIndex(
+                ({id}) => id === parameters.itemId
+            )
+
+            return matchIdx
+        }
+
         return {
-            // TODO: Rather than invalidate, can we selectively update?
-            invalidate: [
-                {queryKey: getCustomerProductList.queryKey(parameters)},
-                {queryKey: getCustomerProductLists.queryKey(parameters)}
+            update: [
+                {
+                    queryKey: getCustomerProductList.queryKey(parameters),
+                    updater: (oldData: CustomerProductList) => {
+                        const matchIdx = findCustomerProductListItemIndex(
+                            oldData,
+                            parameters.itemId
+                        )
+
+                        // Return if there is no match.
+                        if (!matchIdx) {
+                            return
+                        }
+
+                        // Copy list and remove item.
+                        const newCustomerProductList = {...oldData}
+                        if (matchIdx > -1) {
+                            newCustomerProductList?.customerProductListItems?.splice(matchIdx, 1)
+                        }
+
+                        return {
+                            ...newCustomerProductList
+                        }
+                    }
+                },
+                {
+                    queryKey: getCustomerProductLists.queryKey(parameters),
+                    updater: (oldData: CustomerProductListResult) => {
+                        if (!oldData) {
+                            return
+                        }
+
+                        const newCustomerProductListResult = {...oldData}
+                        const listMatchIndex = newCustomerProductListResult?.data.findIndex(
+                            ({id}) => id === parameters.listId
+                        )
+
+                        if (listMatchIndex > -1) {
+                            const itemMatchIndex = findCustomerProductListItemIndex(
+                                newCustomerProductListResult.data[listMatchIndex],
+                                parameters.itemId
+                            )
+
+                            if (itemMatchIndex) {
+                                newCustomerProductListResult.data[
+                                    listMatchIndex
+                                ]?.customerProductListItems?.splice(itemMatchIndex, 1)
+                            }
+                        }
+
+                        return newCustomerProductListResult
+                    }
+                }
             ],
             remove: [{queryKey: getCustomerProductListItem.queryKey(parameters)}]
         }
@@ -129,8 +188,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     // registerExternalProfile: TODO('registerExternalProfile'),
     removeCustomerAddress(customerId, {parameters}) {
         return {
-            // TODO: Rather than invalidate, can we selectively update?
-            // ...invalidateCustomer(parameters),
             update: [
                 {
                     queryKey: getCustomer.queryKey(parameters),
@@ -204,13 +261,71 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             invalidate: [{queryKey: getCustomerProductLists.queryKey(parameters)}]
         }
     },
-    updateCustomerProductListItem(customerId, {parameters}) {
+    updateCustomerProductListItem(customerId, {parameters}, response) {
+        const findCustomerProductListItemIndex = (list: CustomerProductList, itemId: string) => {
+            const matchIdx = list?.customerProductListItems?.findIndex(
+                ({id}) => id === parameters.itemId
+            )
+
+            return matchIdx
+        }
+
         return {
-            update: [{queryKey: getCustomerProductListItem.queryKey(parameters)}],
-            // TODO: Rather than invalidate, can we selectively update?
-            invalidate: [
-                {queryKey: getCustomerProductList.queryKey(parameters)},
-                {queryKey: getCustomerProductLists.queryKey(parameters)}
+            update: [
+                {
+                    queryKey: getCustomerProductListItem.queryKey(parameters)
+                },
+                {
+                    queryKey: getCustomerProductList.queryKey(parameters),
+                    updater: (oldData: CustomerProductList) => {
+                        const matchIdx = findCustomerProductListItemIndex(
+                            oldData,
+                            parameters.itemId
+                        )
+
+                        // Return if there is no match.
+                        if (!matchIdx) {
+                            return
+                        }
+
+                        // Copy list and remove item.
+                        const newCustomerProductList = {...oldData}
+                        if (matchIdx > -1 && newCustomerProductList.customerProductListItems) {
+                            newCustomerProductList.customerProductListItems[matchIdx] = response
+                        }
+
+                        return {
+                            ...newCustomerProductList
+                        }
+                    }
+                },
+                {
+                    queryKey: getCustomerProductLists.queryKey(parameters),
+                    updater: (oldData: CustomerProductListResult) => {
+                        if (!oldData) {
+                            return
+                        }
+
+                        const newCustomerProductListResult = {...oldData}
+                        const listMatchIndex = newCustomerProductListResult?.data.findIndex(
+                            ({id}) => id === parameters.listId
+                        )
+
+                        if (listMatchIndex > -1) {
+                            const itemMatchIndex = findCustomerProductListItemIndex(
+                                newCustomerProductListResult.data[listMatchIndex],
+                                parameters.itemId
+                            )
+
+                            const list  = newCustomerProductListResult.data[listMatchIndex].customerProductListItems
+                            if (itemMatchIndex && list) {
+                                list[itemMatchIndex] = response 
+                            }
+                        }
+
+                        return newCustomerProductListResult
+                    }
+                }
             ]
         }
     }
