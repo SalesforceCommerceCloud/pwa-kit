@@ -95,15 +95,6 @@ jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     }
 })
 
-// Mock isTokenValid globally
-jest.mock('./app/commerce-api/utils', () => {
-    const originalModule = jest.requireActual('./app/commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 // TextEncoder is a web API, need to import it
 // from nodejs util in testing environment.
 // This is used in commerce-api/pkce.js
