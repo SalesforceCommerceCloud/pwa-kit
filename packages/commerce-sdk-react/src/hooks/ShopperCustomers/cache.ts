@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {Query} from '@tanstack/react-query'
 import {getCustomerProductListItem, QueryKeys} from './queryKeyHelpers'
 import {ApiClients, CacheUpdate, CacheUpdateMatrix, Tail} from '../types'
@@ -17,6 +18,9 @@ import {
 import {and, pathStartsWith} from '../utils'
 
 type Client = ApiClients['shopperCustomers']
+type CustomerAddress = ShopperCustomersTypes.CustomerAddress
+type CustomerPaymentInstrument = ShopperCustomersTypes.CustomerPaymentInstrument
+type CustomerProductList = ShopperCustomersTypes.CustomerProductList
 
 const noop = () => ({})
 
@@ -30,17 +34,39 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         // getCustomerAddress uses `addressName` rather than `addressId`
         const newParams = {...parameters, addressName: response.addressId}
         return {
-            // TODO: Rather than invalidate, can we selectively update?
-            ...invalidateCustomer(newParams),
-            update: [{queryKey: getCustomerAddress.queryKey(newParams)}]
+            update: [
+                {
+                    queryKey: getCustomerAddress.queryKey(newParams)
+                },
+                {
+                    queryKey: getCustomer.queryKey(newParams),
+                    updater: (oldData: CustomerAddress) => {
+                        return {
+                            ...oldData,
+                            addresses: [...oldData?.addresses, response]
+                        }
+                    }
+                }
+            ]
         }
     },
     createCustomerPaymentInstrument(customerId, {parameters}, response) {
         const newParams = {...parameters, paymentInstrumentId: response.paymentInstrumentId}
         return {
-            // TODO: Rather than invalidate, can we selectively update?
-            ...invalidateCustomer(newParams),
-            update: [{queryKey: getCustomerPaymentInstrument.queryKey(newParams)}]
+            update: [
+                {
+                    queryKey: getCustomerPaymentInstrument.queryKey(newParams)
+                },
+                {
+                    queryKey: getCustomer.queryKey(newParams),
+                    updater: (oldData: CustomerPaymentInstrument) => {
+                        return {
+                            ...oldData,
+                            paymentInstruments: [...oldData?.paymentInstruments, response]
+                        }
+                    }
+                }
+            ]
         }
     },
     createCustomerProductList(customerId, {parameters}, response) {
@@ -104,7 +130,26 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     removeCustomerAddress(customerId, {parameters}) {
         return {
             // TODO: Rather than invalidate, can we selectively update?
-            ...invalidateCustomer(parameters),
+            // ...invalidateCustomer(parameters),
+            update: [
+                {
+                    queryKey: getCustomer.queryKey(parameters),
+                    updater: (oldData: CustomerAddress) => {
+                        const newAddresses = [...oldData?.addresses]
+                        const matchIdx = newAddresses.findIndex(
+                            ({addressId}) => addressId === parameters.addressName
+                        )
+                        if (matchIdx > -1) {
+                            newAddresses.splice(matchIdx, 1)
+                        }
+
+                        return {
+                            ...oldData,
+                            addresses: newAddresses
+                        }
+                    }
+                }
+            ],
             remove: [{queryKey: getCustomerAddress.queryKey(parameters)}]
         }
     },
@@ -125,11 +170,30 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             invalidate: [{predicate}]
         }
     },
-    updateCustomerAddress(customerId, {parameters}) {
+    updateCustomerAddress(customerId, {parameters}, response) {
         return {
-            // TODO: Rather than invalidate, can we selectively update?
-            ...invalidateCustomer(parameters),
-            update: [{queryKey: getCustomerAddress.queryKey(parameters)}]
+            update: [
+                {
+                    queryKey: getCustomerAddress.queryKey(parameters)
+                },
+                {
+                    queryKey: getCustomer.queryKey(parameters),
+                    updater: (oldData: CustomerAddress) => {
+                        const newAddresses = [...oldData?.addresses]
+                        const matchIdx = newAddresses.findIndex(
+                            ({addressId}) => addressId === response.addressId
+                        )
+                        if (matchIdx > -1) {
+                            newAddresses[matchIdx] = response
+                        }
+
+                        return {
+                            ...oldData,
+                            addresses: newAddresses
+                        }
+                    }
+                }
+            ]
         }
     },
     updateCustomerPassword: noop,
