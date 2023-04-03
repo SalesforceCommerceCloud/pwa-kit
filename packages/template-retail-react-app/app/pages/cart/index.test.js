@@ -15,7 +15,8 @@ import {
     mockShippingMethods,
     mockCustomerBaskets,
     mockEmptyBasket,
-    mockCartVariant
+    mockCartVariant,
+    mockedCustomerProductLists
 } from '../../mocks/mock-data'
 import mockVariant from '../../mocks/variant-750518699578M'
 import {rest} from 'msw'
@@ -53,7 +54,11 @@ const mockPromotions = {
 beforeEach(() => {
     jest.clearAllMocks()
     jest.resetModules()
+
     global.server.use(
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockedCustomerProductLists))
+        }),
         rest.get('*/products/:productId', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockProduct))
         }),
@@ -169,7 +174,7 @@ beforeEach(() => {
 afterEach(() => {
     localStorage.clear()
 })
-jest.setTimeout(30000)
+// jest.setTimeout(30000)
 
 describe('Empty cart tests', function () {
     beforeEach(() => {
@@ -187,18 +192,19 @@ describe('Empty cart tests', function () {
 })
 
 describe('Rendering tests', function () {
-    test('Renders skeleton before rendering cart items, shipping info', async () => {
+    test.only('Renders skeleton before rendering cart items, shipping info', async () => {
         renderWithProviders(<Cart />)
+
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-skeleton')).toBeInTheDocument()
             expect(screen.queryByTestId('sf-cart-container')).not.toBeInTheDocument()
         })
-        await waitFor(async () => {
+        await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
         })
         const summary = screen.getByTestId('sf-order-summary')
-        expect(await within(summary).findByText(/promotion applied/i)).toBeInTheDocument()
+        expect(within(summary).getByText(/promotion applied/i)).toBeInTheDocument()
         expect(within(summary).getByText(/free/i)).toBeInTheDocument()
         expect(within(summary).getAllByText(/61.43/i).length).toEqual(2)
     })
