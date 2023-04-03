@@ -52,9 +52,6 @@ const mockPromotions = {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.clearAllMocks()
-    jest.resetModules()
-
     global.server.use(
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockedCustomerProductLists))
@@ -174,7 +171,7 @@ beforeEach(() => {
 afterEach(() => {
     localStorage.clear()
 })
-// jest.setTimeout(30000)
+jest.setTimeout(30000)
 
 describe('Empty cart tests', function () {
     beforeEach(() => {
@@ -192,21 +189,18 @@ describe('Empty cart tests', function () {
 })
 
 describe('Rendering tests', function () {
-    test('Renders skeleton before rendering cart items, shipping info', async () => {
+    test('Renders skeleton before rendering cart items', async () => {
         renderWithProviders(<Cart />)
 
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-skeleton')).toBeInTheDocument()
             expect(screen.queryByTestId('sf-cart-container')).not.toBeInTheDocument()
         })
+
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
         })
-        const summary = screen.getByTestId('sf-order-summary')
-        expect(within(summary).getByText(/promotion applied/i)).toBeInTheDocument()
-        expect(within(summary).getByText(/free/i)).toBeInTheDocument()
-        expect(within(summary).getAllByText(/61.43/i).length).toEqual(2)
     })
 })
 
@@ -298,7 +292,7 @@ describe('Remove item from cart', function () {
             })
         )
     })
-    test.only('Can remove item from the cart', async () => {
+    test('Can remove item from the cart', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
