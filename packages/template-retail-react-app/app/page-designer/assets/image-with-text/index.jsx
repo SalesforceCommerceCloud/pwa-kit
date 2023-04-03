@@ -23,9 +23,9 @@ import {isAbsoluteURL} from '../../utils'
  */
 export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     const hasCaption = ITCText || heading
-    const isAbsoulte = isAbsoluteURL(ITCLink)
-    const LinkWrapper = isAbsoulte ? ChakraLink : Link
-    const linkProps = isAbsoulte ? {href: ITCLink} : {to: ITCLink}
+    const isAbsolute = isAbsoluteURL(ITCLink)
+    const LinkWrapper = isAbsolute ? ChakraLink : Link
+    const linkProps = isAbsolute ? {href: ITCLink} : {to: ITCLink}
 
     return (
         <Box className={'image-with-text'}>
