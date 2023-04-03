@@ -10,13 +10,6 @@ import {Box, Image, Link as ChakraLink, Text} from '@chakra-ui/react'
 import Link from '../../../components/link'
 import {isAbsoluteURL} from '../../utils'
 
-const LinkWrapper = ({ITCLink, children}) => {
-    const chakraLinkWrapper = (children) => <ChakraLink href={ITCLink}>{children}</ChakraLink>
-    const linkWrapper = (children) => <Link to={ITCLink}>{children}</Link>
-
-    return isAbsoluteURL(ITCLink) ? chakraLinkWrapper(children) : linkWrapper(children)
-}
-
 /**
  * Image with text component
  *
@@ -30,6 +23,9 @@ const LinkWrapper = ({ITCLink, children}) => {
  */
 export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     const hasCaption = ITCText || heading
+    const isAbsoulte = isAbsoluteURL(ITCLink)
+    const LinkWrapper = isAbsoulte ? ChakraLink : Link
+    const linkProps = isAbsoulte ? {href: ITCLink} : {to: ITCLink}
 
     return (
         <Box className={'image-with-text'}>
@@ -43,7 +39,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                 <picture>
                     <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
                     <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
-                    <LinkWrapper ITCLink={ITCLink}>
+                    <LinkWrapper {...linkProps}>
                         <Image
                             className={'image-with-text-image'}
                             data-testid={'image-with-text-image'}
