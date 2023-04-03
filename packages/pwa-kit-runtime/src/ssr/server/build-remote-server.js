@@ -779,6 +779,7 @@ export const RemoteServerFactory = {
      * @param {Object} opts - the options object to pass to the original `sendFile` method
      */
     serveStaticFile(filePath, opts = {}) {
+        console.log('=========== 782 serveStaticFile', filePath)
         return (req, res) => {
             const baseDir = req.app.options.buildDir
             return this._serveStaticFile(req, res, baseDir, filePath, opts)
@@ -789,8 +790,10 @@ export const RemoteServerFactory = {
      * @private
      */
     _serveStaticFile(req, res, baseDir, filePath, opts = {}) {
+        console.log('=========== 793 _serveStaticFile res.sendFile', res.sendFile)
         const options = req.app.options
         const file = path.resolve(baseDir, filePath)
+        console.log('========= 796 fs.existsSync(file)', fs.existsSync(file))
         res.sendFile(file, {
             headers: {
                 [CACHE_CONTROL]: options.defaultCacheControl
@@ -877,53 +880,49 @@ export const RemoteServerFactory = {
             return Buffer.from(body, isBase64Encoded ? 'base64' : 'utf8')
         }
 
+        function getMultiValueHeaders({headers}) {
+            const multiValueHeaders = {}
+
+            Object.entries(headers).forEach(([headerKey, headerValue]) => {
+                const headerArray = Array.isArray(headerValue)
+                    ? headerValue.map(String)
+                    : [String(headerValue)]
+
+                multiValueHeaders[headerKey.toLowerCase()] = headerArray
+            })
+
+            return multiValueHeaders
+        }
+
         const _serverlessExpressHandler = serverlessExpress({
             app,
             // the underlying serverless-express library strips `headers`
             // which our ssr-infrastructure expects, these mappings restore
             // and pass through all request / response properties
             eventSource: {
-                getRequest: ({
-                    event,
-                    method = event.httpMethod,
-                    path = getPathWithQueryStringParams({event})
-                }) => {
-                    let headers = {}
+                getRequest: ({event, path = getPathWithQueryStringParams({event})}) => {
+                    console.log('======= 891 getRequest event', event)
+                    console.log('======= 892 getRequest path', path)
+                    const multiValueHeaders = getMultiValueHeaders({headers: event.headers})
+                    const transferEncodingHeader = multiValueHeaders['transfer-encoding']
 
-                    if (event.multiValueHeaders) {
-                        headers = getCommaDelimitedHeaders({
-                            headersMap: event.multiValueHeaders,
-                            lowerCaseKey: true
-                        })
-                    } else if (event.headers) {
-                        headers = event.headers
-                    }
-
-                    let body
-
-                    if (event.body) {
-                        body = getEventBody({event})
-                        const {isBase64Encoded} = event
-                        headers['content-length'] = Buffer.byteLength(
-                            body,
-                            isBase64Encoded ? 'base64' : 'utf8'
+                    // chunked transfer not currently supported by API Gateway
+                    if (transferEncodingHeader && transferEncodingHeader.includes('chunked')) {
+                        multiValueHeaders['transfer-encoding'] = transferEncodingHeader.filter(
+                            (headerValue) => headerValue !== 'chunked'
                         )
                     }
-
-                    const remoteAddress =
-                        (event &&
-                            event.requestContext &&
-                            event.requestContext.identity &&
-                            event.requestContext.identity.sourceIp) ||
-                        ''
-
-                    return {
-                        method,
-                        headers,
-                        body,
-                        remoteAddress,
+                    const ret = {
+                        method: event.httpMethod,
+                        statusCode: event.statusCode,
+                        body: event.body,
+                        isBase64Encoded: event.isBase64Encoded,
+                        headers: event.headers,
+                        multiValueHeaders,
                         path
                     }
+                    console.log('========= 921 return', ret)
+                    return ret
                 },
                 getResponse: ({statusCode, body, headers, isBase64Encoded}) => {
                     const multiValueHeaders = {}
@@ -947,37 +946,8 @@ export const RemoteServerFactory = {
             // },
 
             // TODO: this is for debugging, remove
-            respondWithErrors: true
-            // resolutionMode: 'CALLBACK',
-            // callback: (err, response) => {
-            //     console.log('=== 829 _serverlessExpressHandler callback')
-            //     // The 'response' parameter here is NOT the same response
-            //     // object handled by ExpressJS code. The serverlessExpress
-            //     // middleware works by sending an http.Request to the Express
-            //     // server and parsing the HTTP response that it returns.
-            //     // Wait util all pending metrics have been sent, and any pending
-            //     // response caching to complete. We have to do this now, before
-            //     // sending the response; there's no way to do it afterwards
-            //     // because the Lambda container is frozen inside the callback.
-
-            //     // We return this Promise, but the serverlessExpress object
-            //     // doesn't make any use of it.
-            //     return (
-            //         app._requestMonitor
-            //             ._waitForResponses()
-            //             .then(() => app.metrics.flush())
-            //             // Now call the Lambda callback to complete the response
-            //             .then(() => callback(err, processLambdaResponse(response)))
-            //             // TODO: this is debug code, we might need it, to handle
-            //             // uncaught exceptions, but maybe not
-            //             .catch((err) => console.log('=== 869 err', err))
-            //         // DON'T add any then() handlers here, after the callback.
-            //         // They won't be called after the response is sent, but they
-            //         // *might* be called if the Lambda container running this code
-            //         // is reused, which can lead to odd and unpredictable
-            //         // behaviour.
-            //     )
-            // }
+            respondWithErrors: true,
+            resolutionMode: 'CALLBACK'
         })
 
         const handler = (event, context, callback) => {
