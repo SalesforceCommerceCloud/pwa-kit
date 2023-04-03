@@ -243,40 +243,56 @@ describe('Rendering tests', function () {
         expect(within(summary).getAllByText(/61.43/i).length).toEqual(2)
     })
 })
-// describe('Update item in cart', function () {
-// test.skip('Can update item quantity in the cart', async () => {
-//     renderWithProviders(<Cart />)
-//     await waitFor(async () => {
-//         expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-//         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
-//     })
-//
-//     const cartItem = await screen.findByTestId(
-//         `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
-//     )
-//
-//     expect(await within(cartItem).getByDisplayValue('2'))
-//
-//     await act(async () => {
-//         const incrementButton = await within(cartItem).findByTestId('quantity-increment')
-//
-//         // update item quantity
-//         fireEvent.pointerDown(incrementButton)
-//     })
-//
-//     await waitFor(() => {
-//         expect(screen.getByTestId('loading')).toBeInTheDocument()
-//     })
-//
-//     await waitFor(() => {
-//         expect(within(cartItem).getByDisplayValue('3'))
-//     })
-//
-//     await waitFor(() => {
-//         expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
-//     })
-// })
-// })
+
+describe('Update item in cart', function () {
+    test.only('Can update item quantity in the cart', async () => {
+        createServer([
+            ...cartHandlers,
+            {
+                path: '*/products/:productId',
+                res: () => {
+                    return mockCartVariant
+                }
+            },
+            {
+                path: '*/customers/:customerId/baskets',
+                res: () => {
+                    return mockCustomerBaskets
+                }
+            }
+        ])
+        renderWithProviders(<Cart />)
+        await waitFor(async () => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+        })
+
+        const cartItem = await screen.findByTestId(
+            `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
+        )
+
+        expect(await within(cartItem).getByDisplayValue('2'))
+
+        await act(async () => {
+            const incrementButton = await within(cartItem).findByTestId('quantity-increment')
+
+            // update item quantity
+            fireEvent.pointerDown(incrementButton)
+        })
+
+        await waitFor(() => {
+            expect(screen.getByTestId('loading')).toBeInTheDocument()
+        })
+
+        await waitFor(() => {
+            expect(within(cartItem).getByDisplayValue('3'))
+        })
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+        })
+    })
+})
 
 describe('Update quantity in product view', function () {
     createServer([
