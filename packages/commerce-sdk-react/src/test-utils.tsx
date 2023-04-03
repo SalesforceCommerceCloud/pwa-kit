@@ -102,7 +102,7 @@ export function renderHookWithProviders<TProps, TResult>(
 /** Mocks DELETE, PATCH, POST, and PUT so we don't have to look up which verb an endpoint uses. */
 export const mockMutationEndpoints = (
     matchingPath: string,
-    response: string | object,
+    response: string | object | undefined,
     statusCode = 200
 ) => {
     const matcher = (uri: string) => uri.includes(matchingPath)
@@ -136,7 +136,7 @@ export const assertUpdateQuery = (
 
 export const assertInvalidateQuery = (
     queryResult: UseQueryResult,
-    oldData: Record<string, unknown> | unknown[]
+    oldData: Record<string, unknown> | unknown[] | undefined
 ) => {
     // query should be invalidated and refetching
     expect(queryResult.data).toEqual(oldData)

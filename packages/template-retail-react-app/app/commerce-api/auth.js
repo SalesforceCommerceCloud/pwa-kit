@@ -26,14 +26,14 @@ import Cookies from 'js-cookie'
  * @typedef {Object} Customer
  */
 
-const usidStorageKey = 'usid'
-const cidStorageKey = 'cid'
-const encUserIdStorageKey = 'enc-user-id'
-const tokenStorageKey = 'token'
-const refreshTokenRegisteredStorageKey = 'cc-nx'
-const refreshTokenGuestStorageKey = 'cc-nx-g'
-const oidStorageKey = 'oid'
-const dwSessionIdKey = 'dwsid'
+const usidStorageKey = 'OLD_usid'
+const cidStorageKey = 'OLD_cid'
+const encUserIdStorageKey = 'OLD_enc-user-id'
+const tokenStorageKey = 'OLD_token'
+const refreshTokenRegisteredStorageKey = 'OLD_cc-nx'
+const refreshTokenGuestStorageKey = 'OLD_cc-nx-g'
+const oidStorageKey = 'OLD_oid'
+const dwSessionIdKey = 'OLD_dwsid'
 const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridge.
 
 const EXPIRED_TOKEN = 'EXPIRED_TOKEN'
@@ -195,6 +195,7 @@ class Auth {
      * @returns {Promise}
      */
     async login(credentials) {
+        console.warn('@TODO: old login method is still being used.')
         // Calling login while its already pending will return a reference
         // to the existing promise.
         if (this._pendingLogin) {

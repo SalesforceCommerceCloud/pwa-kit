@@ -8,6 +8,8 @@ import React from 'react'
 import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
 import {screen} from '@testing-library/react'
+import {rest} from 'msw'
+import {mockCustomerBaskets} from '../mocks/mock-data'
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -560,6 +562,14 @@ const MOCK_PRODUCT = {
     c_size: '9LG',
     c_width: 'Z'
 }
+beforeEach(() => {
+    jest.resetModules()
+    global.server.use(
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
+        })
+    )
+})
 
 test('Renders AddToCartModal with multiple products', () => {
     const MOCK_DATA = {

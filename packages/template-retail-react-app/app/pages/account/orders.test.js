@@ -1,33 +1,20 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import {mockOrderHistory, mockOrderProducts} from '../../commerce-api/mock-data'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {mockCustomerBaskets, mockOrderHistory, mockOrderProducts} from '../../mocks/mock-data'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
 
 const MockedComponent = () => {
-    const customer = useCustomer()
-
-    useEffect(() => {
-        if (!customer.isRegistered) {
-            customer.login('est@test.com', 'password')
-        }
-    }, [])
-
-    if (!customer.isRegistered) {
-        return null
-    }
-
     return (
         <Switch>
             <Route path={createPathWithDefaults('/account/orders')}>
@@ -39,15 +26,24 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
+    global.server.use(
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.json(mockCustomerBaskets))
+        )
+    )
+
     window.history.pushState({}, 'Account', createPathWithDefaults('/account/orders'))
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
 })
 
 test('Renders order history and details', async () => {
     global.server.use(
+        rest.get('*/orders/:orderNo', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockOrderHistory.data[0]))
+        }),
         rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderHistory))
         }),
@@ -77,4 +73,17 @@ test('Renders order history and details', async () => {
     expect(
         await screen.findByAltText(/Long Sleeve Crew Neck, Fire Red, small/i)
     ).toBeInTheDocument()
+})
+
+test('Renders order history place holder when no orders', async () => {
+    global.server.use(
+        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json({limit: 0, offset: 0, total: 0}))
+        })
+    )
+    await renderWithProviders(<MockedComponent history={history} />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    expect(await screen.findByTestId('account-order-history-place-holder')).toBeInTheDocument()
 })

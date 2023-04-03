@@ -12,7 +12,7 @@ import {
     ocapiBasketWithItem,
     ocapiBasketWithPaymentInstrumentAndBillingAddress,
     mockShippingMethods
-} from './mock-data'
+} from '../mocks/mock-data'
 
 jest.mock('cross-fetch', () => jest.requireActual('jest-fetch-mock'))
 

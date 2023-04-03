@@ -30,19 +30,14 @@ type useCustomerType = {
  */
 const useCustomerType = (): useCustomerType => {
     let customerType = null
-    if (onClient) {
-        const {siteId} = useConfig()
-        customerType = useLocalStorage(`${siteId}_customer_type`)
-    } else {
-        const auth = useAuthContext()
-        customerType = auth.get('customer_type')
-    }
+
+    const auth = useAuthContext()
+    customerType = auth.get('customer_type')
 
     const isGuest = customerType === 'guest'
     const isRegistered = customerType === 'registered'
 
     if (customerType !== null && customerType !== 'guest' && customerType !== 'registered') {
-        console.warn(`Unrecognized customer type found in storage: ${customerType}`)
         customerType = null
     }
 
