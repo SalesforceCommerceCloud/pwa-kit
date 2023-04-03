@@ -71,6 +71,8 @@ const registeredUserPayload = {
 }
 export const guestToken = jwt.sign(guestPayload, 'secret')
 export const registerUserToken = jwt.sign(registeredUserPayload, 'secret')
+// TODO: is hardcoding this the right thing to do?
+// We had to do it because of a mocked config file.
 export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
 export const SUPPORTED_LOCALES = [

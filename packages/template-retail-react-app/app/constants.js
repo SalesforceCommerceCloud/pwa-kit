@@ -8,7 +8,9 @@
 import {defineMessage} from 'react-intl'
 
 // Global app defaults
-export const DEFAULT_LOCALE = 'en-US'
+// NOTE: this needs to match the default locale of the default site (in the multisite config)
+// TODO: but generating a project by default would use single-site config with en-US? Hmm
+export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_SITE_TITLE = 'Retail React App'
 export const MAX_CACHE_AGE = 60 * 15 // 15 min
 
