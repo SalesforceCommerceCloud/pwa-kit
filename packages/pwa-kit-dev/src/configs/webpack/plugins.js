@@ -205,6 +205,8 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
 
     return new webpack.NormalModuleReplacementPlugin(overridesRegex, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
+        console.log('resource', resource)
+        console.log('resolved', resolved)
         // NOTE: the way the Template Extensibility feature works, the order in which
         // we check for file rewrites / aliases is important
         if (
@@ -216,15 +218,23 @@ export const extendedTemplateReplacementPlugin = (projectDir) => {
             return
         }
         const matchRegex = makeRegExp(pkg?.mobify?.extends)
+        console.log('matchRegex', matchRegex)
         const relativePathNoExt = resolved?.split?.(matchRegex)?.[1]?.split?.('.')?.[0]
+
+        //this resolves to actual file path
         if (_overridesHashMap.has(relativePathNoExt)) {
-            const depth = pkg?.mobify?.overridesDir?.replace?.(/^\//, '')?.split('/') || []
+            console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+            console.log('relativePathNoExt', relativePathNoExt)
+
             const relativePath = resolved?.split?.(matchRegex)?.[1]
+            console.log('relativePath', relativePath)
             const newPath = projectDir + pkg?.mobify?.overridesDir + relativePath
+            console.log('newPath', newPath)
             // NOTE: overriding either of these alone does not work, both must be set
             resource.request = newPath
             const end = _overridesHashMap.get(relativePathNoExt)?.[1]
             resource.createData.resource = newPath + (end[0] !== '.' ? '/' : '') + end?.join('')
+            console.log('resource.createData.resource', resource.createData.resource)
         }
     })
 }

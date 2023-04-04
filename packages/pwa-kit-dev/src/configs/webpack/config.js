@@ -209,9 +209,9 @@ const baseConfig = (target) => {
                     //     ? caretOverrideReplacementPlugin(projectDir)
                     //     : () => null,
 
-                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                        ? extendedTemplateReplacementPlugin(projectDir)
-                        : () => null,
+                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                    //     ? extendedTemplateReplacementPlugin(projectDir)
+                    //     : () => null,
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
