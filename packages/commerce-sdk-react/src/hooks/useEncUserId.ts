@@ -17,12 +17,15 @@ const onClient = typeof window !== 'undefined'
  *
  */
 const useEncUserId = (): string | null => {
-    if (onClient) {
-        const config = useConfig()
-        return useLocalStorage(`${config.siteId}_enc_user_id`)
-    }
+    const config = useConfig()
     const auth = useAuthContext()
-    return auth.get('enc_user_id')
+
+    return onClient
+        ? // This conditional is a constant value based on the environment, so the same path will
+          // always be followed., and the "rule of hooks" is not violated.
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          useLocalStorage(`${config.siteId}_enc_user_id`)
+        : auth.get('enc_user_id')
 }
 
 export default useEncUserId
