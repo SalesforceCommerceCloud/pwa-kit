@@ -29,7 +29,7 @@
     "lint": "npm run lint:js && npm run typecheck",
     "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "npm run lint:js -- --fix",
-    "typcheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "save-credentials": "pwa-kit-dev save-credentials",
     "start": "pwa-kit-dev start",
     "start:inspect": "npm run start -- --inspect",
