@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-const request = require('supertest')
+import request from 'supertest'
 
 describe('server', () => {
     let originalEnv, app, server
@@ -18,6 +18,7 @@ describe('server', () => {
             MOBIFY_PROPERTY_ID: 'test',
             AWS_LAMBDA_FUNCTION_NAME: 'pretend-to-be-remote'
         })
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const ssr = require('./ssr')
         app = ssr.app
         server = ssr.server
