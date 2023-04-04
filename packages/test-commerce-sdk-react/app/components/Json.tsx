@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 
-const Json = ({data}: {data: any}) => {
+const Json = ({data}: {data: unknown}) => {
     const [expanded, setExpanded] = useState(false)
 
     const style = {

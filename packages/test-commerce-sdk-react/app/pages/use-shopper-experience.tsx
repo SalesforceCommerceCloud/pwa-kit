@@ -83,6 +83,8 @@ const UseShopperExperience = () => {
                 parameters: {pageId: PAGE_ID}
             },
             get hook() {
+                // TODO: Address the lint error instead of ignoring it
+                // eslint-disable-next-line react-hooks/rules-of-hooks
                 return usePage(this.arg)
             }
         },
@@ -95,6 +97,8 @@ const UseShopperExperience = () => {
                 }
             },
             get hook() {
+                // TODO: Address the lint error instead of ignoring it
+                // eslint-disable-next-line react-hooks/rules-of-hooks
                 return usePages(this.arg)
             }
         },
@@ -108,6 +112,8 @@ const UseShopperExperience = () => {
                 }
             },
             get hook() {
+                // TODO: Address the lint error instead of ignoring it
+                // eslint-disable-next-line react-hooks/rules-of-hooks
                 return usePages(this.arg)
             }
         }
