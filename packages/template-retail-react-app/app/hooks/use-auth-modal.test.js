@@ -45,7 +45,7 @@ const mockRegisteredCustomer = {
 let authModal = undefined
 const MockedComponent = (props) => {
     const {initialView} = props
-    authModal = initialView ? useAuthModal(initialView) : useAuthModal()
+    authModal = useAuthModal(initialView || undefined)
     const match = {
         params: {pageName: 'profile'}
     }

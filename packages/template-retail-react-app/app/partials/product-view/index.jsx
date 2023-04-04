@@ -94,12 +94,14 @@ const ProductView = forwardRef(
             isProductLoading,
 
             isProductPartOfSet = false,
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
         },
         ref
     ) => {
+        const showToast = useToast()
         const intl = useIntl()
         const history = useHistory()
         const location = useLocation()
@@ -171,7 +173,6 @@ const ProductView = forwardRef(
                 })
             }
 
-            const showToast = useToast()
             const showError = () => {
                 showToast({
                     title: intl.formatMessage(API_ERROR_MESSAGE),

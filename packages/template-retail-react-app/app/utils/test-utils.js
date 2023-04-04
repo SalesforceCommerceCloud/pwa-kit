@@ -186,7 +186,6 @@ export const renderWithProviders = (children, options) => {
     const locals = {}
 
     return render(children, {
-        // eslint-disable-next-line react/display-name
         wrapper: () => (
             <TestProvidersWithDataAPI {...options?.wrapperProps} locals={locals}>
                 {children}
@@ -230,7 +229,7 @@ export const withPageProvider = (Component, options) => {
             components: new Proxy(
                 {},
                 {
-                    // eslint-disable-next-line no-unused-vars
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     get(_target, _prop) {
                         return (props) => (
                             <div>

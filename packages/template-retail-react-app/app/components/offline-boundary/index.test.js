@@ -23,6 +23,7 @@ describe('The OfflineBoundary', () => {
     beforeEach(() => {
         // React's logging is noisey even when an Error Boundary catches. Silence
         // the distracting logs during tests, since they are expected in any event.
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         jest.spyOn(console, 'error').mockImplementation(() => {})
     })
 

@@ -45,7 +45,6 @@ test('Page renders correct component', () => {
     const component = <Component component={SAMPLE_COMPONENT} />
 
     const {container} = render(component, {
-        // eslint-disable-next-line react/display-name
         wrapper: () => (
             <PageContext.Provider value={{components: TEST_COMPONENTS}}>
                 {component}

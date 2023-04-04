@@ -76,14 +76,12 @@ describe('The useSearchParams', () => {
             'limit=25&offset=0&refine=c_refinementColor%3DBlack%7CPurple&sort=best-matches'
 
         const parsedString = parse(stringToParse)
-        expect(parsedString).toEqual(
-            {
-                _refine: ['c_refinementColor=Black|Purple'],
-                limit: 25,
-                offset: 0,
-                refine: {c_refinementColor: ['Black', 'Purple']},
-                sort: 'best-matches'
-            } // eslint-disable-line
-        )
+        expect(parsedString).toEqual({
+            _refine: ['c_refinementColor=Black|Purple'],
+            limit: 25,
+            offset: 0,
+            refine: {c_refinementColor: ['Black', 'Purple']},
+            sort: 'best-matches'
+        })
     })
 })

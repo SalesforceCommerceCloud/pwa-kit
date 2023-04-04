@@ -222,7 +222,7 @@ export const AuthModal = ({
                         id="auth_modal.password_reset_success.info.will_email_shortly"
                         values={{
                             email: submittedEmail.current,
-                            // eslint-disable-next-line react/display-name
+
                             b: (chunks) => <b>{chunks}</b>
                         }}
                     />
