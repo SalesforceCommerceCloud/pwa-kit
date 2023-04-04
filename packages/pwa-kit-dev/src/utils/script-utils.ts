@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+// TODO: This is a .ts file, so we need to add a tsconfig to the package for linting to work
 import os from 'os'
 import path from 'path'
 import archiver from 'archiver'

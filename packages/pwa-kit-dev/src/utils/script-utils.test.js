@@ -5,12 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {mkdtemp, rm, writeFile} from 'fs/promises'
-
-const pkg = require('../../package.json')
-import * as scriptUtils from './script-utils'
+import {mkdtemp, rm, writeFile, readJsonSync} from 'fs-extra'
 import path from 'path'
 import os from 'os'
+import * as scriptUtils from './script-utils'
+const pkg = readJsonSync('../../package.json')
 
 describe('scriptUtils', () => {
     const originalEnv = process.env

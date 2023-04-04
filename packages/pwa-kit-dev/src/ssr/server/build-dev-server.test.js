@@ -6,11 +6,11 @@
  */
 import {NO_CACHE} from 'pwa-kit-runtime/ssr/server/constants'
 import {X_MOBIFY_REQUEST_CLASS, X_PROXY_REQUEST_URL} from 'pwa-kit-runtime/utils/ssr-proxying'
-const {
+import {
     getResponseFromCache,
     sendCachedResponse,
     cacheResponseWhenDone
-} = require('pwa-kit-runtime/ssr/server/express')
+} from 'pwa-kit-runtime/ssr/server/express'
 import fetch from 'node-fetch'
 import request from 'supertest'
 import {makeErrorHandler, DevServerFactory, setLocalAssetHeaders} from './build-dev-server'
@@ -31,7 +31,9 @@ const testFixtures = path.resolve(__dirname, 'test_fixtures')
 // for testing.
 const NoWebpackDevServerFactory = {
     ...DevServerFactory,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     _addSDKInternalHandlers() {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     _getRequestProcessor() {}
 }
 
