@@ -7,50 +7,53 @@
 
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
+import {useIntl, defineMessage} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
-import useEinstein from '../../commerce-api/hooks/useEinstein'
-
+import useEinstein from '../../hooks/use-einstein'
 import LoginForm from '../../components/login'
-
+import {API_ERROR_MESSAGE} from '../../constants'
+const LOGIN_ERROR_MESSAGE = defineMessage({
+    defaultMessage: 'Incorrect username or password, please try again.',
+    id: 'login_page.error.incorrect_username_or_password'
+})
 const Login = () => {
     const {formatMessage} = useIntl()
-
     const navigate = useNavigation()
-    const customer = useCustomer()
     const form = useForm()
     const location = useLocation()
     const einstein = useEinstein()
+    const {isRegistered} = useCustomerType()
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
     const submitForm = async (data) => {
-        try {
-            await customer.login(data)
-        } catch (error) {
-            const message = /invalid credentials/i.test(error.message)
-                ? formatMessage({
-                      defaultMessage: 'Incorrect username or password, please try again.',
-                      id: 'login_page.error.incorrect_username_or_password'
-                  })
-                : error.message
-            form.setError('global', {type: 'manual', message})
-        }
+        return login.mutateAsync(
+            {username: data.email, password: data.password},
+            {
+                onError: (error) => {
+                    const message = /Unauthorized/i.test(error.message)
+                        ? formatMessage(LOGIN_ERROR_MESSAGE)
+                        : formatMessage(API_ERROR_MESSAGE)
+                    form.setError('global', {type: 'manual', message})
+                }
+            }
+        )
     }
 
     // If customer is registered push to account page
     useEffect(() => {
-        if (customer.authType != null && customer.isRegistered) {
+        if (isRegistered) {
             if (location?.state?.directedFrom) {
                 navigate(location.state.directedFrom)
             } else {
                 navigate('/account')
             }
         }
-    }, [customer])
+    }, [isRegistered])
 
     /**************** Einstein ****************/
     useEffect(() => {

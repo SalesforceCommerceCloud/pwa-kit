@@ -68,9 +68,8 @@ const routes = [
         exact: true
     },
     {
-        path: '/checkout/confirmation',
-        component: CheckoutConfirmation,
-        exact: true
+        path: '/checkout/confirmation/:orderNo',
+        component: CheckoutConfirmation
     },
     {
         path: '/callback',

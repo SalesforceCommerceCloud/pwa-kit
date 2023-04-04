@@ -4,8 +4,8 @@
     "license": "See license in LICENSE",
     "private": true,
     "engines": {
-        "node": "^14.0.0 || ^16.0.0",
-        "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+        "node": "^14.0.0 || ^16.0.0 || ^18.0.0",
+        "npm": "^6.14.4 || ^7.0.0 || ^8.0.0 || ^9.0.0"
     },
     "devDependencies": {
         "@chakra-ui/icons": "^1.1.7",
@@ -18,6 +18,8 @@
         "@lhci/cli": "^0.7.0",
         "@loadable/component": "^5.15.3",
         "@peculiar/webcrypto": "^1.4.2",
+        "@tanstack/react-query": "^4.0.10",
+        "@tanstack/react-query-devtools": "^4.22.0",
         "@testing-library/dom": "^9.0.1",
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^11.2.7",
@@ -26,7 +28,7 @@
         "base64-arraybuffer": "^0.2.0",
         "bundlesize2": "^0.0.31",
         "card-validator": "^8.1.1",
-        "commerce-sdk-isomorphic": "^1.9.0",
+        "commerce-sdk-react-preview": "^2.8.0-dev",
         "cross-env": "^5.2.1",
         "cross-fetch": "^3.1.5",
         "focus-visible": "^5.2.0",
@@ -35,6 +37,7 @@
         "helmet": "^4.6.0",
         "jest-fetch-mock": "^2.1.2",
         "js-cookie": "^3.0.1",
+        "jsonwebtoken": "^9.0.0",
         "jwt-decode": "^3.1.2",
         "lodash": "^4.17.21",
         "msw": "^0.28.1",
@@ -80,11 +83,11 @@
     "bundlesize": [
         {
             "path": "build/main.js",
-            "maxSize": "55 kB"
+            "maxSize": "65 kB"
         },
         {
             "path": "build/vendor.js",
-            "maxSize": "275 kB"
+            "maxSize": "355 kB"
         }
     ],
     "browserslist": [

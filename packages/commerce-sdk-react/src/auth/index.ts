@@ -268,15 +268,19 @@ class Auth {
      */
     async queueRequest(fn: () => Promise<TokenResponse>, isGuest: boolean) {
         const queue = this.pendingToken ?? Promise.resolve()
-        this.pendingToken = queue.then(async () => {
-            const token = await fn()
-            this.handleTokenResponse(token, isGuest)
+        this.pendingToken = queue
+            .then(async () => {
+                const token = await fn()
+                this.handleTokenResponse(token, isGuest)
 
-            // Q: Why don't we just return token? Why re-construct the same object again?
-            // A: because a user could open multiple tabs and the data in memory could be out-dated
-            // We must always grab the data from the storage (cookie/localstorage) directly
-            return this.data
-        })
+                // Q: Why don't we just return token? Why re-construct the same object again?
+                // A: because a user could open multiple tabs and the data in memory could be out-dated
+                // We must always grab the data from the storage (cookie/localstorage) directly
+                return this.data
+            })
+            .finally(() => {
+                this.pendingToken = undefined
+            })
         return this.pendingToken
     }
 
@@ -298,8 +302,7 @@ class Auth {
             this.set('customer_id', customerId)
             this.set('usid', usid)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
-            this.pendingToken = Promise.resolve(this.data)
-            return this.pendingToken
+            return this.data
         }
         if (this.pendingToken) {
             return this.pendingToken
@@ -307,8 +310,7 @@ class Auth {
         const accessToken = this.get('access_token')
 
         if (accessToken && !this.isTokenExpired(accessToken)) {
-            this.pendingToken = Promise.resolve(this.data)
-            return this.pendingToken
+            return this.data
         }
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
@@ -423,6 +425,11 @@ class Auth {
     parseSlasJWT(jwt: string) {
         const payload: SlasJwtPayload = jwtDecode(jwt)
         const {sub, isb} = payload
+
+        if (!sub || !isb) {
+            throw new Error('Unable to parse access token payload: missing sub and isb.')
+        }
+
         // ISB format
         // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
         const isbParts = isb.split('::')

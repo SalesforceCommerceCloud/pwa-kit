@@ -6,7 +6,7 @@
  */
 
 import React, {useState} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
 import {
@@ -20,20 +20,22 @@ import {
     SimpleGrid,
     Skeleton,
     Stack,
-    Text,
-
-    // Hooks
-    useToast
+    Text
 } from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import FormActionButtons from '../../components/forms/form-action-buttons'
 import {useForm} from 'react-hook-form'
+import {useToast} from '../../hooks/use-toast'
+
 import LoadingSpinner from '../../components/loading-spinner'
 import {LocationIcon, PlusIcon} from '../../components/icons'
 import ActionCard from '../../components/action-card'
 import AddressFields from '../../components/forms/address-fields'
 import AddressDisplay from '../../components/address-display'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
+import {nanoid} from 'nanoid'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 const DEFAULT_SKELETON_COUNT = 3
 
@@ -117,39 +119,77 @@ ShippingAddressForm.propTypes = {
     submitForm: PropTypes.func
 }
 
+const successfullyAddedAddress = defineMessage({
+    defaultMessage: 'New address saved',
+    id: 'account_addresses.info.new_address_saved'
+})
+
+const successfullyUpdatedAddress = defineMessage({
+    defaultMessage: 'Address updated',
+    id: 'account_addresses.info.address_updated'
+})
+
+const successfullyRemovedAddress = defineMessage({
+    defaultMessage: 'Address removed',
+    id: 'account_addresses.info.address_removed'
+})
 const AccountAddresses = () => {
     const {formatMessage} = useIntl()
-    const {isRegistered, addresses, addSavedAddress, updateSavedAddress, removeSavedAddress} =
-        useCustomer()
+    const {data: customer, isLoading} = useCurrentCustomer()
+    const {isRegistered, addresses, customerId} = customer
+
+    const addCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
+    const updateSavedAddress = useShopperCustomersMutation('updateCustomerAddress')
+    const removeCustomerAddress = useShopperCustomersMutation('removeCustomerAddress')
+
     const [isEditing, setIsEditing] = useState(false)
     const [selectedAddressId, setSelectedAddressId] = useState(false)
-    const toast = useToast()
+    const showToast = useToast()
     const form = useForm()
 
     const hasAddresses = addresses?.length > 0
-
+    const showError = () => {
+        showToast({
+            title: formatMessage(API_ERROR_MESSAGE),
+            status: 'error'
+        })
+    }
     const submitForm = async (address) => {
         try {
+            let data
             form.clearErrors()
             if (selectedAddressId) {
-                await updateSavedAddress({...address, addressId: selectedAddressId})
+                const body = {
+                    ...address,
+                    addressId: selectedAddressId
+                }
+                data = await updateSavedAddress.mutateAsync({
+                    body,
+                    parameters: {
+                        customerId,
+                        addressName: selectedAddressId
+                    }
+                })
             } else {
-                await addSavedAddress(address)
+                const body = {
+                    addressId: nanoid(),
+                    ...address
+                }
+                data = await addCustomerAddress.mutateAsync({
+                    body,
+                    parameters: {customerId: customer.customerId}
+                })
             }
-            toggleEdit()
-            toast({
-                title: selectedAddressId
-                    ? formatMessage({
-                          defaultMessage: 'Address updated',
-                          id: 'account_addresses.info.address_updated'
-                      })
-                    : formatMessage({
-                          defaultMessage: 'New address saved',
-                          id: 'account_addresses.info.new_address_saved'
-                      }),
-                status: 'success',
-                isClosable: true
-            })
+            if (data) {
+                toggleEdit()
+                showToast({
+                    title: selectedAddressId
+                        ? formatMessage(successfullyUpdatedAddress)
+                        : formatMessage(successfullyAddedAddress),
+                    status: 'success',
+                    isClosable: true
+                })
+            }
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }
@@ -162,9 +202,26 @@ const AccountAddresses = () => {
                 setIsEditing(false)
                 form.reset({addressId: ''})
             }
-            await removeSavedAddress(addressId)
+            await removeCustomerAddress.mutateAsync(
+                {
+                    parameters: {
+                        customerId,
+                        addressName: addressId
+                    }
+                },
+                {
+                    onSuccess: () => {
+                        showToast({
+                            title: formatMessage(successfullyRemovedAddress),
+                            status: 'success',
+                            isClosable: true
+                        })
+                    }
+                }
+            )
         } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
+            showError()
+            throw error
         }
     }
 
@@ -189,7 +246,7 @@ const AccountAddresses = () => {
                 />
             </Heading>
 
-            {!isRegistered && (
+            {isLoading && (
                 <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4}>
                     {new Array(DEFAULT_SKELETON_COUNT).fill().map((_, index) => {
                         return (
@@ -283,7 +340,7 @@ const AccountAddresses = () => {
                 </SimpleGrid>
             )}
 
-            {!hasAddresses && (
+            {!hasAddresses && !isLoading && (
                 <>
                     {!isEditing && isRegistered && (
                         <PageActionPlaceHolder

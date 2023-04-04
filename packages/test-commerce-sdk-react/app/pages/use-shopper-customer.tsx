@@ -83,7 +83,7 @@ function UseCustomer() {
     const loginRegisteredUser = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
     // TODO: Implement the flow - Login as a guest user and then registered that user.
-    //  Currently Login as a guest doesn't work in packages/test-commerce-sdk-react/app/pages/use-shopper-login-helper.tsx
+    //  Currently Login as a guest doesn't work in packages/test-commerce-sdk-react/app/pages/use-auth-helper.tsx
     // const loginGuestUser = useAuthHelper(AuthHelpers.LoginGuestUser)
     // const guestUserMutationHooks = [
     //     {

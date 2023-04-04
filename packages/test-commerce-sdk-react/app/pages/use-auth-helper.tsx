@@ -8,7 +8,7 @@ import React from 'react'
 import {AuthHelpers, useAuthHelper} from 'commerce-sdk-react-preview'
 import Json from '../components/Json'
 
-const UseShopperLoginHelper = () => {
+const UseAuthHelper = () => {
     // use string or enum
     const loginGuestUser = useAuthHelper(AuthHelpers.LoginGuestUser)
     const loginRegisteredUser = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
@@ -51,6 +51,6 @@ const UseShopperLoginHelper = () => {
     )
 }
 
-UseShopperLoginHelper.getTemplateName = () => 'UseShopperLoginHelper'
+UseAuthHelper.getTemplateName = () => 'UseAuthHelper'
 
-export default UseShopperLoginHelper
+export default UseAuthHelper

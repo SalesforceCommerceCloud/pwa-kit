@@ -11,7 +11,7 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 
 import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
-import {useProduct} from '../../hooks'
+import {useDerivedProduct} from '../../hooks'
 import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
 // project components
@@ -78,6 +78,7 @@ const ButtonWithRegistration = withRegistration(Button)
  * Render a product detail view that includes name, image gallery, price,
  * variant selections, action buttons
  */
+
 const ProductView = forwardRef(
     (
         {
@@ -91,6 +92,7 @@ const ProductView = forwardRef(
             addToWishlist,
             updateWishlist,
             isProductLoading,
+
             isProductPartOfSet = false,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
@@ -120,7 +122,7 @@ const ProductView = forwardRef(
             variationAttributes,
             stockLevel,
             stepQuantity
-        } = useProduct(product, isProductPartOfSet)
+        } = useDerivedProduct(product, isProductPartOfSet)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)
