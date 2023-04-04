@@ -127,6 +127,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchedToken
     ])
 
+    // Initialize the session
     useEffect(() => void auth.ready(), [auth])
 
     return (
