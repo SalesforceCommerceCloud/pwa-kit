@@ -30,7 +30,7 @@ const Json = ({data}: {data: any}) => {
             background:
                 'linear-gradient(to bottom, rgba(137,255,241,0) 0%,rgba(255,255,255,1) 100%)'
         }
-    }
+    } as const
     return (
         <div style={style.body} onClick={() => setExpanded(!expanded)}>
             <a style={style.button}>{expanded ? '[-]' : '[+]'}</a>

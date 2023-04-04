@@ -21,8 +21,7 @@ const ASPECT_ATTRIBUTES = JSON.stringify({
 const componentMapProxy = new Proxy(
     {},
     {
-        // eslint-disable-next-line no-unused-vars
-        get(_target, _prop) {
+        get() {
             return (props: any) => (
                 <div style={{marginBottom: '10px'}}>
                     <b>{props.typeId}</b>

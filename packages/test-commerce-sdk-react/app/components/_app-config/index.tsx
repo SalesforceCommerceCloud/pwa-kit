@@ -66,8 +66,11 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 AppConfig.restore = () => {}
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 AppConfig.extraGetPropsArgs = () => {}
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 AppConfig.freeze = () => {}
 
 const isServerSide = typeof window === 'undefined'
