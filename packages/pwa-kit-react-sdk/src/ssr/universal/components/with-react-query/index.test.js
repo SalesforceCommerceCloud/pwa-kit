@@ -8,8 +8,6 @@ import {withReactQuery} from './index'
 import {shallow} from 'enzyme'
 import React from 'react'
 
-import {SERVER_RETRY_WARNING} from '.'
-
 describe('withReactQuery', function () {
     let windowSpy
 

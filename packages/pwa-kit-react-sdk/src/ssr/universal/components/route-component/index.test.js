@@ -9,6 +9,9 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {getRoutes, routeComponent} from './index'
 
+// TODO: The way mocks are set up in this file is kinda weird...
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const delay = (t) => new Promise((resolve) => setTimeout(resolve, t))
 
 /**

@@ -1,13 +1,9 @@
-/**
- * @jest-environment node
- */
 /*
  * Copyright (c) 2021, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* eslint-disable header/header */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
 import {randomUUID} from 'crypto'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
@@ -16,6 +12,8 @@ import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
+
+import {getAppConfig} from '../universal/compatibility'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -53,6 +51,8 @@ jest.mock('../universal/compatibility', () => {
 })
 
 jest.mock('../universal/routes', () => {
+    // TODO: Can these requires be converted to top-level imports?
+    /* eslint-disable @typescript-eslint/no-var-requires */
     const React = require('react')
     const PropTypes = require('prop-types')
     const errors = require('../universal/errors')
@@ -60,6 +60,7 @@ jest.mock('../universal/routes', () => {
     const {Helmet} = require('react-helmet')
     const {useQuery} = require('@tanstack/react-query')
     const {useServerContext} = require('../universal/hooks')
+    /* eslint-enable @typescript-eslint/no-var-requires */
 
     // Test utility to exercise paths that work with @loadable/component.
     const fakeLoadable = (Wrapped) => {
@@ -150,7 +151,6 @@ jest.mock('../universal/routes', () => {
         }
     }
 
-    // eslint-disable-next-line react/require-render-return
     class RenderThrowsError extends React.Component {
         static getProps() {
             return Promise.resolve()
@@ -381,8 +381,6 @@ jest.mock('pwa-kit-runtime/ssr/server/build-remote-server', () => {
 
 describe('The Node SSR Environment', () => {
     const OLD_ENV = process.env
-
-    const {getAppConfig} = require('../universal/compatibility')
 
     beforeAll(() => {
         // These values are not allowed to be `undefined` when `isRemote` returns true. So we mock them.

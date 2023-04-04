@@ -6,9 +6,8 @@
  */
 import React from 'react'
 import {OuterApp} from './main'
-import {shallow, mount} from 'enzyme'
+import {mount} from 'enzyme'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
-import Switch from '../universal/components/switch'
 import * as errors from '../universal/errors'
 import AppErrorBoundary from '../universal/components/app-error-boundary'
 import {uuidv4} from '../../utils/uuidv4.client'
