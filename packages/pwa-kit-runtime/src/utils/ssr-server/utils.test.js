@@ -44,6 +44,7 @@ describe.each([[true], [false]])('Utils remote/local tests (isRemote: %p)', (isR
         })
 
         test(`localDevLog should log conditionally (quiet: ${quiet})`, () => {
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
             const log = jest.spyOn(console, 'log').mockImplementation(() => {})
             const msg = 'message'
             utils.localDevLog(msg)
@@ -52,6 +53,7 @@ describe.each([[true], [false]])('Utils remote/local tests (isRemote: %p)', (isR
         })
 
         test(`infoLog should log conditionally (quiet: ${quiet})`, () => {
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
             const log = jest.spyOn(console, 'log').mockImplementation(() => {})
             const msg = 'message'
             utils.infoLog(msg)
@@ -63,6 +65,7 @@ describe.each([[true], [false]])('Utils remote/local tests (isRemote: %p)', (isR
 
 describe('catchAndLog', () => {
     test('error', () => {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         const error = jest.spyOn(console, 'error').mockImplementation(() => {})
         utils.catchAndLog()
         expect(error).toHaveBeenCalledWith('Uncaught exception: ', '(no error)')

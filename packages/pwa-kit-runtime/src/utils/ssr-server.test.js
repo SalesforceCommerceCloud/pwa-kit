@@ -267,11 +267,7 @@ describe('utils/ssr-server tests', () => {
                 mobify: {
                     ssrParameters: {
                         // Create an array that is one entry too long
-                        proxyConfigs: Array.apply(
-                            // eslint-disable-line prefer-spread
-                            null,
-                            {length: MAX_PROXY_CONFIGS + 1}
-                        )
+                        proxyConfigs: Array.apply(null, {length: MAX_PROXY_CONFIGS + 1})
                             .map(Number.call, Number)
                             .map((index) => ({
                                 host: `www.${index}.com`

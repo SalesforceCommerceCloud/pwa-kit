@@ -144,7 +144,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _logStartupMessage(options) {
         // Hook for the DevServer
     },
@@ -152,7 +152,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _getProtocol(options) {
         return 'https'
     },
@@ -167,7 +167,8 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _strictSSL(options) {
         return true
     },
@@ -175,7 +176,8 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setCompression(app) {
         // Let the CDN do it
     },
@@ -183,7 +185,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+
     _setupLogging(app) {
         app.use(
             expressLogging(
@@ -229,7 +231,8 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupMetricsFlushing(app) {
         // Hook for the dev-server
     },
@@ -237,7 +240,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+
     _updatePackageMobify(options) {
         updatePackageMobify(options.mobify)
     },
@@ -359,15 +362,14 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
     _addSDKInternalHandlers(app) {},
 
     /**
      * @private
      */
     _setupSSRRequestProcessorMiddleware(app) {
-        const that = this
-
         // Attach this middleware as early as possible. It does timing
         // and applies some early processing that must occur before
         // anything else.
@@ -408,7 +410,8 @@ export const RemoteServerFactory = {
             }
 
             // Apply the request processor
-            const requestProcessor = that._getRequestProcessor(req)
+            // `this` is bound to the calling context, usually RemoteServerFactory
+            const requestProcessor = this._getRequestProcessor(req)
             const parsed = URL.parse(req.url)
             const originalQuerystring = parsed.query
             let updatedQuerystring = originalQuerystring
@@ -569,7 +572,8 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
         app.all('/mobify/proxy/*', (_, res) => {
             return res.status(501).json({
@@ -910,7 +914,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _getRequestProcessor(req) {
         return null
     }
@@ -983,7 +987,7 @@ const ssrMiddleware = (req, res, next) => {
     next()
 }
 
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorHandlerMiddleware = (err, req, res, next) => {
     catchAndLog(err)
     req.app.sendMetric('RenderErrors')
@@ -1046,6 +1050,7 @@ const applyPatches = once((options) => {
 
     // Patch the whatwg-encoding decode function so that it will accept plain
     // JS strings and return them as-is.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const whatWGEncoding = require('whatwg-encoding')
     const originalDecode = whatWGEncoding.decode
     whatWGEncoding.decode = (buffer, fallbackEncodingName) => {

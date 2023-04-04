@@ -4,9 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-/* eslint-env jest */
-/* eslint max-nested-callbacks:0 */
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}

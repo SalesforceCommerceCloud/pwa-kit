@@ -103,8 +103,6 @@ beforeAll(() => {
     RemoteServerFactory._createApp(opts())
 })
 
-afterAll(() => {})
-
 describe('_createApp validates the options object', () => {
     let savedEnvironment
 
@@ -1053,6 +1051,7 @@ describe('DevServer middleware', () => {
         }).toThrow(error)
     })
     test('_validateConfiguration strictSSL', () => {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
         RemoteServerFactory._validateConfiguration(opts({strictSSL: false}))
         expect(warn.mock.calls).toEqual([

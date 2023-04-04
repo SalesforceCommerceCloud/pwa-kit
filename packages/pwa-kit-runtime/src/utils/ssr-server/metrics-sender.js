@@ -45,6 +45,7 @@ export class MetricsSender {
     _setup() {
         /* istanbul ignore next */
         if (!this._CW && (isRemote() || MetricsSender._override)) {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
             const Cloudwatch = require('aws-sdk/clients/cloudwatch')
             this._CW = new Cloudwatch({
                 apiVersion: '2010-08-01',
