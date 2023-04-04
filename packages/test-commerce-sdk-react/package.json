@@ -21,12 +21,15 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
-    "react-router-dom": "^5.3.4"
+    "react-router-dom": "^5.3.4",
+    "typescript": "4.8.3"
   },
   "scripts": {
     "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\"",
-    "lint": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
-    "lint:fix": "npm run lint -- --fix",
+    "lint": "npm run lint:js && npm run typecheck",
+    "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "npm run lint:js -- --fix",
+    "typcheck": "tsc --noEmit",
     "save-credentials": "pwa-kit-dev save-credentials",
     "start": "pwa-kit-dev start",
     "start:inspect": "npm run start -- --inspect",
