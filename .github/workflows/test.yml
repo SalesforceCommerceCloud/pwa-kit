@@ -33,16 +33,8 @@ jobs:
   pwa-kit:
     strategy:
       matrix:
-        node: [14, 16, 18]
-        npm: [6, 7, 8, 9]
-        # We exclude the less likely Node and NPM combinations to reduce the number of GA builds.
-        exclude:
-          - node: 16
-            npm: 6
-          - node: 18
-            npm: 6
-          - node: 14
-            npm: 9
+        node: [16, 18]
+        npm: [7, 8, 9]
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
