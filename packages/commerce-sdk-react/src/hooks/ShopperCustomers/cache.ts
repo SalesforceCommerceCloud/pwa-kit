@@ -6,8 +6,9 @@
  */
 import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {Query} from '@tanstack/react-query'
-import {getCustomerProductListItem, QueryKeys} from './queryKeyHelpers'
-import {ApiClients, CacheUpdate, CacheUpdateMatrix, Tail} from '../types'
+import clone from 'clone'
+import {getCustomerProductListItem} from './queryKeyHelpers'
+import {ApiClients, CacheUpdateMatrix} from '../types'
 import {
     getCustomer,
     getCustomerAddress,
@@ -18,17 +19,11 @@ import {
 import {and, pathStartsWith} from '../utils'
 
 type Client = ApiClients['shopperCustomers']
-type CustomerAddress = ShopperCustomersTypes.CustomerAddress
-type CustomerPaymentInstrument = ShopperCustomersTypes.CustomerPaymentInstrument
+type Customer = ShopperCustomersTypes.Customer
 type CustomerProductList = ShopperCustomersTypes.CustomerProductList
 type CustomerProductListResult = ShopperCustomersTypes.CustomerProductListResult
 
 const noop = () => ({})
-
-/** Invalidates the customer endpoint, but not derivative endpoints. */
-const invalidateCustomer = (parameters: Tail<QueryKeys['getCustomer']>): CacheUpdate => ({
-    invalidate: [{queryKey: getCustomer.queryKey(parameters)}]
-})
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     createCustomerAddress(customerId, {parameters}, response) {
@@ -41,11 +36,17 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 },
                 {
                     queryKey: getCustomer.queryKey(newParams),
-                    updater: (oldData: CustomerAddress) => {
-                        return {
-                            ...oldData,
-                            addresses: [...oldData?.addresses, response]
+                    updater: (oldData: Customer) => {
+                        if (!oldData) {
+                            return
                         }
+
+                        const newData = clone(oldData)
+
+                        // Push new address onto the end of addresses list.
+                        newData.addresses?.push(response)
+
+                        return newData
                     }
                 }
             ]
@@ -60,11 +61,17 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 },
                 {
                     queryKey: getCustomer.queryKey(newParams),
-                    updater: (oldData: CustomerPaymentInstrument) => {
-                        return {
-                            ...oldData,
-                            paymentInstruments: [...oldData?.paymentInstruments, response]
+                    updater: (oldData: Customer) => {
+                        if (!oldData) {
+                            return
                         }
+
+                        const newData = clone(oldData)
+
+                        // Add the new payment instrument to the end of the list
+                        newData.paymentInstruments?.push(response)
+
+                        return newData
                     }
                 }
             ]
@@ -72,81 +79,55 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     },
     createCustomerProductList(customerId, {parameters}, response) {
         // We always invalidate, because even without an ID we assume that something has changed
-        // TODO: Rather than invalidate, can we selectively update?
-        const invalidate: CacheUpdate['invalidate'] = [
-            {queryKey: getCustomerProductLists.queryKey(parameters)}
-        ]
-        // We can only update cache for this product list if we have the ID
+        // QUESTION: Why would we not have and ID?
         const listId = response.id
-        if (!listId) return {invalidate}
         return {
-            invalidate,
-            update: [{queryKey: getCustomerProductList.queryKey({...parameters, listId})}]
+            update: [
+                {
+                    queryKey: getCustomerProductLists.queryKey(parameters),
+                    updater: (oldData: CustomerProductListResult) => {
+                        if (!oldData) {
+                            return
+                        }
+
+                        const newData = clone(oldData)
+
+                        // Add new list to front of the lists.
+                        newData.data.unshift(response)
+                        newData.total++
+                        newData.limit++
+
+                        return newData
+                    }
+                },
+                {
+                    queryKey: getCustomerProductList.queryKey({...parameters, listId})
+                }
+            ]
         }
     },
     createCustomerProductListItem(customerId, {parameters}, response) {
         // We always invalidate, because even without an ID we assume that something has changed
-        // TODO: Rather than invalidate, can we selectively update?
-        const invalidate: CacheUpdate['invalidate'] = [
-            {queryKey: getCustomerProductList.queryKey(parameters)},
-            {queryKey: getCustomerProductLists.queryKey(parameters)}
-        ]
-        // We can only update cache for this product list item if we have the ID
+        // QUESTION: Why would we get a response that doesn't have an ID?
         const itemId = response.id
-        if (!itemId) return {invalidate}
-        return {
-            invalidate,
-            update: [{queryKey: getCustomerProductListItem.queryKey({...parameters, itemId})}]
-        }
-    },
-    deleteCustomerPaymentInstrument(customerId, {parameters}) {
-        return {
-            // TODO: Rather than invalidate, can we selectively update?
-            ...invalidateCustomer(parameters),
-            remove: [{queryKey: getCustomerPaymentInstrument.queryKey(parameters)}]
-        }
-    },
-    deleteCustomerProductList(customerId, {parameters}) {
-        return {
-            // TODO: Rather than invalidate, can we selectively update?
-            invalidate: [{queryKey: getCustomerProductLists.queryKey(parameters)}],
-            remove: [{queryKey: getCustomerProductList.path(parameters)}]
-        }
-    },
-    deleteCustomerProductListItem(customerId, {parameters}) {
-        // TODO: Dry me up.
-        const findCustomerProductListItemIndex = (list: CustomerProductList, itemId: string) => {
-            const matchIdx = list?.customerProductListItems?.findIndex(
-                ({id}) => id === parameters.itemId
-            )
-
-            return matchIdx
-        }
 
         return {
             update: [
                 {
+                    queryKey: getCustomerProductListItem.queryKey({...parameters, itemId})
+                },
+                {
                     queryKey: getCustomerProductList.queryKey(parameters),
                     updater: (oldData: CustomerProductList) => {
-                        const matchIdx = findCustomerProductListItemIndex(
-                            oldData,
-                            parameters.itemId
-                        )
-
-                        // Return if there is no match.
-                        if (!matchIdx) {
+                        if (!oldData) {
                             return
                         }
 
-                        // Copy list and remove item.
-                        const newCustomerProductList = {...oldData}
-                        if (matchIdx > -1) {
-                            newCustomerProductList?.customerProductListItems?.splice(matchIdx, 1)
-                        }
+                        const newData = clone(oldData)
 
-                        return {
-                            ...newCustomerProductList
-                        }
+                        newData.customerProductListItems?.push(response)
+
+                        return newData
                     }
                 },
                 {
@@ -156,25 +137,142 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                             return
                         }
 
-                        const newCustomerProductListResult = {...oldData}
-                        const listMatchIndex = newCustomerProductListResult?.data.findIndex(
-                            ({id}) => id === parameters.listId
-                        )
+                        const newData = clone(oldData)
 
-                        if (listMatchIndex > -1) {
-                            const itemMatchIndex = findCustomerProductListItemIndex(
-                                newCustomerProductListResult.data[listMatchIndex],
-                                parameters.itemId
-                            )
+                        // Find the list that we want to add the item to.
+                        const listIndex = newData.data.findIndex(({id}) => id === parameters.listId)
 
-                            if (itemMatchIndex) {
-                                newCustomerProductListResult.data[
-                                    listMatchIndex
-                                ]?.customerProductListItems?.splice(itemMatchIndex, 1)
-                            }
+                        // Push the new item onto the end of the list.
+                        if (listIndex < 0) {
+                            return
                         }
 
-                        return newCustomerProductListResult
+                        newData.data[listIndex].customerProductListItems?.push(response)
+
+                        return newData
+                    }
+                }
+            ]
+        }
+    },
+    deleteCustomerPaymentInstrument(customerId, {parameters}) {
+        return {
+            update: [
+                {
+                    queryKey: getCustomer.queryKey(parameters),
+                    updater: (oldData: Customer) => {
+                        if (!oldData) {
+                            return
+                        }
+
+                        const newData = clone(oldData)
+
+                        const paymentInstrumentIndex = newData?.paymentInstruments?.findIndex(
+                            ({paymentInstrumentId}) =>
+                                paymentInstrumentId === parameters.paymentInstrumentId
+                        )
+
+                        // Return undefined if no payment instrument was found.
+                        if (
+                            typeof paymentInstrumentIndex === 'undefined' ||
+                            paymentInstrumentIndex < 0
+                        ) {
+                            return
+                        }
+
+                        // Remove the found payment instrument.
+                        newData?.paymentInstruments?.splice(paymentInstrumentIndex, 1)
+
+                        return newData
+                    }
+                }
+            ],
+            remove: [{queryKey: getCustomerPaymentInstrument.queryKey(parameters)}]
+        }
+    },
+    deleteCustomerProductList(customerId, {parameters}) {
+        return {
+            update: [
+                {
+                    queryKey: getCustomerProductLists.queryKey(parameters),
+                    updater: (oldData: CustomerProductListResult) => {
+                        if (!oldData) {
+                            return
+                        }
+
+                        const newData = clone(oldData)
+
+                        const listIndex = newData.data.findIndex(({id}) => id === parameters.listId)
+
+                        // Return undefined if no list is found
+                        if (listIndex < 0) {
+                            return
+                        }
+
+                        // Remove the list from the result object
+                        newData.data.splice(listIndex, 1)
+                        newData.limit--
+                        newData.total--
+
+                        return newData
+                    }
+                }
+            ],
+            remove: [{queryKey: getCustomerProductList.path(parameters)}]
+        }
+    },
+    deleteCustomerProductListItem(customerId, {parameters}) {
+        return {
+            update: [
+                {
+                    queryKey: getCustomerProductList.queryKey(parameters),
+                    updater: (oldData: CustomerProductList) => {
+                        if (!oldData) {
+                            return
+                        }
+
+                        const newData = clone(oldData)
+
+                        const itemIndex = newData.customerProductListItems?.findIndex(
+                            ({id}) => id === parameters.itemId
+                        )
+
+                        // Return undefined if there is no item found.
+                        if (typeof itemIndex === 'undefined' || itemIndex < 0) {
+                            return
+                        }
+
+                        // Remove the list item
+                        newData.customerProductListItems?.splice(itemIndex, 1)
+
+                        return newData
+                    }
+                },
+                {
+                    queryKey: getCustomerProductLists.queryKey(parameters),
+                    updater: (oldData: CustomerProductListResult) => {
+                        if (!oldData) {
+                            return
+                        }
+
+                        const newData = clone(oldData)
+
+                        const listIndex = newData?.data.findIndex(
+                            ({id}) => id === parameters.listId
+                        )
+                        const itemIndex = newData?.data?.[
+                            listIndex
+                        ]?.customerProductListItems?.findIndex(({id}) => id === parameters.itemId)
+
+                        // Return undefined if no item was found in the provided list.
+                        if (listIndex < 0 || typeof itemIndex === 'undefined' || itemIndex < 0) {
+                            return
+                        }
+
+                        // Remove the item from the list.
+                        newData.data[listIndex]?.customerProductListItems?.splice(itemIndex, 1)
+
+                        return newData
                     }
                 }
             ],
@@ -191,19 +289,26 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             update: [
                 {
                     queryKey: getCustomer.queryKey(parameters),
-                    updater: (oldData: CustomerAddress) => {
-                        const newAddresses = [...oldData?.addresses]
-                        const matchIdx = newAddresses.findIndex(
-                            ({addressId}) => addressId === parameters.addressName
-                        )
-                        if (matchIdx > -1) {
-                            newAddresses.splice(matchIdx, 1)
+                    updater: (oldData: Customer) => {
+                        if (!oldData) {
+                            return
                         }
 
-                        return {
-                            ...oldData,
-                            addresses: newAddresses
+                        const newData = clone(oldData)
+
+                        const addressIndex = newData?.addresses?.findIndex(
+                            ({addressId}) => addressId === parameters.addressName
+                        )
+
+                        // Return undefined if the address is not found...
+                        if (typeof addressIndex === 'undefined' || addressIndex < 0) {
+                            return
                         }
+
+                        // Rmove the found address.
+                        newData?.addresses?.splice(addressIndex, 1)
+
+                        return newData
                     }
                 }
             ],
@@ -235,41 +340,63 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 },
                 {
                     queryKey: getCustomer.queryKey(parameters),
-                    updater: (oldData: CustomerAddress) => {
-                        const newAddresses = [...oldData?.addresses]
-                        const matchIdx = newAddresses.findIndex(
-                            ({addressId}) => addressId === response.addressId
-                        )
-                        if (matchIdx > -1) {
-                            newAddresses[matchIdx] = response
+                    updater: (oldData: Customer) => {
+                        if (!oldData) {
+                            return
                         }
 
-                        return {
-                            ...oldData,
-                            addresses: newAddresses
+                        const newData = clone(oldData)
+
+                        const addressIndex = newData?.addresses?.findIndex(
+                            ({addressId}) => addressId === response.addressId
+                        )
+
+                        // Return undefined if no address is found...
+                        if (typeof addressIndex === 'undefined' || addressIndex < 0) {
+                            return
                         }
+
+                        // Update the found address.
+                        newData.addresses![addressIndex] = response
+
+                        return newData
                     }
                 }
             ]
         }
     },
     updateCustomerPassword: noop,
-    updateCustomerProductList(customerId, {parameters}) {
+    updateCustomerProductList(customerId, {parameters}, response) {
         return {
-            update: [{queryKey: getCustomerProductList.queryKey(parameters)}],
-            // TODO: Rather than invalidate, can we selectively update?
-            invalidate: [{queryKey: getCustomerProductLists.queryKey(parameters)}]
+            update: [
+                {
+                    queryKey: getCustomerProductList.queryKey(parameters)
+                },
+                {
+                    queryKey: getCustomerProductLists.queryKey(parameters),
+                    updater: (oldData: CustomerProductList[]) => {
+                        if (!oldData) {
+                            return
+                        }
+
+                        const newData = clone(oldData)
+                        const listIndex = newData.findIndex(({id}) => id === response.id)
+
+                        // Return undefined if we didn't find the product list we were looking for.
+                        if (listIndex < 0) {
+                            return
+                        }
+
+                        // Update the product list.
+                        newData[listIndex] = response
+
+                        return newData
+                    }
+                }
+            ]
         }
     },
     updateCustomerProductListItem(customerId, {parameters}, response) {
-        const findCustomerProductListItemIndex = (list: CustomerProductList, itemId: string) => {
-            const matchIdx = list?.customerProductListItems?.findIndex(
-                ({id}) => id === parameters.itemId
-            )
-
-            return matchIdx
-        }
-
         return {
             update: [
                 {
@@ -278,25 +405,26 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomerProductList.queryKey(parameters),
                     updater: (oldData: CustomerProductList) => {
-                        const matchIdx = findCustomerProductListItemIndex(
-                            oldData,
-                            parameters.itemId
-                        )
-
-                        // Return if there is no match.
-                        if (!matchIdx) {
+                        if (!oldData) {
                             return
                         }
 
-                        // Copy list and remove item.
-                        const newCustomerProductList = {...oldData}
-                        if (matchIdx > -1 && newCustomerProductList.customerProductListItems) {
-                            newCustomerProductList.customerProductListItems[matchIdx] = response
+                        const newData = clone(oldData)
+
+                        // Find the index of the item we want to update.
+                        const itemIndex = newData.customerProductListItems?.findIndex(
+                            ({id}) => id === parameters.itemId
+                        )
+
+                        // Return undefined when item isn't found.
+                        if (typeof itemIndex === 'undefined' || itemIndex < 0) {
+                            return
                         }
 
-                        return {
-                            ...newCustomerProductList
-                        }
+                        // Make a copy of the list we are mutating as to leave the original alone.
+                        newData.customerProductListItems![itemIndex] = response
+
+                        return newData
                     }
                 },
                 {
@@ -306,24 +434,25 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                             return
                         }
 
-                        const newCustomerProductListResult = {...oldData}
-                        const listMatchIndex = newCustomerProductListResult?.data.findIndex(
-                            ({id}) => id === parameters.listId
-                        )
+                        const newData = clone(oldData)
 
-                        if (listMatchIndex > -1) {
-                            const itemMatchIndex = findCustomerProductListItemIndex(
-                                newCustomerProductListResult.data[listMatchIndex],
-                                parameters.itemId
-                            )
+                        // Find the list with the current list id.
+                        const listIndex = newData.data.findIndex(({id}) => id === parameters.listId)
+                        // Find the index of the item in the list.
+                        const itemIndex = newData?.data[
+                            listIndex
+                        ]?.customerProductListItems?.findIndex(({id}) => id === parameters.itemId)
 
-                            const list  = newCustomerProductListResult.data[listMatchIndex].customerProductListItems
-                            if (itemMatchIndex && list) {
-                                list[itemMatchIndex] = response 
-                            }
+                        // Return undefined if item isn't found...
+                        if (listIndex < 0 || typeof itemIndex === 'undefined' || itemIndex < 0) {
+                            return
                         }
 
-                        return newCustomerProductListResult
+                        // Update the item in the found list.
+                        // NOTE: We know that there is an item to update given the item index is > -1
+                        newData.data[listIndex].customerProductListItems![itemIndex] = response
+
+                        return newData
                     }
                 }
             ]
