@@ -19,6 +19,7 @@ on:
       - develop
       # TODO: Should we run on all pushes to release branches, or should we run on GitHub releases?
       - 'release-*'
+      - 'v3'
   schedule:
     # Run every day at 12pm (PST) - cron uses UTC times
     - cron: '0 8 * * *'
