@@ -78,7 +78,7 @@ jobs:
         uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' )
+        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' || env.V3 == 'true' )
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
