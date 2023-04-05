@@ -126,13 +126,14 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         const newData = clone(oldData)
 
                         newData.customerProductListItems?.push(response)
-
+                        // console.log('updater: ', oldData, newData)
                         return newData
                     }
                 },
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
                     updater: (oldData: CustomerProductListResult) => {
+                        console.log('updater --> oldData: ', oldData)
                         if (!oldData) {
                             return
                         }
@@ -146,7 +147,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         if (listIndex < 0) {
                             return
                         }
-
+                        console.log('updater: ', oldData, newData)
                         newData.data[listIndex].customerProductListItems?.push(response)
 
                         return newData
@@ -374,13 +375,13 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 },
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
-                    updater: (oldData: CustomerProductList[]) => {
+                    updater: (oldData: CustomerProductListResult) => {
                         if (!oldData) {
                             return
                         }
 
                         const newData = clone(oldData)
-                        const listIndex = newData.findIndex(({id}) => id === response.id)
+                        const listIndex = newData.data.findIndex(({id}) => id === response.id)
 
                         // Return undefined if we didn't find the product list we were looking for.
                         if (listIndex < 0) {
@@ -388,7 +389,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Update the product list.
-                        newData[listIndex] = response
+                        newData.data[listIndex] = response
 
                         return newData
                     }
