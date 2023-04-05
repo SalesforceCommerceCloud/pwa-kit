@@ -7,7 +7,7 @@
   },
   "devDependencies": {
     "commander": "^2.20.3",
-    "lerna": "^3.22.1",
+    "lerna": "^6.6.1",
     "semver": "^7.3.8",
     "shelljs": "^0.8.5"
   },
@@ -18,7 +18,7 @@
     "pretest": "npm run lint",
     "test": "lerna run --stream --concurrency=1 test",
     "test:max-file-size": "lerna run --stream test:max-file-size",
-    "lint": "lerna run --parallel --stream lint -- --silent",
+    "lint": "lerna run --parallel --stream lint",
     "lint:fix": "lerna run lint:fix",
     "format": "lerna run --parallel --stream format",
     "bump-version": "node ./scripts/bump-version.js"
