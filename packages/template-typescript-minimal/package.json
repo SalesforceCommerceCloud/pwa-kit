@@ -7,15 +7,30 @@
 	},
 	"private": true,
 	"devDependencies": {
-		"@loadable/component": "^5.15.3",
-		"@tanstack/react-query": "^4.28.0",
-		"@types/react": "^17.0.53",
-		"@types/react-dom": "^17.0.19",
-		"react": "^17.0.2",
-		"react-dom": "^17.0.2",
-		"react-helmet": "^6.1.0",
-		"react-router-dom": "^5.3.4"
-	},
+        "@loadable/component": "^5.15.3",
+        "@tanstack/react-query": "^4.28.0",
+        "@types/react": "^17.0.53",
+        "@types/react-dom": "^17.0.19",
+        "pwa-kit-dev": "2.8.0-dev",
+        "pwa-kit-react-sdk": "2.8.0-dev",
+        "pwa-kit-runtime": "2.8.0-dev",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-helmet": "^6.1.0",
+        "react-router-dom": "^5.3.4"
+    },
+    "scripts": {
+        "format": "pwa-kit-dev format \"**/*.{js,jsx,tsx}\"",
+        "lint": "pwa-kit-dev lint \"**/*.{js,jsx,tsx}\"",
+        "lint:fix": "npm run lint -- --fix",
+        "save-credentials": "pwa-kit-dev save-credentials",
+        "start": "pwa-kit-dev start",
+        "start:inspect": "npm run start -- --inspect",
+        "test": "pwa-kit-dev test",
+        "build": "pwa-kit-dev build",
+        "push": "npm run build && pwa-kit-dev push",
+        "tail-logs": "pwa-kit-dev tail-logs"
+    },
 	"mobify": {
 		"ssrEnabled": true,
 		"ssrOnly": [
