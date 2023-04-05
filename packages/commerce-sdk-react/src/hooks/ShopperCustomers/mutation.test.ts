@@ -363,7 +363,7 @@ describe('ShopperCustomers mutations', () => {
             await waitForValueToChange(() => result.current.query)
             assertUpdateQuery(result.current.query, data)
         })
-        test.only('`deleteCustomerProductListItem` updates cache on success', async () => {
+        test('`deleteCustomerProductListItem` updates cache on success', async () => {
             const data = oldProductListItem
             const list = baseProductList
             const listResult = baseListResult
