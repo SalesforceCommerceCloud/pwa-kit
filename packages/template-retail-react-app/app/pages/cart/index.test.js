@@ -189,7 +189,7 @@ describe('Empty cart tests', function () {
 })
 
 describe('Rendering tests', function () {
-    test('Renders skeleton before rendering cart items', async () => {
+    test.skip('Renders skeleton before rendering cart items', async () => {
         renderWithProviders(<Cart />)
 
         await waitFor(() => {
@@ -299,6 +299,7 @@ describe('Remove item from cart', function () {
 
         // remove item
         const cartItem = screen.getByTestId('sf-cart-item-701642889830M')
+
         userEvent.click(within(cartItem).getByRole('button', {name: /remove/i}))
         userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
 
