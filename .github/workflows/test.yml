@@ -39,7 +39,7 @@ jobs:
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
+      IS_DEFAULT_NPM: ${{ matrix.node == 16 && matrix.npm == 8 }}
       IS_LATEST_NPM: ${{ matrix.node == 16 && matrix.npm == 8 }}
     steps:
       - name: Checkout
@@ -129,20 +129,12 @@ jobs:
   pwa-kit-windows:
     strategy:
       matrix:
-        node: [14, 16, 18]
-        npm: [6, 7, 8, 9]
-        # We exclude the less likely Node and NPM combinations to reduce the number of GA builds.
-        exclude:
-          - node: 16
-            npm: 6
-          - node: 18
-            npm: 6
-          - node: 14
-            npm: 9
+        node: [16, 18]
+        npm: [7, 8, 9]
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
+      IS_DEFAULT_NPM: ${{ matrix.node == 16 && matrix.npm == 8 }}
     runs-on: windows-latest
     steps:
         - name: Checkout
