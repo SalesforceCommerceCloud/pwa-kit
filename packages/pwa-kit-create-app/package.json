@@ -1,45 +1,36 @@
 {
-  "name": "pwa-kit-create-app",
-  "version": "2.8.0-dev",
-  "description": "Salesforce's project generator tool",
-  "author": "cc-pwa-kit@salesforce.com",
-  "license": "See license in LICENSE",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
-  },
-  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-create-app#readme",
-  "bugs": {
-    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
-  },
-  "bin": "scripts/create-mobify-app.js",
-  "files": [
-    "assets",
-    "templates"
-  ],
-  "scripts": {
-    "prepare": "node scripts/build.js",
-    "format": "internal-lib-build format \"**/*.{js,jsx}\"",
-    "lint": "npm run lint:js",
-    "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "internal-lib-build lint .",
-    "test": "internal-lib-build test"
-  },
-  "engines": {
-    "node": "^16.0.0 || ^18.0.0",
-    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
-  },
-  "dependencies": {
-    "commander": "^9.5.0",
-    "deepmerge": "2.2.1",
-    "inquirer": "7.3.3",
-    "semver": "^7.3.8",
-    "shelljs": "^0.8.5",
-    "slugify": "^1.6.5",
-    "tar": "^6.1.13"
-  },
-  "devDependencies": {
-    "internal-lib-build": "2.8.0-dev",
-    "verdaccio": "^5.22.1"
-  }
+	"name": "pwa-kit-create-app",
+	"version": "2.8.0-dev",
+	"description": "Salesforce's project generator tool",
+	"author": "cc-pwa-kit@salesforce.com",
+	"license": "See license in LICENSE",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+	},
+	"homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-create-app#readme",
+	"bugs": {
+		"url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+	},
+	"bin": "scripts/create-mobify-app.js",
+	"files": [
+		"assets",
+		"templates"
+	],
+	"engines": {
+		"node": "^16.0.0 || ^18.0.0",
+		"npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+	},
+	"dependencies": {
+		"commander": "^9.5.0",
+		"deepmerge": "2.2.1",
+		"inquirer": "7.3.3",
+		"semver": "^7.3.8",
+		"shelljs": "^0.8.5",
+		"slugify": "^1.6.5",
+		"tar": "^6.1.13"
+	},
+	"devDependencies": {
+		"verdaccio": "^5.22.1"
+	}
 }
