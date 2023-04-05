@@ -289,7 +289,7 @@ test('Can proceed through checkout steps as guest', async () => {
     expect(await screen.findByText(/success/i)).toBeInTheDocument()
 })
 
-test.skip('Can proceed through checkout as registered customer', async () => {
+test('Can proceed through checkout as registered customer', async () => {
     await logInDuringCheckout()
 
     // Email should be displayed in previous step summary
@@ -299,18 +299,10 @@ test.skip('Can proceed through checkout as registered customer', async () => {
     user.click(screen.getByDisplayValue('savedaddress1'))
     user.click(screen.getByText(/continue to shipping method/i))
 
-    screen.logTestingPlaygroundURL()
-
     // Wait for next step to render
-    await waitFor(
-        () => {
-            // TODO
-            const content = screen.getByTestId('sf-toggle-card-step-2-content')
-            // console.log('--- content', content)
-            expect(content).not.toBeEmptyDOMElement()
-        },
-        {timeout: 10000}
-    )
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
+    })
 
     // Shipping address displayed in previous step summary
     expect(screen.getByText('Test McTester')).toBeInTheDocument()
@@ -396,7 +388,7 @@ test('Can edit address during checkout as a registered customer', async () => {
     expect(screen.getByText('369 Main Street')).toBeInTheDocument()
 })
 
-test.skip('Can add address during checkout as a registered customer', async () => {
+test('Can add address during checkout as a registered customer', async () => {
     await logInDuringCheckout()
 
     global.server.use(
@@ -406,8 +398,6 @@ test.skip('Can add address during checkout as a registered customer', async () =
     )
 
     // Add address
-    // TODO
-    screen.logTestingPlaygroundURL()
     user.click(screen.getByText(/add new address/i))
 
     const firstName = await screen.findByLabelText(/first name/i)
