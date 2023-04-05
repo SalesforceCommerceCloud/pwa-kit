@@ -128,21 +128,31 @@ const App = (props) => {
     const {l10n} = site
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
+    console.log('currency', currency)
 
-    // Handle creating a new pasket if there isn't one already assigned to the current
+    // Handle creating a new basket if there isn't one already assigned to the current
     // customer.
     const {data: customer} = useCurrentCustomer()
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId: customer.customerId}},
         {enabled: !!customer.customerId && !isServer}
     )
+    console.log('basket?.currency', baskets?.baskets?.[0]?.currency)
     const createBasket = useShopperBasketsMutation('createBasket')
+    const updateBasket = useShopperBasketsMutation('updateBasket')
 
-    // Create a new basket if the current customer doesn't have one.
     useEffect(() => {
+        // Create a new basket if the current customer doesn't have one.
         if (baskets?.total === 0) {
             createBasket.mutate({
                 body: {}
+            })
+        }
+        // update the basket currency if it doesn't match the current locale currency
+        if (baskets?.baskets?.[0]?.currency && baskets?.baskets?.[0]?.currency !== currency) {
+            updateBasket.mutate({
+                parameters: {basketId: baskets?.baskets?.[0]?.basketId},
+                body: {currency}
             })
         }
     }, [baskets])
