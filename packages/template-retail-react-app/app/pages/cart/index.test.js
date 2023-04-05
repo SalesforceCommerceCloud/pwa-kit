@@ -189,13 +189,11 @@ describe('Empty cart tests', function () {
 })
 
 describe('Rendering tests', function () {
-    test.skip('Renders skeleton before rendering cart items', async () => {
+    test('Renders skeleton before rendering cart items', async () => {
         renderWithProviders(<Cart />)
 
-        await waitFor(() => {
-            expect(screen.getByTestId('sf-cart-skeleton')).toBeInTheDocument()
-            expect(screen.queryByTestId('sf-cart-container')).not.toBeInTheDocument()
-        })
+        expect(screen.getByTestId('sf-cart-skeleton')).toBeInTheDocument()
+        expect(screen.queryByTestId('sf-cart-container')).not.toBeInTheDocument()
 
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
