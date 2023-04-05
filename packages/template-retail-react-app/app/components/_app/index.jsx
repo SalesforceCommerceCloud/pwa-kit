@@ -147,9 +147,9 @@ const App = (props) => {
             })
         }
         // update the basket currency if it doesn't match the current locale currency
-        if (baskets?.baskets?.[0]?.currency && baskets?.baskets?.[0]?.currency !== currency) {
+        if (baskets?.baskets?.[0]?.currency && baskets.baskets[0].currency !== currency) {
             updateBasket.mutate({
-                parameters: {basketId: baskets?.baskets?.[0]?.basketId},
+                parameters: {basketId: baskets.baskets[0].basketId},
                 body: {currency}
             })
         }
