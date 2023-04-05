@@ -128,7 +128,6 @@ const App = (props) => {
     const {l10n} = site
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
-    console.log('currency', currency)
 
     // Handle creating a new basket if there isn't one already assigned to the current
     // customer.
@@ -137,7 +136,6 @@ const App = (props) => {
         {parameters: {customerId: customer.customerId}},
         {enabled: !!customer.customerId && !isServer}
     )
-    console.log('basket?.currency', baskets?.baskets?.[0]?.currency)
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
 
