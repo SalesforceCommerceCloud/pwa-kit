@@ -26,7 +26,7 @@ import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CategoriesProvider, CurrencyProvider} from '^retail-react-app/app/contexts'
+import {CurrencyProvider} from '^retail-react-app/app/contexts'
 
 // Local Project Components
 import Header from '../header'
@@ -50,7 +50,13 @@ import {useCurrentCustomer} from '^retail-react-app/app/hooks/use-current-custom
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten} from '^retail-react-app/app/utils/utils'
+import {
+    watchOnlineStatus,
+    flatten,
+    mergeMatchedItems,
+    isServer,
+    resolveLocaleFromUrl
+} from '^retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '^retail-react-app/app/utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -134,9 +140,17 @@ const App = (props) => {
 
     // Create a new basket if the current customer doesn't have one.
     useEffect(() => {
+        // Create a new basket if the current customer doesn't have one.
         if (baskets?.total === 0) {
             createBasket.mutate({
                 body: {}
+            })
+        }
+        // update the basket currency if it doesn't match the current locale currency
+        if (baskets?.baskets?.[0]?.currency && baskets.baskets[0].currency !== currency) {
+            updateBasket.mutate({
+                parameters: {basketId: baskets.baskets[0].basketId},
+                body: {currency}
             })
         }
     }, [baskets])
@@ -163,7 +177,7 @@ const App = (props) => {
         // Close the drawer.
         onClose()
     }
-
+    
     const onCartClick = () => {
         const path = buildUrl('/cart')
         history.push(path)
@@ -311,8 +325,9 @@ App.shouldGetProps = () => {
     return typeof window === 'undefined'
 }
 
-App.getProps = async ({api, res}) => {
+App.getProps = async ({res}) => {
     const site = resolveSiteFromUrl(res.locals.originalUrl)
+    const locale = resolveLocaleFromUrl(res.locals.originalUrl)
     const l10nConfig = site.l10n
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -327,35 +342,22 @@ App.getProps = async ({api, res}) => {
             // then the app would use the default locale as the fallback.
 
             // NOTE: Your implementation may differ, this is just what we did.
-            //
-            // Since the CommerceAPI client already has the current `locale` set,
-            // we can use it's value to load the correct messages for the application.
-            // Take a look at the `app/components/_app-config` component on how the
-            // preferred locale was derived.
-            const {locale} = api.getConfig()
-
-            return [locale]
+            return [locale?.id]
         },
         l10nConfig
     })
     const messages = await fetchTranslations(targetLocale)
 
-    // Login as `guest` to get session.
-    await api.auth.login()
-
     return {
         targetLocale,
-        messages,
-        config: res?.locals?.config
+        messages
     }
 }
 
 App.propTypes = {
     children: PropTypes.node,
     targetLocale: PropTypes.string,
-    messages: PropTypes.object,
-    categories: PropTypes.object,
-    config: PropTypes.object
+    messages: PropTypes.object
 }
 
 /**

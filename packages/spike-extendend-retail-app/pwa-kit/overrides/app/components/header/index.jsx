@@ -27,28 +27,27 @@ import {
     useDisclosure,
     useMediaQuery,
 } from '@chakra-ui/react'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 
-import useBasket from '^retail-react-app/app/commerce-api/hooks/useBasket'
-import useCustomer from '^retail-react-app/app/commerce-api/hooks/useCustomer'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 
-import Link from '^retail-react-app/app/components/link'
-import Search from '^retail-react-app/app/components/search'
-import withRegistration from '^retail-react-app/app/hoc/with-registration'
-
+import Link from '../link'
+import Search from '../search'
+import withRegistration from '../../hoc/with-registration'
 import {
     AccountIcon,
     BrandLogo,
     BasketIcon,
-    HeartIcon,
-    ChevronDownIcon,
-    SignoutIcon,
     HamburgerIcon,
+    ChevronDownIcon,
+    HeartIcon,
+    SignoutIcon,
 } from '../icons'
 
-import {noop} from '^retail-react-app/app/utils/utils'
-import {navLinks, messages} from '^retail-react-app/app/pages/account/constant'
-import useNavigation from '^retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from '^retail-react-app/app/components/loading-spinner'
+import {noop} from '../../utils/utils'
+import {navLinks, messages} from '../../pages/account/constant'
+import useNavigation from '../../hooks/use-navigation'
+import LoadingSpinner from '../loading-spinner'
 
 const ENTER_KEY = 'Enter'
 
@@ -82,8 +81,12 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
-    const basket = useBasket()
-    const customer = useCustomer()
+    const {
+        derivedData: {totalItems},
+        data: basket
+    } = useCurrentBasket()
+    const {isRegistered} = useCustomerType()
+    const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
 
     const {isOpen, onClose, onOpen} = useDisclosure()
@@ -98,7 +101,7 @@ const Header = ({
 
     const onSignoutClick = async () => {
         setShowLoading(true)
-        await customer.logout()
+        await logout.mutateAsync()
         navigate('/login')
         setShowLoading(false)
     }
@@ -164,7 +167,8 @@ const Header = ({
                             defaultMessage: 'My account',
                         })}
                     />
-                    {customer.isRegistered && (
+
+                    {isRegistered && (
                         <Popover
                             isLazy
                             arrowSize={15}
@@ -259,10 +263,8 @@ const Header = ({
                         icon={
                             <>
                                 <BasketIcon />
-                                {basket?.loaded && (
-                                    <Badge variant="notification">
-                                        {basket.itemAccumulatedCount}
-                                    </Badge>
+                                {basket && totalItems > 0 && (
+                                    <Badge variant="notification">{totalItems}</Badge>
                                 )}
                             </>
                         }
