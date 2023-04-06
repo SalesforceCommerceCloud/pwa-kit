@@ -6,21 +6,12 @@
     "bugs": {
         "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
     },
-<<<<<<< HEAD
-    "scripts": {
-      "lint": "npm run lint:js",
-      "lint:fix": "npm run lint:js -- --fix",
-      "lint:js": "node ./bin/internal-lib-build.js lint .",
-      "format": "node ./bin/internal-lib-build.js format \"**/*.{js,jsx}\""
-    },
-=======
     "repository": {
         "type": "git",
         "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
     },
     "license": "See license in LICENSE",
     "author": "cc-pwa-kit@salesforce.com",
->>>>>>> v3
     "bin": "scripts/create-mobify-app.js",
     "files": [
         "assets",
