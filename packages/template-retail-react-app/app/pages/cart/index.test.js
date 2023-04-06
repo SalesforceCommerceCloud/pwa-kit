@@ -298,7 +298,12 @@ describe('Remove item from cart', function () {
         })
 
         userEvent.click(within(cartItem).getByText(/remove/i))
-        userEvent.click(screen.getByText(/yes, remove item/i))
+
+        try {
+            userEvent.click(screen.getByText(/yes, remove item/i))
+        } catch {
+            userEvent.click(await screen.findByText(/yes, remove item/i))
+        }
 
         await waitFor(
             () => {
