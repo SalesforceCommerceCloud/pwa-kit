@@ -5,6 +5,5 @@ runs:
   - name: Run Lighthouse CI on the PWA
     # lighthouse ci doesn't work on node 18 at this time 
     # https://github.com/GoogleChrome/lighthouse-ci/issues/862
-    if: ${{ matrix.node != 18 }}
     run: npm run test:lighthouse --prefix packages/template-retail-react-app
     shell: bash

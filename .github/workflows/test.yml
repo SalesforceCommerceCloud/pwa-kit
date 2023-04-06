@@ -39,6 +39,7 @@ jobs:
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
+      IS_MRT_NODE: ${{ matrix.node == 16 }}
       IS_DEFAULT_NPM: ${{ matrix.node == 16 && matrix.npm == 8 || matrix.node == 18 && matrix.npm == 9 }}
       IS_LATEST_NPM: ${{ matrix.node == 16 && matrix.npm == 8 }}
     steps:
@@ -63,7 +64,7 @@ jobs:
         uses: "./.github/actions/unit_tests"
 
       - name: Run Lighthouse CI on the PWA
-        if: env.IS_DEFAULT_NPM == 'true'
+        if: env.IS_MRT_NODE == 'true'
         uses: "./.github/actions/lighthouse_ci"
 
       - name: Smoke test scripts
