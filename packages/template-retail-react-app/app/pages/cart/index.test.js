@@ -301,7 +301,9 @@ describe('Remove item from cart', function () {
 
         try {
             userEvent.click(screen.getByText(/yes, remove item/i))
-        } catch {}
+        } catch {
+            // do nothing
+        }
 
         console.log('--- cannot get the button immediately.. will try findBy query now')
         const button = await screen.findByText(/yes, remove item/i)
