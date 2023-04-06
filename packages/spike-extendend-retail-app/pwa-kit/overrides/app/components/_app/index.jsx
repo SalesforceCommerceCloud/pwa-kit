@@ -26,7 +26,7 @@ import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CategoriesProvider, CurrencyProvider} from '^retail-react-app/app/contexts'
+import {CurrencyProvider} from '^retail-react-app/app/contexts'
 
 // Local Project Components
 import Header from '../header'
@@ -177,7 +177,7 @@ const App = (props) => {
         // Close the drawer.
         onClose()
     }
-
+    
     const onCartClick = () => {
         const path = buildUrl('/cart')
         history.push(path)

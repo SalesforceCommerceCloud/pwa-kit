@@ -39,16 +39,16 @@ import {
     AccountIcon,
     BrandLogo,
     BasketIcon,
-    HeartIcon,
-    ChevronDownIcon,
-    SignoutIcon,
     HamburgerIcon,
+    ChevronDownIcon,
+    HeartIcon,
+    SignoutIcon,
 } from '../icons'
 
-import {noop} from '^retail-react-app/app/utils/utils'
-import {navLinks, messages} from '^retail-react-app/app/pages/account/constant'
-import useNavigation from '^retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from '^retail-react-app/app/components/loading-spinner'
+import {noop} from '../../utils/utils'
+import {navLinks, messages} from '../../pages/account/constant'
+import useNavigation from '../../hooks/use-navigation'
+import LoadingSpinner from '../loading-spinner'
 
 const ENTER_KEY = 'Enter'
 
