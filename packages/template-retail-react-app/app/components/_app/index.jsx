@@ -69,7 +69,6 @@ import {
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import {useAutoBasketMerge} from '../../hooks/use-auto-merge-basket'
 
 const onClient = typeof window !== 'undefined'
 
@@ -141,7 +140,7 @@ const App = (props) => {
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
 
-    useAutoBasketMerge()
+    // useAutoBasketMerge()
     useEffect(() => {
         // Create a new basket if the current customer doesn't have one.
         if (baskets?.total === 0) {
