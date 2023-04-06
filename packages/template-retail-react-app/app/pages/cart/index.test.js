@@ -301,12 +301,12 @@ describe('Remove item from cart', function () {
 
         try {
             userEvent.click(screen.getByText(/yes, remove item/i))
-        } catch {
-            console.log('--- cannot get the button immediately.. will try findBy query now')
-            const button = await screen.findByText(/yes, remove item/i)
-            console.log('--- found the button')
-            userEvent.click(button)
-        }
+        } catch {}
+
+        console.log('--- cannot get the button immediately.. will try findBy query now')
+        const button = await screen.findByText(/yes, remove item/i)
+        console.log('--- found the button', button)
+        userEvent.click(button)
 
         await waitFor(
             () => {
