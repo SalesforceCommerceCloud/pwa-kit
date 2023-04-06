@@ -1,18 +1,14 @@
 {
   "name": "internal-lib-build",
   "version": "2.8.0-dev",
-  "engines": {
-    "node": "^14.0.0 || ^16.0.0 || ^18.0.0",
-    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0 || ^9.0.0"
-  },
   "private": true,
   "description": "Build tools for *libraries* in the monorepo",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
-  },
-  "bugs": {
-    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
@@ -23,6 +19,12 @@
     "bin",
     "configs"
   ],
+  "scripts": {
+    "format": "node ./bin/internal-lib-build.js format \"**/*.{js,jsx}\"",
+    "lint": "npm run lint:js",
+    "lint:fix": "npm run lint:js -- --fix",
+    "lint:js": "node ./bin/internal-lib-build.js lint ."
+  },
   "dependencies": {
     "@babel/cli": "^7.21.0",
     "@babel/core": "^7.21.3",
@@ -80,10 +82,8 @@
       "optional": true
     }
   },
-  "scripts": {
-    "lint": "npm run lint:js",
-    "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "node ./bin/internal-lib-build.js lint .",
-    "format": "node ./bin/internal-lib-build.js format \"**/*.{js,jsx}\""
+  "engines": {
+    "node": "^16.0.0 || ^18.0.0",
+    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
   }
 }
