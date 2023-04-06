@@ -189,16 +189,11 @@ describe('Empty cart tests', function () {
 })
 
 describe('Rendering tests', function () {
-    test('Renders skeleton before rendering cart items', async () => {
+    test('Renders skeleton initially', async () => {
         renderWithProviders(<Cart />)
 
         expect(screen.getByTestId('sf-cart-skeleton')).toBeInTheDocument()
         expect(screen.queryByTestId('sf-cart-container')).not.toBeInTheDocument()
-
-        await waitFor(() => {
-            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-            expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
-        })
     })
 })
 
@@ -292,11 +287,15 @@ describe('Remove item from cart', function () {
     })
     test('Can remove item from the cart', async () => {
         renderWithProviders(<Cart />)
-        expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
-        expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
 
-        // remove item
-        const cartItem = screen.getByTestId('sf-cart-item-701642889830M')
+        let cartItem
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+
+            cartItem = screen.getByTestId('sf-cart-item-701642889830M')
+            expect(cartItem).toBeInTheDocument()
+        })
 
         userEvent.click(within(cartItem).getByRole('button', {name: /remove/i}))
         userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
