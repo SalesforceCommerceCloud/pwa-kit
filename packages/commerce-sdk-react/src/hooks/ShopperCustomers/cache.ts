@@ -35,9 +35,9 @@ type DataProcessor<T> = (data: NonNullable<T>) => T
 /**
  * Create an update handler for the cache matrix. This updater will implicitly clone and assert
  * that the data being passed to is is not undefined.
- *  
- * @param update 
- * @returns 
+ *
+ * @param update
+ * @returns
  */
 const createUpdateFunction =
     <T>(update: DataProcessor<T>): Updater<T> =>
