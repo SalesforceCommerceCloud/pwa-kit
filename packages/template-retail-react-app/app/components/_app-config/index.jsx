@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@chakra-ui/react'
 
@@ -12,14 +12,6 @@ import {ChakraProvider} from '@chakra-ui/react'
 import 'focus-visible/dist/focus-visible'
 
 import theme from '../../theme'
-import CommerceAPI from '../../commerce-api'
-import {
-    BasketProvider,
-    CommerceAPIProvider as _CommerceAPIProvider,
-    CustomerProductListsProvider,
-    //TODO: Remove when integration is finished
-    CustomerProvider as _CustomerProvider
-} from '../../commerce-api/contexts'
 import {MultiSiteProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
@@ -41,9 +33,6 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
  * as Redux, or Mobx, if you like.
  */
 const AppConfig = ({children, locals = {}}) => {
-    const [basket, setBasket] = useState(null)
-    const [customer, setCustomer] = useState(null)
-
     const {correlationId} = useCorrelationId()
     const headers = {
         'correlation-id': correlationId
@@ -66,15 +55,7 @@ const AppConfig = ({children, locals = {}}) => {
             headers={headers}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-                <_CommerceAPIProvider value={locals.api}>
-                    <_CustomerProvider value={{customer, setCustomer}}>
-                        <BasketProvider value={{basket, setBasket}}>
-                            <CustomerProductListsProvider>
-                                <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                            </CustomerProductListsProvider>
-                        </BasketProvider>
-                    </_CustomerProvider>
-                </_CommerceAPIProvider>
+                <ChakraProvider theme={theme}>{children}</ChakraProvider>
             </MultiSiteProvider>
         </CommerceApiProvider>
     )
@@ -87,7 +68,6 @@ AppConfig.restore = (locals = {}) => {
             : `${window.location.pathname}${window.location.search}`
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
-    const currency = locale.preferredCurrency
 
     const {app: appConfig} = getConfig()
     const apiConfig = {
@@ -97,7 +77,6 @@ AppConfig.restore = (locals = {}) => {
 
     apiConfig.parameters.siteId = site.id
 
-    locals.api = new CommerceAPI({...apiConfig, locale: locale.id, currency})
     locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
     locals.site = site
     locals.locale = locale
@@ -108,7 +87,6 @@ AppConfig.freeze = () => undefined
 
 AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
-        api: locals.api,
         buildUrl: locals.buildUrl,
         site: locals.site,
         locale: locals.locale

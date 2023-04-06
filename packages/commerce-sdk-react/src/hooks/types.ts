@@ -72,6 +72,8 @@ export type ApiClientConfigParams = {
     organizationId: string
     siteId: string
     shortCode: string
+    locale?: string
+    currency?: string
 }
 
 export interface ApiClients {
