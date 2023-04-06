@@ -25,6 +25,8 @@ import {useCurrency} from '../../hooks'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
+import {useToast} from '../../hooks/use-toast'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 const ProductViewHeader = ({name, price, currency, category, productType}) => {
     const intl = useIntl()
@@ -54,7 +56,7 @@ const ProductViewHeader = ({name, price, currency, category, productType}) => {
                         })} `}
                     {intl.formatNumber(price, {
                         style: 'currency',
-                        currency: currency || activeCurrency,
+                        currency: currency || activeCurrency
                     })}
                 </Text>
             </Skeleton>
@@ -469,7 +471,7 @@ const ProductView = forwardRef(
                                         <Text color="blue.600">
                                             {intl.formatMessage({
                                                 defaultMessage: 'See full details',
-                                                id: 'product_view.link.full_details',
+                                                id: 'product_view.link.full_details'
                                             })}
                                         </Text>
                                     </Link>

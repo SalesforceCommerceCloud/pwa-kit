@@ -27,9 +27,9 @@ import {
     useDisclosure,
     useMediaQuery,
 } from '@chakra-ui/react'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 
-import useBasket from '^retail-react-app/app/commerce-api/hooks/useBasket'
-import useCustomer from '^retail-react-app/app/commerce-api/hooks/useCustomer'
+import {useCurrentBasket} from '^retail-react-app/app/hooks/use-current-basket'
 
 import Link from '^retail-react-app/app/components/link'
 import Search from '^retail-react-app/app/components/search'
@@ -82,8 +82,12 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
-    const basket = useBasket()
-    const customer = useCustomer()
+    const {
+        derivedData: {totalItems},
+        data: basket
+    } = useCurrentBasket()
+    const {isRegistered} = useCustomerType()
+    const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
 
     const {isOpen, onClose, onOpen} = useDisclosure()
@@ -98,7 +102,7 @@ const Header = ({
 
     const onSignoutClick = async () => {
         setShowLoading(true)
-        await customer.logout()
+        await logout.mutateAsync()
         navigate('/login')
         setShowLoading(false)
     }
@@ -164,7 +168,8 @@ const Header = ({
                             defaultMessage: 'My account',
                         })}
                     />
-                    {customer.isRegistered && (
+
+                    {isRegistered && (
                         <Popover
                             isLazy
                             arrowSize={15}
@@ -259,10 +264,8 @@ const Header = ({
                         icon={
                             <>
                                 <BasketIcon />
-                                {basket?.loaded && (
-                                    <Badge variant="notification">
-                                        {basket.itemAccumulatedCount}
-                                    </Badge>
+                                {basket && totalItems > 0 && (
+                                    <Badge variant="notification">{totalItems}</Badge>
                                 )}
                             </>
                         }
