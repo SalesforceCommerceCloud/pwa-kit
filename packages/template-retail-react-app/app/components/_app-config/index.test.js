@@ -66,10 +66,8 @@ describe('AppConfig', () => {
     })
 
     test('AppConfig static methods behave as expected', () => {
-        const mockAPI = {}
         expect(AppConfig.restore()).toBe(undefined)
         expect(AppConfig.restore({frozen: 'any values here'})).toBe(undefined)
         expect(AppConfig.freeze()).toBe(undefined)
-        expect(AppConfig.extraGetPropsArgs({api: mockAPI}).api).toEqual(mockAPI)
     })
 })

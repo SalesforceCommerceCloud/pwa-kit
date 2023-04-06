@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {render} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {ChakraProvider} from '@chakra-ui/react'
@@ -12,13 +12,6 @@ import PropTypes from 'prop-types'
 import {PageContext, Region} from '../page-designer/core'
 
 import theme from '../theme'
-import _CommerceAPI from '../commerce-api'
-import {
-    BasketProvider,
-    CommerceAPIProvider as _CommerceAPIProvider,
-    CustomerProvider as _CustomerProvider,
-    CustomerProductListsProvider
-} from '../commerce-api/contexts'
 import {AddToCartModalProvider} from '../hooks/use-add-to-cart-modal'
 import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
@@ -95,19 +88,6 @@ export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
 
 export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Router>)
 
-export const renderWithRouterAndCommerceAPI = (node) => {
-    const api = new _CommerceAPI({
-        ...mockConfig.app.commerceAPI,
-        einsteinConfig: mockConfig.app.einsteinAPI,
-        proxy: undefined
-    })
-    return renderWithReactIntl(
-        <_CommerceAPIProvider value={api}>
-            <Router>{node}</Router>
-        </_CommerceAPIProvider>
-    )
-}
-
 /**
  * This is the Providers used to wrap components
  * for testing purposes.
@@ -115,8 +95,6 @@ export const renderWithRouterAndCommerceAPI = (node) => {
  */
 export const TestProviders = ({
     children,
-    initialBasket = null,
-    initialCustomer = null,
     locale = {id: DEFAULT_LOCALE},
     messages = fallbackMessages,
     appConfig = mockConfig.app,
@@ -133,28 +111,7 @@ export const TestProviders = ({
         }
     }, [])
 
-    // API config overrides for disabling localhost proxy.
-    const proxy = undefined
-
-    // @TODO: make this dynamic (getting from package.json during CI tests fails, so hardcoding for now)
-    const ocapiHost = 'zzrf-001.dx.commercecloud.salesforce.com'
-
-    const api = new _CommerceAPI({
-        ...appConfig.commerceAPI,
-        einsteinConfig: appConfig.einsteinAPI,
-        proxy,
-        ocapiHost
-    })
     const commerceApiConfig = appConfig.commerceAPI
-    const [basket, _setBasket] = useState(initialBasket)
-    const [customer, setCustomer] = useState(initialCustomer)
-
-    const setBasket = useCallback((data) => {
-        if (!mounted.current) {
-            return
-        }
-        _setBasket(data)
-    })
 
     const site = getSiteByReference(siteAlias || appConfig.defaultSite)
 
@@ -168,35 +125,23 @@ export const TestProviders = ({
         <ServerContext.Provider value={{}}>
             <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
-                    <_CommerceAPIProvider value={api}>
-                        <CommerceApiProvider
-                            shortCode={commerceApiConfig.parameters.shortCode}
-                            clientId={commerceApiConfig.parameters.clientId}
-                            organizationId={commerceApiConfig.parameters.organizationId}
-                            siteId={site?.id}
-                            locale={locale.id}
-                            redirectURI={`${window.location.origin}/testcallback`}
-                            fetchedToken={
-                                bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''
-                            }
-                        >
-                            <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                                <_CustomerProvider value={{customer, setCustomer}}>
-                                    <BasketProvider value={{basket, setBasket}}>
-                                        <CustomerProductListsProvider>
-                                            <Router>
-                                                <ChakraProvider theme={theme}>
-                                                    <AddToCartModalProvider>
-                                                        {children}
-                                                    </AddToCartModalProvider>
-                                                </ChakraProvider>
-                                            </Router>
-                                        </CustomerProductListsProvider>
-                                    </BasketProvider>
-                                </_CustomerProvider>
-                            </CurrencyProvider>
-                        </CommerceApiProvider>
-                    </_CommerceAPIProvider>
+                    <CommerceApiProvider
+                        shortCode={commerceApiConfig.parameters.shortCode}
+                        clientId={commerceApiConfig.parameters.clientId}
+                        organizationId={commerceApiConfig.parameters.organizationId}
+                        siteId={site?.id}
+                        locale={locale.id}
+                        redirectURI={`${window.location.origin}/testcallback`}
+                        fetchedToken={bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''}
+                    >
+                        <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                            <Router>
+                                <ChakraProvider theme={theme}>
+                                    <AddToCartModalProvider>{children}</AddToCartModalProvider>
+                                </ChakraProvider>
+                            </Router>
+                        </CurrencyProvider>
+                    </CommerceApiProvider>
                 </MultiSiteProvider>
             </IntlProvider>
         </ServerContext.Provider>
