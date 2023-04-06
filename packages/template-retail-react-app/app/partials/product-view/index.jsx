@@ -26,7 +26,6 @@ import {useToast} from '../../hooks/use-toast'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
-import {useToast} from '../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../constants'
 
 const ProductViewHeader = ({name, price, currency, category, productType}) => {
