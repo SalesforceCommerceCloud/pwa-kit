@@ -25,6 +25,25 @@ type CustomerProductListResult = ShopperCustomersTypes.CustomerProductListResult
 
 const noop = () => ({})
 
+// ReactQuery type def for the updater function uses type `unknown` for the first param,
+// this makes it hard to define the `createUpdateFunction` below, so we created this type.
+type Updater<T> = (data: T | undefined) => T | undefined
+
+// This is a slight variation of above, but we know the data is not null.
+type DataProcessor<T> = (data: NonNullable<T>) => T
+
+/**
+ * Create an update handler for the cache matrix. This updater will implicitly clone and assert
+ * that the data being passed to is is not undefined.
+ *  
+ * @param update 
+ * @returns 
+ */
+const createUpdateFunction =
+    <T>(update: DataProcessor<T>): Updater<T> =>
+    (data) =>
+        !data ? data : update(clone(data))
+
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     createCustomerAddress(customerId, {parameters}, response) {
         // getCustomerAddress uses `addressName` rather than `addressId`
@@ -36,18 +55,12 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 },
                 {
                     queryKey: getCustomer.queryKey(newParams),
-                    updater: (oldData: Customer) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
+                    updater: createUpdateFunction((customer: Customer) => {
                         // Push new address onto the end of addresses list.
-                        newData.addresses?.push(response)
+                        customer?.addresses?.push(response)
 
-                        return newData
-                    }
+                        return customer
+                    })
                 }
             ]
         }
@@ -61,44 +74,34 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 },
                 {
                     queryKey: getCustomer.queryKey(newParams),
-                    updater: (oldData: Customer) => {
-                        if (!oldData) {
-                            return
-                        }
+                    updater: createUpdateFunction((customer: Customer) => {
+                        // Push new address onto the end of addresses list.
+                        customer?.paymentInstruments?.push(response)
 
-                        const newData = clone(oldData)
-
-                        // Add the new payment instrument to the end of the list
-                        newData.paymentInstruments?.push(response)
-
-                        return newData
-                    }
+                        return customer
+                    })
                 }
             ]
         }
     },
     createCustomerProductList(customerId, {parameters}, response) {
         // We always invalidate, because even without an ID we assume that something has changed
-        // QUESTION: Why would we not have and ID?
         const listId = response.id
         return {
             update: [
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
-                    updater: (oldData: CustomerProductListResult) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
+                    updater: createUpdateFunction((result: CustomerProductListResult) => {
+                        // Push new address onto the end of addresses list.
                         // Add new list to front of the lists.
-                        newData.data.unshift(response)
-                        newData.total++
-                        newData.limit++
 
-                        return newData
-                    }
+                        // Remove the list from the result object
+                        result.data.unshift(response)
+                        result.limit++
+                        result.total++
+
+                        return result
+                    })
                 },
                 {
                     queryKey: getCustomerProductList.queryKey({...parameters, listId})
@@ -118,40 +121,31 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 },
                 {
                     queryKey: getCustomerProductList.queryKey(parameters),
-                    updater: (oldData: CustomerProductList) => {
-                        if (!oldData) {
-                            return
+                    updater: createUpdateFunction((list: CustomerProductList) => {
+                        return {
+                            ...list,
+                            customerProductListItems: [
+                                ...(list?.customerProductListItems || []),
+                                response
+                            ]
                         }
-
-                        const newData = clone(oldData)
-
-                        newData.customerProductListItems?.push(response)
-                        // console.log('updater: ', oldData, newData)
-                        return newData
-                    }
+                    })
                 },
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
-                    updater: (oldData: CustomerProductListResult) => {
-                        console.log('updater --> oldData: ', oldData)
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
+                    updater: createUpdateFunction((result: CustomerProductListResult) => {
                         // Find the list that we want to add the item to.
-                        const listIndex = newData.data.findIndex(({id}) => id === parameters.listId)
+                        const listIndex = result.data.findIndex(({id}) => id === parameters.listId)
 
                         // Push the new item onto the end of the list.
                         if (listIndex < 0) {
                             return
                         }
-                        console.log('updater: ', oldData, newData)
-                        newData.data[listIndex].customerProductListItems?.push(response)
 
-                        return newData
-                    }
+                        result.data[listIndex].customerProductListItems?.push(response)
+
+                        return result
+                    })
                 }
             ]
         }
@@ -161,14 +155,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             update: [
                 {
                     queryKey: getCustomer.queryKey(parameters),
-                    updater: (oldData: Customer) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
-                        const paymentInstrumentIndex = newData?.paymentInstruments?.findIndex(
+                    updater: createUpdateFunction((customer: Customer) => {
+                        const paymentInstrumentIndex = customer?.paymentInstruments?.findIndex(
                             ({paymentInstrumentId}) =>
                                 paymentInstrumentId === parameters.paymentInstrumentId
                         )
@@ -182,10 +170,10 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Remove the found payment instrument.
-                        newData?.paymentInstruments?.splice(paymentInstrumentIndex, 1)
+                        customer?.paymentInstruments?.splice(paymentInstrumentIndex, 1)
 
-                        return newData
-                    }
+                        return customer
+                    })
                 }
             ],
             remove: [{queryKey: getCustomerPaymentInstrument.queryKey(parameters)}]
@@ -196,14 +184,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             update: [
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
-                    updater: (oldData: CustomerProductListResult) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
-                        const listIndex = newData.data.findIndex(({id}) => id === parameters.listId)
+                    updater: createUpdateFunction((result: CustomerProductListResult) => {
+                        const listIndex = result.data.findIndex(({id}) => id === parameters.listId)
 
                         // Return undefined if no list is found
                         if (listIndex < 0) {
@@ -211,12 +193,12 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Remove the list from the result object
-                        newData.data.splice(listIndex, 1)
-                        newData.limit--
-                        newData.total--
+                        result.data.splice(listIndex, 1)
+                        result.limit--
+                        result.total--
 
-                        return newData
-                    }
+                        return result
+                    })
                 }
             ],
             remove: [{queryKey: getCustomerProductList.path(parameters)}]
@@ -227,14 +209,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             update: [
                 {
                     queryKey: getCustomerProductList.queryKey(parameters),
-                    updater: (oldData: CustomerProductList) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
-                        const itemIndex = newData.customerProductListItems?.findIndex(
+                    updater: createUpdateFunction((list: CustomerProductList) => {
+                        const itemIndex = list.customerProductListItems?.findIndex(
                             ({id}) => id === parameters.itemId
                         )
 
@@ -244,24 +220,16 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Remove the list item
-                        newData.customerProductListItems?.splice(itemIndex, 1)
+                        list.customerProductListItems?.splice(itemIndex as number, 1)
 
-                        return newData
-                    }
+                        return list
+                    })
                 },
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
-                    updater: (oldData: CustomerProductListResult) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
-                        const listIndex = newData?.data.findIndex(
-                            ({id}) => id === parameters.listId
-                        )
-                        const itemIndex = newData?.data?.[
+                    updater: createUpdateFunction((result: CustomerProductListResult) => {
+                        const listIndex = result?.data.findIndex(({id}) => id === parameters.listId)
+                        const itemIndex = result?.data?.[
                             listIndex
                         ]?.customerProductListItems?.findIndex(({id}) => id === parameters.itemId)
 
@@ -271,10 +239,10 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Remove the item from the list.
-                        newData.data[listIndex]?.customerProductListItems?.splice(itemIndex, 1)
+                        result.data[listIndex]?.customerProductListItems?.splice(itemIndex, 1)
 
-                        return newData
-                    }
+                        return result
+                    })
                 }
             ],
             remove: [{queryKey: getCustomerProductListItem.queryKey(parameters)}]
@@ -290,14 +258,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             update: [
                 {
                     queryKey: getCustomer.queryKey(parameters),
-                    updater: (oldData: Customer) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
-                        const addressIndex = newData?.addresses?.findIndex(
+                    updater: createUpdateFunction((customer: Customer) => {
+                        const addressIndex = customer?.addresses?.findIndex(
                             ({addressId}) => addressId === parameters.addressName
                         )
 
@@ -306,11 +268,11 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                             return
                         }
 
-                        // Rmove the found address.
-                        newData?.addresses?.splice(addressIndex, 1)
+                        // Remove the found address.
+                        customer?.addresses?.splice(addressIndex, 1)
 
-                        return newData
-                    }
+                        return customer
+                    })
                 }
             ],
             remove: [{queryKey: getCustomerAddress.queryKey(parameters)}]
@@ -341,14 +303,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 },
                 {
                     queryKey: getCustomer.queryKey(parameters),
-                    updater: (oldData: Customer) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
-                        const addressIndex = newData?.addresses?.findIndex(
+                    updater: createUpdateFunction((customer: Customer) => {
+                        const addressIndex = customer?.addresses?.findIndex(
                             ({addressId}) => addressId === response.addressId
                         )
 
@@ -358,10 +314,10 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Update the found address.
-                        newData.addresses![addressIndex] = response
+                        customer.addresses![addressIndex] = response
 
-                        return newData
-                    }
+                        return customer
+                    })
                 }
             ]
         }
@@ -375,13 +331,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 },
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
-                    updater: (oldData: CustomerProductListResult) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-                        const listIndex = newData.data.findIndex(({id}) => id === response.id)
+                    updater: createUpdateFunction((result: CustomerProductListResult) => {
+                        const listIndex = result.data.findIndex(({id}) => id === response.id)
 
                         // Return undefined if we didn't find the product list we were looking for.
                         if (listIndex < 0) {
@@ -389,10 +340,10 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Update the product list.
-                        newData.data[listIndex] = response
+                        result.data[listIndex] = response
 
-                        return newData
-                    }
+                        return result
+                    })
                 }
             ]
         }
@@ -405,15 +356,9 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 },
                 {
                     queryKey: getCustomerProductList.queryKey(parameters),
-                    updater: (oldData: CustomerProductList) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
+                    updater: createUpdateFunction((list: CustomerProductList) => {
                         // Find the index of the item we want to update.
-                        const itemIndex = newData.customerProductListItems?.findIndex(
+                        const itemIndex = list.customerProductListItems?.findIndex(
                             ({id}) => id === parameters.itemId
                         )
 
@@ -423,24 +368,18 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Make a copy of the list we are mutating as to leave the original alone.
-                        newData.customerProductListItems![itemIndex] = response
+                        list.customerProductListItems![itemIndex] = response
 
-                        return newData
-                    }
+                        return list
+                    })
                 },
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
-                    updater: (oldData: CustomerProductListResult) => {
-                        if (!oldData) {
-                            return
-                        }
-
-                        const newData = clone(oldData)
-
+                    updater: createUpdateFunction((result: CustomerProductListResult) => {
                         // Find the list with the current list id.
-                        const listIndex = newData.data.findIndex(({id}) => id === parameters.listId)
+                        const listIndex = result.data.findIndex(({id}) => id === parameters.listId)
                         // Find the index of the item in the list.
-                        const itemIndex = newData?.data[
+                        const itemIndex = result?.data[
                             listIndex
                         ]?.customerProductListItems?.findIndex(({id}) => id === parameters.itemId)
 
@@ -451,10 +390,10 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
 
                         // Update the item in the found list.
                         // NOTE: We know that there is an item to update given the item index is > -1
-                        newData.data[listIndex].customerProductListItems![itemIndex] = response
+                        result.data[listIndex].customerProductListItems![itemIndex] = response
 
-                        return newData
-                    }
+                        return result
+                    })
                 }
             ]
         }

@@ -81,17 +81,8 @@ const createOptions = <Mut extends ShopperCustomersMutation>(
     body: Argument<Client[Mut]> extends {body: infer B} ? B : undefined
 ): Argument<Client[Mut]> => ({...queryOptions, body})
 
-// Not implemented checks are temporary to make sure we don't forget to add tests when adding
-// implentations. When all mutations are added, the "not implemented" tests can be removed,
-// and the `TestMap` type can be changed from optional keys to required keys. Doing so will
-// leverage TypeScript to enforce having tests for all mutations.
-const notImplTestCases: ShopperCustomersMutation[][] = [[], ['updateCustomerProductList']]
-
 describe('ShopperCustomers mutations', () => {
     beforeEach(() => nock.cleanAll())
-    // test.each(notImplTestCases)('`%s` is not yet implemented', async (mutationName) => {
-    //     expect(() => useShopperCustomersMutation(mutationName)).toThrow(NotImplementedError)
-    // })
     describe('modify a customer', () => {
         test('`createCustomerAddress` updates cache on success', async () => {
             const customer: ShopperCustomersTypes.Customer = {...baseCustomer, addresses: []}
