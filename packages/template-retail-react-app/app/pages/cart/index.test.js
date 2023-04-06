@@ -299,16 +299,20 @@ describe('Remove item from cart', function () {
 
         userEvent.click(within(cartItem).getByText(/remove/i))
 
+        let confirmButton
         try {
-            userEvent.click(screen.getByText(/yes, remove item/i))
+            confirmButton = screen.getByText(/yes, remove item/i)
         } catch {
             // do nothing
         }
 
-        console.log('--- cannot get the button immediately.. will try findBy query now')
-        const button = await screen.findByText(/yes, remove item/i)
-        console.log('--- found the button', button)
-        userEvent.click(button)
+        if (!confirmButton) {
+            console.log('--- cannot get the button immediately.. will try findBy query now')
+            confirmButton = await screen.findByText(/yes, remove item/i)
+            console.log('--- found the button', confirmButton)
+        }
+
+        userEvent.click(confirmButton)
 
         await waitFor(
             () => {
