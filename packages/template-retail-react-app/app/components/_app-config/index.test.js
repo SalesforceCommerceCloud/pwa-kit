@@ -60,6 +60,7 @@ describe('AppConfig', () => {
 
         // Wait for access token to be saved
         // Otherwise, the test would end prematurely before our component has finished its business
+        // (for example: commerce-sdk-react Provider needs to finish its useEffect for `auth.ready()`)
         await waitFor(() => {
             expect(window.localStorage.setItem).toHaveBeenCalled()
         })
