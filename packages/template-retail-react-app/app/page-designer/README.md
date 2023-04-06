@@ -13,7 +13,10 @@ Use this folder to add React components that can render Page Designer components
 
 This folder includes components for layout and visualization of images, grids, and carousels.
 
-**By default, Page Designer integration is not enabled in the Retail React App.**
+**By default, Page Designer integration is not enabled in the Retail React App.** Additionally, to utilize the `shopperExperience`
+API used in the example below your commerce API client (SLAS client) needs to include the `sfcc.shopper-experience` scope.
+See [Authorization for Shopper APIs](https://developer.salesforce.com/docs/commerce/commerce-api/guide/authorization-for-shopper-apis.html)
+for more information on configuring your SLAS client.
 
 ## Folder Structure
 

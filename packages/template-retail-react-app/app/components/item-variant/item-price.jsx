@@ -8,10 +8,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {Stack, Text} from '@chakra-ui/react'
-import useBasket from '../../commerce-api/hooks/useBasket'
 import {useItemVariant} from '.'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {useCurrency} from '../../hooks'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 
 const PricePerItem = ({currency, basket, basePrice}) => {
     const {currency: activeCurrency} = useCurrency()
@@ -19,7 +19,7 @@ const PricePerItem = ({currency, basket, basePrice}) => {
         <Text fontSize={{base: '12px', lg: '14px'}}>
             <FormattedNumber
                 style="currency"
-                currency={currency || basket.currency || activeCurrency}
+                currency={currency || basket?.currency || activeCurrency}
                 value={basePrice}
             />
             <FormattedMessage
@@ -43,7 +43,7 @@ PricePerItem.propTypes = {
  */
 const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...props}) => {
     const variant = useItemVariant()
-    const basket = useBasket()
+    const {data: basket} = useCurrentBasket()
     const {currency: activeCurrency} = useCurrency()
     const intl = useIntl()
 
@@ -78,7 +78,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
 
                 <FormattedNumber
                     style="currency"
-                    currency={currency || basket.currency || activeCurrency}
+                    currency={currency || basket?.currency || activeCurrency}
                     value={displayPrice}
                 />
                 {hasDiscount && (
@@ -92,7 +92,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                     >
                         <FormattedNumber
                             style="currency"
-                            currency={currency || basket.currency || activeCurrency}
+                            currency={currency || basket?.currency || activeCurrency}
                             value={price}
                         />
                     </Text>

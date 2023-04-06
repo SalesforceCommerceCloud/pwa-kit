@@ -1,10 +1,10 @@
 {
 	"name": "spike-extended-retail-app",
-	"version": "2.8.0-dev.0",
+	"version": "2.8.0-dev",
 	"license": "See license in LICENSE",
 	"engines": {
-		"node": "^14.0.0 || ^16.0.0",
-		"npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+		"node": "^14.0.0 || ^16.0.0 || ^18.0.0",
+		"npm": "^6.14.4 || ^7.0.0 || ^8.0.0 || ^9.0.0"
 	},
 	"mobify": {
 		"extends": "retail-react-app",
@@ -21,6 +21,7 @@
 		"@lhci/cli": "^0.7.0",
 		"@loadable/component": "^5.15.0",
 		"@peculiar/webcrypto": "^1.3.3",
+		"@tanstack/react-query": "^4.28.0",
 		"@testing-library/dom": "^9.0.0",
 		"@testing-library/jest-dom": "^5.16.4",
 		"@testing-library/react": "^11.2.5",
@@ -30,6 +31,7 @@
 		"bundlesize2": "^0.0.30",
 		"card-validator": "^8.1.0",
 		"commerce-sdk-isomorphic": "^1.9.0",
+		"commerce-sdk-react-preview": "^2.8.0-dev",
 		"cross-env": "^5.2.0",
 		"cross-fetch": "^3.1.5",
 		"focus-visible": "^5.2.0",
@@ -44,9 +46,9 @@
 		"nanoid": "^3.1.31",
 		"njwt": "^1.2.0",
 		"prop-types": "^15.6.0",
-        "pwa-kit-dev": "2.8.0-dev.0",
-		"pwa-kit-react-sdk": "2.8.0-dev.0",
-		"pwa-kit-runtime": "2.8.0-dev.0",
+        "pwa-kit-dev": "2.8.0-dev",
+		"pwa-kit-react-sdk": "2.8.0-dev",
+		"pwa-kit-runtime": "2.8.0-dev",
 		"query-string": "^7.0.1",
 		"raf": "^3.4.0",
 		"randomstring": "^1.2.1",
@@ -56,7 +58,7 @@
 		"react-hook-form": "^6.15.5",
 		"react-intl": "^5.13.1",
 		"react-router-dom": "^5.1.2",
-		"retail-react-app": "2.8.0-dev.0"
+		"retail-react-app": "2.8.0-dev"
 	},
 	"peerDependencies": {
 		"@chakra-ui/system": "^1.12.1"

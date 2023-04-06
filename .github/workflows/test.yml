@@ -13,11 +13,13 @@ on:
   # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
   # https://docs.github.com/en/actions/managing-workflow-runs/approving-workflow-runs-from-public-forks
   pull_request: # Default: opened, reopened, synchronize (head branch updated)
+  merge_group: # Trigger GA workflow when a pull request is added to a merge queue.
   push:
     branches:
       - develop
       # TODO: Should we run on all pushes to release branches, or should we run on GitHub releases?
       - 'release-*'
+      - 'v3'
   schedule:
     # Run every day at 12pm (PST) - cron uses UTC times
     - cron: '0 8 * * *'
@@ -25,21 +27,20 @@ env:
   IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
   DEVELOP: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'develop' }}
   RELEASE: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && startsWith(github.head_ref || github.ref_name, 'release-') }}
+  V3: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'v3' }}
 
 jobs:
   pwa-kit:
     strategy:
       matrix:
-        node: [14, 16]
-        npm: [6, 7, 8]
-        exclude:
-          - node: 16
-            npm: 6
+        node: [16, 18]
+        npm: [7, 8, 9]
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
+      IS_MRT_NODE: ${{ matrix.node == 16 && matrix.npm == 8 }}
+      IS_DEFAULT_NPM: ${{ matrix.node == 16 && matrix.npm == 8 || matrix.node == 18 && matrix.npm == 9 }}
       IS_LATEST_NPM: ${{ matrix.node == 16 && matrix.npm == 8 }}
     steps:
       - name: Checkout
@@ -63,7 +64,9 @@ jobs:
         uses: "./.github/actions/unit_tests"
 
       - name: Run Lighthouse CI on the PWA
-        if: env.IS_DEFAULT_NPM == 'true'
+        # lighthouse ci doesn't work on node 18 at this time 
+        # https://github.com/GoogleChrome/lighthouse-ci/issues/862
+        if: env.IS_MRT_NODE == 'true'
         uses: "./.github/actions/lighthouse_ci"
 
       - name: Smoke test scripts
@@ -71,7 +74,7 @@ jobs:
         uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' )
+        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' || env.V3 == 'true' )
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
@@ -83,6 +86,13 @@ jobs:
         with:
           CWD: "./packages/template-retail-react-app"
           TARGET: staging
+      
+      - name: Push Bundle to MRT (v3)
+        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.V3 == 'true'
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "./packages/template-retail-react-app"
+          TARGET: staging-v3
 
       - name: Push Bundle to MRT (Production)
         if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.RELEASE == 'true'
@@ -122,15 +132,12 @@ jobs:
   pwa-kit-windows:
     strategy:
       matrix:
-        node: [14, 16]
-        npm: [6, 7, 8]
-        exclude:
-          - node: 16
-            npm: 6
+        node: [16, 18]
+        npm: [7, 8, 9]
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
+      IS_DEFAULT_NPM: ${{ matrix.node == 16 && matrix.npm == 8 || matrix.node == 18 && matrix.npm == 9 }}
     runs-on: windows-latest
     steps:
         - name: Checkout
@@ -170,7 +177,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
@@ -180,7 +187,7 @@ jobs:
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 5
+        timeout-minutes: 8
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
@@ -260,7 +267,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Setup Windows Machine
         uses: "./.github/actions/setup_windows"

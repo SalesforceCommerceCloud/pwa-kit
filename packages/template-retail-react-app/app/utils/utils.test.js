@@ -308,3 +308,73 @@ describe('resolveLocaleFromUrl', function () {
         })
     })
 })
+
+describe('keysToCamel', () => {
+    test('converts object keys to camelcase', () => {
+        const input = {
+            numba_one: true,
+            'numba-two': false,
+            number3: 'un-changed',
+            c_Custom: 'un_changed',
+            _custom: 'unchanged'
+        }
+
+        const result = utils.keysToCamel(input)
+
+        expect(result).toEqual({
+            numbaOne: true,
+            numbaTwo: false,
+            number3: 'un-changed',
+            c_Custom: 'un_changed',
+            _custom: 'unchanged'
+        })
+    })
+
+    test('converts arrays of objects to camelcase', () => {
+        const input = [
+            {
+                numba_one: true,
+                number3: 'un-changed',
+                c_Custom: 'un_changed',
+                _custom: 'unchanged'
+            },
+            {
+                'numba-two': false
+            }
+        ]
+
+        const result = utils.keysToCamel(input)
+
+        expect(result).toEqual([
+            {
+                numbaOne: true,
+                number3: 'un-changed',
+                c_Custom: 'un_changed',
+                _custom: 'unchanged'
+            },
+            {
+                numbaTwo: false
+            }
+        ])
+    })
+
+    test('converts nested keys to camelcase', () => {
+        const input = {
+            numba_one: {
+                sub1: 'unchanged',
+                sub2: {sub_sub_2: 'changed'},
+                sub3: [{sub_sub_3: 'changed', sub3Sub4: 'unchanged'}]
+            }
+        }
+
+        const result = utils.keysToCamel(input)
+
+        expect(result).toEqual({
+            numbaOne: {
+                sub1: 'unchanged',
+                sub2: {subSub_2: 'changed'},
+                sub3: [{subSub_3: 'changed', sub3Sub4: 'unchanged'}]
+            }
+        })
+    })
+})

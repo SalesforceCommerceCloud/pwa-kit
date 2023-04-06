@@ -34,7 +34,10 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                     </Text>
                 </Stack>
             </Stack>
-            <form onSubmit={form.handleSubmit(submitForm)} data-testid="sf-auth-modal-form">
+            <form
+                onSubmit={form.handleSubmit(submitForm)}
+                data-testid="sf-auth-modal-form-register"
+            >
                 <Stack paddingTop={8} spacing={8} paddingLeft={4} paddingRight={4}>
                     {form.errors?.global && (
                         <Alert status="error">

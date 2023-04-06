@@ -28,8 +28,8 @@ The PWA Kit is a storefront technology for headless commerce using Salesforce Co
 
 ### Requirements
 
--   Node 14.17.0 or later
--   npm 6.14.4 or later
+-   Node 16 or later
+-   npm 8 or later
 
 ### Create Your First Project
 

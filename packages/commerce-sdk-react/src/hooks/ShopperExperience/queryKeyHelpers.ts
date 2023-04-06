@@ -12,8 +12,15 @@ import {pick} from '../utils'
 type Client = ShopperExperience<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
-    getPages: ['/organizations/', string | undefined, '/pages', Params<'getPages'>]
+    getPages: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/pages',
+        Params<'getPages'>
+    ]
     getPage: [
+        '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
         '/pages/',
@@ -48,7 +55,7 @@ export const getPages: QueryKeyHelper<'getPages'> = {
             'siteId',
             'locale'
         ]),
-    path: (params) => ['/organizations/', params.organizationId, '/pages'],
+    path: (params) => ['/commerce-sdk-react', '/organizations/', params.organizationId, '/pages'],
     queryKey: (params: Params<'getPages'>) => [
         ...getPages.path(params),
         getPages.parameters(params)
@@ -65,6 +72,12 @@ export const getPage: QueryKeyHelper<'getPage'> = {
             'siteId',
             'locale'
         ]),
-    path: (params) => ['/organizations/', params.organizationId, '/pages/', params.pageId],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/pages/',
+        params.pageId
+    ],
     queryKey: (params: Params<'getPage'>) => [...getPage.path(params), getPage.parameters(params)]
 }
