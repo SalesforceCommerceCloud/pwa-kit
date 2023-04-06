@@ -168,6 +168,10 @@ const App = (props) => {
         const lastLoginTimeStamp = Date.parse(customer.lastLoginTime)
         const creationTimeStamp = Date.parse(customer.creationDate)
         const isNewCustomer = lastLoginTimeStamp - creationTimeStamp < NEW_CUSTOMER_MAX_AGE
+
+        // Only call merge when there are items in the guest basket and you are
+        // a returning customer.
+        // new customer will be merged automatically from the backend
         const shouldMerge =
             customerType === 'registered' &&
             prevAuthType.current === 'guest' &&
