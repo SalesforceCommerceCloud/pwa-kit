@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
@@ -69,6 +69,7 @@ import {
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
+import {useAutoBasketMerge} from '../../hooks/use-auto-merge-basket'
 
 const onClient = typeof window !== 'undefined'
 
@@ -103,17 +104,10 @@ const useLazyLoadCategories = () => {
         }
     }
 }
-// This value represents the max age in milliseconds a customer can be before they are
-// no longer considered a "new" customer.
-// E.g. If a customers creation date is older than 2 seconds it will no longer be considered
-// a new customer.
-const NEW_CUSTOMER_MAX_AGE = 2 * 1000 // 2 seconds in milliseconds
+
 const App = (props) => {
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
     const {data: categoriesTree} = useLazyLoadCategories()
-
-    const prevAuthType = useRef()
-
     const categories = flatten(categoriesTree || {}, 'categories')
 
     const appOrigin = getAppOrigin()
@@ -121,7 +115,7 @@ const App = (props) => {
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
-    const {isRegistered, customerType} = useCustomerType()
+    const {isRegistered} = useCustomerType()
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
@@ -142,12 +136,12 @@ const App = (props) => {
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId: customer.customerId}},
-        {enabled: !!customer.customerId && !isServer, keepPreviousData: true}
+        {enabled: !!customer.customerId && !isServer}
     )
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
-    const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
+    useAutoBasketMerge()
     useEffect(() => {
         // Create a new basket if the current customer doesn't have one.
         if (baskets?.total === 0) {
@@ -165,40 +159,10 @@ const App = (props) => {
     }, [baskets])
 
     useEffect(() => {
-        const lastLoginTimeStamp = Date.parse(customer.lastLoginTime)
-        const creationTimeStamp = Date.parse(customer.creationDate)
-        const isNewCustomer = lastLoginTimeStamp - creationTimeStamp < NEW_CUSTOMER_MAX_AGE
-
-        // Only call merge when there are items in the guest basket and you are
-        // a returning customer.
-        // new customer will be merged automatically from the backend
-        const shouldMerge =
-            customerType === 'registered' &&
-            prevAuthType.current === 'guest' &&
-            !isNewCustomer &&
-            baskets?.baskets?.[0]?.productItems?.length > 0
-        if (shouldMerge) {
-            mergeBasket.mutate({
-                headers: {
-                    // This is not required since the request has no body
-                    // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
-                    'Content-Type': 'application/json'
-                },
-                parameters: {
-                    createDestinationBasket: true
-                }
-            })
-        }
-        // Update the current `authType` value.
-        prevAuthType.current = customerType
-    }, [customerType])
-
-    useEffect(() => {
         // Listen for online status changes.
         watchOnlineStatus((isOnline) => {
             setIsOnline(isOnline)
         })
-        prevAuthType.current = customerType
     }, [])
 
     useEffect(() => {
