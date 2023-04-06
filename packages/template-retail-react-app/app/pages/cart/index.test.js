@@ -285,7 +285,7 @@ describe('Remove item from cart', function () {
             })
         )
     })
-    test.skip('Can remove item from the cart', async () => {
+    test('Can remove item from the cart', async () => {
         renderWithProviders(<Cart />)
 
         let cartItem
@@ -302,9 +302,10 @@ describe('Remove item from cart', function () {
         try {
             userEvent.click(screen.getByText(/yes, remove item/i))
         } catch {
-            // TODO: for some reason, CI would arrive here and then timeout on the findByText call
-            // Will skip this test for now
-            userEvent.click(await screen.findByText(/yes, remove item/i))
+            console.log('--- cannot get the button immediately.. will try findBy query now')
+            const button = await screen.findByText(/yes, remove item/i)
+            console.log('--- found the button')
+            userEvent.click(button)
         }
 
         await waitFor(
@@ -313,7 +314,7 @@ describe('Remove item from cart', function () {
             },
             {timeout: 20000}
         )
-    })
+    }, 60000)
 })
 
 describe('Coupons tests', function () {
