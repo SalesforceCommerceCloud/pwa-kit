@@ -297,8 +297,8 @@ describe('Remove item from cart', function () {
             expect(cartItem).toBeInTheDocument()
         })
 
-        userEvent.click(within(cartItem).getByRole('button', {name: /remove/i}))
-        userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
+        userEvent.click(within(cartItem).getByText(/remove/i))
+        userEvent.click(screen.getByText(/yes, remove item/i))
 
         await waitFor(
             () => {
