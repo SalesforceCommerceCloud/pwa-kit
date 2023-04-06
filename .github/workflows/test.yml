@@ -64,6 +64,8 @@ jobs:
         uses: "./.github/actions/unit_tests"
 
       - name: Run Lighthouse CI on the PWA
+        # lighthouse ci doesn't work on node 18 at this time 
+        # https://github.com/GoogleChrome/lighthouse-ci/issues/862
         if: env.IS_MRT_NODE == 'true'
         uses: "./.github/actions/lighthouse_ci"
 
