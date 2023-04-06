@@ -2,17 +2,6 @@
     "name": "pwa-kit-runtime",
     "version": "2.8.0-dev",
     "description": "The PWAKit Runtime",
-<<<<<<< HEAD
-    "engines": {
-      "node": "^16.0.0 || ^18.0.0",
-      "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
-    },
-=======
->>>>>>> v3
     "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-runtime#readme",
     "bugs": {
         "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
