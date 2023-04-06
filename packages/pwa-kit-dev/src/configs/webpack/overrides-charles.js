@@ -96,8 +96,8 @@ class OverlayResolverPlugin {
         resolver.getHook('resolve').tapAsync(
             'FeatureResolverPlugin',
             function (requestContext, resolveContext, callback) {
-                // exact match * means import the "parent" (superModule) of the requesting module
-                if (requestContext.request === '*') {
+                // exact match ^ means import the "parent" (superModule) of the requesting module
+                if (requestContext.request === '^') {
                     // const targetFile = this.findFile(requestContext.path, requestContext.)
                     const overlayRelative = this.toOverlayRelative(requestContext.context.issuer)
                     const overlay = this.findOverlay(requestContext.context.issuer)
@@ -121,7 +121,7 @@ class OverlayResolverPlugin {
                         resolveContext,
                         callback
                     )
-                } else if (requestContext.request.startsWith('*/')) {
+                } else if (requestContext.request.startsWith('^/')) {
                     // let aliases find the file
                     return callback()
                 } else if (

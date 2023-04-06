@@ -44,7 +44,7 @@ const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
 
 //new plugin
-const OverridesResolverPlugin = require('./overrides-plugin')
+const OverridesResolverPlugin = require('./overrides-charles')
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -159,11 +159,14 @@ const baseConfig = (target) => {
                     path: buildDir
                 },
                 resolve: {
-                    // plugins: [
-                    //     pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                    //         ? new OverridesResolverPlugin(projectDir)
-                    //         : () => null
-                    // ],
+                    plugins: [
+                        pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                            ? new OverridesResolverPlugin({
+                                  overlays: [pkg?.mobify?.extends],
+                                  appBase: '/app' + pkg?.mobify?.overridesDir
+                              })
+                            : () => null
+                    ],
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
                         'babel-runtime': findInProjectThenSDK('babel-runtime'),
@@ -188,7 +191,17 @@ const baseConfig = (target) => {
                         '@chakra-ui/skip-nav':
                             findInProjectThenExtendsThenSDK('@chakra-ui/skip-nav'),
                         '@emotion/react': findInProjectThenExtendsThenSDK('@emotion/react'),
-                        '@emotion/styled': findInProjectThenExtendsThenSDK('@emotion/styled')
+                        '@emotion/styled': findInProjectThenExtendsThenSDK('@emotion/styled'),
+                        ...(pkg.mobify.overridesDir && pkg.mobify.extends
+                            ? Object.assign(
+                                  // NOTE: when an array of `extends` dirs are accepted, don't coerce here
+                                  ...[pkg.mobify.extends].map((extendTarget) => ({
+                                      [`^${extendTarget}`]: [pkg.mobify.extends]
+                                          .map((o) => path.resolve(path.join('node_modules', o)))
+                                          .concat('.' + path.resolve(pkg.mobify.overridesDir))
+                                  }))
+                              )
+                            : {})
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -205,13 +218,13 @@ const baseConfig = (target) => {
 
                     sdkReplacementPlugin(projectDir),
 
-                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                        ? caretOverrideReplacementPlugin(projectDir)
-                        : () => null,
+                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                    //     ? caretOverrideReplacementPlugin(projectDir)
+                    //     : () => null,
 
-                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                        ? extendedTemplateReplacementPlugin(projectDir)
-                        : () => null,
+                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                    //     ? extendedTemplateReplacementPlugin(projectDir)
+                    //     : () => null,
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
