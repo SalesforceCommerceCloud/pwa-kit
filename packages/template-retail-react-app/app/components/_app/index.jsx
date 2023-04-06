@@ -142,7 +142,7 @@ const App = (props) => {
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId: customer.customerId}},
-        {enabled: !!customer.customerId && !isServer}
+        {enabled: !!customer.customerId && !isServer, keepPreviousData: true}
     )
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
@@ -169,7 +169,10 @@ const App = (props) => {
         const creationTimeStamp = Date.parse(customer.creationDate)
         const isNewCustomer = lastLoginTimeStamp - creationTimeStamp < NEW_CUSTOMER_MAX_AGE
         const shouldMerge =
-            customerType === 'registered' && prevAuthType.current === 'guest' && !isNewCustomer
+            customerType === 'registered' &&
+            prevAuthType.current === 'guest' &&
+            !isNewCustomer &&
+            baskets?.baskets?.[0]?.productItems?.length > 0
         if (shouldMerge) {
             mergeBasket.mutate({
                 headers: {
@@ -191,7 +194,6 @@ const App = (props) => {
         watchOnlineStatus((isOnline) => {
             setIsOnline(isOnline)
         })
-
         prevAuthType.current = customerType
     }, [])
 
