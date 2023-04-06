@@ -102,27 +102,25 @@ export const AuthModal = ({
         return {
             login: async (data) => {
                 try {
-                    const res = await login.mutateAsync({
+                    await login.mutateAsync({
                         username: data.email,
                         password: data.password
                     })
 
-                    if (res) {
-                        const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
-                        // we only want to merge basket when customerType changes from guest to registered
-                        const shouldMergeBasket = hasBasketItem && prevAuthType.current === 'guest'
-                        if (shouldMergeBasket) {
-                            mergeBasket.mutate({
-                                headers: {
-                                    // This is not required since the request has no body
-                                    // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
-                                    'Content-Type': 'application/json'
-                                },
-                                parameters: {
-                                    createDestinationBasket: true
-                                }
-                            })
-                        }
+                    const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
+                    // we only want to merge basket when customerType changes from guest to registered
+                    const shouldMergeBasket = hasBasketItem && prevAuthType.current === 'guest'
+                    if (shouldMergeBasket) {
+                        mergeBasket.mutate({
+                            headers: {
+                                // This is not required since the request has no body
+                                // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
+                                'Content-Type': 'application/json'
+                            },
+                            parameters: {
+                                createDestinationBasket: true
+                            }
+                        })
                     }
                     onLoginSuccess()
                 } catch (error) {

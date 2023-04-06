@@ -49,18 +49,18 @@ const Login = () => {
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     /*****************/
     const submitForm = async (data) => {
-        const res = await login.mutateAsync(
-            {username: data.email, password: data.password},
-            {
-                onError: (error) => {
-                    const message = /Unauthorized/i.test(error.message)
-                        ? formatMessage(LOGIN_ERROR_MESSAGE)
-                        : formatMessage(API_ERROR_MESSAGE)
-                    form.setError('global', {type: 'manual', message})
+        try {
+            await login.mutateAsync(
+                {username: data.email, password: data.password},
+                {
+                    onError: (error) => {
+                        const message = /Unauthorized/i.test(error.message)
+                            ? formatMessage(LOGIN_ERROR_MESSAGE)
+                            : formatMessage(API_ERROR_MESSAGE)
+                        form.setError('global', {type: 'manual', message})
+                    }
                 }
-            }
-        )
-        if (res) {
+            )
             const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
             // we only want to merge basket when customerType changes from guest to registered
             const shouldMergeBasket = hasBasketItem && prevAuthType.current === 'guest'
@@ -76,6 +76,8 @@ const Login = () => {
                     }
                 })
             }
+        } catch (error) {
+            console.error(error)
         }
     }
     useEffect(() => {
