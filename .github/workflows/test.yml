@@ -19,6 +19,7 @@ on:
       - develop
       # TODO: Should we run on all pushes to release branches, or should we run on GitHub releases?
       - 'release-*'
+      - 'v3'
   schedule:
     # Run every day at 12pm (PST) - cron uses UTC times
     - cron: '0 8 * * *'
@@ -26,26 +27,21 @@ env:
   IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
   DEVELOP: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'develop' }}
   RELEASE: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && startsWith(github.head_ref || github.ref_name, 'release-') }}
+  V3: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'v3' }}
 
 jobs:
   pwa-kit:
     strategy:
+      fail-fast: false
       matrix:
-        node: [14, 16, 18]
-        npm: [6, 7, 8, 9]
-        # We exclude the less likely Node and NPM combinations to reduce the number of GA builds.
-        exclude:
-          - node: 16
-            npm: 6
-          - node: 18
-            npm: 6
-          - node: 14
-            npm: 9
+        node: [16, 18]
+        npm: [7, 8, 9]
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
+      IS_MRT_NODE: ${{ matrix.node == 16 && matrix.npm == 8 }}
+      IS_DEFAULT_NPM: ${{ matrix.node == 16 && matrix.npm == 8 || matrix.node == 18 && matrix.npm == 9 }}
       IS_LATEST_NPM: ${{ matrix.node == 16 && matrix.npm == 8 }}
     steps:
       - name: Checkout
@@ -69,7 +65,9 @@ jobs:
         uses: "./.github/actions/unit_tests"
 
       - name: Run Lighthouse CI on the PWA
-        if: env.IS_DEFAULT_NPM == 'true'
+        # lighthouse ci doesn't work on node 18 at this time 
+        # https://github.com/GoogleChrome/lighthouse-ci/issues/862
+        if: env.IS_MRT_NODE == 'true'
         uses: "./.github/actions/lighthouse_ci"
 
       - name: Smoke test scripts
@@ -77,7 +75,7 @@ jobs:
         uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' )
+        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' || env.V3 == 'true' )
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
@@ -89,6 +87,13 @@ jobs:
         with:
           CWD: "./packages/template-retail-react-app"
           TARGET: staging
+      
+      - name: Push Bundle to MRT (v3)
+        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.V3 == 'true'
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "./packages/template-retail-react-app"
+          TARGET: staging-v3
 
       - name: Push Bundle to MRT (Production)
         if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.RELEASE == 'true'
@@ -127,21 +132,14 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   pwa-kit-windows:
     strategy:
+      fail-fast: false
       matrix:
-        node: [14, 16, 18]
-        npm: [6, 7, 8, 9]
-        # We exclude the less likely Node and NPM combinations to reduce the number of GA builds.
-        exclude:
-          - node: 16
-            npm: 6
-          - node: 18
-            npm: 6
-          - node: 14
-            npm: 9
+        node: [16, 18]
+        npm: [7, 8, 9]
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
+      IS_DEFAULT_NPM: ${{ matrix.node == 16 && matrix.npm == 8 || matrix.node == 18 && matrix.npm == 9 }}
     runs-on: windows-latest
     steps:
         - name: Checkout
@@ -168,6 +166,7 @@ jobs:
   # with a few extra steps. Can the workflows be merged? (Add `os` to the matrix?)
   generated:
     strategy:
+      fail-fast: false
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: ubuntu-latest
@@ -258,6 +257,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   generated-windows:
     strategy:
+      fail-fast: false
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: windows-latest
