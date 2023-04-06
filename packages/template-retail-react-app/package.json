@@ -1,13 +1,13 @@
 {
-	"name": "retail-react-app",
-	"version": "2.8.0-dev",
-	"license": "See license in LICENSE",
-	"private": true,
-	"engines": {
-		"node": "^16.0.0 || ^18.0.0",
-		"npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
-	},
-	"devDependencies": {
+    "name": "retail-react-app",
+    "version": "2.8.0-dev",
+    "license": "See license in LICENSE",
+    "private": true,
+    "engines": {
+        "node": "^16.0.0 || ^18.0.0",
+        "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+    },
+    "devDependencies": {
         "@chakra-ui/icons": "^1.1.7",
         "@chakra-ui/react": "^1.8.9",
         "@chakra-ui/skip-nav": "^1.2.6",
@@ -59,8 +59,8 @@
     },
     "peerDependencies": {
         "@chakra-ui/system": "^1.12.1"
-	},
-	"scripts": {
+    },
+    "scripts": {
         "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
         "build-translations": "npm run extract-default-translations && npm run compile-translations",
         "compile-translations": "formatjs compile-folder --ast app/translations app/translations/compiled",
@@ -80,19 +80,19 @@
         "test:lighthouse": "cross-env NODE_ENV=production lhci autorun --config=tests/lighthouserc.js",
         "test:max-file-size": "npm run build && bundlesize"
     },
-	"bundlesize": [
-		{
-			"path": "build/main.js",
-			"maxSize": "65 kB"
-		},
-		{
-			"path": "build/vendor.js",
-			"maxSize": "355 kB"
-		}
-	],
-	"browserslist": [
-		"iOS >= 9.0",
-		"Android >= 4.4.4",
-		"last 4 ChromeAndroid versions"
-	]
+    "bundlesize": [
+        {
+            "path": "build/main.js",
+            "maxSize": "65 kB"
+        },
+        {
+            "path": "build/vendor.js",
+            "maxSize": "355 kB"
+        }
+    ],
+    "browserslist": [
+        "iOS >= 9.0",
+        "Android >= 4.4.4",
+        "last 4 ChromeAndroid versions"
+    ]
 }
