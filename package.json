@@ -1,9 +1,17 @@
 {
   "name": "pwa-kit",
   "version": "2.8.0-dev",
-  "engines": {
-    "node": "^16.0.0 || ^18.0.0",
-    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+  "scripts": {
+    "bump-version": "node ./scripts/bump-version.js",
+    "format": "lerna run --stream format",
+    "preinstall": "node ./scripts/check-version.js",
+    "postinstall": "node ./scripts/bootstrap.js",
+    "lerna": "lerna",
+    "lint": "lerna run --stream lint",
+    "lint:fix": "lerna run lint:fix",
+    "pretest": "npm run lint",
+    "test": "lerna run --stream --concurrency=1 test",
+    "test:max-file-size": "lerna run --stream test:max-file-size"
   },
   "devDependencies": {
     "commander": "^2.20.3",
@@ -11,16 +19,8 @@
     "semver": "^7.3.8",
     "shelljs": "^0.8.5"
   },
-  "scripts": {
-    "preinstall": "node ./scripts/check-version.js",
-    "postinstall": "node ./scripts/bootstrap.js",
-    "lerna": "lerna",
-    "pretest": "npm run lint",
-    "test": "lerna run --stream --concurrency=1 test",
-    "test:max-file-size": "lerna run --stream test:max-file-size",
-    "lint": "lerna run --stream lint",
-    "lint:fix": "lerna run lint:fix",
-    "format": "lerna run --stream format",
-    "bump-version": "node ./scripts/bump-version.js"
+  "engines": {
+    "node": "^16.0.0 || ^18.0.0",
+    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
   }
 }
