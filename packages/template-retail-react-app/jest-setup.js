@@ -224,9 +224,8 @@ const defaultHandlers = [
     }
 ]
 
-// Never initialize the server in the global scope.
-export function createServer(handlerConfig) {
-    const handlers = [...defaultHandlers, ...handlerConfig].map((config) => {
+const setupHandlers = (handlerConfig = [], defaultHandlers = []) => {
+    return [...defaultHandlers, ...handlerConfig].map((config) => {
         return rest[config.method || 'get'](config.path, (req, res, ctx) => {
             return res(
                 ctx.delay(0),
@@ -235,7 +234,35 @@ export function createServer(handlerConfig) {
             )
         })
     })
+}
+
+// NOTE!!!: Never initialize the server in the global scope.
+// call it within a test suite. e.g
+// describe('test suite', () => {
+//    createServer([
+//       {
+//            path: '*/oauth2/token',
+//            method: 'post',
+//            res: () => {
+//            return {
+//               customer_id: 'customerid_1',
+//               access_token: registerUserToken,
+//               refresh_token: 'testrefeshtoken_1',
+//               usid: 'testusid_1',
+//               enc_user_id: 'testEncUserId_1',
+//               id_token: 'testIdToken_1'
+//            }
+//       }
+//    ])
+// })
+export function createServer(handlerConfig) {
+    const handlers = setupHandlers(handlerConfig, defaultHandlers)
     const server = setupServer(...handlers)
+
+    const prependHandlersToServer = (handlerConfig = []) => {
+        const handlers = setupHandlers(handlerConfig)
+        server.use(...handlers)
+    }
 
     beforeAll(() => {
         server.listen()
@@ -247,5 +274,5 @@ export function createServer(handlerConfig) {
         server.close()
     })
 
-    return {server}
+    return {server, prependHandlersToServer}
 }

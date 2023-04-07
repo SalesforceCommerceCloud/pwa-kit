@@ -12,7 +12,6 @@ import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import mockConfig from '../../../config/mocks/default'
-import {rest} from 'msw'
 import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
 import {createServer} from '../../../jest-setup'
 
@@ -70,7 +69,7 @@ afterEach(() => {
 })
 
 describe('Registration', function () {
-    const {server} = createServer(handlers)
+    const {prependHandlersToServer} = createServer(handlers)
 
     test('allows customer to create an account', async () => {
         // render our test component
@@ -95,23 +94,26 @@ describe('Registration', function () {
         user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
 
         // login with credentials
-        server.use(
-            rest.post('*/oauth2/token', (req, res, ctx) => {
-                return res(
-                    ctx.delay(0),
-                    ctx.json({
+        prependHandlersToServer([
+            {
+                path: '*/oauth2/token',
+                method: 'post',
+                res: () => {
+                    return {
                         customer_id: 'customerid_1',
                         access_token: registerUserToken,
                         refresh_token: 'testrefeshtoken_1',
                         usid: 'testusid_1',
                         enc_user_id: 'testEncUserId_1',
                         id_token: 'testIdToken_1'
-                    })
-                )
-            }),
-            rest.post('*/customers', (req, res, ctx) => {
-                return res(
-                    ctx.json({
+                    }
+                }
+            },
+            {
+                path: '*/customers',
+                method: 'post',
+                res: () => {
+                    return {
                         authType: 'registered',
                         creationDate: '2020-02-13T17:44:15.892Z',
                         customerId: 'customerid_1',
@@ -122,10 +124,10 @@ describe('Registration', function () {
                         lastModified: '2020-02-13T17:44:15.898Z',
                         lastName: 'Tester',
                         login: 'tester'
-                    })
-                )
-            })
-        )
+                    }
+                }
+            }
+        ])
 
         user.click(withinForm.getByText(/create account/i))
         // wait for success state to appear
