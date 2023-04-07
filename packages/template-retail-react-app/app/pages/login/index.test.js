@@ -15,7 +15,8 @@ import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
 import mockConfig from '../../../config/mocks/default'
-import {mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {mockCustomerBaskets} from '../../mocks/mock-data'
+import {createServer} from '../../../jest-setup'
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
     currency: 'USD',
@@ -45,28 +46,31 @@ const MockedComponent = () => {
     )
 }
 
+const handlers = [
+    {
+        path: '*/oauth2/token',
+        method: 'post',
+        res: () => {
+            return {
+                customer_id: 'customerid',
+                access_token: guestToken,
+                refresh_token: 'testrefeshtoken',
+                usid: 'testusid',
+                enc_user_id: 'testEncUserId',
+                id_token: 'testIdToken'
+            }
+        }
+    },
+    {
+        path: '*/customers/:customerId/baskets',
+        res: () => {
+            return mockCustomerBaskets
+        }
+    }
+]
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    global.server.use(
-        rest.post('*/customers', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        }),
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            const {customerId} = req.params
-            if (customerId === 'customerId') {
-                return res(
-                    ctx.delay(0),
-                    ctx.status(200),
-                    ctx.json({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                )
-            }
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        })
-    )
 })
 afterEach(() => {
     jest.resetModules()
@@ -74,26 +78,17 @@ afterEach(() => {
 })
 
 describe('Logging in tests', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.post('*/oauth2/token', (req, res, ctx) =>
-                res(
-                    ctx.delay(0),
-                    ctx.json({
-                        customer_id: 'customerid',
-                        access_token: guestToken,
-                        refresh_token: 'testrefeshtoken',
-                        usid: 'testusid',
-                        enc_user_id: 'testEncUserId',
-                        id_token: 'testIdToken'
-                    })
-                )
-            ),
-            rest.post('*/baskets/actions/merge', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockMergedBasket))
-            })
-        )
-    })
+    const {server} = createServer([
+        ...handlers,
+
+        {
+            path: '*/baskets/actions/merge',
+            method: 'post',
+            res: () => {
+                return mockMergedBasket
+            }
+        }
+    ])
     test('Allows customer to sign in to their account', async () => {
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
@@ -107,8 +102,9 @@ describe('Logging in tests', function () {
         // enter credentials and submit
         user.type(screen.getByLabelText('Email'), 'customer@test.com')
         user.type(screen.getByLabelText('Password'), 'Password!1')
+
         // login with credentials
-        global.server.use(
+        server.use(
             rest.post('*/oauth2/token', (req, res, ctx) =>
                 res(
                     ctx.delay(0),
@@ -134,28 +130,9 @@ describe('Logging in tests', function () {
 })
 
 describe('Error while logging in', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.post('*/oauth2/token', (req, res, ctx) =>
-                res(
-                    ctx.delay(0),
-                    ctx.json({
-                        customer_id: 'customerid',
-                        access_token: guestToken,
-                        refresh_token: 'testrefeshtoken',
-                        usid: 'testusid',
-                        enc_user_id: 'testEncUserId',
-                        id_token: 'testIdToken'
-                    })
-                )
-            ),
-            rest.post('*/baskets/actions/merge', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockMergedBasket))
-            })
-        )
-    })
+    const {server} = createServer(handlers)
 
-    test.skip('Renders error when given incorrect log in credentials', async () => {
+    test('Renders error when given incorrect log in credentials', async () => {
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
@@ -170,7 +147,7 @@ describe('Error while logging in', function () {
         user.type(screen.getByLabelText('Password'), 'SomeFakePassword1!')
 
         // mock failed auth request
-        global.server.use(
+        server.use(
             rest.post('*/oauth2/login', (req, res, ctx) =>
                 res(ctx.delay(0), ctx.status(401), ctx.json({message: 'Unauthorized Credentials.'}))
             ),
@@ -178,7 +155,6 @@ describe('Error while logging in', function () {
                 return res(ctx.delay(0), ctx.status(404), ctx.json({message: 'Not Found.'}))
             })
         )
-
         user.click(screen.getByText(/sign in/i))
         // wait for login error alert to appear
         expect(
@@ -186,7 +162,9 @@ describe('Error while logging in', function () {
         ).toBeInTheDocument()
     })
 })
+
 describe('Navigate away from login page tests', function () {
+    createServer(handlers)
     test('should navigate to sign up page when the user clicks Create Account', async () => {
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {

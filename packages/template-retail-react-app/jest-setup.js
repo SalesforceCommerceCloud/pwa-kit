@@ -226,9 +226,7 @@ const defaultHandlers = [
 
 // Never initialize the server in the global scope.
 export function createServer(handlerConfig) {
-    // console.log('handlerConfig', handlerConfig)
     const handlers = [...defaultHandlers, ...handlerConfig].map((config) => {
-        console.log('mocking enpoint---------------', config.path)
         return rest[config.method || 'get'](config.path, (req, res, ctx) => {
             return res(
                 ctx.delay(0),
@@ -237,7 +235,6 @@ export function createServer(handlerConfig) {
             )
         })
     })
-    console.log('handlers', handlers.length)
     const server = setupServer(...handlers)
 
     beforeAll(() => {
@@ -250,5 +247,5 @@ export function createServer(handlerConfig) {
         server.close()
     })
 
-    return server
+    return {server}
 }
