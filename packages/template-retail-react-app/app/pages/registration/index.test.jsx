@@ -13,7 +13,8 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import mockConfig from '../../../config/mocks/default'
 import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {createServer} from '../../../jest-setup'
 
 const MockedComponent = () => {
     const match = {
@@ -28,100 +29,109 @@ const MockedComponent = () => {
         </Router>
     )
 }
-const mockMergedBasket = {
-    basketId: 'a10ff320829cb0eef93ca5310a',
-    currency: 'USD',
-    customerInfo: {
-        customerId: 'registeredCustomerId',
-        email: 'customer@test.com'
+const handlers = [
+    {
+        path: '*/oauth2/token',
+        method: 'post',
+        res: () => {
+            return {
+                customer_id: 'customerid',
+                access_token: guestToken,
+                refresh_token: 'testrefeshtoken',
+                usid: 'testusid',
+                enc_user_id: 'testEncUserId',
+                id_token: 'testIdToken'
+            }
+        }
+    },
+    {
+        path: '*/customers/:customerId/baskets',
+        res: () => {
+            return mockCustomerBaskets
+        }
+    },
+    {
+        path: '*/customers/:customerId',
+        res: () => {
+            return mockedRegisteredCustomer
+        }
+    },
+    {
+        path: '*/customers',
+        res: () => {
+            return mockedRegisteredCustomer
+        }
     }
-}
+]
 
-// Set up and clean up
-beforeEach(() => {
-    global.server.use(
-        rest.post('*/customers', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'customerid',
-                    access_token: guestToken,
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId',
-                    id_token: 'testIdToken'
-                })
-            )
-        ),
-        rest.post('*/baskets/actions/merge', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockMergedBasket))
-        })
-    )
-})
 afterEach(() => {
     jest.resetModules()
     localStorage.clear()
 })
 
-test('Allows customer to create an account', async () => {
-    // render our test component
-    await renderWithProviders(<MockedComponent />, {
-        wrapperProps: {
-            siteAlias: 'uk',
-            locale: {id: 'en-GB'},
-            appConfig: mockConfig.app,
-            bypassAuth: false
-        }
-    })
+describe('Registration', function () {
+    const {server} = createServer(handlers)
 
-    const form = await screen.findByTestId('sf-auth-modal-form-register')
-    expect(form).toBeInTheDocument()
-
-    // fill out form and submit
-    const withinForm = within(form)
-
-    user.paste(withinForm.getByLabelText('First Name'), 'Tester')
-    user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
-    user.paste(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
-    user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
-
-    // login with credentials
-    global.server.use(
-        rest.post('*/oauth2/token', (req, res, ctx) => {
-            return res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'customerid_1',
-                    access_token: registerUserToken,
-                    refresh_token: 'testrefeshtoken_1',
-                    usid: 'testusid_1',
-                    enc_user_id: 'testEncUserId_1',
-                    id_token: 'testIdToken_1'
-                })
-            )
-        }),
-        rest.post('*/oauth2/login', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        }),
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+    test('allows customer to create an account', async () => {
+        // render our test component
+        await renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app,
+                bypassAuth: false
+            }
         })
-    )
 
-    user.click(withinForm.getByText(/create account/i))
+        const form = await screen.findByTestId('sf-auth-modal-form-register')
+        expect(form).toBeInTheDocument()
 
-    // wait for success state to appear
-    const myAccount = await screen.findAllByText(/My Account/)
-    await waitFor(
-        () => {
+        // fill out form and submit
+        const withinForm = within(form)
+
+        user.paste(withinForm.getByLabelText('First Name'), 'Tester')
+        user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
+        user.paste(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
+        user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+
+        // login with credentials
+        server.use(
+            rest.post('*/oauth2/token', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({
+                        customer_id: 'customerid_1',
+                        access_token: registerUserToken,
+                        refresh_token: 'testrefeshtoken_1',
+                        usid: 'testusid_1',
+                        enc_user_id: 'testEncUserId_1',
+                        id_token: 'testIdToken_1'
+                    })
+                )
+            }),
+            rest.post('*/customers', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        authType: 'registered',
+                        creationDate: '2020-02-13T17:44:15.892Z',
+                        customerId: 'customerid_1',
+                        customerNo: '00006002',
+                        email: 'customer@test.com',
+                        enabled: true,
+                        firstName: 'Tester',
+                        lastModified: '2020-02-13T17:44:15.898Z',
+                        lastName: 'Tester',
+                        login: 'tester'
+                    })
+                )
+            })
+        )
+
+        user.click(withinForm.getByText(/create account/i))
+        // wait for success state to appear
+        const myAccount = await screen.findAllByText(/My Account/)
+        await waitFor(() => {
             expect(myAccount.length).toEqual(2)
-        },
-        {
-            timeout: 5000
-        }
-    )
+        })
+    })
 })

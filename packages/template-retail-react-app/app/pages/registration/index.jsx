@@ -27,7 +27,7 @@ const Registration = () => {
     const {pathname} = useLocation()
     const register = useAuthHelper(AuthHelpers.Register)
 
-    const submitForm = (data) => {
+    const submitForm = async (data) => {
         const body = {
             customer: {
                 firstName: data.firstName,
@@ -38,11 +38,11 @@ const Registration = () => {
             password: data.password
         }
 
-        return register.mutateAsync(body, {
-            onError: () => {
-                form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
-            }
-        })
+        try {
+            await register.mutateAsync(body)
+        } catch (e) {
+            form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+        }
     }
 
     useEffect(() => {
