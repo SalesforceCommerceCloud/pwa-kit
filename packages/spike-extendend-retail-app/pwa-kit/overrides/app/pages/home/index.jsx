@@ -75,13 +75,11 @@ const Home = () => {
             />
 
             <Hero
-                title={intl.formatMessage({
-                    defaultMessage: 'The React PWA Starter Store for Retail',
-                    id: 'home.title.react_starter_store'
-                })}
+                // @TODO: translations not working?
+                title={'🎉 Hello Extensible React Template!'}
                 img={{
                     src: getAssetUrl('static/img/hero.png'),
-                    alt: 'npx pwa-kit-create-app'
+                    alt: 'npx pwa-kit-create-app',
                 }}
                 actions={
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
