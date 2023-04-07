@@ -117,7 +117,7 @@ const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
     }
-
+    console.log('appBase', '.' + pkg?.mobify?.overridesDir + '/app')
     class Builder {
         constructor() {
             this.config = {
@@ -163,7 +163,7 @@ const baseConfig = (target) => {
                         pkg?.mobify?.extends && pkg?.mobify?.overridesDir
                             ? new OverridesResolverPlugin({
                                   overlays: [pkg?.mobify?.extends],
-                                  appBase: '/app' + pkg?.mobify?.overridesDir
+                                  appBase: '.' + pkg?.mobify?.overridesDir + '/app'
                               })
                             : () => null
                     ],
@@ -297,7 +297,10 @@ const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        exclude: /node_modules/,
+        ...(pkg.mobify.overridesDir && pkg.mobify.extends
+            ? // TODO generate this dynamically
+              {exclude: /node_modules(?!\/retail-react-app)/}
+            : {exclude: /node_modules/}),
         use: [
             {
                 loader: findInProjectThenSDK('babel-loader'),

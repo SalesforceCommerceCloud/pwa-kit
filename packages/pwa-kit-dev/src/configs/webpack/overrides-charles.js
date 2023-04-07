@@ -28,10 +28,19 @@ class OverlayResolverPlugin {
     constructor(options) {
         this.appBase = options.appBase || './app'
         this.appBase = path.resolve(this.appBase)
+        console.log('~options.appBase', options.appBase)
         this.overlays = options.overlays || []
-        this._allSearchDirs = this.overlays
-            .map((o) => path.join(path.resolve(o), path.basename(this.appBase)))
-            .concat([this.appBase])
+        this._allSearchDirs = [this.appBase].concat(
+            this.overlays.map((o) => {
+                return path.join(
+                    path.resolve(
+                        // prefix with `~` or `/` indicates relative filesystem, otherwise `node_modules`
+                        `${o.startsWith('~') || o.startsWith('/') ? '' : 'node_modules/'}${o}`
+                    ),
+                    path.basename(this.appBase)
+                )
+            })
+        )
     }
 
     isRelevant(p) {
@@ -51,6 +60,10 @@ class OverlayResolverPlugin {
      * @param {[]} extensions
      */
     findFile(requestPath, dirs, extensions) {
+        console.log('~====== findFile')
+        console.log('~requestPath', requestPath)
+        console.log('~dirs', dirs)
+        console.log('~dirs', dirs)
         // TODO search all overlay extensions of requested file
         var fileExt = path.extname(requestPath)
         for (var dir of dirs) {
@@ -130,7 +143,9 @@ class OverlayResolverPlugin {
                 ) {
                     // app base request relative
                     var resolvedPath = path.resolve(requestContext.path, requestContext.request)
+
                     if (this.isAppBaseRelative(resolvedPath)) {
+                        console.log('~resolvedPath', resolvedPath)
                         let overlayRelative = this.toOverlayRelative(resolvedPath)
                         let targetFile, target
                         try {
@@ -139,6 +154,10 @@ class OverlayResolverPlugin {
                                 this._allSearchDirs,
                                 resolver.options.extensions
                             )
+                            if (targetFile) {
+                                console.log('~FOUND', targetFile)
+                            }
+
                             if (targetFile) {
                                 target = resolver.ensureHook('resolved')
                                 requestContext.path = targetFile
