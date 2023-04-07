@@ -77,7 +77,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientId,
             organizationId,
             shortCode,
-            siteId
+            siteId,
+            locale,
+            currency
         },
         throwOnBadResponse: true,
         fetchOptions
@@ -102,6 +104,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         proxy,
         fetchOptions,
+        locale,
+        currency,
         headers?.['correlation-id']
     ])
 
