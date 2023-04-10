@@ -6,7 +6,6 @@
  */
 import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {Query} from '@tanstack/react-query'
-import clone from 'clone'
 import {getCustomerProductListItem} from './queryKeyHelpers'
 import {ApiClients, CacheUpdateMatrix} from '../types'
 import {
@@ -16,7 +15,7 @@ import {
     getCustomerProductList,
     getCustomerProductLists
 } from './queryKeyHelpers'
-import {and, pathStartsWith} from '../utils'
+import {and, clone, pathStartsWith} from '../utils'
 
 type Client = ApiClients['shopperCustomers']
 type Customer = ShopperCustomersTypes.Customer
