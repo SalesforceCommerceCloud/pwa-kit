@@ -57,7 +57,9 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                     queryKey: getCustomer.queryKey(newParams),
                     updater: createUpdateFunction((customer: Customer) => {
                         // Push new address onto the end of addresses list.
-                        customer?.addresses?.push(response)
+                        if (customer?.addresses) {
+                            customer.addresses = [...(customer.addresses ?? []), response]
+                        }
 
                         return customer
                     })
@@ -76,7 +78,12 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                     queryKey: getCustomer.queryKey(newParams),
                     updater: createUpdateFunction((customer: Customer) => {
                         // Push new address onto the end of addresses list.
-                        customer?.paymentInstruments?.push(response)
+                        if (customer?.paymentInstruments) {
+                            customer.paymentInstruments = [
+                                ...(customer.paymentInstruments ?? []),
+                                response
+                            ]
+                        }
 
                         return customer
                     })
@@ -140,7 +147,10 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                             return
                         }
 
-                        list.customerProductListItems?.push(response)
+                        list.customerProductListItems = [
+                            ...(list.customerProductListItems ?? []),
+                            response
+                        ]
 
                         return result
                     })
@@ -365,7 +375,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                             return
                         }
 
-                        // Make a copy of the list we are mutating as to leave the original alone.
                         list.customerProductListItems![itemIndex] = response
 
                         return list
