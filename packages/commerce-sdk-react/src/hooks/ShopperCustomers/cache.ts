@@ -133,14 +133,14 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                     queryKey: getCustomerProductLists.queryKey(parameters),
                     updater: createUpdateFunction((result: CustomerProductListResult) => {
                         // Find the list that we want to add the item to.
-                        const listIndex = result.data.findIndex(({id}) => id === parameters.listId)
+                        const list = result.data.find(({id}) => id === parameters.listId)
 
                         // Push the new item onto the end of the list.
-                        if (listIndex < 0) {
+                        if (!list) {
                             return
                         }
 
-                        result.data[listIndex].customerProductListItems?.push(response)
+                        list.customerProductListItems?.push(response)
 
                         return result
                     })
