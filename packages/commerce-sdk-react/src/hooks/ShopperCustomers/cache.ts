@@ -234,10 +234,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
                     updater: createUpdateFunction((result: CustomerProductListResult) => {
-                        const listIndex = result?.data.findIndex(({id}) => id === parameters.listId)
-                        const itemIndex = result?.data?.[
-                            listIndex
-                        ]?.customerProductListItems?.findIndex(({id}) => id === parameters.itemId)
+                        const list = result?.data.find(({id}) => id === parameters.listId)
+                        const itemIndex = list?.customerProductListItems?.findIndex(({id}) => id === parameters.itemId)
 
                         // Return undefined if no item was found in the provided list.
                         if (typeof itemIndex === 'undefined' || itemIndex < 0) {
