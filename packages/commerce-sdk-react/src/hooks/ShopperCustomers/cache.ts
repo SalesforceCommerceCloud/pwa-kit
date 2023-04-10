@@ -159,7 +159,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                                 paymentInstrumentId === parameters.paymentInstrumentId
                         )
 
-                        // Return undefined if no payment instrument was found.
+                        // Return undefined (no changes) if no payment instrument was found.
                         if (
                             typeof paymentInstrumentIndex === 'undefined' ||
                             paymentInstrumentIndex < 0
