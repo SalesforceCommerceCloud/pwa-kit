@@ -64,6 +64,9 @@ jobs:
       - name: Run unit tests
         uses: "./.github/actions/unit_tests"
 
+      - name: Run bundlesize test
+        uses: "./.github/actions/bundle_size_test"
+
       - name: Run Lighthouse CI on the PWA
         # lighthouse ci doesn't work on node 18 at this time 
         # https://github.com/GoogleChrome/lighthouse-ci/issues/862
@@ -191,12 +194,6 @@ jobs:
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 8
-
-      - name: Run bundlesize test
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/bundle_size_test"
-        with:
-          cwd: ${{ env.PROJECT_DIR }}
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
