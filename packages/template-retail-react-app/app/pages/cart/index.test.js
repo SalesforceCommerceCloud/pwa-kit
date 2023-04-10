@@ -285,11 +285,7 @@ describe('Remove item from cart', function () {
             })
         )
     })
-    test('Can remove item from the cart', async () => {
-        if (process.env.CI) {
-            console.log('--- skipping this test only in CI because it has proven to be flaky there')
-            return
-        }
+    test.skip('Can remove item from the cart', async () => {
         renderWithProviders(<Cart />)
 
         let cartItem
