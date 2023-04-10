@@ -77,7 +77,10 @@ const Login = () => {
                 })
             }
         } catch (error) {
-            console.error(error)
+            const message = /Unauthorized/i.test(error.message)
+                ? formatMessage(LOGIN_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
+            form.setError('global', {type: 'manual', message})
         }
     }
     useEffect(() => {
