@@ -35,6 +35,30 @@ const options = {
 
 const runtime = getRuntime()
 
+
+// AM dance
+
+// https://account.demandware.com/dwsso/oauth2/.well-known/openid-configuration
+const JWKS_AM = jose.createRemoteJWKSet(
+    new URL("https://account.demandware.com:443/dwsso/oauth2/connect/jwk_uri")
+)
+
+
+async function validateAMJWT(jwt) {
+    // https://github.com/panva/jose/blob/cb8d91cb59981b16457056f2d3ea2705afb3ca13/docs/interfaces/jwt_verify.JWTVerifyOptions.md
+    // `iat|exp|nbf` seems to be automatically validated: https://github.com/panva/jose/blob/cb8d91cb59981b16457056f2d3ea2705afb3ca13/src/lib/jwt_claims_set.ts#L87-L88
+    try {
+        return await jose.jwtVerify(jwt, JWKS_AM, {
+            algorithms: ["RS256"],
+            audience: "056a095b-fa17-4fcb-bc76-806718566248",
+            issuer: "https://account.demandware.com:443/dwsso/oauth2",
+        })
+    } catch (error) {
+        return { error }
+    }
+}
+
+
 // TODO: We can't store secrets in MRT yet, for now we should store it in plain text
 const SLAS_PUBLIC_CLIENT_ID = process.env.SLAS_PUBLIC_CLIENT_ID
 const SLAS_PRIVATE_CLIENT_ID = process.env.SLAS_PRIVATE_CLIENT_ID
@@ -91,7 +115,7 @@ async function validateSLASJWT(jwt, expectedClientID) {
 // Given a JWT, use TSOB to get a "powerful" JWT with Shopper Context scopes. Use that to set Shopper Context.
 // TODO: This endpoint should probably be called something like /protected-shopper-context
 // TSOB === Trusted System On Behalf
-async function handlerShopperContext(req, res) {
+async function handlerStorefrontPreview(req, res) {
     // TODO: Verify AM JWT BEFORE processing SLAS JWT. SLAS JWT validation can likely be middleware/decorator.
     const auth = req.get('authorization')
     if (!auth) {
@@ -106,6 +130,12 @@ async function handlerShopperContext(req, res) {
     req.get('authorization')
 
     const token = bits[1]
+
+    const { error: amValidationError } = await validateAMJWT(token)
+    if (amValidationError) {
+        console.log({ amValidationError })
+        return res.status(403).json({ amValidationError })
+    }
 
     // [1] Validate the Shopper JWT, and pull the USID from it.
     const {payload, error: slasValdiationError} = await validateSLASJWT(
@@ -212,19 +242,18 @@ async function handlerShopperContext(req, res) {
     })
 }
 
+function handlerCallbackAM(req, res) {
+    return res.sendFile(path.resolve("public", "callback-am.html"))
+}
+
 const {handler} = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
     app.use(
         helmet({
             contentSecurityPolicy: {
-                useDefaults: true,
                 directives: {
-                    'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-                    'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
-                    'connect-src': ["'self'", 'api.cquotient.com'],
-
-                    // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null
+                    'frame-ancestors': ["'self'", 'localhost:*', '*.mobify-storefront.com' ],
+                    'default-src': helmet.contentSecurityPolicy.dangerouslyDisableDefaultSrc,
                 }
             },
             hsts: isRemote()
@@ -249,7 +278,11 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
 
     // Shopper Context handler
-    app.post('/shopper-context-handler', handlerShopperContext)
+    app.post('/preview', handlerStorefrontPreview)
+
+    app.get("/callback-am", handlerCallbackAM)
+
+
 
     app.get('*', runtime.render)
 })

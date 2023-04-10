@@ -6,7 +6,8 @@
     "devDependencies": {
         "pwa-kit-dev": "2.8.0-dev",
         "pwa-kit-runtime": "2.8.0-dev",
-        "supertest": "^4.0.2"
+        "supertest": "^4.0.2",
+        "helmet": "^4.6.0"
     },
     "scripts": {
         "test": "pwa-kit-dev test",

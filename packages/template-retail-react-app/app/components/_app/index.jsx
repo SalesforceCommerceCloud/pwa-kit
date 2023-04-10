@@ -24,7 +24,7 @@ import * as queryKeyHelpers from 'commerce-sdk-react-preview/hooks/ShopperProduc
 import fetch from 'node-fetch'
 
 // Chakra
-import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
+import {Box, useDisclosure, useStyleConfig, Link as ChakraLink} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
@@ -74,12 +74,24 @@ import {resolveSiteFromUrl} from '../../utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 
+
+function buildAuthURL() {
+    const base = "https://account.demandware.com/dwsso/oauth2/authorize"
+    const query = new URLSearchParams({
+        client_id: "056a095b-fa17-4fcb-bc76-806718566248",
+        redirect_uri: `http://localhost:3000/callback-am`,
+        response_type: "token",
+    })
+    const authURL = `${base}?${query}`
+    return authURL
+}
+
 const addShopperContext = async (getTokenWhenReady) => {
     const token = await getTokenWhenReady()
 
     // [2] Set the context by asking to preview with our token.
     let shopperContextResponse = await fetch(
-        new URL('http://localhost:3000/shopper-context-handler'),
+        new URL('http://localhost:3000/preview'),
         {
             method: 'POST',
             body: JSON.stringify({token}),
@@ -96,6 +108,8 @@ const addShopperContext = async (getTokenWhenReady) => {
         return
     }
 }
+
+
 
 /*
 The categories tree can be really large! For performance reasons,
@@ -285,7 +299,7 @@ const App = (props) => {
 
                     <Box id="app" display="flex" flexDirection="column" flex={1}>
                         <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-
+                        <ChakraLink href={buildAuthURL()}>Login with AM</ChakraLink>
                         <Box {...styles.headerWrapper}>
                             {!isCheckout ? (
                                 <Header
