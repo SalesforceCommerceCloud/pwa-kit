@@ -5,18 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, defineMessage} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
-import {
-    AuthHelpers,
-    useAuthHelper,
-    useCustomerBaskets,
-    useCustomerId,
-    useCustomerType,
-    useShopperBasketsMutation
-} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
@@ -24,7 +17,7 @@ import {useLocation} from 'react-router-dom'
 import useEinstein from '../../hooks/use-einstein'
 import LoginForm from '../../components/login'
 import {API_ERROR_MESSAGE} from '../../constants'
-import {isServer} from '../../utils/utils'
+import {useMergeBasket} from '../../hooks/use-merge-basket'
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
     id: 'login_page.error.incorrect_username_or_password'
@@ -35,19 +28,10 @@ const Login = () => {
     const form = useForm()
     const location = useLocation()
     const einstein = useEinstein()
-    const {isRegistered, customerType} = useCustomerType()
-    const customerId = useCustomerId()
+    const {isRegistered} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const {mergeBasketIfNeeded} = useMergeBasket()
 
-    /************** merge basket for recurring users ***/
-    const prevAuthType = useRef()
-
-    const {data: baskets} = useCustomerBaskets(
-        {parameters: {customerId}},
-        {enabled: !!customerId && !isServer, keepPreviousData: true}
-    )
-    const mergeBasket = useShopperBasketsMutation('mergeBasket')
-    /*****************/
     const submitForm = async (data) => {
         try {
             await login.mutateAsync(
@@ -61,21 +45,7 @@ const Login = () => {
                     }
                 }
             )
-            const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
-            // we only want to merge basket when customerType changes from guest to registered
-            const shouldMergeBasket = hasBasketItem && prevAuthType.current === 'guest'
-            if (shouldMergeBasket) {
-                mergeBasket.mutate({
-                    headers: {
-                        // This is not required since the request has no body
-                        // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
-                        'Content-Type': 'application/json'
-                    },
-                    parameters: {
-                        createDestinationBasket: true
-                    }
-                })
-            }
+            mergeBasketIfNeeded()
         } catch (error) {
             const message = /Unauthorized/i.test(error.message)
                 ? formatMessage(LOGIN_ERROR_MESSAGE)
@@ -83,9 +53,6 @@ const Login = () => {
             form.setError('global', {type: 'manual', message})
         }
     }
-    useEffect(() => {
-        prevAuthType.current = customerType
-    }, [customerType])
 
     // If customer is registered push to account page
     useEffect(() => {

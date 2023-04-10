@@ -27,17 +27,16 @@ import {
     useCustomerId,
     useCustomerType,
     useShopperCustomersMutation,
-    ShopperCustomersMutations,
-    useCustomerBaskets,
-    useShopperBasketsMutation
+    ShopperCustomersMutations
 } from 'commerce-sdk-react-preview'
 import {BrandLogo} from '../components/icons'
 import LoginForm from '../components/login'
 import ResetPasswordForm from '../components/reset-password'
 import RegisterForm from '../components/register'
-import {isServer, noop} from '../utils/utils'
+import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
 import useNavigation from './use-navigation'
+import {useMergeBasket} from './use-merge-basket'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
@@ -59,7 +58,8 @@ export const AuthModal = ({
 }) => {
     const {formatMessage} = useIntl()
     const customerId = useCustomerId()
-    const {isRegistered, customerType} = useCustomerType()
+    const {isRegistered} = useCustomerType()
+    const {mergeBasketIfNeeded} = useMergeBasket()
 
     const customer = useCustomer(
         {parameters: {customerId}},
@@ -73,20 +73,6 @@ export const AuthModal = ({
     const toast = useToast()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
-
-    /************** merge basket for recurring users ***/
-    const prevAuthType = useRef()
-
-    const {data: baskets} = useCustomerBaskets(
-        {parameters: {customerId}},
-        {enabled: !!customerId && !isServer, keepPreviousData: true}
-    )
-    const mergeBasket = useShopperBasketsMutation('mergeBasket')
-    /*****************/
-
-    useEffect(() => {
-        prevAuthType.current = customerType
-    }, [customerType])
 
     const getResetPasswordToken = useShopperCustomersMutation(
         ShopperCustomersMutations.GetResetPasswordToken
@@ -107,21 +93,7 @@ export const AuthModal = ({
                         password: data.password
                     })
 
-                    const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
-                    // we only want to merge basket when customerType changes from guest to registered
-                    const shouldMergeBasket = hasBasketItem && prevAuthType.current === 'guest'
-                    if (shouldMergeBasket) {
-                        mergeBasket.mutate({
-                            headers: {
-                                // This is not required since the request has no body
-                                // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
-                                'Content-Type': 'application/json'
-                            },
-                            parameters: {
-                                createDestinationBasket: true
-                            }
-                        })
-                    }
+                    mergeBasketIfNeeded()
                     onLoginSuccess()
                 } catch (error) {
                     const message = /Unauthorized/i.test(error.message)
