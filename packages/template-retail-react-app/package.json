@@ -94,5 +94,8 @@
       "path": "build/vendor.js",
       "maxSize": "355 kB"
     }
-  ]
+  ],
+  "dependencies": {
+    "@tanstack/react-query-devtools": "^4.29.1"
+  }
 }
