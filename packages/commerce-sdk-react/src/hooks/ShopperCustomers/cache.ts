@@ -164,10 +164,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         )
 
                         // Return undefined (no changes) if no payment instrument was found.
-                        if (
-                            typeof paymentInstrumentIndex === 'undefined' ||
-                            paymentInstrumentIndex < 0
-                        ) {
+                        if (paymentInstrumentIndex === undefined || paymentInstrumentIndex < 0) {
                             return
                         }
 
@@ -266,7 +263,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         )
 
                         // Return undefined if the address is not found...
-                        if (typeof addressIndex === 'undefined' || addressIndex < 0) {
+                        if (addressIndex === undefined || addressIndex < 0) {
                             return
                         }
 
@@ -311,7 +308,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         )
 
                         // Return undefined if no address is found...
-                        if (typeof addressIndex === 'undefined' || addressIndex < 0) {
+                        if (addressIndex === undefined || addressIndex < 0) {
                             return
                         }
 
@@ -365,7 +362,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         )
 
                         // Return undefined when item isn't found.
-                        if (typeof itemIndex === 'undefined' || itemIndex < 0) {
+                        if (itemIndex === undefined || itemIndex < 0) {
                             return
                         }
 
