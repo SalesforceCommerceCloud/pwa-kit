@@ -31,17 +31,14 @@ const Login = () => {
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
     const submitForm = async (data) => {
-        return login.mutateAsync(
-            {username: data.email, password: data.password},
-            {
-                onError: (error) => {
-                    const message = /Unauthorized/i.test(error.message)
-                        ? formatMessage(LOGIN_ERROR_MESSAGE)
-                        : formatMessage(API_ERROR_MESSAGE)
-                    form.setError('global', {type: 'manual', message})
-                }
-            }
-        )
+        try {
+            await login.mutateAsync({username: data.email, password: data.password})
+        } catch (error) {
+            const message = /Unauthorized/i.test(error.message)
+                ? formatMessage(LOGIN_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
+            form.setError('global', {type: 'manual', message})
+        }
     }
 
     // If customer is registered push to account page
