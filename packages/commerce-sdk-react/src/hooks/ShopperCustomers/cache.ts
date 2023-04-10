@@ -42,7 +42,7 @@ type DataProcessor<T> = (data: NonNullable<T>) => T
 const createUpdateFunction =
     <T>(update: DataProcessor<T>): Updater<T> =>
     (data) =>
-        !data ? data : update(clone(data))
+        data ? update(clone(data)) : undefined
 
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     createCustomerAddress(customerId, {parameters}, response) {
