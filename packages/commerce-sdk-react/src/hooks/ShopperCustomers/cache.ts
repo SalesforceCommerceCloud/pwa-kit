@@ -141,7 +141,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         // Find the list that we want to add the item to.
                         const list = result.data.find(({id}) => id === parameters.listId)
 
-                        // Push the new item onto the end of the list.
                         if (!list) {
                             return
                         }
@@ -222,12 +221,12 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         )
 
                         // Return undefined if there is no item found.
-                        if (typeof itemIndex === 'undefined' || itemIndex < 0) {
+                        if (itemIndex === undefined || itemIndex < 0) {
                             return
                         }
 
                         // Remove the list item
-                        list.customerProductListItems?.splice(itemIndex as number, 1)
+                        list.customerProductListItems?.splice(itemIndex, 1)
 
                         return list
                     })
