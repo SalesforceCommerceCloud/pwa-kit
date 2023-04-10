@@ -232,7 +232,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         ]?.customerProductListItems?.findIndex(({id}) => id === parameters.itemId)
 
                         // Return undefined if no item was found in the provided list.
-                        if (listIndex < 0 || typeof itemIndex === 'undefined' || itemIndex < 0) {
+                        if (typeof itemIndex === 'undefined' || itemIndex < 0) {
                             return
                         }
 
