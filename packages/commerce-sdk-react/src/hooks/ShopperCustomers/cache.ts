@@ -94,8 +94,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                     updater: createUpdateFunction((result: CustomerProductListResult) => {
                         // Push new address onto the end of addresses list.
                         // Add new list to front of the lists.
-
-                        // Remove the list from the result object
                         result.data.unshift(response)
                         result.limit++
                         result.total++
