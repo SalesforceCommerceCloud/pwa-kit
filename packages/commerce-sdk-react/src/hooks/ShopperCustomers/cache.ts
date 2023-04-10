@@ -74,7 +74,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomer.queryKey(newParams),
                     updater: createUpdateFunction((customer: Customer) => {
-                        // Push new address onto the end of addresses list.
                         customer.paymentInstruments = [
                             ...(customer.paymentInstruments ?? []),
                             response
@@ -94,7 +93,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
                     updater: createUpdateFunction((result: CustomerProductListResult) => {
-                        // Push new address onto the end of addresses list.
                         // Add new list to front of the lists.
                         result.data.unshift(response)
                         result.limit++
