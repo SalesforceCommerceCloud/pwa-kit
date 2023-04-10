@@ -1,0 +1,13 @@
+name: bundlesize
+inputs:
+  cwd:
+    required: false
+    default: "${PWD}"
+runs:
+  using: composite
+  steps:
+  - name: Check bundle size
+    run: |-
+        cd ${{ inputs.cwd }}
+        npm run test:max-file-size
+    shell: bash

@@ -192,6 +192,12 @@ jobs:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 8
 
+      - name: Run bundlesize test
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
+        uses: "./.github/actions/bundle_size_test"
+        with:
+          cwd: ${{ env.PROJECT_DIR }}
+
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/unit_tests"
