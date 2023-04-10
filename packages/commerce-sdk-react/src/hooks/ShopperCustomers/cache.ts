@@ -56,9 +56,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                     queryKey: getCustomer.queryKey(newParams),
                     updater: createUpdateFunction((customer: Customer) => {
                         // Push new address onto the end of addresses list.
-                        if (customer?.addresses) {
-                            customer.addresses = [...(customer.addresses ?? []), response]
-                        }
+                        customer.addresses = [...(customer.addresses ?? []), response]
 
                         return customer
                     })
@@ -77,12 +75,10 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                     queryKey: getCustomer.queryKey(newParams),
                     updater: createUpdateFunction((customer: Customer) => {
                         // Push new address onto the end of addresses list.
-                        if (customer?.paymentInstruments) {
-                            customer.paymentInstruments = [
-                                ...(customer.paymentInstruments ?? []),
-                                response
-                            ]
-                        }
+                        customer.paymentInstruments = [
+                            ...(customer.paymentInstruments ?? []),
+                            response
+                        ]
 
                         return customer
                     })
@@ -162,7 +158,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomer.queryKey(parameters),
                     updater: createUpdateFunction((customer: Customer) => {
-                        const paymentInstrumentIndex = customer?.paymentInstruments?.findIndex(
+                        const paymentInstrumentIndex = customer.paymentInstruments?.findIndex(
                             ({paymentInstrumentId}) =>
                                 paymentInstrumentId === parameters.paymentInstrumentId
                         )
@@ -176,7 +172,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Remove the found payment instrument.
-                        customer?.paymentInstruments?.splice(paymentInstrumentIndex, 1)
+                        customer.paymentInstruments?.splice(paymentInstrumentIndex, 1)
 
                         return customer
                     })
@@ -234,16 +230,18 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
                     updater: createUpdateFunction((result: CustomerProductListResult) => {
-                        const list = result?.data.find(({id}) => id === parameters.listId)
-                        const itemIndex = list?.customerProductListItems?.findIndex(({id}) => id === parameters.itemId)
+                        const list = result.data.find(({id}) => id === parameters.listId)
+                        const itemIndex = list?.customerProductListItems?.findIndex(
+                            ({id}) => id === parameters.itemId
+                        )
 
                         // Return undefined if no item was found in the provided list.
-                        if (typeof itemIndex === 'undefined' || itemIndex < 0) {
+                        if (itemIndex === undefined || itemIndex < 0) {
                             return
                         }
 
                         // Remove the item from the list.
-                        result.data[listIndex]?.customerProductListItems?.splice(itemIndex, 1)
+                        list?.customerProductListItems?.splice(itemIndex, 1)
 
                         return result
                     })
@@ -263,7 +261,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomer.queryKey(parameters),
                     updater: createUpdateFunction((customer: Customer) => {
-                        const addressIndex = customer?.addresses?.findIndex(
+                        const addressIndex = customer.addresses?.findIndex(
                             ({addressId}) => addressId === parameters.addressName
                         )
 
@@ -273,7 +271,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Remove the found address.
-                        customer?.addresses?.splice(addressIndex, 1)
+                        customer.addresses?.splice(addressIndex, 1)
 
                         return customer
                     })
@@ -308,7 +306,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomer.queryKey(parameters),
                     updater: createUpdateFunction((customer: Customer) => {
-                        const addressIndex = customer?.addresses?.findIndex(
+                        const addressIndex = customer.addresses?.findIndex(
                             ({addressId}) => addressId === response.addressId
                         )
 
@@ -382,12 +380,12 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         // Find the list with the current list id.
                         const listIndex = result.data.findIndex(({id}) => id === parameters.listId)
                         // Find the index of the item in the list.
-                        const itemIndex = result?.data[
+                        const itemIndex = result.data[
                             listIndex
                         ]?.customerProductListItems?.findIndex(({id}) => id === parameters.itemId)
 
                         // Return undefined if item isn't found...
-                        if (listIndex < 0 || typeof itemIndex === 'undefined' || itemIndex < 0) {
+                        if (listIndex < 0 || itemIndex === undefined || itemIndex < 0) {
                             return
                         }
 
