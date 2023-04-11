@@ -26,7 +26,9 @@ import {
     useCustomer,
     useCustomerId,
     useCustomerType,
+    useCustomerBaskets,
     useShopperCustomersMutation,
+    useShopperBasketsMutation,
     ShopperCustomersMutations
 } from 'commerce-sdk-react-preview'
 import {BrandLogo} from '../components/icons'
@@ -36,7 +38,8 @@ import RegisterForm from '../components/register'
 import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
 import useNavigation from './use-navigation'
-
+import {usePrevious} from './use-previous'
+import {isServer} from '../utils/utils'
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
 const PASSWORD_VIEW = 'password'
@@ -57,11 +60,14 @@ export const AuthModal = ({
 }) => {
     const {formatMessage} = useIntl()
     const customerId = useCustomerId()
-    const {isRegistered} = useCustomerType()
+    const {isRegistered, customerType} = useCustomerType()
+    const prevAuthType = usePrevious(customerType)
+
     const customer = useCustomer(
         {parameters: {customerId}},
         {enabled: !!customerId && isRegistered}
     )
+
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
@@ -73,6 +79,12 @@ export const AuthModal = ({
     const getResetPasswordToken = useShopperCustomersMutation(
         ShopperCustomersMutations.GetResetPasswordToken
     )
+
+    const {data: baskets} = useCustomerBaskets(
+        {parameters: {customerId}},
+        {enabled: !!customerId && !isServer, keepPreviousData: true}
+    )
+    const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
     const submitForm = async (data) => {
         form.clearErrors()
@@ -88,7 +100,24 @@ export const AuthModal = ({
                         username: data.email,
                         password: data.password
                     })
-                    onLoginSuccess()
+                    const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
+                    // we only want to merge basket when the user is logged in as a recurring user
+                    // only recurring users trigger the login mutation, new user triggers register mutation
+                    // this logic needs to stay in this block because this is the only place that tells if a user is a recurring user
+                    // if you change logic here, also change it in login page
+                    const shouldMergeBasket = hasBasketItem && prevAuthType === 'guest'
+                    if (shouldMergeBasket) {
+                        mergeBasket.mutate({
+                            headers: {
+                                // This is not required since the request has no body
+                                // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
+                                'Content-Type': 'application/json'
+                            },
+                            parameters: {
+                                createDestinationBasket: true
+                            }
+                        })
+                    }
                 } catch (error) {
                     const message = /Unauthorized/i.test(error.message)
                         ? formatMessage(LOGIN_ERROR)
