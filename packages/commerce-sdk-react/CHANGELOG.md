@@ -1,4 +1,5 @@
 ## v2.8.0-dev (Mar 03, 2023)
+- Add missing cache updating for shopper customers [#1113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1113)
 - Add missing cache invalidation for contexts/customers/login/order [#1073](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1073)
 ## v2.7.0 (Mar 03, 2023)
 - Add Page/Region/Component components for shopper experience/page designer page rendering [#963](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/963)
