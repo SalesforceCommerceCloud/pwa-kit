@@ -31,6 +31,9 @@ import RecommendedProducts from '../../components/recommended-products'
 import ProductView from '../../partials/product-view'
 import InformationAccordion from './partials/information-accordion'
 
+//Component Slots
+import AbovePDP from '../../components/product-detail/above-fold'
+
 // constant
 import {
     API_ERROR_MESSAGE,
@@ -243,6 +246,7 @@ const ProductDetail = () => {
     }, [product])
 
     return (
+        <><AbovePDP />
         <Box
             className="sf-product-detail-page"
             layerStyle="page"
@@ -377,7 +381,7 @@ const ProductDetail = () => {
                     />
                 </Stack>
             </Stack>
-        </Box>
+        </Box></>
     )
 }
 

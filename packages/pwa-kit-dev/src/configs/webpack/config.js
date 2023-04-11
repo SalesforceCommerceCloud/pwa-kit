@@ -193,7 +193,7 @@ const baseConfig = (target) => {
                             findInProjectThenExtendsThenSDK('@chakra-ui/skip-nav'),
                         '@emotion/react': findInProjectThenExtendsThenSDK('@emotion/react'),
                         '@emotion/styled': findInProjectThenExtendsThenSDK('@emotion/styled'),
-                        ...(pkg.mobify.overridesDir && pkg.mobify.extends
+                        ...(pkg?.mobify?.overridesDir && pkg?.mobify?.extends
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
                                   ...[pkg.mobify.extends].map((extendTarget) => ({
