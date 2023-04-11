@@ -210,7 +210,7 @@ test('onVariantSelected callback is called after successfully selected a variant
         />
     )
 
-    const size = screen.getByRole('link', {name: /xl/i})
+    const size = screen.getByRole('radio', {name: /xl/i})
     userEvent.click(size)
 
     await waitFor(() => {
