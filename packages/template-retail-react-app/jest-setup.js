@@ -8,6 +8,7 @@ const path = require('path')
 const mockConfig = require(path.join(__dirname, 'config/mocks/default.js'))
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
+const {configure: configureTestingLibrary} = require('@testing-library/react')
 const {Crypto} = require('@peculiar/webcrypto')
 const {setupServer} = require('msw/node')
 const {rest} = require('msw')
@@ -17,6 +18,10 @@ const {
     exampleTokenReponse,
     mockCustomerBaskets
 } = require('./app/mocks/mock-data')
+
+configureTestingLibrary({
+    ...(process.env.CI ? {asyncUtilTimeout: 6000} : {})
+})
 
 /**
  * Set up an API mocking server for testing purposes.

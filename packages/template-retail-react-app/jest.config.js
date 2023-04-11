@@ -40,5 +40,6 @@ module.exports = {
             functions: 65,
             lines: 74
         }
-    }
+    },
+    ...(process.env.CI ? {testTimeout: 30000} : {})
 }
