@@ -135,7 +135,11 @@ class OverlayResolverPlugin {
                     return base
                 }
             } else {
-                return
+                if (this.overridesHashMap.has(requestPath)) {
+                    base = path.join(base, this.overridesHashMap.get(requestPath)[0])
+                    console.log('base without EXTENSIONS', base)
+                    return base
+                }
             }
         }
 
