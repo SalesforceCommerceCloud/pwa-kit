@@ -120,3 +120,11 @@ export const omitNullableParameters = <T extends {parameters: object}>(
     // the connection to `T` is lost, and TypeScript complains.
     parameters: omitNullable<T['parameters']>(obj.parameters)
 })
+
+/** Simple deep clone utility */
+export const clone = <T>(val: T): T => {
+    if (typeof val !== 'object' || val === null) return val
+    if (Array.isArray(val)) return val.map(clone) as T
+    const entries = Object.entries(val).map(([k, v]) => [k, clone(v)])
+    return Object.fromEntries(entries) as T
+}
