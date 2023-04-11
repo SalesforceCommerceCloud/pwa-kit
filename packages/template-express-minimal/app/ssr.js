@@ -20,6 +20,40 @@ const options = {
 
 const runtime = getRuntime()
 
+function buildAuthURL() {
+    const base = 'https://account.demandware.com/dwsso/oauth2/authorize'
+    const query = new URLSearchParams({
+        client_id: '056a095b-fa17-4fcb-bc76-806718566248',
+        redirect_uri: `http://localhost:3443/callback-am`,
+        response_type: 'token'
+    })
+    const authURL = `${base}?${query}`
+    return authURL
+}
+
+function handlerCallbackAM(req, res) {
+    return res.send(`
+        <html>
+            <head>
+                <meta charset="UTF-8" />
+                <title>Account Manager Callback</title>
+            </head>
+            <body>
+                <h1>Loading...</h1>
+                <script>    
+                    // 1. dig the param out
+                    // 2. shove it localstorage
+                    // 3. redirect to the hompage
+                    const accessToken = new URLSearchParams(window.location.hash.substr(1)).get('access_token')
+                    console.log('accessToken', accessToken)
+                    localStorage.setItem('access_token', accessToken)
+                    window.location.href = '/'
+                </script>
+            </body>
+        </html>
+    `)
+}
+
 const handler = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
     app.use(
@@ -50,10 +84,17 @@ const handler = runtime.createHandler(options, (app) => {
                 
                 <h1>Storefront Preview App wrapper</h1>
                  <h3>Retail React App Iframe</h3>
+                 <a href="${buildAuthURL()}">Login with AM</a>
                 <iframe src="http://localhost:3000/"></iframe>
+                
             </html>
         `)
     })
+
+    // Shopper Context handler
+    // app.post('/preview', handlerStorefrontPreview)
+    //
+    app.get('/callback-am', handlerCallbackAM)
 })
 
 // SSR requires that we export a single handler function called 'get', that
