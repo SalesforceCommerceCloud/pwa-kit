@@ -140,7 +140,6 @@ const App = (props) => {
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
 
-    // useAutoBasketMerge()
     useEffect(() => {
         // Create a new basket if the current customer doesn't have one.
         if (baskets?.total === 0) {

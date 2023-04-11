@@ -9,7 +9,14 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, defineMessage} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
-import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
+import {
+    AuthHelpers,
+    useAuthHelper,
+    useCustomerBaskets,
+    useCustomerId,
+    useCustomerType,
+    useShopperBasketsMutation
+} from 'commerce-sdk-react-preview'
 import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
@@ -17,7 +24,8 @@ import {useLocation} from 'react-router-dom'
 import useEinstein from '../../hooks/use-einstein'
 import LoginForm from '../../components/login'
 import {API_ERROR_MESSAGE} from '../../constants'
-import {useMergeBasket} from '../../hooks/use-merge-basket'
+import {usePrevious} from '../../hooks/use-previous'
+import {isServer} from '../../utils/utils'
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
     id: 'login_page.error.incorrect_username_or_password'
@@ -28,24 +36,38 @@ const Login = () => {
     const form = useForm()
     const location = useLocation()
     const einstein = useEinstein()
-    const {isRegistered} = useCustomerType()
+    const {isRegistered, customerType} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
-    const {mergeBasketIfNeeded} = useMergeBasket()
+
+    const customerId = useCustomerId()
+    const prevAuthType = usePrevious(customerType)
+    const {data: baskets} = useCustomerBaskets(
+        {parameters: {customerId}},
+        {enabled: !!customerId && !isServer, keepPreviousData: true}
+    )
+    const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
     const submitForm = async (data) => {
         try {
-            await login.mutateAsync(
-                {username: data.email, password: data.password},
-                {
-                    onError: (error) => {
-                        const message = /Unauthorized/i.test(error.message)
-                            ? formatMessage(LOGIN_ERROR_MESSAGE)
-                            : formatMessage(API_ERROR_MESSAGE)
-                        form.setError('global', {type: 'manual', message})
+            await login.mutateAsync({username: data.email, password: data.password})
+            const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
+            // we only want to merge basket when the user is logged in as a recurring user
+            // only recurring users trigger the login mutation, new user triggers register mutation
+            // this logic needs to stay in this block because this is the only place that tells if a user is a recurring user
+            // if you change logic here, also change it in login page
+            const shouldMergeBasket = hasBasketItem && prevAuthType === 'guest'
+            if (shouldMergeBasket) {
+                mergeBasket.mutate({
+                    headers: {
+                        // This is not required since the request has no body
+                        // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
+                        'Content-Type': 'application/json'
+                    },
+                    parameters: {
+                        createDestinationBasket: true
                     }
-                }
-            )
-            mergeBasketIfNeeded()
+                })
+            }
         } catch (error) {
             const message = /Unauthorized/i.test(error.message)
                 ? formatMessage(LOGIN_ERROR_MESSAGE)
