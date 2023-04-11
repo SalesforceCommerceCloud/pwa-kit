@@ -39,7 +39,7 @@ const CheckoutConfirmation = loadable(
 const LoginRedirect = loadable(() => import('^retail-react-app/app/pages/login-redirect'), {
     fallback,
 })
-const ProductDetail = loadable(() => import('^retail-react-app/app/pages/product-detail'), {
+const ProductDetail = loadable(() => import('./pages/product-detail'), {
     fallback,
 })
 const ProductList = loadable(() => import('^retail-react-app/app/pages/product-list'), {fallback})

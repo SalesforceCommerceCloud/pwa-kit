@@ -127,18 +127,23 @@ class OverlayResolverPlugin {
         var fileExt = path.extname(requestPath)
         for (var dir of dirs) {
             var base = path.join(dir, requestPath)
-            if (requestPath === 'pages/home') {
-                console.log('NEW base', base)
-            }
+            console.log('OG base', base)
             if (fileExt) {
                 if (this.overridesHashMap.has(requestPath)) {
                     return base
                 }
             } else {
                 if (this.overridesHashMap.has(requestPath)) {
-                    base = path.join(base, this.overridesHashMap.get(requestPath)[0])
-                    console.log('base without EXTENSIONS', base)
-                    return base
+                    const end = this.overridesHashMap.get(requestPath)[1]
+                    if (end[0] === 'index') {
+                        base = path.join(base, this.overridesHashMap.get(requestPath)[1].join(''))
+                        console.log('ENDS WITH INDEX', base)
+                        return base
+                    } else {
+                        base = base + end.join('')
+                        console.log('DOES NOT END WITH INDEX', base)
+                        return base
+                    }
                 }
             }
         }
@@ -208,6 +213,7 @@ class OverlayResolverPlugin {
                     // app base request relative
                     // ex - /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app/components/header
                     var resolvedPath = path.resolve(requestContext.path, requestContext.request)
+                    console.log('requestContext', requestContext)
 
                     if (this.isAppBaseRelative(resolvedPath)) {
                         // ex - components/header
