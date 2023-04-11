@@ -74,33 +74,32 @@ import {resolveSiteFromUrl} from '../../utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 
-
 function buildAuthURL() {
-    const base = "https://account.demandware.com/dwsso/oauth2/authorize"
+    const base = 'https://account.demandware.com/dwsso/oauth2/authorize'
     const query = new URLSearchParams({
-        client_id: "056a095b-fa17-4fcb-bc76-806718566248",
+        client_id: '056a095b-fa17-4fcb-bc76-806718566248',
         redirect_uri: `http://localhost:3000/callback-am`,
-        response_type: "token",
+        response_type: 'token'
     })
     const authURL = `${base}?${query}`
     return authURL
 }
 
-const addShopperContext = async (getTokenWhenReady) => {
+const addShopperContext = async (accessToken, getTokenWhenReady) => {
     const token = await getTokenWhenReady()
 
+    console.log('addShopperContext accessToken:', accessToken)
+    console.log('addShopperContext getTokenWhenReady:', getTokenWhenReady)
+
     // [2] Set the context by asking to preview with our token.
-    let shopperContextResponse = await fetch(
-        new URL('http://localhost:3000/preview'),
-        {
-            method: 'POST',
-            body: JSON.stringify({token}),
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            }
+    let shopperContextResponse = await fetch(new URL('http://localhost:3000/preview'), {
+        method: 'POST',
+        body: JSON.stringify({token}),
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
         }
-    )
+    })
 
     if (!shopperContextResponse.ok) {
         const shopperContextError = await shopperContextResponse.json()
@@ -108,8 +107,6 @@ const addShopperContext = async (getTokenWhenReady) => {
         return
     }
 }
-
-
 
 /*
 The categories tree can be really large! For performance reasons,
@@ -144,7 +141,7 @@ const useLazyLoadCategories = () => {
 }
 
 const App = (props) => {
-    const { children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
+    const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
     const {data: categoriesTree} = useLazyLoadCategories()
     const categories = flatten(categoriesTree || {}, 'categories')
 
@@ -243,7 +240,13 @@ const App = (props) => {
     }
     const {getTokenWhenReady} = useAccessToken()
 
-    addShopperContext(getTokenWhenReady)
+    let accessToken
+    if (typeof window !== 'undefined') {
+        accessToken = localStorage.getItem('token')
+    }
+
+    console.log('accessToken:', accessToken)
+    addShopperContext(accessToken, getTokenWhenReady)
 
     return (
         <Box className="sf-app" {...styles.container}>

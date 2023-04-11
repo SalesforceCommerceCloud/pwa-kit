@@ -74,16 +74,16 @@ const handler = runtime.createHandler(options, (app) => {
             <html>
                 <style>
                     iframe{      
-                        display: block;  /* iframes are inline by default */   
-                        height: 100vh;  /* Set height to 100% of the viewport height */   
-                        width: 100vw;  /* Set width to 100% of the viewport width */     
-                        border: none; /* Remove default border */
-                        background: lightyellow; /* Just for styling */
+                        display: block;   
+                        height: 100vh;     
+                        width: 100vw;       
+                        border: none; 
+                        background: lightseagreen; 
                     }
                 </style>
                 
                 <h1>Storefront Preview App wrapper</h1>
-                 <h3>Retail React App Iframe</h3>
+                 <h3>Retail React App http://localhost:3000/ on an iframe</h3>
                  <a href="${buildAuthURL()}">Login with AM</a>
                 <iframe src="http://localhost:3000/"></iframe>
                 

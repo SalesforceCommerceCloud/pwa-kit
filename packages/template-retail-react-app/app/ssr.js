@@ -52,6 +52,7 @@ async function validateAMJWT(jwt) {
             issuer: 'https://account.demandware.com:443/dwsso/oauth2'
         })
     } catch (error) {
+        console.log('validateSLASJWT error:', error)
         return {error}
     }
 }
@@ -130,7 +131,7 @@ async function handlerStorefrontPreview(req, res) {
 
     const {error: amValidationError} = await validateAMJWT(token)
     if (amValidationError) {
-        console.log({amValidationError})
+        console.log('handlerStorefrontPreview amValidationError:', {amValidationError})
         return res.status(403).json({amValidationError})
     }
 
