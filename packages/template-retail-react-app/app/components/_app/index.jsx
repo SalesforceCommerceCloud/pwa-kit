@@ -132,7 +132,6 @@ const App = (props) => {
     // Handle creating a new basket if there isn't one already assigned to the current
     // customer.
     const {data: customer} = useCurrentCustomer()
-
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId: customer.customerId}},
         {enabled: !!customer.customerId && !isServer}
