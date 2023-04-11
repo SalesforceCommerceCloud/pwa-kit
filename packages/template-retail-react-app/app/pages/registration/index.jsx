@@ -39,7 +39,7 @@ const Registration = () => {
         }
 
         try {
-            await register.mutateAsync(body)
+            await register.mutateAsync(body, {})
         } catch (e) {
             form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
         }
