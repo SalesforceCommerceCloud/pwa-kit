@@ -31,6 +31,7 @@ class OverlayResolverPlugin {
         // this is ./pwa-kit/overrides/app
         this.appBase = options.appBase || './app'
         this.appBase = path.resolve(this.appBase)
+        console.log('this.appBase', this.appBase)
         
         // this is [retail-react-app]
         this.overlays = options.overlays || []
@@ -55,7 +56,6 @@ class OverlayResolverPlugin {
         )
 
         this.projectDir = options.projectDir
-        console.log('this.projectDir', this.projectDir)
         this.pkg = require(path.resolve(this.projectDir, 'package.json'))
         this.overridesHashMap = new Map()
 
@@ -65,13 +65,14 @@ class OverlayResolverPlugin {
             ''
         )}/**/*${OVERRIDES_EXTENSIONS}`
         const overridesFsRead = glob.sync(globPattern)
-        console.log('overridesFsRead', overridesFsRead)
+
+        const overrideReplace = this.pkg?.mobify?.overridesDir + '/app/'
         
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
             const [l, ...rest] = item?.split(/(index|\.)/)
             this.overridesHashMap.set(
-                l.replace(/\/$/, '')?.replace(this.pkg?.mobify?.overridesDir?.replace(/\//, ''), ''),
+                l.replace(/\/$/, '')?.replace(overrideReplace.replace(/\//, ''), ''),
                 [end, rest]
             )
         })
@@ -122,6 +123,24 @@ class OverlayResolverPlugin {
         }
     }
 
+    findFileMap(requestPath, dirs, extensions) {
+        var fileExt = path.extname(requestPath)
+        for (var dir of dirs) {
+            var base = path.join(dir, requestPath)
+            if (requestPath === 'pages/home') {
+                console.log('NEW base', base)
+            }
+            if (fileExt) {
+                if (this.overridesHashMap.has(requestPath)) {
+                    return base
+                }
+            } else {
+                return
+            }
+        }
+
+    }
+
     /**
      *
      */
@@ -155,7 +174,7 @@ class OverlayResolverPlugin {
                     const searchOverlays = this._allSearchDirs.slice(
                         this._allSearchDirs.indexOf(overlay) + 1
                     )
-                    var targetFile = this.findFile(
+                    var targetFile = this.findFileMap(
                         overlayRelative,
                         searchOverlays,
                         resolver.options.extensions
@@ -191,8 +210,10 @@ class OverlayResolverPlugin {
                         let overlayRelative = this.toOverlayRelative(resolvedPath)
 
                         let targetFile, target
+                        const vars = [overlayRelative, this._allSearchDirs, resolver.options.extensions]
+                        console.log('vars', vars)
                         try {
-                            targetFile = this.findFile(
+                            targetFile = this.findFileMap(
                                 overlayRelative,
                                 this._allSearchDirs,
                                 resolver.options.extensions
@@ -231,7 +252,7 @@ class OverlayResolverPlugin {
                     let overlayRelative = this.toOverlayRelative(requestContext.request)
                     let targetFile, target
                     try {
-                        targetFile = this.findFile(
+                        targetFile = this.findFileMap(
                             overlayRelative,
                             this._allSearchDirs,
                             resolver.options.extensions
