@@ -8,7 +8,7 @@
     },
     "mobify": {
         "extends": "retail-react-app",
-        "overridesDir": "/pwa-kit/overrides"
+        "overridesDir": "/pwa-kit-overrides"
     },
     "devDependencies": {
         "@chakra-ui/icons": "^1.0.6",
