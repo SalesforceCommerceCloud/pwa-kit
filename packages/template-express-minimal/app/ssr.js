@@ -45,9 +45,10 @@ function handlerCallbackAM(req, res) {
                     // 2. shove it localstorage
                     // 3. redirect to the hompage
                     const accessToken = new URLSearchParams(window.location.hash.substr(1)).get('access_token')
-                    console.log('accessToken', accessToken)
+                    // TODO: Option 1. Use parent domain Local Storage to save token in parent to be sent to iframe. 
                     localStorage.setItem('access_token', accessToken)
-                    window.location.href = '/'
+                    // TODO: Option 2. Use hash parameters to save token in parent to be sent to iframe.
+                    window.location.href = '/#token=' + accessToken
                 </script>
             </body>
         </html>
@@ -82,10 +83,28 @@ const handler = runtime.createHandler(options, (app) => {
                     }
                 </style>
                 
+                
                 <h1>Storefront Preview App wrapper</h1>
                  <h3>Retail React App http://localhost:3000/ on an iframe</h3>
                  <a href="${buildAuthURL()}">Login with AM</a>
-                <iframe src="http://localhost:3000/"></iframe>
+          
+                <iframe src="http://localhost:3000/" id="iframe"></iframe>
+                <script>
+                    window.addEventListener("load", (event) => {
+                        let accessToken
+                        // TODO: Option 1. Get token from parent local storage                      
+                        accessToken = localStorage.getItem('access_token')
+                        
+                        // TODO: Option 2. Get token from parent URL hash paraments.
+                        // if (window.location.hash === "#token") {
+                        //    let urlParams = new URLSearchParams(window.location.hash.replace("#","?"))
+                        //    accessToken = urlParams.get("token")
+                        // }
+                
+                        // Send token to iframe   
+                        document.getElementById("iframe").contentWindow.postMessage(accessToken, "*")
+                    })
+                </script>
                 
             </html>
         `)
