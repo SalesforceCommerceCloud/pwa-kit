@@ -72,7 +72,7 @@ import {resolveSiteFromUrl} from '../../utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 
-/* 
+/*
 The categories tree can be really large! For performance reasons,
 we only load the level 0 categories on server side, and load the rest
 on client side to reduce SSR page size.
@@ -160,6 +160,12 @@ const App = (props) => {
         watchOnlineStatus((isOnline) => {
             setIsOnline(isOnline)
         })
+
+        // Receive message from parent
+        window.addEventListener('message', ({ data, origin }) => {
+            console.log(`iframe received ${data} from ${origin}`)
+            alert(`iframe received ${data} from ${origin}`);
+        });
     }, [])
 
     useEffect(() => {
