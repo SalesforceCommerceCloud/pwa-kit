@@ -7,7 +7,7 @@
 
 ---
 
-This folder contains React components and utilities that render pages from [Page Designer](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/page_designer/b2c_creating_pd_pages.html).
+This folder contains the React components used when rendering the pages from [Page Designer](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/page_designer/b2c_creating_pd_pages.html).
 
 Use this folder to add React components that can render Page Designer components that have been serialized to JSON.
 
@@ -20,8 +20,7 @@ for more information on configuring your SLAS client.
 
 ## Folder Structure
 
--   **`/core`** - Base components for rendering: `<Page>`, `<Region>`, and `<Component>`. Use `<Page>` to render Page Designer content. Use `<Region>` and `<Component>` for creating new assets.
--   **`/assets`** - Non-visual components used in Page Designer. Includes `<Image>` and `<ImageWithText>` as well as any other Page Designer assets that you want to use in your PWA-Kit app. If you need to visualize a component, add it here.
+-   **`/assets`** - Visual components used in Page Designer. Includes `<Image>` and `<ImageWithText>` as well as any other Page Designer assets that you want to use in your PWA-Kit app. If you need to visualize a component, add it here.
 -   **`/layouts`** - Components responsible for layout. Includes various grids and a `<Carousel>` component.
 
 ## Sample Usage
@@ -32,8 +31,10 @@ Create a new file called `app/pages/page-viewer/index.jsx`, and add the followin
 // app/pages/page-viewer/index.jsx
 
 import React from 'react'
+import {useParams} from 'react-router-dom'
 import {Box} from '@chakra-ui/react'
-import {Page, pageType} from '../../page-designer'
+import {usePage} from 'commerce-sdk-react-preview'
+import {Page} from 'commerce-sdk-react-preview/components'
 import {ImageTile, ImageWithText} from '../../page-designer/assets'
 import {
     Carousel,
@@ -59,31 +60,23 @@ const PAGEDESIGNER_TO_COMPONENT = {
     'commerce_layouts.mobileGrid3r2c': MobileGrid3r2c
 }
 
-const PageViewer = ({page}) => (
-    <Box layerStyle={'page'}>
-        <Page page={page} components={PAGEDESIGNER_TO_COMPONENT} />
-    </Box>
-)
+const PageViewer = () => {
+    const {pageId} = useParams()
+    const {data: page, error}= usePage({parameters: {pageId}})
 
-PageViewer.getProps = async ({api, params}) => {
-    const {pageId} = params
-    const page = await api.shopperExperience.getPage({
-        parameters: {pageId}
-    })
-
-    if (page.isError) {
-        let ErrorClass = page.type?.endsWith('page-not-found') ? HTTPNotFound : HTTPError
-        throw new ErrorClass(page.detail)
+    if (error) {
+        let ErrorClass = error.response?.status === 404 ? HTTPNotFound : HTTPError
+        throw new ErrorClass(error.response?.statusText)
     }
 
-    return {page}
+    return (
+        <Box layerStyle={'page'}>
+            <Page page={page} components={PAGEDESIGNER_TO_COMPONENT} />
+        </Box>
+    )
 }
 
 PageViewer.displayName = 'PageViewer'
-
-PageViewer.propTypes = {
-    page: pageType.isRequired
-}
 
 export default PageViewer
 ```

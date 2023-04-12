@@ -5,7 +5,5 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export * from './component'
-export * from './page'
-export * from './region'
-export * from './types'
+export * from './image-tile'
+export * from './image-with-text'
