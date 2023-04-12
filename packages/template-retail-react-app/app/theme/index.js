@@ -54,7 +54,7 @@ import ImageGallery from './components/project/image-gallery'
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
 // more about extending and overriding themes for your project.
-const overrides = {
+export const overrides = {
     styles,
     layerStyles,
     colors,

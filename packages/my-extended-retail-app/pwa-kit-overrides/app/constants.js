@@ -12,9 +12,12 @@ export const DEFAULT_LOCALE = 'en-US'
 export const DEFAULT_SITE_TITLE = 'Retail React App'
 export const MAX_CACHE_AGE = 60 * 15 // 15 min
 
-// Constants used in the used for product searching.
-export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'most-popular', refine: []}
+// Constants used for product searching.
+export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
 export const DEFAULT_LIMIT_VALUES = [25, 50, 100] // Page sizes
+
+//Constants for customer orders searching.
+export const DEFAULT_ORDERS_SEARCH_PARAMS = {limit: 10, offset: 0, sort: 'best-matches', refine: []}
 
 // Constants for Search Component
 export const RECENT_SEARCH_LIMIT = 5
@@ -22,15 +25,14 @@ export const RECENT_SEARCH_KEY = 'recent-search-key'
 export const RECENT_SEARCH_MIN_LENGTH = 3
 
 // Constants for the Homepage's Shop Products section.
-
 // toggle between 'newarrivals' and 'womens'
-export const HOME_SHOP_PRODUCTS_CATEGORY_ID = 'newarrivals'
+export const HOME_SHOP_PRODUCTS_CATEGORY_ID = 'womens'
+
 export const HOME_SHOP_PRODUCTS_LIMIT = 10
 
 // Constants for menu
-export const CAT_MENU_DEFAULT_NAV_DEPTH = 1
+export const CAT_MENU_DEFAULT_NAV_SSR_DEPTH = 1
 export const CAT_MENU_DEFAULT_ROOT_CATEGORY = 'root'
-export const CAT_MENU_STALE_TIME = 10000 // 10 seconds
 
 export const cssColorGroups = {
     beige: '#d3bca9',
@@ -64,8 +66,6 @@ export const API_ERROR_MESSAGE = defineMessage({
 
 export const HOME_HREF = '/'
 
-export const MAX_ORDER_QUANTITY = 10
-
 export const urlPartPositions = {
     PATH: 'path',
     QUERY_PARAM: 'query_param',
@@ -81,6 +81,11 @@ export const urlPartPositions = {
 export const TOAST_MESSAGE_ADDED_TO_WISHLIST = defineMessage({
     id: 'global.info.added_to_wishlist',
     defaultMessage: '{quantity} {quantity, plural, one {item} other {items}} added to wishlist',
+})
+
+export const TOAST_MESSAGE_REMOVED_ITEM_FROM_CART = defineMessage({
+    defaultMessage: 'Item removed from cart',
+    id: 'cart.info.removed_from_cart',
 })
 
 export const TOAST_ACTION_VIEW_WISHLIST = defineMessage({
