@@ -10,6 +10,7 @@ const path = require('path')
 const mockConfig = require(path.join(__dirname, 'config/mocks/default.js'))
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
+const {configure: configureTestingLibrary} = require('@testing-library/react')
 const {Crypto} = require('@peculiar/webcrypto')
 const {setupServer} = require('msw/node')
 const {rest} = require('msw')
@@ -19,6 +20,11 @@ const {
     exampleTokenReponse,
     mockCustomerBaskets
 } = require('./app/mocks/mock-data')
+
+configureTestingLibrary({
+    // Increase to: 6 x default timeout of 1 second
+    ...(process.env.CI ? {asyncUtilTimeout: 6000} : {})
+})
 
 /**
  * Set up an API mocking server for testing purposes.
@@ -81,13 +87,7 @@ afterEach(() => {
     global.server.resetHandlers()
 })
 afterAll(() => {
-    // Intentionally not closing the server!
-    // We run into many race condition issues,
-    // that was cause by the server close too soon
-    // and the tests not well written in an proper async manner.
-    // Let's not close the server and see how things goes.
-    // We can revisit this.
-    // global.server.close()
+    global.server.close()
 })
 
 // Mock the application configuration to be used in all tests.

@@ -46,7 +46,6 @@
   },
   "devDependencies": {
     "@tanstack/react-query": "^4.28.0",
-    "@tanstack/react-query-devtools": "^4.28.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^12.1.5",
     "@testing-library/react-hooks": "^8.0.1",

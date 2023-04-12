@@ -1,0 +1,8 @@
+name: bundlesize
+runs:
+  using: composite
+  steps:
+  - name: Check bundle size
+    run: |-
+        npm run test:max-file-size
+    shell: bash
