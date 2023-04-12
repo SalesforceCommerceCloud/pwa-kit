@@ -20,6 +20,7 @@ const {
 } = require('./app/mocks/mock-data')
 
 configureTestingLibrary({
+    // Increase to: 6 x default timeout of 1 second
     ...(process.env.CI ? {asyncUtilTimeout: 6000} : {})
 })
 
