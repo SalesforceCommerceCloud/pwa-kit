@@ -6,11 +6,11 @@
  */
 import React from 'react'
 import {within} from '@testing-library/dom'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithChakra} from '../../utils/test-utils'
 import * as Icons from './index'
 
 test('renders svg icons with Chakra Icon component', () => {
-    renderWithProviders(<Icons.CheckIcon />)
+    renderWithChakra(<Icons.CheckIcon />)
     const svg = document.querySelector('.chakra-icon')
     const use = within(svg).getByRole('presentation')
     expect(svg).toBeInTheDocument()

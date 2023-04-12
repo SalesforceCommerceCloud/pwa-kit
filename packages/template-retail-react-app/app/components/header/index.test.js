@@ -10,9 +10,9 @@ import userEvent from '@testing-library/user-event'
 import {fireEvent, screen, waitFor, act} from '@testing-library/react'
 import Header from './index'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import {rest} from 'msw'
 import {createMemoryHistory} from 'history'
-import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {createServer} from '../../../jest-setup'
 
 jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual('@chakra-ui/react')
@@ -41,169 +41,174 @@ MockedComponent.propTypes = {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    global.server.use(
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
-        })
-    )
 })
 afterEach(() => {
     localStorage.clear()
 })
-test('renders Header', async () => {
-    renderWithProviders(<Header />)
 
-    await waitFor(() => {
-        const menu = document.querySelector('button[aria-label="Menu"]')
-        const logo = document.querySelector('button[aria-label="Logo"]')
-        const account = document.querySelector('svg[aria-label="My account"]')
-        const cart = document.querySelector('button[aria-label="My cart"]')
-        const wishlist = document.querySelector('button[aria-label="Wishlist"]')
-        const searchInput = document.querySelector('input[type="search"]')
-        expect(menu).toBeInTheDocument()
-        expect(logo).toBeInTheDocument()
-        expect(account).toBeInTheDocument()
-        expect(cart).toBeInTheDocument()
-        expect(wishlist).toBeInTheDocument()
-        expect(searchInput).toBeInTheDocument()
+describe('Header component', function () {
+    const {prependHandlersToServer} = createServer()
+    test('renders properly', async () => {
+        renderWithProviders(<Header />)
+
+        await waitFor(() => {
+            const menu = document.querySelector('button[aria-label="Menu"]')
+            const logo = document.querySelector('button[aria-label="Logo"]')
+            const account = document.querySelector('svg[aria-label="My account"]')
+            const cart = document.querySelector('button[aria-label="My cart"]')
+            const wishlist = document.querySelector('button[aria-label="Wishlist"]')
+            const searchInput = document.querySelector('input[type="search"]')
+            expect(menu).toBeInTheDocument()
+            expect(logo).toBeInTheDocument()
+            expect(account).toBeInTheDocument()
+            expect(cart).toBeInTheDocument()
+            expect(wishlist).toBeInTheDocument()
+            expect(searchInput).toBeInTheDocument()
+        })
     })
-})
 
-test('renders Header with event handlers', async () => {
-    const onMenuClick = jest.fn()
-    const onLogoClick = jest.fn()
-    const onMyAccountClick = jest.fn()
-    const onMyCartClick = jest.fn()
-    renderWithProviders(
-        <Header
-            onMenuClick={onMenuClick}
-            onLogoClick={onLogoClick}
-            onMyAccountClick={onMyAccountClick}
-            onMyCartClick={onMyCartClick}
-        />
-    )
-    await waitFor(() => {
-        const menu = document.querySelector('button[aria-label="Menu"]')
-        const logo = document.querySelector('button[aria-label="Logo"]')
-        const account = document.querySelector('svg[aria-label="My account"]')
-        const cart = document.querySelector('button[aria-label="My cart"]')
-        expect(menu).toBeInTheDocument()
-        fireEvent.click(menu)
-        expect(onMenuClick).toHaveBeenCalledTimes(1)
-        fireEvent.click(logo)
-        expect(onLogoClick).toHaveBeenCalledTimes(1)
-        fireEvent.click(account)
-        expect(onMyAccountClick).toHaveBeenCalledTimes(1)
-        fireEvent.click(cart)
-        expect(onMyCartClick).toHaveBeenCalledTimes(1)
-    })
-})
-
-/**
- * The badge component on the cart that shows the number of items in the cart
- * should only be displayed when there is a valid cart loaded.
- */
-const testBaskets = [null, undefined, {total: 0}]
-
-test.each(testBaskets)(
-    `does not render cart badge when basket value is not defined`,
-    async (initialBasket) => {
-        global.server.use(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(200), ctx.json(initialBasket))
-            })
+    test('renders Header with event handlers', async () => {
+        const onMenuClick = jest.fn()
+        const onLogoClick = jest.fn()
+        const onMyAccountClick = jest.fn()
+        const onMyCartClick = jest.fn()
+        renderWithProviders(
+            <Header
+                onMenuClick={onMenuClick}
+                onLogoClick={onLogoClick}
+                onMyAccountClick={onMyAccountClick}
+                onMyCartClick={onMyCartClick}
+            />
         )
+        await waitFor(() => {
+            const menu = document.querySelector('button[aria-label="Menu"]')
+            const logo = document.querySelector('button[aria-label="Logo"]')
+            const account = document.querySelector('svg[aria-label="My account"]')
+            const cart = document.querySelector('button[aria-label="My cart"]')
+            expect(menu).toBeInTheDocument()
+            fireEvent.click(menu)
+            expect(onMenuClick).toHaveBeenCalledTimes(1)
+            fireEvent.click(logo)
+            expect(onLogoClick).toHaveBeenCalledTimes(1)
+            fireEvent.click(account)
+            expect(onMyAccountClick).toHaveBeenCalledTimes(1)
+            fireEvent.click(cart)
+            expect(onMyCartClick).toHaveBeenCalledTimes(1)
+        })
+    })
+
+    /**
+     * The badge component on the cart that shows the number of items in the cart
+     * should only be displayed when there is a valid cart loaded.
+     */
+    const testBaskets = [null, undefined, {total: 0}]
+
+    test.each(testBaskets)(
+        `does not render cart badge when basket value is not defined`,
+        async (initialBasket) => {
+            prependHandlersToServer([
+                {
+                    path: '/customers/:customerId/baskets',
+                    res: () => {
+                        return initialBasket
+                    }
+                }
+            ])
+            renderWithProviders(<Header />)
+
+            await waitFor(() => {
+                // Look for badge.
+                const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
+                expect(badge).not.toBeInTheDocument()
+            })
+        }
+    )
+
+    test('renders cart badge when basket is loaded', async () => {
         renderWithProviders(<Header />)
 
         await waitFor(() => {
             // Look for badge.
             const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
-            expect(badge).not.toBeInTheDocument()
+            expect(badge).toBeInTheDocument()
         })
-    }
-)
-
-test('renders cart badge when basket is loaded', async () => {
-    renderWithProviders(<Header />)
-
-    await waitFor(() => {
-        // Look for badge.
-        const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
-        expect(badge).toBeInTheDocument()
-    })
-})
-
-test('route to account page when an authenticated users click on account icon', async () => {
-    const history = createMemoryHistory()
-    // mock push function
-    history.push = jest.fn()
-    renderWithProviders(<MockedComponent history={history} />)
-
-    await waitFor(() => {
-        // Look for account icon
-        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
-        expect(accountTrigger).toBeInTheDocument()
-    })
-    const accountIcon = document.querySelector('svg[aria-label="My account"]')
-    fireEvent.click(accountIcon)
-    await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
     })
 
-    fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
-    await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
-    })
-})
-
-test('route to wishlist page when an authenticated users click on wishlist icon', async () => {
-    const history = createMemoryHistory()
-    // mock push function
-    history.push = jest.fn()
-
-    renderWithProviders(<MockedComponent history={history} />)
-
-    await waitFor(() => {
-        // Look for account icon
-        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
-        expect(accountTrigger).toBeInTheDocument()
-    })
-    const wishlistIcon = screen.getByRole('button', {name: /wishlist/i})
-    userEvent.click(wishlistIcon)
-    await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account/wishlist'))
-    })
-})
-
-test('shows dropdown menu when an authenticated users hover on the account icon', async () => {
-    global.server.use(
-        rest.post('*/customers/action/login', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        })
-    )
-    const history = createMemoryHistory()
-    // mock push function
-    history.push = jest.fn()
-    await act(async () => {
+    test('route to account page when an authenticated users click on account icon', async () => {
+        const history = createMemoryHistory()
+        // mock push function
+        history.push = jest.fn()
         renderWithProviders(<MockedComponent history={history} />)
+
+        await waitFor(() => {
+            // Look for account icon
+            const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+            expect(accountTrigger).toBeInTheDocument()
+        })
+        const accountIcon = document.querySelector('svg[aria-label="My account"]')
+        fireEvent.click(accountIcon)
+        await waitFor(() => {
+            expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
+        })
+
+        fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
+        await waitFor(() => {
+            expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
+        })
     })
 
-    await waitFor(() => {
-        // Look for account icon
-        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
-        expect(accountTrigger).toBeInTheDocument()
-    })
-    const accountIcon = document.querySelector('svg[aria-label="My account"]')
-    fireEvent.click(accountIcon)
-    await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
-    })
-    userEvent.hover(accountIcon)
+    test('route to wishlist page when an authenticated users click on wishlist icon', async () => {
+        const history = createMemoryHistory()
+        // mock push function
+        history.push = jest.fn()
 
-    await waitFor(() => {
-        expect(screen.getByText(/account details/i)).toBeInTheDocument()
-        expect(screen.getByText(/addresses/i)).toBeInTheDocument()
-        expect(screen.getByText(/wishlist/i)).toBeInTheDocument()
-        expect(screen.getByText(/order history/i)).toBeInTheDocument()
+        renderWithProviders(<MockedComponent history={history} />)
+
+        await waitFor(() => {
+            // Look for account icon
+            const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+            expect(accountTrigger).toBeInTheDocument()
+        })
+        const wishlistIcon = screen.getByRole('button', {name: /wishlist/i})
+        userEvent.click(wishlistIcon)
+        await waitFor(() => {
+            expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account/wishlist'))
+        })
+    })
+
+    test('shows dropdown menu when an authenticated users hover on the account icon', async () => {
+        prependHandlersToServer([
+            {
+                path: '/customers/:customerId/baskets',
+                res: () => {
+                    return mockedRegisteredCustomer
+                }
+            }
+        ])
+        const history = createMemoryHistory()
+        // mock push function
+        history.push = jest.fn()
+        await act(async () => {
+            renderWithProviders(<MockedComponent history={history} />)
+        })
+
+        await waitFor(() => {
+            // Look for account icon
+            const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+            expect(accountTrigger).toBeInTheDocument()
+        })
+        const accountIcon = document.querySelector('svg[aria-label="My account"]')
+        fireEvent.click(accountIcon)
+        await waitFor(() => {
+            expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
+        })
+        userEvent.hover(accountIcon)
+
+        await waitFor(() => {
+            expect(screen.getByText(/account details/i)).toBeInTheDocument()
+            expect(screen.getByText(/addresses/i)).toBeInTheDocument()
+            expect(screen.getByText(/wishlist/i)).toBeInTheDocument()
+            expect(screen.getByText(/order history/i)).toBeInTheDocument()
+        })
     })
 })

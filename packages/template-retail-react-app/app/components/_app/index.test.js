@@ -14,6 +14,7 @@ import {DEFAULT_LOCALE} from '../../utils/test-utils'
 import useMultiSite from '../../hooks/use-multi-site'
 import messages from '../../translations/compiled/en-GB.json'
 import mockConfig from '../../../config/mocks/default'
+import {createServer} from '../../../jest-setup'
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 let windowSpy
 beforeAll(() => {
@@ -36,6 +37,7 @@ afterEach(() => {
 })
 
 describe('App', () => {
+    createServer()
     const site = {
         ...mockConfig.app.sites[0],
         alias: 'uk'

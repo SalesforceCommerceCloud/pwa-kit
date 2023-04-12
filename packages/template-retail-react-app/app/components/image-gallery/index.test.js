@@ -11,7 +11,7 @@ import {screen, fireEvent, waitFor} from '@testing-library/react'
 import ImageGallery from './index'
 import {Skeleton as ImageGallerySkeleton} from './index'
 import {createMemoryHistory} from 'history'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithChakra} from '../../utils/test-utils'
 
 const MockComponent = ({imageGroups = [], selectedVariationAttributes = {}}) => {
     return !imageGroups.length ? (
@@ -29,19 +29,19 @@ MockComponent.propTypes = {
 }
 describe('Image Gallery Component', () => {
     test('renders component with all images', () => {
-        renderWithProviders(<MockComponent imageGroups={data} selectedVariationAttributes={{}} />)
+        renderWithChakra(<MockComponent imageGroups={data} selectedVariationAttributes={{}} />)
         expect(screen.getAllByAltText(/Ruffle Front V-Neck Cardigan/).length).toEqual(3)
     })
 
     test('render skeleton', () => {
-        renderWithProviders(<MockComponent />)
+        renderWithChakra(<MockComponent />)
         expect(screen.getByTestId('sf-image-gallery-skeleton')).toBeInTheDocument()
     })
 
     test('can select thumbnail image with enter keyboard', async () => {
         const history = createMemoryHistory()
 
-        renderWithProviders(
+        renderWithChakra(
             <MockComponent imageGroups={data} selectedVariationAttributes={{}} history={history} />
         )
         const thumbnailImages = screen.getAllByTestId('image-gallery-thumbnails')
@@ -60,7 +60,7 @@ describe('Image Gallery Component', () => {
     test('can select thumbnail image by clicking on the image', async () => {
         const history = createMemoryHistory()
 
-        renderWithProviders(
+        renderWithChakra(
             <MockComponent imageGroups={data} selectedVariationAttributes={{}} history={history} />
         )
         const thumbnailImages = screen.getAllByTestId('image-gallery-thumbnails')

@@ -10,8 +10,7 @@ import {screen, waitFor} from '@testing-library/react'
 import withRegistration from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
-import {rest} from 'msw'
-import {mockedGuestCustomer} from '../../mocks/mock-data'
+import {createServer} from '../../../jest-setup'
 
 const ButtonWithRegistration = withRegistration(Button)
 
@@ -36,6 +35,7 @@ afterEach(() => {
 })
 
 describe('Registered users tests', function () {
+    createServer()
     test('should execute onClick for registered users', async () => {
         const onClick = jest.fn()
         renderWithProviders(<MockedComponent onClick={onClick} />)
@@ -51,13 +51,7 @@ describe('Registered users tests', function () {
 })
 
 describe('Guest user tests', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.get('*/customers/:customerId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
-            })
-        )
-    })
+    createServer()
     test('should show login modal if user not registered', async () => {
         const onClick = jest.fn()
         renderWithProviders(

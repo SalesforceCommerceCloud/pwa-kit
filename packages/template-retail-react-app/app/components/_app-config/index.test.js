@@ -13,32 +13,16 @@ import {uuidv4} from 'pwa-kit-react-sdk/utils/uuidv4.client'
 import {StaticRouter} from 'react-router-dom'
 
 import mockConfig from '../../../config/mocks/default'
-import {rest} from 'msw'
-import {registerUserToken} from '../../utils/test-utils'
+import {createServer} from '../../../jest-setup'
 
 describe('AppConfig', () => {
+    createServer()
     beforeAll(() => {
         jest.spyOn(window.localStorage, 'setItem')
     })
 
     beforeEach(() => {
         window.localStorage.setItem.mockClear()
-
-        global.server.use(
-            rest.post('*/oauth2/token', (req, res, ctx) =>
-                res(
-                    ctx.delay(0),
-                    ctx.json({
-                        customer_id: 'customerid',
-                        access_token: registerUserToken,
-                        refresh_token: 'testrefeshtoken',
-                        usid: 'testusid',
-                        enc_user_id: 'testEncUserId',
-                        id_token: 'testIdToken'
-                    })
-                )
-            )
-        )
     })
 
     afterAll(() => {

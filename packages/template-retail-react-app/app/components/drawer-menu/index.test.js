@@ -8,8 +8,10 @@ import React from 'react'
 import DrawerMenu from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {mockCategories} from '../../mocks/mock-data'
+import {createServer} from '../../../jest-setup'
 
 describe('DrawerMenu', () => {
+    createServer()
     test('Renders DrawerMenu without errors', async () => {
         renderWithProviders(<DrawerMenu isOpen={true} root={mockCategories.root} />)
 

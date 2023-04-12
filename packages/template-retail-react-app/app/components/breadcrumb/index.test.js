@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import Breadcrumb from './index'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithChakra} from '../../utils/test-utils'
 
 const mockCategories = [
     {
@@ -23,8 +23,8 @@ const mockCategories = [
     }
 ]
 
-test('Renders Breadcrum', () => {
-    const {getAllByTestId} = renderWithProviders(<Breadcrumb categories={mockCategories} />)
+test('Renders Breadcrumb', () => {
+    const {getAllByTestId} = renderWithChakra(<Breadcrumb categories={mockCategories} />)
 
     expect(getAllByTestId('sf-crumb-item').length).toEqual(mockCategories.length)
 })

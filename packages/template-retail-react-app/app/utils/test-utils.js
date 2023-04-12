@@ -87,6 +87,8 @@ export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
 }
 
 export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Router>)
+export const renderWithChakra = (node) =>
+    renderWithRouter(<ChakraProvider theme={theme}>{node}</ChakraProvider>)
 
 /**
  * This is the Providers used to wrap components

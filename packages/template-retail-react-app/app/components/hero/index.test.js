@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {fireEvent} from '@testing-library/react'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithChakra} from '../../utils/test-utils'
 import Hero from './index'
 
 test('Hero renders without errors', () => {
@@ -18,7 +18,7 @@ test('Hero renders without errors', () => {
             alt: 'alt'
         }
     }
-    const {getByText} = renderWithProviders(<Hero {...data} />)
+    const {getByText} = renderWithChakra(<Hero {...data} />)
     expect(getByText(/title/i)).toBeInTheDocument()
 })
 
@@ -32,7 +32,7 @@ test('Hero renders actions and event handlers', () => {
             alt: 'alt'
         }
     }
-    const {getByTestId} = renderWithProviders(<Hero {...data} />)
+    const {getByTestId} = renderWithChakra(<Hero {...data} />)
     const button = getByTestId('button')
     expect(button).toBeInTheDocument()
     fireEvent.click(button)
