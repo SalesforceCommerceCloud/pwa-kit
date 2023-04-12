@@ -213,9 +213,12 @@ const withChunking = (config) => {
             splitChunks: {
                 cacheGroups: {
                     vendor: {
-                        // Anything imported from node_modules lands in
-                        // vendor.js, if we're chunking.
-                        test: /node_modules/,
+                        // Two scenarios that we'd like to chunk vendor.js:
+                        // 1. The package is in node_modules
+                        // 2. The package is one of the monorepo packages.
+                        //    This is for local development to ensure the bundle
+                        //    composition is the same as a production build
+                        test: /(node_modules)|(packages\/.*\/dist)/,
                         name: 'vendor',
                         chunks: 'all'
                     }

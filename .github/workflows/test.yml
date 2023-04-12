@@ -63,6 +63,9 @@ jobs:
       - name: Run unit tests
         uses: "./.github/actions/unit_tests"
 
+      - name: Run bundlesize test
+        uses: "./.github/actions/bundle_size_test"
+
       - name: Smoke test scripts
         if: env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/smoke_tests"

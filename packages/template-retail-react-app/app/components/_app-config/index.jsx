@@ -23,6 +23,7 @@ import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/wit
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -57,6 +58,7 @@ const AppConfig = ({children, locals = {}}) => {
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
             </MultiSiteProvider>
+            <ReactQueryDevtools />
         </CommerceApiProvider>
     )
 }
