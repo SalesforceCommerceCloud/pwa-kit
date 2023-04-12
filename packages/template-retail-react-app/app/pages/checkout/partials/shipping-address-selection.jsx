@@ -105,11 +105,12 @@ const ShippingAddressSelection = ({
     onSubmit = async () => null
 }) => {
     const {formatMessage} = useIntl()
-    const {data: customer} = useCurrentCustomer()
+    const {data: customer, isLoading, isFetching} = useCurrentCustomer()
+    const isLoadingRegisteredCustomer = isLoading && isFetching
 
-    const hasSavedAddresses = customer.addresses && customer.addresses.length > 0
-    const [isEditingAddress, setIsEditingAddress] = useState(!hasSavedAddresses)
-    const [selectedAddressId, setSelectedAddressId] = useState(false)
+    const hasSavedAddresses = customer.addresses?.length > 0
+    const [isEditingAddress, setIsEditingAddress] = useState(false)
+    const [selectedAddressId, setSelectedAddressId] = useState(undefined)
 
     form =
         form ||
@@ -145,7 +146,7 @@ const ShippingAddressSelection = ({
     useEffect(() => {
         // If the customer deletes all their saved addresses during checkout,
         // we need to make sure to display the address form.
-        if (!customer?.addresses && !isEditingAddress) {
+        if (!isLoading && !customer?.addresses && !isEditingAddress) {
             setIsEditingAddress(true)
         }
     }, [customer])
@@ -217,6 +218,11 @@ const ShippingAddressSelection = ({
         }
 
         form.trigger()
+    }
+
+    if (isLoadingRegisteredCustomer) {
+        // Don't render anything yet, to make sure values like hasSavedAddresses are correct
+        return null
     }
 
     return (
@@ -320,7 +326,7 @@ const ShippingAddressSelection = ({
                     />
                 )}
 
-                {isEditingAddress && !selectedAddressId && (
+                {(customer.isGuest || (isEditingAddress && !selectedAddressId)) && (
                     <ShippingAddressEditForm
                         title={formatMessage({
                             defaultMessage: 'Add New Address',
@@ -334,7 +340,7 @@ const ShippingAddressSelection = ({
                     />
                 )}
 
-                {!isEditingAddress && !hideSubmitButton && (
+                {customer.isRegistered && !isEditingAddress && !hideSubmitButton && (
                     <Box pt={2}>
                         <Container variant="form">
                             <Button
