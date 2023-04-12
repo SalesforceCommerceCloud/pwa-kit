@@ -10,8 +10,8 @@ import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistSecondaryButtonGroup from './wishlist-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {rest} from 'msw'
 import {mockedProductLists, mockedWishListProducts} from '../index.mock'
+import {createServer} from '../../../../../jest-setup'
 
 const mockData = {
     creationDate: '2021-09-13T23:29:23.396Z',
@@ -350,39 +350,46 @@ const MockedComponent = (props) => {
     )
 }
 
+const handlers = [
+    {
+        path: '*/products',
+        res: () => {
+            return mockedWishListProducts
+        }
+    },
+    {
+        path: '*/customers/:customerId/product-lists',
+        res: () => {
+            return mockedProductLists
+        }
+    },
+    {
+        path: '*/customers/:customerId/product-lists/:listId/items/:itemId',
+        status: 204,
+        method: 'delete'
+    }
+]
+
 beforeEach(() => {
     jest.resetModules()
-
-    global.server.use(
-        // For `useWishList`
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedWishListProducts))
-        }),
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductLists))
-        }),
-        rest.delete(
-            '*/customers/:customerId/product-lists/:listId/items/:itemId',
-            (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(204))
-            }
-        )
-    )
 })
 
-test('can remove item', async () => {
-    const mockedHandler = jest.fn()
-    renderWithProviders(<MockedComponent onClick={mockedHandler} />)
+describe('WishlistSecondaryButtonGroup', () => {
+    createServer(handlers)
+    test('can remove item', async () => {
+        const mockedHandler = jest.fn()
+        renderWithProviders(<MockedComponent onClick={mockedHandler} />)
 
-    const removeButton = await screen.findByRole('button', {
-        name: /remove/i
-    })
-    user.click(removeButton)
+        const removeButton = await screen.findByRole('button', {
+            name: /remove/i
+        })
+        user.click(removeButton)
 
-    const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
-    user.click(confirmButton)
+        const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
+        user.click(confirmButton)
 
-    await waitFor(() => {
-        expect(mockedHandler).toHaveBeenCalled()
+        await waitFor(() => {
+            expect(mockedHandler).toHaveBeenCalled()
+        })
     })
 })

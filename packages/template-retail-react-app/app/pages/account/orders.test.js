@@ -8,11 +8,11 @@ import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import {mockCustomerBaskets, mockOrderHistory, mockOrderProducts} from '../../mocks/mock-data'
+import {mockOrderHistory, mockOrderProducts} from '../../mocks/mock-data'
 import Orders from './orders'
 import mockConfig from '../../../config/mocks/default'
+import {createServer} from '../../../jest-setup'
 
 const MockedComponent = () => {
     return (
@@ -26,12 +26,6 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    global.server.use(
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.json(mockCustomerBaskets))
-        )
-    )
-
     window.history.pushState({}, 'Account', createPathWithDefaults('/account/orders'))
 })
 afterEach(() => {
@@ -39,51 +33,67 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test('Renders order history and details', async () => {
-    global.server.use(
-        rest.get('*/orders/:orderNo', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrderHistory.data[0]))
-        }),
-        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrderHistory))
-        }),
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrderProducts))
+describe('Order account page', function () {
+    const {prependHandlersToServer} = createServer()
+
+    test('Renders order history and details', async () => {
+        prependHandlersToServer([
+            {
+                path: '*/orders/:orderNo',
+                res: () => {
+                    return mockOrderHistory.data[0]
+                }
+            },
+            {
+                path: '*/customers/:customerId/orders',
+                res: () => {
+                    return mockOrderHistory
+                }
+            },
+            {
+                path: '*/products',
+                res: () => {
+                    return mockOrderProducts
+                }
+            }
+        ])
+        await renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
         })
-    )
-    await renderWithProviders(<MockedComponent history={history} />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findAllByText(/Ordered: /i)).toHaveLength(3)
+        expect(
+            await screen.findAllByAltText(
+                'Pleated Bib Long Sleeve Shirt, Silver Grey, small',
+                {},
+                {timeout: 15000}
+            )
+        ).toHaveLength(3)
+
+        user.click((await screen.findAllByText(/view details/i))[0])
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/order number: 00028011/i)).toBeInTheDocument()
+        expect(
+            await screen.findByAltText(/Pleated Bib Long Sleeve Shirt, Silver Grey, small/i)
+        ).toBeInTheDocument()
+        expect(
+            await screen.findByAltText(/Long Sleeve Crew Neck, Fire Red, small/i)
+        ).toBeInTheDocument()
     })
-    expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
-    expect(await screen.findAllByText(/Ordered: /i)).toHaveLength(3)
-    expect(
-        await screen.findAllByAltText(
-            'Pleated Bib Long Sleeve Shirt, Silver Grey, small',
-            {},
-            {timeout: 15000}
-        )
-    ).toHaveLength(3)
 
-    user.click((await screen.findAllByText(/view details/i))[0])
-    expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-    expect(await screen.findByText(/order number: 00028011/i)).toBeInTheDocument()
-    expect(
-        await screen.findByAltText(/Pleated Bib Long Sleeve Shirt, Silver Grey, small/i)
-    ).toBeInTheDocument()
-    expect(
-        await screen.findByAltText(/Long Sleeve Crew Neck, Fire Red, small/i)
-    ).toBeInTheDocument()
-})
-
-test('Renders order history place holder when no orders', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json({limit: 0, offset: 0, total: 0}))
+    test('Renders order history place holder when no orders', async () => {
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/orders',
+                res: () => {
+                    return {limit: 0, offset: 0, total: 0}
+                }
+            }
+        ])
+        await renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
         })
-    )
-    await renderWithProviders(<MockedComponent history={history} />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
-    })
 
-    expect(await screen.findByTestId('account-order-history-place-holder')).toBeInTheDocument()
+        expect(await screen.findByTestId('account-order-history-place-holder')).toBeInTheDocument()
+    })
 })

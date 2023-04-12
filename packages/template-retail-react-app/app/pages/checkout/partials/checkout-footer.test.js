@@ -9,8 +9,12 @@ import {screen} from '@testing-library/react'
 
 import CheckoutFooter from './checkout-footer'
 import {renderWithProviders} from '../../../utils/test-utils'
+import {createServer} from '../../../../jest-setup'
 
-test('renders component', () => {
-    renderWithProviders(<CheckoutFooter />)
-    expect(screen.getByRole('link', {name: 'Shipping'})).toBeInTheDocument()
+describe('Checkout Footer', function () {
+    createServer()
+    test('renders component', () => {
+        renderWithProviders(<CheckoutFooter />)
+        expect(screen.getByRole('link', {name: 'Shipping'})).toBeInTheDocument()
+    })
 })

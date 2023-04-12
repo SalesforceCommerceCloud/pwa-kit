@@ -247,7 +247,6 @@ const defaultHandlers = [
 
 const setupHandlers = (handlerConfig = [], defaultHandlers = []) => {
     return [...defaultHandlers, ...handlerConfig].map((config) => {
-        console.log('config.path', config.path)
         return rest[config.method?.toLowerCase() || 'get'](config.path, (req, res, ctx) => {
             return res(
                 ctx.delay(0),

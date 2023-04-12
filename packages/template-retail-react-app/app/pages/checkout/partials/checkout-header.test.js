@@ -9,8 +9,12 @@ import {screen} from '@testing-library/react'
 
 import CheckoutHeader from './checkout-header'
 import {renderWithProviders} from '../../../utils/test-utils'
+import {createServer} from '../../../../jest-setup'
 
-test('renders component', () => {
-    renderWithProviders(<CheckoutHeader />)
-    expect(screen.getByTitle(/back to homepage/i)).toBeInTheDocument()
+describe('Checkout header', function () {
+    createServer()
+    test('renders component', () => {
+        renderWithProviders(<CheckoutHeader />)
+        expect(screen.getByTitle(/back to homepage/i)).toBeInTheDocument()
+    })
 })

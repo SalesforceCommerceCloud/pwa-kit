@@ -8,17 +8,12 @@ import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within, act} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import {
-    mockOrderHistory,
-    mockedGuestCustomer,
-    mockedRegisteredCustomer,
-    mockOrderProducts
-} from '../../mocks/mock-data'
+import {mockOrderHistory, mockedRegisteredCustomer, mockOrderProducts} from '../../mocks/mock-data'
 import Account from './index'
 import Login from '../login'
 import mockConfig from '../../../config/mocks/default'
+import {createServer} from '../../../jest-setup'
 
 const MockedComponent = () => {
     return (
@@ -35,15 +30,27 @@ const MockedComponent = () => {
     )
 }
 
+const handlers = [
+    {
+        path: '*/products',
+        res: () => {
+            return {
+                body: mockOrderProducts
+            }
+        }
+    },
+    {
+        path: '*/customers/:customerId/orders',
+        res: () => {
+            return {
+                body: mockOrderHistory
+            }
+        }
+    }
+]
+
 // Set up and clean up
 beforeEach(() => {
-    global.server.use(
-        rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
-        rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.json(mockOrderHistory))
-        )
-    )
-
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
@@ -55,13 +62,7 @@ afterEach(() => {
 
 const expectedBasePath = '/uk/en-GB'
 describe('Test redirects', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.get('*/customers/:customerId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
-            })
-        )
-    })
+    createServer(handlers)
     test('Redirects to login page if the customer is not logged in', async () => {
         const Component = () => {
             return (
@@ -78,34 +79,24 @@ describe('Test redirects', function () {
         })
         await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
     })
-})
 
-test('Provides navigation for subpages', async () => {
-    global.server.use(
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrderProducts))
-        }),
-        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrderHistory))
+    test('Provides navigation for subpages', async () => {
+        await renderWithProviders(<MockedComponent />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
         })
-    )
-    await renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        expect(await screen.findByTestId('account-page')).toBeInTheDocument()
+
+        const nav = within(screen.getByTestId('account-detail-nav'))
+        user.click(nav.getByText('Addresses'))
+        await waitFor(() =>
+            expect(window.location.pathname).toEqual(`${expectedBasePath}/account/addresses`)
+        )
+        user.click(nav.getByText('Order History'))
+        await waitFor(() =>
+            expect(window.location.pathname).toEqual(`${expectedBasePath}/account/orders`)
+        )
     })
-    expect(await screen.findByTestId('account-page')).toBeInTheDocument()
 
-    const nav = within(screen.getByTestId('account-detail-nav'))
-    user.click(nav.getByText('Addresses'))
-    await waitFor(() =>
-        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/addresses`)
-    )
-    user.click(nav.getByText('Order History'))
-    await waitFor(() =>
-        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/orders`)
-    )
-})
-
-describe('Render and logs out', function () {
     test('Renders account detail page by default for logged-in customer, and can log out', async () => {
         renderWithProviders(<MockedComponent />)
 
@@ -126,19 +117,20 @@ describe('Render and logs out', function () {
 })
 
 describe('updating profile', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.patch('*/customers/:customerId', (req, res, ctx) => {
-                return res(
-                    ctx.json({
-                        ...mockedRegisteredCustomer,
-                        firstName: 'Geordi',
-                        phoneHome: '(567) 123-5585'
-                    })
-                )
-            })
-        )
-    })
+    createServer([
+        ...handlers,
+        {
+            path: '*/customers/:customerId',
+            method: 'patch',
+            res: () => {
+                return {
+                    ...mockedRegisteredCustomer,
+                    firstName: 'Geordi',
+                    phoneHome: '(567) 123-5585'
+                }
+            }
+        }
+    ])
     test('Allows customer to edit profile details', async () => {
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
@@ -164,13 +156,16 @@ describe('updating profile', function () {
 })
 
 describe('updating password', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.put('*/password', (req, res, ctx) => {
-                return res(ctx.json())
-            })
-        )
-    })
+    createServer([
+        ...handlers,
+        {
+            path: '*/password',
+            method: 'put',
+            res: () => {
+                return {}
+            }
+        }
+    ])
     test('Allows customer to update password', async () => {
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()

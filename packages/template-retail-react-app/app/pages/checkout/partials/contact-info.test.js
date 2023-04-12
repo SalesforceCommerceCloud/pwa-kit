@@ -10,6 +10,7 @@ import user from '@testing-library/user-event'
 
 import ContactInfo from './contact-info'
 import {renderWithProviders} from '../../../utils/test-utils'
+import {createServer} from '../../../../jest-setup'
 
 jest.mock('../util/checkout-context', () => {
     return {
@@ -27,19 +28,22 @@ jest.mock('../util/checkout-context', () => {
     }
 })
 
-test('renders component', () => {
-    renderWithProviders(<ContactInfo />)
+describe('Contact Info', function () {
+    createServer()
+    test('renders component', () => {
+        renderWithProviders(<ContactInfo />)
 
-    // switch to login
-    const trigger = screen.getByText(/Already have an account\? Log in/i)
-    user.click(trigger)
+        // switch to login
+        const trigger = screen.getByText(/Already have an account\? Log in/i)
+        user.click(trigger)
 
-    // open forgot password modal
-    const withinCard = within(screen.getByTestId('sf-toggle-card-step-0'))
-    const openModal = withinCard.getByText(/Forgot password\?/i)
-    user.click(openModal)
+        // open forgot password modal
+        const withinCard = within(screen.getByTestId('sf-toggle-card-step-0'))
+        const openModal = withinCard.getByText(/Forgot password\?/i)
+        user.click(openModal)
 
-    // check that forgot password modal is open
-    const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
-    expect(withinForm.getByText(/Reset Password/i)).toBeInTheDocument()
+        // check that forgot password modal is open
+        const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
+        expect(withinForm.getByText(/Reset Password/i)).toBeInTheDocument()
+    })
 })

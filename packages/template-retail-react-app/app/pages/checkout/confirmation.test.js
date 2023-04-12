@@ -14,6 +14,7 @@ import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import Confirmation from './confirmation'
 import {mockOrder, mockProducts} from './confirmation.mock'
+import {createServer} from '../../../jest-setup'
 
 const MockedComponent = () => {
     return (
@@ -25,15 +26,22 @@ const MockedComponent = () => {
     )
 }
 
+const handlers = [
+    {
+        path: '*/orders/:orderId',
+        res: () => {
+            return mockOrder
+        }
+    },
+    {
+        path: '*/products',
+        res: () => {
+            return mockProducts
+        }
+    }
+]
+
 beforeEach(() => {
-    global.server.use(
-        rest.get('*/orders/:orderId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrder))
-        }),
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockProducts))
-        })
-    )
     window.history.pushState(
         {},
         'Checkout',
@@ -41,70 +49,80 @@ beforeEach(() => {
     )
 })
 
-test('Renders the order detail', async () => {
-    renderWithProviders(<MockedComponent />)
-    const el = await screen.findByText(mockOrder.orderNo)
-    expect(el).toBeInTheDocument()
-})
-
-test('Renders the Create Account form for guest customer', async () => {
-    renderWithProviders(<MockedComponent />, {
-        wrapperProps: {isGuest: true}
+describe('Confirmation checkout', function () {
+    const {prependHandlersToServer} = createServer(handlers)
+    test('Renders the order detail', async () => {
+        renderWithProviders(<MockedComponent />)
+        const el = await screen.findByText(mockOrder.orderNo)
+        expect(el).toBeInTheDocument()
     })
 
-    const button = await screen.findByRole('button', {name: /create account/i})
-    expect(button).toBeInTheDocument()
+    test('Renders the Create Account form for guest customer', async () => {
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {isGuest: true}
+        })
 
-    // Email should already have been auto-filled
-    const email = await screen.findByText(mockOrder.customerInfo.email)
-    expect(email).toBeInTheDocument()
+        const button = await screen.findByRole('button', {name: /create account/i})
+        expect(button).toBeInTheDocument()
 
-    const password = screen.getByLabelText('Password')
-    expect(password).toBeInTheDocument()
-})
+        // Email should already have been auto-filled
+        const email = await screen.findByText(mockOrder.customerInfo.email)
+        expect(email).toBeInTheDocument()
 
-test('Create Account form - renders error message', async () => {
-    global.server.use(
-        rest.post('*/customers', (_, res, ctx) => {
-            const failedAccountCreation = {
-                title: 'Login Already In Use',
-                type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/login-already-in-use',
-                detail: 'The login is already in use.'
+        const password = screen.getByLabelText('Password')
+        expect(password).toBeInTheDocument()
+    })
+
+    test('Create Account form - renders error message', async () => {
+        prependHandlersToServer([
+            {
+                path: '*/customers',
+                method: 'post',
+                status: 404,
+                res: () => {
+                    const failedAccountCreation = {
+                        title: 'Login Already In Use',
+                        type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/login-already-in-use',
+                        detail: 'The login is already in use.'
+                    }
+                    return failedAccountCreation
+                }
             }
-            return res(ctx.status(400), ctx.json(failedAccountCreation))
-        })
-    )
+        ])
 
-    renderWithProviders(<MockedComponent />, {
-        wrapperProps: {isGuest: true}
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {isGuest: true}
+        })
+
+        const createAccountButton = await screen.findByRole('button', {name: /create account/i})
+        const passwordEl = await screen.findByLabelText('Password')
+        user.type(passwordEl, 'P4ssword!')
+        user.click(createAccountButton)
+        const alert = await screen.findByRole('alert')
+        expect(alert).toBeInTheDocument()
     })
 
-    const createAccountButton = await screen.findByRole('button', {name: /create account/i})
-    const passwordEl = await screen.findByLabelText('Password')
-    user.type(passwordEl, 'P4ssword!')
-    user.click(createAccountButton)
-    const alert = await screen.findByRole('alert')
-    expect(alert).toBeInTheDocument()
-})
+    test('Create Account form - successful submission results in redirect to the Account page', async () => {
+        prependHandlersToServer([
+            {
+                path: '*/customers',
+                method: 'post',
+                status: 200
+            }
+        ])
 
-test('Create Account form - successful submission results in redirect to the Account page', async () => {
-    global.server.use(
-        rest.post('*/customers', (_, res, ctx) => {
-            return res(ctx.status(200))
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {isGuest: true}
         })
-    )
 
-    renderWithProviders(<MockedComponent />, {
-        wrapperProps: {isGuest: true}
-    })
+        const createAccountButton = await screen.findByRole('button', {name: /create account/i})
+        const password = screen.getByLabelText('Password')
 
-    const createAccountButton = await screen.findByRole('button', {name: /create account/i})
-    const password = screen.getByLabelText('Password')
+        user.type(password, 'P4ssword!')
+        user.click(createAccountButton)
 
-    user.type(password, 'P4ssword!')
-    user.click(createAccountButton)
-
-    await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/account')
+        await waitFor(() => {
+            expect(window.location.pathname).toEqual('/uk/en-GB/account')
+        })
     })
 })
