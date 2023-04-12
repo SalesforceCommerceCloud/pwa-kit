@@ -7,10 +7,11 @@
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 import mockConfig from '../../../config/mocks/default'
+import {createServer} from '../../../jest-setup'
+import {mockCustomerBaskets} from '../../mocks/mock-data'
 
 const mockRegisteredCustomer = {
     authType: 'registered',
@@ -30,108 +31,122 @@ const MockedComponent = () => {
     )
 }
 
+const handlers = [
+    {
+        path: '*/customers',
+        method: 'post',
+        res: () => {
+            return mockRegisteredCustomer
+        }
+    },
+    {
+        path: '*/customers/:customerId',
+        res: () => {
+            return mockRegisteredCustomer
+        }
+    },
+    {
+        path: '*/customers/:customerId/baskets',
+        res: () => {
+            return mockCustomerBaskets
+        }
+    }
+]
+
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
+
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
-    global.server.use(
-        rest.post('*/customers', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
-        }),
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            const {customerId} = req.params
-            if (customerId === 'customerId') {
-                return res(
-                    ctx.delay(0),
-                    ctx.status(200),
-                    ctx.json({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                )
-            }
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
-        })
-    )
 })
+
 afterEach(() => {
     jest.resetModules()
     localStorage.clear()
-    jest.clearAllMocks()
+
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 
-test('Allows customer to go to sign in page', async () => {
-    // render our test component
-    await renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+describe('Reset password', function () {
+    const {prependHandlersToServer} = createServer(handlers)
+    test('should allow customer to go to sign in page', async () => {
+        // render our test component
+        await renderWithProviders(<MockedComponent />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        user.click(await screen.findByText('Sign in'))
+
+        await waitFor(() => {
+            expect(window.location.pathname).toEqual('/uk/en-GB/login')
+        })
     })
 
-    user.click(await screen.findByText('Sign in'))
+    test('should allow customer to generate password token', async () => {
+        prependHandlersToServer([
+            {
+                path: '*/create-reset-token',
+                method: 'post',
+                res: () => {
+                    return {
+                        email: 'foo@test.com',
+                        expiresInMinutes: 10,
+                        login: 'foo@test.com',
+                        resetToken: 'testresettoken'
+                    }
+                }
+            }
+        ])
+        // render our test component
+        await renderWithProviders(<MockedComponent />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
 
-    await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/login')
-    })
-})
-
-test('Allows customer to generate password token', async () => {
-    global.server.use(
-        rest.post('*/create-reset-token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    email: 'foo@test.com',
-                    expiresInMinutes: 10,
-                    login: 'foo@test.com',
-                    resetToken: 'testresettoken'
-                })
-            )
+        // enter credentials and submit
+        user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+        user.click(
+            within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
         )
-    )
-    // render our test component
-    await renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+
+        expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
+
+        await waitFor(() => {
+            expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+        })
+
+        await waitFor(() => {
+            user.click(screen.getByText('Back to Sign In'))
+        })
+
+        await waitFor(() => {
+            expect(window.location.pathname).toEqual('/uk/en-GB/login')
+        })
     })
 
-    // enter credentials and submit
-    user.type(await screen.findByLabelText('Email'), 'foo@test.com')
-    user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    test('Renders error message from server', async () => {
+        prependHandlersToServer([
+            {
+                path: '*/create-reset-token',
+                method: 'post',
+                status: 500,
+                res: () => {
+                    return {
+                        detail: 'Something went wrong',
+                        title: 'Error',
+                        type: '/error'
+                    }
+                }
+            }
+        ])
+        await renderWithProviders(<MockedComponent />)
 
-    expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
-
-    await waitFor(() => {
-        expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
-    })
-
-    await waitFor(() => {
-        user.click(screen.getByText('Back to Sign In'))
-    })
-
-    await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/login')
-    })
-})
-
-test('Renders error message from server', async () => {
-    global.server.use(
-        rest.post('*/create-reset-token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.status(500),
-                ctx.json({
-                    detail: 'Something went wrong',
-                    title: 'Error',
-                    type: '/error'
-                })
-            )
+        user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+        user.click(
+            within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
         )
-    )
-    await renderWithProviders(<MockedComponent />)
 
-    user.type(await screen.findByLabelText('Email'), 'foo@test.com')
-    user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
-
-    await waitFor(() => {
-        expect(screen.getByText('500 Internal Server Error')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByText('500 Internal Server Error')).toBeInTheDocument()
+        })
     })
 })

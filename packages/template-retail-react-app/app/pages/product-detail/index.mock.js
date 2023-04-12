@@ -5,55 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export const basketWithProductSet = {
-    _v: '21.3',
-    _type: 'basket',
-    _resource_state: '9fdc9a8aeaea84a84a9dfed115ad37a0a32c86df4693cc7a9f62afc3395527c7',
-    _flash: [
-        {
-            _type: 'flash',
-            type: 'PaymentMethodRequired',
-            message:
-                'No payment method ID was specified. Please provide a valid payment method ID.',
-            path: '$.payment_instruments[0].payment_method_id'
-        },
-        {
-            _type: 'flash',
-            type: 'BillingAddressRequired',
-            message: 'No billing address was specified. Please provide a valid billing address.',
-            path: '$.billing_address'
-        },
-        {
-            _type: 'flash',
-            type: 'OrderTotalNotSet',
-            message: 'Order total missing, calculation failed.',
-            path: '$.order_total'
-        },
-        {
-            _type: 'flash',
-            type: 'ShippingAddressRequired',
-            message: 'No shipping address was specified. Please provide a valid shipping address.',
-            path: '$.shipments[0].shipping_address',
-            details: {
-                shipmentId: 'me'
-            }
-        },
-        {
-            _type: 'flash',
-            type: 'ShippingMethodRequired',
-            message:
-                'No shipping method ID was specified. Please provide a valid shipping method ID.',
-            path: '$.shipments[0].shipping_method',
-            details: {
-                shipmentId: 'me'
-            }
-        },
-        {
-            _type: 'flash',
-            type: 'ShippingItemAdjustedPriceNotSet',
-            message: "Price missing for shipping item ''5fb887a2999303b33676e0d3a5''.",
-            path: '$.shipping_items[0].adjusted_price'
-        }
-    ],
     adjusted_merchandize_total_tax: 17.01,
     adjusted_shipping_total_tax: null,
     agent_basket: false,

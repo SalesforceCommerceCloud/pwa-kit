@@ -12,15 +12,11 @@ import {
     productsResponse
 } from '../../mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
-import {rest} from 'msw'
 import ProductDetail from '.'
 import {renderWithProviders} from '../../utils/test-utils'
 import {basketWithProductSet} from './index.mock'
 import mockedProductSet from '../../mocks/product-set-winter-lookM'
-
-jest.setTimeout(60000)
-
-jest.useFakeTimers()
+import {createServer} from '../../../jest-setup'
 
 const MockedComponent = () => {
     return (
@@ -33,21 +29,23 @@ const MockedComponent = () => {
     )
 }
 
+const handlers = [
+    {
+        path: '*/customers/:customerId/baskets',
+        res: () => {
+            return mockCustomerBaskets
+        }
+    },
+    {
+        path: '*/customers/:customerId/product-lists',
+        res: () => {
+            return mockedCustomerProductLists
+        }
+    }
+]
+
 beforeEach(() => {
     jest.resetModules()
-
-    global.server.use(
-        // By default, the page will be rendered with a product set
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductSet))
-        }),
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
-        }),
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedCustomerProductLists))
-        })
-    )
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
@@ -58,35 +56,40 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test('should render product details page', async () => {
-    global.server.use(
-        // Use a single product (and not a product set)
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(productsResponse.data[0]))
+describe('Product detail', function () {
+    createServer([
+        ...handlers,
+        {
+            path: '*/products/:productId',
+            res: () => {
+                return productsResponse.data[0]
+            }
+        }
+    ])
+    test('should render product details page', async () => {
+        renderWithProviders(<MockedComponent />)
+
+        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getAllByText(/Long Sleeve Crew Neck/).length).toEqual(2)
+            expect(screen.getAllByText(/14.99/).length).toEqual(2)
+            expect(screen.getAllByText(/Add to Cart/).length).toEqual(2)
+            expect(screen.getAllByText(/Add to Wishlist/).length).toEqual(2)
+            expect(screen.getAllByTestId('product-view').length).toEqual(1)
         })
-    )
-
-    renderWithProviders(<MockedComponent />)
-
-    expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-    await waitFor(() => {
-        expect(screen.getAllByText(/Long Sleeve Crew Neck/).length).toEqual(2)
-        expect(screen.getAllByText(/14.99/).length).toEqual(2)
-        expect(screen.getAllByText(/Add to Cart/).length).toEqual(2)
-        expect(screen.getAllByText(/Add to Wishlist/).length).toEqual(2)
-        expect(screen.getAllByTestId('product-view').length).toEqual(1)
     })
 })
 
 describe('product set', () => {
-    beforeEach(() => {
-        global.server.use(
-            // For adding items to basket
-            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-                return res(ctx.json(basketWithProductSet))
-            })
-        )
-    })
+    const {prependHandlersToServer} = createServer([
+        ...handlers,
+        {
+            path: '*/products/:productId',
+            res: () => {
+                return mockedProductSet
+            }
+        }
+    ])
 
     test('render multi-product layout', async () => {
         renderWithProviders(<MockedComponent />)
@@ -100,6 +103,15 @@ describe('product set', () => {
     })
 
     test('add the set to cart successfully', async () => {
+        prependHandlersToServer([
+            {
+                path: '*/baskets/:basketId/items',
+                method: 'post',
+                res: () => {
+                    return basketWithProductSet
+                }
+            }
+        ])
         const urlPathAfterSelectingAllVariants =
             '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)

@@ -7,10 +7,40 @@
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import HomePage from './index'
+import {
+    mockCustomerBaskets,
+    mockedRegisteredCustomer,
+    mockProductSearch
+} from '../../mocks/mock-data'
+import {createServer} from '../../../jest-setup'
 
-test('Home Page renders without errors', async () => {
-    const {getByTestId} = renderWithProviders(<HomePage />)
+const handlers = [
+    {
+        path: '*/customers/:customerId/baskets',
+        res: () => {
+            return mockCustomerBaskets
+        }
+    },
+    {
+        path: '*/customers/:customerId',
+        res: () => {
+            return mockedRegisteredCustomer
+        }
+    },
+    {
+        path: '*/product-search',
+        res: () => {
+            return mockProductSearch
+        }
+    }
+]
 
-    expect(getByTestId('home-page')).toBeInTheDocument()
-    expect(typeof HomePage.getTemplateName()).toEqual('string')
+describe('Home page', function () {
+    createServer(handlers)
+    test('should render without errors', async () => {
+        const {getByTestId} = renderWithProviders(<HomePage />)
+
+        expect(getByTestId('home-page')).toBeInTheDocument()
+        expect(typeof HomePage.getTemplateName()).toEqual('string')
+    })
 })

@@ -8,6 +8,8 @@ import React from 'react'
 import PageNotFound from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {screen} from '@testing-library/react'
+import {createServer} from '../../../jest-setup'
+import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
 
 // Set up and clean up
 beforeEach(() => {
@@ -18,14 +20,30 @@ const MockedComponent = () => {
     return <PageNotFound />
 }
 
-test('renders product item name, attributes and price', () => {
-    renderWithProviders(<MockedComponent />)
+describe('Page not found', function () {
+    createServer([
+        {
+            path: '*/customers/:customerId',
+            res: () => {
+                return mockedRegisteredCustomer
+            }
+        },
+        {
+            path: '*/customers/:customerId/baskets',
+            res: () => {
+                return mockCustomerBaskets
+            }
+        }
+    ])
+    test('renders product item name, attributes and price', () => {
+        renderWithProviders(<MockedComponent />)
 
-    expect(screen.getByText(/The page you're looking for can't be found/i)).toBeInTheDocument()
-    expect(
-        screen.getByText(
-            /Please try retyping the address, going back to the previous page, or going to the home page./i
-        )
-    ).toBeInTheDocument()
-    expect(screen.getByText(/Go to home page/i)).toBeInTheDocument()
+        expect(screen.getByText(/The page you're looking for can't be found/i)).toBeInTheDocument()
+        expect(
+            screen.getByText(
+                /Please try retyping the address, going back to the previous page, or going to the home page./i
+            )
+        ).toBeInTheDocument()
+        expect(screen.getByText(/Go to home page/i)).toBeInTheDocument()
+    })
 })
