@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {mockCustomerBaskets} from './app/mocks/mock-data'
+
 const path = require('path')
 const mockConfig = require(path.join(__dirname, 'config/mocks/default.js'))
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
@@ -188,6 +190,18 @@ const defaultHandlers = [
         }
     },
     {
+        path: '*/customers',
+        res: () => {
+            return mockedRegisteredCustomer
+        }
+    },
+    {
+        path: '*/customers/:customerId/baskets',
+        res: () => {
+            return mockCustomerBaskets
+        }
+    },
+    {
         path: '*/sessions',
         method: 'post'
     },
@@ -233,6 +247,7 @@ const defaultHandlers = [
 
 const setupHandlers = (handlerConfig = [], defaultHandlers = []) => {
     return [...defaultHandlers, ...handlerConfig].map((config) => {
+        console.log('config.path', config.path)
         return rest[config.method?.toLowerCase() || 'get'](config.path, (req, res, ctx) => {
             return res(
                 ctx.delay(0),

@@ -15,8 +15,7 @@ import {
     mockShippingMethods,
     mockCustomerBaskets,
     mockEmptyBasket,
-    mockCartVariant,
-    mockedCustomerProductLists
+    mockCartVariant
 } from '../../mocks/mock-data'
 import mockVariant from '../../mocks/variant-750518699578M'
 import {createServer} from '../../../jest-setup'
@@ -200,8 +199,9 @@ const cartHandlers = [
 ]
 
 describe('Empty cart tests', function () {
-    createServer([
-        ...cartHandlers,
+    const {prependHandlersToServer} = createServer(cartHandlers)
+
+    prependHandlersToServer([
         {
             path: '*/customers/:customerId/baskets',
             res: () => {
@@ -217,8 +217,8 @@ describe('Empty cart tests', function () {
 })
 
 describe('Rendering tests', function () {
-    createServer([
-        ...cartHandlers,
+    const {prependHandlersToServer} = createServer(cartHandlers)
+    prependHandlersToServer([
         {
             path: '*/customers/:customerId/baskets',
             res: () => {
@@ -345,12 +345,6 @@ describe('Remove item from cart', function () {
             }
         },
         {
-            path: '*/customers/:customerId/baskets',
-            res: () => {
-                return mockCustomerBaskets
-            }
-        },
-        {
             path: '*/baskets/:basket/items/:itemId',
             method: 'delete',
             res: () => {
@@ -393,14 +387,8 @@ describe('Remove item from cart', function () {
 })
 
 describe('Coupons tests', function () {
-    createServer([
+    const {prependHandlersToServer} = createServer([
         ...cartHandlers,
-        {
-            path: '*/customers/:customerId/baskets',
-            res: () => {
-                return {baskets: [mockCustomerBasketsWithSuit], total: 1}
-            }
-        },
         {
             path: '*/baskets/:basketId/coupons',
             method: 'post',
@@ -466,6 +454,16 @@ describe('Coupons tests', function () {
             }
         }
     ])
+
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId/baskets',
+            res: () => {
+                return {baskets: [mockCustomerBasketsWithSuit], total: 1}
+            }
+        }
+    ])
+
     test('Can apply and remove product-level coupon code with promotion', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()

@@ -12,7 +12,7 @@ import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import mockConfig from '../../../config/mocks/default'
-import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {mockedRegisteredCustomer} from '../../mocks/mock-data'
 import {createServer} from '../../../jest-setup'
 
 const MockedComponent = () => {
@@ -41,18 +41,6 @@ const handlers = [
                 enc_user_id: 'testEncUserId',
                 id_token: 'testIdToken'
             }
-        }
-    },
-    {
-        path: '*/customers/:customerId/baskets',
-        res: () => {
-            return mockCustomerBaskets
-        }
-    },
-    {
-        path: '*/customers/:customerId',
-        res: () => {
-            return mockedRegisteredCustomer
         }
     },
     {

@@ -10,6 +10,7 @@ import {screen} from '@testing-library/react'
 
 import {renderWithProviders} from '../../../utils/test-utils'
 import CheckboxRefinements from './checkbox-refinements'
+import {createServer} from '../../../../jest-setup'
 
 const data = {
     attributeId: 'c_refinementColor',
@@ -37,6 +38,7 @@ const data = {
 }
 
 describe('Components', function () {
+    createServer()
     test('renders without crashing', async () => {
         const onToggleFilter = jest.fn()
         renderWithProviders(

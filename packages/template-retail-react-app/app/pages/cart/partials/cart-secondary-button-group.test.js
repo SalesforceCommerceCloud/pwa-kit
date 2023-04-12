@@ -13,7 +13,7 @@ import CartSecondaryButtonGroup from './cart-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {noop} from '../../../utils/utils'
-
+import {createServer} from '../../../../jest-setup'
 const MockedComponent = ({
     onAddToWishlistClick = noop,
     onEditClick = noop,
@@ -41,64 +41,67 @@ beforeEach(() => {
     jest.resetModules()
 })
 
-test('renders secondary action component', async () => {
-    renderWithProviders(<MockedComponent />)
-    const removeButton = screen.getByRole('button', {
-        name: /remove/i
-    })
-    expect(removeButton).toBeInTheDocument()
-    user.click(removeButton)
+describe('Cart Secondary buttons group', function () {
+    createServer()
+    test('renders secondary action component', async () => {
+        renderWithProviders(<MockedComponent />)
+        const removeButton = screen.getByRole('button', {
+            name: /remove/i
+        })
+        expect(removeButton).toBeInTheDocument()
+        user.click(removeButton)
 
-    const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
-    await waitFor(() => {
-        // Chakra UI renders multiple elements with toast title in DOM for accessibility.
-        // We need to assert the actual text within the alert
-        expect(confirmButton).toBeInTheDocument()
-    })
-})
-
-test('renders secondary with event handlers', async () => {
-    const onRemoveItemClick = jest.fn()
-    const onEditClick = jest.fn()
-    const onAddToWishlistClick = jest.fn()
-
-    renderWithProviders(
-        <MockedComponent
-            onAddToWishlistClick={onAddToWishlistClick}
-            onEditClick={onEditClick}
-            onRemoveItemClick={onRemoveItemClick}
-        />
-    )
-
-    const editButton = screen.getByRole('button', {
-        name: /Edit/i
+        const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
+        await waitFor(() => {
+            // Chakra UI renders multiple elements with toast title in DOM for accessibility.
+            // We need to assert the actual text within the alert
+            expect(confirmButton).toBeInTheDocument()
+        })
     })
 
-    expect(editButton).toBeInTheDocument()
-    user.click(editButton)
-    expect(onEditClick).toHaveBeenCalledTimes(1)
+    test('renders secondary with event handlers', async () => {
+        const onRemoveItemClick = jest.fn()
+        const onEditClick = jest.fn()
+        const onAddToWishlistClick = jest.fn()
 
-    const addToWishlistButton = screen.getByRole('button', {
-        name: /Add to wishlist/i
+        renderWithProviders(
+            <MockedComponent
+                onAddToWishlistClick={onAddToWishlistClick}
+                onEditClick={onEditClick}
+                onRemoveItemClick={onRemoveItemClick}
+            />
+        )
+
+        const editButton = screen.getByRole('button', {
+            name: /Edit/i
+        })
+
+        expect(editButton).toBeInTheDocument()
+        user.click(editButton)
+        expect(onEditClick).toHaveBeenCalledTimes(1)
+
+        const addToWishlistButton = screen.getByRole('button', {
+            name: /Add to wishlist/i
+        })
+        user.click(addToWishlistButton)
+        expect(onAddToWishlistClick).toHaveBeenCalledTimes(1)
+
+        const removeButton = screen.getByRole('button', {
+            name: /remove/i
+        })
+
+        expect(removeButton).toBeInTheDocument()
+
+        user.click(removeButton)
+
+        const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
+        await waitFor(() => {
+            // Chakra UI renders multiple elements with toast title in DOM for accessibility.
+            // We need to assert the actual text within the alert
+            expect(confirmButton).toBeInTheDocument()
+        })
+        user.click(confirmButton)
+
+        expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
     })
-    user.click(addToWishlistButton)
-    expect(onAddToWishlistClick).toHaveBeenCalledTimes(1)
-
-    const removeButton = screen.getByRole('button', {
-        name: /remove/i
-    })
-
-    expect(removeButton).toBeInTheDocument()
-
-    user.click(removeButton)
-
-    const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
-    await waitFor(() => {
-        // Chakra UI renders multiple elements with toast title in DOM for accessibility.
-        // We need to assert the actual text within the alert
-        expect(confirmButton).toBeInTheDocument()
-    })
-    user.click(confirmButton)
-
-    expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
 })

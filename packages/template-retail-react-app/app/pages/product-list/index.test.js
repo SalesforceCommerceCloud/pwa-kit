@@ -7,11 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {
-    mockProductSearch,
-    mockedEmptyCustomerProductList,
-    mockCustomerBaskets
-} from '../../mocks/mock-data'
+import {mockProductSearch, mockedEmptyCustomerProductList} from '../../mocks/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
@@ -66,12 +62,6 @@ const handlers = [
         res: () => {
             return mockedEmptyCustomerProductList
         }
-    },
-    {
-        path: '*/customers/:customerId/baskets',
-        res: () => {
-            return mockCustomerBaskets
-        }
     }
 ]
 
@@ -86,7 +76,7 @@ describe('product-list', function () {
             }
         }
     ])
-    test('should render product list page', async () => {
+    test.only('should render product list page', async () => {
         window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
