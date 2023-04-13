@@ -119,6 +119,38 @@ export const DevServerMixin = {
      * @private
      */
     _addSDKInternalHandlers(app) {
+        this._t(app)
+
+        setInterval(() => {
+            console.log('periodic refresh')
+            if (global._) {
+                console.log('found lodash remove it')
+                delete global._
+                delete global['__core-js_shared__']
+                delete global['AbortController']
+                delete global.__createBinding
+            }
+        }, 1000)
+
+        app.use('/__mrt/dump', () => {
+            console.log('dump memory')
+            console.log(app.__compiler)
+            app.__compiler.hooks.done.taps = []
+            app.__compiler.hooks = {}
+            // app.__devMiddleware.close(() => console.log('shut down dev middleware'))
+            // app.__compiler = undefined
+            // app.__devMiddleware = undefined
+            // app.__webpackReady = undefined
+            // app.__hotServerMiddleware = undefined
+            // app.__hmrMiddleware = undefined
+
+            // app.use('/mobify/bundle/development', () => undefined)
+            // app.use('/__mrt/hmr', () => undefined)
+        })
+    },
+
+    _t(app) {
+        console.log('create new webpack instance')
         // This is separated out because these routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
 
@@ -129,7 +161,7 @@ export const DevServerMixin = {
             config = require(projectWebpackPath)
         }
         app.__compiler = webpack(config)
-        app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
+        app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true, writeToDisk:true})
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
         app.__devMiddleware.waitUntilValid(() => {
             // Be just a little more generous before letting eg. Lighthouse hit it!

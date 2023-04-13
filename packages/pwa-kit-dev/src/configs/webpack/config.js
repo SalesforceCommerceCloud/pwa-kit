@@ -354,7 +354,7 @@ const renderer =
                 name: SERVER,
                 entry: 'pwa-kit-react-sdk/ssr/server/react-rendering.js',
                 // use eval-source-map for server-side debugging
-                devtool: mode === development ? 'eval-source-map' : false,
+                devtool: false,
                 output: {
                     path: buildDir,
                     filename: 'server-renderer.js',
