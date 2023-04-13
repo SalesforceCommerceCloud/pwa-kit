@@ -218,16 +218,16 @@ export function createServer(handlerConfig) {
     }
 
     beforeEach(() => {
-        jest.spyOn(console, 'error')
+        // jest.spyOn(console, 'error')
         // jest.spyOn(console, 'warn')
-        console.error.mockImplementation(() => {})
+        // console.error.mockImplementation(() => {})
         // console.warn.mockImplementation(() => {})
     })
     beforeAll(() => {
         server.listen()
     })
     afterEach(() => {
-        console.error.mockRestore()
+        // console.error.mockRestore()
         // console.warn.mockRestore()
         server.resetHandlers()
     })
