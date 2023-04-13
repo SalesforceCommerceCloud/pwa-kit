@@ -377,12 +377,9 @@ describe('Remove item from cart', function () {
             return
         }
 
-        await waitFor(
-            () => {
-                expect(screen.getByTestId('sf-cart-empty')).toBeInTheDocument()
-            },
-            {timeout: 20000}
-        )
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-empty')).toBeInTheDocument()
+        })
     })
 })
 

@@ -32,7 +32,11 @@ const SAMPLE_DATA = {
 }
 
 test('Page renders correct component', () => {
-    const {getByText} = renderWithProviders(<ImageWithText {...SAMPLE_DATA} />)
+    const {getByText} = renderWithProviders(<ImageWithText {...SAMPLE_DATA} />, {
+        wrapperProps: {
+            withCommerceApiProvider: false
+        }
+    })
 
     expect(getByText(/image with text component/i)).toBeInTheDocument()
 })

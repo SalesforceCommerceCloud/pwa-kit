@@ -62,7 +62,12 @@ test('MobileGrid2r2c renders without errors', () => {
                     id: 'column4'
                 }
             ]}
-        />
+        />,
+        {
+            wrapperProps: {
+                withCommerceApiProvider: false
+            }
+        }
     )
     expect(document.querySelector('.mobile-2r-2c')).not.toBeNull()
 })

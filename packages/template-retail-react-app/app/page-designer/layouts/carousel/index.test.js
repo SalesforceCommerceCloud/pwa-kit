@@ -20,7 +20,11 @@ const SAMPLE_REGION = {
 }
 
 test('Carousel renders without errors', () => {
-    const {getByTestId} = renderWithProviders(<Carousel regions={[]} />)
+    const {getByTestId} = renderWithProviders(<Carousel regions={[]} />, {
+        wrapperProps: {
+            withCommerceApiProvider: false
+        }
+    })
 
     expect(getByTestId('carousel')).toBeDefined()
     expect(getByTestId('carousel-container')).toBeDefined()
@@ -32,7 +36,12 @@ test('Carousel renders without errors', () => {
 test('Carousel renders region/children without errors', () => {
     const CarouselWithPageProvider = withPageProvider(Carousel)
     const {getByTestId} = renderWithProviders(
-        <CarouselWithPageProvider regions={[SAMPLE_REGION]} />
+        <CarouselWithPageProvider regions={[SAMPLE_REGION]} />,
+        {
+            wrapperProps: {
+                withCommerceApiProvider: false
+            }
+        }
     )
 
     expect(getByTestId('carousel')).toBeDefined()
