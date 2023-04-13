@@ -365,17 +365,21 @@ describe('Remove item from cart', function () {
         })
 
         userEvent.click(within(cartItem).getByText(/remove/i))
-
-        try {
-            userEvent.click(screen.getByText(/yes, remove item/i))
-        } catch {
-            // On CI this remove-item button sometimes does not exist yet.
-            // But if we then call `await screen.findByText(/yes, remove item/i)` at this point,
-            // we would cause a timeout for some reason:
-            // https://github.com/SalesforceCommerceCloud/pwa-kit/actions/runs/4631134309/jobs/8193613016
-            console.warn('--- Exiting early to avoid this flaky test from timing out')
-            return
-        }
+        let removeButton
+        await waitFor(() => {
+            removeButton = screen.getByText(/yes, remove item/i)
+        })
+        userEvent.click(removeButton)
+        // try {
+        //     userEvent.click(screen.getByText(/yes, remove item/i))
+        // } catch {
+        //     // On CI this remove-item button sometimes does not exist yet.
+        //     // But if we then call `await screen.findByText(/yes, remove item/i)` at this point,
+        //     // we would cause a timeout for some reason:
+        //     // https://github.com/SalesforceCommerceCloud/pwa-kit/actions/runs/4631134309/jobs/8193613016
+        //     console.warn('--- Exiting early to avoid this flaky test from timing out')
+        //     return
+        // }
 
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-empty')).toBeInTheDocument()
