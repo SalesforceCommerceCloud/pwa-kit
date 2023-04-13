@@ -5,8 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* eslint-env jest */
-
 // TODO: The methods tested in this file have been split from one file into
 // multiple, so the tests should be split into multiple files as well.
 

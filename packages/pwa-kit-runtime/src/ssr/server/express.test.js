@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* eslint-env jest */
 import fse from 'fs-extra'
 import https from 'https'
 import nock from 'nock'
@@ -468,7 +467,7 @@ describe('SSRServer operation', () => {
                 expect(response.headers['location'].endsWith('/elsewhere')).toBe(true)
             })
     })
-    test('should warn about non-strict SSL ', () => {
+    test('should warn about non-strict SSL', () => {
         const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             res.redirect(302, '/elsewhere')
