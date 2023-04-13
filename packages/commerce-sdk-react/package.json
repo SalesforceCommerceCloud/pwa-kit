@@ -17,7 +17,7 @@
   "files": [
     "CHANGELOG.md",
     "LICENSE",
-    "+(auth|hooks|scripts)/**/!(*.test*).{ts,js}",
+    "+(auth|components|hooks|scripts)/**/!(*.test*).{ts,js}",
     "*.{js,d.ts}",
     "!*.test*.{js,d.ts}",
     "!test*.*",
