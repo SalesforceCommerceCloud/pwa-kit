@@ -21,6 +21,7 @@ type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
+    clientSecret: string
     proxy: string
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
@@ -138,12 +139,14 @@ class Auth {
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
+    private clientSecret: string | undefined
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
             proxy: config.proxy,
             parameters: {
                 clientId: config.clientId,
+                clientSecret: config.clientId,
                 organizationId: config.organizationId,
                 shortCode: config.shortCode,
                 siteId: config.siteId
@@ -162,6 +165,8 @@ class Auth {
             throwOnBadResponse: true,
             fetchOptions: config.fetchOptions
         })
+
+        this.clientSecret = config.clientSecret // Change this with mechanism for getting secret from MRT
 
         const storageOptions = {keyPrefix: config.siteId}
         const serverStorageOptions = {
@@ -327,7 +332,11 @@ class Auth {
             }
         }
         return this.queueRequest(
-            () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
+            () =>
+                helpers.loginGuestUser(this.client, {
+                    redirectURI: this.redirectURI,
+                    clientSecret: this.clientSecret
+                }),
             true
         )
     }
@@ -353,11 +362,13 @@ class Auth {
     async loginGuestUser() {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
+        const clientSecret = this.clientSecret
         const isGuest = true
         return this.queueRequest(
             () =>
                 helpers.loginGuestUser(this.client, {
                     redirectURI,
+                    clientSecret,
                     ...(usid && {usid})
                 }),
             isGuest
@@ -398,9 +409,11 @@ class Auth {
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
+        const clientSecret = this.clientSecret
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(this.client, credentials, {
             redirectURI,
+            clientSecret,
             ...(usid && {usid})
         })
         this.handleTokenResponse(token, isGuest)

@@ -26,6 +26,7 @@ export const DEFAULT_TEST_CONFIG = {
     proxy: `${DEFAULT_TEST_HOST}/mobify/proxy/api`,
     redirectURI: `${DEFAULT_TEST_HOST}/callback`,
     clientId: '12345678-1234-1234-1234-123412341234',
+    clientSecret: 'abc123',
     organizationId: 'f_ecom_zzrmy_orgf_001',
     shortCode: '12345678',
     siteId: 'RefArchGlobal',

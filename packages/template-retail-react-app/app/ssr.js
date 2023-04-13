@@ -12,6 +12,8 @@ const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 const helmet = require('helmet')
 
+// const {helpers, ShopperLogin} = require('commerce-sdk-isomorphic')
+
 const options = {
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),
@@ -63,6 +65,39 @@ const {handler} = runtime.createHandler(options, (app) => {
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
     app.get('*', runtime.render)
+
+    // Handle client secret for SLAS
+    app.post('/auth', async (req, res) => {
+        /*
+        const client = CommerceSDK({secret: process.env.SECRET})
+        const tokenResponse = await client.doTokenDance()
+        return res.json(tokenResponse)
+        */
+
+        // const client = new ShopperLogin({
+        //     parameters: {
+        //         clientId: `c9c45bfd-0ed3-4aa2-9971-40f88962b836`,
+        //         organizationId: 'f_ecom_zzrf_001',
+        //         shortCode: `8o7m175y`,
+        //         siteId: `RefArchGlobal`
+        //     },
+        //     throwOnBadResponse: true
+        // })
+
+        // let _res
+        // try {
+        //     _res = await helpers.loginGuestUser(client, {
+        //         redirectURI: 'localhost:3000/callback'
+        //     })
+        // } catch (e) {
+        //     _res = e
+        // }
+        // console.log(_res)
+        // res.send(_res)
+
+
+        return null
+    })
 })
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.

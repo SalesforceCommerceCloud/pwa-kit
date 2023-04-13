@@ -28,6 +28,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     locale: string
     currency: string
     redirectURI: string
+    clientSecret: string
     fetchOptions?: ShopperBasketsTypes.FetchOptions
     headers?: Record<string, string>
     fetchedToken?: string
@@ -58,6 +59,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {
         children,
         clientId,
+        clientSecret,
         headers = {},
         organizationId,
         proxy,
@@ -75,6 +77,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         headers,
         parameters: {
             clientId,
+            clientSecret,
             organizationId,
             shortCode,
             siteId,
@@ -99,6 +102,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         }
     }, [
         clientId,
+        clientSecret,
         organizationId,
         shortCode,
         siteId,
@@ -112,6 +116,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const auth = useMemo(() => {
         return new Auth({
             clientId,
+            clientSecret,
             organizationId,
             shortCode,
             siteId,
@@ -122,6 +127,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         })
     }, [
         clientId,
+        clientSecret,
         organizationId,
         shortCode,
         siteId,
@@ -139,6 +145,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         <ConfigContext.Provider
             value={{
                 clientId,
+                clientSecret,
                 headers,
                 organizationId,
                 proxy,
