@@ -20,7 +20,7 @@ import {
 import mockVariant from '../../mocks/variant-750518699578M'
 import {createServer} from '../../../jest-setup'
 import {mockProductLists} from '../../mocks/product-lists'
-import {mockCustomerBasketsWithSuit, mockSuitProduct} from '../../mocks/basket-with-suit'
+import {mockCustomerBasketsWithSuit} from '../../mocks/basket-with-suit'
 
 const mockProduct = {
     ...mockVariant,

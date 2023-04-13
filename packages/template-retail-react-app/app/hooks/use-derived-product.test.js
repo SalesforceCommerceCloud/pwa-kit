@@ -36,7 +36,11 @@ describe('useDerivedProduct hook', () => {
         const history = createMemoryHistory()
         history.push('/test/path?test')
 
-        renderWithProviders(<MockComponent product={mockProductDetail} />)
+        renderWithProviders(<MockComponent product={mockProductDetail} />, {
+            wrapperProps: {
+                withCommerceApiProvider: false
+            }
+        })
 
         expect(screen.getByText(/Quantity: 1/)).toBeInTheDocument()
         expect(
@@ -62,7 +66,11 @@ describe('useDerivedProduct hook', () => {
             }
         }
 
-        renderWithProviders(<MockComponent product={mockData} />)
+        renderWithProviders(<MockComponent product={mockData} />, {
+            wrapperProps: {
+                withCommerceApiProvider: false
+            }
+        })
 
         expect(screen.getByText(/Out of stock/)).toBeInTheDocument()
     })

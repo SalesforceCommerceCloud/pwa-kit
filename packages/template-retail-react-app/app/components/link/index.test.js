@@ -11,6 +11,11 @@ import mockConfig from '../../../config/mocks/default'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createServer} from '../../../jest-setup'
 const originalLocation = window.location
+jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
+    return {
+        getConfig: jest.fn()
+    }
+})
 
 afterEach(() => {
     // Restore `window.location` to the `jsdom` `Location` object

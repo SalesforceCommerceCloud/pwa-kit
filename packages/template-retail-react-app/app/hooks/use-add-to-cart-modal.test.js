@@ -8,8 +8,7 @@ import React from 'react'
 import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
 import {screen} from '@testing-library/react'
-import {rest} from 'msw'
-import {mockCustomerBaskets} from '../mocks/mock-data'
+import {createServer} from '../../jest-setup'
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -564,58 +563,57 @@ const MOCK_PRODUCT = {
 }
 beforeEach(() => {
     jest.resetModules()
-    global.server.use(
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
-        })
-    )
 })
 
-test('Renders AddToCartModal with multiple products', () => {
-    const MOCK_DATA = {
-        product: MOCK_PRODUCT,
-        itemsAdded: [
-            {
-                product: MOCK_PRODUCT,
-                variant: MOCK_PRODUCT.variants[0],
-                quantity: 22
-            },
-            {
-                product: MOCK_PRODUCT,
-                variant: MOCK_PRODUCT.variants[0],
-                quantity: 1
-            }
-        ]
-    }
+describe('AddToCart Modal', function () {
+    createServer()
+    test('Renders AddToCartModal with multiple products', () => {
+        const MOCK_DATA = {
+            product: MOCK_PRODUCT,
+            itemsAdded: [
+                {
+                    product: MOCK_PRODUCT,
+                    variant: MOCK_PRODUCT.variants[0],
+                    id: '701642811388M',
+                    quantity: 22
+                },
+                {
+                    product: MOCK_PRODUCT,
+                    variant: MOCK_PRODUCT.variants[0],
+                    quantity: 1
+                }
+            ]
+        }
 
-    renderWithProviders(
-        <AddToCartModalContext.Provider
-            value={{
-                isOpen: true,
-                data: MOCK_DATA
-            }}
-        >
-            <AddToCartModal />
-        </AddToCartModalContext.Provider>
-    )
+        renderWithProviders(
+            <AddToCartModalContext.Provider
+                value={{
+                    isOpen: true,
+                    data: MOCK_DATA
+                }}
+            >
+                <AddToCartModal />
+            </AddToCartModalContext.Provider>
+        )
 
-    expect(screen.getAllByText(MOCK_PRODUCT.name)[0]).toBeInTheDocument()
-    expect(screen.getByRole('dialog', {name: /23 items added to cart/i})).toBeInTheDocument()
+        expect(screen.getAllByText(MOCK_PRODUCT.name)[0]).toBeInTheDocument()
+        expect(screen.getByRole('dialog', {name: /23 items added to cart/i})).toBeInTheDocument()
 
-    const numOfRowsRendered = screen.getAllByTestId('product-added').length
-    expect(numOfRowsRendered).toEqual(MOCK_DATA.itemsAdded.length)
-})
+        const numOfRowsRendered = screen.getAllByTestId('product-added').length
+        expect(numOfRowsRendered).toEqual(MOCK_DATA.itemsAdded.length)
+    })
 
-test('Do not render when isOpen is false', () => {
-    const {queryByText} = renderWithProviders(
-        <AddToCartModalContext.Provider
-            value={{
-                isOpen: false
-            }}
-        >
-            <AddToCartModal />
-        </AddToCartModalContext.Provider>
-    )
+    test('Do not render when isOpen is false', () => {
+        const {queryByText} = renderWithProviders(
+            <AddToCartModalContext.Provider
+                value={{
+                    isOpen: false
+                }}
+            >
+                <AddToCartModal />
+            </AddToCartModalContext.Provider>
+        )
 
-    expect(queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
+        expect(queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
+    })
 })

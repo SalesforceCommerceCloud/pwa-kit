@@ -14,6 +14,7 @@ import {
     mockBasket,
     mockRecommenderDetails
 } from './einstein-mock-data'
+import {createServer} from '../../jest-setup'
 
 jest.mock('cross-fetch', () => {
     return {
@@ -35,6 +36,7 @@ beforeEach(() => {
 })
 
 describe('EinsteinAPI', () => {
+    createServer()
     test('viewProduct sends expected api request', async () => {
         await einsteinApi.sendViewProduct(mockProduct)
         expect(fetch).toHaveBeenCalledWith(

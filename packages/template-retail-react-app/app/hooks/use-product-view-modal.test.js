@@ -16,7 +16,7 @@ import mockProductDetail from '../mocks/variant-750518699578M'
 import {useProductViewModal} from './use-product-view-modal'
 import {DEFAULT_LOCALE, renderWithProviders} from '../utils/test-utils'
 import messages from '../translations/compiled/en-GB.json'
-import {rest} from 'msw'
+import {createServer} from '../../jest-setup'
 
 jest.mock('commerce-sdk-react-preview', () => {
     const originalModule = jest.requireActual('commerce-sdk-react-preview')
@@ -44,7 +44,6 @@ const mockProduct = {
 const MockComponent = ({product}) => {
     const productViewModalData = useProductViewModal(product)
     const [isShown, setIsShown] = React.useState(false)
-
     return (
         <div>
             <button onClick={() => setIsShown(!isShown)}>Toggle the content</button>
@@ -63,15 +62,15 @@ MockComponent.propTypes = {
     product: PropTypes.object
 }
 
-beforeEach(() => {
-    global.server.use(
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockProduct))
-        })
-    )
-})
-
 describe('useProductViewModal hook', () => {
+    createServer([
+        {
+            path: '*/products/:productId',
+            res: () => {
+                return mockProduct
+            }
+        }
+    ])
     test('return proper data', async () => {
         const history = createMemoryHistory()
         history.push('/test/path')

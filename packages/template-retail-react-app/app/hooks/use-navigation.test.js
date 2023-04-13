@@ -10,6 +10,7 @@ import useNavigation from './use-navigation'
 import mockConfig from '../../config/mocks/default'
 import {renderWithProviders} from '../utils/test-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {createServer} from '../../jest-setup'
 
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {
@@ -54,52 +55,55 @@ const TestComponent = () => {
     )
 }
 
-test('prepends locale and site and calls history.push', () => {
-    getConfig.mockImplementation(() => mockConfig)
-    const {getByTestId} = renderWithProviders(<TestComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+describe('useNavigation', () => {
+    createServer()
+    test('prepends locale and site and calls history.push', () => {
+        getConfig.mockImplementation(() => mockConfig)
+        const {getByTestId} = renderWithProviders(<TestComponent />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        user.click(getByTestId('page1-link'))
+        expect(mockHistoryPush).toHaveBeenCalledWith('/uk/en-GB/page1')
     })
-    user.click(getByTestId('page1-link'))
-    expect(mockHistoryPush).toHaveBeenCalledWith('/uk/en-GB/page1')
-})
 
-test('append locale as path and site as query and calls history.push', () => {
-    const newConfig = {
-        ...mockConfig,
-        app: {
-            ...mockConfig.app,
-            url: {
-                locale: 'path',
-                site: 'query_param',
-                showDefaults: true
+    test('append locale as path and site as query and calls history.push', () => {
+        const newConfig = {
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                url: {
+                    locale: 'path',
+                    site: 'query_param',
+                    showDefaults: true
+                }
             }
         }
-    }
-    getConfig.mockImplementation(() => newConfig)
-    const {getByTestId} = renderWithProviders(<TestComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: newConfig.app}
-    })
-    user.click(getByTestId('page1-link'))
-    expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/page1?site=uk')
-})
-
-test('works for any history method and args', () => {
-    getConfig.mockImplementation(() => mockConfig)
-
-    const {getByTestId} = renderWithProviders(<TestComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        getConfig.mockImplementation(() => newConfig)
+        const {getByTestId} = renderWithProviders(<TestComponent />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: newConfig.app}
+        })
+        user.click(getByTestId('page1-link'))
+        expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/page1?site=uk')
     })
 
-    user.click(getByTestId('page2-link'))
-    expect(mockHistoryReplace).toHaveBeenCalledWith('/uk/en-GB/page2', {})
-})
+    test('works for any history method and args', () => {
+        getConfig.mockImplementation(() => mockConfig)
 
-test('if given the path to root or homepage, will not prepend the locale', () => {
-    getConfig.mockImplementation(() => mockConfig)
+        const {getByTestId} = renderWithProviders(<TestComponent />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
 
-    const {getByTestId} = renderWithProviders(<TestComponent />, {
-        wrapperProps: {siteAlias: 'us', locale: 'en-US'}
+        user.click(getByTestId('page2-link'))
+        expect(mockHistoryReplace).toHaveBeenCalledWith('/uk/en-GB/page2', {})
     })
-    user.click(getByTestId('page4-link'))
-    expect(mockHistoryPush).toHaveBeenCalledWith('/')
+
+    test('if given the path to root or homepage, will not prepend the locale', () => {
+        getConfig.mockImplementation(() => mockConfig)
+
+        const {getByTestId} = renderWithProviders(<TestComponent />, {
+            wrapperProps: {siteAlias: 'us', locale: 'en-US'}
+        })
+        user.click(getByTestId('page4-link'))
+        expect(mockHistoryPush).toHaveBeenCalledWith('/')
+    })
 })

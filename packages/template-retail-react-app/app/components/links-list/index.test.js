@@ -11,6 +11,7 @@ import {screen} from '@testing-library/react'
 
 import {renderWithProviders} from '../../utils/test-utils'
 import LinksList from './index'
+import {createServer} from '../../../jest-setup'
 
 const links = [
     {
@@ -29,16 +30,12 @@ FooterStylesProvider.propTypes = {
 }
 
 describe('Links List', function () {
+    createServer()
     test('renders LinksList with default arguments', () => {
         renderWithProviders(
             <FooterStylesProvider>
                 <LinksList links={links} />
-            </FooterStylesProvider>,
-            {
-                wrapperProps: {
-                    withCommerceApiProvider: false
-                }
-            }
+            </FooterStylesProvider>
         )
 
         expect(screen.getAllByRole('listitem')).toHaveLength(1)
@@ -51,12 +48,7 @@ describe('Links List', function () {
         renderWithProviders(
             <FooterStylesProvider>
                 <LinksList links={links} heading="Customer Support" />
-            </FooterStylesProvider>,
-            {
-                wrapperProps: {
-                    withCommerceApiProvider: false
-                }
-            }
+            </FooterStylesProvider>
         )
 
         expect(screen.getByRole('heading')).toBeInTheDocument()
@@ -66,12 +58,7 @@ describe('Links List', function () {
         renderWithProviders(
             <FooterStylesProvider>
                 <LinksList links={links} variant="horizontal" />
-            </FooterStylesProvider>,
-            {
-                wrapperProps: {
-                    withCommerceApiProvider: false
-                }
-            }
+            </FooterStylesProvider>
         )
 
         expect(document.querySelector(horizontalVariantSelector)).toBeInTheDocument()

@@ -21,7 +21,12 @@ test('ImageTile renders without errors', () => {
                 },
                 url: `${getAssetUrl('static/img/hero.png')}`
             }}
-        />
+        />,
+        {
+            wrapperProps: {
+                withCommerceApiProvider: false
+            }
+        }
     )
 
     const image = getByTestId('image-tile-image')
