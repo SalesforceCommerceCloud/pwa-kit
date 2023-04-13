@@ -107,7 +107,7 @@ describe('scriptUtils', () => {
             expect(scriptUtils.defaultMessage(mockGit)).toEqual('branch: short')
         })
 
-        test('works outside of a git repo ', async () => {
+        test('works outside of a git repo', async () => {
             const mockGit = {
                 branch: () => {
                     throw {code: 'ENOENT'}
@@ -117,7 +117,7 @@ describe('scriptUtils', () => {
             expect(scriptUtils.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
         })
 
-        test('works with any other error ', async () => {
+        test('works with any other error', async () => {
             const mockGit = {
                 branch: () => {
                     throw new Error()
@@ -270,9 +270,12 @@ describe('scriptUtils', () => {
 
                 const fn = async () => await client.push(bundle, projectSlug, targetSlug)
 
+                // TODO: Split up this batch of tests to avoid conditional assertions
                 if (status === 200) {
+                    // eslint-disable-next-line jest/no-conditional-expect
                     expect(await fn()).toBe(goodResponseBody)
                 } else {
+                    // eslint-disable-next-line jest/no-conditional-expect
                     await expect(fn).rejects.toThrow('For more information visit')
                 }
 

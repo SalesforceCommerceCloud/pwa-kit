@@ -55,7 +55,7 @@ describe('The useSearchParams', () => {
         )
     })
 
-    test('test stringy method', () => {
+    test('stringy method', () => {
         const objectToStringify = {
             limit: '25',
             offset: '0',
@@ -71,7 +71,7 @@ describe('The useSearchParams', () => {
         )
     })
 
-    test('test parse method', () => {
+    test('parse method', () => {
         const stringToParse =
             'limit=25&offset=0&refine=c_refinementColor%3DBlack%7CPurple&sort=best-matches'
 

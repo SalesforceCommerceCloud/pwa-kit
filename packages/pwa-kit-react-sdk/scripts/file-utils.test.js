@@ -33,7 +33,7 @@ test('readFile reads as utf8', () => {
     fs.readFile.mockImplementation(successCallbackAdapter())
 
     return fileUtils.readFile('test.dat').then(() => {
-        expect(fs.readFile).toBeCalled()
+        expect(fs.readFile).toHaveBeenCalled()
         expect(fs.readFile.mock.calls[0].slice(0, -1)).toEqual(['test.dat', 'utf8'])
     })
 })
@@ -57,10 +57,10 @@ test('writeToPath returns a function that writes to a given path', () => {
     const writer = fileUtils.writeToPath('test/summary.dat')
 
     expect(typeof writer).toBe('function')
-    expect(fs.writeFile).not.toBeCalled()
+    expect(fs.writeFile).not.toHaveBeenCalled()
 
     return writer('ABC 123').then(() => {
-        expect(fs.writeFile).toBeCalled()
+        expect(fs.writeFile).toHaveBeenCalled()
         expect(fs.writeFile.mock.calls[0].slice(0, -1)).toEqual([
             'test/summary.dat',
             'ABC 123',
@@ -75,7 +75,7 @@ test('mkdirIfNonexistent does not make a directory if it exists', () => {
     return fileUtils.mkdirIfNonexistent('testdir').then((result) => {
         expect(fs.stat).toHaveBeenCalledTimes(1)
         expect(argsIgnoringCallback(fs.stat)).toEqual(['testdir'])
-        expect(fs.mkdir).not.toBeCalled()
+        expect(fs.mkdir).not.toHaveBeenCalled()
         expect(result.test).toBe(true)
     })
 })
@@ -85,9 +85,9 @@ test("mkdirIfNonexistent makes a directory if it doesn't exist", () => {
     fs.mkdir.mockImplementation(successCallbackAdapter())
 
     return fileUtils.mkdirIfNonexistent('testdir').then(() => {
-        expect(fs.stat).toBeCalled()
+        expect(fs.stat).toHaveBeenCalled()
         expect(argsIgnoringCallback(fs.stat)).toEqual(['testdir'])
-        expect(fs.mkdir).toBeCalled()
+        expect(fs.mkdir).toHaveBeenCalled()
         expect(argsIgnoringCallback(fs.mkdir)).toEqual(['testdir'])
     })
 })
@@ -129,7 +129,7 @@ test('filterDirectories returns the names that are directories after passing thr
             expect(fs.stat.mock.calls.length).toBe(itemList.length)
             expect(pathBuilder.mock.calls.length).toBe(itemList.length)
             itemList.forEach((item) => {
-                expect(pathBuilder).toBeCalledWith(item)
+                expect(pathBuilder).toHaveBeenCalledWith(item)
             })
 
             expect(result).toEqual(dirList)
@@ -158,7 +158,7 @@ test('filterFiles returns the names that are directories after passing through t
             expect(fs.stat.mock.calls.length).toBe(itemList.length)
             expect(pathBuilder.mock.calls.length).toBe(itemList.length)
             itemList.forEach((item) => {
-                expect(pathBuilder).toBeCalledWith(item)
+                expect(pathBuilder).toHaveBeenCalledWith(item)
             })
 
             expect(result).toEqual(fileList)
@@ -169,7 +169,7 @@ test('jsonRead reads JSON from a file', () => {
     fs.readFile.mockImplementation(successCallbackAdapter('{"test": true}'))
 
     return fileUtils.jsonRead('test.json').then((result) => {
-        expect(fs.readFile).toBeCalled()
+        expect(fs.readFile).toHaveBeenCalled()
         expect(fs.readFile.mock.calls[0][0]).toBe('test.json')
 
         expect(result).toEqual({test: true})
@@ -182,7 +182,7 @@ test('jsonWrite writes JSON to a file', () => {
     return fileUtils
         .jsonWrite('test.json')({test: true})
         .then(() => {
-            expect(fs.writeFile).toBeCalled()
+            expect(fs.writeFile).toHaveBeenCalled()
             expect(fs.writeFile.mock.calls[0][0]).toBe('test.json')
             expect(fs.writeFile.mock.calls[0][1]).toBe('{\n  "test": true\n}')
         })

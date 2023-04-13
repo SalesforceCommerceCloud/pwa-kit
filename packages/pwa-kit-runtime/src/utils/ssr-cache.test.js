@@ -9,8 +9,7 @@ import {PersistentCache} from './ssr-cache'
 const localRemoteTestCases = [true, false]
 
 localRemoteTestCases.forEach((useLocalCache) => {
-    const name = `${useLocalCache ? 'Local' : 'Remote'} noop PersistentCache`
-    describe(name, () => {
+    describe(`${useLocalCache ? 'Local' : 'Remote'} noop PersistentCache`, () => {
         const testCache = new PersistentCache({
             useLocalCache,
             bucket: 'TestBucket',
@@ -27,26 +26,22 @@ localRemoteTestCases.forEach((useLocalCache) => {
             buf[i] = i
         }
         const expiration = Date.now() + 10000
-        test('get', () => {
-            testCache.get({key, namespace}).then((result) => {
-                expect(result.data).toBeUndefined()
-                expect(result.metadata).toBeUndefined()
-                expect(result.found).toBe(false)
-                expect(result.key).toEqual(key)
-                expect(result.namespace).toEqual(namespace)
-            })
+        test('get', async () => {
+            const result = await testCache.get({key, namespace})
+            expect(result.data).toBeUndefined()
+            expect(result.metadata).toBeUndefined()
+            expect(result.found).toBe(false)
+            expect(result.key).toEqual(key)
+            expect(result.namespace).toEqual(namespace)
         })
-        test('put', () => {
-            testCache
-                .put({key, namespace, data: buf, expiration})
-                .then(() => testCache.get({key, namespace}))
-                .then((result) => {
-                    expect(result.data).toBeUndefined()
-                    expect(result.metadata).toBeUndefined()
-                    expect(result.found).toBe(false)
-                    expect(result.key).toEqual(key)
-                    expect(result.namespace).toEqual(namespace)
-                })
+        test('put', async () => {
+            await testCache.put({key, namespace, data: buf, expiration})
+            const result = await testCache.get({key, namespace})
+            expect(result.data).toBeUndefined()
+            expect(result.metadata).toBeUndefined()
+            expect(result.found).toBe(false)
+            expect(result.key).toEqual(key)
+            expect(result.namespace).toEqual(namespace)
         })
         test('delete', async () => {
             await expect(testCache.delete({key, namespace})).resolves.not.toThrow()

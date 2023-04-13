@@ -113,6 +113,8 @@ test('Renders login modal by default', async () => {
     expect(screen.getByText(/sign in/i)).toBeInTheDocument()
 })
 
+// TODO: Fix flaky/broken test
+// eslint-disable-next-line jest/no-disabled-tests
 test.skip('Renders error when given incorrect log in credentials', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
@@ -155,6 +157,7 @@ test.skip('Renders error when given incorrect log in credentials', async () => {
 })
 
 // TODO: investigate why this test is failing when running with other tests
+// eslint-disable-next-line jest/no-disabled-tests
 test.skip('Allows customer to create an account', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
@@ -235,6 +238,7 @@ test.skip('Allows customer to create an account', async () => {
 })
 
 // TODO: investingate why this test is failing when running with other tests
+// eslint-disable-next-line jest/no-disabled-tests
 test.skip('Allows customer to sign in to their account', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
@@ -288,6 +292,9 @@ describe('Reset password', function () {
             )
         )
     })
+
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Allows customer to generate password token', async () => {
         // render our test component
         renderWithProviders(<MockedComponent initialView="password" />, {
@@ -317,6 +324,8 @@ describe('Reset password', function () {
         })
     })
 
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Allows customer to open generate password token modal from everywhere', () => {
         // render our test component
         renderWithProviders(<MockedComponent initialView="password" />)

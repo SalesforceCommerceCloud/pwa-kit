@@ -102,10 +102,12 @@ test('should display Selected refinements as there are some in the response', as
     expect(countOfRefinements.length).toEqual(2)
 })
 
+// TODO: Fix flaky/broken test
+// eslint-disable-next-line jest/no-disabled-tests
 test.skip('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
-    expect(await screen.findAllByText('Black'))
+    expect(await screen.findAllByText('Black')).toBeInTheDocument()
     const wishlistButton = await screen.getAllByLabelText('Wishlist')
     expect(wishlistButton.length).toBe(25)
     user.click(wishlistButton[0])
@@ -145,7 +147,7 @@ test('click on Clear All should clear out all the filter in search params', asyn
     )
 })
 
-test('should display Search Results for when searching ', async () => {
+test('should display Search Results for when searching', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/search?q=test')
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}

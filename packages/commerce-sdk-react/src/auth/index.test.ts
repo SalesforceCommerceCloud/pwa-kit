@@ -258,35 +258,35 @@ describe('Auth', () => {
         })
 
         await auth.ready()
-        expect(helpers.refreshAccessToken).not.toBeCalled()
+        expect(helpers.refreshAccessToken).not.toHaveBeenCalled()
 
         // And then now test with an _expired_ token
         // @ts-expect-error private method
         auth.set('access_token', JWTExpired)
 
         await auth.ready()
-        expect(helpers.refreshAccessToken).toBeCalled()
+        expect(helpers.refreshAccessToken).toHaveBeenCalled()
     })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
 
         await auth.ready()
-        expect(helpers.loginGuestUser).toBeCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
     test('loginGuestUser', async () => {
         const auth = new Auth(config)
         await auth.loginGuestUser()
-        expect(helpers.loginGuestUser).toBeCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
     test('loginRegisteredUserB2C', async () => {
         const auth = new Auth(config)
         await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
-        expect(helpers.loginRegisteredUserB2C).toBeCalled()
+        expect(helpers.loginRegisteredUserB2C).toHaveBeenCalled()
     })
     test('logout', async () => {
         const auth = new Auth(config)
         await auth.logout()
-        expect(helpers.loginGuestUser).toBeCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
     test('running on the server uses a shared context memory store', () => {
         const refreshTokenGuest = 'guest'

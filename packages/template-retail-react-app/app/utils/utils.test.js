@@ -22,17 +22,15 @@ jest.mock('./site-utils', () => {
 })
 
 describe('requestIdleCallback should be a working shim', () => {
-    test('without a working implementation built in', () => {
-        return new Promise((resolve) => {
-            utils.requestIdleCallback(resolve)
-        })
+    test('without a working implementation built in', async () => {
+        const result = new Promise((resolve) => utils.requestIdleCallback(resolve))
+        await expect(result).resolves.toBeDefined()
     })
 
-    test('with a working implementation built in', () => {
+    test('with a working implementation built in', async () => {
         window.requestIdleCallback = (fn) => setTimeout(() => fn(), 1)
-        return new Promise((resolve) => {
-            utils.requestIdleCallback(resolve)
-        })
+        const result = new Promise((resolve) => utils.requestIdleCallback(resolve))
+        await expect(result).resolves.toBeDefined()
     })
 })
 

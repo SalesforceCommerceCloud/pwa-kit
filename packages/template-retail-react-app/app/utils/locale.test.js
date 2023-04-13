@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+// CAUTION: This test file relies on config values that may get changed in generated projects
+
 import {determineTargetLocale, fetchTranslations, getTargetLocale} from './locale'
 
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from './test-utils'
@@ -24,7 +26,9 @@ const testId2 = 'account.accordion.button.my_account'
 test('our assumptions before further testing', () => {
     expect(supportedLocales.includes(nonSupportedLocale)).toBe(false)
     if (isMultiLocales) {
+        // eslint-disable-next-line jest/no-conditional-expect
         expect(DEFAULT_LOCALE).toBe('en-GB')
+        // eslint-disable-next-line jest/no-conditional-expect
         expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
     }
 })
@@ -80,6 +84,7 @@ describe('getTargetLocale', () => {
     test('with getUserPreferredLocales parameter', () => {
         const locale = supportedLocale
         if (isMultiLocales) {
+            // eslint-disable-next-line jest/no-conditional-expect
             expect(locale).not.toBe(DEFAULT_LOCALE)
         }
         const targetLocale = getTargetLocale({

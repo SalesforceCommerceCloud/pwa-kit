@@ -46,7 +46,7 @@ const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
  * An HTTPS.Agent that allows self-signed certificates
  * @type {module:https.Agent}
  */
-export const httpsAgent = new https.Agent({
+const httpsAgent = new https.Agent({
     rejectUnauthorized: false
 })
 
@@ -228,7 +228,7 @@ describe('SSRServer Lambda integration', () => {
     ]
 
     lambdaTestCases.forEach((testCase) =>
-        test(testCase.name, () => {
+        test(`${testCase.name}`, () => {
             const options = {
                 buildDir: testFixtures,
                 mainFilename: 'main-big.js',

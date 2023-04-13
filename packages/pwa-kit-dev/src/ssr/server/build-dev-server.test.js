@@ -43,7 +43,7 @@ const httpAgent = new http.Agent({})
  * An HTTPS.Agent that allows self-signed certificates
  * @type {module:https.Agent}
  */
-export const httpsAgent = new https.Agent({
+const httpsAgent = new https.Agent({
     rejectUnauthorized: false
 })
 
@@ -98,25 +98,21 @@ const opts = (overrides = {}) => {
 }
 
 describe('DevServer error handlers', () => {
-    const testServerErrorHandler = (error, times) => {
-        const exit = jest.fn()
-        const proc = {exit}
-        const close = jest.fn()
-        const devserver = {close}
-        const log = jest.fn()
-        const handler = makeErrorHandler(proc, devserver, log)
-        const e = {code: error}
+    const expectServerErrorHandled = (error, times) => {
+        const proc = {exit: jest.fn()}
+        const devserver = {close: jest.fn()}
+        const handler = makeErrorHandler(proc, devserver, jest.fn())
 
-        handler(e)
-        expect(close).toHaveBeenCalledTimes(times)
+        handler({code: error})
+        expect(devserver.close).toHaveBeenCalledTimes(times)
     }
 
     test('should exit the current process if the requested port is in use', () => {
-        testServerErrorHandler('EADDRINUSE', 1)
+        expectServerErrorHandled('EADDRINUSE', 1)
     })
 
     test('should ignore errors other than EADDRINUSE', () => {
-        testServerErrorHandler('EACCES', 0)
+        expectServerErrorHandled('EACCES', 0)
     })
 })
 
@@ -274,7 +270,7 @@ describe('DevServer listening on http/https protocol', () => {
 
     cases.forEach(({options, env, name}) => {
         const protocol = options.protocol || env.DEV_SERVER_PROTOCOL
-        test(name, () => {
+        test(`${name}`, () => {
             process.env = {...process.env, ...env}
             const {server: _server} = NoWebpackDevServerFactory.createHandler(
                 opts(options),
@@ -651,7 +647,7 @@ describe('DevServer rendering', () => {
         expect(req.app.__hotServerMiddleware).toHaveBeenCalledWith(req, res, next)
     })
 
-    test('uses hot server middleware when ready', () => {
+    test('redirects to loading screen when not ready', () => {
         const TestFactory = {
             ...NoWebpackDevServerFactory,
             _redirectToLoadingScreen: jest.fn()
@@ -725,7 +721,7 @@ describe('DevServer service worker', () => {
     ]
 
     cases.forEach(({file, content, name, requestPath}) => {
-        test(name, async () => {
+        test(`${name}`, async () => {
             const updatedFile = path.resolve(tmpDir, file)
             await fse.writeFile(updatedFile, content)
 

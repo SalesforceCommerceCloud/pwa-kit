@@ -155,6 +155,8 @@ describe('Error while logging in', function () {
         )
     })
 
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Renders error when given incorrect log in credentials', async () => {
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {

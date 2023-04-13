@@ -47,6 +47,7 @@ module.exports = {
                 'jest/expect-expect': [
                     'warn',
                     {
+                        // Anything starting with `expect` counts as an assertion
                         assertFunctionNames: ['expect*', '**.expect*']
                     }
                 ],

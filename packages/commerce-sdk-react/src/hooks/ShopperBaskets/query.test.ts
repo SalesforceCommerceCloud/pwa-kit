@@ -52,6 +52,7 @@ describe('Shopper Baskets query hooks', () => {
         await waitAndExpectSuccess(wait, () => result.current)
         expect(result.current.data).toEqual(data)
     })
+    // eslint-disable-next-line jest/expect-expect
     test.each(testCases)('`%s` returns error on error', async (queryName) => {
         mockQueryEndpoint(basketsEndpoint, {}, 400)
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {

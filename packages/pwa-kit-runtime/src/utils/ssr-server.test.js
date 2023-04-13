@@ -8,6 +8,10 @@
 // TODO: The methods tested in this file have been split from one file into
 // multiple, so the tests should be split into multiple files as well.
 
+// TODO: There are a lot batched tests with conditional assertions. Can they be
+// split into smaller batches or otherwise refactored to avoid the conditionals?
+/* eslint-disable jest/no-conditional-expect */
+
 import sinon from 'sinon'
 
 import {
@@ -345,7 +349,7 @@ describe('utils/ssr-server tests', () => {
         ]
 
         testCases.forEach((testCase) =>
-            test(testCase.name, () => {
+            test(`${testCase.name}`, () => {
                 const newMobify = Object.assign({}, baseMobify, testCase.mobify || {})
 
                 if (testCase.environment) {
@@ -357,9 +361,9 @@ describe('utils/ssr-server tests', () => {
                 if (testCase.validate) {
                     updatePackageMobify(newMobify)
                     testCase.validate(getPackageMobify())
-                } else {
-                    expect(() => updatePackageMobify(newMobify)).toThrow()
+                    return
                 }
+                expect(() => updatePackageMobify(newMobify)).toThrow()
             })
         )
     })
@@ -730,6 +734,7 @@ describe('processExpressResponse', () => {
 
     responseTypes.forEach((responseType) =>
         testCases.forEach((testCase) =>
+            // eslint-disable-next-line jest/expect-expect
             test(`${testCase.name} (${responseType.name})`, () => {
                 const headers = Object.assign({}, testCase.headers)
                 const response = responseType.create(headers)
@@ -822,7 +827,7 @@ describe('outgoingRequestHook tests', () => {
     )
 
     testCases.forEach((testCase) =>
-        test(testCase.name, () => {
+        test(`${testCase.name}`, () => {
             const createAppOptions = {appHostname}
 
             createAppOptions.proxyKeepAliveAgent = testCase.addProxyKeepAliveAgent
@@ -1050,14 +1055,14 @@ describe('wrapResponseWrite', () => {
         response.write('12345')
         expect(chunks.length).toEqual(1)
         expect(chunks[0].toString()).toEqual('12345')
-        expect(write.calledWith('12345'))
+        expect(write).toHaveBeenCalledWith('12345')
         write.reset()
 
         // String with encoding
         response.write('67890', 'utf-8')
         expect(chunks.length).toEqual(2)
         expect(chunks[1].toString()).toEqual('67890')
-        expect(write.calledWith('12345', 'utf-8'))
+        expect(write).toHaveBeenCalledWith('12345', 'utf-8')
         write.reset()
 
         // Buffer
@@ -1065,7 +1070,7 @@ describe('wrapResponseWrite', () => {
         response.write(chunk1)
         expect(chunks.length).toEqual(3)
         expect(chunks[2].toString()).toEqual('abcde')
-        expect(write.calledWith(chunk1))
+        expect(write).toHaveBeenCalledWith(chunk1)
         write.reset()
 
         expect(() => response.write({})).toThrow('unexpected type')
