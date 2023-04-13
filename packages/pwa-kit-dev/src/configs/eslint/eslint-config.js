@@ -39,12 +39,24 @@ module.exports = {
     },
     overrides: [
         {
-            files: ['**/*.{spec,test}.{js,jsx,ts,tsx}'],
-            env: {jest: true}
+            // Jest (v29) default test match pattern
+            files: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
+            plugins: ['jest'],
+            extends: ['plugin:jest/recommended' /*, 'plugin:jest/style' */],
+            rules: {
+                'jest/expect-expect': [
+                    'warn',
+                    {
+                        assertFunctionNames: ['expect*', '**.expect*']
+                    }
+                ],
+                // This doesn't reliably report all errors :/
+                'jest/no-standalone-expect': ['off']
+            }
         },
         {
             files: ['**/*.ts', '**/*.tsx'],
-            extends: 'plugin:@typescript-eslint/recommended-requiring-type-checking',
+            extends: ['plugin:@typescript-eslint/recommended-requiring-type-checking'],
             rules: {
                 // These rules all deal with the `any` type in some capacity;
                 // we want to be more permissive than @typescript-eslint is by default
