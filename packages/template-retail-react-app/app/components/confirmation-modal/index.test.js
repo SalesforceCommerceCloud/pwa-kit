@@ -28,7 +28,11 @@ afterEach(() => {
 })
 
 test('Renders confirmation modal with default config', async () => {
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {
+            withCommerceApiProvider: false
+        }
+    })
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
@@ -41,7 +45,11 @@ test('Renders confirmation modal with default config', async () => {
 })
 
 test('Renders confirmation modal with the given config', async () => {
-    renderWithProviders(<MockedComponent {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} />)
+    renderWithProviders(<MockedComponent {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} />, {
+        wrapperProps: {
+            withCommerceApiProvider: false
+        }
+    })
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
@@ -56,7 +64,11 @@ test('Renders confirmation modal with the given config', async () => {
 test('Verify confirm action button click', async () => {
     const onPrimaryAction = jest.fn()
 
-    renderWithProviders(<MockedComponent onPrimaryAction={onPrimaryAction} />)
+    renderWithProviders(<MockedComponent onPrimaryAction={onPrimaryAction} />, {
+        wrapperProps: {
+            withCommerceApiProvider: false
+        }
+    })
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
@@ -74,7 +86,11 @@ test('Verify confirm action button click', async () => {
 test('Verify cancel action button click', async () => {
     const onAlternateAction = jest.fn()
 
-    renderWithProviders(<MockedComponent onAlternateAction={onAlternateAction} />)
+    renderWithProviders(<MockedComponent onAlternateAction={onAlternateAction} />, {
+        wrapperProps: {
+            withCommerceApiProvider: false
+        }
+    })
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)

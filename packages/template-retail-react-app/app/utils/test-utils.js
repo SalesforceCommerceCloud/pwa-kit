@@ -86,7 +86,12 @@ export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     )
 }
 
-export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Router>)
+export const renderWithRouter = (node) =>
+    renderWithReactIntl(
+        <CurrencyProvider currency={DEFAULT_CURRENCY}>
+            <Router>{node}</Router>
+        </CurrencyProvider>
+    )
 export const renderWithChakra = (node) =>
     renderWithRouter(<ChakraProvider theme={theme}>{node}</ChakraProvider>)
 
@@ -102,7 +107,8 @@ export const TestProviders = ({
     appConfig = mockConfig.app,
     siteAlias = DEFAULT_SITE,
     isGuest = false,
-    bypassAuth = true
+    bypassAuth = true,
+    withCommerceApiProvider = true
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -127,23 +133,31 @@ export const TestProviders = ({
         <ServerContext.Provider value={{}}>
             <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
-                    <CommerceApiProvider
-                        shortCode={commerceApiConfig.parameters.shortCode}
-                        clientId={commerceApiConfig.parameters.clientId}
-                        organizationId={commerceApiConfig.parameters.organizationId}
-                        siteId={site?.id}
-                        locale={locale.id}
-                        redirectURI={`${window.location.origin}/testcallback`}
-                        fetchedToken={bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''}
-                    >
-                        <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                            <Router>
-                                <ChakraProvider theme={theme}>
-                                    <AddToCartModalProvider>{children}</AddToCartModalProvider>
-                                </ChakraProvider>
-                            </Router>
-                        </CurrencyProvider>
-                    </CommerceApiProvider>
+                    {withCommerceApiProvider ? (
+                        <CommerceApiProvider
+                            shortCode={commerceApiConfig.parameters.shortCode}
+                            clientId={commerceApiConfig.parameters.clientId}
+                            organizationId={commerceApiConfig.parameters.organizationId}
+                            siteId={site?.id}
+                            locale={locale.id}
+                            redirectURI={`${window.location.origin}/testcallback`}
+                            fetchedToken={
+                                bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''
+                            }
+                        >
+                            <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                                <Router>
+                                    <ChakraProvider theme={theme}>
+                                        <AddToCartModalProvider>{children}</AddToCartModalProvider>
+                                    </ChakraProvider>
+                                </Router>
+                            </CurrencyProvider>
+                        </CommerceApiProvider>
+                    ) : (
+                        <DumbComponentProviders currency={DEFAULT_CURRENCY} theme={theme}>
+                            {children}
+                        </DumbComponentProviders>
+                    )}
                 </MultiSiteProvider>
             </IntlProvider>
         </ServerContext.Provider>
@@ -160,7 +174,24 @@ TestProviders.propTypes = {
     appConfig: PropTypes.object,
     siteAlias: PropTypes.string,
     bypassAuth: PropTypes.bool,
+    withCommerceApiProvider: PropTypes.bool,
     isGuest: PropTypes.bool
+}
+
+const DumbComponentProviders = ({children, theme, currency}) => {
+    return (
+        <CurrencyProvider currency={currency}>
+            <Router>
+                <ChakraProvider theme={theme}>{children}</ChakraProvider>
+            </Router>
+        </CurrencyProvider>
+    )
+}
+
+DumbComponentProviders.propTypes = {
+    children: PropTypes.element,
+    theme: PropTypes.object,
+    currency: PropTypes.string
 }
 
 /**

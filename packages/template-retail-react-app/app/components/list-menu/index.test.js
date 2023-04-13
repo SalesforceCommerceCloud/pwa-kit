@@ -9,8 +9,10 @@ import {screen, waitFor} from '@testing-library/react'
 import ListMenu from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {mockCategories} from '../../mocks/mock-data'
+import {createServer} from '../../../jest-setup'
 
 describe('ListMenu', () => {
+    createServer()
     test('ListMenu renders without errors', async () => {
         renderWithProviders(<ListMenu root={mockCategories.root} />)
 

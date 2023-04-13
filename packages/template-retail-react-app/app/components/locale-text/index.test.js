@@ -9,14 +9,22 @@ import LocaleText from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
 test('Renders LocaleText', () => {
-    renderWithProviders(<LocaleText shortCode="en-GB" />)
+    renderWithProviders(<LocaleText shortCode="en-GB" />, {
+        wrapperProps: {
+            withCommerceApiProvider: false
+        }
+    })
     const text = document.querySelector('.chakra-text')
 
     expect(text).toBeInTheDocument()
 })
 
 test('Renders LocaleText with as type', () => {
-    renderWithProviders(<LocaleText className="test-class" shortCode="en-GB" as="option" />)
+    renderWithProviders(<LocaleText className="test-class" shortCode="en-GB" as="option" />, {
+        wrapperProps: {
+            withCommerceApiProvider: false
+        }
+    })
 
     const text = document.querySelector('option.test-class')
 
@@ -26,7 +34,11 @@ test('Renders LocaleText with as type', () => {
 test('Warns on missing shortCode message definition', () => {
     jest.spyOn(console, 'error')
 
-    renderWithProviders(<LocaleText shortCode="fa-KE" />)
+    renderWithProviders(<LocaleText shortCode="fa-KE" />, {
+        wrapperProps: {
+            withCommerceApiProvider: false
+        }
+    })
 
     const text = document.querySelector('.chakra-text')
 

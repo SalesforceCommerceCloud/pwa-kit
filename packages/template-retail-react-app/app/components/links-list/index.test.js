@@ -28,35 +28,52 @@ FooterStylesProvider.propTypes = {
     children: PropTypes.node
 }
 
-test('renders LinksList with default arguments', () => {
-    renderWithProviders(
-        <FooterStylesProvider>
-            <LinksList links={links} />
-        </FooterStylesProvider>
-    )
+describe('Links List', function () {
+    test('renders LinksList with default arguments', () => {
+        renderWithProviders(
+            <FooterStylesProvider>
+                <LinksList links={links} />
+            </FooterStylesProvider>,
+            {
+                wrapperProps: {
+                    withCommerceApiProvider: false
+                }
+            }
+        )
 
-    expect(screen.getAllByRole('listitem')).toHaveLength(1)
-    expect(screen.getByRole('link', {name: links[0].text})).toBeInTheDocument()
-    expect(screen.queryByRole('heading')).toBeNull()
-    expect(document.querySelector(horizontalVariantSelector)).toBeNull()
-})
+        expect(screen.getAllByRole('listitem')).toHaveLength(1)
+        expect(screen.getByRole('link', {name: links[0].text})).toBeInTheDocument()
+        expect(screen.queryByRole('heading')).toBeNull()
+        expect(document.querySelector(horizontalVariantSelector)).toBeNull()
+    })
 
-test('renders LinksList with heading', () => {
-    renderWithProviders(
-        <FooterStylesProvider>
-            <LinksList links={links} heading="Customer Support" />
-        </FooterStylesProvider>
-    )
+    test('renders LinksList with heading', () => {
+        renderWithProviders(
+            <FooterStylesProvider>
+                <LinksList links={links} heading="Customer Support" />
+            </FooterStylesProvider>,
+            {
+                wrapperProps: {
+                    withCommerceApiProvider: false
+                }
+            }
+        )
 
-    expect(screen.getByRole('heading')).toBeInTheDocument()
-})
+        expect(screen.getByRole('heading')).toBeInTheDocument()
+    })
 
-test('renders LinksList with horizontal variant', () => {
-    renderWithProviders(
-        <FooterStylesProvider>
-            <LinksList links={links} variant="horizontal" />
-        </FooterStylesProvider>
-    )
+    test('renders LinksList with horizontal variant', () => {
+        renderWithProviders(
+            <FooterStylesProvider>
+                <LinksList links={links} variant="horizontal" />
+            </FooterStylesProvider>,
+            {
+                wrapperProps: {
+                    withCommerceApiProvider: false
+                }
+            }
+        )
 
-    expect(document.querySelector(horizontalVariantSelector)).toBeInTheDocument()
+        expect(document.querySelector(horizontalVariantSelector)).toBeInTheDocument()
+    })
 })

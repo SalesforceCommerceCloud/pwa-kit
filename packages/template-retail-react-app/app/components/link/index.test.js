@@ -5,17 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithChakra, renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import Link from './index'
 import mockConfig from '../../../config/mocks/default'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createServer} from '../../../jest-setup'
 const originalLocation = window.location
-jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
-    return {
-        getConfig: jest.fn()
-    }
-})
 
 afterEach(() => {
     // Restore `window.location` to the `jsdom` `Location` object
@@ -30,7 +25,7 @@ describe('Link Component', function () {
         getConfig.mockImplementation(() => mockConfig)
         delete window.location
         window.location = new URL('/us/en-US', 'https://www.example.com')
-        const {getByText} = renderWithChakra(<Link href="/mypage">My Page</Link>, {
+        const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
             wrapperProps: {locale: {id: 'en-US'}, siteAlias: 'us', appConfig: mockConfig.app}
         })
         expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')

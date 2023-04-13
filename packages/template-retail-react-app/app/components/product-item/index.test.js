@@ -9,6 +9,7 @@ import ProductItem from './index'
 import {mockedCustomerProductListsDetails} from '../../mocks/mock-data'
 import {renderWithProviders} from '../../utils/test-utils'
 import {screen} from '@testing-library/react'
+import {createServer} from '../../../jest-setup'
 
 jest.mock('commerce-sdk-react-preview', () => {
     const originalModule = jest.requireActual('commerce-sdk-react-preview')
@@ -23,16 +24,17 @@ beforeEach(() => {
     jest.resetModules()
 })
 
-jest.setTimeout(60000)
 const MockedComponent = () => {
     const product = mockedCustomerProductListsDetails.data[0]
     return <ProductItem product={{...product, productName: product.name}} />
 }
+describe('Product Item', function () {
+    createServer()
+    test('renders product item name, attributes and price', async () => {
+        renderWithProviders(<MockedComponent />)
 
-test('renders product item name, attributes and price', async () => {
-    renderWithProviders(<MockedComponent />)
-
-    expect(await screen.getByText(/apple ipod nano/i)).toBeInTheDocument()
-    expect(await screen.getByText(/color: green/i)).toBeInTheDocument()
-    expect(await screen.getByText(/memory size: 16 GB/i)).toBeInTheDocument()
+        expect(await screen.getByText(/apple ipod nano/i)).toBeInTheDocument()
+        expect(await screen.getByText(/color: green/i)).toBeInTheDocument()
+        expect(await screen.getByText(/memory size: 16 GB/i)).toBeInTheDocument()
+    })
 })

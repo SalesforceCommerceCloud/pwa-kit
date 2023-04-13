@@ -28,80 +28,12 @@ configureTestingLibrary({
     ...(process.env.CI ? {asyncUtilTimeout: 6000} : {})
 })
 
-/**
- * Set up an API mocking server for testing purposes.
- * This mock server includes the basic oauth flow endpoints.
- */
-// export const setupMockServer = () => {
-//     return setupServer(
-//         rest.post('*/oauth2/authorize', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-//         rest.get('*/oauth2/authorize', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-//         rest.post('*/oauth2/login', (req, res, ctx) =>
-//             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-//         ),
-//         rest.get('*/oauth2/logout', (req, res, ctx) =>
-//             res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
-//         ),
-//         rest.get('*/customers/:customerId', (req, res, ctx) =>
-//             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-//         ),
-//         rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
-//             res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
-//         ),
-//         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-//         rest.post('*/oauth2/token', (req, res, ctx) =>
-//             res(
-//                 ctx.delay(0),
-//                 ctx.json({
-//                     customer_id: 'customerid',
-//                     // Is this token for guest or registered user?
-//                     access_token:
-//                         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjF9.BDAp9G8nmArdBqAbsE5GUWZ3fiv2LwQKClEFDCGIyy8',
-//                     refresh_token: 'testrefeshtoken',
-//                     usid: 'testusid',
-//                     enc_user_id: 'testEncUserId',
-//                     id_token: 'testIdToken'
-//                 })
-//             )
-//         ),
-//         rest.get('*/categories/:categoryId', (req, res, ctx) =>
-//             res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
-//         ),
-//         rest.post('*/baskets/actions/merge', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-//         rest.post('*/v3/activities/EinsteinTestSite/*', (req, res, ctx) => {
-//             return res(ctx.delay(0), ctx.status(200), ctx.json({}))
-//         }),
-//         rest.post('*/v3/personalization/recs/EinsteinTestSite/*', (req, res, ctx) => {
-//             return res(ctx.delay(0), ctx.status(200), ctx.json({}))
-//         })
-//     )
-// }
-
-beforeAll(() => {
-    // global.server = setupMockServer()
-    // global.server.listen({
-    //     onUnhandledRequest(req) {
-    //         console.error('Found an unhandled %s request to %s', req.method, req.url.href)
-    //     }
-    // })
-})
-afterEach(() => {
-    // global.server.resetHandlers()
-})
-afterAll(() => {
-    // Intentionally not closing the server!
-    // We run into many race condition issues,
-    // that was cause by the server close too soon
-    // and the tests not well written in an proper async manner.
-    // Let's not close the server and see how things goes.
-    // We can revisit this.
-    // global.server.close()
-})
-
 // Mock the application configuration to be used in all tests.
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {
-        getConfig: () => mockConfig
+        getConfig: jest.fn().mockImplementation(() => {
+            return mockConfig
+        })
     }
 })
 
@@ -287,16 +219,16 @@ export function createServer(handlerConfig) {
 
     beforeEach(() => {
         jest.spyOn(console, 'error')
-        jest.spyOn(console, 'warn')
+        // jest.spyOn(console, 'warn')
         console.error.mockImplementation(() => {})
-        console.warn.mockImplementation(() => {})
+        // console.warn.mockImplementation(() => {})
     })
     beforeAll(() => {
         server.listen()
     })
     afterEach(() => {
         console.error.mockRestore()
-        console.warn.mockRestore()
+        // console.warn.mockRestore()
         server.resetHandlers()
     })
     afterAll(() => {

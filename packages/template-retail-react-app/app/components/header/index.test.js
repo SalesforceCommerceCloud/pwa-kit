@@ -13,6 +13,7 @@ import {renderWithProviders, createPathWithDefaults} from '../../utils/test-util
 import {createMemoryHistory} from 'history'
 import {mockedRegisteredCustomer} from '../../mocks/mock-data'
 import {createServer} from '../../../jest-setup'
+import {mockProducts} from '../../pages/checkout/confirmation.mock'
 
 jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual('@chakra-ui/react')
@@ -47,7 +48,14 @@ afterEach(() => {
 })
 
 describe('Header component', function () {
-    const {prependHandlersToServer} = createServer()
+    const {prependHandlersToServer} = createServer([
+        {
+            path: '*/products',
+            res: () => {
+                return mockProducts
+            }
+        }
+    ])
     test('renders properly', async () => {
         renderWithProviders(<Header />)
 

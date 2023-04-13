@@ -7,6 +7,7 @@
 import React from 'react'
 import ProductTile, {Skeleton} from './index'
 import {renderWithProviders} from '../../utils/test-utils'
+import {createServer} from '../../../jest-setup'
 
 const mockProductSearchItem = {
     currency: 'USD',
@@ -70,27 +71,30 @@ const mockProductSet = {
     ]
 }
 
-test('Renders links and images', () => {
-    const {getAllByRole} = renderWithProviders(<ProductTile product={mockProductSearchItem} />)
+describe('Product Tile', function () {
+    createServer()
+    test('Renders links and images', () => {
+        const {getAllByRole} = renderWithProviders(<ProductTile product={mockProductSearchItem} />)
 
-    const link = getAllByRole('link')
-    const img = getAllByRole('img')
+        const link = getAllByRole('link')
+        const img = getAllByRole('img')
 
-    expect(link).toBeDefined()
-    expect(img).toBeDefined()
-})
+        expect(link).toBeDefined()
+        expect(img).toBeDefined()
+    })
 
-test('Renders Skeleton', () => {
-    const {getAllByTestId} = renderWithProviders(<Skeleton />)
+    test('Renders Skeleton', () => {
+        const {getAllByTestId} = renderWithProviders(<Skeleton />)
 
-    const skeleton = getAllByTestId('sf-product-tile-skeleton')
+        const skeleton = getAllByTestId('sf-product-tile-skeleton')
 
-    expect(skeleton).toBeDefined()
-})
+        expect(skeleton).toBeDefined()
+    })
 
-test('Product set - renders the appropriate price label', async () => {
-    const {getByTestId} = renderWithProviders(<ProductTile product={mockProductSet} />)
+    test('Product set - renders the appropriate price label', async () => {
+        const {getByTestId} = renderWithProviders(<ProductTile product={mockProductSet} />)
 
-    const container = getByTestId('product-tile-price')
-    expect(container).toHaveTextContent(/starting at/i)
+        const container = getByTestId('product-tile-price')
+        expect(container).toHaveTextContent(/starting at/i)
+    })
 })

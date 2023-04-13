@@ -11,7 +11,11 @@ import {fireEvent} from '@testing-library/react'
 
 describe('Social Icons Component', () => {
     test('Renders SocialIcons', () => {
-        renderWithProviders(<SocialIcons />)
+        renderWithProviders(<SocialIcons />, {
+            wrapperProps: {
+                withCommerceApiProvider: false
+            }
+        })
 
         const links = document.querySelectorAll('button')
 
@@ -20,7 +24,11 @@ describe('Social Icons Component', () => {
 
     test('should open a new windown when an icon is clicked', () => {
         window.open = jest.fn()
-        renderWithProviders(<SocialIcons />)
+        renderWithProviders(<SocialIcons />, {
+            wrapperProps: {
+                withCommerceApiProvider: false
+            }
+        })
 
         const links = document.querySelectorAll('button')
         // click the first link

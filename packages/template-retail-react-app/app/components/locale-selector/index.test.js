@@ -7,12 +7,12 @@
 import React from 'react'
 import {fireEvent} from '@testing-library/react'
 import LocaleSelector from './index'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithChakra} from '../../utils/test-utils'
 
 const supportedLocales = ['en-GB', 'fr-FR', 'it-IT', 'zh-CN', 'ja-JP']
 
 test('Renders LocaleSelector', () => {
-    renderWithProviders(<LocaleSelector selectedLocale="en-GB" locales={supportedLocales} />)
+    renderWithChakra(<LocaleSelector selectedLocale="en-GB" locales={supportedLocales} />)
     const accordion = document.querySelector('.chakra-accordion')
     const selectedLocale = document.querySelector('button[aria-expanded="false"]')
 
@@ -23,7 +23,7 @@ test('Renders LocaleSelector', () => {
 test('Renders LocaleSelector with event handlers', () => {
     const onSelect = jest.fn()
 
-    renderWithProviders(
+    renderWithChakra(
         <LocaleSelector selectedLocale="fr-FR" locales={supportedLocales} onSelect={onSelect} />
     )
 

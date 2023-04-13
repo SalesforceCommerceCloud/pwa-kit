@@ -7,6 +7,7 @@
 import React from 'react'
 import NestedAccordion from './index'
 import {renderWithProviders} from '../../utils/test-utils'
+import {createServer} from '../../../jest-setup'
 
 const mockItem = {
     id: 't1',
@@ -32,67 +33,74 @@ const mockItem = {
         }
     ]
 }
-test('Renders NestedAccordion', () => {
-    renderWithProviders(<NestedAccordion item={mockItem} />)
+describe('Nested Accordion', function () {
+    createServer()
+    test('Renders NestedAccordion', () => {
+        renderWithProviders(<NestedAccordion item={mockItem} />)
 
-    const accordions = document.querySelectorAll('.sf-nested-accordion')
+        const accordions = document.querySelectorAll('.sf-nested-accordion')
 
-    expect(accordions.length).toEqual(2)
-})
+        expect(accordions.length).toEqual(2)
+    })
 
-test('Renders NestedAccordion with items elements before and after', () => {
-    renderWithProviders(
-        <NestedAccordion
-            item={mockItem}
-            itemsBefore={[
-                <div className="itemsBefore" key="before">
-                    before
-                </div>
-            ]}
-            itemsAfter={[
-                <div className="itemsAfter" key="after">
-                    before
-                </div>
-            ]}
-        />
-    )
+    test('Renders NestedAccordion with items elements before and after', () => {
+        renderWithProviders(
+            <NestedAccordion
+                item={mockItem}
+                itemsBefore={[
+                    <div className="itemsBefore" key="before">
+                        before
+                    </div>
+                ]}
+                itemsAfter={[
+                    <div className="itemsAfter" key="after">
+                        before
+                    </div>
+                ]}
+            />
+        )
 
-    const itemBefore = document.querySelector('.itemsBefore')
-    const itemAfter = document.querySelector('.itemsAfter')
+        const itemBefore = document.querySelector('.itemsBefore')
+        const itemAfter = document.querySelector('.itemsAfter')
 
-    expect(itemBefore).toBeInTheDocument()
-    expect(itemAfter).toBeInTheDocument()
-})
+        expect(itemBefore).toBeInTheDocument()
+        expect(itemAfter).toBeInTheDocument()
+    })
 
-test('Renders NestedAccordion with items functions before and after', () => {
-    const onItemsBefore = jest.fn(() => [
-        <div className="itemsBefore" key="before">
-            before
-        </div>
-    ])
-    const onItemsAfter = jest.fn(() => [
-        <div className="itemsAfter" key="after">
-            after
-        </div>
-    ])
+    test('Renders NestedAccordion with items functions before and after', () => {
+        const onItemsBefore = jest.fn(() => [
+            <div className="itemsBefore" key="before">
+                before
+            </div>
+        ])
+        const onItemsAfter = jest.fn(() => [
+            <div className="itemsAfter" key="after">
+                after
+            </div>
+        ])
 
-    renderWithProviders(
-        <NestedAccordion item={mockItem} itemsBefore={onItemsBefore} itemsAfter={onItemsAfter} />
-    )
+        renderWithProviders(
+            <NestedAccordion
+                item={mockItem}
+                itemsBefore={onItemsBefore}
+                itemsAfter={onItemsAfter}
+            />
+        )
 
-    const itemBefore = document.querySelector('.itemsBefore')
-    const itemAfter = document.querySelector('.itemsAfter')
+        const itemBefore = document.querySelector('.itemsBefore')
+        const itemAfter = document.querySelector('.itemsAfter')
 
-    expect(onItemsBefore).toHaveBeenCalled()
-    expect(onItemsAfter).toHaveBeenCalled()
-    expect(itemBefore).toBeInTheDocument()
-    expect(itemAfter).toBeInTheDocument()
-})
+        expect(onItemsBefore).toHaveBeenCalled()
+        expect(onItemsAfter).toHaveBeenCalled()
+        expect(itemBefore).toBeInTheDocument()
+        expect(itemAfter).toBeInTheDocument()
+    })
 
-test('Renders NestedAccordion with custom url builder', () => {
-    const mockPath = '/mock-path'
-    renderWithProviders(<NestedAccordion item={mockItem} urlBuilder={() => mockPath} />)
+    test('Renders NestedAccordion with custom url builder', () => {
+        const mockPath = '/mock-path'
+        renderWithProviders(<NestedAccordion item={mockItem} urlBuilder={() => mockPath} />)
 
-    const firstLeafLink = document.querySelector('.sf-nested-accordion a')
-    expect(firstLeafLink.href.endsWith(mockPath)).toEqual(true)
+        const firstLeafLink = document.querySelector('.sf-nested-accordion a')
+        expect(firstLeafLink.href.endsWith(mockPath)).toEqual(true)
+    })
 })

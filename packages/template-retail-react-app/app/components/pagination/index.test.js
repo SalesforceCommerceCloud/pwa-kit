@@ -11,9 +11,14 @@ import {renderWithProviders} from '../../utils/test-utils'
 const mockUrls = ['/test?offset=0', '/test?offset=25', '/test?offset=50', '/test?offset=75']
 const mockCurrentUrl = '/test?offset=25'
 
-test('Renders Breadcrum', () => {
+test('Renders Pagination', () => {
     const {getAllByRole} = renderWithProviders(
-        <Pagination urls={mockUrls} currentUrl={mockCurrentUrl} />
+        <Pagination urls={mockUrls} currentUrl={mockCurrentUrl} />,
+        {
+            wrapperProps: {
+                withCommerceApiProvider: false
+            }
+        }
     )
 
     const [prev, next] = getAllByRole('link')

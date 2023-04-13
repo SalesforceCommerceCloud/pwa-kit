@@ -9,6 +9,7 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import ProductScroller from './index'
 import {renderWithProviders} from '../../utils/test-utils'
+import {createServer} from '../../../jest-setup'
 
 // Our component uses `scrollBy` on an html element, which we need
 // to create ourselves as its not in jsdom by default. Here we make
@@ -25,8 +26,13 @@ const testProducts = [1, 2, 3, 4].map((i) => ({
 }))
 
 describe('Product Scroller', () => {
+    createServer()
     test('renders loading skeletons', () => {
-        renderWithProviders(<ProductScroller isLoading />)
+        renderWithProviders(<ProductScroller isLoading />, {
+            wrapperProps: {
+                withCommerceApiProvider: false
+            }
+        })
         expect(screen.getAllByTestId('product-scroller-item-skeleton')).toHaveLength(4)
     })
     test('renders nothing when no products and not loading', () => {
