@@ -1,9 +1,15 @@
+/**
+ * @jest-environment node
+ */
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+// The @jest-environment comment block *MUST* be the first line of the file for the tests to pass.
+// That conflicts with the monorepo header rule, so we must disable the rule!
+/* eslint-disable header/header */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
 import {randomUUID} from 'crypto'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
