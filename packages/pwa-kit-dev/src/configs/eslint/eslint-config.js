@@ -42,7 +42,7 @@ module.exports = {
             // Jest (v29) default test match pattern
             files: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
             plugins: ['jest'],
-            extends: ['plugin:jest/recommended' /*, 'plugin:jest/style' */],
+            extends: ['plugin:jest/recommended', 'plugin:jest/style'],
             rules: {
                 'jest/expect-expect': [
                     'warn',
