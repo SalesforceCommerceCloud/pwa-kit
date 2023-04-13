@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Box, SimpleGrid, Icon, Text, Stack, Flex } from '@chakra-ui/react';
-import { HeartIcon, SocialTwitterIcon, DukeIcon } from '../icons'
+import { HeartIcon, SocialTwitterIcon, CheckIcon } from '../icons'
 
 const Feature = ({title, text, icon}) => {
   return (
@@ -48,7 +48,7 @@ const AbovePDP = () => {
           }
         />
         <Feature
-          icon={<Icon as={DukeIcon} w={10} h={10} />}
+          icon={<Icon as={CheckIcon} w={10} h={10} />}
           title={'A component slot'}
           text={
             'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore...'
