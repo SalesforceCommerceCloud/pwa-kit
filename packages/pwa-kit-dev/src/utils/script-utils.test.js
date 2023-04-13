@@ -9,7 +9,7 @@ import {mkdtemp, rm, writeFile, readJsonSync} from 'fs-extra'
 import path from 'path'
 import os from 'os'
 import * as scriptUtils from './script-utils'
-const pkg = readJsonSync('../../package.json')
+const pkg = readJsonSync(path.join(__dirname, '../../package.json'))
 
 describe('scriptUtils', () => {
     const originalEnv = process.env
