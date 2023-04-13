@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const p = require('path')
 const program = require('commander')
 const sh = require('shelljs')
@@ -36,21 +37,6 @@ const main = () => {
         )
         execSync(`node ${prepareDist}`)
     })
-
-    program
-        .command('lint')
-        .argument('<path>', 'path or glob to lint')
-        .option('--fix', 'Try and fix errors (default: false)')
-        .action((path, {fix}) => {
-            const eslint = p.join(binDir, 'eslint')
-            const eslintConfig = p.resolve(p.join(__dirname, '..', 'configs', '.eslintrc.js'))
-
-            execSync(
-                `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
-                    fix ? ' --fix' : ''
-                } "${path}"`
-            )
-        })
 
     program
         .command('format')
