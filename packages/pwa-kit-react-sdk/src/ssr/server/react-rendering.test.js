@@ -349,6 +349,14 @@ jest.mock('../universal/routes', () => {
     }
 })
 
+jest.mock('pwa-kit-runtime/utils/ssr-server', () => {
+    const actual = jest.requireActual('pwa-kit-runtime/utils/ssr-server')
+    return {
+        ...actual,
+        isRemote: jest.fn()
+    }
+})
+
 jest.mock('@loadable/server', () => {
     const lodableServer = jest.requireActual('@loadable/server')
     return {
@@ -419,7 +427,7 @@ describe('The Node SSR Environment', () => {
         {
             description: `rendering PWA's for desktop`,
             req: {url: '/pwa/'},
-            assertions(res) {
+            assertions: (res) => {
                 expect(res.statusCode).toBe(200)
                 const html = res.text
                 console.error(html)
@@ -727,7 +735,7 @@ describe('The Node SSR Environment', () => {
         })
     })
     isRemoteValues.forEach((isRemoteValue) => {
-        // Run test cases
+        // Rename `assertions` to `expectations` to pass linter rule
         cases.forEach(({description, req, assertions: expectations, mocks}) => {
             test(`renders PWA pages properly when ${
                 isRemoteValue ? 'remote' : 'local'

@@ -1055,14 +1055,14 @@ describe('wrapResponseWrite', () => {
         response.write('12345')
         expect(chunks.length).toEqual(1)
         expect(chunks[0].toString()).toEqual('12345')
-        expect(write).toHaveBeenCalledWith('12345')
+        expect(write.calledWith('12345')).toBe(true)
         write.reset()
 
         // String with encoding
         response.write('67890', 'utf-8')
         expect(chunks.length).toEqual(2)
         expect(chunks[1].toString()).toEqual('67890')
-        expect(write).toHaveBeenCalledWith('12345', 'utf-8')
+        expect(write.calledWith('67890', 'utf-8')).toBe(true)
         write.reset()
 
         // Buffer
@@ -1070,7 +1070,7 @@ describe('wrapResponseWrite', () => {
         response.write(chunk1)
         expect(chunks.length).toEqual(3)
         expect(chunks[2].toString()).toEqual('abcde')
-        expect(write).toHaveBeenCalledWith(chunk1)
+        expect(write.calledWith(chunk1)).toBe(true)
         write.reset()
 
         expect(() => response.write({})).toThrow('unexpected type')

@@ -24,13 +24,13 @@ jest.mock('./site-utils', () => {
 describe('requestIdleCallback should be a working shim', () => {
     test('without a working implementation built in', async () => {
         const result = new Promise((resolve) => utils.requestIdleCallback(resolve))
-        await expect(result).resolves.toBeDefined()
+        await expect(result).resolves.toBeUndefined()
     })
 
     test('with a working implementation built in', async () => {
         window.requestIdleCallback = (fn) => setTimeout(() => fn(), 1)
         const result = new Promise((resolve) => utils.requestIdleCallback(resolve))
-        await expect(result).resolves.toBeDefined()
+        await expect(result).resolves.toBeUndefined()
     })
 })
 
