@@ -184,7 +184,7 @@ describe('DevServer request processor support', () => {
             .expect(200)
             .then((response) => {
                 const requestClass = response.headers[X_MOBIFY_REQUEST_CLASS]
-                expect(requestClass).toEqual('bot')
+                expect(requestClass).toBe('bot')
                 expect(route).toHaveBeenCalled()
             })
     })
@@ -207,7 +207,7 @@ describe('DevServer request processor support', () => {
             .get('/')
             .expect(200)
             .then((response) => {
-                expect(response.headers[X_MOBIFY_REQUEST_CLASS]).toBe(undefined)
+                expect(response.headers[X_MOBIFY_REQUEST_CLASS]).toBeUndefined()
                 expect(route).toHaveBeenCalled()
                 expect(response.text).toEqual(helloWorld)
             })
@@ -381,31 +381,31 @@ describe('DevServer proxying', () => {
                 expect(nockResponse.isDone()).toBe(true)
 
                 // We expect a 200 (that nock returned)
-                expect(response.status).toEqual(200)
+                expect(response.status).toBe(200)
 
                 // We expect that we got a copy of the request headers
-                expect(requestHeaders.length).toBe(1)
+                expect(requestHeaders).toHaveLength(1)
 
                 // Verify that the request headers were rewritten
                 const headers = requestHeaders[0]
-                expect(headers.host).toEqual('test.proxy.com')
-                expect(headers.origin).toEqual('https://test.proxy.com')
+                expect(headers.host).toBe('test.proxy.com')
+                expect(headers.origin).toBe('https://test.proxy.com')
 
                 // Verify that the cookie and multi-value headers are
                 // correctly preserved.
-                expect(headers.cookie).toEqual('abc=123')
+                expect(headers.cookie).toBe('abc=123')
                 const multi = headers['x-multi-value']
-                expect(multi).toEqual('abc, def')
+                expect(multi).toBe('abc, def')
 
                 // Verify that the response contains a Set-Cookie
                 const setCookie = response.headers['set-cookie']
-                expect(setCookie.length).toBe(1)
-                expect(setCookie[0]).toEqual('xyz=456')
+                expect(setCookie).toHaveLength(1)
+                expect(setCookie[0]).toBe('xyz=456')
 
                 // Verify that the x-proxy-request-url header is present in
                 // the response
                 const requestUrl = response.headers[X_PROXY_REQUEST_URL]
-                expect(requestUrl).toEqual(`https://test.proxy.com${targetPath}`)
+                expect(requestUrl).toBe(`https://test.proxy.com${targetPath}`)
             })
     })
 
@@ -422,7 +422,7 @@ describe('DevServer proxying', () => {
             .then((response) => {
                 // Expected that proxy request would not be fetched
                 expect(nockResponse.isDone()).toBe(false)
-                expect(response.status).toEqual(405)
+                expect(response.status).toBe(405)
             })
     })
 
@@ -436,12 +436,12 @@ describe('DevServer proxying', () => {
                 expect('cache-control' in headers).toBe(false)
                 expect('cookie' in headers).toBe(false)
 
-                expect(headers['accept-language']).toEqual('en')
+                expect(headers['accept-language']).toBe('en')
 
-                expect(headers['accept-encoding']).toEqual('gzip')
+                expect(headers['accept-encoding']).toBe('gzip')
 
                 // This value is fixed
-                expect(headers['user-agent']).toEqual('Amazon CloudFront')
+                expect(headers['user-agent']).toBe('Amazon CloudFront')
 
                 return 'Success'
             })
@@ -463,7 +463,7 @@ describe('DevServer proxying', () => {
             .then((response) => {
                 // Expected that proxy request would be fetched
                 expect(nockResponse.isDone()).toBe(true)
-                expect(response.status).toEqual(200)
+                expect(response.status).toBe(200)
             })
     })
 
@@ -565,9 +565,9 @@ describe('DevServer persistent caching support', () => {
             .then(() => request(app).get(url))
             .then((res) => app._requestMonitor._waitForResponses().then(() => res))
             .then((res) => {
-                expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('false')
-                expect(res.headers['content-encoding']).toEqual('gzip')
+                expect(res.status).toBe(200)
+                expect(res.headers['x-mobify-from-cache']).toBe('false')
+                expect(res.headers['content-encoding']).toBe('gzip')
                 expect(res.text).toEqual(expected)
             })
             .then(() =>
@@ -580,9 +580,9 @@ describe('DevServer persistent caching support', () => {
             .then(() => request(app).get(url))
             .then((res) => app._requestMonitor._waitForResponses().then(() => res))
             .then((res) => {
-                expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('false')
-                expect(res.headers['content-encoding']).toEqual('gzip')
+                expect(res.status).toBe(200)
+                expect(res.headers['x-mobify-from-cache']).toBe('false')
+                expect(res.headers['content-encoding']).toBe('gzip')
                 expect(res.text).toEqual(expected)
             })
     })
@@ -594,9 +594,9 @@ describe('DevServer persistent caching support', () => {
             .get(url)
             .then((res) => app._requestMonitor._waitForResponses().then(() => res))
             .then((res) => {
-                expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('false')
-                expect(res.headers['content-encoding']).toEqual('gzip')
+                expect(res.status).toBe(200)
+                expect(res.headers['x-mobify-from-cache']).toBe('false')
+                expect(res.headers['content-encoding']).toBe('gzip')
             })
             .then(() =>
                 app.applicationCache.get({

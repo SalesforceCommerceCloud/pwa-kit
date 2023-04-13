@@ -42,7 +42,7 @@ test('writeFile writes as utf8', () => {
     fs.writeFile.mockImplementation(successCallbackAdapter())
 
     return fileUtils.writeFile('myfile.json', '{"test": true, "json": "JSON"}').then(() => {
-        expect(fs.writeFile.mock.calls.length).toBe(1)
+        expect(fs.writeFile.mock.calls).toHaveLength(1)
         expect(fs.writeFile.mock.calls[0].slice(0, -1)).toEqual([
             'myfile.json',
             '{"test": true, "json": "JSON"}',
@@ -95,7 +95,7 @@ test("mkdirIfNonexistent makes a directory if it doesn't exist", () => {
 test('existsSync calls statSync and returns true if it succeeds', () => {
     fs.statSync.mockReturnValueOnce(true)
     expect(fileUtils.existsSync('test.dat')).toBe(true)
-    expect(fs.statSync.mock.calls.length).toBe(1)
+    expect(fs.statSync.mock.calls).toHaveLength(1)
     expect(fs.statSync.mock.calls[0][0]).toBe('test.dat')
 })
 
@@ -126,8 +126,8 @@ test('filterDirectories returns the names that are directories after passing thr
     return fileUtils
         .filterDirectories(pathBuilder)(itemList)
         .then((result) => {
-            expect(fs.stat.mock.calls.length).toBe(itemList.length)
-            expect(pathBuilder.mock.calls.length).toBe(itemList.length)
+            expect(fs.stat.mock.calls).toHaveLength(itemList.length)
+            expect(pathBuilder.mock.calls).toHaveLength(itemList.length)
             itemList.forEach((item) => {
                 expect(pathBuilder).toHaveBeenCalledWith(item)
             })
@@ -155,8 +155,8 @@ test('filterFiles returns the names that are directories after passing through t
     return fileUtils
         .filterFiles(pathBuilder)(itemList)
         .then((result) => {
-            expect(fs.stat.mock.calls.length).toBe(itemList.length)
-            expect(pathBuilder.mock.calls.length).toBe(itemList.length)
+            expect(fs.stat.mock.calls).toHaveLength(itemList.length)
+            expect(pathBuilder.mock.calls).toHaveLength(itemList.length)
             itemList.forEach((item) => {
                 expect(pathBuilder).toHaveBeenCalledWith(item)
             })

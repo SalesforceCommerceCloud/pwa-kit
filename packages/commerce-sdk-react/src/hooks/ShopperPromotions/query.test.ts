@@ -36,7 +36,7 @@ const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof
 describe('Shopper Promotions query hooks', () => {
     beforeEach(() => nock.cleanAll())
     afterEach(() => {
-        expect(nock.pendingMocks().length).toBe(0)
+        expect(nock.pendingMocks()).toHaveLength(0)
     })
     test.each(testCases)('`%s` returns data on success', async (queryName, data) => {
         mockQueryEndpoint(promotionsEndpoint, data)

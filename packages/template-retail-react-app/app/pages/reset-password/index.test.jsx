@@ -70,7 +70,7 @@ test('Allows customer to go to sign in page', async () => {
     user.click(await screen.findByText('Sign in'))
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/login')
+        expect(window.location.pathname).toBe('/uk/en-GB/login')
     })
 })
 
@@ -108,7 +108,7 @@ test('Allows customer to generate password token', async () => {
     })
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/login')
+        expect(window.location.pathname).toBe('/uk/en-GB/login')
     })
 })
 

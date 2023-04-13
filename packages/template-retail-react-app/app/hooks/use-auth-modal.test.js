@@ -227,9 +227,9 @@ test.skip('Allows customer to create an account', async () => {
     // wait for success state to appear
     await waitFor(
         () => {
-            expect(window.location.pathname).toEqual('/uk/en-GB/account')
+            expect(window.location.pathname).toBe('/uk/en-GB/account')
             const myAccount = screen.getAllByText(/My Account/)
-            expect(myAccount.length).toEqual(2)
+            expect(myAccount).toHaveLength(2)
         },
         {
             timeout: 5000
@@ -277,7 +277,7 @@ test.skip('Allows customer to sign in to their account', async () => {
     // allow time to transition to account page
     await waitFor(
         () => {
-            expect(window.location.pathname).toEqual('/uk/en-GB/account')
+            expect(window.location.pathname).toBe('/uk/en-GB/account')
             expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
         },
         {timeout: 5000}

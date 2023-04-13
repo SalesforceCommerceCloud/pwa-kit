@@ -17,14 +17,14 @@ describe('withLegacyGetProps', function () {
     })
 
     test(`Has working getInitializers method`, () => {
-        expect(withLegacyGetProps({}).getInitializers().length).toBe(1)
-        expect(withLegacyGetProps({getInitializers: () => ['xyz']}).getInitializers().length).toBe(
+        expect(withLegacyGetProps({}).getInitializers()).toHaveLength(1)
+        expect(withLegacyGetProps({getInitializers: () => ['xyz']}).getInitializers()).toHaveLength(
             2
         )
     })
 
     test(`Has working getHOCsInUse method`, () => {
-        expect(withLegacyGetProps({}).getHOCsInUse().length).toBe(1)
-        expect(withLegacyGetProps({getHOCsInUse: () => ['xyz']}).getHOCsInUse().length).toBe(2)
+        expect(withLegacyGetProps({}).getHOCsInUse()).toHaveLength(1)
+        expect(withLegacyGetProps({getHOCsInUse: () => ['xyz']}).getHOCsInUse()).toHaveLength(2)
     })
 })

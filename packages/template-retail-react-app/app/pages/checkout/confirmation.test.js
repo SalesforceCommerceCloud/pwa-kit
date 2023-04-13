@@ -104,6 +104,6 @@ test('Create Account form - successful submission results in redirect to the Acc
     user.click(createAccountButton)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/account')
+        expect(window.location.pathname).toBe('/uk/en-GB/account')
     })
 })

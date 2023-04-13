@@ -57,24 +57,24 @@ describe('WatchOnlineStatus', () => {
 describe('escapeRegexChars', () => {
     test('escapes special characters', () => {
         const escapedString = utils.escapeRegexChars('{}()*+?.,\\^$|#')
-        expect(escapedString).toEqual('\\{\\}\\(\\)\\*\\+\\?\\.\\,\\\\\\^\\$\\|\\#')
+        expect(escapedString).toBe('\\{\\}\\(\\)\\*\\+\\?\\.\\,\\\\\\^\\$\\|\\#')
     })
 })
 
 describe('boldString & Capitalize test', () => {
     test('boldString returns provided part of string bolded html', () => {
         const boldedString = utils.boldString('boldedString', 'bolded')
-        expect(boldedString).toEqual('<b>bolded</b>String')
+        expect(boldedString).toBe('<b>bolded</b>String')
     })
 
     test('boldString handles special regex characters', () => {
         const boldedString = utils.boldString('some (*special!) chars', '(*special!)')
-        expect(boldedString).toEqual('some <b>(*special!)</b> chars')
+        expect(boldedString).toBe('some <b>(*special!)</b> chars')
     })
 
     test('capitalize capitalizes a string', () => {
         const stringToCapitlize = utils.capitalize('capitalize string test')
-        expect(stringToCapitlize).toEqual('Capitalize String Test')
+        expect(stringToCapitlize).toBe('Capitalize String Test')
     })
 })
 
@@ -82,10 +82,10 @@ describe('session storage tests', () => {
     test('sets,gets and removes item in session storage', () => {
         utils.setSessionJSONItem('test', ['text'])
         let testing = utils.getSessionJSONItem('test')
-        expect(testing.length).toEqual(1)
+        expect(testing).toHaveLength(1)
         utils.clearSessionJSONItem('test')
         testing = utils.getSessionJSONItem('test')
-        expect(testing).not.toBeDefined()
+        expect(testing).toBeUndefined()
     })
 })
 
@@ -97,7 +97,7 @@ describe('flatten', () => {
             children: [{id: 2, item: 2, children: [{id: 3, item: 3}]}]
         })
 
-        expect(JSON.stringify(result)).toEqual(
+        expect(JSON.stringify(result)).toBe(
             '{"1":{"id":1,"item":1,"children":[{"id":2,"item":2,"children":[{"id":3,"item":3}]}]},"2":{"id":2,"item":2,"children":[{"id":3,"item":3}]},"3":{"id":3,"item":3}}'
         )
     })

@@ -258,7 +258,7 @@ describe('SSRServer operation', () => {
             process.env[envVar] = 'value'
         })
         const app = RemoteServerFactory._createApp(opts({protocol: 'http'}))
-        expect(app.options.protocol).toEqual('https')
+        expect(app.options.protocol).toBe('https')
         process.env = savedEnvironment
     })
 
@@ -307,8 +307,8 @@ describe('SSRServer operation', () => {
             .expect(200)
             .then((res) => {
                 expect(console.warn.mock.calls[0][0]).toContain(`Discarding "Set-Cookie: blah123"`)
-                expect(res.headers['Set-Cookie']).toBe(undefined)
-                expect(res.headers['set-cookie']).toBe(undefined)
+                expect(res.headers['Set-Cookie']).toBeUndefined()
+                expect(res.headers['set-cookie']).toBeUndefined()
             })
     })
 
@@ -326,7 +326,7 @@ describe('SSRServer operation', () => {
             .get('/')
             .expect(200)
             .then((res) => {
-                expect(res.headers['content-type']).toEqual('text/plain; charset=utf-8')
+                expect(res.headers['content-type']).toBe('text/plain; charset=utf-8')
             })
     })
 
@@ -431,7 +431,7 @@ describe('SSRServer operation', () => {
 
     test('SSRServer creates cache on demand', () => {
         const app = RemoteServerFactory._createApp(opts())
-        expect(app._applicationCache).toBe(undefined)
+        expect(app._applicationCache).toBeUndefined()
         expect(app.applicationCache).toBeInstanceOf(PersistentCache)
         expect(app._applicationCache).toBe(app.applicationCache)
     })
@@ -802,7 +802,7 @@ describe('SSRServer persistent caching', () => {
                     .then((response) => {
                         expect(response.ok).toEqual(testCase.expectOk)
 
-                        expect(route.mock.calls.length).toBe(testCase.expectRenderCallCount)
+                        expect(route.mock.calls).toHaveLength(testCase.expectRenderCallCount)
 
                         expect(response.headers).toMatchObject(testCase.expectHeaders)
 
@@ -865,7 +865,7 @@ describe('generateCacheKey', () => {
     }
 
     test('returns expected results', () => {
-        expect(generateCacheKey(mockRequest({url: '/test/1?id=abc'})).indexOf('/test/1')).toEqual(0)
+        expect(generateCacheKey(mockRequest({url: '/test/1?id=abc'})).indexOf('/test/1')).toBe(0)
     })
 
     test('path affects key', () => {
@@ -888,7 +888,7 @@ describe('generateCacheKey', () => {
         })
         expect(generateCacheKey(request2)).not.toEqual(result1)
         // query string and device type is hashed
-        expect(generateCacheKey(request2)).toEqual(
+        expect(generateCacheKey(request2)).toBe(
             `/test/${getHashForString(['a=1', 'device=PHONE'].join('-'))}`
         )
     })
@@ -904,7 +904,7 @@ describe('generateCacheKey', () => {
             }
         })
         expect(generateCacheKey(request2)).not.toEqual(result1)
-        expect(generateCacheKey(request2)).toEqual(
+        expect(generateCacheKey(request2)).toBe(
             `/test/${getHashForString(['a=1', 'device=PHONE'].join('-'))}`
         )
     })
@@ -919,7 +919,7 @@ describe('generateCacheKey', () => {
             }
         })
 
-        expect(generateCacheKey(request1)).toEqual(
+        expect(generateCacheKey(request1)).toBe(
             `/test/${getHashForString(['a=1', 'device=TABLET'].join('-'))}`
         )
     })

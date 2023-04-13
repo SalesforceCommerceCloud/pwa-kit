@@ -435,8 +435,8 @@ describe('The Node SSR Environment', () => {
                 const include = ['<div>This is a PWA</div>']
                 const data = dataFromHTML(doc)
                 const dataScript = doc.querySelectorAll('script[id=mobify-data]')[0]
-                expect(dataScript.innerHTML.split(/\r\n|\r|\n/).length).toBe(1)
-                expect(data.__DEVICE_TYPE__).toEqual('DESKTOP')
+                expect(dataScript.innerHTML.split(/\r\n|\r|\n/)).toHaveLength(1)
+                expect(data.__DEVICE_TYPE__).toBe('DESKTOP')
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
             }
@@ -454,7 +454,7 @@ describe('The Node SSR Environment', () => {
                 const html = res.text
                 const doc = parse(html)
                 const data = dataFromHTML(doc)
-                expect(data.__DEVICE_TYPE__).toEqual('TABLET')
+                expect(data.__DEVICE_TYPE__).toBe('TABLET')
                 const include = ['<div>This is a PWA</div>']
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
@@ -473,7 +473,7 @@ describe('The Node SSR Environment', () => {
                 const html = res.text
                 const doc = parse(html)
                 const data = dataFromHTML(doc)
-                expect(data.__DEVICE_TYPE__).toEqual('PHONE')
+                expect(data.__DEVICE_TYPE__).toBe('PHONE')
                 const include = ['<div>This is a PWA</div>']
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
@@ -600,10 +600,10 @@ describe('The Node SSR Environment', () => {
                 const doc = parse(html)
                 const data = dataFromHTML(doc)
 
-                expect(data.__ERROR__.message).toEqual('Internal Server Error')
+                expect(data.__ERROR__.message).toBe('Internal Server Error')
                 expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
 
-                expect(data.__ERROR__.status).toEqual(500)
+                expect(data.__ERROR__.status).toBe(500)
             }
         },
         {
@@ -614,9 +614,9 @@ describe('The Node SSR Environment', () => {
                 const doc = parse(html)
                 const data = dataFromHTML(doc)
 
-                expect(data.__ERROR__.message).toEqual('Internal Server Error')
+                expect(data.__ERROR__.message).toBe('Internal Server Error')
                 expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
-                expect(data.__ERROR__.status).toEqual(500)
+                expect(data.__ERROR__.status).toBe(500)
                 expect(res.statusCode).toBe(500)
             }
         },
@@ -628,39 +628,31 @@ describe('The Node SSR Environment', () => {
                 const html = res.text
                 const doc = parse(html)
                 const head = doc.querySelector('head')
-                expect(html.includes('lang="helmet-html-attribute"')).toBe(true)
-                expect(doc.querySelector('body').getAttribute('class')).toEqual(
+                expect(html).toContain('lang="helmet-html-attribute"')
+                expect(doc.querySelector('body').getAttribute('class')).toBe(
                     'helmet-body-attribute'
                 )
-                expect(head.querySelector(`title`).innerHTML).toEqual('Helmet title')
-                expect(head.querySelector('base').getAttribute('target')).toEqual('_blank')
-                expect(
-                    doc.querySelector('style').innerHTML.includes('background-color: blue;')
-                ).toBe(true)
-                expect(
-                    doc
-                        .querySelector('noscript')
-                        .innerHTML.includes(
-                            '<link rel="stylesheet" type="text/css" href="foo.css" />'
-                        )
-                ).toBe(true)
+                expect(head.querySelector(`title`).innerHTML).toBe('Helmet title')
+                expect(head.querySelector('base').getAttribute('target')).toBe('_blank')
+                expect(doc.querySelector('style').innerHTML).toContain('background-color: blue;')
+                expect(doc.querySelector('noscript').innerHTML).toContain(
+                    '<link rel="stylesheet" type="text/css" href="foo.css" />'
+                )
                 expect(doc.querySelector('noscript').innerHTML).toEqual(
                     expect.stringContaining(
                         '<link rel="stylesheet" type="text/css" href="foo.css" />'
                     )
                 )
-                expect(head.querySelector('meta[name="helmet-meta-1"]')).not.toBe(null)
-                expect(head.querySelector('meta[property="helmet-meta-2"]')).not.toBe(null)
-                expect(head.querySelector('link[rel="helmet-link-1"]')).not.toBe(null)
-                expect(head.querySelector('link[rel="helmet-link-2"]')).not.toBe(null)
-                expect(head.querySelector('script[src="http://include.com/pathtojs.js"]')).not.toBe(
-                    null
-                )
+                expect(head.querySelector('meta[name="helmet-meta-1"]')).not.toBeNull()
+                expect(head.querySelector('meta[property="helmet-meta-2"]')).not.toBeNull()
+                expect(head.querySelector('link[rel="helmet-link-1"]')).not.toBeNull()
+                expect(head.querySelector('link[rel="helmet-link-2"]')).not.toBeNull()
                 expect(
-                    head
-                        .querySelector('script[type="application/ld+json"]')
-                        .innerHTML.includes(`"@context": "http://schema.org"`)
-                ).toBe(true)
+                    head.querySelector('script[src="http://include.com/pathtojs.js"]')
+                ).not.toBeNull()
+                expect(
+                    head.querySelector('script[type="application/ld+json"]').innerHTML
+                ).toContain(`"@context": "http://schema.org"`)
             }
         },
         {

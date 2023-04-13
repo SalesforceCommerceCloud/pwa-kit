@@ -33,7 +33,7 @@ describe('The useSearchParams', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('limits').text).toEqual(
+        expect(wrapper.getByTestId('limits').text).toBe(
             '{"limit":25,"offset":0,"sort":"best-matches","refine":{},"_refine":[]}'
         )
     })
@@ -50,7 +50,7 @@ describe('The useSearchParams', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('limits').text).toEqual(
+        expect(wrapper.getByTestId('limits').text).toBe(
             '{"limit":25,"offset":0,"sort":"best-matches","refine":{"c_refinementColor":["Black","Purple"]},"_refine":["c_refinementColor=Black|Purple"]}'
         )
     })
@@ -66,7 +66,7 @@ describe('The useSearchParams', () => {
         }
 
         const stringifiedObject = stringify(objectToStringify)
-        expect(stringifiedObject).toEqual(
+        expect(stringifiedObject).toBe(
             'limit=25&offset=0&refine=c_refinementColor%3DBlack%7CPurple&sort=best-matches'
         )
     })

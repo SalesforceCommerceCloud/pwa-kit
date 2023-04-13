@@ -52,9 +52,9 @@ test('Region renders without errors', () => {
     })
 
     // Regions are in document.
-    expect(container.querySelectorAll('.region')?.length).toEqual(1)
+    expect(container.querySelectorAll('.region')?.length).toBe(1)
 
     // Components are in document. (Note: Sub-regions/components aren't rendered because that is
     // the responsibility of the component definition.)
-    expect(container.querySelectorAll('.component')?.length).toEqual(1)
+    expect(container.querySelectorAll('.component')?.length).toBe(1)
 })

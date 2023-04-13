@@ -29,7 +29,7 @@ describe('main', function () {
             WrappedApp: routeComponent(App, false, locals)
         }
         const wrapper = mount(<OuterApp {...props} />)
-        expect(wrapper.find(App).length).toBe(1)
+        expect(wrapper.find(App)).toHaveLength(1)
         window.__PRELOADED_STATE__ = oldPreloadedState
     })
 
@@ -45,7 +45,7 @@ describe('main', function () {
             WrappedApp: routeComponent(App, false, locals)
         }
         const wrapper = mount(<OuterApp {...props} />)
-        expect(wrapper.find(AppErrorBoundary).length).toBe(1)
+        expect(wrapper.find(AppErrorBoundary)).toHaveLength(1)
         window.__ERROR__ = oldWindowError
     })
 })

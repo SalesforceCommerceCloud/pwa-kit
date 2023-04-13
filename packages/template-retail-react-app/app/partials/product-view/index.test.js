@@ -48,11 +48,11 @@ test('ProductView Component renders properly', async () => {
     const addToCart = jest.fn()
     await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
 
-    expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i).length).toEqual(2)
-    expect(screen.getAllByText(/299.99/).length).toEqual(2)
-    expect(screen.getAllByText(/Add to cart/i).length).toEqual(2)
-    expect(screen.getAllByRole('radiogroup').length).toEqual(3)
-    expect(screen.getAllByText(/add to cart/i).length).toEqual(2)
+    expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
+    expect(screen.getAllByText(/299.99/)).toHaveLength(2)
+    expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
+    expect(screen.getAllByRole('radiogroup')).toHaveLength(3)
+    expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
 })
 
 test('ProductView Component renders with addToCart event handler', async () => {
@@ -148,8 +148,8 @@ test('renders a product set properly - parent item', () => {
     expect(addSetToWishlistButton).toBeInTheDocument()
 
     // What should _not_ exist:
-    expect(variationAttributes.length).toEqual(0)
-    expect(quantityPicker).toBe(null)
+    expect(variationAttributes).toHaveLength(0)
+    expect(quantityPicker).toBeNull()
 })
 
 test('renders a product set properly - child item', () => {
@@ -171,11 +171,11 @@ test('renders a product set properly - child item', () => {
     // What should exist:
     expect(addToCartButton).toBeInTheDocument()
     expect(addToWishlistButton).toBeInTheDocument()
-    expect(variationAttributes.length).toEqual(2)
+    expect(variationAttributes).toHaveLength(2)
     expect(quantityPicker).toBeInTheDocument()
 
     // What should _not_ exist:
-    expect(startingAtLabels.length).toEqual(0)
+    expect(startingAtLabels).toHaveLength(0)
 })
 
 test('validateOrderability callback is called when adding a set to cart', async () => {

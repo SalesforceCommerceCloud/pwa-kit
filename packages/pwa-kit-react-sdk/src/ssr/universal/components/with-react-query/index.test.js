@@ -29,12 +29,12 @@ describe('withReactQuery', function () {
     })
 
     test(`Has working getInitializers method`, () => {
-        expect(withReactQuery({}).getInitializers().length).toBe(1)
-        expect(withReactQuery({getInitializers: () => ['xyz']}).getInitializers().length).toBe(2)
+        expect(withReactQuery({}).getInitializers()).toHaveLength(1)
+        expect(withReactQuery({getInitializers: () => ['xyz']}).getInitializers()).toHaveLength(2)
     })
 
     test(`Has working getHOCsInUse method`, () => {
-        expect(withReactQuery({}).getHOCsInUse().length).toBe(1)
-        expect(withReactQuery({getHOCsInUse: () => ['xyz']}).getHOCsInUse().length).toBe(2)
+        expect(withReactQuery({}).getHOCsInUse()).toHaveLength(1)
+        expect(withReactQuery({getHOCsInUse: () => ['xyz']}).getHOCsInUse()).toHaveLength(2)
     })
 })

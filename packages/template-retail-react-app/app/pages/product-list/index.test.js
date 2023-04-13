@@ -80,7 +80,7 @@ test('should render sort option list page', async () => {
 test('should render skeleton', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent isLoading />)
-    expect(screen.getAllByTestId('sf-product-tile-skeleton').length).toEqual(25)
+    expect(screen.getAllByTestId('sf-product-tile-skeleton')).toHaveLength(25)
 })
 
 test('should render empty list page', async () => {
@@ -99,7 +99,7 @@ test('should display Selected refinements as there are some in the response', as
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     const countOfRefinements = await screen.findAllByText('Black')
-    expect(countOfRefinements.length).toEqual(2)
+    expect(countOfRefinements).toHaveLength(2)
 })
 
 // TODO: Fix flaky/broken test
@@ -109,7 +109,7 @@ test.skip('show login modal when an unauthenticated user tries to add an item to
     renderWithProviders(<MockedComponent />)
     expect(await screen.findAllByText('Black')).toBeInTheDocument()
     const wishlistButton = await screen.getAllByLabelText('Wishlist')
-    expect(wishlistButton.length).toBe(25)
+    expect(wishlistButton).toHaveLength(25)
     user.click(wishlistButton[0])
     expect(await screen.findByText(/Email/)).toBeInTheDocument()
     expect(await screen.findByText(/Password/)).toBeInTheDocument()
@@ -125,7 +125,7 @@ test('clicking a filter will change url', async () => {
 
     user.click(screen.getByText(/Beige/i))
     await waitFor(() =>
-        expect(window.location.search).toEqual(
+        expect(window.location.search).toBe(
             '?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
         )
     )
@@ -142,9 +142,7 @@ test('click on Clear All should clear out all the filter in search params', asyn
     })
     const clearAllButton = await screen.findAllByText(/Clear All/i)
     user.click(clearAllButton[0])
-    await waitFor(() =>
-        expect(window.location.search).toEqual('?limit=25&offset=0&sort=best-matches')
-    )
+    await waitFor(() => expect(window.location.search).toBe('?limit=25&offset=0&sort=best-matches'))
 })
 
 test('should display Search Results for when searching', async () => {
@@ -167,7 +165,7 @@ test('clicking a filter on search result will change url', async () => {
     user.click(screen.getByText(/Beige/i))
 
     await waitFor(() =>
-        expect(window.location.search).toEqual(
+        expect(window.location.search).toBe(
             '?limit=25&q=dress&refine=c_refinementColor%3DBeige&sort=best-matches'
         )
     )

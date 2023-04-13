@@ -24,7 +24,7 @@ const testId1 = 'footer.link.privacy_policy'
 const testId2 = 'account.accordion.button.my_account'
 
 test('our assumptions before further testing', () => {
-    expect(supportedLocales.includes(nonSupportedLocale)).toBe(false)
+    expect(supportedLocales).not.toContain(nonSupportedLocale)
     if (isMultiLocales) {
         // eslint-disable-next-line jest/no-conditional-expect
         expect(DEFAULT_LOCALE).toBe('en-GB')

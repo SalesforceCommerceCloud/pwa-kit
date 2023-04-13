@@ -72,7 +72,7 @@ describe('scriptUtils', () => {
 
         test('glob works with Array.filter', () => {
             const matched = allPaths.filter(matcher)
-            expect(matched.length).toStrictEqual(expectToMatch.length)
+            expect(matched).toHaveLength(expectToMatch.length)
         })
     })
 
@@ -104,7 +104,7 @@ describe('scriptUtils', () => {
     describe('defaultMessage', () => {
         test('works', async () => {
             const mockGit = {branch: () => 'branch', short: () => 'short'}
-            expect(scriptUtils.defaultMessage(mockGit)).toEqual('branch: short')
+            expect(scriptUtils.defaultMessage(mockGit)).toBe('branch: short')
         })
 
         test('works outside of a git repo', async () => {
@@ -114,7 +114,7 @@ describe('scriptUtils', () => {
                 },
                 short: () => 'short'
             }
-            expect(scriptUtils.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
+            expect(scriptUtils.defaultMessage(mockGit)).toBe('PWA Kit Bundle')
         })
 
         test('works with any other error', async () => {
@@ -124,7 +124,7 @@ describe('scriptUtils', () => {
                 },
                 short: () => 'short'
             }
-            expect(scriptUtils.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
+            expect(scriptUtils.defaultMessage(mockGit)).toBe('PWA Kit Bundle')
         })
     })
 
@@ -197,7 +197,7 @@ describe('scriptUtils', () => {
             })
 
             expect(bundle.message).toEqual(message)
-            expect(bundle.encoding).toEqual('base64')
+            expect(bundle.encoding).toBe('base64')
             expect(bundle.ssr_parameters).toEqual({})
             expect(bundle.ssr_only).toEqual(['ssr.js'])
             expect(bundle.ssr_shared).toEqual(['ssr.js', 'static/favicon.ico'])
