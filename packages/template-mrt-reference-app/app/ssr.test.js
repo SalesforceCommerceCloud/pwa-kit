@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import request from 'supertest'
+// Tests cannot run if this require is converted to an import
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const request = require('supertest')
 
 describe('server', () => {
     let originalEnv, app, server
