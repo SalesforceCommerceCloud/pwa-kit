@@ -11,6 +11,8 @@ This folder contains the React components used when rendering the pages from [Pa
 
 Use this folder to add React components that can render Page Designer components that have been serialized to JSON.
 
+> NOTE: If you are creating components that do not already exist in Page Designer, follow [this](https://documentation.b2c.commercecloud.salesforce.com/DOC1/index.jsp) guide to first create your Page Designer components before creating their matching PWA-Kit React components.
+
 This folder includes components for layout and visualization of images, grids, and carousels.
 
 **By default, Page Designer integration is not enabled in the Retail React App.** Additionally, to utilize the `shopperExperience`
