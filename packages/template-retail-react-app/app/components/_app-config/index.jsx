@@ -38,6 +38,18 @@ const AppConfig = ({children, locals = {}}) => {
     const headers = {
         'correlation-id': correlationId
     }
+//useState with token
+    //useEffect to listen message
+    // slastsobtoken to set the fetechToken
+    // Refesh the context by sending CONTEXT_CHANGED
+    //      trigger cache clear
+
+    //TODO implement price change
+    // quip doc separte preview and context prevewiew
+    // bundle shopper context
+
+    // shopper context in common right? --> create pwa-kit-preview or pwa-kit-react-sdk with the shopper context logic
+    //used by preview app and by template-retail-react-app
 
     const commerceApiConfig = locals.appConfig.commerceAPI
 
@@ -54,6 +66,7 @@ const AppConfig = ({children, locals = {}}) => {
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
+            //fetchedToken={state}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>

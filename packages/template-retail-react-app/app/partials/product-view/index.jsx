@@ -282,13 +282,15 @@ const ProductView = forwardRef(
             }
         }, [variant?.productId, quantity])
 
+        console.log('ProductView product?.productPromotions[2]?.promotionalPrice:', product?.productPromotions[2]?.promotionalPrice)
+
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
                 {/* Basic information etc. title, price, breadcrumb*/}
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
-                        price={product?.price}
+                        price={product?.productPromotions[2]?.promotionalPrice || product?.price}
                         productType={product?.type}
                         currency={product?.currency}
                         category={category}
@@ -327,7 +329,7 @@ const ProductView = forwardRef(
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
-                                price={product?.price}
+                                price={product?.productPromotions[2]?.promotionalPrice || product?.price}
                                 productType={product?.type}
                                 currency={product?.currency}
                                 category={category}

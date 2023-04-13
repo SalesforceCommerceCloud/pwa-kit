@@ -21,6 +21,8 @@ import {
     useShopperBasketsMutation
 } from 'commerce-sdk-react-preview'
 import * as queryKeyHelpers from 'commerce-sdk-react-preview/hooks/ShopperProducts/queryKeyHelpers'
+import fetch from 'node-fetch'
+
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
@@ -72,6 +74,30 @@ import {resolveSiteFromUrl} from '../../utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 
+const preview = async (AMToken, getTokenWhenReady) => {
+    // SLAS token
+    const token = await getTokenWhenReady()
+
+    console.log('preview AMToken:', AMToken)
+    console.log('preview SLAS token:', token)
+
+    // [2] Set the context by asking to preview with our token.
+    let previewResponse = await fetch(new URL('http://localhost:3000/preview'), {
+        method: 'POST',
+        body: JSON.stringify({access_token: `Bearer ${AMToken}`}),
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    })
+
+    if (!previewResponse.ok) {
+        const previewError = await previewResponse.json()
+        console.log({previewError})
+        return
+    }
+}
+
 /*
 The categories tree can be really large! For performance reasons,
 we only load the level 0 categories on server side, and load the rest
@@ -108,6 +134,7 @@ const App = (props) => {
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
     const {data: categoriesTree} = useLazyLoadCategories()
     const categories = flatten(categoriesTree || {}, 'categories')
+    const {getTokenWhenReady} = useAccessToken()
 
     const appOrigin = getAppOrigin()
 
@@ -163,8 +190,19 @@ const App = (props) => {
 
         // Receive message from parent
         window.addEventListener('message', ({ data, origin }) => {
-            console.log(`iframe received ${data} from ${origin}`)
-            alert(`iframe received ${data} from ${origin}`);
+            // console.log(`iframe received ${data} from ${origin}`)
+            //alert(`iframe received ${data} from ${origin}`);
+            // localStorage.setItem("access_token_am", data)
+            //
+            // if (typeof window !== 'undefined') {
+            //     AMToken = localStorage.getItem('access_token_am')
+            // }
+
+            let AMToken = data
+            console.log('AMToken:', AMToken)
+            if(AMToken){
+                preview(AMToken, getTokenWhenReady)
+            }
         });
     }, [])
 
