@@ -33,7 +33,7 @@ import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from '^retail-react-app/app/pages/home/data'
 
 //Hooks
-import useEinstein from '^retail-react-app/app/hooks/use-einstein'
+import useEinstein from '../../hooks/use-einstein'
 
 // Constants
 import {
