@@ -40,8 +40,11 @@ jobs:
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
+      # (We also use this env var for making sure a step runs once for the current node version)
       IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
-      IS_LATEST_NPM: ${{ matrix.node == 16 && matrix.npm == 8 }}
+      # The current recommended version for Managed Runtime: 
+      # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
+      IS_MRT_NODE: ${{ matrix.node == 16 && matrix.npm == 8 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -71,35 +74,35 @@ jobs:
         uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' || env.V3 == 'true' )
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' || env.V3 == 'true' )
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT (Development)
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.DEVELOP == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOP == 'true'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "./packages/template-retail-react-app"
           TARGET: staging
       
       - name: Push Bundle to MRT (v3)
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.V3 == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.V3 == 'true'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "./packages/template-retail-react-app"
           TARGET: staging-v3
 
       - name: Push Bundle to MRT (Production)
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.RELEASE == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "./packages/template-retail-react-app"
           TARGET: production
 
       - name: Push Bundle to MRT (Commerce SDK React)
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.DEVELOPMENT == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOPMENT == 'true'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "./packages/test-commerce-sdk-react"
@@ -110,7 +113,7 @@ jobs:
         uses: "./.github/actions/check_clean"
 
       - name: Publish to NPM
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.RELEASE == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
         uses: "./.github/actions/publish_to_npm"
         with:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
@@ -135,7 +138,11 @@ jobs:
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 16 && matrix.npm == 8 || matrix.node == 18 && matrix.npm == 9 }}
+      # (We also use this env var for making sure a step runs once for the current node version)
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+      # The current recommended version for Managed Runtime: 
+      # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
+      IS_MRT_NODE: ${{ matrix.node == 16 && matrix.npm == 8 }}
     runs-on: windows-latest
     steps:
         - name: Checkout
