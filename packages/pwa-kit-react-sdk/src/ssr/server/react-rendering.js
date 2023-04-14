@@ -73,6 +73,29 @@ const logAndFormatError = (err) => {
     }
 }
 
+// Because multi-value params are not supported in `aws-serverless-express` we need to re-add
+// the stripped duplicate params.
+const FIX_LOCATION_SEARCH = (req, location) => {
+    const params = new URLSearchParams(location.search)
+    const newParams = new URLSearchParams()
+    const orderedKeys = [...new Set(params.keys())]
+
+    // Maintain the original order of the parameters by iterating the
+    // ordered list of keys, and using the `req.query` object as the source of values.
+    orderedKeys.forEach((key) => {
+        const value = req.query[key]
+        const values = Array.isArray(value) ? value : [value]
+
+        values.forEach((v) => {
+            newParams.append(key, v)
+        })
+    })
+    const searchString = newParams.toString()
+
+    // Update the location objects reference.
+    location.search = searchString ? `?${searchString}` : ''
+}
+
 /**
  * This is the main react-rendering function for SSR. It is an Express handler.
  *
@@ -94,10 +117,14 @@ export const render = async (req, res, next) => {
     const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname, search] = req.originalUrl.split('?')
-    const location = {
+    let location = {
         pathname,
         search: search ? `?${search}` : ''
     }
+
+    // TODO: Remove this fix once we upgrade from `aws-serverless-express` to
+    // `vendia/serverless-express`.
+    FIX_LOCATION_SEARCH(req, location)
 
     // Step 1 - Find the match.
     let route
