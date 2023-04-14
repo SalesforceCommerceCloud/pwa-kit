@@ -62,7 +62,7 @@ import {
 } from '../../constants'
 
 import Seo from '../seo'
-import {resolveSiteFromUrl} from '../../utils/site-utils'
+import {resolveLocaleFromUrl, resolveSiteFromUrl} from '../../utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -321,7 +321,7 @@ App.shouldGetProps = () => {
 
 App.getProps = async ({res}) => {
     const site = resolveSiteFromUrl(res.locals.originalUrl)
-    const locale = resolveSiteFromUrl(res.locals.originalUrl)
+    const locale = resolveLocaleFromUrl(res.locals.originalUrl)
     const l10nConfig = site.l10n
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
