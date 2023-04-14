@@ -76,6 +76,7 @@ class OverlayResolverPlugin {
                 [end, rest]
             )
         })
+        console.log('this.overridesHashMap', this.overridesHashMap)
     }
 
     isRelevant(p) {
@@ -196,6 +197,7 @@ class OverlayResolverPlugin {
                     this.isAppBaseRelative(requestContext.path) &&
                     requestContext.request.startsWith('.')
                 ) {
+                    
                     // app base request relative
                     // ex - /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app/components/header
                     var resolvedPath = path.resolve(requestContext.path, requestContext.request)
@@ -205,7 +207,6 @@ class OverlayResolverPlugin {
                         let overlayRelative = this.toOverlayRelative(resolvedPath)
 
                         let targetFile, target
-                        const vars = [overlayRelative, this._allSearchDirs, resolver.options.extensions]
                         try {
                             targetFile = this.findFileMap(
                                 overlayRelative,
@@ -233,6 +234,41 @@ class OverlayResolverPlugin {
                             return callback()
                         }
                     } else {
+                        return callback()
+                    }
+                } else if (requestContext.request.startsWith('.')) {
+                    // if request looks like '../../components/product-detail/above-fold'
+                    // and the path looks like '/Users/yunakim/cc-pwa/pwa-kit/packages/template-retail-react-app/app/pages/product-detail'
+                    const overlayRelative = requestContext.request.replaceAll('../', '')
+                    let targetFile, target
+
+                    if (requestContext.request === '../../components/product-detail/above-fold') {
+                        console.log('overlayRelative', overlayRelative)
+                    }
+                    try {
+                        targetFile = this.findFileMap(
+                            overlayRelative,
+                            this._allSearchDirs,
+                            resolver.options.extensions
+                        )
+                        if (targetFile) {
+                            console.log('~FOUND', targetFile)
+                        }
+
+                        if (targetFile) {
+                            target = resolver.ensureHook('resolved')
+                            requestContext.path = targetFile
+                            resolver.doResolve(
+                                target,
+                                requestContext,
+                                `${this.constructor.name} found base override file`,
+                                resolveContext,
+                                callback
+                            )
+                        } else {
+                            return callback()
+                        }
+                    } catch (e) {
                         return callback()
                     }
                 } else if (
@@ -267,9 +303,7 @@ class OverlayResolverPlugin {
                         return callback()
                     }
                 } else {
-                    if (requestContext.request === '../../components/product-detail/above-fold') {
-                        console.log('MISSING THIS')
-                    }
+
                     callback()
                 }
             }.bind(this)
