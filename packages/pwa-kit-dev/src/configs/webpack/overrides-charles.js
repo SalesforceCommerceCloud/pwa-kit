@@ -31,7 +31,6 @@ class OverlayResolverPlugin {
         this.appBase = options.appBase || './app'
         this.appBase = path.resolve(this.appBase)
         // this is /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app
-        console.log('this.appBase', this.appBase)
         
         // this is [retail-react-app]
         this.overlays = options.overlays || []
@@ -76,7 +75,6 @@ class OverlayResolverPlugin {
                 [end, rest]
             )
         })
-        console.log('this.overridesHashMap', this.overridesHashMap)
     }
 
     isRelevant(p) {
@@ -92,34 +90,9 @@ class OverlayResolverPlugin {
     /**
      *
      * @param requestPath
-     * @param target
-     * @param {[]} extensions
+     * @param dirs
      */
-    findFile(requestPath, dirs, extensions) {
-        // TODO search all overlay extensions of requested file
-        var fileExt = path.extname(requestPath)
-        for (var dir of dirs) {
-            var base = path.join(dir, requestPath)
-            if (fileExt) {
-                if (fs.existsSync(base)) {
-                    return base
-                }
-            } else {
-                // TODO this is technically not how we should find index
-                // see resolver plugin docs
-                if (fs.existsSync(base) && fs.lstatSync(base).isDirectory()) {
-                    base = path.join(base, 'index')
-                }
-                for (var ext of extensions) {
-                    if (fs.existsSync(base + ext)) {
-                        return base + ext
-                    }
-                }
-            }
-        }
-    }
-
-    findFileMap(requestPath, dirs, extensions) {
+    findFileMap(requestPath, dirs) {
         var fileExt = path.extname(requestPath)
         for (var dir of dirs) {
             var base = path.join(dir, requestPath)
@@ -142,9 +115,6 @@ class OverlayResolverPlugin {
         }
     }
 
-    /**
-     *
-     */
     toOverlayRelative(p) {
         var overlay = this.findOverlay(p)
         return p.substring(overlay.length + 1)
@@ -165,7 +135,6 @@ class OverlayResolverPlugin {
             'FeatureResolverPlugin',
             function (requestContext, resolveContext, callback) {
                 // exact match ^ means import the "parent" (superModule) of the requesting module
-                console.log('requestContext', requestContext)
                 if (requestContext.request === '^') {
                     const overlayRelative = this.toOverlayRelative(requestContext.context.issuer)
                     const overlay = this.findOverlay(requestContext.context.issuer)
@@ -193,6 +162,8 @@ class OverlayResolverPlugin {
                 } else if (requestContext.request.startsWith('^/')) {
                     // let aliases find the file
                     return callback()
+                
+                //this block catches requests coming from the overrides directory
                 } else if (
                     this.isAppBaseRelative(requestContext.path) &&
                     requestContext.request.startsWith('.')
@@ -206,19 +177,15 @@ class OverlayResolverPlugin {
                         // ex - components/header
                         let overlayRelative = this.toOverlayRelative(resolvedPath)
 
-                        let targetFile, target
                         try {
-                            targetFile = this.findFileMap(
+                            var targetFile = this.findFileMap(
                                 overlayRelative,
                                 this._allSearchDirs,
                                 resolver.options.extensions
                             )
-                            // if (targetFile) {
-                            //     console.log('~FOUND', targetFile)
-                            // }
 
                             if (targetFile) {
-                                target = resolver.ensureHook('resolved')
+                                const target = resolver.ensureHook('resolved')
                                 requestContext.path = targetFile
                                 resolver.doResolve(
                                     target,
@@ -236,27 +203,21 @@ class OverlayResolverPlugin {
                     } else {
                         return callback()
                     }
+                
+                // this block catches requests coming from the underlying template
                 } else if (requestContext.request.startsWith('.')) {
                     // if request looks like '../../components/product-detail/above-fold'
                     // and the path looks like '/Users/yunakim/cc-pwa/pwa-kit/packages/template-retail-react-app/app/pages/product-detail'
                     const overlayRelative = requestContext.request.replaceAll('../', '')
-                    let targetFile, target
-
-                    if (requestContext.request === '../../components/product-detail/above-fold') {
-                        console.log('overlayRelative', overlayRelative)
-                    }
                     try {
-                        targetFile = this.findFileMap(
+                        var targetFile = this.findFileMap(
                             overlayRelative,
                             this._allSearchDirs,
                             resolver.options.extensions
                         )
-                        if (targetFile) {
-                            console.log('~FOUND', targetFile)
-                        }
 
                         if (targetFile) {
-                            target = resolver.ensureHook('resolved')
+                            const target = resolver.ensureHook('resolved')
                             requestContext.path = targetFile
                             resolver.doResolve(
                                 target,
@@ -277,17 +238,15 @@ class OverlayResolverPlugin {
                 ) {
                     // external dependency requiring app code (app-config, app, ssr, etc)
                     // TODO: DRY this is nearly the same as the above condition
-
                     let overlayRelative = this.toOverlayRelative(requestContext.request)
-                    let targetFile, target
                     try {
-                        targetFile = this.findFileMap(
+                        var targetFile = this.findFileMap(
                             overlayRelative,
                             this._allSearchDirs,
                             resolver.options.extensions
                         )
                         if (targetFile) {
-                            target = resolver.ensureHook('resolved')
+                            const target = resolver.ensureHook('resolved')
                             requestContext.path = targetFile
                             resolver.doResolve(
                                 target,
