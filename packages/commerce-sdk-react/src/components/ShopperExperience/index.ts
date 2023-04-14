@@ -6,5 +6,5 @@
  */
 
 export {Component, propType as componentPropType} from './Component'
-export {Page, propType as pagePropType} from './Page'
+export {Page, PageContext, propType as pagePropType, usePageContext} from './Page'
 export {Region, propType as regionPropType} from './Region'
