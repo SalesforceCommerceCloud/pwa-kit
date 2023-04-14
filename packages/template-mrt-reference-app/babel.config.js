@@ -8,5 +8,5 @@ const base = require('pwa-kit-dev/configs/babel/babel-config').default
 
 module.exports = {
     ...base,
-    exclude: ['./app/ssr.js', './app/ssr.test.js']
+    exclude: ['./app/ssr.js', './app/ssr.test.sh']
 }
