@@ -146,7 +146,7 @@ class Auth {
             proxy: config.proxy,
             parameters: {
                 clientId: config.clientId,
-                clientSecret: config.clientId,
+                // clientSecret: config.clientId,
                 organizationId: config.organizationId,
                 shortCode: config.shortCode,
                 siteId: config.siteId
@@ -335,7 +335,7 @@ class Auth {
             () =>
                 helpers.loginGuestUser(this.client, {
                     redirectURI: this.redirectURI,
-                    clientSecret: this.clientSecret
+                    // clientSecret: this.clientSecret
                 }),
             true
         )
@@ -368,7 +368,7 @@ class Auth {
             () =>
                 helpers.loginGuestUser(this.client, {
                     redirectURI,
-                    clientSecret,
+                    // clientSecret,
                     ...(usid && {usid})
                 }),
             isGuest
@@ -413,7 +413,7 @@ class Auth {
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(this.client, credentials, {
             redirectURI,
-            clientSecret,
+            // clientSecret,
             ...(usid && {usid})
         })
         this.handleTokenResponse(token, isGuest)

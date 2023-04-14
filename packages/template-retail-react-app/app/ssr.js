@@ -7,6 +7,8 @@
 'use strict'
 
 const path = require('path')
+const bodyParser = require('body-parser')
+const { createProxyMiddleware, fixRequestBody } = require('http-proxy-middleware');
 const {getRuntime} = require('pwa-kit-runtime/ssr/server/express')
 const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
@@ -64,40 +66,52 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
+
+    const secret = 'YOUR_SECRET, CHANGE ME!!!!!!!!!!!!!'
+    const clientId = '530b254c-a400-49d8-848e-6c05b20c6e46'
+    const shortCode = 'kv7kzm78'
+
+    // TODO: to productize this, move implementation to commerce-sdk-react
+    const createSlasHandler = ({clientId, secret, shortCode}) => {
+        return (req, res, next) => {
+            if (!req.path.startsWith('/shopper/auth')) {
+                return next()
+            }
+            if (req.path.includes('/token') && req.body?.grant_type === 'client_credentials') {
+                const encodedClientCredential = Buffer.from(`${clientId}:${secret}`).toString('base64')
+                
+                // Normally, we are not supposed to modify the request headers
+                // but we are doing this intentionally here because we cannot
+                // do that in the onProxyReq callback.
+                req.headers['Authorization'] = `Basic ${encodedClientCredential}`
+            }
+            createProxyMiddleware({
+                target: `https://${shortCode}.api.commercecloud.salesforce.com`,
+                changeOrigin: true,
+                onProxyReq: (outGoingReq, incomingReq) => {
+        
+                    // NOTE: we need to read the request body.
+                    // So we added bodyparser middleware but
+                    // this proxy middleware hangs if you use bodyparser.
+                    // So we need to fix the request body here.
+                    fixRequestBody(outGoingReq, incomingReq)
+        
+                    // NOTE: we are supposed to inject the auth header here
+                    // but for some reason, calling outGoingReq.setHeader()
+                    // does not work! It always throw an error saying that
+                    // Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+                    // It seems like this is a known issue with http-proxy-middleware.
+                    // Solution: we modify the req.headers['Authorization'] before
+                    // forwarding it to the proxy middleware.
+                }
+              })(req, res, next)
+        }
+    }
+
+
+    app.use(bodyParser.urlencoded({ extended: true }), createSlasHandler({clientId, secret, shortCode}))
+
     app.get('*', runtime.render)
-
-    // Handle client secret for SLAS
-    app.post('/auth', async (req, res) => {
-        /*
-        const client = CommerceSDK({secret: process.env.SECRET})
-        const tokenResponse = await client.doTokenDance()
-        return res.json(tokenResponse)
-        */
-
-        // const client = new ShopperLogin({
-        //     parameters: {
-        //         clientId: `c9c45bfd-0ed3-4aa2-9971-40f88962b836`,
-        //         organizationId: 'f_ecom_zzrf_001',
-        //         shortCode: `8o7m175y`,
-        //         siteId: `RefArchGlobal`
-        //     },
-        //     throwOnBadResponse: true
-        // })
-
-        // let _res
-        // try {
-        //     _res = await helpers.loginGuestUser(client, {
-        //         redirectURI: 'localhost:3000/callback'
-        //     })
-        // } catch (e) {
-        //     _res = e
-        // }
-        // console.log(_res)
-        // res.send(_res)
-
-
-        return null
-    })
 })
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
