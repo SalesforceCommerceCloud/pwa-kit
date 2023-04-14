@@ -35,8 +35,10 @@ class AppConfig extends React.Component {
      *    the client.
      * @param frozen - the application state, restored from JSON in the HTML.
      */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-    static restore(locals, frozen = {}) {}
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    static restore(locals, frozen = {}) {
+        // No-op by default, should be overridden in a project.
+    }
 
     /**
      * Freeze a state management backend for embedding into the page HTML.

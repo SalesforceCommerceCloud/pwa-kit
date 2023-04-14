@@ -49,8 +49,9 @@ export class PersistentCache {
      * clean up any locally cached data.
      * @private
      */
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    close() {}
+    close() {
+        // Doesn't do anything!
+    }
 
     /**
      * Return an object that represents an entry not found in the cache

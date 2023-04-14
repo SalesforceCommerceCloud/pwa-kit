@@ -31,10 +31,12 @@ const testFixtures = path.resolve(__dirname, 'test_fixtures')
 // for testing.
 const NoWebpackDevServerFactory = {
     ...DevServerFactory,
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    _addSDKInternalHandlers() {},
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    _getRequestProcessor() {}
+    _addSDKInternalHandlers() {
+        // Override default implementation with no-op
+    },
+    _getRequestProcessor() {
+        // Override default implementation with no-op
+    }
 }
 
 const httpAgent = new http.Agent({})

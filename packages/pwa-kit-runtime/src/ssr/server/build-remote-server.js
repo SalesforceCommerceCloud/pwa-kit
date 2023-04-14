@@ -363,8 +363,10 @@ export const RemoteServerFactory = {
      * @private
      */
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-    _addSDKInternalHandlers(app) {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _addSDKInternalHandlers(app) {
+        // This method is used by the dev server, but is not needed here.
+    },
 
     /**
      * @private
