@@ -16,7 +16,7 @@ localRemoteTestCases.forEach((useLocalCache) => {
             s3Endpoint: 'http://localhost:4568',
             accessKeyId: 'S3RVER',
             secretAccessKey: 'S3RVER',
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
+
             sendMetric: () => {}
         })
         const key = 'key'

@@ -19,7 +19,7 @@ const FormActionButtons = ({
     cancelButtonProps = {},
     saveButtonLabel,
     cancelButtonLabel,
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
+
     onCancel = () => {}
 }) => {
     return (

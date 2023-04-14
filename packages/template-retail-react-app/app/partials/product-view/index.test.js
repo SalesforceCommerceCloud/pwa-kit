@@ -129,7 +129,6 @@ test('Product View can update quantity', async () => {
 test('renders a product set properly - parent item', () => {
     const parent = mockProductSet
     renderWithProviders(
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
     )
 
@@ -155,7 +154,6 @@ test('renders a product set properly - parent item', () => {
 test('renders a product set properly - child item', () => {
     const child = mockProductSet.setProducts[0]
     renderWithProviders(
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />
     )
 
@@ -186,9 +184,7 @@ test('validateOrderability callback is called when adding a set to cart', async 
         <MockComponent
             product={parent}
             validateOrderability={validateOrderability}
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             addToCart={() => {}}
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             addToWishlist={() => {}}
         />
     )
@@ -209,9 +205,7 @@ test('onVariantSelected callback is called after successfully selected a variant
         <MockComponent
             product={child}
             onVariantSelected={onVariantSelected}
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             addToCart={() => {}}
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             addToWishlist={() => {}}
         />
     )

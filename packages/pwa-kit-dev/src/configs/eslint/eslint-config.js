@@ -33,6 +33,12 @@ module.exports = {
     },
     reportUnusedDisableDirectives: true,
     rules: {
+        // The goal of the no-empty-function rule is to minimize the contextual knowledge required
+        // by the reader. The suggested fix for empty functions is to add comments indicating that
+        // the empty function is intentional. However, in my opinion, it is clear from context that
+        // most of our empty arrow functions are intentional no-ops, so we don't want the rule to be
+        // enforced for those.
+        '@typescript-eslint/no-empty-function': ['error', {allow: ['arrowFunctions']}],
         'react-hooks/rules-of-hooks': 'error',
         // react-hooks/exhaustive-deps has too many false positives; use-effect-no-deps is nicer
         'use-effect-no-deps/use-effect-no-deps': 'warn'

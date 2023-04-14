@@ -246,7 +246,6 @@ const ruleForBabelLoader = (babelPlugins) => {
     }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 const findAndReplace = (array = [], findFn = () => {}, replacement) => {
     const clone = array.slice(0)
     const index = clone.findIndex(findFn)

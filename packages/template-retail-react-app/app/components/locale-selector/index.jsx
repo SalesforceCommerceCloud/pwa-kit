@@ -49,7 +49,7 @@ const flags = {
  * populated with all the supported locales for the application allowing the
  * user to change the current locale.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-function
+
 const LocaleSelector = ({selectedLocale = '', locales = [], onSelect = () => {}, ...props}) => {
     const styles = useStyleConfig('LocaleSelector')
     return (

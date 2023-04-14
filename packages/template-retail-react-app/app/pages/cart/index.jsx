@@ -463,7 +463,6 @@ const Cart = () => {
                 onPrimaryAction={() => {
                     handleRemoveItem(selectedItem)
                 }}
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 onAlternateAction={() => {}}
                 {...modalProps}
             />

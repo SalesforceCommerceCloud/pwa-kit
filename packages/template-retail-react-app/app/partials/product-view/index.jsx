@@ -94,7 +94,7 @@ const ProductView = forwardRef(
             isProductLoading,
 
             isProductPartOfSet = false,
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
+
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel

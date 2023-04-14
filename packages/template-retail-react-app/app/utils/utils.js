@@ -76,7 +76,7 @@ export const shallowEquals = (a, b) => {
  * around a function that will do nothing.
  * Usually used as default for event handlers.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-function
+
 export const noop = () => {}
 
 /**
