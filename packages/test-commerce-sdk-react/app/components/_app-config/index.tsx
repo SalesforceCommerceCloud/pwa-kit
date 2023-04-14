@@ -67,9 +67,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
 }
 
 AppConfig.restore = () => {}
-
 AppConfig.extraGetPropsArgs = () => {}
-
 AppConfig.freeze = () => {}
 
 const isServerSide = typeof window === 'undefined'
