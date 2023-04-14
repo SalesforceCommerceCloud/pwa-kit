@@ -5,8 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {Component as ComponentType} from '../types'
 import {usePageContext} from '../Page'
+
+/**
+ * This PropType represents a `component` object from the ShopperExperience API.
+ */
+export const propType = PropTypes.shape({
+    data: PropTypes.object,
+    id: PropTypes.string,
+    typeId: PropTypes.string
+})
 
 type ComponentProps = {
     component: ComponentType

@@ -5,8 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {Region as RegionType} from '../types'
-import {Component} from '../Component'
+import {Component, propType as componentPropType} from '../Component'
+import {propType as regionPropType} from '../Region'
+
+/**
+ * This PropType represents a `region` object from the ShopperExperience API.
+ */
+export const propType = PropTypes.shape({
+    id: PropTypes.string,
+    components: PropTypes.arrayOf(componentPropType)
+})
 
 interface RegionProps extends React.ComponentProps<'div'> {
     region: RegionType
@@ -35,5 +45,10 @@ export const Region = (props: RegionProps) => {
 }
 
 Region.displayName = 'Region'
+
+Region.propTypes = {
+    region: regionPropType.isRequired,
+    className: PropTypes.string
+}
 
 export default Region

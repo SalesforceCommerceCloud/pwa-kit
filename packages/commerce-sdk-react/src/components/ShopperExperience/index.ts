@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export * from './Component'
-export * from './Page'
-export * from './Region'
+
+export {Component, propType as componentPropType} from './Component'
+export {Page, propType as pagePropType} from './Page'
+export {Region, propType as regionPropType} from './Region'
