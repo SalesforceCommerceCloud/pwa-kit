@@ -44,7 +44,7 @@ const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
 
 //new plugin
-const OverridesResolverPlugin = require('./overrides-charles')
+const OverridesResolverPlugin = require('./overrides-plugin')
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)

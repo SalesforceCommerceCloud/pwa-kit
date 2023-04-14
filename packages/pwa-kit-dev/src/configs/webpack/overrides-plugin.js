@@ -2,10 +2,59 @@ const path = require('path')
 const fs = require('fs')
 const glob = require('glob')
 
-class OverridesResolverPlugin {
-    constructor(projectDir) {
-        // projectDir = /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app
-        this.projectDir = projectDir
+/**
+ * Implements a b2c-cartridge-like overlay resolve for webpack
+ *
+ * @example
+ * // import from the *next* in the overlay-chain (i.e. similar to module.superModule)
+ * import Something from '*'
+ *
+ * @example
+ * // import from the overlay chain (not the forward slash is escaped here due to being in a comment)
+ * import Something, {SomethingElse} from '*\/components/something'
+ *
+ * @example
+ * // (ONLY IN BASE) paths required relative to the appBase will first be searched through the overlays
+ * import Something from '../../components/something'
+ *
+ * @class OverlayResolverPlugin
+ */
+class OverlayResolverPlugin {
+    /**
+     *
+     * @param options
+     * @param {string} options.appBase path to application base
+     * @param {string[]} options.overlays paths to overlays
+     */
+    constructor(options) {
+
+        this.appBase = options.appBase || './app'
+        this.appBase = path.resolve(this.appBase)
+        // this is /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app
+        
+        // this is [retail-react-app]
+        this.overlays = options.overlays || []
+
+        /* this is [
+            '/Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app',
+
+            '/Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/node_modules/retail-react-app/app'
+            ] 
+        */
+
+        this._allSearchDirs = [this.appBase].concat(
+            this.overlays.map((o) => {
+                return path.join(
+                    path.resolve(
+                        // prefix with `~` or `/` indicates relative filesystem, otherwise `node_modules`
+                        `${o.startsWith('~') || o.startsWith('/') ? '' : 'node_modules/'}${o}`
+                    ),
+                    path.basename(this.appBase)
+                )
+            })
+        )
+
+        this.projectDir = options.projectDir
         this.pkg = require(path.resolve(this.projectDir, 'package.json'))
         this.overridesHashMap = new Map()
 
@@ -15,52 +64,51 @@ class OverridesResolverPlugin {
             ''
         )}/**/*${OVERRIDES_EXTENSIONS}`
         const overridesFsRead = glob.sync(globPattern)
-        console.log('overridesFsRead', overridesFsRead)
+
+        const overrideReplace = this.pkg?.mobify?.overridesDir + '/app/'
         
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
             const [l, ...rest] = item?.split(/(index|\.)/)
             this.overridesHashMap.set(
-                l.replace(/\/$/, '')?.replace(this.pkg?.mobify?.overridesDir?.replace(/\//, ''), ''),
+                l.replace(/\/$/, '')?.replace(overrideReplace.replace(/\//, ''), ''),
                 [end, rest]
             )
         })
-        console.log('overridesHashMap', this.overridesHashMap)
-         
-        // ++++++++++++++++++++++++++++++++++
-
-        // app base = overrides = spike-extendend
-        // overlays = extends (ITS SWITCHED!!!!!!!) = retail-react
-        // 
-        this.appBase = '.' + this.pkg.mobify.overridesDir // ./pwa-kit/overrides
-        this.overlays = [this.pkg.mobify.extends] //retail-react-app
-
-        this._allSearchDirs = this.overlays
-            .map((o) => './node_modules/' + o)
-            .concat([this.appBase])
-
-        console.log('this._allSearchDirs', this._allSearchDirs)
-
     }
 
-    findFile(requestPath, dirs, extensions) {
-        // TODO search all overlay extensions of requested file
+    isRelevant(p) {
+        return [this.appBase].concat(this.overlays).some((_configPath) => {
+            _configPath.indexOf(p)
+        })
+    }
+
+    isBaseFile(p) {
+        return p.indexOf(this.appBase) === 0
+    }
+
+    /**
+     *
+     * @param requestPath
+     * @param dirs
+     */
+    findFileMap(requestPath, dirs) {
         var fileExt = path.extname(requestPath)
         for (var dir of dirs) {
             var base = path.join(dir, requestPath)
             if (fileExt) {
-                if (fs.existsSync(base)) {
+                if (this.overridesHashMap.has(requestPath)) {
                     return base
                 }
             } else {
-                // TODO this is technically not how we should find index
-                // see resolver plugin docs
-                if (fs.existsSync(base) && fs.lstatSync(base).isDirectory()) {
-                    base = path.join(base, 'index')
-                }
-                for (var ext of extensions) {
-                    if (fs.existsSync(base + ext)) {
-                        return base + ext
+                if (this.overridesHashMap.has(requestPath)) {
+                    const end = this.overridesHashMap.get(requestPath)[1]
+                    if (end[0] === 'index') {
+                        base = path.join(base, this.overridesHashMap.get(requestPath)[1].join(''))
+                        return base
+                    } else {
+                        base = base + end.join('')
+                        return base
                     }
                 }
             }
@@ -69,7 +117,6 @@ class OverridesResolverPlugin {
 
     toOverlayRelative(p) {
         var overlay = this.findOverlay(p)
-        console.log('overlay', overlay)
         return p.substring(overlay.length + 1)
     }
 
@@ -79,61 +126,148 @@ class OverridesResolverPlugin {
         })
     }
 
+    isAppBaseRelative(p) {
+        return p && p.indexOf(this.appBase) === 0
+    }
+
     apply(resolver) {
-        resolver.getHook('resolve').tapAsync('OverridesResolverPlugin', (requestContext, resolveContext, callback) => {
-            console.log('requestContext', requestContext)
-            console.log('resolveContext', resolveContext)
+        resolver.getHook('resolve').tapAsync(
+            'FeatureResolverPlugin',
+            function (requestContext, resolveContext, callback) {
+                // exact match ^ means import the "parent" (superModule) of the requesting module
+                if (requestContext.request === '^') {
+                    const overlayRelative = this.toOverlayRelative(requestContext.context.issuer)
+                    const overlay = this.findOverlay(requestContext.context.issuer)
 
-            if (requestContext.request.startsWith('^')) {
-                const resolved = path.resolve(requestContext.path, requestContext.request)
-                const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
-                const newPath = path.resolve(this.projectDir, 'node_modules', relativePath)
-                requestContext.path = newPath
-                
-                const target = resolver.ensureHook('resolved')
-                resolver.doResolve(
-                    target, requestContext, 'extending from template', resolveContext, callback)
-
-            } else if (requestContext.request.startsWith('.')) {
-                //something in here to deal with RELATIVE IMPORTS
-                //everything that does NOT come from node modules starts with a .
-                //request with a . is not an external dependency
-
-                const overlayRelative = this.toOverlayRelative(requestContext.context.issuer)
-                console.log('overlayRelative', overlayRelative)
-
-                // this should be '/Users/yunakim/cc-pwa/pwa-kit/packages/template-retail-react-app/app/components/icons/index.jsx'
-                const resolved = path.resolve(requestContext.path, requestContext.request)
-
-                // this would equal something like 'retail-react-app', but should be 'template-retail-react-app'
-                const extendsPkg = this.pkg?.mobify?.extends
-
-                // this would equal something like '/app/components/icons/index.jsx'
-                const relativePath = resolved?.split?.(extendsPkg)?.[1]
-
-                // this should be /app/components/icons
-                const relativePathNoExt = resolved?.split?.(extendsPkg)?.[1]?.split?.('.')?.[0]
-
-                if (this.overridesHashMap.has(relativePathNoExt)) {
-                    const newPath = this.projectDir + this.pkg?.mobify?.overridesDir + relativePath
-                    requestContext.path = newPath
-
-                    const target = resolver.ensureHook('resolved')
-                    resolver.doResolve(
-                        target, requestContext, 'relative import override', resolveContext, callback
+                    const searchOverlays = this._allSearchDirs.slice(
+                        this._allSearchDirs.indexOf(overlay) + 1
                     )
+                    var targetFile = this.findFileMap(
+                        overlayRelative,
+                        searchOverlays,
+                        resolver.options.extensions
+                    )
+                    if (!targetFile) {
+                        targetFile = path.resolve(__dirname, 'null.js')
+                    }
+                    const target = resolver.ensureHook('resolved')
+                    requestContext.path = targetFile
+                    resolver.doResolve(
+                        target,
+                        requestContext,
+                        `${this.constructor.name} found parent`,
+                        resolveContext,
+                        callback
+                    )
+                } else if (requestContext.request.startsWith('^/')) {
+                    // let aliases find the file
+                    return callback()
+                
+                //this block catches requests coming from the overrides directory
+                } else if (
+                    this.isAppBaseRelative(requestContext.path) &&
+                    requestContext.request.startsWith('.')
+                ) {
+                    
+                    // app base request relative
+                    // ex - /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app/components/header
+                    var resolvedPath = path.resolve(requestContext.path, requestContext.request)
+
+                    if (this.isAppBaseRelative(resolvedPath)) {
+                        // ex - components/header
+                        let overlayRelative = this.toOverlayRelative(resolvedPath)
+
+                        try {
+                            var targetFile = this.findFileMap(
+                                overlayRelative,
+                                this._allSearchDirs,
+                                resolver.options.extensions
+                            )
+
+                            if (targetFile) {
+                                const target = resolver.ensureHook('resolved')
+                                requestContext.path = targetFile
+                                resolver.doResolve(
+                                    target,
+                                    requestContext,
+                                    `${this.constructor.name} found base override file`,
+                                    resolveContext,
+                                    callback
+                                )
+                            } else {
+                                return callback()
+                            }
+                        } catch (e) {
+                            return callback()
+                        }
+                    } else {
+                        return callback()
+                    }
+                
+                // this block catches requests coming from the underlying template
+                } else if (requestContext.request.startsWith('.')) {
+                    // if request looks like '../../components/product-detail/above-fold'
+                    // and the path looks like '/Users/yunakim/cc-pwa/pwa-kit/packages/template-retail-react-app/app/pages/product-detail'
+                    const overlayRelative = requestContext.request.replaceAll('../', '')
+                    try {
+                        var targetFile = this.findFileMap(
+                            overlayRelative,
+                            this._allSearchDirs,
+                            resolver.options.extensions
+                        )
+
+                        if (targetFile) {
+                            const target = resolver.ensureHook('resolved')
+                            requestContext.path = targetFile
+                            resolver.doResolve(
+                                target,
+                                requestContext,
+                                `${this.constructor.name} found base override file`,
+                                resolveContext,
+                                callback
+                            )
+                        } else {
+                            return callback()
+                        }
+                    } catch (e) {
+                        return callback()
+                    }
+                } else if (
+                    requestContext.request &&
+                    this.isAppBaseRelative(requestContext.request)
+                ) {
+                    // external dependency requiring app code (app-config, app, ssr, etc)
+                    // TODO: DRY this is nearly the same as the above condition
+                    let overlayRelative = this.toOverlayRelative(requestContext.request)
+                    try {
+                        var targetFile = this.findFileMap(
+                            overlayRelative,
+                            this._allSearchDirs,
+                            resolver.options.extensions
+                        )
+                        if (targetFile) {
+                            const target = resolver.ensureHook('resolved')
+                            requestContext.path = targetFile
+                            resolver.doResolve(
+                                target,
+                                requestContext,
+                                `${this.constructor.name} found base override file`,
+                                resolveContext,
+                                callback
+                            )
+                        } else {
+                            return callback()
+                        }
+                    } catch (e) {
+                        return callback()
+                    }
+                } else {
+
+                    callback()
                 }
-                //new version works before file system even resolves ? ? ?
-            } else {
-                callback()
-            }
-
-            //TODO: overwrite just 1 file to get it to load
-            // get these files to resolve and route correctly
-            //findfile ==== our glob sync algorithm (_overridesmap)
-
-        })
+            }.bind(this)
+        )
     }
 }
 
-module.exports = OverridesResolverPlugin
+module.exports = OverlayResolverPlugin
