@@ -58,14 +58,20 @@ const excludedPackages = [
 // standardize them.
 const commonConfigs = ['.prettierrc.yaml']
 
+// For dependencies that we want to use the same version in all packages,
+// use this package as the source of truth for the version to use
+const COMMON_DEPS_SOURCE_OF_TRUTH = 'template-retail-react-app'
+
 // We are going to copy these devDependencies into each package from this script,
 // in order to standardize them.
 const commonDevDeps = {
-    'cross-env': require('../packages/internal-lib-build/package.json').dependencies['cross-env']
+    'cross-env':
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        require(`../packages/${COMMON_DEPS_SOURCE_OF_TRUTH}/package.json`).devDependencies['cross-env']
 }
 if (!commonDevDeps['cross-env']) {
     throw new Error(
-        'Expected `internal-lib-build` to have `cross-env` as a dependency. You should revisit the assumptions in `./scripts/check-dependencies.js`.'
+        `Expected "${COMMON_DEPS_SOURCE_OF_TRUTH} to have "cross-env" as a dependency. You should revisit the assumptions in ./scripts/check-dependencies.js.`
     )
 }
 
