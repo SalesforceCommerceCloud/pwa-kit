@@ -50,13 +50,7 @@ import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {
-    watchOnlineStatus,
-    flatten,
-    mergeMatchedItems,
-    isServer,
-    resolveLocaleFromUrl
-} from '../../utils/utils'
+import {watchOnlineStatus, flatten, mergeMatchedItems, isServer} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -327,7 +321,7 @@ App.shouldGetProps = () => {
 
 App.getProps = async ({res}) => {
     const site = resolveSiteFromUrl(res.locals.originalUrl)
-    const locale = resolveLocaleFromUrl(res.locals.originalUrl)
+    const locale = resolveSiteFromUrl(res.locals.originalUrl)
     const l10nConfig = site.l10n
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {

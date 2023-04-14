@@ -6,8 +6,12 @@
  */
 
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getLocaleByReference, getParamsFromPath} from './utils'
-import {getDefaultSite, getSiteByReference} from './site-utils'
+import {
+    getLocaleByReference,
+    getParamsFromPath,
+    getDefaultSite,
+    getSiteByReference
+} from './site-utils'
 import {HOME_HREF, urlPartPositions} from '../constants'
 
 /**
