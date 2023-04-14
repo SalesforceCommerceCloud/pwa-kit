@@ -48,7 +48,6 @@ class AppConfig extends React.Component {
      * @return {Object} - the application state as an object, which will be
      *    serialized into JSON and embedded in the page HTML.
      */
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static freeze(locals) {
         return undefined
@@ -62,7 +61,6 @@ class AppConfig extends React.Component {
      *    the client.
      * @return {Object}
      */
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static extraGetPropsArgs(locals) {
         return {}

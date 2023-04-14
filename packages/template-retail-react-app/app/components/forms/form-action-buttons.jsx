@@ -19,7 +19,6 @@ const FormActionButtons = ({
     cancelButtonProps = {},
     saveButtonLabel,
     cancelButtonLabel,
-
     onCancel = () => {}
 }) => {
     return (

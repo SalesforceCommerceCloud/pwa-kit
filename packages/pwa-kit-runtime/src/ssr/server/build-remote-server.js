@@ -167,7 +167,6 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _strictSSL(options) {
         return true
@@ -176,7 +175,6 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setCompression(app) {
         // Let the CDN do it
@@ -231,7 +229,6 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupMetricsFlushing(app) {
         // Hook for the dev-server
@@ -240,7 +237,6 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-
     _updatePackageMobify(options) {
         updatePackageMobify(options.mobify)
     },
@@ -362,7 +358,6 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _addSDKInternalHandlers(app) {
         // This method is used by the dev server, but is not needed here.
@@ -574,7 +569,6 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
         app.all('/mobify/proxy/*', (_, res) => {

@@ -76,7 +76,6 @@ export const shallowEquals = (a, b) => {
  * around a function that will do nothing.
  * Usually used as default for event handlers.
  */
-
 export const noop = () => {}
 
 /**
@@ -228,15 +227,10 @@ export const getConfigMatcher = (config) => {
     })
     const sites = [...siteIds, ...siteAliases].filter(Boolean)
     const locales = [...localesIds, ...localeAliases].filter(Boolean)
-
-    // prettier-ignore
-
     const searchPatternForSite = `site=(?<site>${sites.join('|')})`
-    // prettier-ignore
-    // eslint-disable-next-line
-    const pathPattern = `(?:\/(?<site>${sites.join('|')}))?(?:\/(?<locale>${locales.join("|")}))?(?!\\w)`
-    // prettier-ignore
-
+    const pathPattern = `(?:/(?<site>${sites.join('|')}))?(?:/(?<locale>${locales.join(
+        '|'
+    )}))?(?!\\w)`
     const searchPatternForLocale = `locale=(?<locale>${locales.join('|')})`
     const pathMatcher = new RegExp(pathPattern)
     const searchMatcherForSite = new RegExp(searchPatternForSite)

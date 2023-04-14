@@ -92,9 +92,7 @@ const ProductView = forwardRef(
             addToWishlist,
             updateWishlist,
             isProductLoading,
-
             isProductPartOfSet = false,
-
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel

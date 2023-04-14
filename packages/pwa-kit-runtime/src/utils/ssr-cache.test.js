@@ -16,7 +16,6 @@ localRemoteTestCases.forEach((useLocalCache) => {
             s3Endpoint: 'http://localhost:4568',
             accessKeyId: 'S3RVER',
             secretAccessKey: 'S3RVER',
-
             sendMetric: () => {}
         })
         const key = 'key'
