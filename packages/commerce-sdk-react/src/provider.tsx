@@ -28,10 +28,10 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     locale: string
     currency: string
     redirectURI: string
-    clientSecret: string
     fetchOptions?: ShopperBasketsTypes.FetchOptions
     headers?: Record<string, string>
     fetchedToken?: string
+    isPrivateClient?: boolean
 }
 
 /**
@@ -59,7 +59,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {
         children,
         clientId,
-        clientSecret,
         headers = {},
         organizationId,
         proxy,
@@ -69,7 +68,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shortCode,
         locale,
         currency,
-        fetchedToken
+        fetchedToken,
+        isPrivateClient
     } = props
 
     const config = {
@@ -77,7 +77,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         headers,
         parameters: {
             clientId,
-            clientSecret,
             organizationId,
             shortCode,
             siteId,
@@ -85,7 +84,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             currency
         },
         throwOnBadResponse: true,
-        fetchOptions
+        fetchOptions,
+        isPrivateClient
     }
     const apiClients = useMemo(() => {
         return {
@@ -102,7 +102,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         }
     }, [
         clientId,
-        clientSecret,
         organizationId,
         shortCode,
         siteId,
@@ -110,24 +109,24 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchOptions,
         locale,
         currency,
-        headers?.['correlation-id']
+        headers?.['correlation-id'],
+        isPrivateClient
     ])
 
     const auth = useMemo(() => {
         return new Auth({
             clientId,
-            clientSecret,
             organizationId,
             shortCode,
             siteId,
             proxy,
             redirectURI,
             fetchOptions,
-            fetchedToken
+            fetchedToken,
+            isPrivateClient
         })
     }, [
         clientId,
-        clientSecret,
         organizationId,
         shortCode,
         siteId,
@@ -145,7 +144,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         <ConfigContext.Provider
             value={{
                 clientId,
-                clientSecret,
                 headers,
                 organizationId,
                 proxy,

@@ -44,12 +44,12 @@ type StoredAuthData = Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: s
 
 const config = {
     clientId: 'clientId',
-    clientSecret: 'clientSecret',
     organizationId: 'organizationId',
     shortCode: 'shortCode',
     siteId: 'siteId',
     proxy: 'proxy',
-    redirectURI: 'redirectURI'
+    redirectURI: 'redirectURI',
+    isPrivateClient: false
 }
 
 describe('Auth', () => {

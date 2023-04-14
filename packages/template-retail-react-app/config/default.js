@@ -26,7 +26,8 @@ module.exports = {
                 organizationId: 'f_ecom_zzrf_001',
                 shortCode: '8o7m175y',
                 siteId: 'RefArchGlobal'
-            }
+            },
+            isPrivateClient: true
         },
         einsteinAPI: {
             host: 'https://api.cquotient.com',
