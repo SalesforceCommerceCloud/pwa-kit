@@ -214,55 +214,60 @@ export const createBundle = async ({
         throw new Error('no ssrOnly or ssrShared files are defined')
     }
 
-    return Promise.resolve()
-        .then(() => stat(buildDirectory))
-        .catch(() => {
-            const fullPath = path.join(process.cwd(), buildDirectory)
-            throw new Error(
-                `Build directory at path "${fullPath}" not found.\n` +
-                    'Run `pwa-kit-dev build` first!'
+    return (
+        Promise.resolve()
+            .then(() => stat(buildDirectory))
+            .catch(() => {
+                const fullPath = path.join(process.cwd(), buildDirectory)
+                throw new Error(
+                    `Build directory at path "${fullPath}" not found.\n` +
+                        'Run `pwa-kit-dev build` first!'
+                )
+            })
+            .then(
+                () =>
+                    new Promise((resolve, reject) => {
+                        const output = createWriteStream(destination)
+                        const archive = archiver('tar')
+
+                        archive.pipe(output)
+
+                        // See https://web.archive.org/web/20160712064705/http://archiverjs.com/docs/global.html#TarEntryData
+                        const newRoot = path.join(projectSlug, 'bld', '')
+                        // WARNING: There are a lot of type assertions here because we use a very old
+                        // version of archiver, and the types provided don't match the docs. :\
+                        archive.directory(buildDirectory, '', ((entry: EntryData) => {
+                            const stats = entry.stats as unknown as Stats | undefined
+                            if (stats?.isFile() && entry.name) {
+                                filesInArchive.push(entry.name)
+                            }
+                            entry.prefix = newRoot
+                            return entry
+                        }) as unknown as EntryData)
+
+                        archive.on('error', reject)
+                        output.on('finish', resolve)
+
+                        archive.finalize()
+                    })
             )
-        })
-        .then(
-            () =>
-                new Promise((resolve, reject) => {
-                    const output = createWriteStream(destination)
-                    const archive = archiver('tar')
-
-                    archive.pipe(output)
-
-                    // See https://web.archive.org/web/20160712064705/http://archiverjs.com/docs/global.html#TarEntryData
-                    const newRoot = path.join(projectSlug, 'bld', '')
-                    // WARNING: There are a lot of type assertions here because we use a very old
-                    // version of archiver, and the types provided don't match the docs. :\
-                    archive.directory(buildDirectory, '', ((entry: EntryData) => {
-                        const stats = entry.stats as unknown as Stats | undefined
-                        if (stats?.isFile() && entry.name) {
-                            filesInArchive.push(entry.name)
-                        }
-                        entry.prefix = newRoot
-                        return entry
-                    }) as unknown as EntryData)
-
-                    archive.on('error', reject)
-                    output.on('finish', resolve)
-
-                    archive.finalize()
-                })
-        )
-        .then(() => readFile(destination))
-        .then((data) => {
-            const encoding = 'base64'
-            return {
-                message,
-                encoding,
-                data: data.toString(encoding),
-                ssr_parameters,
-                ssr_only: filesInArchive.filter(glob(ssr_only)),
-                ssr_shared: filesInArchive.filter(glob(ssr_shared))
-            }
-        })
-        .finally(() => void rm(tmpDir, {recursive: true}))
+            .then(() => readFile(destination))
+            .then((data) => {
+                const encoding = 'base64'
+                return {
+                    message,
+                    encoding,
+                    data: data.toString(encoding),
+                    ssr_parameters,
+                    ssr_only: filesInArchive.filter(glob(ssr_only)),
+                    ssr_shared: filesInArchive.filter(glob(ssr_shared))
+                }
+            })
+            // This is a false positive. The promise returned by `.finally()` won't resolve until
+            // the `rm()` completes!
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            .finally(() => rm(tmpDir, {recursive: true}))
+    )
 }
 
 export const glob = (patterns?: string[]): ((str: string) => boolean) => {
