@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "npm-packlist": "^4.0.0",
-    "pwa-kit-dev":"2.8.0-dev",
+    "pwa-kit-dev": "2.8.0-dev",
     "typescript": "4.8.3"
   },
   "peerDependencies": {
