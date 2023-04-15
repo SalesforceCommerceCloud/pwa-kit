@@ -317,13 +317,16 @@ class Auth {
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
         if (refreshToken) {
             try {
-                return this.queueRequest(
+                return await this.queueRequest(
                     () => helpers.refreshAccessToken(this.client, {refreshToken}),
                     !!refreshTokenGuest
                 )
-            } catch {
-                // If anything bad happens during refresh token flow
-                // we continue with the PKCE guest user flow.
+            } catch (error) {
+                // If the refresh token is invalid, we need to re-login the user
+                if (error instanceof Error && error.message === '400 Bad Request') {
+                    // clean up storage and restart the login flow
+                    await this.logout()
+                }
             }
         }
         return this.queueRequest(
