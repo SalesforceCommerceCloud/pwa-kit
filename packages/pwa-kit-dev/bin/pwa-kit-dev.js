@@ -333,11 +333,8 @@ const main = async () => {
         .option('--fix', 'Try and fix errors (default: false)')
         .action(async (path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
-            const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
             execSync(
-                `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
-                    fix ? ' --fix' : ''
-                } "${path}"`
+                `${eslint} --resolve-plugins-relative-to ${pkgRoot}${fix ? ' --fix' : ''} "${path}"`
             )
         })
 
