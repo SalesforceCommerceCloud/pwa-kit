@@ -6,23 +6,23 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {ChakraProvider} from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
 
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
 import theme from '../../theme'
-import {MultiSiteProvider} from '../../contexts'
-import {resolveSiteFromUrl} from '../../utils/site-utils'
-import {resolveLocaleFromUrl} from '../../utils/utils'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {createUrlTemplate} from '../../utils/url'
+import { MultiSiteProvider } from '../../contexts'
+import { resolveSiteFromUrl } from '../../utils/site-utils'
+import { resolveLocaleFromUrl } from '../../utils/utils'
+import { getConfig } from 'pwa-kit-runtime/utils/ssr-config'
+import { createUrlTemplate } from '../../utils/url'
 
-import {CommerceApiProvider} from 'commerce-sdk-react-preview'
-import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
-import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import { CommerceApiProvider } from 'commerce-sdk-react-preview'
+import { withLegacyGetProps } from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
+import { withReactQuery } from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+import { useCorrelationId } from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import { getAppOrigin } from 'pwa-kit-react-sdk/utils/url'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -32,8 +32,8 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
  * You can also use the AppConfig to configure a state-management library such
  * as Redux, or Mobx, if you like.
  */
-const AppConfig = ({children, locals = {}}) => {
-    const {correlationId} = useCorrelationId()
+const AppConfig = ({ children, locals = {} }) => {
+    const { correlationId } = useCorrelationId()
     const headers = {
         'correlation-id': correlationId
     }
@@ -52,6 +52,7 @@ const AppConfig = ({children, locals = {}}) => {
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
+            isPrivateClient={commerceApiConfig.isPrivateClient}
             headers={headers}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
@@ -69,7 +70,7 @@ AppConfig.restore = (locals = {}) => {
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
 
-    const {app: appConfig} = getConfig()
+    const { app: appConfig } = getConfig()
     const apiConfig = {
         ...appConfig.commerceAPI,
         einsteinConfig: appConfig.einsteinAPI
@@ -109,7 +110,7 @@ const options = {
                 retry: false,
                 refetchOnWindowFocus: false,
                 staleTime: 2 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {})
+                ...(isServerSide ? { retryOnMount: false } : {})
             },
             mutations: {
                 retry: false

@@ -133,7 +133,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         proxy,
         redirectURI,
         fetchOptions,
-        fetchedToken
+        fetchedToken,
+        isPrivateClient
     ])
 
     useEffect(() => {
@@ -152,7 +153,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 siteId,
                 shortCode,
                 locale,
-                currency
+                currency,
+                isPrivateClient
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>
