@@ -117,7 +117,7 @@ export const render = async (req, res, next) => {
     const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname, search] = req.originalUrl.split('?')
-    let location = {
+    const location = {
         pathname,
         search: search ? `?${search}` : ''
     }
