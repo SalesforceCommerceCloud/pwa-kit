@@ -325,7 +325,8 @@ class Auth {
                 // If the refresh token is invalid, we need to re-login the user
                 if (error instanceof Error && error.message === '400 Bad Request') {
                     // clean up storage and restart the login flow
-                    await this.logout()
+                    this.clearStorage()
+                    return this.loginGuestUser()
                 }
             }
         }
@@ -415,8 +416,14 @@ class Auth {
      *
      */
     async logout() {
-        // TODO: are we missing a call to /logout?
-        // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
+        // invalidate refresh_token and access_token in the backend
+        const refreshTokenRegistered = this.get('refresh_token_registered')
+        const refreshTokenGuest = this.get('refresh_token_guest')
+        const refreshToken: string = refreshTokenRegistered || refreshTokenGuest
+        await helpers.logout(this.client, {
+            refreshToken: refreshToken,
+            accessToken: this.get('access_token')
+        })
         this.clearStorage()
         return this.loginGuestUser()
     }
