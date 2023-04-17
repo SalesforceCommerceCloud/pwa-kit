@@ -10,7 +10,7 @@
  * Contains rules for JavaScript, TypeScript, and Jest.
  */
 module.exports = {
-  extends: [require.resolve('./partials/base')],
-  // TypeScript and Jest rules only apply to specific file paths, so they are overrides.
-  overrides: [require('./partials/typescript'), require('./partials/jest')]
+    extends: [require.resolve('./partials/base')],
+    // TypeScript and Jest rules only apply to specific file paths, so they are overrides.
+    overrides: [require('./partials/typescript-permit-any'), require('./partials/jest')]
 }

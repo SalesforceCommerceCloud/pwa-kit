@@ -6,8 +6,8 @@
  */
 
 /**
- * Recommended configuration for PWA Kit projects.
- * Contains rules for JavaScript, TypeScript, React, and Jest.
+ * Configuration for PWA Kit projects. Extends the recommended configuration with stricter rules
+ * that restrict usage of the `any` type.
  */
 module.exports = {
     extends: [
@@ -16,5 +16,5 @@ module.exports = {
         require.resolve('./partials/react')
     ],
     // TypeScript and Jest rules only apply to specific file paths, so they are overrides.
-    overrides: [require('./partials/typescript-permit-any'), require('./partials/jest')]
+    overrides: [require('./partials/typescript'), require('./partials/jest')]
 }
