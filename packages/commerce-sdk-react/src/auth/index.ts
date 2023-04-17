@@ -323,10 +323,16 @@ class Auth {
                 )
             } catch (error) {
                 // If the refresh token is invalid, we need to re-login the user
-                if (error instanceof Error && error.message === '400 Bad Request') {
-                    // clean up storage and restart the login flow
-                    this.clearStorage()
-                    return this.loginGuestUser()
+                if (error instanceof Error && 'response' in error) {
+                    // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
+                    // We can't use `instanceof`, so instead we just check for the `response` property
+                    // and assume it is a fetch Response.
+                    const json = await (error['response'] as Response).json()
+                    if (json.message === 'invalid refresh_token') {
+                        // clean up storage and restart the login flow
+                        this.clearStorage()
+                        return this.loginGuestUser()
+                    }
                 }
             }
         }
