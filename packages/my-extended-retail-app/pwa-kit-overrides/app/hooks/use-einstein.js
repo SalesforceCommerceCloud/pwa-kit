@@ -72,7 +72,7 @@ export class EinsteinAPI {
                 id: product.master.masterId,
                 sku: product.id,
                 altId: '',
-                altIdType: '',
+                altIdType: ''
             }
         } else if (
             product.productType &&
@@ -90,7 +90,7 @@ export class EinsteinAPI {
                 id: product.productId,
                 sku: product.productId, //TODO: Should we switch this to product.representedProduct.id once we allow non-master products in search results?
                 altId: '',
-                altIdType: '',
+                altIdType: ''
             }
         } else {
             // handles non-variants
@@ -98,7 +98,7 @@ export class EinsteinAPI {
                 id: product.id,
                 sku: '',
                 altId: '',
-                altIdType: '',
+                altIdType: ''
             }
         }
     }
@@ -114,14 +114,14 @@ export class EinsteinAPI {
             id: item.productId,
             sku: '',
             price: item.price,
-            quantity: item.quantity,
+            quantity: item.quantity
         }
     }
 
     async einsteinFetch(endpoint, method, body) {
         const headers = {
             'Content-Type': 'application/json',
-            'x-cq-client-id': this.einsteinId,
+            'x-cq-client-id': this.einsteinId
         }
 
         // Include `userId` and `cookieId` parameters.
@@ -135,8 +135,8 @@ export class EinsteinAPI {
                 method: method,
                 headers: headers,
                 ...(body && {
-                    body: JSON.stringify(body),
-                }),
+                    body: JSON.stringify(body)
+                })
             })
         } catch {
             console.warn('Einstein request failed')
@@ -160,7 +160,7 @@ export class EinsteinAPI {
         const method = 'POST'
         const body = {
             product: this._constructEinsteinProduct(product),
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -181,7 +181,7 @@ export class EinsteinAPI {
             searchText,
             products,
             showProducts: true, // Needed by Reports and Dashboards to differentiate searches with results vs no results
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -196,7 +196,7 @@ export class EinsteinAPI {
         const body = {
             searchText,
             product: this._constructEinsteinProduct(product),
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -215,11 +215,11 @@ export class EinsteinAPI {
 
         const body = {
             category: {
-                id: category.id,
+                id: category.id
             },
             products,
             showProducts: true, // Needed by Reports and Dashboards to differentiate searches with results vs no results
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -234,10 +234,10 @@ export class EinsteinAPI {
         const method = 'POST'
         const body = {
             category: {
-                id: category.id,
+                id: category.id
             },
             product: this._constructEinsteinProduct(product),
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -255,7 +255,7 @@ export class EinsteinAPI {
             recommenderName,
             __recoUUID,
             products: products,
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -273,7 +273,7 @@ export class EinsteinAPI {
             recommenderName,
             __recoUUID,
             product: this._constructEinsteinProduct(product),
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -284,12 +284,11 @@ export class EinsteinAPI {
      * Use this only for pages where another activity does not fit. (ie. on the PDP, use viewProduct rather than this)
      **/
     async sendViewPage(path, args) {
-        console.log('calling external API ____')
         const endpoint = `/activities/${this.siteId}/viewPage`
         const method = 'POST'
         const body = {
             currentLocation: path,
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -306,7 +305,7 @@ export class EinsteinAPI {
         const body = {
             products: products,
             amount: subTotal,
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -323,7 +322,7 @@ export class EinsteinAPI {
             stepName,
             stepNumber,
             basketId: basket.basketId,
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -338,7 +337,7 @@ export class EinsteinAPI {
         const method = 'POST'
         const body = {
             products: items.map((item) => this._constructEinsteinItem(item)),
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -365,7 +364,7 @@ export class EinsteinAPI {
         const method = 'POST'
         const body = {
             products: products?.map((product) => this._constructEinsteinProduct(product)),
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -381,18 +380,23 @@ export class EinsteinAPI {
 
         const body = {
             products: products?.map((product) => this._constructEinsteinProduct(product)),
-            ...args,
+            ...args
         }
 
         return this.einsteinFetch(endpoint, method, body)
     }
+
+    async sendSomeEvent() {
+        console.log('--- Einstein: sending some event')
+    }
 }
 
+// TODO: to be able to get future updates, I should import the original hook and extend it somehow..
 const useEinstein = () => {
     const api = useCommerceApi()
     const {getTokenWhenReady} = useAccessToken()
     const {
-        app: {einsteinAPI: config},
+        app: {einsteinAPI: config}
     } = getConfig()
     const {host, einsteinId, siteId, isProduction} = config
     const usid = useUsid()
@@ -406,7 +410,7 @@ const useEinstein = () => {
                 userId: encUserId,
                 cookieId: usid,
                 siteId,
-                isProduction,
+                isProduction
             }),
         [host, einsteinId, encUserId, usid, siteId, isProduction]
     )
@@ -421,8 +425,8 @@ const useEinstein = () => {
             const products = await api.shopperProducts.getProducts({
                 parameters: {ids: ids.join(',')},
                 headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                    Authorization: `Bearer ${token}`
+                }
             })
 
             // Merge the product detail into the recommendations response
@@ -434,9 +438,9 @@ const useEinstein = () => {
                         ...rec,
                         ...product,
                         productId: rec.id,
-                        image: {disBaseLink: rec.imageUrl, alt: rec.productName},
+                        image: {disBaseLink: rec.imageUrl, alt: rec.productName}
                     }
-                }),
+                })
             }
         }
         return reco
@@ -463,6 +467,9 @@ const useEinstein = () => {
             return einstein.sendClickCategory(...args)
         },
         async sendViewPage(...args) {
+            console.log(
+                '--- can send pageview event to other analytics providers, by piggy backing on existing implementation'
+            )
             return einstein.sendViewPage(...args)
         },
         async sendBeginCheckout(...args) {
@@ -508,6 +515,11 @@ const useEinstein = () => {
                 setIsLoading(false)
             }
         },
+        // Unfortunately, it does not look like Einstein API allows you to send your own custom events.
+        // But if it does allow, this is what it would like to extend by adding more kinds of events.
+        async sendSomeEvent(...args) {
+            return einstein.sendSomeEvent(...args)
+        }
     }
 }
 
