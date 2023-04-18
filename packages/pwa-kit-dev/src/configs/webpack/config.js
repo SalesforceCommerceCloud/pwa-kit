@@ -8,7 +8,7 @@
 /* eslint-env node */
 
 // For more information on these settings, see https://webpack.js.org/configuration
-import fs from 'fs'
+import fse from 'fs-extra'
 import {resolve} from 'path'
 
 import webpack from 'webpack'
@@ -24,7 +24,7 @@ import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-
 
 const projectDir = process.cwd()
 
-const pkg = require(resolve(projectDir, 'package.json'))
+const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
     ? resolve(process.env.PWA_KIT_BUILD_DIR)
     : resolve(projectDir, 'build')
@@ -56,7 +56,7 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
 const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
         const p = resolve(projectDir, ...segments) + ext
-        if (fs.existsSync(p)) {
+        if (fse.existsSync(p)) {
             return true
         }
     }
@@ -74,7 +74,7 @@ const findInProjectThenSDK = (pkg) => {
     ]
     let candidate
     for (candidate of candidates) {
-        if (fs.existsSync(candidate)) {
+        if (fse.existsSync(candidate)) {
             return candidate
         }
     }
@@ -320,7 +320,7 @@ const client =
         .build()
 
 const optional = (name, path) => {
-    return fs.existsSync(path) ? {[name]: path} : {}
+    return fse.existsSync(path) ? {[name]: path} : {}
 }
 
 const clientOptional = baseConfig('web')
@@ -345,7 +345,7 @@ const clientOptional = baseConfig('web')
     .build()
 
 const renderer =
-    fs.existsSync(resolve(projectDir, 'node_modules', 'pwa-kit-react-sdk')) &&
+    fse.existsSync(resolve(projectDir, 'node_modules', 'pwa-kit-react-sdk')) &&
     baseConfig('node')
         .extend((config) => {
             return {

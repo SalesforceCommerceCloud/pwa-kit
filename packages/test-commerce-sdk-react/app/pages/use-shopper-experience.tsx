@@ -21,8 +21,7 @@ const ASPECT_ATTRIBUTES = JSON.stringify({
 const componentMapProxy = new Proxy(
     {},
     {
-        // eslint-disable-next-line no-unused-vars
-        get(_target, _prop) {
+        get() {
             return (props: any) => (
                 <div style={{marginBottom: '10px'}}>
                     <b>{props.typeId}</b>
@@ -84,6 +83,8 @@ const UseShopperExperience = () => {
                 parameters: {pageId: PAGE_ID}
             },
             get hook() {
+                // TODO: Address the lint error instead of ignoring it
+                // eslint-disable-next-line react-hooks/rules-of-hooks
                 return usePage(this.arg)
             }
         },
@@ -96,6 +97,8 @@ const UseShopperExperience = () => {
                 }
             },
             get hook() {
+                // TODO: Address the lint error instead of ignoring it
+                // eslint-disable-next-line react-hooks/rules-of-hooks
                 return usePages(this.arg)
             }
         },
@@ -109,6 +112,8 @@ const UseShopperExperience = () => {
                 }
             },
             get hook() {
+                // TODO: Address the lint error instead of ignoring it
+                // eslint-disable-next-line react-hooks/rules-of-hooks
                 return usePages(this.arg)
             }
         }

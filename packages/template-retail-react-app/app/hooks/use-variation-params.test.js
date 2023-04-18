@@ -42,7 +42,7 @@ describe('The useVariationParams', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('params').text).toEqual('{"color":"blue","size":"2"}')
+        expect(wrapper.getByTestId('params').text).toBe('{"color":"blue","size":"2"}')
     })
 
     test('returns correct params when there are non-product params in the url.', () => {
@@ -55,7 +55,7 @@ describe('The useVariationParams', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('params').text).toEqual('{"color":"blue","size":"2"}')
+        expect(wrapper.getByTestId('params').text).toBe('{"color":"blue","size":"2"}')
     })
 
     test('returns correct params when there is only a subset product params in the url.', () => {
@@ -68,6 +68,6 @@ describe('The useVariationParams', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('params').text).toEqual('{"color":"blue"}')
+        expect(wrapper.getByTestId('params').text).toBe('{"color":"blue"}')
     })
 })

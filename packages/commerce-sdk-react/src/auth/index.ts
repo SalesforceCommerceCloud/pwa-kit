@@ -433,7 +433,7 @@ class Auth {
      *
      */
     parseSlasJWT(jwt: string) {
-        const payload = jwtDecode(jwt) as SlasJwtPayload
+        const payload: SlasJwtPayload = jwtDecode(jwt)
         const {sub, isb} = payload
 
         if (!sub || !isb) {

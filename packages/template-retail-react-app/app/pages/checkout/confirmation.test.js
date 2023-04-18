@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* eslint-disable no-unused-vars */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
@@ -105,6 +104,6 @@ test('Create Account form - successful submission results in redirect to the Acc
     user.click(createAccountButton)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/account')
+        expect(window.location.pathname).toBe('/uk/en-GB/account')
     })
 })

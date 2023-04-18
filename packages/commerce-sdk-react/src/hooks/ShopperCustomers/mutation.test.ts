@@ -91,7 +91,7 @@ describe('ShopperCustomers mutations', () => {
             mockQueryEndpoint(customersEndpoint, customer) // getCustomer
             mockMutationEndpoints(customersEndpoint, data) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomer refetch
-            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+            const {result, waitForValueToChange} = renderHookWithProviders(
                 (props: {enabled: boolean} = {enabled: false}) => ({
                     customer: queries.useCustomer(queryOptions),
                     mutation: useShopperCustomersMutation('createCustomerAddress'),
@@ -128,7 +128,7 @@ describe('ShopperCustomers mutations', () => {
             mockQueryEndpoint(customersEndpoint, customer) // getCustomer
             mockMutationEndpoints(customersEndpoint, data) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomer refetch
-            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+            const {result, waitForValueToChange} = renderHookWithProviders(
                 (props: {enabled: boolean} = {enabled: false}) => ({
                     customer: queries.useCustomer(queryOptions),
                     mutation: useShopperCustomersMutation('createCustomerPaymentInstrument'),
@@ -279,7 +279,7 @@ describe('ShopperCustomers mutations', () => {
             mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
             mockMutationEndpoints(customersEndpoint, data) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
-            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+            const {result, waitForValueToChange} = renderHookWithProviders(
                 (props: {enabled: boolean} = {enabled: false}) => ({
                     lists: queries.useCustomerProductLists(queryOptions),
                     mutation: useShopperCustomersMutation('createCustomerProductList'),
@@ -318,7 +318,7 @@ describe('ShopperCustomers mutations', () => {
             mockQueryEndpoint(customersEndpoint, oldList) // getCustomerProductList
 
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
-            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+            const {result, waitForValueToChange} = renderHookWithProviders(
                 (props: {enabled: boolean} = {enabled: false}) => ({
                     lists: queries.useCustomerProductLists(queryOptions),
                     mutation: useShopperCustomersMutation('updateCustomerProductList'),
@@ -346,7 +346,7 @@ describe('ShopperCustomers mutations', () => {
             mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
             mockMutationEndpoints(customersEndpoint, data) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
-            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+            const {result, waitForValueToChange} = renderHookWithProviders(
                 (props: {enabled: boolean} = {enabled: false}) => ({
                     lists: queries.useCustomerProductLists(queryOptions),
                     mutation: useShopperCustomersMutation('deleteCustomerProductList'),
@@ -384,7 +384,7 @@ describe('ShopperCustomers mutations', () => {
             mockMutationEndpoints(customersEndpoint, data) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
             mockQueryEndpoint(customersEndpoint, {test: 'use this? should not be!'}) // getCustomerProductLists refetch
-            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+            const {result, waitForValueToChange} = renderHookWithProviders(
                 (props: {enabled: boolean} = {enabled: false}) => ({
                     list: queries.useCustomerProductList(queryOptions),
                     lists: queries.useCustomerProductLists(queryOptions),

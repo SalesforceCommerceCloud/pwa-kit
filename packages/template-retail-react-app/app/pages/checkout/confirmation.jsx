@@ -153,7 +153,6 @@ const CheckoutConfirmation = () => {
                                                 defaultMessage="We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
                                                 id="checkout_confirmation.message.will_email_shortly"
                                                 values={{
-                                                    // eslint-disable-next-line react/display-name
                                                     b: (chunks) => <b>{chunks}</b>,
                                                     email: order.customerInfo.email
                                                 }}

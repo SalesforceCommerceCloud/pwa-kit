@@ -5,10 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* eslint-env jest */
-
 // TODO: The methods tested in this file have been split from one file into
 // multiple, so the tests should be split into multiple files as well.
+
+// TODO: There are a lot batched tests with conditional assertions. Can they be
+// split into smaller batches or otherwise refactored to avoid the conditionals?
+/* eslint-disable jest/no-conditional-expect */
 
 import sinon from 'sinon'
 
@@ -154,17 +156,17 @@ afterAll(() => {
 
 describe('utils/ssr-server tests', () => {
     test('getFullRequestURL', () => {
-        expect(getFullRequestURL('https://a.b/c')).toEqual('https://a.b/c')
+        expect(getFullRequestURL('https://a.b/c')).toBe('https://a.b/c')
 
         expect(() => getFullRequestURL('/somepath')).toThrow()
 
         updatePackageMobify(baseMobify)
 
-        expect(getFullRequestURL(`${PROXY_PATH_PREFIX}/base/somepath`)).toEqual(
+        expect(getFullRequestURL(`${PROXY_PATH_PREFIX}/base/somepath`)).toBe(
             'https://www.merlinspotions.com/somepath'
         )
 
-        expect(getFullRequestURL(`${PROXY_PATH_PREFIX}/base2/somepath`)).toEqual(
+        expect(getFullRequestURL(`${PROXY_PATH_PREFIX}/base2/somepath`)).toBe(
             'https://api.merlinspotions.com/somepath'
         )
     })
@@ -183,15 +185,15 @@ describe('utils/ssr-server tests', () => {
                 mobify: {},
                 validate: () => {
                     const inputConfigs = baseMobify.ssrParameters.proxyConfigs
-                    expect(proxyConfigs.length).toBe(inputConfigs.length)
+                    expect(proxyConfigs).toHaveLength(inputConfigs.length)
                     for (let i = 0; i < inputConfigs.length; i++) {
                         expect(proxyConfigs[i].protocol).toEqual(inputConfigs[i].protocol)
                         expect(proxyConfigs[i].host).toEqual(inputConfigs[i].host)
                         expect(proxyConfigs[i].path).toEqual(inputConfigs[i].path)
-                        expect(proxyConfigs[i].proxyPath).toEqual(
+                        expect(proxyConfigs[i].proxyPath).toBe(
                             `/mobify/proxy/${inputConfigs[i].path}`
                         )
-                        expect(proxyConfigs[i].cachingPath).toEqual(
+                        expect(proxyConfigs[i].cachingPath).toBe(
                             `/mobify/caching/${inputConfigs[i].path}`
                         )
                     }
@@ -224,20 +226,20 @@ describe('utils/ssr-server tests', () => {
                     SSR_PROXY3: 'http://far.away/base8/caching'
                 },
                 validate: () => {
-                    expect(proxyConfigs.length).toBe(3)
+                    expect(proxyConfigs).toHaveLength(3)
                     expect(proxyConfigs.every((config) => config.protocol === 'http')).toBe(true)
-                    expect(proxyConfigs[0].host).toEqual('somewhere.else')
-                    expect(proxyConfigs[1].host).toEqual('another.place')
-                    expect(proxyConfigs[2].host).toEqual('far.away')
-                    expect(proxyConfigs[0].path).toEqual('base')
-                    expect(proxyConfigs[1].path).toEqual('base9')
-                    expect(proxyConfigs[2].path).toEqual('base8')
-                    expect(proxyConfigs[0].proxyPath).toEqual('/mobify/proxy/base')
-                    expect(proxyConfigs[1].proxyPath).toEqual('/mobify/proxy/base9')
-                    expect(proxyConfigs[2].proxyPath).toEqual('/mobify/proxy/base8')
-                    expect(proxyConfigs[0].cachingPath).toEqual('/mobify/caching/base')
-                    expect(proxyConfigs[1].cachingPath).toEqual('/mobify/caching/base9')
-                    expect(proxyConfigs[2].cachingPath).toEqual('/mobify/caching/base8')
+                    expect(proxyConfigs[0].host).toBe('somewhere.else')
+                    expect(proxyConfigs[1].host).toBe('another.place')
+                    expect(proxyConfigs[2].host).toBe('far.away')
+                    expect(proxyConfigs[0].path).toBe('base')
+                    expect(proxyConfigs[1].path).toBe('base9')
+                    expect(proxyConfigs[2].path).toBe('base8')
+                    expect(proxyConfigs[0].proxyPath).toBe('/mobify/proxy/base')
+                    expect(proxyConfigs[1].proxyPath).toBe('/mobify/proxy/base9')
+                    expect(proxyConfigs[2].proxyPath).toBe('/mobify/proxy/base8')
+                    expect(proxyConfigs[0].cachingPath).toBe('/mobify/caching/base')
+                    expect(proxyConfigs[1].cachingPath).toBe('/mobify/caching/base9')
+                    expect(proxyConfigs[2].cachingPath).toBe('/mobify/caching/base8')
                 }
             },
             {
@@ -254,7 +256,7 @@ describe('utils/ssr-server tests', () => {
                 },
                 validate: () => {
                     const inputConfigs = baseMobify.ssrParameters.proxyConfigs
-                    expect(proxyConfigs.length).toBe(inputConfigs.length)
+                    expect(proxyConfigs).toHaveLength(inputConfigs.length)
                     for (let i = 0; i < inputConfigs.length; i++) {
                         expect(proxyConfigs[i].protocol).toEqual(inputConfigs[i].protocol)
                         expect(proxyConfigs[i].host).toEqual(inputConfigs[i].host)
@@ -267,11 +269,7 @@ describe('utils/ssr-server tests', () => {
                 mobify: {
                     ssrParameters: {
                         // Create an array that is one entry too long
-                        proxyConfigs: Array.apply(
-                            // eslint-disable-line prefer-spread
-                            null,
-                            {length: MAX_PROXY_CONFIGS + 1}
-                        )
+                        proxyConfigs: Array.apply(null, {length: MAX_PROXY_CONFIGS + 1})
                             .map(Number.call, Number)
                             .map((index) => ({
                                 host: `www.${index}.com`
@@ -285,7 +283,7 @@ describe('utils/ssr-server tests', () => {
                     ssrParameters: {}
                 },
                 validate: () => {
-                    expect(proxyConfigs.length).toBe(0)
+                    expect(proxyConfigs).toHaveLength(0)
                 }
             },
             {
@@ -351,7 +349,7 @@ describe('utils/ssr-server tests', () => {
         ]
 
         testCases.forEach((testCase) =>
-            test(testCase.name, () => {
+            test(`${testCase.name}`, () => {
                 const newMobify = Object.assign({}, baseMobify, testCase.mobify || {})
 
                 if (testCase.environment) {
@@ -363,9 +361,9 @@ describe('utils/ssr-server tests', () => {
                 if (testCase.validate) {
                     updatePackageMobify(newMobify)
                     testCase.validate(getPackageMobify())
-                } else {
-                    expect(() => updatePackageMobify(newMobify)).toThrow()
+                    return
                 }
+                expect(() => updatePackageMobify(newMobify)).toThrow()
             })
         )
     })
@@ -527,8 +525,8 @@ describe('utils/ssr-shared tests', () => {
 })
 
 test('escapeJSText', () => {
-    expect(escapeJSText()).toEqual(undefined)
-    expect(escapeJSText('</script>')).toEqual('\\x3c\\x2fscript>')
+    expect(escapeJSText()).toBeUndefined()
+    expect(escapeJSText('</script>')).toBe('\\x3c\\x2fscript>')
 })
 
 describe('MetricsSender', () => {
@@ -607,7 +605,7 @@ describe('MetricsSender', () => {
 
             // Expect that the correct values were sent
             const expected = metrics1.concat(metrics2).concat(metrics3)
-            expect(calledParams.length).toBe(expected.length)
+            expect(calledParams).toHaveLength(expected.length)
             expected.forEach((metric, index) => {
                 const actual = calledParams[index]
                 expect(actual).toBeDefined()
@@ -676,7 +674,7 @@ describe('MetricsSender', () => {
 
 test('processLambdaResponse with no parameter', () => {
     expect(processLambdaResponse()).toBeUndefined()
-    expect(processLambdaResponse(null)).toBe(null)
+    expect(processLambdaResponse(null)).toBeNull()
 })
 
 describe('processExpressResponse', () => {
@@ -687,7 +685,7 @@ describe('processExpressResponse', () => {
                 [CONTENT_TYPE]: 'text/plain'
             },
             validate: (headers) => {
-                expect(headers[CONTENT_TYPE]).toEqual('text/plain')
+                expect(headers[CONTENT_TYPE]).toBe('text/plain')
                 expect(headers[X_ORIGINAL_CONTENT_TYPE]).toBeFalsy()
             }
         },
@@ -699,8 +697,8 @@ describe('processExpressResponse', () => {
             },
             validate: (headers) => {
                 expect(headers[CONTENT_TYPE]).toEqual(APPLICATION_OCTET_STREAM)
-                expect(headers[CONTENT_ENCODING]).toEqual('gzip')
-                expect(headers[X_ORIGINAL_CONTENT_TYPE]).toEqual('text/plain')
+                expect(headers[CONTENT_ENCODING]).toBe('gzip')
+                expect(headers[X_ORIGINAL_CONTENT_TYPE]).toBe('text/plain')
             }
         },
         {
@@ -712,8 +710,8 @@ describe('processExpressResponse', () => {
             },
             validate: (headers) => {
                 expect(headers[CONTENT_TYPE]).toEqual(APPLICATION_OCTET_STREAM)
-                expect(headers[CONTENT_ENCODING]).toEqual('gzip')
-                expect(headers[X_ORIGINAL_CONTENT_TYPE]).toEqual('text/plain')
+                expect(headers[CONTENT_ENCODING]).toBe('gzip')
+                expect(headers[X_ORIGINAL_CONTENT_TYPE]).toBe('text/plain')
             }
         }
     ]
@@ -736,6 +734,7 @@ describe('processExpressResponse', () => {
 
     responseTypes.forEach((responseType) =>
         testCases.forEach((testCase) =>
+            // eslint-disable-next-line jest/expect-expect
             test(`${testCase.name} (${responseType.name})`, () => {
                 const headers = Object.assign({}, testCase.headers)
                 const response = responseType.create(headers)
@@ -828,7 +827,7 @@ describe('outgoingRequestHook tests', () => {
     )
 
     testCases.forEach((testCase) =>
-        test(testCase.name, () => {
+        test(`${testCase.name}`, () => {
             const createAppOptions = {appHostname}
 
             createAppOptions.proxyKeepAliveAgent = testCase.addProxyKeepAliveAgent
@@ -879,7 +878,7 @@ describe('outgoingRequestHook tests', () => {
 
             if (expectUrl) {
                 const url = called.shift()
-                expect(url).toEqual(`//${testCase.hostname}`)
+                expect(url).toBe(`//${testCase.hostname}`)
             }
 
             let calledOptions
@@ -890,7 +889,7 @@ describe('outgoingRequestHook tests', () => {
             const calledHeaders = calledOptions && calledOptions.headers
             if (testCase.addHeaders) {
                 expect(calledHeaders).toBeDefined()
-                expect(calledHeaders['x-extra']).toEqual('123')
+                expect(calledHeaders['x-extra']).toBe('123')
             }
 
             if (testCase.expectHeader) {
@@ -952,7 +951,7 @@ describe('updateGlobalAgentOptions', () => {
             from.options[key] = key
         })
         updateGlobalAgentOptions(from, to)
-        expect(to.options.xyzzy).toEqual(1)
+        expect(to.options.xyzzy).toBe(1)
         Object.entries(from.options).forEach(([key, value]) =>
             expect(to.options[key]).toEqual(value)
         )
@@ -978,14 +977,14 @@ describe('parseCacheControl', () => {
         const result = parseCacheControl('max-age=123, nocache, nostore, must-revalidate')
         expect(result).toBeDefined()
         expect(result['s-maxage']).toBeUndefined()
-        expect(result['max-age']).toEqual('123')
+        expect(result['max-age']).toBe('123')
     })
 
     test('parses s-maxage', () => {
         const result = parseCacheControl('s-maxage=123, nocache, nostore, must-revalidate')
         expect(result).toBeDefined()
         expect(result['max-age']).toBeUndefined()
-        expect(result['s-maxage']).toEqual('123')
+        expect(result['s-maxage']).toBe('123')
     })
 
     test('parses max-age and s-maxage', () => {
@@ -993,8 +992,8 @@ describe('parseCacheControl', () => {
             's-maxage=123, nocache, max-age=456, nostore, must-revalidate'
         )
         expect(result).toBeDefined()
-        expect(result['max-age']).toEqual('456')
-        expect(result['s-maxage']).toEqual('123')
+        expect(result['max-age']).toBe('456')
+        expect(result['s-maxage']).toBe('123')
     })
 })
 
@@ -1054,24 +1053,24 @@ describe('wrapResponseWrite', () => {
 
         // String without encoding
         response.write('12345')
-        expect(chunks.length).toEqual(1)
-        expect(chunks[0].toString()).toEqual('12345')
-        expect(write.calledWith('12345'))
+        expect(chunks).toHaveLength(1)
+        expect(chunks[0].toString()).toBe('12345')
+        expect(write.calledWith('12345')).toBe(true)
         write.reset()
 
         // String with encoding
         response.write('67890', 'utf-8')
-        expect(chunks.length).toEqual(2)
-        expect(chunks[1].toString()).toEqual('67890')
-        expect(write.calledWith('12345', 'utf-8'))
+        expect(chunks).toHaveLength(2)
+        expect(chunks[1].toString()).toBe('67890')
+        expect(write.calledWith('67890', 'utf-8')).toBe(true)
         write.reset()
 
         // Buffer
         const chunk1 = Buffer.from('abcde')
         response.write(chunk1)
-        expect(chunks.length).toEqual(3)
-        expect(chunks[2].toString()).toEqual('abcde')
-        expect(write.calledWith(chunk1))
+        expect(chunks).toHaveLength(3)
+        expect(chunks[2].toString()).toBe('abcde')
+        expect(write.calledWith(chunk1)).toBe(true)
         write.reset()
 
         expect(() => response.write({})).toThrow('unexpected type')
@@ -1083,7 +1082,7 @@ describe('CachedResponse', () => {
         const cached = new CachedResponse({})
         expect(cached.found).toBe(false)
         expect(cached.data).toBeUndefined()
-        expect(cached.status).toEqual(200)
+        expect(cached.status).toBe(200)
         expect(cached.headers).toEqual({})
         expect(cached.expiration).toBeUndefined()
     })
@@ -1110,11 +1109,11 @@ describe('CachedResponse', () => {
             res
         })
         expect(cached.found).toBe(true)
-        expect(cached.key).toEqual('key')
-        expect(cached.namespace).toEqual('namespace')
+        expect(cached.key).toBe('key')
+        expect(cached.namespace).toBe('namespace')
         expect(cached.data).toEqual(entry.data)
         expect(cached.headers).toEqual(entry.metadata.headers)
-        expect(cached.status).toEqual(201)
+        expect(cached.status).toBe(201)
         expect(cached.expiration).toEqual(new Date(entry.expiration))
     })
 })

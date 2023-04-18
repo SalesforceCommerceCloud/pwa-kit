@@ -8,9 +8,9 @@
 // NOTE: This conditional export by default exports the named export `getConfig`
 // for use in node environments. If specified by the `WEBPACK_TARGET` global
 // this module will export a browser safe version.
+/* global WEBPACK_TARGET */
 
 /* istanbul ignore next */
-// eslint-disable-next-line no-undef
 if (typeof WEBPACK_TARGET !== 'undefined' && WEBPACK_TARGET === 'web') {
     module.exports = require('./ssr-config.client.js')
 } else {
