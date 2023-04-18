@@ -7,8 +7,7 @@
 'use strict'
 
 const path = require('path')
-const bodyParser = require('body-parser')
-const {createProxyMiddleware, fixRequestBody} = require('http-proxy-middleware')
+const {createProxyMiddleware} = require('http-proxy-middleware')
 const {getRuntime} = require('pwa-kit-runtime/ssr/server/express')
 const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
@@ -81,13 +80,24 @@ const {handler} = runtime.createHandler(options, (app) => {
                 // So we added bodyparser middleware but
                 // this proxy middleware hangs if you use bodyparser.
                 // So we need to fix the request body here.
-                fixRequestBody(outGoingReq, incomingReq)
+                // fixRequestBody(outGoingReq, incomingReq)
+
+                if (incomingReq.path.includes('/token')) {
+                    const encodedClientCredential = Buffer.from(`${clientId}:${secret}`).toString(
+                        'base64'
+                    )
+
+                    // Normally, we are not supposed to modify the request headers
+                    // but we are doing this intentionally here because we cannot
+                    // do that in the onProxyReq callback.
+                    outGoingReq.setHeader('Authorization', `Basic ${encodedClientCredential}`)
+                }
 
                 // NOTE: we are supposed to inject the auth header here
                 // but for some reason, calling outGoingReq.setHeader()
                 // does not work! It always throw an error saying that
                 // Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
-                // It seems like this is a known issue with http-proxy-middleware.
+                // It seems like this is a known issue with http-proxy-middleware.`
                 // Solution: we modify the req.headers['Authorization'] before
                 // forwarding it to the proxy middleware.
             }
@@ -96,22 +106,12 @@ const {handler} = runtime.createHandler(options, (app) => {
             if (!req.path.startsWith('/shopper/auth')) {
                 return next()
             }
-            if (req.path.includes('/token') && req.body?.grant_type === 'client_credentials') {
-                const encodedClientCredential = Buffer.from(`${clientId}:${secret}`).toString(
-                    'base64'
-                )
-
-                // Normally, we are not supposed to modify the request headers
-                // but we are doing this intentionally here because we cannot
-                // do that in the onProxyReq callback.
-                req.headers['Authorization'] = `Basic ${encodedClientCredential}`
-            }
             proxy(req, res, next)
         }
     }
 
     app.use(
-        bodyParser.urlencoded({extended: true}),
+        // bodyParser.urlencoded({extended: true}),
         createSlasHandler({clientId, secret, shortCode})
     )
 
