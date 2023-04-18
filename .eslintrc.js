@@ -1,5 +1,6 @@
 module.exports = {
     root: true,
+    plugins: ['header'],
     rules: {
         'header/header': [
             2,

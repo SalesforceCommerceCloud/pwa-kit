@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* eslint-disable no-unused-vars */
 import React from 'react'
 import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
@@ -197,6 +196,8 @@ describe('Rendering tests', function () {
     })
 })
 
+// TODO: Fix flaky/broken test
+// eslint-disable-next-line jest/no-disabled-tests
 test.skip('Can update item quantity in the cart', async () => {
     renderWithProviders(<Cart />)
     await waitFor(async () => {
@@ -208,7 +209,9 @@ test.skip('Can update item quantity in the cart', async () => {
         `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
     )
 
-    expect(await within(cartItem).getByDisplayValue('2'))
+    // TODO: Fix assertion
+    // eslint-disable-next-line jest/valid-expect
+    expect(within(cartItem).getByDisplayValue('2'))
 
     await act(async () => {
         const incrementButton = await within(cartItem).findByTestId('quantity-increment')
@@ -222,6 +225,8 @@ test.skip('Can update item quantity in the cart', async () => {
     })
 
     await waitFor(() => {
+        // TODO: Fix assertion
+        // eslint-disable-next-line jest/valid-expect
         expect(within(cartItem).getByDisplayValue('3'))
     })
 
@@ -230,6 +235,8 @@ test.skip('Can update item quantity in the cart', async () => {
     })
 })
 
+// TODO: Fix flaky/broken test
+// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('Update quantity in product view', function () {
     beforeEach(() => {
         global.server.use(
@@ -259,6 +266,8 @@ describe.skip('Update quantity in product view', function () {
             const incrementButton = await within(productView).findByTestId('quantity-increment')
             // update item quantity
             fireEvent.pointerDown(incrementButton)
+            // TODO: Fix assertion
+            // eslint-disable-next-line jest/valid-expect
             expect(within(productView).getByDisplayValue('3'))
 
             const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
@@ -268,6 +277,8 @@ describe.skip('Update quantity in product view', function () {
             expect(productView).not.toBeInTheDocument()
         })
         await waitFor(() => {
+            // TODO: Fix assertion
+            // eslint-disable-next-line jest/valid-expect
             expect(within(cartItem).getByDisplayValue('3'))
         })
 
@@ -285,6 +296,9 @@ describe('Remove item from cart', function () {
             })
         )
     })
+
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Can remove item from the cart', async () => {
         renderWithProviders(<Cart />)
 
@@ -456,15 +470,15 @@ describe('Coupons tests', function () {
 
         const cartItem = await screen.findByTestId('sf-cart-item-750518699585M')
         // Promotions discount
-        expect(await within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)).toBeInTheDocument()
+        expect(within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)).toBeInTheDocument()
 
         const orderSummary = screen.getByTestId('sf-order-summary')
         userEvent.click(within(orderSummary).getByText('Remove'))
 
         expect(await screen.findByText('Promotion removed')).toBeInTheDocument()
         await waitFor(async () => {
-            const menSuit = await screen.queryByText(/MENSSUITS/i)
-            const promotionDiscount = await within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)
+            const menSuit = screen.queryByText(/MENSSUITS/i)
+            const promotionDiscount = within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)
             expect(promotionDiscount).not.toBeInTheDocument()
             expect(menSuit).not.toBeInTheDocument()
         })

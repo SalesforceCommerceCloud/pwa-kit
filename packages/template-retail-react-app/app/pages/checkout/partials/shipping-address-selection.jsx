@@ -112,21 +112,20 @@ const ShippingAddressSelection = ({
     const [isEditingAddress, setIsEditingAddress] = useState(false)
     const [selectedAddressId, setSelectedAddressId] = useState(undefined)
 
-    form =
-        form ||
-        useForm({
-            mode: 'onChange',
-            shouldUnregister: false,
-            defaultValues: {
-                ...selectedAddress
-            }
-        })
+    const defaultForm = useForm({
+        mode: 'onChange',
+        shouldUnregister: false,
+        defaultValues: {...selectedAddress}
+    })
+    if (!form) form = defaultForm
 
     const matchedAddress =
         hasSavedAddresses &&
         selectedAddress &&
         customer.addresses.find((savedAddress) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const {addressId, creationDate, lastModified, preferred, ...address} = savedAddress
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const {id, _type, ...selectedAddr} = selectedAddress
             return shallowEquals(address, selectedAddr)
         })

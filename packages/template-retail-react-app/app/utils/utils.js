@@ -32,6 +32,22 @@ export const watchOnlineStatus = (callback, win = window) => {
 }
 
 /**
+ * Compares the primary fields of two address objects to determine if they match.
+ * @param {Object} addr1
+ * @param {Object} addr2
+ * @returns {boolean}
+ */
+export const isMatchingAddress = (addr1, addr2) => {
+    if (!addr1 || !addr2) return false
+    const normalize = (addr) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {id, addressId, _type, preferred, creationDate, lastModified, ...normalized} = addr
+        return normalized
+    }
+    return shallowEquals(normalize(addr1), normalize(addr2))
+}
+
+/**
  * Performs a shallow comparison on two objects
  * @param {Object} a
  * @param {Object} b

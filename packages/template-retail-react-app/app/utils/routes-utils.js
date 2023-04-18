@@ -22,7 +22,7 @@ export const configureRoutes = (routes = [], config, {ignoredRoutes = []}) => {
     if (!routes.length) return []
     if (!config) return routes
 
-    const {url: urlConfig} = config?.app
+    const {url: urlConfig} = config.app
 
     const allSites = getSites()
     if (!allSites) return routes

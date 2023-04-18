@@ -133,7 +133,7 @@ describe('Auth', () => {
         expect(newAuth.get('access_token')).not.toBe('123')
         expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
-    test('ready - re-use pendingToken', () => {
+    test('ready - re-use pendingToken', async () => {
         const auth = new Auth(config)
         const data = {
             refresh_token: 'refresh_token_guest',
@@ -150,9 +150,9 @@ describe('Auth', () => {
         // @ts-expect-error private method
         auth.pendingToken = Promise.resolve(data)
 
-        expect(auth.ready()).resolves.toEqual(data)
+        await expect(auth.ready()).resolves.toEqual(data)
     })
-    test('ready - re-use valid access token', () => {
+    test('ready - re-use valid access token', async () => {
         const auth = new Auth(config)
         const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
 
@@ -177,7 +177,7 @@ describe('Auth', () => {
             auth.set(key, data[key])
         })
 
-        expect(auth.ready()).resolves.toEqual(result)
+        await expect(auth.ready()).resolves.toEqual(result)
         // @ts-expect-error private method
         expect(auth.pendingToken).toBeUndefined()
     })
@@ -192,6 +192,8 @@ describe('Auth', () => {
         const auth = new Auth({...config, fetchedToken})
         jest.spyOn(auth, 'queueRequest')
         await auth.ready()
+        // The "unbound method" isn't being called, so the rule isn't applicable
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(auth.queueRequest).not.toHaveBeenCalled()
         // @ts-expect-error private method
         expect(auth.pendingToken).toBeUndefined()
@@ -256,37 +258,37 @@ describe('Auth', () => {
         })
 
         await auth.ready()
-        expect(helpers.refreshAccessToken).not.toBeCalled()
+        expect(helpers.refreshAccessToken).not.toHaveBeenCalled()
 
         // And then now test with an _expired_ token
         // @ts-expect-error private method
         auth.set('access_token', JWTExpired)
 
         await auth.ready()
-        expect(helpers.refreshAccessToken).toBeCalled()
+        expect(helpers.refreshAccessToken).toHaveBeenCalled()
     })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
 
         await auth.ready()
-        expect(helpers.loginGuestUser).toBeCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
     test('loginGuestUser', async () => {
         const auth = new Auth(config)
         await auth.loginGuestUser()
-        expect(helpers.loginGuestUser).toBeCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
     test('loginRegisteredUserB2C', async () => {
         const auth = new Auth(config)
         await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
-        expect(helpers.loginRegisteredUserB2C).toBeCalled()
+        expect(helpers.loginRegisteredUserB2C).toHaveBeenCalled()
     })
     test('logout', async () => {
         const auth = new Auth(config)
         await auth.logout()
-        expect(helpers.loginGuestUser).toBeCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
-    test('running on the server uses a shared context memory store', async () => {
+    test('running on the server uses a shared context memory store', () => {
         const refreshTokenGuest = 'guest'
 
         // Mock running on the server so shared context storage is used.

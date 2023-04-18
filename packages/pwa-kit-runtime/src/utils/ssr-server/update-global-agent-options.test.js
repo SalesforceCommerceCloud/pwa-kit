@@ -14,7 +14,7 @@ describe('update-global-agent-options', () => {
             from.options[key] = key
         })
         updateGlobalAgentOptions(from, to)
-        expect(Object.keys(to.options).length).toEqual(AGENT_OPTIONS_TO_COPY.length)
+        expect(Object.keys(to.options)).toHaveLength(AGENT_OPTIONS_TO_COPY.length)
         expect(to.options).not.toHaveProperty('random')
     })
 })

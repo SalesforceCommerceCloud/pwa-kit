@@ -36,13 +36,13 @@ describe('resolveSiteFromUrl', function () {
     test('return site based on the site alias in the url', () => {
         getConfig.mockImplementation(() => mockConfig)
         const result = resolveSiteFromUrl('https://www.example-site.com/us/en-US/women/dress')
-        expect(result.id).toEqual('site-2')
+        expect(result.id).toBe('site-2')
     })
 
     test('return default site for home page', () => {
         getConfig.mockImplementation(() => mockConfig)
         const result = resolveSiteFromUrl('https://www.example-site.com/')
-        expect(result.id).toEqual('site-1')
+        expect(result.id).toBe('site-1')
     })
 
     test('throw an error when no matching site can be found', () => {
@@ -74,7 +74,7 @@ describe('resolveSiteFromUrl', function () {
         })
 
         const result = resolveSiteFromUrl('https://www.example-site.com/')
-        expect(result.id).toEqual('site-2')
+        expect(result.id).toBe('site-2')
     })
 })
 
