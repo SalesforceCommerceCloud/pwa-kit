@@ -13,8 +13,7 @@ import 'focus-visible/dist/focus-visible'
 
 import theme from '../../theme'
 import {MultiSiteProvider} from '../../contexts'
-import {resolveSiteFromUrl} from '../../utils/site-utils'
-import {resolveLocaleFromUrl} from '../../utils/site-utils'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '../../utils/url'
 
