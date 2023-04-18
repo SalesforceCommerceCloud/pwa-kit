@@ -53,6 +53,8 @@ const Payment = () => {
         defaultValues: {...selectedBillingAddress}
     })
 
+    // Using destructuring to remove properties from the object...
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
 
     const paymentMethodForm = useForm()
@@ -87,6 +89,8 @@ const Payment = () => {
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
+        // Using destructuring to remove properties from the object...
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
         return updateBillingAddressForBasket({
             body: address,

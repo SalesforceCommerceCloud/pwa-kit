@@ -45,7 +45,7 @@ const mockRegisteredCustomer = {
 let authModal = undefined
 const MockedComponent = (props) => {
     const {initialView} = props
-    authModal = initialView ? useAuthModal(initialView) : useAuthModal()
+    authModal = useAuthModal(initialView || undefined)
     const match = {
         params: {pageName: 'profile'}
     }
@@ -113,6 +113,8 @@ test('Renders login modal by default', async () => {
     expect(screen.getByText(/sign in/i)).toBeInTheDocument()
 })
 
+// TODO: Fix flaky/broken test
+// eslint-disable-next-line jest/no-disabled-tests
 test.skip('Renders error when given incorrect log in credentials', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
@@ -155,6 +157,7 @@ test.skip('Renders error when given incorrect log in credentials', async () => {
 })
 
 // TODO: investigate why this test is failing when running with other tests
+// eslint-disable-next-line jest/no-disabled-tests
 test.skip('Allows customer to create an account', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
@@ -224,9 +227,9 @@ test.skip('Allows customer to create an account', async () => {
     // wait for success state to appear
     await waitFor(
         () => {
-            expect(window.location.pathname).toEqual('/uk/en-GB/account')
+            expect(window.location.pathname).toBe('/uk/en-GB/account')
             const myAccount = screen.getAllByText(/My Account/)
-            expect(myAccount.length).toEqual(2)
+            expect(myAccount).toHaveLength(2)
         },
         {
             timeout: 5000
@@ -235,6 +238,7 @@ test.skip('Allows customer to create an account', async () => {
 })
 
 // TODO: investingate why this test is failing when running with other tests
+// eslint-disable-next-line jest/no-disabled-tests
 test.skip('Allows customer to sign in to their account', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
@@ -273,7 +277,7 @@ test.skip('Allows customer to sign in to their account', async () => {
     // allow time to transition to account page
     await waitFor(
         () => {
-            expect(window.location.pathname).toEqual('/uk/en-GB/account')
+            expect(window.location.pathname).toBe('/uk/en-GB/account')
             expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
         },
         {timeout: 5000}
@@ -288,6 +292,9 @@ describe('Reset password', function () {
             )
         )
     })
+
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Allows customer to generate password token', async () => {
         // render our test component
         renderWithProviders(<MockedComponent initialView="password" />, {
@@ -317,6 +324,8 @@ describe('Reset password', function () {
         })
     })
 
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Allows customer to open generate password token modal from everywhere', () => {
         // render our test component
         renderWithProviders(<MockedComponent initialView="password" />)

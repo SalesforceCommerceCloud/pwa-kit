@@ -6,9 +6,8 @@
  */
 import React from 'react'
 import {OuterApp} from './main'
-import {shallow, mount} from 'enzyme'
+import {mount} from 'enzyme'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
-import Switch from '../universal/components/switch'
 import * as errors from '../universal/errors'
 import AppErrorBoundary from '../universal/components/app-error-boundary'
 import {uuidv4} from '../../utils/uuidv4.client'
@@ -30,7 +29,7 @@ describe('main', function () {
             WrappedApp: routeComponent(App, false, locals)
         }
         const wrapper = mount(<OuterApp {...props} />)
-        expect(wrapper.find(App).length).toBe(1)
+        expect(wrapper.find(App)).toHaveLength(1)
         window.__PRELOADED_STATE__ = oldPreloadedState
     })
 
@@ -46,7 +45,7 @@ describe('main', function () {
             WrappedApp: routeComponent(App, false, locals)
         }
         const wrapper = mount(<OuterApp {...props} />)
-        expect(wrapper.find(AppErrorBoundary).length).toBe(1)
+        expect(wrapper.find(AppErrorBoundary)).toHaveLength(1)
         window.__ERROR__ = oldWindowError
     })
 })

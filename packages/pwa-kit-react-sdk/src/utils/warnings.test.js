@@ -21,7 +21,7 @@ describe('warnings', () => {
             deprecated('msg')
         }
         testFunction1()
-        expect(console.warn.mock.calls[0][0]).toEqual(
+        expect(console.warn.mock.calls[0][0]).toBe(
             `[PWA Kit API WARNING]: You are currently using an deprecated function: [testFunction1]. msg`
         )
 
@@ -32,7 +32,7 @@ describe('warnings', () => {
             deprecated()
         }
         testFunction2()
-        expect(console.warn.mock.calls[1][0]).toEqual(
+        expect(console.warn.mock.calls[1][0]).toBe(
             `[PWA Kit API WARNING]: You are currently using an deprecated function: [testFunction2]. `
         )
     })
@@ -42,7 +42,7 @@ describe('warnings', () => {
             experimental('msg')
         }
         testFunction3()
-        expect(console.warn.mock.calls[0][0]).toEqual(
+        expect(console.warn.mock.calls[0][0]).toBe(
             `[PWA Kit API WARNING]: You are currently using an experimental function: [testFunction3] This function may change at any time. msg`
         )
 
@@ -53,7 +53,7 @@ describe('warnings', () => {
             experimental()
         }
         testFunction4()
-        expect(console.warn.mock.calls[1][0]).toEqual(
+        expect(console.warn.mock.calls[1][0]).toBe(
             `[PWA Kit API WARNING]: You are currently using an experimental function: [testFunction4] This function may change at any time. `
         )
     })

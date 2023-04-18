@@ -21,7 +21,7 @@
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "internal-lib-build lint .",
+    "lint:js": "pwa-kit-dev lint .",
     "prepare": "node scripts/build.js",
     "test": "internal-lib-build test"
   },
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "internal-lib-build": "2.8.0-dev",
+    "pwa-kit-dev": "2.8.0-dev",
     "verdaccio": "^5.22.1"
   },
   "engines": {

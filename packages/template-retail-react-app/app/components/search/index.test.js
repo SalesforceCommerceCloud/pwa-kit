@@ -46,7 +46,7 @@ test('changes url when enter is pressed', async () => {
     await user.type(searchInput, 'Dresses{enter}')
     await waitFor(() => {
         expect(window.location.pathname).toEqual(createPathWithDefaults('/search'))
-        expect(window.location.search).toEqual('?q=Dresses')
+        expect(window.location.search).toBe('?q=Dresses')
         const suggestionPopoverEl = screen.getByTestId('sf-suggestion-popover')
         expect(suggestionPopoverEl).toBeInTheDocument()
     })
@@ -103,12 +103,12 @@ test('clicking clear searches clears recent searches', async () => {
     await searchInput.focus()
     const clearSearch = document.getElementById('clear-search')
     await user.click(clearSearch)
-    expect(getSessionJSONItem(RECENT_SEARCH_KEY)).not.toBeDefined()
+    expect(getSessionJSONItem(RECENT_SEARCH_KEY)).toBeUndefined()
 })
 
 test('passing undefined to Suggestions returns undefined', async () => {
     const suggestions = renderWithProviders(
         <Suggestions suggestions={undefined} closeAndNavigate={noop} />
     )
-    expect(suggestions.innerHTML).not.toBeDefined()
+    expect(suggestions.innerHTML).toBeUndefined()
 })

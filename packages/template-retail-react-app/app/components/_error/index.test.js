@@ -10,7 +10,7 @@ import {renderWithProviders} from '../../utils/test-utils'
 import Error from './index'
 
 test('Error renders without errors', () => {
-    expect(renderWithProviders(<Error />))
+    expect(renderWithProviders(<Error />)).toBeDefined()
 })
 
 test('Error status 500', () => {

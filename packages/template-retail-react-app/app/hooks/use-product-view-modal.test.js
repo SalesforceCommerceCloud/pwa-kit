@@ -106,9 +106,9 @@ describe('useProductViewModal hook', () => {
         fireEvent.click(toggleButton)
         expect(history.location.pathname).toBe('/test/path')
         const searchParams = new URLSearchParams(history.location.search)
-        expect(searchParams.get('color')).toEqual('BLACKFB')
-        expect(searchParams.get('width')).toEqual('V')
-        expect(searchParams.get('pid')).toEqual('750518699578M')
+        expect(searchParams.get('color')).toBe('BLACKFB')
+        expect(searchParams.get('width')).toBe('V')
+        expect(searchParams.get('pid')).toBe('750518699578M')
     })
 
     test("clean up product's related url param when unmounting product content", () => {
@@ -135,9 +135,9 @@ describe('useProductViewModal hook', () => {
         fireEvent.click(toggleButton)
         const searchParams = new URLSearchParams(history.location.search.toString())
         waitFor(() => {
-            expect(searchParams.get('color')).toEqual(undefined)
-            expect(searchParams.get('width')).toEqual(undefined)
-            expect(searchParams.get('pid')).toEqual(undefined)
+            expect(searchParams.get('color')).toBeUndefined()
+            expect(searchParams.get('width')).toBeUndefined()
+            expect(searchParams.get('pid')).toBeUndefined()
         })
     })
 
