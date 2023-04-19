@@ -117,7 +117,6 @@ const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
     }
-    console.log('appBase', '.' + pkg?.mobify?.overridesDir + '/app')
     class Builder {
         constructor() {
             this.config = {
