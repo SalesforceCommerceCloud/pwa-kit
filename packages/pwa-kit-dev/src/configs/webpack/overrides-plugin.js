@@ -3,28 +3,28 @@ const fs = require('fs')
 const glob = require('glob')
 
 /**
- * Implements a b2c-cartridge-like overlay resolve for webpack
+ * Implements a b2c-cartridge-like override resolve for webpack
  *
  * @example
- * // import from the *next* in the overlay-chain (i.e. similar to module.superModule)
+ * // import from the *next* in the override-chain (i.e. similar to module.superModule)
  * import Something from '*'
  *
  * @example
- * // import from the overlay chain (not the forward slash is escaped here due to being in a comment)
+ * // import from the override chain (not the forward slash is escaped here due to being in a comment)
  * import Something, {SomethingElse} from '*\/components/something'
  *
  * @example
- * // (ONLY IN BASE) paths required relative to the appBase will first be searched through the overlays
+ * // (ONLY IN BASE) paths required relative to the appBase will first be searched through the overrides
  * import Something from '../../components/something'
  *
- * @class OverlayResolverPlugin
+ * @class OverridesResolverPlugin
  */
-class OverlayResolverPlugin {
+class OverridesResolverPlugin {
     /**
      *
      * @param options
      * @param {string} options.appBase path to application base
-     * @param {string[]} options.overlays paths to overlays
+     * @param {string[]} options.overrudes paths to overrides
      */
     constructor(options) {
 
@@ -33,7 +33,7 @@ class OverlayResolverPlugin {
         // this is /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app
         
         // this is [retail-react-app]
-        this.overlays = options.overlays || []
+        this.overrides = options.overrides || []
 
         /* this is [
             '/Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app',
@@ -43,7 +43,7 @@ class OverlayResolverPlugin {
         */
 
         this._allSearchDirs = [this.appBase].concat(
-            this.overlays.map((o) => {
+            this.overrides.map((o) => {
                 return path.join(
                     path.resolve(
                         // prefix with `~` or `/` indicates relative filesystem, otherwise `node_modules`
@@ -78,7 +78,7 @@ class OverlayResolverPlugin {
     }
 
     isRelevant(p) {
-        return [this.appBase].concat(this.overlays).some((_configPath) => {
+        return [this.appBase].concat(this.overrides).some((_configPath) => {
             _configPath.indexOf(p)
         })
     }
@@ -115,14 +115,14 @@ class OverlayResolverPlugin {
         }
     }
 
-    toOverlayRelative(p) {
-        var overlay = this.findOverlay(p)
-        return p.substring(overlay.length + 1)
+    toOverrideRelative(p) {
+        var override = this.findOverride(p)
+        return p.substring(override.length + 1)
     }
 
-    findOverlay(p) {
-        return this._allSearchDirs.find((overlay) => {
-            return p.indexOf(overlay) === 0
+    findOverride(p) {
+        return this._allSearchDirs.find((override) => {
+            return p.indexOf(override) === 0
         })
     }
 
@@ -136,15 +136,15 @@ class OverlayResolverPlugin {
             function (requestContext, resolveContext, callback) {
                 // exact match ^ means import the "parent" (superModule) of the requesting module
                 if (requestContext.request === '^') {
-                    const overlayRelative = this.toOverlayRelative(requestContext.context.issuer)
-                    const overlay = this.findOverlay(requestContext.context.issuer)
+                    const overrideRelative = this.toOverrideRelative(requestContext.context.issuer)
+                    const override = this.findOverride(requestContext.context.issuer)
 
-                    const searchOverlays = this._allSearchDirs.slice(
-                        this._allSearchDirs.indexOf(overlay) + 1
+                    const searchOverrides = this._allSearchDirs.slice(
+                        this._allSearchDirs.indexOf(override) + 1
                     )
                     var targetFile = this.findFileMap(
-                        overlayRelative,
-                        searchOverlays,
+                        overrideRelative,
+                        searchOverrides,
                         resolver.options.extensions
                     )
                     if (!targetFile) {
@@ -175,11 +175,11 @@ class OverlayResolverPlugin {
 
                     if (this.isAppBaseRelative(resolvedPath)) {
                         // ex - components/header
-                        let overlayRelative = this.toOverlayRelative(resolvedPath)
+                        let overrideRelative = this.toOverrideRelative(resolvedPath)
 
                         try {
                             var targetFile = this.findFileMap(
-                                overlayRelative,
+                                overrideRelative,
                                 this._allSearchDirs,
                                 resolver.options.extensions
                             )
@@ -208,10 +208,10 @@ class OverlayResolverPlugin {
                 } else if (requestContext.request.startsWith('.')) {
                     // if request looks like '../../components/product-detail/above-fold'
                     // and the path looks like '/Users/yunakim/cc-pwa/pwa-kit/packages/template-retail-react-app/app/pages/product-detail'
-                    const overlayRelative = requestContext.request.replaceAll('../', '')
+                    const overrideRelative = requestContext.request.replaceAll('../', '')
                     try {
                         var targetFile = this.findFileMap(
-                            overlayRelative,
+                            overrideRelative,
                             this._allSearchDirs,
                             resolver.options.extensions
                         )
@@ -238,10 +238,10 @@ class OverlayResolverPlugin {
                 ) {
                     // external dependency requiring app code (app-config, app, ssr, etc)
                     // TODO: DRY this is nearly the same as the above condition
-                    let overlayRelative = this.toOverlayRelative(requestContext.request)
+                    let overrideRelative = this.toOverrideRelative(requestContext.request)
                     try {
                         var targetFile = this.findFileMap(
-                            overlayRelative,
+                            overrideRelative,
                             this._allSearchDirs,
                             resolver.options.extensions
                         )
@@ -270,4 +270,4 @@ class OverlayResolverPlugin {
     }
 }
 
-module.exports = OverlayResolverPlugin
+module.exports = OverridesResolverPlugin

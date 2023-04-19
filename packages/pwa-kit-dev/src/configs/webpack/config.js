@@ -161,7 +161,7 @@ const baseConfig = (target) => {
                     plugins: [
                         pkg?.mobify?.extends && pkg?.mobify?.overridesDir
                             ? new OverridesResolverPlugin({
-                                  overlays: [pkg?.mobify?.extends],
+                                  overrides: [pkg?.mobify?.extends],
                                   appBase: '.' + pkg?.mobify?.overridesDir + '/app',
                                   projectDir: process.cwd()
                               })
