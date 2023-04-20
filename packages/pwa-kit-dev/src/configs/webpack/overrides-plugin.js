@@ -64,6 +64,7 @@ class OverridesResolverPlugin {
             ''
         )}/**/*${OVERRIDES_EXTENSIONS}`
         const overridesFsRead = glob.sync(globPattern)
+        console.log('overridesFsRead', overridesFsRead)
 
         const overrideReplace = this.pkg?.mobify?.overridesDir + '/app/'
         
@@ -75,6 +76,7 @@ class OverridesResolverPlugin {
                 [end, rest]
             )
         })
+        console.log('this.overridesHashMap', this.overridesHashMap)
     }
 
     isRelevant(p) {
@@ -97,7 +99,8 @@ class OverridesResolverPlugin {
         for (var dir of dirs) {
             var base = path.join(dir, requestPath)
             if (fileExt) {
-                if (this.overridesHashMap.has(requestPath)) {
+                const noExtPath = requestPath.replace(fileExt, '')
+                if (this.overridesHashMap.has(noExtPath)) {
                     return base
                 }
             } else {
@@ -183,6 +186,7 @@ class OverridesResolverPlugin {
                                 this._allSearchDirs,
                                 resolver.options.extensions
                             )
+
 
                             if (targetFile) {
                                 const target = resolver.ensureHook('resolved')
