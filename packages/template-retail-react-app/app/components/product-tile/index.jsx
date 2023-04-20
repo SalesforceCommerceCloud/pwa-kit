@@ -82,6 +82,7 @@ const ProductTile = (props) => {
         <Link
             data-testid="product-tile"
             {...styles.container}
+            style={{opacity: product?.c_inBasket ? 0.25: 1}}
             to={productUrlBuilder({id: productId}, intl.local)}
             {...rest}
         >

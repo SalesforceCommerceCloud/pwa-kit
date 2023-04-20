@@ -8,12 +8,13 @@ const sites = require('./sites.js')
 
 module.exports = {
     app: {
+        extends: ['retail-react-app', 'another-plug', 'pwa-kit-preview'],
         url: {
             site: 'path',
             locale: 'path',
             showDefaults: true
         },
-        defaultSite: 'RefArchGlobal',
+        defaultSite: 'RefArch',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -22,10 +23,10 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
-                siteId: 'RefArchGlobal'
+                clientId: 'a91336d3-a40c-4c12-a7e4-8fc1ff93a5ae',
+                organizationId: 'f_ecom_zzrf_015',
+                shortCode: 'kv7kzm78',
+                siteId: 'RefArch'
             }
         },
         einsteinAPI: {

@@ -138,7 +138,7 @@ const ProductList = (props) => {
         {
             parameters: {
                 ...searchParams,
-                refine: searchParams._refine
+                refine: [...searchParams._refine, 'htype=master']
             }
         },
         {
