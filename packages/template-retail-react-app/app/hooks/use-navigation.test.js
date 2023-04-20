@@ -10,6 +10,7 @@ import useNavigation from './use-navigation'
 import mockConfig from '../../config/mocks/default'
 import {renderWithProviders} from '../utils/test-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+const originalLocation = window.location
 
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {
@@ -36,7 +37,6 @@ jest.mock('react-router', () => {
 
 afterEach(() => {
     jest.clearAllMocks()
-    const originalLocation = window.location
 
     // Restore `window.location` to the `jsdom` `Location` object
     window.location = originalLocation
