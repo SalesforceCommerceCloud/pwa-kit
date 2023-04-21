@@ -138,8 +138,10 @@ class Auth {
     private REFRESH_TOKEN_EXPIRATION_DAYS = 90
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
+    private onSuccess: (() => void) | undefined
 
-    constructor(config: AuthConfig) {
+    constructor(config: AuthConfig, onSuccess?: () => void) {
+        this.onSuccess = onSuccess
         this.client = new ShopperLogin({
             proxy: config.proxy,
             parameters: {
@@ -352,6 +354,7 @@ class Auth {
     ): (...args: Args) => Promise<Data> {
         return async (...args) => {
             await this.ready()
+            if (this.onSuccess) this.onSuccess()
             return await fn(...args)
         }
     }

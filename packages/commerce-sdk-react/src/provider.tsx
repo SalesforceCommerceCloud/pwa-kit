@@ -18,6 +18,7 @@ import {
     ShopperSearch,
     ShopperBasketsTypes
 } from 'commerce-sdk-isomorphic'
+import { useQueryClient } from '@tanstack/react-query'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 
@@ -83,6 +84,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
         fetchOptions
     }
+    const queryClient = useQueryClient()
     const apiClients = useMemo(() => {
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -118,6 +120,13 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             redirectURI,
             fetchOptions,
             fetchedToken
+        }, () => {
+            queryClient.cancelQueries({ queryKey: [
+                "/commerce-sdk-react",
+                "/organizations/",
+                "f_ecom_zzrf_001",
+                "/customers"
+              ]})
         })
     }, [
         clientId,
