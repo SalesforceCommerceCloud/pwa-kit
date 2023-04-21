@@ -17,7 +17,7 @@ import {
     createUrlTemplate,
     removeSiteLocaleFromPath
 } from './url'
-import {getUrlConfig} from './utils'
+import {getUrlConfig} from './site-utils'
 import mockConfig from '../../config/mocks/default'
 
 afterEach(() => {
@@ -35,7 +35,14 @@ jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
     return {
         ...original,
-        getConfig: jest.fn(() => mockConfig),
+        getConfig: jest.fn(() => mockConfig)
+    }
+})
+
+jest.mock('./site-utils', () => {
+    const original = jest.requireActual('./site-utils')
+    return {
+        ...original,
         getUrlConfig: jest.fn()
     }
 })
