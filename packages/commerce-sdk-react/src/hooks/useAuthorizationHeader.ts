@@ -19,6 +19,14 @@ export const useAuthorizationHeader = <Options extends ApiOptions, Data>(
     const auth = useAuthContext()
     return async (options) => {
         const {access_token} = await auth.ready()
+
+        if (options?.parameters?.customerId && options?.parameters?.customerId !== auth.get('customer_id')) {
+            console.log('customerId mismatch')
+            console.log(options?.parameters?.customerId)
+            console.log(options?.parameters?.customerId)
+            options.parameters.customerId = auth.get('customer_id')
+        }
+
         return await method({
             ...options,
             headers: {
