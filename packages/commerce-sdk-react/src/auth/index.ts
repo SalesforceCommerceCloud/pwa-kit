@@ -331,7 +331,6 @@ class Auth {
                     if (json.message === 'invalid refresh_token') {
                         // clean up storage and restart the login flow
                         this.clearStorage()
-                        return this.loginGuestUser()
                     }
                 }
             }
