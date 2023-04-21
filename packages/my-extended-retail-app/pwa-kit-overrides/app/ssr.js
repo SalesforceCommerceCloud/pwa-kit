@@ -27,7 +27,7 @@ const options = {
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development.
-    protocol: 'http',
+    protocol: 'http'
 }
 
 const runtime = getRuntime()
@@ -40,13 +40,18 @@ const {handler} = runtime.createHandler(options, (app) => {
                 useDefaults: true,
                 directives: {
                     'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-                    'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
+                    'script-src': [
+                        "'self'",
+                        "'unsafe-eval'",
+                        'storage.googleapis.com',
+                        'www.googletagmanager.com'
+                    ],
 
                     // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null,
-                },
+                    'upgrade-insecure-requests': isRemote() ? [] : null
+                }
             },
-            hsts: isRemote(),
+            hsts: isRemote()
         })
     )
 

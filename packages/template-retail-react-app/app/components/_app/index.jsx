@@ -69,6 +69,7 @@ import {
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
+import {Helmet} from 'react-helmet'
 
 const onClient = typeof window !== 'undefined'
 
@@ -205,6 +206,16 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
+            <Helmet>
+                <script async src="https://www.googletagmanager.com/gtag/js?id=G-2DSPGYVQRG" />
+
+                {/* TODO: not sure why this is not in the html */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: "console.log('--- GA4'); window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-2DSPGYVQRG');"
+                    }}
+                />
+            </Helmet>
             <IntlProvider
                 onError={(err) => {
                     if (err.code === 'MISSING_TRANSLATION') {
