@@ -34,7 +34,6 @@ import useEinstein from '../../hooks/use-einstein'
 import useSomeAnalytics from '../../hooks/use-some-analytics'
 
 const Footer = ({...otherProps}) => {
-    console.log('--- overriding footer')
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)

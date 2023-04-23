@@ -207,7 +207,6 @@ const App = (props) => {
     return (
         <Box className="sf-app" {...styles.container}>
             <Helmet>
-                {/* Alternatively, you can integrate Google Analytics via a package like https://www.npmjs.com/package/react-ga4 */}
                 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2DSPGYVQRG" />
                 <script>
                     {`
@@ -218,6 +217,7 @@ const App = (props) => {
                       gtag('config', 'G-2DSPGYVQRG');
                     `}
                 </script>
+                {/* Alternatively, you can integrate Google Analytics via a package like https://www.npmjs.com/package/react-ga4 */}
             </Helmet>
             <IntlProvider
                 onError={(err) => {

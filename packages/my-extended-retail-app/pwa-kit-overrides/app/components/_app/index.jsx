@@ -18,7 +18,7 @@ import {
     useCommerceApi,
     useCustomerType,
     useCustomerBaskets,
-    useShopperBasketsMutation,
+    useShopperBasketsMutation
 } from 'commerce-sdk-react-preview'
 import * as queryKeyHelpers from 'commerce-sdk-react-preview/hooks/ShopperProducts/queryKeyHelpers'
 // Chakra
@@ -55,7 +55,7 @@ import {
     flatten,
     mergeMatchedItems,
     isServer,
-    resolveLocaleFromUrl,
+    resolveLocaleFromUrl
 } from '^retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '^retail-react-app/app/utils/locale'
 import {
@@ -64,11 +64,12 @@ import {
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE,
+    DEFAULT_LOCALE
 } from '^retail-react-app/app/constants'
 
 import Seo from '^retail-react-app/app/components/seo'
 import {resolveSiteFromUrl} from '^retail-react-app/app/utils/site-utils'
+import {Helmet} from 'react-helmet'
 
 const onClient = typeof window !== 'undefined'
 
@@ -81,12 +82,12 @@ const useLazyLoadCategories = () => {
     const itemsKey = 'categories'
 
     const levelZeroCategoriesQuery = useCategory({
-        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH},
+        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
 
     const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
     const queries = useCategoryBulk(ids, {
-        enabled: onClient && ids?.length > 0,
+        enabled: onClient && ids?.length > 0
     })
     const dataArray = queries.map((query) => query.data).filter(Boolean)
     const isLoading = queries.some((query) => query.isLoading)
@@ -99,12 +100,15 @@ const useLazyLoadCategories = () => {
             [itemsKey]: mergeMatchedItems(
                 levelZeroCategoriesQuery.data?.categories || [],
                 dataArray
-            ),
-        },
+            )
+        }
     }
 }
 
 const App = (props) => {
+    // TODO: why is this log not showing up?
+    console.log('--- overriding App component')
+
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
     const {data: categoriesTree} = useLazyLoadCategories()
     const categories = flatten(categoriesTree || {}, 'categories')
@@ -144,14 +148,14 @@ const App = (props) => {
         // Create a new basket if the current customer doesn't have one.
         if (baskets?.total === 0) {
             createBasket.mutate({
-                body: {},
+                body: {}
             })
         }
         // update the basket currency if it doesn't match the current locale currency
         if (baskets?.baskets?.[0]?.currency && baskets.baskets[0].currency !== currency) {
             updateBasket.mutate({
                 parameters: {basketId: baskets.baskets[0].basketId},
-                body: {currency},
+                body: {currency}
             })
         }
     }, [baskets])
@@ -206,6 +210,19 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
+            <Helmet>
+                <script async src="https://www.googletagmanager.com/gtag/js?id=G-2DSPGYVQRG" />
+                <script>
+                    {`
+                      window.dataLayer = window.dataLayer || [];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('js', new Date());
+
+                      gtag('config', 'G-2DSPGYVQRG');
+                    `}
+                </script>
+                {/* Alternatively, you can integrate Google Analytics via a package like https://www.npmjs.com/package/react-ga4 */}
+            </Helmet>
             <IntlProvider
                 onError={(err) => {
                     if (err.code === 'MISSING_TRANSLATION') {
@@ -295,7 +312,7 @@ const App = (props) => {
                                     display: 'flex',
                                     flexDirection: 'column',
                                     flex: 1,
-                                    outline: 0,
+                                    outline: 0
                                 }}
                             >
                                 <Box
@@ -345,20 +362,20 @@ App.getProps = async ({res}) => {
             // NOTE: Your implementation may differ, this is just what we did.
             return [locale?.id]
         },
-        l10nConfig,
+        l10nConfig
     })
     const messages = await fetchTranslations(targetLocale)
 
     return {
         targetLocale,
-        messages,
+        messages
     }
 }
 
 App.propTypes = {
     children: PropTypes.node,
     targetLocale: PropTypes.string,
-    messages: PropTypes.object,
+    messages: PropTypes.object
 }
 
 /**
@@ -371,10 +388,10 @@ export const useCategoryBulk = (ids = [], queryOptions) => {
     const api = useCommerceApi()
     const {getTokenWhenReady} = useAccessToken()
     const {
-        app: {commerceAPI},
+        app: {commerceAPI}
     } = getConfig()
     const {
-        parameters: {organizationId},
+        parameters: {organizationId}
     } = commerceAPI
     const {site} = useMultiSite()
 
@@ -384,20 +401,20 @@ export const useCategoryBulk = (ids = [], queryOptions) => {
                 id,
                 levels: 2,
                 organizationId,
-                siteId: site.id,
+                siteId: site.id
             }),
             queryFn: async () => {
                 const token = await getTokenWhenReady()
                 const res = await api.shopperProducts.getCategory({
                     parameters: {id, levels: 2},
                     headers: {
-                        authorization: `Bearer ${token}`,
-                    },
+                        authorization: `Bearer ${token}`
+                    }
                 })
                 return res
             },
             ...queryOptions,
-            enabled: queryOptions.enabled !== false && Boolean(id),
+            enabled: queryOptions.enabled !== false && Boolean(id)
         }
     })
     const res = useQueries({queries})
