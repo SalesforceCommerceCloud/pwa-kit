@@ -47,6 +47,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'storage.googleapis.com',
                         'www.googletagmanager.com'
                     ],
+                    'connect-src': ["'self'", 'www.google-analytics.com'],
 
                     // Do not upgrade insecure requests for local development
                     'upgrade-insecure-requests': isRemote() ? [] : null
