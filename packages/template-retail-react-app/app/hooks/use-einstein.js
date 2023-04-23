@@ -387,7 +387,7 @@ export class EinsteinAPI {
     }
 }
 
-const useEinstein = () => {
+const useEinstein = (EinsteinClass = EinsteinAPI) => {
     const api = useCommerceApi()
     const {getTokenWhenReady} = useAccessToken()
     const {
@@ -399,7 +399,7 @@ const useEinstein = () => {
 
     const einstein = useMemo(
         () =>
-            new EinsteinAPI({
+            new EinsteinClass({
                 host,
                 einsteinId,
                 userId: encUserId,
@@ -442,6 +442,8 @@ const useEinstein = () => {
     }
 
     return {
+        _instance: einstein,
+
         isLoading,
 
         recommendations,
