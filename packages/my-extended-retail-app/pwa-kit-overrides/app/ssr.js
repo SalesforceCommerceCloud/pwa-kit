@@ -43,6 +43,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'script-src': [
                         "'self'",
                         "'unsafe-eval'",
+                        "'unsafe-inline'",
                         'storage.googleapis.com',
                         'www.googletagmanager.com'
                     ],
