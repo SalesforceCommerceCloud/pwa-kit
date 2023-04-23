@@ -31,7 +31,7 @@ import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../hooks/use-einstein'
-import {useGoogleAnalytics} from '../../hooks/use-google-analytics'
+import useSomeAnalytics from '../../hooks/use-some-analytics'
 
 const Footer = ({...otherProps}) => {
     console.log('--- overriding footer')
@@ -195,11 +195,14 @@ const Subscribe = ({...otherProps}) => {
     const intl = useIntl()
 
     const einstein = useEinstein()
-    const ga = useGoogleAnalytics()
+    const analytics = useSomeAnalytics()
 
     const onClick = () => {
         einstein.sendSomeEvent()
-        ga.sendSomeEvent()
+        analytics.sendSomeEvent()
+
+        // Send custom event for Google Analytics
+        window.gtag('event', 'email_signup')
     }
 
     return (
@@ -219,7 +222,6 @@ const Subscribe = ({...otherProps}) => {
 
             <Box>
                 <InputGroup>
-                    {/* TODO: override this email sign up (and try relative-path import). Then calls both useEinstein and useGoogleAnalytics */}
                     <Input type="email" placeholder="you@email.com" {...styles.subscribeField} />
                     <InputRightElement {...styles.subscribeButtonContainer}>
                         <Button variant="footer" onClick={onClick}>
