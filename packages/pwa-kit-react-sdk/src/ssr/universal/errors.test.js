@@ -12,6 +12,6 @@ describe('Errors', () => {
         const status = 400
         const msg = 'This is a bad request'
         const err = new errors.HTTPError(status, msg)
-        expect(err.toString()).toEqual(`HTTPError ${status}: ${msg}`)
+        expect(err.toString()).toBe(`HTTPError ${status}: ${msg}`)
     })
 })

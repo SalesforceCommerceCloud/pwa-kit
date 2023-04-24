@@ -50,13 +50,7 @@ import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {
-    watchOnlineStatus,
-    flatten,
-    mergeMatchedItems,
-    isServer,
-    resolveLocaleFromUrl
-} from '../../utils/utils'
+import {watchOnlineStatus, flatten, mergeMatchedItems, isServer} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -68,7 +62,7 @@ import {
 } from '../../constants'
 
 import Seo from '../seo'
-import {resolveSiteFromUrl} from '../../utils/site-utils'
+import {resolveLocaleFromUrl, resolveSiteFromUrl} from '../../utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 

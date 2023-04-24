@@ -55,7 +55,7 @@ export const useProductViewModal = (initialProduct) => {
         }
     )
     const cleanUpVariantParams = () => {
-        const paramToRemove = [...product?.variationAttributes?.map(({id}) => id), 'pid']
+        const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
         const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
 
         history.replace({search: updatedParams})

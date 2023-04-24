@@ -79,7 +79,8 @@ export const getPaymentInstrumentCardType = (type) => {
 }
 
 export const createCreditCardPaymentBodyFromForm = (paymentFormData) => {
-    // eslint-disable-next-line no-unused-vars
+    // Using destructuring to omit properties
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {expiry, paymentInstrumentId, ...selectedPayment} = paymentFormData
 
     // The form gives us the expiration date as `MM/YY` - so we need to split it into

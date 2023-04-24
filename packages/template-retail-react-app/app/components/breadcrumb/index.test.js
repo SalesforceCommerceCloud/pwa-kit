@@ -26,5 +26,5 @@ const mockCategories = [
 test('Renders Breadcrum', () => {
     const {getAllByTestId} = renderWithProviders(<Breadcrumb categories={mockCategories} />)
 
-    expect(getAllByTestId('sf-crumb-item').length).toEqual(mockCategories.length)
+    expect(getAllByTestId('sf-crumb-item')).toHaveLength(mockCategories.length)
 })

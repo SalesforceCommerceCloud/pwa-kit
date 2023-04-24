@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint jest/expect-expect: ['error', {assertFunctionNames: ['validate']}] */
 import {BaseStorage, MemoryStorage} from './storage'
 
 const key = 'key'
@@ -53,7 +54,7 @@ const testCases = [
 
 describe('Storage Classes', () => {
     testCases.forEach(({description, storageOptions, validate}) => {
-        test(description, () => {
+        test(`${description}`, () => {
             const storage = new MemoryStorage(storageOptions)
             validate(storage)
         })

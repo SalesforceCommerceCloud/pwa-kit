@@ -81,7 +81,7 @@ const ResetPassword = () => {
                                     id="reset_password.info.receive_email_shortly"
                                     values={{
                                         email: submittedEmail,
-                                        // eslint-disable-next-line react/display-name
+
                                         b: (chunks) => <b>{chunks}</b>
                                     }}
                                 />

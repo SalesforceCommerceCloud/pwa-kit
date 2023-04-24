@@ -58,7 +58,7 @@ describe('CorrelationIdProvider', function () {
                 </SampleProvider>
             </Router>
         )
-        expect(wrapper.text().includes(id)).toBe(true)
+        expect(wrapper.text()).toContain(id)
     })
 
     test('renders when correlationId is passed as a string', () => {
@@ -72,7 +72,7 @@ describe('CorrelationIdProvider', function () {
                 </SampleProvider>
             </Router>
         )
-        expect(wrapper.text().includes(id)).toBe(true)
+        expect(wrapper.text()).toContain(id)
     })
 
     test('generates a new id when changing page', () => {

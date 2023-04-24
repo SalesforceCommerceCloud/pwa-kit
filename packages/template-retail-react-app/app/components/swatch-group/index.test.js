@@ -113,7 +113,7 @@ describe('Swatch Component', () => {
                 <Page />
             </Router>
         )
-        expect(screen.getAllByRole('radio').length).toEqual(data.values.length)
+        expect(screen.getAllByRole('radio')).toHaveLength(data.values.length)
     })
 
     test('swatch can be selected', () => {
@@ -126,11 +126,11 @@ describe('Swatch Component', () => {
             </Router>
         )
 
-        expect(screen.getAllByRole('radio').length).toEqual(data.values.length)
+        expect(screen.getAllByRole('radio')).toHaveLength(data.values.length)
         const firstSwatch = screen.getAllByRole('radio')[0]
         fireEvent.click(firstSwatch)
         waitFor(() => {
-            expect(history.search).toEqual('?color=BLACKFB')
+            expect(history.search).toBe('?color=BLACKFB')
         })
     })
 })
