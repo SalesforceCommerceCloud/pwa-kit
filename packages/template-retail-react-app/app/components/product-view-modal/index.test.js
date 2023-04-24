@@ -53,7 +53,7 @@ describe('Product View Modal', function () {
         const trigger = screen.getByText(/open modal/i)
         fireEvent.click(trigger)
 
-        expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i).length).toEqual(2)
+        expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
     })
 
     test('renders product view modal with handleUpdateCart handler', () => {

@@ -77,7 +77,7 @@ describe('Test redirects', function () {
         renderWithProviders(<Component />, {
             wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app, isGuest: true}
         })
-        await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
+        await waitFor(() => expect(window.location.pathname).toBe(`${expectedBasePath}/login`))
     })
 
     test('Provides navigation for subpages', async () => {
@@ -89,11 +89,11 @@ describe('Test redirects', function () {
         const nav = within(screen.getByTestId('account-detail-nav'))
         user.click(nav.getByText('Addresses'))
         await waitFor(() =>
-            expect(window.location.pathname).toEqual(`${expectedBasePath}/account/addresses`)
+            expect(window.location.pathname).toBe(`${expectedBasePath}/account/addresses`)
         )
         user.click(nav.getByText('Order History'))
         await waitFor(() =>
-            expect(window.location.pathname).toEqual(`${expectedBasePath}/account/orders`)
+            expect(window.location.pathname).toBe(`${expectedBasePath}/account/orders`)
         )
     })
 
@@ -102,7 +102,7 @@ describe('Test redirects', function () {
 
         // Render user profile page
         await waitFor(() => {
-            expect(window.location.pathname).toEqual(`${expectedBasePath}/account`)
+            expect(window.location.pathname).toBe(`${expectedBasePath}/account`)
             expect(screen.getByTestId('account-detail-page')).toBeInTheDocument()
             expect(screen.getByText('Testing Tester')).toBeInTheDocument()
             expect(screen.getByText('customer@test.com')).toBeInTheDocument()
@@ -111,7 +111,7 @@ describe('Test redirects', function () {
 
         user.click(screen.getAllByText(/Log Out/)[0])
         await waitFor(() => {
-            expect(window.location.pathname).toEqual(`${expectedBasePath}/login`)
+            expect(window.location.pathname).toBe(`${expectedBasePath}/login`)
         })
     })
 })

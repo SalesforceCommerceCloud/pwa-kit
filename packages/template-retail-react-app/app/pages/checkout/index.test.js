@@ -219,9 +219,9 @@ describe('Checkout page guest flow', function () {
         // Wait for checkout to load and display first step
         await screen.findByText(/checkout as guest/i)
 
-        // Verify cart products display
-        user.click(screen.getByText(/2 items in cart/i))
-        expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument
+    // Verify cart products display
+    user.click(screen.getByText(/2 items in cart/i))
+    expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument()
 
         // Provide customer email and submit
         const emailInput = screen.getByLabelText(/email/i)

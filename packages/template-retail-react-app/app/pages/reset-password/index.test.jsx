@@ -78,7 +78,7 @@ describe('Reset password', function () {
         user.click(await screen.findByText('Sign in'))
 
         await waitFor(() => {
-            expect(window.location.pathname).toEqual('/uk/en-GB/login')
+            expect(window.location.pathname).toBe('/uk/en-GB/login')
         })
     })
 
@@ -119,7 +119,7 @@ describe('Reset password', function () {
         })
 
         await waitFor(() => {
-            expect(window.location.pathname).toEqual('/uk/en-GB/login')
+            expect(window.location.pathname).toBe('/uk/en-GB/login')
         })
     })
 

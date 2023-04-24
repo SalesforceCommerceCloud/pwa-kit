@@ -33,5 +33,5 @@ test('Renders LocaleSelector with event handlers', () => {
 
     fireEvent.click(firstLocale)
     expect(onSelect).toHaveBeenCalledTimes(1)
-    expect(onSelect).toBeCalledWith('en-GB')
+    expect(onSelect).toHaveBeenCalledWith('en-GB')
 })

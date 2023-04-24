@@ -121,7 +121,7 @@ describe('Registration', function () {
         // wait for success state to appear
         const myAccount = await screen.findAllByText(/My Account/)
         await waitFor(() => {
-            expect(myAccount.length).toEqual(2)
+            expect(myAccount).toHaveLength(2)
         })
     })
 })

@@ -92,7 +92,7 @@ describe('App', () => {
         const hasGeneralLocale = ({hrefLang}) => hrefLang === DEFAULT_LOCALE.slice(0, 2)
 
         // `length + 2` because one for a general locale and the other with x-default value
-        expect(hreflangLinks.length).toBe(resultUseMultiSite.site.l10n.supportedLocales.length + 2)
+        expect(hreflangLinks).toHaveLength(resultUseMultiSite.site.l10n.supportedLocales.length + 2)
 
         expect(hreflangLinks.some((link) => hasGeneralLocale(link))).toBe(true)
         expect(hreflangLinks.some((link) => link.hrefLang === 'x-default')).toBe(true)

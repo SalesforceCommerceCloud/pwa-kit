@@ -71,11 +71,11 @@ describe('Product detail', function () {
 
         expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
         await waitFor(() => {
-            expect(screen.getAllByText(/Long Sleeve Crew Neck/).length).toEqual(2)
-            expect(screen.getAllByText(/14.99/).length).toEqual(2)
-            expect(screen.getAllByText(/Add to Cart/).length).toEqual(2)
-            expect(screen.getAllByText(/Add to Wishlist/).length).toEqual(2)
-            expect(screen.getAllByTestId('product-view').length).toEqual(1)
+            expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+            expect(screen.getAllByText(/14.99/)).toHaveLength(2)
+            expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
+            expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
+            expect(screen.getAllByTestId('product-view')).toHaveLength(1)
         })
     })
 })
@@ -96,7 +96,7 @@ describe('product set', () => {
 
         await waitFor(
             () => {
-                expect(screen.getAllByTestId('product-view').length).toEqual(4) // 1 parent + 3 children
+                expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
             },
             {timeout: 5000}
         )
@@ -157,7 +157,7 @@ describe('product set', () => {
             // Show error when users have not selected all the variants yet
             // 1 error for each child product
             const errorMessages = screen.getAllByText(/Please select all your options above/i)
-            expect(errorMessages.length).toEqual(3)
+            expect(errorMessages).toHaveLength(3)
         })
     })
 
@@ -168,7 +168,7 @@ describe('product set', () => {
 
         childProducts.forEach((child) => {
             const heroImage = within(child).getAllByRole('img')[0]
-            expect(heroImage.getAttribute('loading')).toEqual('lazy')
+            expect(heroImage.getAttribute('loading')).toBe('lazy')
         })
     })
 })

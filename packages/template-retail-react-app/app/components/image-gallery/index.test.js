@@ -30,7 +30,7 @@ MockComponent.propTypes = {
 describe('Image Gallery Component', () => {
     test('renders component with all images', () => {
         renderWithChakra(<MockComponent imageGroups={data} selectedVariationAttributes={{}} />)
-        expect(screen.getAllByAltText(/Ruffle Front V-Neck Cardigan/).length).toEqual(3)
+        expect(screen.getAllByAltText(/Ruffle Front V-Neck Cardigan/).length).toHaveLength(3)
     })
 
     test('render skeleton', () => {

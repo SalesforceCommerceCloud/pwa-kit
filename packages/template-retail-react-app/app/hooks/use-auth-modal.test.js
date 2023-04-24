@@ -32,7 +32,7 @@ const mockPasswordToken = {
 let authModal = undefined
 const MockedComponent = (props) => {
     const {initialView} = props
-    authModal = initialView ? useAuthModal(initialView) : useAuthModal()
+    authModal = useAuthModal(initialView || undefined)
     const match = {
         params: {pageName: 'profile'}
     }
@@ -98,6 +98,8 @@ describe('useAuthModal', function () {
         expect(screen.getByText(/sign in/i)).toBeInTheDocument()
     })
 
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Renders error when given incorrect log in credentials', async () => {
         // render our test component
         renderWithProviders(<MockedComponent />, {
@@ -152,6 +154,7 @@ describe('useAuthModal', function () {
     })
 
     // TODO: investigate why this test is failing when running with other tests
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Allows customer to create an account', async () => {
         // render our test component
         renderWithProviders(<MockedComponent />, {
@@ -228,9 +231,9 @@ describe('useAuthModal', function () {
         // wait for success state to appear
         await waitFor(
             () => {
-                expect(window.location.pathname).toEqual('/uk/en-GB/account')
+                expect(window.location.pathname).toBe('/uk/en-GB/account')
                 const myAccount = screen.getAllByText(/My Account/)
-                expect(myAccount.length).toEqual(2)
+                expect(myAccount).toHaveLength(2)
             },
             {
                 timeout: 5000
@@ -239,6 +242,7 @@ describe('useAuthModal', function () {
     })
 
     // TODO: investingate why this test is failing when running with other tests
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Allows customer to sign in to their account', async () => {
         // render our test component
         renderWithProviders(<MockedComponent />, {
@@ -277,7 +281,7 @@ describe('useAuthModal', function () {
         // allow time to transition to account page
         await waitFor(
             () => {
-                expect(window.location.pathname).toEqual('/uk/en-GB/account')
+                expect(window.location.pathname).toBe('/uk/en-GB/account')
                 expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
             },
             {timeout: 5000}
@@ -323,6 +327,8 @@ describe('useAuthModal', function () {
             })
         })
 
+        // TODO: Fix flaky/broken test
+        // eslint-disable-next-line jest/no-disabled-tests
         test.skip('Allows customer to open generate password token modal from everywhere', () => {
             // render our test component
             renderWithProviders(<MockedComponent initialView="password" />)

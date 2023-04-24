@@ -43,7 +43,7 @@ export const watchOnlineStatus = (callback, win = window) => {
 export const isMatchingAddress = (addr1, addr2) => {
     if (!addr1 || !addr2) return false
     const normalize = (addr) => {
-        // eslint-disable-next-line no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {id, addressId, _type, preferred, creationDate, lastModified, ...normalized} = addr
         return normalized
     }
@@ -227,15 +227,10 @@ export const getConfigMatcher = (config) => {
     })
     const sites = [...siteIds, ...siteAliases].filter(Boolean)
     const locales = [...localesIds, ...localeAliases].filter(Boolean)
-
-    // prettier-ignore
-    // eslint-disable-next-line
     const searchPatternForSite = `site=(?<site>${sites.join('|')})`
-    // prettier-ignore
-    // eslint-disable-next-line
-    const pathPattern = `(?:\/(?<site>${sites.join('|')}))?(?:\/(?<locale>${locales.join("|")}))?(?!\\w)`
-    // prettier-ignore
-    // eslint-disable-next-line
+    const pathPattern = `(?:/(?<site>${sites.join('|')}))?(?:/(?<locale>${locales.join(
+        '|'
+    )}))?(?!\\w)`
     const searchPatternForLocale = `locale=(?<locale>${locales.join('|')})`
     const pathMatcher = new RegExp(pathPattern)
     const searchMatcherForSite = new RegExp(searchPatternForSite)

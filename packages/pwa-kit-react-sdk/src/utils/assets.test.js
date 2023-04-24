@@ -5,8 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* eslint-env jest */
-
 import {loadScript} from './assets'
 
 import sinon from 'sinon'
@@ -71,8 +69,8 @@ describe('loadScript', () => {
         expect(document.createElement.called).toBe(true)
         expect(headElement.appendChild.called).toBe(true)
         const element = headElement.appendChild.getCall(0).args[0]
-        expect(element.id).toEqual('loadScriptTest1')
-        expect(element.src).toEqual('loadScriptTest1src')
+        expect(element.id).toBe('loadScriptTest1')
+        expect(element.src).toBe('loadScriptTest1src')
     })
 
     test('loadScript uses document.write when the flag is enabled', () => {

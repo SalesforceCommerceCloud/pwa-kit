@@ -265,7 +265,7 @@ const Cart = () => {
     }, 750)
 
     const handleChangeItemQuantity = async (product, value) => {
-        const {stockLevel} = products?.[product.productId].inventory
+        const {stockLevel} = products[product.productId].inventory
 
         // Handle removing of the items when 0 is selected.
         if (value === 0) {

@@ -91,7 +91,7 @@ describe('product-list', function () {
     test('should render skeleton', async () => {
         window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
         renderWithProviders(<MockedComponent isLoading />)
-        expect(screen.getAllByTestId('sf-product-tile-skeleton').length).toEqual(25)
+        expect(screen.getAllByTestId('sf-product-tile-skeleton')).toHaveLength(25)
     })
 
     test('should render empty list page', async () => {
@@ -110,7 +110,20 @@ describe('product-list', function () {
         window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
         renderWithProviders(<MockedComponent />)
         const countOfRefinements = await screen.findAllByText('Black')
-        expect(countOfRefinements.length).toEqual(2)
+        expect(countOfRefinements).toHaveLength(2)
+    })
+
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
+    test.skip('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
+        window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+        renderWithProviders(<MockedComponent />)
+        expect(await screen.findAllByText('Black')).toBeInTheDocument()
+        const wishlistButton = await screen.getAllByLabelText('Wishlist')
+        expect(wishlistButton).toHaveLength(25)
+        user.click(wishlistButton[0])
+        expect(await screen.findByText(/Email/)).toBeInTheDocument()
+        expect(await screen.findByText(/Password/)).toBeInTheDocument()
     })
 
     test('clicking a filter will change url', async () => {
@@ -123,7 +136,7 @@ describe('product-list', function () {
 
         user.click(screen.getByText(/Beige/i))
         await waitFor(() =>
-            expect(window.location.search).toEqual(
+            expect(window.location.search).toBe(
                 '?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
             )
         )
@@ -141,11 +154,11 @@ describe('product-list', function () {
         const clearAllButton = await screen.findAllByText(/Clear All/i)
         user.click(clearAllButton[0])
         await waitFor(() =>
-            expect(window.location.search).toEqual('?limit=25&offset=0&sort=best-matches')
+            expect(window.location.search).toBe('?limit=25&offset=0&sort=best-matches')
         )
     })
 
-    test('should display Search Results for when searching ', async () => {
+    test('should display Search Results for when searching', async () => {
         window.history.pushState({}, 'ProductList', '/uk/en-GB/search?q=test')
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
@@ -165,7 +178,7 @@ describe('product-list', function () {
         user.click(screen.getByText(/Beige/i))
 
         await waitFor(() =>
-            expect(window.location.search).toEqual(
+            expect(window.location.search).toBe(
                 '?limit=25&q=dress&refine=c_refinementColor%3DBeige&sort=best-matches'
             )
         )

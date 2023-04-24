@@ -40,7 +40,7 @@ describe('Nested Accordion', function () {
 
         const accordions = document.querySelectorAll('.sf-nested-accordion')
 
-        expect(accordions.length).toEqual(2)
+        expect(accordions.length).toHaveLength(2)
     })
 
     test('Renders NestedAccordion with items elements before and after', () => {
@@ -101,6 +101,6 @@ describe('Nested Accordion', function () {
         renderWithProviders(<NestedAccordion item={mockItem} urlBuilder={() => mockPath} />)
 
         const firstLeafLink = document.querySelector('.sf-nested-accordion a')
-        expect(firstLeafLink.href.endsWith(mockPath)).toEqual(true)
+        expect(firstLeafLink.href.endsWith(mockPath)).toBe(true)
     })
 })

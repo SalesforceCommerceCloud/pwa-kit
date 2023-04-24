@@ -23,6 +23,6 @@ describe('Home page', function () {
         const {getByTestId} = renderWithProviders(<HomePage />)
 
         expect(getByTestId('home-page')).toBeInTheDocument()
-        expect(typeof HomePage.getTemplateName()).toEqual('string')
+        expect(typeof HomePage.getTemplateName()).toBe('string')
     })
 })

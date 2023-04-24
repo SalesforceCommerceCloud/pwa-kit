@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const chalk = require('chalk')
 const p = require('path')
 const fse = require('fs-extra')
@@ -332,11 +333,8 @@ const main = async () => {
         .option('--fix', 'Try and fix errors (default: false)')
         .action(async (path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
-            const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
             execSync(
-                `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
-                    fix ? ' --fix' : ''
-                } "${path}"`
+                `${eslint} --resolve-plugins-relative-to ${pkgRoot}${fix ? ' --fix' : ''} "${path}"`
             )
         })
 

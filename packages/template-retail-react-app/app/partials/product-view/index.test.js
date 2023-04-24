@@ -53,11 +53,11 @@ describe('Product View Component', function () {
             <MockComponent product={mockProductDetail} addToCart={addToCart} />
         )
 
-        expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i).length).toEqual(2)
-        expect(screen.getAllByText(/299.99/).length).toEqual(2)
-        expect(screen.getAllByText(/Add to cart/i).length).toEqual(2)
-        expect(screen.getAllByRole('radiogroup').length).toEqual(3)
-        expect(screen.getAllByText(/add to cart/i).length).toEqual(2)
+        expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
+        expect(screen.getAllByText(/299.99/)).toHaveLength(2)
+        expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
+        expect(screen.getAllByRole('radiogroup')).toHaveLength(3)
+        expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
     })
 
     test('renders with addToCart event handler', async () => {
@@ -158,8 +158,8 @@ describe('Product View Component', function () {
         expect(addSetToWishlistButton).toBeInTheDocument()
 
         // What should _not_ exist:
-        expect(variationAttributes.length).toEqual(0)
-        expect(quantityPicker).toBe(null)
+        expect(variationAttributes.length).toHaveLength(0)
+        expect(quantityPicker).toBeNull()
     })
 
     test('renders a product set properly - child item', () => {
@@ -180,11 +180,11 @@ describe('Product View Component', function () {
         // What should exist:
         expect(addToCartButton).toBeInTheDocument()
         expect(addToWishlistButton).toBeInTheDocument()
-        expect(variationAttributes.length).toEqual(2)
+        expect(variationAttributes.length).toHaveLength(2)
         expect(quantityPicker).toBeInTheDocument()
 
         // What should _not_ exist:
-        expect(startingAtLabels.length).toEqual(0)
+        expect(startingAtLabels.length).toHaveLength(0)
     })
 
     test('validateOrderability callback is called when adding a set to cart', async () => {

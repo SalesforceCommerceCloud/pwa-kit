@@ -301,7 +301,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomer.queryKey(parameters),
                     updater: createUpdateFunction((customer: Customer) => {
-                        const addressIndex = customer.addresses?.findIndex(
+                        if (!customer.addresses) return
+                        const addressIndex = customer.addresses.findIndex(
                             ({addressId}) => addressId === response.addressId
                         )
 
@@ -311,7 +312,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         }
 
                         // Update the found address.
-                        customer.addresses![addressIndex] = response
+                        customer.addresses[addressIndex] = response
 
                         return customer
                     })
@@ -354,6 +355,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomerProductList.queryKey(parameters),
                     updater: createUpdateFunction((list: CustomerProductList) => {
+                        if (!list.customerProductListItems) return
                         // Find the index of the item we want to update.
                         const itemIndex = list.customerProductListItems?.findIndex(
                             ({id}) => id === parameters.itemId
@@ -364,7 +366,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                             return
                         }
 
-                        list.customerProductListItems![itemIndex] = response
+                        list.customerProductListItems[itemIndex] = response
 
                         return list
                     })
@@ -375,18 +377,18 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                         // Find the list with the current list id.
                         const listIndex = result.data.findIndex(({id}) => id === parameters.listId)
                         // Find the index of the item in the list.
-                        const itemIndex = result.data[
-                            listIndex
-                        ]?.customerProductListItems?.findIndex(({id}) => id === parameters.itemId)
+                        const items = result.data[listIndex].customerProductListItems
+
+                        if (!items) return
+
+                        const itemIndex = items.findIndex(({id}) => id === parameters.itemId)
 
                         // Return undefined if item isn't found...
-                        if (listIndex < 0 || itemIndex === undefined || itemIndex < 0) {
-                            return
-                        }
+                        if (itemIndex === undefined || itemIndex < 0) return
 
                         // Update the item in the found list.
                         // NOTE: We know that there is an item to update given the item index is > -1
-                        result.data[listIndex].customerProductListItems![itemIndex] = response
+                        items[itemIndex] = response
 
                         return result
                     })

@@ -26,5 +26,5 @@ const mockCategories = [
 test('Renders Breadcrumb', () => {
     const {getAllByTestId} = renderWithChakra(<Breadcrumb categories={mockCategories} />)
 
-    expect(getAllByTestId('sf-crumb-item').length).toEqual(mockCategories.length)
+    expect(getAllByTestId('sf-crumb-item')).toHaveLength(mockCategories.length)
 })

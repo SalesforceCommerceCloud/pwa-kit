@@ -113,7 +113,7 @@ describe('Swatch Component', () => {
                 <Page />
             </Router>
         )
-        expect(screen.getAllByRole('link').length).toEqual(data.values.length)
+        expect(screen.getAllByRole('link')).toHaveLength(data.values.length)
     })
 
     test('swatch can be selected', () => {
@@ -126,11 +126,11 @@ describe('Swatch Component', () => {
             </Router>
         )
 
-        expect(screen.getAllByRole('link').length).toEqual(data.values.length)
+        expect(screen.getAllByRole('link')).toHaveLength(data.values.length)
         const firstSwatch = screen.getAllByRole('link')[0]
         fireEvent.click(firstSwatch)
         waitFor(() => {
-            expect(history.search).toEqual('?color=BLACKFB')
+            expect(history.search).toBe('?color=BLACKFB')
         })
     })
 })

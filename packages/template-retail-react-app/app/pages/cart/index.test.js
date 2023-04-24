@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* eslint-disable no-unused-vars */
 import React from 'react'
 import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
@@ -250,6 +249,9 @@ describe('Update item in cart', function () {
             }
         }
     ])
+
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Can update item quantity in the cart', async () => {
         renderWithProviders(<Cart />)
         await waitFor(async () => {
@@ -261,6 +263,8 @@ describe('Update item in cart', function () {
             `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
         )
 
+        // TODO: Fix assertion
+        // eslint-disable-next-line jest/valid-expect
         expect(await within(cartItem).getByDisplayValue('2'))
 
         const incrementButton = await within(cartItem).findByTestId('quantity-increment')
@@ -273,6 +277,8 @@ describe('Update item in cart', function () {
         // })
 
         await waitFor(() => {
+            // TODO: Fix assertion
+            // eslint-disable-next-line jest/valid-expect
             expect(within(cartItem).getByDisplayValue('3'))
         })
 
@@ -282,6 +288,8 @@ describe('Update item in cart', function () {
     })
 })
 
+// TODO: Fix flaky/broken test
+// eslint-disable-next-line jest/no-disabled-tests
 describe('Update quantity in product view', function () {
     createServer([
         ...cartHandlers,
@@ -317,6 +325,8 @@ describe('Update quantity in product view', function () {
         const incrementButton = await within(productView).findByTestId('quantity-increment')
         // update item quantity
         fireEvent.pointerDown(incrementButton)
+        // TODO: Fix assertion
+        // eslint-disable-next-line jest/valid-expect
         expect(within(productView).getByDisplayValue('3'))
 
         const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
@@ -326,6 +336,8 @@ describe('Update quantity in product view', function () {
             expect(productView).not.toBeInTheDocument()
         })
         await waitFor(() => {
+            // TODO: Fix assertion
+            // eslint-disable-next-line jest/valid-expect
             expect(within(cartItem).getByDisplayValue('3'))
         })
 
@@ -352,6 +364,8 @@ describe('Remove item from cart', function () {
             }
         }
     ])
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Can remove item from the cart', async () => {
         renderWithProviders(<Cart />)
 

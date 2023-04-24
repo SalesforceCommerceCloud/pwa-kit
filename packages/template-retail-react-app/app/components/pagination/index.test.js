@@ -26,5 +26,5 @@ test('Renders Pagination', () => {
 
     expect(prev).toBeDefined()
     expect(next).toBeDefined()
-    expect(option.length).toEqual(mockUrls.length)
+    expect(option).toHaveLength(mockUrls.length)
 })
