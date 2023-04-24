@@ -73,6 +73,31 @@ const logAndFormatError = (err) => {
     }
 }
 
+// Because multi-value params are not supported in `aws-serverless-express` create a proper
+// search string using the `query` property. We pay special attention to the order the params
+// as best as we can.
+const getLocationSearch = (req) => {
+    const [_, search] = req.originalUrl.split('?')
+    const params = new URLSearchParams(search)
+    const newParams = new URLSearchParams()
+    const orderedKeys = [...new Set(params.keys())]
+
+    // Maintain the original order of the parameters by iterating the
+    // ordered list of keys, and using the `req.query` object as the source of values.
+    orderedKeys.forEach((key) => {
+        const value = req.query[key]
+        const values = Array.isArray(value) ? value : [value]
+
+        values.forEach((v) => {
+            newParams.append(key, v)
+        })
+    })
+    const searchString = newParams.toString()
+
+    // Update the location objects reference.
+    return searchString ? `?${searchString}` : ''
+}
+
 /**
  * This is the main react-rendering function for SSR. It is an Express handler.
  *
@@ -93,10 +118,10 @@ export const render = async (req, res, next) => {
     const routes = getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
 
-    const [pathname, search] = req.originalUrl.split('?')
+    const [pathname] = req.originalUrl.split('?')
     const location = {
         pathname,
-        search: search ? `?${search}` : ''
+        search: getLocationSearch(req)
     }
 
     // Step 1 - Find the match.
