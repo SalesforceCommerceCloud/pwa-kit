@@ -40,7 +40,7 @@ describe('Nested Accordion', function () {
 
         const accordions = document.querySelectorAll('.sf-nested-accordion')
 
-        expect(accordions.length).toHaveLength(2)
+        expect(accordions).toHaveLength(2)
     })
 
     test('Renders NestedAccordion with items elements before and after', () => {

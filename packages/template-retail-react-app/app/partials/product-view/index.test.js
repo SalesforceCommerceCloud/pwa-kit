@@ -158,7 +158,7 @@ describe('Product View Component', function () {
         expect(addSetToWishlistButton).toBeInTheDocument()
 
         // What should _not_ exist:
-        expect(variationAttributes.length).toHaveLength(0)
+        expect(variationAttributes).toHaveLength(0)
         expect(quantityPicker).toBeNull()
     })
 
@@ -180,11 +180,11 @@ describe('Product View Component', function () {
         // What should exist:
         expect(addToCartButton).toBeInTheDocument()
         expect(addToWishlistButton).toBeInTheDocument()
-        expect(variationAttributes.length).toHaveLength(2)
+        expect(variationAttributes).toHaveLength(2)
         expect(quantityPicker).toBeInTheDocument()
 
         // What should _not_ exist:
-        expect(startingAtLabels.length).toHaveLength(0)
+        expect(startingAtLabels).toHaveLength(0)
     })
 
     test('validateOrderability callback is called when adding a set to cart', async () => {
