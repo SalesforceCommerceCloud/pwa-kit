@@ -27,7 +27,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
     "build:docs": "typedoc",
-    "build:watch": "nodemon --watch 'src/**' --ext 'tsx,ts' --exec  \"npm run build\"",
+    "build:watch": "nodemon --watch 'src/**' --ext 'tsx,ts' --exec  'npm run build'",
     "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\"",
     "lint": "npm run lint:js && tsc --noEmit",
     "lint:fix": "npm run lint:js -- --fix",
