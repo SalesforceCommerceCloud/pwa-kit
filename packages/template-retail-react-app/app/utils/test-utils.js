@@ -16,7 +16,6 @@ import {AddToCartModalProvider} from '../hooks/use-add-to-cart-modal'
 import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
-import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
@@ -170,7 +169,7 @@ TestProviders.propTypes = {
  * @param {object} options
  */
 export const renderWithProviders = (children, options) => {
-    const TestProvidersWithDataAPI = withReactQuery(withLegacyGetProps(TestProviders), {
+    const TestProvidersWithDataAPI = withReactQuery(TestProviders, {
         queryClientConfig: {
             defaultOptions: {
                 queries: {
