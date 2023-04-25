@@ -6,9 +6,9 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Component} from '../Component'
+import {componentPropType} from '../prop-types'
 import {Region as RegionType} from '../types'
-import {Component, propType as componentPropType} from '../Component'
-import {propType as regionPropType} from '../Region'
 
 /**
  * This PropType represents a `region` object from the ShopperExperience API.
@@ -47,7 +47,7 @@ export const Region = (props: RegionProps) => {
 Region.displayName = 'Region'
 
 Region.propTypes = {
-    region: regionPropType.isRequired,
+    region: propType.isRequired,
     className: PropTypes.string
 }
 

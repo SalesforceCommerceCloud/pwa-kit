@@ -5,22 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useContext, useEffect, useState} from 'react'
-import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import type {Component as ComponentType, Page as PageType} from '../types'
-import {Region, propType as regionPropType} from '../Region'
-
-/**
- * This PropType represents a `page` object from the ShopperExperience API.
- */
-export const propType = PropTypes.shape({
-    data: PropTypes.object,
-    description: PropTypes.string,
-    id: PropTypes.string,
-    name: PropTypes.string,
-    regions: PropTypes.arrayOf(regionPropType),
-    typeId: PropTypes.string
-})
+import {Region} from '../Region'
 
 type ComponentMap = {
     [typeId: string]: React.ComponentType<ComponentType & unknown>
