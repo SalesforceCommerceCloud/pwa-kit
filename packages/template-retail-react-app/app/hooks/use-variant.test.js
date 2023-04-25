@@ -61,7 +61,7 @@ describe('The useVariant', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('variant').text).toEqual('')
+        expect(wrapper.getByTestId('variant').text).toBe('')
     })
 
     test('returns the correct variant when one can be deduced from the location search params.', () => {
@@ -74,7 +74,7 @@ describe('The useVariant', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('variant').text).toEqual(
+        expect(wrapper.getByTestId('variant').text).toBe(
             '{"orderable":true,"price":195,"productId":"883360492148M","variationValues":{"color":"DKL","size":"34"}}'
         )
     })

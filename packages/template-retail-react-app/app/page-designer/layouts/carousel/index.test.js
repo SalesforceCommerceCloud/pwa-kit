@@ -36,5 +36,5 @@ test('Carousel renders region/children without errors', () => {
     )
 
     expect(getByTestId('carousel')).toBeDefined()
-    expect(getByTestId('carousel-container-items').childElementCount).toEqual(1)
+    expect(getByTestId('carousel-container-items').childElementCount).toBe(1)
 })

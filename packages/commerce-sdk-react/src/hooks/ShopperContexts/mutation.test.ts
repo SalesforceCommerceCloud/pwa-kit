@@ -134,6 +134,6 @@ describe('Shopper Contexts mutation hooks', () => {
         // 2. Do delete mutation
         act(() => result.current.mutation.mutate(options))
         await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
-        expect(result.current.mutation.data).toEqual(undefined)
+        expect(result.current.mutation.data).toBeUndefined()
     })
 })

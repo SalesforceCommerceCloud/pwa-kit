@@ -194,7 +194,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Verify cart products display
     user.click(screen.getByText(/2 items in cart/i))
-    expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument
+    expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument()
 
     // Provide customer email and submit
     const emailInput = screen.getByLabelText(/email/i)

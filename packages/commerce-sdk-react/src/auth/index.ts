@@ -317,13 +317,22 @@ class Auth {
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
         if (refreshToken) {
             try {
-                return this.queueRequest(
+                return await this.queueRequest(
                     () => helpers.refreshAccessToken(this.client, {refreshToken}),
                     !!refreshTokenGuest
                 )
-            } catch {
-                // If anything bad happens during refresh token flow
-                // we continue with the PKCE guest user flow.
+            } catch (error) {
+                // If the refresh token is invalid, we need to re-login the user
+                if (error instanceof Error && 'response' in error) {
+                    // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
+                    // We can't use `instanceof`, so instead we just check for the `response` property
+                    // and assume it is a fetch Response.
+                    const json = await (error['response'] as Response).json()
+                    if (json.message === 'invalid refresh_token') {
+                        // clean up storage and restart the login flow
+                        this.clearStorage()
+                    }
+                }
             }
         }
         return this.queueRequest(
@@ -423,7 +432,7 @@ class Auth {
      *
      */
     parseSlasJWT(jwt: string) {
-        const payload = jwtDecode(jwt) as SlasJwtPayload
+        const payload: SlasJwtPayload = jwtDecode(jwt)
         const {sub, isb} = payload
 
         if (!sub || !isb) {

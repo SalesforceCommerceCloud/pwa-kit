@@ -33,7 +33,7 @@ describe('The useSearchParams', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('limits').text).toEqual(
+        expect(wrapper.getByTestId('limits').text).toBe(
             '{"limit":25,"offset":0,"sort":"best-matches","refine":{},"_refine":[]}'
         )
     })
@@ -50,12 +50,12 @@ describe('The useSearchParams', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('limits').text).toEqual(
+        expect(wrapper.getByTestId('limits').text).toBe(
             '{"limit":25,"offset":0,"sort":"best-matches","refine":{"c_refinementColor":["Black","Purple"]},"_refine":["c_refinementColor=Black|Purple"]}'
         )
     })
 
-    test('test stringy method', () => {
+    test('stringy method', () => {
         const objectToStringify = {
             limit: '25',
             offset: '0',
@@ -66,24 +66,22 @@ describe('The useSearchParams', () => {
         }
 
         const stringifiedObject = stringify(objectToStringify)
-        expect(stringifiedObject).toEqual(
+        expect(stringifiedObject).toBe(
             'limit=25&offset=0&refine=c_refinementColor%3DBlack%7CPurple&sort=best-matches'
         )
     })
 
-    test('test parse method', () => {
+    test('parse method', () => {
         const stringToParse =
             'limit=25&offset=0&refine=c_refinementColor%3DBlack%7CPurple&sort=best-matches'
 
         const parsedString = parse(stringToParse)
-        expect(parsedString).toEqual(
-            {
-                _refine: ['c_refinementColor=Black|Purple'],
-                limit: 25,
-                offset: 0,
-                refine: {c_refinementColor: ['Black', 'Purple']},
-                sort: 'best-matches'
-            } // eslint-disable-line
-        )
+        expect(parsedString).toEqual({
+            _refine: ['c_refinementColor=Black|Purple'],
+            limit: 25,
+            offset: 0,
+            refine: {c_refinementColor: ['Black', 'Purple']},
+            sort: 'best-matches'
+        })
     })
 })

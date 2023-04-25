@@ -5,9 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* eslint-env jest */
-/* eslint max-nested-callbacks:0 */
-
 import {
     cookieAsString,
     parseHost,
@@ -437,6 +434,7 @@ describe('rewriteProxyResponseHeaders tests', () => {
     ]
 
     testCases.forEach((testCase, testCaseIndex) =>
+        // eslint-disable-next-line jest/valid-title
         test(testCase.name || `test ${testCaseIndex}`, () => {
             const updatedHeaders = rewriteProxyResponseHeaders({
                 appHostname: testCase.appHostname,
@@ -656,6 +654,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
     ]
 
     testCases.forEach((testCase, testCaseIndex) =>
+        // eslint-disable-next-line jest/valid-title
         test(testCase.name || `test ${testCaseIndex}`, () => {
             const headers = Object.assign({}, testCase.input || {})
 
@@ -692,6 +691,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
             if (testCase.testAllowlist) {
                 Object.keys(ALLOWED_CACHING_PROXY_REQUEST_HEADERS).forEach((key) => {
                     if (expectedKeys.indexOf(key) < 0) {
+                        // eslint-disable-next-line jest/no-conditional-expect
                         expect(updatedHeaders[key]).toEqual(headers[key])
                     }
                 })

@@ -16,7 +16,6 @@ import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {PageContext, Region} from 'commerce-sdk-react-preview/components'
-import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import fallbackMessages from '../translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/default'
@@ -170,7 +169,7 @@ TestProviders.propTypes = {
  * @param {object} options
  */
 export const renderWithProviders = (children, options) => {
-    const TestProvidersWithDataAPI = withReactQuery(withLegacyGetProps(TestProviders), {
+    const TestProvidersWithDataAPI = withReactQuery(TestProviders, {
         queryClientConfig: {
             defaultOptions: {
                 queries: {
@@ -186,7 +185,6 @@ export const renderWithProviders = (children, options) => {
     const locals = {}
 
     return render(children, {
-        // eslint-disable-next-line react/display-name
         wrapper: () => (
             <TestProvidersWithDataAPI {...options?.wrapperProps} locals={locals}>
                 {children}
@@ -230,7 +228,7 @@ export const withPageProvider = (Component, options) => {
             components: new Proxy(
                 {},
                 {
-                    // eslint-disable-next-line no-unused-vars
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     get(_target, _prop) {
                         return (props) => (
                             <div>

@@ -67,8 +67,8 @@ describe('AppConfig', () => {
     })
 
     test('AppConfig static methods behave as expected', () => {
-        expect(AppConfig.restore()).toBe(undefined)
-        expect(AppConfig.restore({frozen: 'any values here'})).toBe(undefined)
-        expect(AppConfig.freeze()).toBe(undefined)
+        expect(AppConfig.restore()).toBeUndefined()
+        expect(AppConfig.restore({frozen: 'any values here'})).toBeUndefined()
+        expect(AppConfig.freeze()).toBeUndefined()
     })
 })

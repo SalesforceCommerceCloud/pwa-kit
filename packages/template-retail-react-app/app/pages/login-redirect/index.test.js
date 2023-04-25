@@ -12,5 +12,5 @@ test('Login Redirect renders without errors', () => {
     const {getByRole} = renderWithReactIntl(<LoginRedirect />)
 
     expect(getByRole('heading', {name: /login redirect/i})).toBeInTheDocument()
-    expect(typeof LoginRedirect.getTemplateName()).toEqual('string')
+    expect(typeof LoginRedirect.getTemplateName()).toBe('string')
 })

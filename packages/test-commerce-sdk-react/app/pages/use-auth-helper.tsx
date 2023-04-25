@@ -25,7 +25,7 @@ const UseAuthHelper = () => {
         <>
             <h1>LoginGuestUser</h1>
             <Json data={loginGuestUser} />
-            <button onClick={() => loginGuestUserFlow()}>loginGuestUser</button>
+            <button onClick={() => void loginGuestUserFlow()}>loginGuestUser</button>
             {isError(loginGuestUser.error) && (
                 <p style={{color: 'red'}}>Error: {loginGuestUser.error.message}</p>
             )}

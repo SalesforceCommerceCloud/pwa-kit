@@ -127,7 +127,7 @@ describe('Logging in tests', function () {
 
         user.click(screen.getByText(/sign in/i))
         await waitFor(() => {
-            expect(window.location.pathname).toEqual('/uk/en-GB/account')
+            expect(window.location.pathname).toBe('/uk/en-GB/account')
             expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
         })
     })
@@ -155,6 +155,8 @@ describe('Error while logging in', function () {
         )
     })
 
+    // TODO: Fix flaky/broken test
+    // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Renders error when given incorrect log in credentials', async () => {
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {

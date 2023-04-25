@@ -6,11 +6,11 @@
  */
 import os from 'os'
 import path from 'path'
-import archiver from 'archiver'
-import _fetch from 'node-fetch'
+import archiver, {EntryData} from 'archiver'
+import {default as _fetch, Response} from 'node-fetch'
 import {URL} from 'url'
 import {readFile, stat, mkdtemp, rm} from 'fs/promises'
-import {createWriteStream} from 'fs'
+import {createWriteStream, Stats} from 'fs'
 import {readJson} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
@@ -28,7 +28,8 @@ interface Credentials {
 interface CloudAPIClientOpts {
     credentials: Credentials
     origin?: string
-    fetch?: _fetch
+    // _fetch is a function and a namespace, we want to use the function here
+    fetch?: typeof _fetch
 }
 
 interface StringMap {
@@ -106,16 +107,16 @@ export class CloudAPIClient {
         }
     }
 
-    private async throwForStatus(res: _fetch.Response) {
+    private async throwForStatus(res: Response) {
         if (res.status < 400) {
             return
         }
 
         const body = await res.text()
-        let error
+        let error: {message?: string; docs_url?: string}
         try {
             error = JSON.parse(body)
-        } catch (err) {
+        } catch {
             error = {} // Cloud doesn't always return JSON
         }
 
@@ -173,11 +174,11 @@ export class CloudAPIClient {
     }
 }
 
-export const defaultMessage = (gitInstance: git = git): string => {
+export const defaultMessage = (gitInstance: typeof git = git): string => {
     try {
         return `${gitInstance.branch()}: ${gitInstance.short()}`
-    } catch (err) {
-        if (err.code === 'ENOENT') {
+    } catch (err: any) {
+        if (err?.code === 'ENOENT') {
             console.log(
                 'Using default bundle message as no message was provided and not in a Git repo.'
             )
@@ -202,68 +203,74 @@ export const createBundle = async ({
     ssr_shared,
     buildDirectory,
     projectSlug
-}: CreateBundleArgs): Promise<Bundle> => {
+}: CreateBundleArgs): Promise<Bundle | any> => {
     message = message || defaultMessage()
 
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'pwa-kit-dev-'))
     const destination = path.join(tmpDir, 'build.tar')
-    const filesInArchive = []
+    const filesInArchive: string[] = []
 
     if (ssr_only.length === 0 || ssr_shared.length === 0) {
         throw new Error('no ssrOnly or ssrShared files are defined')
     }
 
-    return Promise.resolve()
-        .then(() => stat(buildDirectory))
-        .catch((e) => {
-            const fullPath = path.join(process.cwd(), buildDirectory)
-            throw new Error(
-                `Build directory at path "${fullPath}" not found.\n` +
-                    'Run `pwa-kit-dev build` first!'
-            )
-        })
-        .then(
-            () =>
-                new Promise((resolve, reject) => {
-                    const output = createWriteStream(destination)
-                    const archive = archiver('tar')
+    return (
+        Promise.resolve()
+            .then(() => stat(buildDirectory))
+            .catch(() => {
+                const fullPath = path.join(process.cwd(), buildDirectory)
+                throw new Error(
+                    `Build directory at path "${fullPath}" not found.\n` +
+                        'Run `pwa-kit-dev build` first!'
+                )
+            })
+            .then(
+                () =>
+                    new Promise((resolve, reject) => {
+                        const output = createWriteStream(destination)
+                        const archive = archiver('tar')
 
-                    archive.pipe(output)
+                        archive.pipe(output)
 
-                    // See https://archiverjs.com/docs/global.html#TarEntryData
-                    const newRoot = path.join(projectSlug, 'bld', '')
-                    archive.directory(buildDirectory, '', (entry) => {
-                        if (entry.stats.isFile()) {
-                            filesInArchive.push(entry.name)
-                        }
-                        entry.prefix = newRoot
-                        return entry
+                        // See https://web.archive.org/web/20160712064705/http://archiverjs.com/docs/global.html#TarEntryData
+                        const newRoot = path.join(projectSlug, 'bld', '')
+                        // WARNING: There are a lot of type assertions here because we use a very old
+                        // version of archiver, and the types provided don't match the docs. :\
+                        archive.directory(buildDirectory, '', ((entry: EntryData) => {
+                            const stats = entry.stats as unknown as Stats | undefined
+                            if (stats?.isFile() && entry.name) {
+                                filesInArchive.push(entry.name)
+                            }
+                            entry.prefix = newRoot
+                            return entry
+                        }) as unknown as EntryData)
+
+                        archive.on('error', reject)
+                        output.on('finish', resolve)
+
+                        archive.finalize()
                     })
-
-                    archive.on('error', reject)
-                    output.on('finish', resolve)
-
-                    archive.finalize()
-                })
-        )
-        .then(() => readFile(destination))
-        .then((data) => {
-            const encoding = 'base64'
-            return {
-                message,
-                encoding,
-                data: data.toString(encoding),
-                ssr_parameters,
-                ssr_only: filesInArchive.filter(glob(ssr_only)),
-                ssr_shared: filesInArchive.filter(glob(ssr_shared))
-            }
-        })
-        .finally(() => rm(tmpDir, {recursive: true}))
+            )
+            .then(() => readFile(destination))
+            .then((data) => {
+                const encoding = 'base64'
+                return {
+                    message,
+                    encoding,
+                    data: data.toString(encoding),
+                    ssr_parameters,
+                    ssr_only: filesInArchive.filter(glob(ssr_only)),
+                    ssr_shared: filesInArchive.filter(glob(ssr_shared))
+                }
+            })
+            // This is a false positive. The promise returned by `.finally()` won't resolve until
+            // the `rm()` completes!
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            .finally(() => rm(tmpDir, {recursive: true}))
+    )
 }
 
-type MatchFn = (a: string) => boolean
-
-export const glob = (patterns?: string[]): MatchFn => {
+export const glob = (patterns?: string[]): ((str: string) => boolean) => {
     // The patterns can include negations, so matching is done against all
     // the patterns. A match is true if a given path matches any pattern and
     // does not match any negating patterns.
@@ -312,7 +319,7 @@ export const readCredentials = async (filepath: string): Promise<Credentials> =>
 }
 
 interface LogRecord {
-    level: string
+    level: string | undefined
     message: string
     shortRequestId?: string
 }
@@ -341,7 +348,7 @@ export const parseLog = (log: string): LogRecord => {
 
     const match = /(?<id>[a-f\d]{8})/.exec(requestId || message)
     if (match) {
-        shortRequestId = match.groups.id
+        shortRequestId = match.groups?.id
     }
     return {level, message, shortRequestId}
 }
