@@ -8,7 +8,7 @@
 /* eslint-env node */
 
 // For more information on these settings, see https://webpack.js.org/configuration
-import {resolve} from 'path'
+import path, {resolve} from 'path'
 import glob from 'glob'
 import fse from 'fs-extra'
 
