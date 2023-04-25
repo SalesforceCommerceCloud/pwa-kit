@@ -137,7 +137,7 @@ const App = (props) => {
     const {data: messages} = useQuery({
         queryKey: ['app', 'translationas', 'messages', targetLocale],
         queryFn: () => fetchTranslations(targetLocale),
-        enabled: typeof window === 'undefined'
+        enabled: isServer
     })
 
     // Used to conditionally render header/footer for checkout page
