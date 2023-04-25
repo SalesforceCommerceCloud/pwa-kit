@@ -91,7 +91,6 @@ const ProductView = forwardRef(
             addToWishlist,
             updateWishlist,
             isProductLoading,
-
             isProductPartOfSet = false,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
@@ -99,6 +98,7 @@ const ProductView = forwardRef(
         },
         ref
     ) => {
+        const showToast = useToast()
         const intl = useIntl()
         const history = useHistory()
         const location = useLocation()
@@ -170,7 +170,6 @@ const ProductView = forwardRef(
                 })
             }
 
-            const showToast = useToast()
             const showError = () => {
                 showToast({
                     title: intl.formatMessage(API_ERROR_MESSAGE),

@@ -49,7 +49,9 @@ export class PersistentCache {
      * clean up any locally cached data.
      * @private
      */
-    close() {}
+    close() {
+        // Doesn't do anything!
+    }
 
     /**
      * Return an object that represents an entry not found in the cache

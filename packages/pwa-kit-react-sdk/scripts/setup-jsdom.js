@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 global.document = require('jsdom').jsdom('<body></body>')
 global.window = document.defaultView
 global.window.matchMedia =

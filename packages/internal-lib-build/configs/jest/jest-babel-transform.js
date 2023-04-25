@@ -9,6 +9,7 @@
 // packages. See: https://babeljs.io/docs/en/config-files#jest
 
 /* eslint-env node */
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 const babelJest = require('babel-jest')
 

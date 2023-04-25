@@ -75,7 +75,7 @@ test('Page renders without errors', () => {
 
     // Meta data and title are set
     const helmet = Helmet.peek()
-    expect(helmet.title).toEqual('title')
+    expect(helmet.title).toBe('title')
     expect(
         helmet.metaTags.find(
             ({name, content}) => name === 'description' && content === 'description'
@@ -86,9 +86,9 @@ test('Page renders without errors', () => {
     ).toBeTruthy()
 
     // Regions are in document.
-    expect(container.querySelectorAll('.region')?.length).toEqual(3)
+    expect(container.querySelectorAll('.region')?.length).toBe(3)
 
     // Components are in document. (Note: Sub-regions/components aren't rendered because that is
     // the responsibility of the component definition.)
-    expect(container.querySelectorAll('.component')?.length).toEqual(2)
+    expect(container.querySelectorAll('.component')?.length).toBe(2)
 })

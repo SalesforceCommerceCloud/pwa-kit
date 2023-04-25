@@ -80,13 +80,12 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                                 id="register_form.message.agree_to_policy_terms"
                                 defaultMessage="By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
                                 values={{
-                                    // eslint-disable-next-line react/display-name
                                     policy: (chunks) => (
                                         <ChakraLink as={Link} to="/privacy-policy" color="blue.600">
                                             {chunks}
                                         </ChakraLink>
                                     ),
-                                    // eslint-disable-next-line react/display-name
+
                                     terms: (chunks) => (
                                         <ChakraLink
                                             as={Link}

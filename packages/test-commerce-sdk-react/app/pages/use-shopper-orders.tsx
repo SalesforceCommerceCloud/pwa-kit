@@ -88,10 +88,9 @@ function UseShopperOrders() {
     ].map(({action, body, parameters}) => {
         return {
             name: action,
-            // hook: useShopperOrdersMutation({
-            //     action,
-            //     headers: {'test-header': 'value'}
-            // }),
+            // This is essentially a shorthand to avoid writing out a giant object;
+            // it *technically* violates the rules of hooks, but not in an impactful way.
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             hook: useShopperOrdersMutation(action as ShopperOrdersMutation),
             body,
             parameters

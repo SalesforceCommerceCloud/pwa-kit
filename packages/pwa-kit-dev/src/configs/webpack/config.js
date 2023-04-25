@@ -8,9 +8,9 @@
 /* eslint-env node */
 
 // For more information on these settings, see https://webpack.js.org/configuration
-import fs from 'fs'
-import path, {resolve} from 'path'
+import {resolve} from 'path'
 import glob from 'glob'
+import fse from 'fs-extra'
 
 import webpack from 'webpack'
 import WebpackNotifierPlugin from 'webpack-notifier'
@@ -28,9 +28,8 @@ import {
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
-const pkg = require(resolve(projectDir, 'package.json'))
+const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
 const sdkDir = resolve(path.join(__dirname, '..', '..', '..'))
-
 const buildDir = process.env.PWA_KIT_BUILD_DIR
     ? resolve(process.env.PWA_KIT_BUILD_DIR)
     : resolve(projectDir, 'build')
@@ -66,7 +65,7 @@ const entryPointExists = (segments) => {
             ? resolve(projectDir, pkg?.mobify?.overridesDir?.replace(/^\//, ''), ...segments) + ext
             : null
 
-        if (fs.existsSync(primary) || (override && fs.existsSync(override))) {
+        if (fse.existsSync(primary) || (override && fse.existsSync(override))) {
             return true
         }
     }
@@ -89,7 +88,7 @@ const findInProjectThenSDK = (pkg) => {
     ]
     let candidate
     for (candidate of candidates) {
-        if (fs.existsSync(candidate)) {
+        if (fse.existsSync(candidate)) {
             return candidate
         }
     }
@@ -260,9 +259,12 @@ const withChunking = (config) => {
             splitChunks: {
                 cacheGroups: {
                     vendor: {
-                        // Anything imported from node_modules lands in
-                        // vendor.js, if we're chunking.
-                        test: /node_modules/,
+                        // Two scenarios that we'd like to chunk vendor.js:
+                        // 1. The package is in node_modules
+                        // 2. The package is one of the monorepo packages.
+                        //    This is for local development to ensure the bundle
+                        //    composition is the same as a production build
+                        test: /(node_modules)|(packages\/.*\/dist)/,
                         name: 'vendor',
                         chunks: 'all'
                     }
@@ -363,7 +365,7 @@ const client =
         .build()
 
 const optional = (name, path) => {
-    return fs.existsSync(path) ? {[name]: path} : {}
+    return fse.existsSync(path) ? {[name]: path} : {}
 }
 
 const clientOptional = baseConfig('web')
@@ -398,7 +400,7 @@ const clientOptional = baseConfig('web')
     .build()
 
 const renderer =
-    fs.existsSync(resolve(projectDir, 'node_modules', 'pwa-kit-react-sdk')) &&
+    fse.existsSync(resolve(projectDir, 'node_modules', 'pwa-kit-react-sdk')) &&
     baseConfig('node')
         .extend((config) => {
             return {
