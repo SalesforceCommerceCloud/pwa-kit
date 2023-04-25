@@ -99,4 +99,4 @@ Open `app/routes.jsx` and add a route for `<PageViewer>`:
 +    },
 ```
 
-Using the local development server, you can now see Page Designer pages rendered in React.js at `http://localhost:3000/page-viewer/:pageid` by providing their `pageid`.
+Using the local development server, you can now see Page Designer pages rendered in React.js at `http://localhost:3000/page-viewer/:pageid` by providing their `pageid` defined in Business Manager.
