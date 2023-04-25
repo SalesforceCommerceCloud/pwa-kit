@@ -22,7 +22,7 @@ import {
     ModalFooter,
     ModalOverlay,
     Stack,
-    useBreakpointValue,
+    useBreakpointValue
 } from '@chakra-ui/react'
 import {useCurrentBasket} from './use-current-basket'
 import Link from '../components/link'
@@ -47,7 +47,7 @@ export const AddToCartModalProvider = ({children}) => {
     )
 }
 AddToCartModalProvider.propTypes = {
-    children: PropTypes.node.isRequired,
+    children: PropTypes.node.isRequired
 }
 
 /**
@@ -83,7 +83,7 @@ export const AddToCartModal = () => {
                         {
                             defaultMessage:
                                 '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                            id: 'add_to_cart_modal.info.added_to_cart',
+                            id: 'add_to_cart_modal.info.added_to_cart'
                         },
                         {quantity: numerOfItemsAdded}
                     )}
@@ -188,7 +188,7 @@ export const AddToCartModal = () => {
                                         {
                                             defaultMessage:
                                                 'Cart Subtotal ({itemAccumulatedCount} item)',
-                                            id: 'add_to_cart_modal.label.cart_subtotal',
+                                            id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
                                         {itemAccumulatedCount: totalItems}
                                     )}
@@ -197,7 +197,7 @@ export const AddToCartModal = () => {
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
-                                            currency: currency,
+                                            currency: currency
                                         })}
                                 </Text>
                             </Flex>
@@ -205,7 +205,7 @@ export const AddToCartModal = () => {
                                 <Button as={Link} to="/cart" width="100%" variant="solid">
                                     {intl.formatMessage({
                                         defaultMessage: 'View Cart',
-                                        id: 'add_to_cart_modal.link.view_cart',
+                                        id: 'add_to_cart_modal.link.view_cart'
                                     })}
                                 </Button>
 
@@ -218,7 +218,7 @@ export const AddToCartModal = () => {
                                 >
                                     {intl.formatMessage({
                                         defaultMessage: 'Proceed to Checkout',
-                                        id: 'add_to_cart_modal.link.checkout',
+                                        id: 'add_to_cart_modal.link.checkout'
                                     })}
                                 </Button>
                             </Stack>
@@ -296,22 +296,22 @@ export const AddToCartModal = () => {
 AddToCartModal.propTypes = {
     product: PropTypes.shape({
         name: PropTypes.string,
-        imageGroups: PropTypes.array,
+        imageGroups: PropTypes.array
     }),
     variant: PropTypes.shape({
         productId: PropTypes.string,
-        variationValues: PropTypes.object,
+        variationValues: PropTypes.object
     }),
     quantity: PropTypes.number,
     isOpen: PropTypes.bool,
     onClose: PropTypes.func,
-    children: PropTypes.any,
+    children: PropTypes.any
 }
 
 export const useAddToCartModal = () => {
     const [state, setState] = useState({
         isOpen: false,
-        data: null,
+        data: null
     })
 
     const {pathname} = useLocation()
@@ -319,7 +319,7 @@ export const useAddToCartModal = () => {
         if (state.isOpen) {
             setState({
                 ...state,
-                isOpen: false,
+                isOpen: false
             })
         }
     }, [pathname])
@@ -330,14 +330,14 @@ export const useAddToCartModal = () => {
         onOpen: (data) => {
             setState({
                 isOpen: true,
-                data,
+                data
             })
         },
         onClose: () => {
             setState({
                 isOpen: false,
-                data: null,
+                data: null
             })
-        },
+        }
     }
 }

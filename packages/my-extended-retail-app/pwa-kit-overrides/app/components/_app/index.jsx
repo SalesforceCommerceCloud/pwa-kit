@@ -36,8 +36,10 @@ import ScrollToTop from '^retail-react-app/app/components/scroll-to-top'
 import Footer from '^retail-react-app/app/components/footer'
 import CheckoutFooter from '^retail-react-app/app/pages/checkout/partials/checkout-footer'
 import CheckoutHeader from '^retail-react-app/app/pages/checkout/partials/checkout-header'
-import DrawerMenu from '^retail-react-app/app/components/drawer-menu'
+
+import DrawerMenu from 'retail-react-app/app/components/drawer-menu'
 import ListMenu from '^retail-react-app/app/components/list-menu'
+
 import {HideOnDesktop, HideOnMobile} from '^retail-react-app/app/components/responsive'
 
 // Hooks
@@ -55,7 +57,6 @@ import {
     flatten,
     mergeMatchedItems,
     isServer,
-    resolveLocaleFromUrl,
 } from '^retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '^retail-react-app/app/utils/locale'
 import {
@@ -68,7 +69,7 @@ import {
 } from '^retail-react-app/app/constants'
 
 import Seo from '^retail-react-app/app/components/seo'
-import {resolveSiteFromUrl} from '^retail-react-app/app/utils/site-utils'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from '^retail-react-app/app/utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 

@@ -73,7 +73,7 @@ AppConfig.restore = (locals = {}) => {
     const {app: appConfig} = getConfig()
     const apiConfig = {
         ...appConfig.commerceAPI,
-        einsteinConfig: appConfig.einsteinAPI,
+        einsteinConfig: appConfig.einsteinAPI
     }
 
     apiConfig.parameters.siteId = site.id
@@ -90,13 +90,13 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
         buildUrl: locals.buildUrl,
         site: locals.site,
-        locale: locals.locale,
+        locale: locals.locale
     }
 }
 
 AppConfig.propTypes = {
     children: PropTypes.node,
-    locals: PropTypes.object,
+    locals: PropTypes.object
 }
 
 const isServerSide = typeof window === 'undefined'

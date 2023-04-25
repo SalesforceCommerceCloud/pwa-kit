@@ -6,7 +6,7 @@
  */
 
 const AbovePDP = () => {
-    return (null)
+    return null
 }
 
 export default AbovePDP

@@ -13,8 +13,7 @@ import 'focus-visible/dist/focus-visible'
 
 import theme from '^retail-react-app/app/theme'
 import {MultiSiteProvider} from '^retail-react-app/app/contexts'
-import {resolveSiteFromUrl} from '^retail-react-app/app/utils/site-utils'
-import {resolveLocaleFromUrl} from '^retail-react-app/app/utils/utils'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from '^retail-react-app/app/utils/site-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '^retail-react-app/app/utils/url'
 
@@ -35,7 +34,7 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
     const headers = {
-        'correlation-id': correlationId
+        'correlation-id': correlationId,
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
@@ -109,13 +108,13 @@ const options = {
                 retry: false,
                 refetchOnWindowFocus: false,
                 staleTime: 2 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {})
+                ...(isServerSide ? {retryOnMount: false} : {}),
             },
             mutations: {
-                retry: false
-            }
-        }
-    }
+                retry: false,
+            },
+        },
+    },
 }
 
 export default withReactQuery(withLegacyGetProps(AppConfig), options)
