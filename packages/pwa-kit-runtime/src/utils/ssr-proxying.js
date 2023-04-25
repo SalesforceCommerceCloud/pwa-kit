@@ -271,7 +271,7 @@ const monthAbbr = [
 // Return the given number as a 2-digit string with a leading zero
 const leadingZero = (n) => {
     const s = Number(n).toString()
-    return s.length > 1 ? s : '0' + s // eslint-disable-line prefer-template
+    return s.length > 1 ? s : '0' + s
 }
 
 /**

@@ -9,6 +9,7 @@ import {getDefaultSite, getSites, resolveSiteFromUrl} from './site-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import mockConfig from '../../config/mocks/default'
+import {getParamsFromPath, resolveLocaleFromUrl} from './site-utils'
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     const origin = jest.requireActual('pwa-kit-react-sdk/ssr/universal/utils')
     return {
@@ -35,13 +36,13 @@ describe('resolveSiteFromUrl', function () {
     test('return site based on the site alias in the url', () => {
         getConfig.mockImplementation(() => mockConfig)
         const result = resolveSiteFromUrl('https://www.example-site.com/us/en-US/women/dress')
-        expect(result.id).toEqual('site-2')
+        expect(result.id).toBe('site-2')
     })
 
     test('return default site for home page', () => {
         getConfig.mockImplementation(() => mockConfig)
         const result = resolveSiteFromUrl('https://www.example-site.com/')
-        expect(result.id).toEqual('site-1')
+        expect(result.id).toBe('site-1')
     })
 
     test('throw an error when no matching site can be found', () => {
@@ -73,7 +74,7 @@ describe('resolveSiteFromUrl', function () {
         })
 
         const result = resolveSiteFromUrl('https://www.example-site.com/')
-        expect(result.id).toEqual('site-2')
+        expect(result.id).toBe('site-2')
     })
 })
 
@@ -202,5 +203,167 @@ describe('getSites', function () {
         expect(() => {
             getSites()
         }).toThrow()
+    })
+})
+
+describe('getParamsFromPath', function () {
+    const cases = [
+        {path: '/us/en-US/', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {path: '/us/en-US', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {path: '/us/en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {path: '/us/en/', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {path: '/RefArch/en-US/', expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}},
+        {path: '/RefArch/en/', expectedRes: {siteRef: 'RefArch', localeRef: 'en'}},
+        {path: '/us/en-US/category/womens', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {
+            path: '/RefArch/en-US/category/womens',
+            expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}
+        },
+        {path: '/en-US/category/womens', expectedRes: {siteRef: undefined, localeRef: 'en-US'}},
+        {path: '/en/category/womens', expectedRes: {siteRef: undefined, localeRef: 'en'}},
+        {path: '/category/womens', expectedRes: {siteRef: undefined, localeRef: undefined}},
+        {path: '/en/', expectedRes: {siteRef: undefined, localeRef: 'en'}},
+        {path: '/en', expectedRes: {siteRef: undefined, localeRef: 'en'}},
+        {path: '/ca/', expectedRes: {siteRef: undefined, localeRef: 'ca'}},
+        {path: '/ca', expectedRes: {siteRef: undefined, localeRef: 'ca'}},
+        {path: '/', expectedRes: {site: undefined, localeRef: undefined}},
+        {path: '/?site=us', expectedRes: {siteRef: 'us', localeRef: undefined}},
+        {path: '/?site=us&locale=en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {path: '/en-US/category/womens?site=us', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {
+            path: '/us/category/womens?locale=en-US',
+            expectedRes: {siteRef: 'us', localeRef: 'en-US'}
+        },
+        {path: '/us/category/womens?locale=en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {
+            path: '/category/womens?site=us&locale=en-US',
+            expectedRes: {siteRef: 'us', localeRef: 'en-US'}
+        },
+        {
+            path: '/category/womens?site=RefArch&locale=en-US',
+            expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}
+        }
+    ]
+    cases.forEach(({path, expectedRes}) => {
+        test(`return expected values when path is ${path}`, () => {
+            getConfig.mockImplementation(() => {
+                return {
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app,
+                        sites: [
+                            {
+                                id: 'RefArch',
+                                alias: 'us',
+                                l10n: {
+                                    supportedCurrencies: ['USD'],
+                                    defaultCurrency: 'USD',
+                                    defaultLocale: 'en-US',
+                                    supportedLocales: [
+                                        {
+                                            id: 'en-US',
+                                            alias: 'en',
+                                            preferredCurrency: 'USD'
+                                        },
+                                        {
+                                            id: 'en-CA',
+                                            alias: 'ca',
+                                            preferredCurrency: 'USD'
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                id: 'RefArchGlobal',
+                                alias: 'global',
+                                l10n: {
+                                    supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
+                                    defaultCurrency: 'GBP',
+                                    supportedLocales: [
+                                        {
+                                            id: 'de-DE',
+                                            preferredCurrency: 'EUR'
+                                        },
+                                        {
+                                            id: 'en-GB',
+                                            alias: 'uk',
+                                            preferredCurrency: 'GBP'
+                                        }
+                                    ],
+                                    defaultLocale: 'en-GB'
+                                }
+                            }
+                        ]
+                    }
+                }
+            })
+            // getSites.mockImplementation(() => {
+            //     return
+            // })
+            expect(getParamsFromPath(path)).toEqual(expectedRes)
+        })
+    })
+})
+
+describe('resolveLocaleFromUrl', function () {
+    const cases = [
+        {
+            path: '/',
+            expectedRes: {
+                id: 'en-GB',
+                preferredCurrency: 'GBP'
+            }
+        },
+        {
+            path: '/uk/en-GB/women/dresses',
+            expectedRes: {
+                id: 'en-GB',
+                preferredCurrency: 'GBP'
+            }
+        },
+        {
+            path: '/women/dresses/?site=uk&locale=en-GB',
+            expectedRes: {
+                id: 'en-GB',
+                preferredCurrency: 'GBP'
+            }
+        },
+        {
+            path: '/uk/fr/women/dresses',
+            expectedRes: {
+                id: 'fr-FR',
+                alias: 'fr',
+                preferredCurrency: 'EUR'
+            }
+        },
+        {
+            path: '/women/dresses/?site=uk&locale=fr',
+            expectedRes: {
+                id: 'fr-FR',
+                alias: 'fr',
+                preferredCurrency: 'EUR'
+            }
+        },
+        {
+            path: '/us/en-US/women/dresses',
+            expectedRes: {
+                id: 'en-US',
+                preferredCurrency: 'USD'
+            }
+        },
+        {
+            path: '/women/dresses/?site=us&locale=en-US',
+            expectedRes: {
+                id: 'en-US',
+                preferredCurrency: 'USD'
+            }
+        }
+    ]
+    cases.forEach(({path, expectedRes}) => {
+        test(`returns expected locale with given path ${path}`, () => {
+            getConfig.mockImplementation(() => mockConfig)
+            const locale = resolveLocaleFromUrl(path)
+            expect(locale).toEqual(expectedRes)
+        })
     })
 })

@@ -8,7 +8,6 @@
 import {pages, PAGEEVENTS} from './events'
 
 describe('Page Events', () => {
-    beforeEach(() => {})
     test('emit and receive a PAGELOAD Page Event', () => {
         expect.assertions(1)
 

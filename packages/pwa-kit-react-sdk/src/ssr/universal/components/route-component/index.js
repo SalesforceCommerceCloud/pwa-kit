@@ -159,7 +159,6 @@ export const routeComponent = (Wrapped, isPage, locals) => {
          *
          * @return {Promise<Object>}
          */
-        // eslint-disable-next-line
         static getProps(args) {
             if (!getPropsEnabled) {
                 return Promise.resolve({})

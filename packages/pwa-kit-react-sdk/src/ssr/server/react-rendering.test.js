@@ -2,11 +2,13 @@
  * @jest-environment node
  */
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+// The @jest-environment comment block *MUST* be the first line of the file for the tests to pass.
+// That conflicts with the monorepo header rule, so we must disable the rule!
 /* eslint-disable header/header */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
 import {randomUUID} from 'crypto'
@@ -16,6 +18,8 @@ import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
+
+import {getAppConfig} from '../universal/compatibility'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -53,6 +57,8 @@ jest.mock('../universal/compatibility', () => {
 })
 
 jest.mock('../universal/routes', () => {
+    // TODO: Can these requires be converted to top-level imports?
+    /* eslint-disable @typescript-eslint/no-var-requires */
     const React = require('react')
     const PropTypes = require('prop-types')
     const errors = require('../universal/errors')
@@ -60,6 +66,7 @@ jest.mock('../universal/routes', () => {
     const {Helmet} = require('react-helmet')
     const {useQuery} = require('@tanstack/react-query')
     const {useServerContext} = require('../universal/hooks')
+    /* eslint-enable @typescript-eslint/no-var-requires */
 
     // Test utility to exercise paths that work with @loadable/component.
     const fakeLoadable = (Wrapped) => {
@@ -150,7 +157,6 @@ jest.mock('../universal/routes', () => {
         }
     }
 
-    // eslint-disable-next-line react/require-render-return
     class RenderThrowsError extends React.Component {
         static getProps() {
             return Promise.resolve()
@@ -382,8 +388,6 @@ jest.mock('pwa-kit-runtime/ssr/server/build-remote-server', () => {
 describe('The Node SSR Environment', () => {
     const OLD_ENV = process.env
 
-    const {getAppConfig} = require('../universal/compatibility')
-
     beforeAll(() => {
         // These values are not allowed to be `undefined` when `isRemote` returns true. So we mock them.
         process.env.BUNDLE_ID = '1'
@@ -431,8 +435,8 @@ describe('The Node SSR Environment', () => {
                 const include = ['<div>This is a PWA</div>']
                 const data = dataFromHTML(doc)
                 const dataScript = doc.querySelectorAll('script[id=mobify-data]')[0]
-                expect(dataScript.innerHTML.split(/\r\n|\r|\n/).length).toBe(1)
-                expect(data.__DEVICE_TYPE__).toEqual('DESKTOP')
+                expect(dataScript.innerHTML.split(/\r\n|\r|\n/)).toHaveLength(1)
+                expect(data.__DEVICE_TYPE__).toBe('DESKTOP')
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
             }
@@ -450,7 +454,7 @@ describe('The Node SSR Environment', () => {
                 const html = res.text
                 const doc = parse(html)
                 const data = dataFromHTML(doc)
-                expect(data.__DEVICE_TYPE__).toEqual('TABLET')
+                expect(data.__DEVICE_TYPE__).toBe('TABLET')
                 const include = ['<div>This is a PWA</div>']
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
@@ -469,7 +473,7 @@ describe('The Node SSR Environment', () => {
                 const html = res.text
                 const doc = parse(html)
                 const data = dataFromHTML(doc)
-                expect(data.__DEVICE_TYPE__).toEqual('PHONE')
+                expect(data.__DEVICE_TYPE__).toBe('PHONE')
                 const include = ['<div>This is a PWA</div>']
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
@@ -596,10 +600,10 @@ describe('The Node SSR Environment', () => {
                 const doc = parse(html)
                 const data = dataFromHTML(doc)
 
-                expect(data.__ERROR__.message).toEqual('Internal Server Error')
+                expect(data.__ERROR__.message).toBe('Internal Server Error')
                 expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
 
-                expect(data.__ERROR__.status).toEqual(500)
+                expect(data.__ERROR__.status).toBe(500)
             }
         },
         {
@@ -610,9 +614,9 @@ describe('The Node SSR Environment', () => {
                 const doc = parse(html)
                 const data = dataFromHTML(doc)
 
-                expect(data.__ERROR__.message).toEqual('Internal Server Error')
+                expect(data.__ERROR__.message).toBe('Internal Server Error')
                 expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
-                expect(data.__ERROR__.status).toEqual(500)
+                expect(data.__ERROR__.status).toBe(500)
                 expect(res.statusCode).toBe(500)
             }
         },
@@ -624,39 +628,31 @@ describe('The Node SSR Environment', () => {
                 const html = res.text
                 const doc = parse(html)
                 const head = doc.querySelector('head')
-                expect(html.includes('lang="helmet-html-attribute"')).toBe(true)
-                expect(doc.querySelector('body').getAttribute('class')).toEqual(
+                expect(html).toContain('lang="helmet-html-attribute"')
+                expect(doc.querySelector('body').getAttribute('class')).toBe(
                     'helmet-body-attribute'
                 )
-                expect(head.querySelector(`title`).innerHTML).toEqual('Helmet title')
-                expect(head.querySelector('base').getAttribute('target')).toEqual('_blank')
-                expect(
-                    doc.querySelector('style').innerHTML.includes('background-color: blue;')
-                ).toBe(true)
-                expect(
-                    doc
-                        .querySelector('noscript')
-                        .innerHTML.includes(
-                            '<link rel="stylesheet" type="text/css" href="foo.css" />'
-                        )
-                ).toBe(true)
+                expect(head.querySelector(`title`).innerHTML).toBe('Helmet title')
+                expect(head.querySelector('base').getAttribute('target')).toBe('_blank')
+                expect(doc.querySelector('style').innerHTML).toContain('background-color: blue;')
+                expect(doc.querySelector('noscript').innerHTML).toContain(
+                    '<link rel="stylesheet" type="text/css" href="foo.css" />'
+                )
                 expect(doc.querySelector('noscript').innerHTML).toEqual(
                     expect.stringContaining(
                         '<link rel="stylesheet" type="text/css" href="foo.css" />'
                     )
                 )
-                expect(head.querySelector('meta[name="helmet-meta-1"]')).not.toBe(null)
-                expect(head.querySelector('meta[property="helmet-meta-2"]')).not.toBe(null)
-                expect(head.querySelector('link[rel="helmet-link-1"]')).not.toBe(null)
-                expect(head.querySelector('link[rel="helmet-link-2"]')).not.toBe(null)
-                expect(head.querySelector('script[src="http://include.com/pathtojs.js"]')).not.toBe(
-                    null
-                )
+                expect(head.querySelector('meta[name="helmet-meta-1"]')).not.toBeNull()
+                expect(head.querySelector('meta[property="helmet-meta-2"]')).not.toBeNull()
+                expect(head.querySelector('link[rel="helmet-link-1"]')).not.toBeNull()
+                expect(head.querySelector('link[rel="helmet-link-2"]')).not.toBeNull()
                 expect(
-                    head
-                        .querySelector('script[type="application/ld+json"]')
-                        .innerHTML.includes(`"@context": "http://schema.org"`)
-                ).toBe(true)
+                    head.querySelector('script[src="http://include.com/pathtojs.js"]')
+                ).not.toBeNull()
+                expect(
+                    head.querySelector('script[type="application/ld+json"]').innerHTML
+                ).toContain(`"@context": "http://schema.org"`)
             }
         },
         {
@@ -731,11 +727,11 @@ describe('The Node SSR Environment', () => {
         })
     })
     isRemoteValues.forEach((isRemoteValue) => {
-        // Run test cases
-        cases.forEach(({description, req, assertions, mocks}) => {
+        // Rename `assertions` to `expectations` to pass linter rule
+        cases.forEach(({description, req, assertions: expectations, mocks}) => {
             test(`renders PWA pages properly when ${
                 isRemoteValue ? 'remote' : 'local'
-            } (${description})`, () => {
+            } (${description})`, async () => {
                 // Mock `isRemote` per test execution.
                 isRemote.mockReturnValue(isRemoteValue)
                 process.env.NODE_ENV = isRemoteValue ? 'production' : 'development'
@@ -747,11 +743,11 @@ describe('The Node SSR Environment', () => {
                 if (mocks) {
                     mocks()
                 }
-                return request(app)
+                const res = await request(app)
                     .get(url)
                     .set(headers || {})
                     .query(query || {})
-                    .then((res) => assertions(res))
+                expectations(res)
             })
         })
     })

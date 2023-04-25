@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React from 'react'
 import {
     AuthHelpers,
     useCustomer,
@@ -192,6 +192,9 @@ function UseCustomer() {
     ].map(({action, body, parameters}) => {
         return {
             name: action,
+            // This is essentially a shorthand to avoid writing out a giant object;
+            // it *technically* violates the rules of hooks, but not in an impactful way.
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             hook: useShopperCustomersMutation(action as ShopperCustomersMutation),
             body,
             parameters
@@ -241,10 +244,7 @@ function UseCustomer() {
     ]
 
     const loginError = loginRegisteredUser.error
-    const loginErrorMessage =
-        typeof loginError === 'object' && loginError !== null && 'message' in loginError
-            ? loginError.message
-            : loginError
+    const loginErrorMessage = loginError instanceof Error ? loginError.message : loginError
 
     return (
         <>

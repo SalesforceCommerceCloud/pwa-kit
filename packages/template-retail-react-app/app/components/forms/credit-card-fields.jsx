@@ -88,8 +88,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                 let value = evt.target.value.replace('/', '')
 
                                 // We ignore input values other than digits and `/`.
-                                // eslint-disable-next-line no-useless-escape
-                                if (value.match(/[^\d|\/]/g)) {
+                                if (value.match(/[^\d|/]/g)) {
                                     return
                                 }
 

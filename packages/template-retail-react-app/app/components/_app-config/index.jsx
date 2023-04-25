@@ -13,8 +13,7 @@ import 'focus-visible/dist/focus-visible'
 
 import theme from '../../theme'
 import {MultiSiteProvider} from '../../contexts'
-import {resolveSiteFromUrl} from '../../utils/site-utils'
-import {resolveLocaleFromUrl} from '../../utils/utils'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '../../utils/url'
 
@@ -23,6 +22,7 @@ import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/wit
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -57,6 +57,7 @@ const AppConfig = ({children, locals = {}}) => {
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
             </MultiSiteProvider>
+            <ReactQueryDevtools />
         </CommerceApiProvider>
     )
 }

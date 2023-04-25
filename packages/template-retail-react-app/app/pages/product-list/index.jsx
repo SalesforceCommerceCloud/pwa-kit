@@ -89,13 +89,10 @@ const REFINEMENT_DISALLOW_LIST = ['c_isNew']
  * allowable filters and sort refinements.
  */
 const ProductList = (props) => {
-    const {
-        // eslint-disable-next-line react/prop-types
-        isLoading: _isLoading, // NOTE: Ignore `getProps` isLoading state.
-        // eslint-disable-next-line react/prop-types
-        staticContext,
-        ...rest
-    } = props
+    // Using destructuring to omit properties; we must rename `isLoading` because we use a different
+    // `isLoading` later in this function.
+    // eslint-disable-next-line react/prop-types, @typescript-eslint/no-unused-vars
+    const {isLoading: _unusedIsLoading, staticContext, ...rest} = props
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
