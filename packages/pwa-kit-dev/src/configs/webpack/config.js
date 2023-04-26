@@ -204,10 +204,14 @@ const baseConfig = (target) => {
                             ? {
                                   'retail-react-app': path.resolve(
                                       projectDir,
-                                      pkg?.name === 'retail-react-app'
-                                          ? ''
-                                          : 'node_modules/retail-react-app'
+                                      'node_modules/retail-react-app'
                                   )
+                              }
+                            : {}),
+                        // TODO: these need to be dynamic via `extends` value, not hard-coded
+                        ...(pkg?.name === 'retail-react-app'
+                            ? {
+                                  'retail-react-app': path.resolve(projectDir)
                               }
                             : {})
                     },
