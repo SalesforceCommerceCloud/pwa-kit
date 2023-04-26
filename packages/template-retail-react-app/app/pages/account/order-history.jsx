@@ -22,16 +22,16 @@ import {
     Img,
     Skeleton
 } from '@chakra-ui/react'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 import {useCustomerOrders, useProducts} from 'commerce-sdk-react-preview'
-import useNavigation from '../../hooks/use-navigation'
-import {usePageUrls, useSearchParams} from '../../hooks'
-import PageActionPlaceHolder from '../../components/page-action-placeholder'
-import Link from '../../components/link'
-import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
-import Pagination from '../../components/pagination'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import {usePageUrls, useSearchParams} from 'retail-react-app/app/hooks'
+import PageActionPlaceHolder from 'retail-react-app/app/components/page-action-placeholder'
+import Link from 'retail-react-app/app/components/link'
+import {ChevronRightIcon, ReceiptIcon} from 'retail-react-app/app/components/icons'
+import Pagination from 'retail-react-app/app/components/pagination'
 import PropTypes from 'prop-types'
-import {DEFAULT_ORDERS_SEARCH_PARAMS} from '../../constants'
+import {DEFAULT_ORDERS_SEARCH_PARAMS} from 'retail-react-app/app/constants'
 
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''

@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {render} from '@testing-library/react'
-import Region from './index'
-import {PageContext} from '../page'
+import Region from 'retail-react-app/app/page-designer/core/region/index'
+import {PageContext} from 'retail-react-app/app/page-designer/core/page'
 
 const SAMPLE_REGION = {
     id: 'regionB',

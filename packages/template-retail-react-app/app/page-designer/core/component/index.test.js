@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {render} from '@testing-library/react'
-import Component from './index'
-import {PageContext} from '../page'
+import Component from 'retail-react-app/app/page-designer/core/component/index'
+import {PageContext} from 'retail-react-app/app/page-designer/core/page'
 
 const SAMPLE_COMPONENT = {
     id: 'rfdvj4ojtltljw3',

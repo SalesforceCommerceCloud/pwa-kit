@@ -7,7 +7,7 @@
 import React from 'react'
 import {FormattedMessage} from 'react-intl'
 import {Text} from '@chakra-ui/react'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 
 const CartTitle = () => {
     const {

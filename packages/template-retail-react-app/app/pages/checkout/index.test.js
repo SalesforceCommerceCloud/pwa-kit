@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import Checkout from './index'
+import Checkout from 'retail-react-app/app/pages/checkout/index'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
@@ -14,14 +14,14 @@ import {
     renderWithProviders,
     createPathWithDefaults,
     registerUserToken
-} from '../../utils/test-utils'
+} from 'retail-react-app/app/utils/test-utils'
 import {
     scapiBasketWithItem,
     mockShippingMethods,
     mockedRegisteredCustomer,
     mockedCustomerProductLists
-} from '../../mocks/mock-data'
-import mockConfig from '../../../config/mocks/default'
+} from 'retail-react-app/app/mocks/mock-data'
+import mockConfig from 'retail-react-app/config/mocks/default'
 
 jest.setTimeout(30000)
 

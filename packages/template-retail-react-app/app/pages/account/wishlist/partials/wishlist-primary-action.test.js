@@ -5,15 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {mockWishListDetails} from './wishlist-primary-action.mock'
-import ItemVariantProvider from '../../../../components/item-variant'
-import {renderWithProviders} from '../../../../utils/test-utils'
-import WishlistPrimaryAction from './wishlist-primary-action'
+import {mockWishListDetails} from 'retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action.mock'
+import ItemVariantProvider from 'retail-react-app/app/components/item-variant'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import WishlistPrimaryAction from 'retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action'
 import userEvent from '@testing-library/user-event'
 import {screen, waitFor} from '@testing-library/react'
 import PropTypes from 'prop-types'
 import {rest} from 'msw'
-import {basketWithProductSet} from '../../../product-detail/index.mock'
+import {basketWithProductSet} from 'retail-react-app/app/pages/product-detail/index.mock'
 
 const MockedComponent = ({variant}) => {
     return (

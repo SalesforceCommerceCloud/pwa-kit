@@ -24,13 +24,17 @@ import {
 import {useHistory} from 'react-router-dom'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from '../util/checkout-context'
-import useLoginFields from '../../../components/forms/useLoginFields'
-import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
-import Field from '../../../components/field'
-import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCheckout} from 'retail-react-app/app/pages/checkout/util/checkout-context'
+import useLoginFields from 'retail-react-app/app/components/forms/useLoginFields'
+import {
+    ToggleCard,
+    ToggleCardEdit,
+    ToggleCardSummary
+} from 'retail-react-app/app/components/toggle-card'
+import Field from 'retail-react-app/app/components/field'
+import {AuthModal, useAuthModal} from 'retail-react-app/app/hooks/use-auth-modal'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 
 const ContactInfo = () => {

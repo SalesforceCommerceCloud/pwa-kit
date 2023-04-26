@@ -24,12 +24,12 @@ import {
     Stack,
     useBreakpointValue
 } from '@chakra-ui/react'
-import {useCurrentBasket} from './use-current-basket'
-import Link from '../components/link'
-import RecommendedProducts from '../components/recommended-products'
-import {LockIcon} from '../components/icons'
-import {findImageGroupBy} from '../utils/image-groups-utils'
-import {getDisplayVariationValues} from '../utils/product-utils'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
+import Link from 'retail-react-app/app/components/link'
+import RecommendedProducts from 'retail-react-app/app/components/recommended-products'
+import {LockIcon} from 'retail-react-app/app/components/icons'
+import {findImageGroupBy} from 'retail-react-app/app/utils/image-groups-utils'
+import {getDisplayVariationValues} from 'retail-react-app/app/utils/product-utils'
 
 /**
  * This is the context for managing the AddToCartModal.

@@ -5,13 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ItemVariantProvider from '../../../../components/item-variant'
-import {renderWithProviders} from '../../../../utils/test-utils'
-import WishlistSecondaryButtonGroup from './wishlist-secondary-button-group'
+import ItemVariantProvider from 'retail-react-app/app/components/item-variant'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import WishlistSecondaryButtonGroup from 'retail-react-app/app/pages/account/wishlist/partials/wishlist-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {mockedProductLists, mockedWishListProducts} from '../index.mock'
+import {
+    mockedProductLists,
+    mockedWishListProducts
+} from 'retail-react-app/app/pages/account/wishlist/index.mock'
 
 const mockData = {
     creationDate: '2021-09-13T23:29:23.396Z',

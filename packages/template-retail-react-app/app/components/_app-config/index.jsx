@@ -11,11 +11,11 @@ import {ChakraProvider} from '@chakra-ui/react'
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
-import theme from '../../theme'
-import {MultiSiteProvider} from '../../contexts'
-import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
+import theme from 'retail-react-app/app/theme'
+import {MultiSiteProvider} from 'retail-react-app/app/contexts'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from 'retail-react-app/app/utils/site-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {createUrlTemplate} from '../../utils/url'
+import {createUrlTemplate} from 'retail-react-app/app/utils/url'
 
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'

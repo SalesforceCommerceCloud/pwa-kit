@@ -7,12 +7,12 @@
 
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
-import {isServer} from '../../../utils/utils'
+import {isServer} from 'retail-react-app/app/utils/utils'
 // Components
 import {Box, Heading, Flex, Text, Fade} from '@chakra-ui/react'
 
 // Project Components
-import Breadcrumb from '../../../components/breadcrumb'
+import Breadcrumb from 'retail-react-app/app/components/breadcrumb'
 
 const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...otherProps}) => {
     return (

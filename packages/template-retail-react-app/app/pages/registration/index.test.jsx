@@ -7,13 +7,17 @@
 import React from 'react'
 import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {guestToken, registerUserToken, renderWithProviders} from '../../utils/test-utils'
+import {
+    guestToken,
+    registerUserToken,
+    renderWithProviders
+} from 'retail-react-app/app/utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import Account from '../account'
-import mockConfig from '../../../config/mocks/default'
+import Account from 'retail-react-app/app/pages/account'
+import mockConfig from 'retail-react-app/config/mocks/default'
 import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {mockedRegisteredCustomer} from 'retail-react-app/app/mocks/mock-data'
 
 const MockedComponent = () => {
     const match = {

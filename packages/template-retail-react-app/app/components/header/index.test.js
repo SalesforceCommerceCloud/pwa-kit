@@ -8,11 +8,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import userEvent from '@testing-library/user-event'
 import {fireEvent, screen, waitFor, act} from '@testing-library/react'
-import Header from './index'
-import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
+import Header from 'retail-react-app/app/components/header/index'
+import {renderWithProviders, createPathWithDefaults} from 'retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
 import {createMemoryHistory} from 'history'
-import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {mockCustomerBaskets, mockedRegisteredCustomer} from 'retail-react-app/app/mocks/mock-data'
 
 jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual('@chakra-ui/react')

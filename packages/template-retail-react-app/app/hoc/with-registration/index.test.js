@@ -7,11 +7,11 @@
 import React from 'react'
 import {Button} from '@chakra-ui/react'
 import {screen, waitFor} from '@testing-library/react'
-import withRegistration from './index'
-import {renderWithProviders} from '../../utils/test-utils'
+import withRegistration from 'retail-react-app/app/hoc/with-registration/index'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {mockedGuestCustomer} from '../../mocks/mock-data'
+import {mockedGuestCustomer} from 'retail-react-app/app/mocks/mock-data'
 
 const ButtonWithRegistration = withRegistration(Button)
 

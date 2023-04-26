@@ -9,10 +9,14 @@ import {Route, Switch} from 'react-router-dom'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import {mockCustomerBaskets, mockOrderHistory, mockOrderProducts} from '../../mocks/mock-data'
-import Orders from './orders'
-import mockConfig from '../../../config/mocks/default'
+import {renderWithProviders, createPathWithDefaults} from 'retail-react-app/app/utils/test-utils'
+import {
+    mockCustomerBaskets,
+    mockOrderHistory,
+    mockOrderProducts
+} from 'retail-react-app/app/mocks/mock-data'
+import Orders from 'retail-react-app/app/pages/account/orders'
+import mockConfig from 'retail-react-app/config/mocks/default'
 
 const MockedComponent = () => {
     return (

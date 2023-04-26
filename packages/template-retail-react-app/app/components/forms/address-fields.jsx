@@ -7,9 +7,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Grid, GridItem, SimpleGrid, Stack} from '@chakra-ui/react'
-import useAddressFields from './useAddressFields'
-import Field from '../field'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import useAddressFields from 'retail-react-app/app/components/forms/useAddressFields'
+import Field from 'retail-react-app/app/components/field'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 
 const AddressFields = ({form, prefix = ''}) => {
     const {data: customer} = useCurrentCustomer()

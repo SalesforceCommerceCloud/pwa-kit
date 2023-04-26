@@ -6,9 +6,9 @@
  */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import ListMenu from './index'
-import {renderWithProviders} from '../../utils/test-utils'
-import {mockCategories} from '../../mocks/mock-data'
+import ListMenu from 'retail-react-app/app/components/list-menu/index'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import {mockCategories} from 'retail-react-app/app/mocks/mock-data'
 
 describe('ListMenu', () => {
     test('ListMenu renders without errors', async () => {

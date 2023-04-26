@@ -8,14 +8,18 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults, guestToken} from '../../utils/test-utils'
+import {
+    renderWithProviders,
+    createPathWithDefaults,
+    guestToken
+} from 'retail-react-app/app/utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import Account from '../account'
-import Registration from '../registration'
-import ResetPassword from '../reset-password'
-import mockConfig from '../../../config/mocks/default'
-import {mockedRegisteredCustomer} from '../../mocks/mock-data'
+import Account from 'retail-react-app/app/pages/account'
+import Registration from 'retail-react-app/app/pages/registration'
+import ResetPassword from 'retail-react-app/app/pages/reset-password'
+import mockConfig from 'retail-react-app/config/mocks/default'
+import {mockedRegisteredCustomer} from 'retail-react-app/app/mocks/mock-data'
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
     currency: 'USD',

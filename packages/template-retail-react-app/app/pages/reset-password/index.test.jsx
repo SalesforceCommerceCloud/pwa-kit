@@ -8,9 +8,9 @@ import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
+import {createPathWithDefaults, renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import ResetPassword from '.'
-import mockConfig from '../../../config/mocks/default'
+import mockConfig from 'retail-react-app/config/mocks/default'
 
 const mockRegisteredCustomer = {
     authType: 'registered',

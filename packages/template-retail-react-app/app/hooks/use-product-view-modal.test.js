@@ -12,10 +12,10 @@ import {screen, fireEvent, waitFor} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
 import {IntlProvider} from 'react-intl'
 
-import mockProductDetail from '../mocks/variant-750518699578M'
-import {useProductViewModal} from './use-product-view-modal'
-import {DEFAULT_LOCALE, renderWithProviders} from '../utils/test-utils'
-import messages from '../translations/compiled/en-GB.json'
+import mockProductDetail from 'retail-react-app/app/mocks/variant-750518699578M'
+import {useProductViewModal} from 'retail-react-app/app/hooks/use-product-view-modal'
+import {DEFAULT_LOCALE, renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import messages from 'retail-react-app/app/translations/compiled/en-GB.json'
 import {rest} from 'msw'
 
 jest.mock('commerce-sdk-react-preview', () => {

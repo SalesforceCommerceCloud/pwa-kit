@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {usePageContext} from '../page'
-import {componentType} from '../types'
+import {usePageContext} from 'retail-react-app/app/page-designer/core/page'
+import {componentType} from 'retail-react-app/app/page-designer/core/types'
 
 /**
  * This component will render a page designer page given its serialized data object.

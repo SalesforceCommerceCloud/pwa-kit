@@ -22,8 +22,8 @@ import {
     List,
     useMultiStyleConfig
 } from '@chakra-ui/react'
-import {findImageGroupBy} from '../../utils/image-groups-utils'
-import DynamicImage from '../dynamic-image'
+import {findImageGroupBy} from 'retail-react-app/app/utils/image-groups-utils'
+import DynamicImage from 'retail-react-app/app/components/dynamic-image'
 
 const EnterKeyNumber = 13
 

@@ -30,9 +30,9 @@ import {
     FlagITIcon,
     FlagCNIcon,
     FlagJPIcon
-} from '../icons'
+} from 'retail-react-app/app/components/icons'
 
-import LocaleText from '../locale-text'
+import LocaleText from 'retail-react-app/app/components/locale-text'
 
 // NOTE: If you want to have flags shown next to a selectable locale, update this
 // mapping object with the short code as the key for the desired icon.

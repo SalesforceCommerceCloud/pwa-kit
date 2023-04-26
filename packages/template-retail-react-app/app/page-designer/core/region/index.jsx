@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Component} from '../component'
-import {regionType} from '../types'
+import {Component} from 'retail-react-app/app/page-designer/core/component'
+import {regionType} from 'retail-react-app/app/page-designer/core/types'
 
 /**
  * This component will render a page designer region given its serialized data object.

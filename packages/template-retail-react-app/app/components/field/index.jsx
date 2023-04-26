@@ -18,7 +18,7 @@ import {
     Select,
     Checkbox
 } from '@chakra-ui/react'
-import {VisibilityIcon, VisibilityOffIcon} from '../icons'
+import {VisibilityIcon, VisibilityOffIcon} from 'retail-react-app/app/components/icons'
 
 const Field = ({
     name,

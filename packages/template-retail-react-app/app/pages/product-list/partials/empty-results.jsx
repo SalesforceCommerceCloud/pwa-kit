@@ -10,8 +10,8 @@ import {Button, Text, Flex, Stack, Link} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
-import {SearchIcon} from '../../../components/icons'
-import RecommendedProducts from '../../../components/recommended-products'
+import {SearchIcon} from 'retail-react-app/app/components/icons'
+import RecommendedProducts from 'retail-react-app/app/components/recommended-products'
 
 const contactUsMessage = defineMessage({
     id: 'empty_search_results.link.contact_us',

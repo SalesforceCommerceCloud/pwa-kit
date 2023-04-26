@@ -8,7 +8,7 @@ import {useMemo, useState} from 'react'
 import fetch from 'cross-fetch'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {useCommerceApi, useAccessToken, useUsid, useEncUserId} from 'commerce-sdk-react-preview'
-import {keysToCamel} from '../utils/utils'
+import {keysToCamel} from 'retail-react-app/app/utils/utils'
 
 export class EinsteinAPI {
     constructor({host, einsteinId, userId, cookieId, siteId, isProduction}) {

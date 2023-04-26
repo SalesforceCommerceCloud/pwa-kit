@@ -6,9 +6,9 @@
  */
 import React from 'react'
 import user from '@testing-library/user-event'
-import useNavigation from './use-navigation'
-import mockConfig from '../../config/mocks/default'
-import {renderWithProviders} from '../utils/test-utils'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import mockConfig from 'retail-react-app/config/mocks/default'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {

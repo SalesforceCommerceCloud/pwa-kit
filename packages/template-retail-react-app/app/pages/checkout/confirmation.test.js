@@ -10,9 +10,9 @@ import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import Confirmation from './confirmation'
-import {mockOrder, mockProducts} from './confirmation.mock'
+import {renderWithProviders, createPathWithDefaults} from 'retail-react-app/app/utils/test-utils'
+import Confirmation from 'retail-react-app/app/pages/checkout/confirmation'
+import {mockOrder, mockProducts} from 'retail-react-app/app/pages/checkout/confirmation.mock'
 
 const MockedComponent = () => {
     return (

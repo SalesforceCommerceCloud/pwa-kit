@@ -46,22 +46,24 @@ import {
 } from '@chakra-ui/react'
 
 // Project Components
-import Pagination from '../../components/pagination'
-import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
-import {HideOnDesktop} from '../../components/responsive'
-import Refinements from './partials/refinements'
-import SelectedRefinements from './partials/selected-refinements'
-import EmptySearchResults from './partials/empty-results'
-import PageHeader from './partials/page-header'
+import Pagination from 'retail-react-app/app/components/pagination'
+import ProductTile, {
+    Skeleton as ProductTileSkeleton
+} from 'retail-react-app/app/components/product-tile'
+import {HideOnDesktop} from 'retail-react-app/app/components/responsive'
+import Refinements from 'retail-react-app/app/pages/product-list/partials/refinements'
+import SelectedRefinements from 'retail-react-app/app/pages/product-list/partials/selected-refinements'
+import EmptySearchResults from 'retail-react-app/app/pages/product-list/partials/empty-results'
+import PageHeader from 'retail-react-app/app/pages/product-list/partials/page-header'
 
 // Icons
-import {FilterIcon, ChevronDownIcon} from '../../components/icons'
+import {FilterIcon, ChevronDownIcon} from 'retail-react-app/app/components/icons'
 
 // Hooks
-import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
-import {useToast} from '../../hooks/use-toast'
+import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from 'retail-react-app/app/hooks'
+import {useToast} from 'retail-react-app/app/hooks/use-toast'
 // import {parse as parseSearchParams} from '../../hooks/use-search-params'
-import useEinstein from '../../hooks/use-einstein'
+import useEinstein from 'retail-react-app/app/hooks/use-einstein'
 
 // Others
 import {HTTPNotFound, HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
@@ -74,10 +76,10 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST
-} from '../../constants'
-import useNavigation from '../../hooks/use-navigation'
-import LoadingSpinner from '../../components/loading-spinner'
-import {useWishList} from '../../hooks/use-wish-list'
+} from 'retail-react-app/app/constants'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
+import {useWishList} from 'retail-react-app/app/hooks/use-wish-list'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.

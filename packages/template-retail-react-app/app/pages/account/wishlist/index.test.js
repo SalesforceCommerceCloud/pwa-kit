@@ -6,10 +6,14 @@
  */
 import React from 'react'
 import AccountWishlist from '.'
-import {renderWithProviders} from '../../../utils/test-utils'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import {screen, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
-import {mockedEmptyWishList, mockedProductLists, mockedWishListProducts} from './index.mock'
+import {
+    mockedEmptyWishList,
+    mockedProductLists,
+    mockedWishListProducts
+} from 'retail-react-app/app/pages/account/wishlist/index.mock'
 
 jest.mock('commerce-sdk-react-preview', () => {
     const originalModule = jest.requireActual('commerce-sdk-react-preview')

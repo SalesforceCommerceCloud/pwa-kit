@@ -5,12 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ConfirmationModal from './index'
+import ConfirmationModal from 'retail-react-app/app/components/confirmation-modal/index'
 import {Box, useDisclosure} from '@chakra-ui/react'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import user from '@testing-library/user-event'
 import {screen} from '@testing-library/react'
-import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/cart/partials/cart-secondary-button-group'
+import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from 'retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
 const MockedComponent = (props) => {
     const modalProps = useDisclosure()

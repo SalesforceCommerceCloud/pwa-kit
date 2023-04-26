@@ -7,8 +7,8 @@
 import React, {useContext, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
-import {Region} from '../region'
-import {pageType} from '../types'
+import {Region} from 'retail-react-app/app/page-designer/core/region'
+import {pageType} from 'retail-react-app/app/page-designer/core/types'
 
 // This context will hold the component map as well as any other future context.
 export const PageContext = React.createContext(undefined)
