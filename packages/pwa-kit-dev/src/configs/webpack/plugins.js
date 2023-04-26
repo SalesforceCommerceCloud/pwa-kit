@@ -7,7 +7,6 @@
 import webpack from 'webpack'
 import path, {resolve} from 'path'
 import glob from 'glob'
-import minimatch from 'minimatch'
 
 const projectDir = process.cwd()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -66,11 +65,10 @@ const makeRegExp = (str, sep = path.sep) => {
  * Allows users to override special SDK components by placing override
  * files in certain magic locations in a project.
  *
- * @param {string} projectDir - absolute path to the project root.
  * @returns {webpack.NormalModuleReplacementPlugin}
  */
 
-export const sdkReplacementPlugin = (projectDir) => {
+export const sdkReplacementPlugin = () => {
     const overridables = [
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app-config$'),
@@ -108,134 +106,6 @@ export const sdkReplacementPlugin = (projectDir) => {
         const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))
         if (requestedFromSDK && replacement) {
             resource.request = replacement.newPath
-        }
-    })
-}
-
-export const caretOverrideReplacementPlugin = (projectDir) => {
-    return new webpack.NormalModuleReplacementPlugin(/\^/, (resource) => {
-        const resolved = path.resolve(resource.context, resource.request)
-        console.log('resolvedCARET', resolved)
-        console.log('resource.context', resource.context)
-        console.log('resource.request', resource.request)
-        // NOTE: the way the Template Extensibility feature works, the order in which
-        // we check for file rewrites / aliases is important
-
-        if (resource.request.match(/\^/)) {
-            const relativePath = resolved?.split(`^`)?.[1]?.replace(/^\//, '')
-            const newPath = path.resolve(projectDir, 'node_modules', relativePath)
-            // NOTE: overriding either of these alone does not work, both must be set
-            resource.request = newPath
-            return
-        }
-    })
-}
-
-export const extendedTemplateReplacementPlugin = (projectDir) => {
-    const globPattern = `${pkg?.mobify?.overridesDir?.replace(
-        /\//,
-        ''
-    )}/**/*${OVERRIDES_EXTENSIONS}`
-    // push a copy of overrides array with the extends path as base
-    const overridesFsRead = glob.sync(globPattern)
-    const overrides = overridesFsRead?.flatMap((item) => {
-        const pathArr = item?.split('/')
-        return [
-            item,
-            item?.replace(pkg?.mobify?.overridesDir?.replace(/^\//, ''), `${pkg?.mobify?.extends}`),
-            [pathArr[pathArr?.length - 2], pathArr[pathArr?.length - 1]]?.join('/')
-        ]
-    })
-
-    const _overridesHashMap = new Map()
-    overridesFsRead.forEach((item) => {
-        const end = item.substr(item.lastIndexOf('/index'))
-        const [l, ...rest] = item?.split(/(index|\.)/)
-        _overridesHashMap.set(
-            l.replace(/\/$/, '')?.replace(pkg?.mobify?.overridesDir?.replace(/\//, ''), ''),
-            [end, rest]
-        )
-    })
-    console.log('_overridesHashMap', _overridesHashMap)
-
-    const overridesMap = [
-        ...overrides.flatMap((item) => {
-            const patterns = []
-            patterns.push(item)
-
-            // matches '.jsx', '.js', '.tsx', '.ts'
-            const extRe = /\.\w+$/
-
-            // returns true if there is a match for the above
-            const hasExt = item?.match?.(extRe)
-
-            // returns true if the string ends with a '/'
-            const hasSlash = item?.endsWith('/')
-
-            // returns true if path ends with file name of 'index'
-            const endsWithIndex = item?.split(extRe)?.[0]?.endsWith?.('index')
-            const noExt = item.replace(extRe, '')
-            if (!endsWithIndex) {
-                patterns.push(noExt)
-                return patterns
-            }
-            if (hasExt || !hasSlash) {
-                const pathNoFile = item
-                    .split(/\.\w+$/)[0]
-                    .split('/')
-                    .slice(0, -1)
-                    .join('/')
-                patterns.push(minimatch.makeRe('**/*' + noExt + OVERRIDES_EXTENSIONS))
-                patterns.push(minimatch.makeRe('**/*' + pathNoFile))
-            }
-
-            return patterns
-        })
-    ]
-    const overridesRegex = makeRegExp(
-        `(${overridesMap
-            ?.map((override) =>
-                override instanceof RegExp && override?.source
-                    ? override?.source
-                    : override?.replace && override?.startsWith('/')
-                    ? override?.replace?.(/^\//, '')
-                    : override
-            )
-            ?.join('|')}|^(?!.*\^).*$)` // trailing regex is negation for ^ char
-    )
-
-    return new webpack.NormalModuleReplacementPlugin(overridesRegex, (resource) => {
-        const resolved = path.resolve(resource.context, resource.request)
-        console.log('resource', resource)
-        console.log('resolved', resolved)
-        // NOTE: the way the Template Extensibility feature works, the order in which
-        // we check for file rewrites / aliases is important
-        if (
-            // NOTE: this array appears to always contain object where the `dependency[x].request
-            // holds reference to the original request, which is what we want to use for
-            // introspecting whether magic characters like `^` were used
-            resource?.dependencies?.[0]?.request?.match?.(/\^/)?.[0]
-        ) {
-            return
-        }
-        const matchRegex = makeRegExp(pkg?.mobify?.extends)
-        console.log('matchRegex', matchRegex)
-        const relativePathNoExt = resolved?.split?.(matchRegex)?.[1]?.split?.('.')?.[0]
-
-        //this resolves to actual file path
-        if (_overridesHashMap.has(relativePathNoExt)) {
-            console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-            console.log('relativePathNoExt', relativePathNoExt)
-
-            const relativePath = resolved?.split?.(matchRegex)?.[1]
-            console.log('relativePath', relativePath)
-            const newPath = projectDir + pkg?.mobify?.overridesDir + relativePath
-            console.log('newPath', newPath)
-            // NOTE: overriding either of these alone does not work, both must be set
-            resource.request = newPath
-            const end = _overridesHashMap.get(relativePathNoExt)?.[1]
-            resource.createData.resource = newPath + (end[0] !== '.' ? '/' : '') + end?.join('')
-            console.log('resource.createData.resource', resource.createData.resource)
         }
     })
 }

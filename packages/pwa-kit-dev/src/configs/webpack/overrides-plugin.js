@@ -166,8 +166,6 @@ class OverridesResolverPlugin {
                     requestContext.request &&
                     this.isFromExtends(requestContext.request, requestContext.path)
                 ) {
-                    console.log('~~~~~~=============== ')
-                    console.log('~isFromExtends()', requestContext)
                     // external dependency requiring app code (app-config, app, ssr, etc)
                     // TODO: DRY this is nearly the same as the above condition
                     let overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(

@@ -20,11 +20,7 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {
-    sdkReplacementPlugin,
-    caretOverrideReplacementPlugin,
-    extendedTemplateReplacementPlugin
-} from './plugins'
+import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 import OverridesResolverPlugin from './overrides-plugin'
 
@@ -155,15 +151,17 @@ const baseConfig = (target) => {
                     path: buildDir
                 },
                 resolve: {
-                    plugins: [
-                        pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                            ? new OverridesResolverPlugin({
-                                  extends: [pkg?.mobify?.extends],
-                                  overridesDir: pkg?.mobify?.overridesDir,
-                                  projectDir: process.cwd()
-                              })
-                            : () => null
-                    ],
+                    ...(pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                        ? {
+                              plugins: [
+                                  new OverridesResolverPlugin({
+                                      extends: [pkg?.mobify?.extends],
+                                      overridesDir: pkg?.mobify?.overridesDir,
+                                      projectDir: process.cwd()
+                                  })
+                              ]
+                          }
+                        : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
                         'babel-runtime': findInProjectThenSDK('babel-runtime'),
@@ -202,9 +200,10 @@ const baseConfig = (target) => {
                         // TODO: these need to be dynamic via `extends` value, not hard-coded
                         ...(pkg?.mobify?.overridesDir && pkg?.mobify?.extends
                             ? {
-                                  'retail-react-app': [
-                                      path.resolve(projectDir, 'node_modules/retail-react-app')
-                                  ]
+                                  'retail-react-app': path.resolve(
+                                      projectDir,
+                                      'node_modules/retail-react-app'
+                                  )
                               }
                             : {}),
                         // TODO: these need to be dynamic via `extends` value, not hard-coded
@@ -227,15 +226,7 @@ const baseConfig = (target) => {
 
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
-                    sdkReplacementPlugin(projectDir),
-
-                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                    //     ? caretOverrideReplacementPlugin(projectDir)
-                    //     : () => null,
-
-                    // pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                    //     ? extendedTemplateReplacementPlugin(projectDir)
-                    //     : () => null,
+                    sdkReplacementPlugin(),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
@@ -272,7 +263,6 @@ const baseConfig = (target) => {
         build() {
             // Clean up temporary properties, to be compatible with the config schema
             this.config.module.rules.filter((rule) => rule.id).forEach((rule) => delete rule.id)
-            console.log('~build() this.config', this.config)
             return this.config
         }
     }
@@ -311,7 +301,7 @@ const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        ...(pkg.mobify.overridesDir && pkg.mobify.extends
+        ...(pkg?.mobify?.overridesDir && pkg?.mobify?.extends
             ? // TODO generate this dynamically
               {exclude: /node_modules(?!\/retail-react-app)/}
             : {exclude: /node_modules/}),
@@ -493,7 +483,6 @@ const ssr = (() => {
                     ...config,
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
-                    // entry: './app/ssr.js',
                     entry:
                         pkg?.mobify?.extends && pkg?.mobify?.overridesDir
                             ? `.${pkg?.mobify?.overridesDir}/app/ssr.js`
