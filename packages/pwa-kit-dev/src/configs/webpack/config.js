@@ -199,7 +199,17 @@ const baseConfig = (target) => {
                                   }))
                               )
                             : {}),
-                        'retail-react-app': ['node_modules/retail-react-app', './']
+                        // TODO: these need to be dynamic via `extends` value, not hard-coded
+                        ...(pkg?.mobify?.overridesDir && pkg?.mobify?.extends
+                            ? {
+                                  'retail-react-app': path.resolve(
+                                      projectDir,
+                                      pkg?.name === 'retail-react-app'
+                                          ? ''
+                                          : 'node_modules/retail-react-app'
+                                  )
+                              }
+                            : {})
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -259,7 +269,7 @@ const baseConfig = (target) => {
         build() {
             // Clean up temporary properties, to be compatible with the config schema
             this.config.module.rules.filter((rule) => rule.id).forEach((rule) => delete rule.id)
-
+            console.log('~build() this.config', this.config)
             return this.config
         }
     }

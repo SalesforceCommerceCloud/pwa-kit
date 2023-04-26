@@ -143,6 +143,8 @@ class OverridesResolverPlugin {
             'FeatureResolverPlugin',
             function (requestContext, resolveContext, callback) {
                 // exact match ^ means import the "parent" (superModule) of the requesting module
+                return callback()
+
                 if (requestContext.request === '^') {
                     const overrideRelative = this.toOverrideRelative(requestContext.context.issuer)
                     const override = this.findOverride(requestContext.context.issuer)
