@@ -35,29 +35,9 @@ class OverridesResolverPlugin {
     constructor(options) {
         this.overridesDir = options.overridesDir || ''
         this.overridesFullPath = path.resolve(this.overridesDir)
-        // this is /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app
-
-        // this is [retail-react-app]
         this.extends = options.extends || []
         this.projectDir = options.projectDir
-
-        /* this is [
-            '/Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app',
-
-            '/Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/node_modules/retail-react-app/app'
-            ]
-        */
-
         this._allSearchDirs = [this.projectDir + this.overridesDir, ...this.extends]
-        // this._allSearchDirs = [this.overridesDir].concat(
-        //     this.extends.map((o) => {
-        //         return path.join(
-        //             path.resolve(`${'node_modules/'}${o}`),
-        //             // path.basename(this.overridesDir)
-        //         )
-        //     })
-        // )
-
         this.projectDir = options.projectDir
         this.pkg = require(path.resolve(this.projectDir, 'package.json'))
         this.extendsHashMap = new Map()
@@ -100,37 +80,24 @@ class OverridesResolverPlugin {
      */
     findFileMap(requestPath, dirs) {
         var fileExt = path.extname(requestPath)
-        console.log('~fileExt', fileExt)
         for (var dir of dirs) {
             var base = path.join(dir, requestPath)
-            console.log('~base', base)
             if (fileExt) {
                 const noExtPath = requestPath.replace(fileExt, '')
-                console.log('~noExtPath', noExtPath)
                 if (this.extendsHashMap.has(noExtPath)) {
-                    console.log('~TRUE this.extendsHashMap.has', noExtPath)
                     return base
-                } else {
-                    console.log('~FALSE this.extendsHashMap.has', noExtPath)
                 }
             } else {
-                console.log('~117 requestPath', requestPath)
                 if (this.extendsHashMap.has(requestPath)) {
-                    console.log('~118 TRUE this.extendsHashMap.has', requestPath)
                     const end = this.extendsHashMap.get(requestPath)[1]
-                    console.log('~120 end', end)
+
                     if (end[0] === 'index') {
                         base = path.join(base, this.extendsHashMap.get(requestPath)[1].join(''))
-                        console.log('~123 base', base)
                         return base
                     } else {
-                        console.log('~base PRE', base + '')
                         base = base?.replace(/$\//, '') + end.join('')
-                        console.log('~127 base', base)
                         return base
                     }
-                } else {
-                    console.log('~ 131 ELSE')
                 }
             }
         }
@@ -172,10 +139,8 @@ class OverridesResolverPlugin {
                         /$\//,
                         ''
                     )
-                    console.log('~overrideRelative', overrideRelative)
                     try {
                         const targetFile = this.findFileMap(overrideRelative, this._allSearchDirs)
-                        console.log('~targetFile', targetFile)
                         if (targetFile) {
                             const target = resolver.ensureHook('resolved')
                             requestContext.path = targetFile
