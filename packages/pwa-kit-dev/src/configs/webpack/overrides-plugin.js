@@ -46,17 +46,15 @@ class OverridesResolverPlugin {
             ]
         */
 
-        this._allSearchDirs = [this.appBase].concat(
-            this.overrides.map((o) => {
-                return path.join(
-                    path.resolve(
-                        // prefix with `~` or `/` indicates relative filesystem, otherwise `node_modules`
-                        `${o.startsWith('~') || o.startsWith('/') ? '' : 'node_modules/'}${o}`
-                    ),
-                    path.basename(this.appBase)
-                )
-            })
-        )
+        this._allSearchDirs = this.overrides
+        // this._allSearchDirs = [this.appBase].concat(
+        //     this.overrides.map((o) => {
+        //         return path.join(
+        //             path.resolve(`${'node_modules/'}${o}`),
+        //             // path.basename(this.appBase)
+        //         )
+        //     })
+        // )
 
         this.projectDir = options.projectDir
         this.pkg = require(path.resolve(this.projectDir, 'package.json'))
@@ -133,8 +131,11 @@ class OverridesResolverPlugin {
         })
     }
 
-    isAppBaseRelative(p) {
-        return p && p.indexOf(this.appBase) === 0
+    isExtendsBase(p) {
+        console.log('~isExtendsBase()', p)
+        console.log('~this.overrides', this.overrides)
+        // return p && p.indexOf(this.appBase) === 0
+        return p && this.overrides.includes(p)
     }
 
     apply(resolver) {
@@ -169,13 +170,18 @@ class OverridesResolverPlugin {
                 } else if (requestContext.request.startsWith('^/')) {
                     // let aliases find the file
                     return callback()
-                
-                //this block catches requests coming from the overrides directory
-                } else if (
-                    this.isAppBaseRelative(requestContext.path) &&
-                    requestContext.request.startsWith('.')
-                ) {
-                    
+
+                    //this block catches requests coming from the overrides directory
+
+                    // ORIGINAL WAY
+                    // import that included the `^` directive:
+                    // 1. check to see if it starts with a `.`
+
+                    // NEW WAY
+                    // import that includes the `retail-react-app` (`mobify.extends`) string:
+                    // 1. check to see if it exists in `overridesDir`
+                    // 2. if not, load from `retail-react-app` (`mobify.extends`)
+                } else if (this.isExtendsBase(requestContext.path)) {
                     // app base request relative
                     // ex - /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app/components/header
                     var resolvedPath = path.resolve(requestContext.path, requestContext.request)
@@ -239,10 +245,7 @@ class OverridesResolverPlugin {
                     } catch (e) {
                         return callback()
                     }
-                } else if (
-                    requestContext.request &&
-                    this.isAppBaseRelative(requestContext.request)
-                ) {
+                } else if (requestContext.request && this.isExtendsBase(requestContext.request)) {
                     // external dependency requiring app code (app-config, app, ssr, etc)
                     // TODO: DRY this is nearly the same as the above condition
                     let overrideRelative = this.toOverrideRelative(requestContext.request)

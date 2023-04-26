@@ -198,7 +198,8 @@ const baseConfig = (target) => {
                                           .concat('.' + path.resolve(pkg.mobify.overridesDir))
                                   }))
                               )
-                            : {})
+                            : {}),
+                        'retail-react-app': ['node_modules/retail-react-app', './']
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },

@@ -19,28 +19,28 @@ import {
     Flex,
     Stack,
     Container,
-    Link,
+    Link
 } from '@chakra-ui/react'
 
 // Project Components
-import Hero from '^retail-react-app/app/components/hero'
-import Seo from '^retail-react-app/app/components/seo'
-import Section from '^retail-react-app/app/components/section'
-import ProductScroller from '^retail-react-app/app/components/product-scroller'
+import Hero from 'retail-react-app/app/components/hero'
+import Seo from 'retail-react-app/app/components/seo'
+import Section from 'retail-react-app/app/components/section'
+import ProductScroller from 'retail-react-app/app/components/product-scroller'
 
 // Others
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
-import {heroFeatures, features} from '^retail-react-app/app/pages/home/data'
+import {heroFeatures, features} from 'retail-react-app/app/pages/home/data'
 
 //Hooks
-import useEinstein from '^retail-react-app/app/hooks/use-einstein'
+import useEinstein from 'retail-react-app/app/hooks/use-einstein'
 
 // Constants
 import {
     MAX_CACHE_AGE,
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
-    HOME_SHOP_PRODUCTS_LIMIT,
-} from '^retail-react-app/app/constants'
+    HOME_SHOP_PRODUCTS_LIMIT
+} from 'retail-react-app/app/constants'
 
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from 'commerce-sdk-react-preview'
@@ -64,8 +64,8 @@ const Home = () => {
     const {data: productSearchResult, isLoading} = useProductSearch({
         parameters: {
             refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
-            limit: HOME_SHOP_PRODUCTS_LIMIT,
-        },
+            limit: HOME_SHOP_PRODUCTS_LIMIT
+        }
     })
 
     /**************** Einstein ****************/
@@ -85,7 +85,7 @@ const Home = () => {
                 title={'🎉 Hello Extensible React Template!'}
                 img={{
                     src: getAssetUrl('static/img/hero.png'),
-                    alt: 'npx pwa-kit-create-app',
+                    alt: 'npx pwa-kit-create-app'
                 }}
                 actions={
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
@@ -160,7 +160,7 @@ const Home = () => {
                     paddingTop={16}
                     title={intl.formatMessage({
                         defaultMessage: 'Shop Products',
-                        id: 'home.heading.shop_products',
+                        id: 'home.heading.shop_products'
                     })}
                     subtitle={intl.formatMessage(
                         {
@@ -168,7 +168,7 @@ const Home = () => {
                                 'This section contains content from the catalog. {docLink} on how to replace it.',
                             id: 'home.description.shop_products',
                             description:
-                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs',
+                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
                         },
                         {
                             docLink: (
@@ -185,16 +185,16 @@ const Home = () => {
                                         margin: '0 auto',
                                         left: 0,
                                         right: 0,
-                                        background: 'gray.700',
+                                        background: 'gray.700'
                                     }}
                                     _hover={{textDecoration: 'none'}}
                                 >
                                     {intl.formatMessage({
                                         defaultMessage: 'Read docs',
-                                        id: 'home.link.read_docs',
+                                        id: 'home.link.read_docs'
                                     })}
                                 </Link>
-                            ),
+                            )
                         }
                     )}
                 >
@@ -212,12 +212,12 @@ const Home = () => {
                 paddingTop={32}
                 title={intl.formatMessage({
                     defaultMessage: 'Features',
-                    id: 'home.heading.features',
+                    id: 'home.heading.features'
                 })}
                 subtitle={intl.formatMessage({
                     defaultMessage:
                         'Out-of-the-box features so that you focus only on adding enhancements.',
-                    id: 'home.description.features',
+                    id: 'home.description.features'
                 })}
             >
                 <Container maxW={'6xl'} marginTop={10}>
@@ -256,21 +256,21 @@ const Home = () => {
                 paddingTop={32}
                 title={intl.formatMessage({
                     defaultMessage: "We're here to help",
-                    id: 'home.heading.here_to_help',
+                    id: 'home.heading.here_to_help'
                 })}
                 subtitle={
                     <>
                         <>
                             {intl.formatMessage({
                                 defaultMessage: 'Contact our support staff.',
-                                id: 'home.description.here_to_help',
+                                id: 'home.description.here_to_help'
                             })}
                         </>
                         <br />
                         <>
                             {intl.formatMessage({
                                 defaultMessage: 'They will get you to the right place.',
-                                id: 'home.description.here_to_help_line_2',
+                                id: 'home.description.here_to_help_line_2'
                             })}
                         </>
                     </>

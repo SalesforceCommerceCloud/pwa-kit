@@ -18,7 +18,7 @@ import {
     useCommerceApi,
     useCustomerType,
     useCustomerBaskets,
-    useShopperBasketsMutation,
+    useShopperBasketsMutation
 } from 'commerce-sdk-react-preview'
 import * as queryKeyHelpers from 'commerce-sdk-react-preview/hooks/ShopperProducts/queryKeyHelpers'
 // Chakra
@@ -26,27 +26,27 @@ import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CurrencyProvider} from '^retail-react-app/app/contexts'
+import {CurrencyProvider} from 'retail-react-app/app/contexts'
 
 // Local Project Components
-import Header from '^retail-react-app/app/components/header'
-import OfflineBanner from '^retail-react-app/app/components/offline-banner'
-import OfflineBoundary from '^retail-react-app/app/components/offline-boundary'
-import ScrollToTop from '^retail-react-app/app/components/scroll-to-top'
-import Footer from '^retail-react-app/app/components/footer'
-import CheckoutFooter from '^retail-react-app/app/pages/checkout/partials/checkout-footer'
-import CheckoutHeader from '^retail-react-app/app/pages/checkout/partials/checkout-header'
+import Header from 'retail-react-app/app/components/header'
+import OfflineBanner from 'retail-react-app/app/components/offline-banner'
+import OfflineBoundary from 'retail-react-app/app/components/offline-boundary'
+import ScrollToTop from 'retail-react-app/app/components/scroll-to-top'
+import Footer from 'retail-react-app/app/components/footer'
+import CheckoutFooter from 'retail-react-app/app/pages/checkout/partials/checkout-footer'
+import CheckoutHeader from 'retail-react-app/app/pages/checkout/partials/checkout-header'
 
 import DrawerMenu from 'retail-react-app/app/components/drawer-menu'
-import ListMenu from '^retail-react-app/app/components/list-menu'
+import ListMenu from 'retail-react-app/app/components/list-menu'
 
-import {HideOnDesktop, HideOnMobile} from '^retail-react-app/app/components/responsive'
+import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/responsive'
 
 // Hooks
-import {AuthModal, useAuthModal} from '^retail-react-app/app/hooks/use-auth-modal'
-import {AddToCartModalProvider} from '^retail-react-app/app/hooks/use-add-to-cart-modal'
-import useMultiSite from '^retail-react-app/app/hooks/use-multi-site'
-import {useCurrentCustomer} from '^retail-react-app/app/hooks/use-current-customer'
+import {AuthModal, useAuthModal} from 'retail-react-app/app/hooks/use-auth-modal'
+import {AddToCartModalProvider} from 'retail-react-app/app/hooks/use-add-to-cart-modal'
+import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -56,20 +56,20 @@ import {
     watchOnlineStatus,
     flatten,
     mergeMatchedItems,
-    isServer,
-} from '^retail-react-app/app/utils/utils'
-import {getTargetLocale, fetchTranslations} from '^retail-react-app/app/utils/locale'
+    isServer
+} from 'retail-react-app/app/utils/utils'
+import {getTargetLocale, fetchTranslations} from 'retail-react-app/app/utils/locale'
 import {
     DEFAULT_SITE_TITLE,
     HOME_HREF,
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE,
-} from '^retail-react-app/app/constants'
+    DEFAULT_LOCALE
+} from 'retail-react-app/app/constants'
 
-import Seo from '^retail-react-app/app/components/seo'
-import {resolveSiteFromUrl, resolveLocaleFromUrl} from '^retail-react-app/app/utils/site-utils'
+import Seo from 'retail-react-app/app/components/seo'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from 'retail-react-app/app/utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -82,12 +82,12 @@ const useLazyLoadCategories = () => {
     const itemsKey = 'categories'
 
     const levelZeroCategoriesQuery = useCategory({
-        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH},
+        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
 
     const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
     const queries = useCategoryBulk(ids, {
-        enabled: onClient && ids?.length > 0,
+        enabled: onClient && ids?.length > 0
     })
     const dataArray = queries.map((query) => query.data).filter(Boolean)
     const isLoading = queries.some((query) => query.isLoading)
@@ -100,8 +100,8 @@ const useLazyLoadCategories = () => {
             [itemsKey]: mergeMatchedItems(
                 levelZeroCategoriesQuery.data?.categories || [],
                 dataArray
-            ),
-        },
+            )
+        }
     }
 }
 
@@ -144,14 +144,14 @@ const App = (props) => {
         // Create a new basket if the current customer doesn't have one.
         if (baskets?.total === 0) {
             createBasket.mutate({
-                body: {},
+                body: {}
             })
         }
         // update the basket currency if it doesn't match the current locale currency
         if (baskets?.baskets?.[0]?.currency && baskets.baskets[0].currency !== currency) {
             updateBasket.mutate({
                 parameters: {basketId: baskets.baskets[0].basketId},
-                body: {currency},
+                body: {currency}
             })
         }
     }, [baskets])
@@ -295,7 +295,7 @@ const App = (props) => {
                                     display: 'flex',
                                     flexDirection: 'column',
                                     flex: 1,
-                                    outline: 0,
+                                    outline: 0
                                 }}
                             >
                                 <Box
@@ -345,20 +345,20 @@ App.getProps = async ({res}) => {
             // NOTE: Your implementation may differ, this is just what we did.
             return [locale?.id]
         },
-        l10nConfig,
+        l10nConfig
     })
     const messages = await fetchTranslations(targetLocale)
 
     return {
         targetLocale,
-        messages,
+        messages
     }
 }
 
 App.propTypes = {
     children: PropTypes.node,
     targetLocale: PropTypes.string,
-    messages: PropTypes.object,
+    messages: PropTypes.object
 }
 
 /**
@@ -371,10 +371,10 @@ export const useCategoryBulk = (ids = [], queryOptions) => {
     const api = useCommerceApi()
     const {getTokenWhenReady} = useAccessToken()
     const {
-        app: {commerceAPI},
+        app: {commerceAPI}
     } = getConfig()
     const {
-        parameters: {organizationId},
+        parameters: {organizationId}
     } = commerceAPI
     const {site} = useMultiSite()
 
@@ -384,20 +384,20 @@ export const useCategoryBulk = (ids = [], queryOptions) => {
                 id,
                 levels: 2,
                 organizationId,
-                siteId: site.id,
+                siteId: site.id
             }),
             queryFn: async () => {
                 const token = await getTokenWhenReady()
                 const res = await api.shopperProducts.getCategory({
                     parameters: {id, levels: 2},
                     headers: {
-                        authorization: `Bearer ${token}`,
-                    },
+                        authorization: `Bearer ${token}`
+                    }
                 })
                 return res
             },
             ...queryOptions,
-            enabled: queryOptions.enabled !== false && Boolean(id),
+            enabled: queryOptions.enabled !== false && Boolean(id)
         }
     })
     const res = useQueries({queries})

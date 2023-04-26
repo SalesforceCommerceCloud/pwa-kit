@@ -18,38 +18,30 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
-import {configureRoutes} from '^retail-react-app/app/utils/routes-utils'
-import {routes as _routes} from '^retail-react-app/app/routes'
+import {configureRoutes} from 'retail-react-app/app/utils/routes-utils'
+
+import {routes as _routes} from 'retail-react-app/app/routes'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Pages
 const Home = loadable(() => import('./pages/home'), {fallback})
 const MyNewRoute = loadable(() => import('./pages/my-new-route'))
-const PageNotFound = loadable(() => import('^retail-react-app/app/pages/page-not-found'))
+const PageNotFound = loadable(() => import('retail-react-app/app/pages/page-not-found'))
 
 const routes = [
     // filter out the two routes we're overriding, the presence of the '*' PageNotFound
     // component catches everything before it so we strip it and then re-add
-    ..._routes.filter((r) => r.path !== '*' && r.path !== '/'),
-    {
-        path: '/',
-        component: Home,
-        exact: true,
-    },
     {
         path: '/my-new-route',
-        component: MyNewRoute,
+        component: MyNewRoute
     },
-    {
-        path: '*',
-        component: PageNotFound,
-    },
+    ..._routes
 ]
 
 export default () => {
     const config = getConfig()
     return configureRoutes(routes, config, {
-        ignoredRoutes: ['/callback', '*'],
+        ignoredRoutes: ['/callback', '*']
     })
 }

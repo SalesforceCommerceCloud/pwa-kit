@@ -11,11 +11,11 @@ import {ChakraProvider} from '@chakra-ui/react'
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
-import theme from '^retail-react-app/app/theme'
-import {MultiSiteProvider} from '^retail-react-app/app/contexts'
-import {resolveSiteFromUrl, resolveLocaleFromUrl} from '^retail-react-app/app/utils/site-utils'
+import theme from 'retail-react-app/app/theme'
+import {MultiSiteProvider} from 'retail-react-app/app/contexts'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from 'retail-react-app/app/utils/site-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {createUrlTemplate} from '^retail-react-app/app/utils/url'
+import {createUrlTemplate} from 'retail-react-app/app/utils/url'
 
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
@@ -34,7 +34,7 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
     const headers = {
-        'correlation-id': correlationId,
+        'correlation-id': correlationId
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
@@ -71,7 +71,7 @@ AppConfig.restore = (locals = {}) => {
     const {app: appConfig} = getConfig()
     const apiConfig = {
         ...appConfig.commerceAPI,
-        einsteinConfig: appConfig.einsteinAPI,
+        einsteinConfig: appConfig.einsteinAPI
     }
 
     apiConfig.parameters.siteId = site.id
@@ -88,13 +88,13 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
         buildUrl: locals.buildUrl,
         site: locals.site,
-        locale: locals.locale,
+        locale: locals.locale
     }
 }
 
 AppConfig.propTypes = {
     children: PropTypes.node,
-    locals: PropTypes.object,
+    locals: PropTypes.object
 }
 
 const isServerSide = typeof window === 'undefined'
@@ -108,13 +108,13 @@ const options = {
                 retry: false,
                 refetchOnWindowFocus: false,
                 staleTime: 2 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {}),
+                ...(isServerSide ? {retryOnMount: false} : {})
             },
             mutations: {
-                retry: false,
-            },
-        },
-    },
+                retry: false
+            }
+        }
+    }
 }
 
 export default withReactQuery(withLegacyGetProps(AppConfig), options)

@@ -29,11 +29,11 @@ import {
 } from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 
-import {useCurrentBasket} from '^retail-react-app/app/hooks/use-current-basket'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 
-import Link from '^retail-react-app/app/components/link'
-import Search from '^retail-react-app/app/components/search'
-import withRegistration from '^retail-react-app/app/hoc/with-registration'
+import Link from 'retail-react-app/app/components/link'
+import Search from 'retail-react-app/app/components/search'
+import withRegistration from 'retail-react-app/app/hoc/with-registration'
 
 import {
     AccountIcon,
@@ -45,10 +45,10 @@ import {
     SignoutIcon,
 } from '../icons'
 
-import {noop} from '^retail-react-app/app/utils/utils'
-import {navLinks, messages} from '^retail-react-app/app/pages/account/constant'
-import useNavigation from '^retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from '^retail-react-app/app/components/loading-spinner'
+import {noop} from 'retail-react-app/app/utils/utils'
+import {navLinks, messages} from 'retail-react-app/app/pages/account/constant'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
 
 const ENTER_KEY = 'Enter'
 
@@ -84,7 +84,7 @@ const Header = ({
     const intl = useIntl()
     const {
         derivedData: {totalItems},
-        data: basket
+        data: basket,
     } = useCurrentBasket()
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)

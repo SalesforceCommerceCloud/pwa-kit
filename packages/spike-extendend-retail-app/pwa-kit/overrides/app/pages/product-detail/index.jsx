@@ -17,19 +17,19 @@ import {
     useCategory,
     useShopperBasketsMutation,
     useShopperCustomersMutation,
-    useCustomerId
+    useCustomerId,
 } from 'commerce-sdk-react-preview'
 
 // Hooks
-import {useCurrentBasket} from '^retail-react-app/app/hooks/use-current-basket'
-import {useVariant} from '^retail-react-app/app/hooks'
-import useNavigation from '^retail-react-app/app/hooks/use-navigation'
-import useEinstein from '^retail-react-app/app/hooks/use-einstein'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
+import {useVariant} from 'retail-react-app/app/hooks'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import useEinstein from 'retail-react-app/app/hooks/use-einstein'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
-import RecommendedProducts from '^retail-react-app/app/components/recommended-products'
-import ProductView from '^retail-react-app/app/partials/product-view'
-import InformationAccordion from '^retail-react-app/app/pages/product-detail/partials/information-accordion'
+import RecommendedProducts from 'retail-react-app/app/components/recommended-products'
+import ProductView from 'retail-react-app/app/partials/product-view'
+import InformationAccordion from 'retail-react-app/app/pages/product-detail/partials/information-accordion'
 
 //Component Slots
 import AbovePDP from '../../components/product-detail/above-fold'
@@ -39,12 +39,12 @@ import {
     API_ERROR_MESSAGE,
     MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
-    TOAST_MESSAGE_ADDED_TO_WISHLIST
-} from '^retail-react-app/app/constants'
-import {rebuildPathWithParams} from '^retail-react-app/app/utils/url'
+    TOAST_MESSAGE_ADDED_TO_WISHLIST,
+} from 'retail-react-app/app/constants'
+import {rebuildPathWithParams} from 'retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
-import {useToast} from '^retail-react-app/app/hooks/use-toast'
-import {useWishList} from '^retail-react-app/app/hooks/use-wish-list'
+import {useToast} from 'retail-react-app/app/hooks/use-toast'
+import {useWishList} from 'retail-react-app/app/hooks/use-wish-list'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -71,13 +71,13 @@ const ProductDetail = () => {
         {
             parameters: {
                 id: urlParams.get('pid') || productId,
-                allImages: true
-            }
+                allImages: true,
+            },
         },
         {
             // When shoppers select a different variant (and the app fetches the new data),
             // the old data is still rendered (and not the skeletons).
-            keepPreviousData: true
+            keepPreviousData: true,
         }
     )
     const isProductASet = product?.type.set
@@ -86,8 +86,8 @@ const ProductDetail = () => {
     const {data: category} = useCategory({
         parameters: {
             id: product?.primaryCategoryId,
-            level: 1
-        }
+            level: 1,
+        },
     })
     const [primaryCategory, setPrimaryCategory] = useState(category)
     const variant = useVariant(product)
@@ -110,7 +110,7 @@ const ProductDetail = () => {
         // update the variation attributes parameter on
         // the url accordingly as the variant changes
         const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
-            pid: variant?.productId
+            pid: variant?.productId,
         })
         history.replace(updatedUrl)
     }, [variant])
@@ -126,7 +126,7 @@ const ProductDetail = () => {
             {
                 parameters: {
                     listId: wishlist.id,
-                    customerId
+                    customerId,
                 },
                 body: {
                     // NOTE: APi does not respect quantity, it always adds 1
@@ -134,8 +134,8 @@ const ProductDetail = () => {
                     productId: variant?.productId || product?.id,
                     public: false,
                     priority: 1,
-                    type: 'product'
-                }
+                    type: 'product',
+                },
             },
             {
                 onSuccess: () => {
@@ -151,12 +151,12 @@ const ProductDetail = () => {
                             <Button variant="link" onClick={() => navigate('/account/wishlist')}>
                                 {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
                             </Button>
-                        )
+                        ),
                     })
                 },
                 onError: () => {
                     showError()
-                }
+                },
             }
         )
     }
@@ -166,7 +166,7 @@ const ProductDetail = () => {
     const showError = () => {
         showToast({
             title: formatMessage(API_ERROR_MESSAGE),
-            status: 'error'
+            status: 'error',
         })
     }
 
@@ -175,12 +175,12 @@ const ProductDetail = () => {
             const productItems = productSelectionValues.map(({variant, quantity}) => ({
                 productId: variant.productId,
                 price: variant.price,
-                quantity
+                quantity,
             }))
 
             await addItemToBasketMutation.mutateAsync({
                 parameters: {basketId: basket.basketId},
-                body: productItems
+                body: productItems,
             })
 
             einstein.sendAddToCart(productItems)
@@ -215,7 +215,7 @@ const ProductDetail = () => {
             if (ref.scrollIntoView) {
                 ref.scrollIntoView({
                     behavior: 'smooth',
-                    block: 'end'
+                    block: 'end',
                 })
             }
 
@@ -246,142 +246,144 @@ const ProductDetail = () => {
     }, [product])
 
     return (
-        <><AbovePDP />
-        <Box
-            className="sf-product-detail-page"
-            layerStyle="page"
-            data-testid="product-details-page"
-        >
-            <Helmet>
-                <title>{product?.pageTitle}</title>
-                <meta name="description" content={product?.pageDescription} />
-            </Helmet>
+        <>
+            <AbovePDP />
+            <Box
+                className="sf-product-detail-page"
+                layerStyle="page"
+                data-testid="product-details-page"
+            >
+                <Helmet>
+                    <title>{product?.pageTitle}</title>
+                    <meta name="description" content={product?.pageDescription} />
+                </Helmet>
 
-            <Stack spacing={16}>
-                {isProductASet ? (
-                    <Fragment>
-                        {/* Product Set: parent product */}
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={handleProductSetAddToCart}
-                            addToWishlist={handleAddToWishlist}
-                            isProductLoading={isProductLoading}
-                            isWishlistLoading={isWishlistLoading}
-                            validateOrderability={handleProductSetValidation}
-                        />
-
-                        <hr />
-
-                        {/* TODO: consider `childProduct.belongsToSet` */}
-                        {
-                            // Product Set: render the child products
-                            product.setProducts.map((childProduct) => (
-                                <Box key={childProduct.id} data-testid="child-product">
-                                    <ProductView
-                                        // Do no use an arrow function as we are manipulating the functions scope.
-                                        ref={function (ref) {
-                                            // Assign the "set" scope of the ref, this is how we access the internal
-                                            // validation.
-                                            childProductRefs.current[childProduct.id] = {
-                                                ref,
-                                                validateOrderability: this.validateOrderability
-                                            }
-                                        }}
-                                        product={childProduct}
-                                        isProductPartOfSet={true}
-                                        addToCart={(variant, quantity) =>
-                                            handleAddToCart([
-                                                {product: childProduct, variant, quantity}
-                                            ])
-                                        }
-                                        addToWishlist={handleAddToWishlist}
-                                        onVariantSelected={(product, variant, quantity) => {
-                                            if (quantity) {
-                                                setProductSetSelection((previousState) => ({
-                                                    ...previousState,
-                                                    [product.id]: {
-                                                        product,
-                                                        variant,
-                                                        quantity
-                                                    }
-                                                }))
-                                            } else {
-                                                const selections = {...productSetSelection}
-                                                delete selections[product.id]
-                                                setProductSetSelection(selections)
-                                            }
-                                        }}
-                                        isProductLoading={isProductLoading}
-                                        isWishlistLoading={isWishlistLoading}
-                                    />
-                                    <InformationAccordion product={childProduct} />
-
-                                    <Box display={['none', 'none', 'none', 'block']}>
-                                        <hr />
-                                    </Box>
-                                </Box>
-                            ))
-                        }
-                    </Fragment>
-                ) : (
-                    <Fragment>
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) =>
-                                handleAddToCart([{product, variant, quantity}])
-                            }
-                            addToWishlist={handleAddToWishlist}
-                            isProductLoading={isProductLoading}
-                            isWishlistLoading={isWishlistLoading}
-                        />
-                        <InformationAccordion product={product} />
-                    </Fragment>
-                )}
-
-                {/* Product Recommendations */}
                 <Stack spacing={16}>
-                    {!isProductASet && (
+                    {isProductASet ? (
+                        <Fragment>
+                            {/* Product Set: parent product */}
+                            <ProductView
+                                product={product}
+                                category={primaryCategory?.parentCategoryTree || []}
+                                addToCart={handleProductSetAddToCart}
+                                addToWishlist={handleAddToWishlist}
+                                isProductLoading={isProductLoading}
+                                isWishlistLoading={isWishlistLoading}
+                                validateOrderability={handleProductSetValidation}
+                            />
+
+                            <hr />
+
+                            {/* TODO: consider `childProduct.belongsToSet` */}
+                            {
+                                // Product Set: render the child products
+                                product.setProducts.map((childProduct) => (
+                                    <Box key={childProduct.id} data-testid="child-product">
+                                        <ProductView
+                                            // Do no use an arrow function as we are manipulating the functions scope.
+                                            ref={function (ref) {
+                                                // Assign the "set" scope of the ref, this is how we access the internal
+                                                // validation.
+                                                childProductRefs.current[childProduct.id] = {
+                                                    ref,
+                                                    validateOrderability: this.validateOrderability,
+                                                }
+                                            }}
+                                            product={childProduct}
+                                            isProductPartOfSet={true}
+                                            addToCart={(variant, quantity) =>
+                                                handleAddToCart([
+                                                    {product: childProduct, variant, quantity},
+                                                ])
+                                            }
+                                            addToWishlist={handleAddToWishlist}
+                                            onVariantSelected={(product, variant, quantity) => {
+                                                if (quantity) {
+                                                    setProductSetSelection((previousState) => ({
+                                                        ...previousState,
+                                                        [product.id]: {
+                                                            product,
+                                                            variant,
+                                                            quantity,
+                                                        },
+                                                    }))
+                                                } else {
+                                                    const selections = {...productSetSelection}
+                                                    delete selections[product.id]
+                                                    setProductSetSelection(selections)
+                                                }
+                                            }}
+                                            isProductLoading={isProductLoading}
+                                            isWishlistLoading={isWishlistLoading}
+                                        />
+                                        <InformationAccordion product={childProduct} />
+
+                                        <Box display={['none', 'none', 'none', 'block']}>
+                                            <hr />
+                                        </Box>
+                                    </Box>
+                                ))
+                            }
+                        </Fragment>
+                    ) : (
+                        <Fragment>
+                            <ProductView
+                                product={product}
+                                category={primaryCategory?.parentCategoryTree || []}
+                                addToCart={(variant, quantity) =>
+                                    handleAddToCart([{product, variant, quantity}])
+                                }
+                                addToWishlist={handleAddToWishlist}
+                                isProductLoading={isProductLoading}
+                                isWishlistLoading={isWishlistLoading}
+                            />
+                            <InformationAccordion product={product} />
+                        </Fragment>
+                    )}
+
+                    {/* Product Recommendations */}
+                    <Stack spacing={16}>
+                        {!isProductASet && (
+                            <RecommendedProducts
+                                title={
+                                    <FormattedMessage
+                                        defaultMessage="Complete the Set"
+                                        id="product_detail.recommended_products.title.complete_set"
+                                    />
+                                }
+                                recommender={'complete-the-set'}
+                                products={[product]}
+                                mx={{base: -4, md: -8, lg: 0}}
+                                shouldFetch={() => product?.id}
+                            />
+                        )}
                         <RecommendedProducts
                             title={
                                 <FormattedMessage
-                                    defaultMessage="Complete the Set"
-                                    id="product_detail.recommended_products.title.complete_set"
+                                    defaultMessage="You might also like"
+                                    id="product_detail.recommended_products.title.might_also_like"
                                 />
                             }
-                            recommender={'complete-the-set'}
+                            recommender={'pdp-similar-items'}
                             products={[product]}
                             mx={{base: -4, md: -8, lg: 0}}
                             shouldFetch={() => product?.id}
                         />
-                    )}
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="You might also like"
-                                id="product_detail.recommended_products.title.might_also_like"
-                            />
-                        }
-                        recommender={'pdp-similar-items'}
-                        products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
 
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Recently Viewed"
-                                id="product_detail.recommended_products.title.recently_viewed"
-                            />
-                        }
-                        recommender={'viewed-recently-einstein'}
-                        mx={{base: -4, md: -8, lg: 0}}
-                    />
+                        <RecommendedProducts
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="Recently Viewed"
+                                    id="product_detail.recommended_products.title.recently_viewed"
+                                />
+                            }
+                            recommender={'viewed-recently-einstein'}
+                            mx={{base: -4, md: -8, lg: 0}}
+                        />
+                    </Stack>
                 </Stack>
-            </Stack>
-        </Box></>
+            </Box>
+        </>
     )
 }
 
@@ -391,7 +393,7 @@ ProductDetail.propTypes = {
     /**
      * The current react router match object. (Provided internally)
      */
-    match: PropTypes.object
+    match: PropTypes.object,
 }
 
 export default ProductDetail
