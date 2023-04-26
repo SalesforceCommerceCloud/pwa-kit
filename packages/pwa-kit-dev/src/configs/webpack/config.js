@@ -158,8 +158,8 @@ const baseConfig = (target) => {
                     plugins: [
                         pkg?.mobify?.extends && pkg?.mobify?.overridesDir
                             ? new OverridesResolverPlugin({
-                                  overrides: [pkg?.mobify?.extends],
-                                  appBase: '.' + pkg?.mobify?.overridesDir + '/app',
+                                  extends: [pkg?.mobify?.extends],
+                                  overridesDir: pkg?.mobify?.overridesDir,
                                   projectDir: process.cwd()
                               })
                             : () => null
@@ -202,10 +202,9 @@ const baseConfig = (target) => {
                         // TODO: these need to be dynamic via `extends` value, not hard-coded
                         ...(pkg?.mobify?.overridesDir && pkg?.mobify?.extends
                             ? {
-                                  'retail-react-app': path.resolve(
-                                      projectDir,
-                                      'node_modules/retail-react-app'
-                                  )
+                                  'retail-react-app': [
+                                      path.resolve(projectDir, 'node_modules/retail-react-app')
+                                  ]
                               }
                             : {}),
                         // TODO: these need to be dynamic via `extends` value, not hard-coded
