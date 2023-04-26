@@ -124,6 +124,20 @@ export const DevServerMixin = {
         // This is separated out because these routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
 
+        setInterval(() => {
+            if (global._) {
+                console.log('detected memory leak - Lodash')
+                console.log('removing global._')
+                delete global._
+            }
+
+            if (global['__core-js_shared__']) {
+                console.log("detected memory leak - CoreJS")
+                console.log("removing global['__core-js_shared__']")
+                delete global['__core-js_shared__']
+            }
+        }, 10000)
+
         let config = require('../../configs/webpack/config')
         if (fs.existsSync(projectWebpackPath)) {
             config = require(projectWebpackPath)
