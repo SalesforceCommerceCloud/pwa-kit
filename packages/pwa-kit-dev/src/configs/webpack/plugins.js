@@ -10,6 +10,7 @@ import glob from 'glob'
 import minimatch from 'minimatch'
 
 const projectDir = process.cwd()
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require(resolve(projectDir, 'package.json'))
 
 const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'

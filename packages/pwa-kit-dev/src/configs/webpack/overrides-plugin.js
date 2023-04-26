@@ -1,6 +1,11 @@
-const path = require('path')
-const fs = require('fs')
-const glob = require('glob')
+/*
+ * Copyright (c) 2023, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import path from 'path'
+import glob from 'glob'
 
 /**
  * Implements a b2c-cartridge-like override resolve for webpack
@@ -27,11 +32,10 @@ class OverridesResolverPlugin {
      * @param {string[]} options.overrudes paths to overrides
      */
     constructor(options) {
-
         this.appBase = options.appBase || './app'
         this.appBase = path.resolve(this.appBase)
         // this is /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app
-        
+
         // this is [retail-react-app]
         this.overrides = options.overrides || []
 
@@ -39,7 +43,7 @@ class OverridesResolverPlugin {
             '/Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app',
 
             '/Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/node_modules/retail-react-app/app'
-            ] 
+            ]
         */
 
         this._allSearchDirs = [this.appBase].concat(
@@ -67,10 +71,10 @@ class OverridesResolverPlugin {
         console.log('overridesFsRead', overridesFsRead)
 
         const overrideReplace = this.pkg?.mobify?.overridesDir + '/app/'
-        
+
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
-            const [l, ...rest] = item?.split(/(index|\.)/)
+            const [l, ...rest] = item.split(/(index|\.)/)
             this.overridesHashMap.set(
                 l.replace(/\/$/, '')?.replace(overrideReplace.replace(/\//, ''), ''),
                 [end, rest]
@@ -145,7 +149,7 @@ class OverridesResolverPlugin {
                     const searchOverrides = this._allSearchDirs.slice(
                         this._allSearchDirs.indexOf(override) + 1
                     )
-                    var targetFile = this.findFileMap(
+                    let targetFile = this.findFileMap(
                         overrideRelative,
                         searchOverrides,
                         resolver.options.extensions
@@ -176,17 +180,16 @@ class OverridesResolverPlugin {
                     // ex - /Users/yunakim/cc-pwa/pwa-kit/packages/spike-extendend-retail-app/pwa-kit/overrides/app/components/header
                     var resolvedPath = path.resolve(requestContext.path, requestContext.request)
 
-                    if (this.isAppBaseRelative(resolvedPath)) {
+                    if (this.isExtendsBase(resolvedPath)) {
                         // ex - components/header
                         let overrideRelative = this.toOverrideRelative(resolvedPath)
 
                         try {
-                            var targetFile = this.findFileMap(
+                            const targetFile = this.findFileMap(
                                 overrideRelative,
                                 this._allSearchDirs,
                                 resolver.options.extensions
                             )
-
 
                             if (targetFile) {
                                 const target = resolver.ensureHook('resolved')
@@ -207,14 +210,14 @@ class OverridesResolverPlugin {
                     } else {
                         return callback()
                     }
-                
-                // this block catches requests coming from the underlying template
+
+                    // this block catches requests coming from the underlying template
                 } else if (requestContext.request.startsWith('.')) {
                     // if request looks like '../../components/product-detail/above-fold'
                     // and the path looks like '/Users/yunakim/cc-pwa/pwa-kit/packages/template-retail-react-app/app/pages/product-detail'
                     const overrideRelative = requestContext.request.replaceAll('../', '')
                     try {
-                        var targetFile = this.findFileMap(
+                        const targetFile = this.findFileMap(
                             overrideRelative,
                             this._allSearchDirs,
                             resolver.options.extensions
@@ -244,7 +247,7 @@ class OverridesResolverPlugin {
                     // TODO: DRY this is nearly the same as the above condition
                     let overrideRelative = this.toOverrideRelative(requestContext.request)
                     try {
-                        var targetFile = this.findFileMap(
+                        const targetFile = this.findFileMap(
                             overrideRelative,
                             this._allSearchDirs,
                             resolver.options.extensions
@@ -266,7 +269,6 @@ class OverridesResolverPlugin {
                         return callback()
                     }
                 } else {
-
                     callback()
                 }
             }.bind(this)
@@ -274,4 +276,4 @@ class OverridesResolverPlugin {
     }
 }
 
-module.exports = OverridesResolverPlugin
+export default OverridesResolverPlugin
