@@ -27,12 +27,8 @@ const fallback = <Skeleton height="75vh" width="100%" />
 // Pages
 const Home = loadable(() => import('./pages/home'), {fallback})
 const MyNewRoute = loadable(() => import('./pages/my-new-route'))
-const PageNotFound = loadable(() => import('retail-react-app/app/pages/page-not-found'))
 
 const routes = [
-    // filter out the two routes we're overriding, the presence of the '*' PageNotFound
-    // component catches everything before it so we strip it and then re-add
-    ..._routes.filter((r) => r.path !== '*' && r.path !== '/'),
     {
         path: '/',
         component: Home,
@@ -42,10 +38,10 @@ const routes = [
         path: '/my-new-route',
         component: MyNewRoute
     },
-    {
-        path: '*',
-        component: PageNotFound
-    }
+    // NOTE: the final item in the array must be the { path: '*', component: PageNotFound } so
+    // routes added after this might not show up unless the '*' route is filtered out and re-inserted
+
+    ..._routes.filter((r) => r.path !== '/') // filter out Home route so we don't override the above
 ]
 
 export default () => {
