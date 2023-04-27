@@ -123,27 +123,67 @@ export const DevServerMixin = {
     _addSDKInternalHandlers(app) {
         // This is separated out because these routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
+        setTimeout(() => {
+            setInterval(() => {
+                console.log('scanning for memory leaks')
+                // ATTEMPT 1. remove global references
+                if (global._) {
+                    console.log('detected memory leak - Lodash')
+                    console.log('removing global._')
+                    delete global._
+                }
+    
+                if (global['__core-js_shared__']) {
+                    console.log("detected memory leak - CoreJS")
+                    console.log("removing global['__core-js_shared__']")
+                    delete global['__core-js_shared__']
+                }
+    
+                if (global['__createBinding']) {
+                    console.log("detected memory leak - tslib")
+                    console.log("removing global['__createBinding']")
+                    delete global['__createBinding']
+                }
+    
+                // ATTEMPT 2. reset all app._ references to webpack dev server
+                // app.__compiler = undefined
+                // app.__compiler = undefined
+                // app.__devMiddleware = undefined
+                // app.__webpackReady = undefined
+                // app.__hotServerMiddleware = undefined
+                // let config = require('../../configs/webpack/config')
+                // if (fs.existsSync(projectWebpackPath)) {
+                //     config = require(projectWebpackPath)
+                // }
+                // if (config.some((cnf) => cnf.name === SERVER)) {
+                //     app.__hotServerMiddleware = webpackHotServerMiddleware(app.__compiler)
+                // }
+                // app.__hmrMiddleware = undefined
+                // app.__compiler = undefined
+                // this._____________addSDKInternalHandlers(app)
 
-        setInterval(() => {
-            if (global._) {
-                console.log('detected memory leak - Lodash')
-                console.log('removing global._')
-                delete global._
-            }
+                // ATTEMPT 4. clear module.require cache
+                Object.keys(require.cache).forEach(function(id) {
+                    delete require.cache[require.resolve(id)]
+                });
 
-            if (global['__core-js_shared__']) {
-                console.log("detected memory leak - CoreJS")
-                console.log("removing global['__core-js_shared__']")
-                delete global['__core-js_shared__']
-            }
-        }, 10000)
+                console.log('remaining cache', Object.keys(require.cache).length)
 
+            }, 10000)
+        }, 20000)
+        
+
+        this._____________addSDKInternalHandlers(app)
+        
+    },
+
+    _____________addSDKInternalHandlers(app) {
         let config = require('../../configs/webpack/config')
         if (fs.existsSync(projectWebpackPath)) {
             config = require(projectWebpackPath)
         }
         app.__compiler = webpack(config)
-        app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
+        app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true, writeToDisk: true})
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
         app.__devMiddleware.waitUntilValid(() => {
             // Be just a little more generous before letting eg. Lighthouse hit it!
@@ -165,6 +205,10 @@ export const DevServerMixin = {
         app.use('/__mrt/hmr', app.__hmrMiddleware)
 
         app.use('/__mrt/status', (req, res) => {
+            return res.json({ready: app.__webpackReady()})
+        })
+
+        app.use('/__mrt/require-cache', (req, res) => {
             return res.json({ready: app.__webpackReady()})
         })
 

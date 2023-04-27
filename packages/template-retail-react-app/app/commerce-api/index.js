@@ -6,7 +6,8 @@
  */
 
 /* eslint-disable no-unused-vars */
-import * as sdk from 'commerce-sdk-isomorphic'
+// import * as sdk from 'commerce-sdk-isomorphic'
+const sdk ={}
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import ShopperBaskets from './shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
@@ -105,62 +106,62 @@ class CommerceAPI {
         // proxies, executing various pre-defined hooks for tapping into or modifying
         // the outgoing method parameters and/or incoming SDK responses
         const self = this
-        Object.keys(apiConfigs).forEach((key) => {
-            const SdkClass = apiConfigs[key].api
-            self._sdkInstances = {
-                ...self._sdkInstances,
-                [key]: new Proxy(new SdkClass(this._config), {
-                    get: function (obj, prop) {
-                        if (typeof obj[prop] === 'function') {
-                            return (...args) => {
-                                const fetchOptions = args[0]
-                                const {locale, currency} = self._config
+        // Object.keys(apiConfigs).forEach((key) => {
+        //     const SdkClass = apiConfigs[key].api
+        //     self._sdkInstances = {
+        //         ...self._sdkInstances,
+        //         [key]: new Proxy(new SdkClass(this._config), {
+        //             get: function (obj, prop) {
+        //                 if (typeof obj[prop] === 'function') {
+        //                     return (...args) => {
+        //                         const fetchOptions = args[0]
+        //                         const {locale, currency} = self._config
 
-                                if (fetchOptions.ignoreHooks) {
-                                    return obj[prop](...args)
-                                }
+        //                         if (fetchOptions.ignoreHooks) {
+        //                             return obj[prop](...args)
+        //                         }
 
-                                // Inject the locale and currency to the API call via its parameters.
-                                //
-                                // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
-                                // it that it doesn't expect, this is why we only add the locale and currency
-                                // to some of the API calls.
+        //                         // Inject the locale and currency to the API call via its parameters.
+        //                         //
+        //                         // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
+        //                         // it that it doesn't expect, this is why we only add the locale and currency
+        //                         // to some of the API calls.
 
-                                // By default we send the locale param and don't send the currency param.
-                                const {sendLocale = true, sendCurrency = false} = apiConfigs[key]
+        //                         // By default we send the locale param and don't send the currency param.
+        //                         const {sendLocale = true, sendCurrency = false} = apiConfigs[key]
 
-                                const includeGlobalLocale = Array.isArray(sendLocale)
-                                    ? sendLocale.includes(prop)
-                                    : !!sendLocale
+        //                         const includeGlobalLocale = Array.isArray(sendLocale)
+        //                             ? sendLocale.includes(prop)
+        //                             : !!sendLocale
 
-                                const includeGlobalCurrency = Array.isArray(sendCurrency)
-                                    ? sendCurrency.includes(prop)
-                                    : !!sendCurrency
+        //                         const includeGlobalCurrency = Array.isArray(sendCurrency)
+        //                             ? sendCurrency.includes(prop)
+        //                             : !!sendCurrency
 
-                                fetchOptions.parameters = {
-                                    ...(includeGlobalLocale ? {locale} : {}),
-                                    ...(includeGlobalCurrency ? {currency} : {}),
-                                    // Allowing individual API calls to override the global locale/currency
-                                    ...fetchOptions.parameters
-                                }
+        //                         fetchOptions.parameters = {
+        //                             ...(includeGlobalLocale ? {locale} : {}),
+        //                             ...(includeGlobalCurrency ? {currency} : {}),
+        //                             // Allowing individual API calls to override the global locale/currency
+        //                             ...fetchOptions.parameters
+        //                         }
 
-                                return self.willSendRequest(prop, ...args).then((newArgs) => {
-                                    return obj[prop](...newArgs).then((res) =>
-                                        self.didReceiveResponse(res, newArgs)
-                                    )
-                                })
-                            }
-                        }
-                        return obj[prop]
-                    }
-                })
-            }
-            Object.defineProperty(self, key, {
-                get() {
-                    return self._sdkInstances[key]
-                }
-            })
-        })
+        //                         return self.willSendRequest(prop, ...args).then((newArgs) => {
+        //                             return obj[prop](...newArgs).then((res) =>
+        //                                 self.didReceiveResponse(res, newArgs)
+        //                             )
+        //                         })
+        //                     }
+        //                 }
+        //                 return obj[prop]
+        //             }
+        //         })
+        //     }
+        //     Object.defineProperty(self, key, {
+        //         get() {
+        //             return self._sdkInstances[key]
+        //         }
+        //     })
+        // })
         this.getConfig = this.getConfig.bind(this)
     }
 
