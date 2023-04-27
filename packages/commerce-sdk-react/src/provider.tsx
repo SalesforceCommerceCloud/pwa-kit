@@ -81,10 +81,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             currency
         },
         throwOnBadResponse: true,
-        fetchOptions: {
-            ...fetchOptions,
-            credentials: 'omit'
-        }
+        fetchOptions
     }
     const apiClients = useMemo(() => {
         return {
