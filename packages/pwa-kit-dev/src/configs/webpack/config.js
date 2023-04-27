@@ -354,7 +354,7 @@ const renderer =
                 devtool: mode === development ? 'eval-source-map' : false,
                 output: {
                     path: buildDir,
-                    filename: 'server-renderer.js',
+                    filename: '[name].js',
                     libraryTarget: 'commonjs2'
                 },
                 plugins: [

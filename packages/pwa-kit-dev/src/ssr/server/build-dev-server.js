@@ -208,10 +208,6 @@ export const DevServerMixin = {
             return res.json({ready: app.__webpackReady()})
         })
 
-        app.use('/__mrt/require-cache', (req, res) => {
-            return res.json({ready: app.__webpackReady()})
-        })
-
         app.use(
             '/__mrt/loading-screen/',
             express.static(path.resolve(__dirname, 'loading-screen'), {
