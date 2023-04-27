@@ -32,11 +32,20 @@ const PageNotFound = loadable(() => import('retail-react-app/app/pages/page-not-
 const routes = [
     // filter out the two routes we're overriding, the presence of the '*' PageNotFound
     // component catches everything before it so we strip it and then re-add
+    ..._routes.filter((r) => r.path !== '*' && r.path !== '/'),
+    {
+        path: '/',
+        component: Home,
+        exact: true
+    },
     {
         path: '/my-new-route',
         component: MyNewRoute
     },
-    ..._routes
+    {
+        path: '*',
+        component: PageNotFound
+    }
 ]
 
 export default () => {
