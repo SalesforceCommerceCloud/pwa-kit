@@ -8,20 +8,6 @@ import path from 'path'
 import glob from 'glob'
 
 /**
- * Implements a b2c-cartridge-like override resolve for webpack
- *
- * @example
- * // import from the *next* in the override-chain (i.e. similar to module.superModule)
- * import Something from '*'
- *
- * @example
- * // import from the override chain (not the forward slash is escaped here due to being in a comment)
- * import Something, {SomethingElse} from '*\/components/something'
- *
- * @example
- * // (ONLY IN BASE) paths required relative to the appBase will first be searched through the overrides
- * import Something from '../../components/something'
- *
  * @class OverridesResolverPlugin
  */
 class OverridesResolverPlugin {
@@ -48,7 +34,6 @@ class OverridesResolverPlugin {
             ''
         )}/**/*${OVERRIDES_EXTENSIONS}`
         const overridesFsRead = glob.sync(globPattern)
-        console.log('overridesFsRead', overridesFsRead)
 
         const overrideReplace = this.pkg?.mobify?.overridesDir + '/'
 
@@ -60,7 +45,6 @@ class OverridesResolverPlugin {
                 [end, rest]
             )
         })
-        console.log('this.extendsHashMap', this.extendsHashMap)
     }
 
     isRelevant(p) {
