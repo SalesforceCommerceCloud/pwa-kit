@@ -29,13 +29,13 @@ class OverridesResolverPlugin {
         this.extendsHashMap = new Map()
 
         const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
-        const globPattern = `${this.pkg?.mobify?.overridesDir?.replace(
+        const globPattern = `${this.pkg?.ccExtensibility?.overridesDir?.replace(
             /\//,
             ''
         )}/**/*${OVERRIDES_EXTENSIONS}`
         const overridesFsRead = glob.sync(globPattern)
 
-        const overrideReplace = this.pkg?.mobify?.overridesDir + '/'
+        const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + '/'
 
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))

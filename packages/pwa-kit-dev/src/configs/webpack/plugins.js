@@ -15,12 +15,14 @@ const pkg = require(resolve(projectDir, 'package.json'))
 const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
 
 const getOverridePath = (relativePath) => {
-    const extendPath = pkg?.mobify?.extends ? `node_modules/${pkg?.mobify?.extends}` : ''
-    const overridePath = pkg?.mobify?.overridesDir?.replace(/^\//, '')
+    const extendPath = pkg?.ccExtensibility?.extends
+        ? `node_modules/${pkg?.ccExtensibility?.extends}`
+        : ''
+    const overridePath = pkg?.ccExtensibility?.overridesDir?.replace(/^\//, '')
 
     // order matters here, we perform look ups starting in the following order:
-    // pkg.mobify.overridesDir => pkg.mobify.extends => current projectDir
-    if (pkg?.mobify?.extends && pkg?.mobify?.overridesDir) {
+    // pkg.ccExtensibility.overridesDir => pkg.ccExtensibility.extends => current projectDir
+    if (pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir) {
         const filePath = `${resolve(
             projectDir,
             overridePath,

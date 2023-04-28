@@ -58,8 +58,12 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
 const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
         const primary = resolve(projectDir, ...segments) + ext
-        const override = pkg?.mobify?.overridesDir
-            ? resolve(projectDir, pkg?.mobify?.overridesDir?.replace(/^\//, ''), ...segments) + ext
+        const override = pkg?.ccExtensibility?.overridesDir
+            ? resolve(
+                  projectDir,
+                  pkg?.ccExtensibility?.overridesDir?.replace(/^\//, ''),
+                  ...segments
+              ) + ext
             : null
 
         if (fse.existsSync(primary) || (override && fse.existsSync(override))) {
@@ -71,7 +75,9 @@ const entryPointExists = (segments) => {
 
 const getAppEntryPoint = (pkg) => {
     const APP_MAIN_PATH = '/app/main'
-    return pkg?.mobify?.overridesDir ? pkg.mobify.overridesDir + APP_MAIN_PATH : APP_MAIN_PATH
+    return pkg?.ccExtensibility?.overridesDir
+        ? pkg.ccExtensibility.overridesDir + APP_MAIN_PATH
+        : APP_MAIN_PATH
 }
 
 const findInProjectThenSDK = (pkg) => {
@@ -151,12 +157,12 @@ const baseConfig = (target) => {
                     path: buildDir
                 },
                 resolve: {
-                    ...(pkg?.mobify?.extends && pkg?.mobify?.overridesDir
+                    ...(pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir
                         ? {
                               plugins: [
                                   new OverridesResolverPlugin({
-                                      extends: [pkg?.mobify?.extends],
-                                      overridesDir: pkg?.mobify?.overridesDir,
+                                      extends: [pkg?.ccExtensibility?.extends],
+                                      overridesDir: pkg?.ccExtensibility?.overridesDir,
                                       projectDir: process.cwd()
                                   })
                               ]
@@ -187,18 +193,20 @@ const baseConfig = (target) => {
                             findInProjectThenExtendsThenSDK('@chakra-ui/skip-nav'),
                         '@emotion/react': findInProjectThenExtendsThenSDK('@emotion/react'),
                         '@emotion/styled': findInProjectThenExtendsThenSDK('@emotion/styled'),
-                        ...(pkg?.mobify?.overridesDir && pkg?.mobify?.extends
+                        ...(pkg?.ccExtensibility?.overridesDir && pkg?.ccExtensibility?.extends
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
-                                  ...[pkg.mobify.extends].map((extendTarget) => ({
-                                      [`^${extendTarget}`]: [pkg.mobify.extends]
+                                  ...[pkg.ccExtensibility.extends].map((extendTarget) => ({
+                                      [`^${extendTarget}`]: [pkg.ccExtensibility.extends]
                                           .map((o) => path.resolve(path.join('node_modules', o)))
-                                          .concat('.' + path.resolve(pkg.mobify.overridesDir))
+                                          .concat(
+                                              '.' + path.resolve(pkg.ccExtensibility.overridesDir)
+                                          )
                                   }))
                               )
                             : {}),
                         // TODO: these need to be dynamic via `extends` value, not hard-coded
-                        ...(pkg?.mobify?.overridesDir && pkg?.mobify?.extends
+                        ...(pkg?.ccExtensibility?.overridesDir && pkg?.ccExtensibility?.extends
                             ? {
                                   'retail-react-app': path.resolve(
                                       projectDir,
@@ -301,7 +309,7 @@ const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        ...(pkg?.mobify?.overridesDir && pkg?.mobify?.extends
+        ...(pkg?.ccExtensibility?.overridesDir && pkg?.ccExtensibility?.extends
             ? // TODO generate this dynamically
               {exclude: /node_modules(?!\/retail-react-app)/}
             : {exclude: /node_modules/}),
@@ -402,14 +410,14 @@ const clientOptional = baseConfig('web')
             entry: {
                 ...optional(
                     'loader',
-                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                        ? `.${pkg?.mobify?.overridesDir}/app/request-processor.js`
+                    pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir
+                        ? `.${pkg?.ccExtensibility?.overridesDir}/app/request-processor.js`
                         : './app/loader.js'
                 ),
                 ...optional(
                     'worker',
-                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                        ? `.${pkg?.mobify?.overridesDir}/app/request-processor.js`
+                    pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir
+                        ? `.${pkg?.ccExtensibility?.overridesDir}/app/request-processor.js`
                         : './app/main.js'
                 ),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
@@ -460,8 +468,9 @@ const renderer =
                         patterns: [
                             {
                                 from:
-                                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                                        ? `${pkg?.mobify?.overridesDir?.replace(
+                                    pkg?.ccExtensibility?.extends &&
+                                    pkg?.ccExtensibility?.overridesDir
+                                        ? `${pkg?.ccExtensibility?.overridesDir?.replace(
                                               /^\//,
                                               ''
                                           )}/app/static`
@@ -488,8 +497,8 @@ const ssr = (() => {
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
                     entry:
-                        pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                            ? `.${pkg?.mobify?.overridesDir}/app/ssr.js`
+                        pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir
+                            ? `.${pkg?.ccExtensibility?.overridesDir}/app/ssr.js`
                             : './app/ssr.js',
                     output: {
                         path: buildDir,
@@ -503,8 +512,9 @@ const ssr = (() => {
                             patterns: [
                                 {
                                     from:
-                                        pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                                            ? `${pkg?.mobify?.overridesDir?.replace(
+                                        pkg?.ccExtensibility?.extends &&
+                                        pkg?.ccExtensibility?.overridesDir
+                                            ? `${pkg?.ccExtensibility?.overridesDir?.replace(
                                                   /^\//,
                                                   ''
                                               )}/app/static`
@@ -532,8 +542,8 @@ const requestProcessor =
                 name: REQUEST_PROCESSOR,
                 // entry: './app/request-processor.js',
                 entry:
-                    pkg?.mobify?.extends && pkg?.mobify?.overridesDir
-                        ? `.${pkg?.mobify?.overridesDir}/app/request-processor.js`
+                    pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir
+                        ? `.${pkg?.ccExtensibility?.overridesDir}/app/request-processor.js`
                         : './app/request-processor.js',
                 output: {
                     path: buildDir,
