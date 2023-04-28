@@ -84,14 +84,6 @@ AppConfig.restore = (locals = {}) => {
 
 AppConfig.freeze = () => undefined
 
-AppConfig.extraGetPropsArgs = (locals = {}) => {
-    return {
-        buildUrl: locals.buildUrl,
-        site: locals.site,
-        locale: locals.locale
-    }
-}
-
 AppConfig.propTypes = {
     children: PropTypes.node,
     locals: PropTypes.object
