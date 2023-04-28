@@ -236,6 +236,11 @@ class Auth {
                 authorizationMethod = '_refreshAccessToken'
             }
             return this[authorizationMethod](credentials)
+                .then((result) => {
+                    // Uncomment the following line for phased launch
+                    // this._onClient && this.createOCAPISession()
+                    return result
+                })
                 .catch((error) => {
                     const retryErrors = [INVALID_TOKEN, EXPIRED_TOKEN]
                     if (retries === 0 && retryErrors.includes(error.message)) {
@@ -244,11 +249,6 @@ class Auth {
                         return startLoginFlow()
                     }
                     throw error
-                })
-                .then((result) => {
-                    // Uncomment the following line for phased launch
-                    // this._onClient && this.createOCAPISession()
-                    return result
                 })
         }
 
