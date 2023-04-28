@@ -20,7 +20,7 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {sdkReplacementPlugin} from './plugins'
+import {sdkReplacementPlugin, makeRegExp} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 import OverridesResolverPlugin from './overrides-plugin'
 
@@ -312,8 +312,8 @@ const ruleForBabelLoader = (babelPlugins) => {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
         ...(pkg?.ccExtensibility?.overridesDir && pkg?.ccExtensibility?.extends
-            ? // TODO generate this dynamically
-              {exclude: /node_modules(?!\/retail-react-app)/}
+            ? // TODO: handle for array here when that's supported
+              {exclude: makeRegExp(`/node_modules(?!/${pkg?.ccExtensibility?.extends})`)}
             : {exclude: /node_modules/}),
         use: [
             {

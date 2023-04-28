@@ -55,7 +55,7 @@ const getOverridePath = (relativePath) => {
           )
 }
 
-const makeRegExp = (str, sep = path.sep) => {
+export const makeRegExp = (str, sep = path.sep) => {
     // Replace unix paths with windows if needed and build a RegExp
     if (sep === '\\') {
         str = str.replace(/\//g, '\\\\')
