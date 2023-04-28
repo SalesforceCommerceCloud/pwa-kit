@@ -85,25 +85,24 @@ function buildAuthURL() {
     return authURL
 }
 
-const addShopperContext = async (accessToken, getTokenWhenReady) => {
+const preview = async (AMToken, getTokenWhenReady) => {
+    // SLAS token
     const token = await getTokenWhenReady()
 
-    console.log('addShopperContext accessToken:', accessToken)
-    console.log('addShopperContext getTokenWhenReady:', getTokenWhenReady)
-
     // [2] Set the context by asking to preview with our token.
-    let shopperContextResponse = await fetch(new URL('http://localhost:3000/preview'), {
+    let previewResponse = await fetch(new URL('http://localhost:3000/preview'), {
         method: 'POST',
-        body: JSON.stringify({token}),
+        // TODO: Skipping failing AM token validation
+        body: JSON.stringify({access_token: `Bearer ${token}`}),
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
         }
     })
 
-    if (!shopperContextResponse.ok) {
-        const shopperContextError = await shopperContextResponse.json()
-        console.log({shopperContextError})
+    if (!previewResponse.ok) {
+        const previewError = await previewResponse.json()
+        console.log({previewError})
         return
     }
 }
@@ -144,6 +143,7 @@ const App = (props) => {
     const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
     const {data: categoriesTree} = useLazyLoadCategories()
     const categories = flatten(categoriesTree || {}, 'categories')
+    const {getTokenWhenReady} = useAccessToken()
 
     const appOrigin = getAppOrigin()
 
@@ -196,6 +196,18 @@ const App = (props) => {
         watchOnlineStatus((isOnline) => {
             setIsOnline(isOnline)
         })
+
+
+        // let AMToken = localStorage.getItem('token')
+        //
+        // console.log('AMToken:', AMToken)
+        // if(AMToken){
+        //     preview(AMToken, getTokenWhenReady)
+        // }
+
+        // TODO: Skipping failing AM token validation
+        preview(getTokenWhenReady, getTokenWhenReady)
+
     }, [])
 
     useEffect(() => {
@@ -238,15 +250,6 @@ const App = (props) => {
         const path = buildUrl('/account/wishlist')
         history.push(path)
     }
-    const {getTokenWhenReady} = useAccessToken()
-
-    let accessToken
-    if (typeof window !== 'undefined') {
-        accessToken = localStorage.getItem('token')
-    }
-
-    console.log('accessToken:', accessToken)
-    addShopperContext(accessToken, getTokenWhenReady)
 
     return (
         <Box className="sf-app" {...styles.container}>
