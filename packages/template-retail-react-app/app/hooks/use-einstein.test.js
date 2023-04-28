@@ -13,6 +13,7 @@ import {
     mockBasket,
     mockRecommenderDetails
 } from './einstein-mock-data'
+import fetchMock from 'jest-fetch-mock'
 
 const einsteinApi = new EinsteinAPI({
     host: `http://localhost/test-path`,
@@ -21,7 +22,6 @@ const einsteinApi = new EinsteinAPI({
     cookieId: 'test-usid'
 })
 
-const fetchMock = require('jest-fetch-mock')
 const fetchOriginal = global.fetch
 
 beforeAll(() => {
@@ -35,9 +35,8 @@ afterAll(() => {
 
 describe('EinsteinAPI', () => {
     test('viewProduct sends expected api request', async () => {
-        
         await einsteinApi.sendViewProduct(mockProduct)
-        
+
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/viewProduct',
             {
