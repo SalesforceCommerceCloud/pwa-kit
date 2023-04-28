@@ -358,7 +358,7 @@ const renderer =
                     // We want to split the build on local development to reduce memory usage.
                     // It is required to have a single entry point for the remote server.
                     // See pwa-kit-runtime/ssr/server/build-remote-server.js render method.
-                    filename: mode === development ? '[name].js' : 'server-renderer.js',
+                    filename: mode === development ? '[name]-server.js' : 'server-renderer.js',
                     libraryTarget: 'commonjs2'
                 },
                 plugins: [
