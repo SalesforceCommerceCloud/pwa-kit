@@ -15,7 +15,7 @@ import {
     useBreakpoint,
     useBreakpointValue
 } from '@chakra-ui/react'
-import {Component} from '../../core'
+import {Component, regionPropType} from 'commerce-sdk-react-preview/components'
 import {ChevronLeftIcon, ChevronRightIcon} from '../../../components/icons'
 import {useEffect} from 'react'
 
@@ -205,7 +205,7 @@ export const Carousel = (props = {}) => {
 }
 
 Carousel.propTypes = {
-    regions: PropTypes.array.isRequired,
+    regions: PropTypes.arrayOf(regionPropType).isRequired,
     textHeadline: PropTypes.string,
     xsCarouselIndicators: PropTypes.bool,
     smCarouselIndicators: PropTypes.bool,
