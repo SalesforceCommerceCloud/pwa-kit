@@ -43,6 +43,20 @@ if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
 
+if (pkg?.ccExtensibility?.extendable && pkg?.ccExtensibility?.extends) {
+    const extendsAsArr = Array.isArray(pkg?.ccExtensibility?.extends)
+        ? pkg?.ccExtensibility?.extends
+        : [pkg?.ccExtensibility?.extends]
+    const conflicts = extendsAsArr.filter((x) => pkg?.ccExtensibility?.extendable?.includes(x))
+    if (conflicts?.length) {
+        throw new Error(
+            `Dependencies in 'extendable' and 'extends' cannot overlap, fix these: ${conflicts.join(
+                ', '
+            )}"`
+        )
+    }
+}
+
 const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
     new BundleAnalyzerPlugin({
         analyzerMode: 'static',
@@ -98,13 +112,13 @@ const findInProjectThenSDK = (pkg) => {
     return candidate
 }
 
-const findInProjectThenExtendsThenSDK = (pkg) => {
+const findDepInStack = (pkg) => {
     const projectPath = resolve(projectDir, 'node_modules', pkg)
     const projectFile = glob.sync(projectPath)
     if (projectFile?.length) {
         return projectPath
     }
-    const extendPath = resolve(projectDir, 'node_modules', pkg?.extends)
+    const extendPath = resolve(projectDir, 'node_modules', pkg)
     const extendFile = glob.sync(extendPath)
     if (extendFile?.length) {
         return extendPath
@@ -170,55 +184,43 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        'babel-runtime': findInProjectThenSDK('babel-runtime'),
-                        '@tanstack/react-query': findInProjectThenSDK('@tanstack/react-query'),
-                        '@loadable/component': findInProjectThenSDK('@loadable/component'),
-                        '@loadable/server': findInProjectThenSDK('@loadable/server'),
-                        '@loadable/webpack-plugin': findInProjectThenSDK(
-                            '@loadable/webpack-plugin'
-                        ),
-                        'svg-sprite-loader': findInProjectThenSDK('svg-sprite-loader'),
-                        react: findInProjectThenSDK('react'),
-                        'react-router-dom': findInProjectThenSDK('react-router-dom'),
-                        'react-dom': findInProjectThenSDK('react-dom'),
-                        'react-helmet': findInProjectThenSDK('react-helmet'),
-                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware'),
+                        'babel-runtime': findDepInStack('babel-runtime'),
+                        '@tanstack/react-query': findDepInStack('@tanstack/react-query'),
+                        '@loadable/component': findDepInStack('@loadable/component'),
+                        '@loadable/server': findDepInStack('@loadable/server'),
+                        '@loadable/webpack-plugin': findDepInStack('@loadable/webpack-plugin'),
+                        'svg-sprite-loader': findDepInStack('svg-sprite-loader'),
+                        react: findDepInStack('react'),
+                        'react-router-dom': findDepInStack('react-router-dom'),
+                        'react-dom': findDepInStack('react-dom'),
+                        'react-helmet': findDepInStack('react-helmet'),
+                        'webpack-hot-middleware': findDepInStack('webpack-hot-middleware'),
 
                         // TODO: these need to be declared in package.json as peerDependencies ?
                         // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
-                        'react-intl': findInProjectThenExtendsThenSDK('react-intl'),
-                        '@chakra-ui/icons': findInProjectThenExtendsThenSDK('@chakra-ui/icons'),
-                        '@chakra-ui/react': findInProjectThenExtendsThenSDK('@chakra-ui/react'),
-                        '@chakra-ui/skip-nav':
-                            findInProjectThenExtendsThenSDK('@chakra-ui/skip-nav'),
-                        '@emotion/react': findInProjectThenExtendsThenSDK('@emotion/react'),
-                        '@emotion/styled': findInProjectThenExtendsThenSDK('@emotion/styled'),
+                        'react-intl': findDepInStack('react-intl'),
+                        '@chakra-ui/icons': findDepInStack('@chakra-ui/icons'),
+                        '@chakra-ui/react': findDepInStack('@chakra-ui/react'),
+                        '@chakra-ui/skip-nav': findDepInStack('@chakra-ui/skip-nav'),
+                        '@emotion/react': findDepInStack('@emotion/react'),
+                        '@emotion/styled': findDepInStack('@emotion/styled'),
                         ...(pkg?.ccExtensibility?.overridesDir && pkg?.ccExtensibility?.extends
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
                                   ...[pkg.ccExtensibility.extends].map((extendTarget) => ({
-                                      [`^${extendTarget}`]: [pkg.ccExtensibility.extends]
-                                          .map((o) => path.resolve(path.join('node_modules', o)))
-                                          .concat(
-                                              '.' + path.resolve(pkg.ccExtensibility.overridesDir)
-                                          )
+                                      [extendTarget]: path.resolve(
+                                          projectDir,
+                                          `node_modules/${extendTarget}`
+                                      )
                                   }))
                               )
                             : {}),
-                        // TODO: these need to be dynamic via `extends` value, not hard-coded
-                        ...(pkg?.ccExtensibility?.overridesDir && pkg?.ccExtensibility?.extends
-                            ? {
-                                  'retail-react-app': path.resolve(
-                                      projectDir,
-                                      'node_modules/retail-react-app'
-                                  )
-                              }
-                            : {}),
-                        // TODO: these need to be dynamic via `extends` value, not hard-coded
-                        ...(pkg?.name === 'retail-react-app'
-                            ? {
-                                  'retail-react-app': path.resolve(projectDir)
-                              }
+                        ...(pkg?.ccExtensibility?.extendable
+                            ? Object.assign(
+                                  ...[pkg?.ccExtensibility?.extendable].map((item) => ({
+                                      [item]: path.resolve(projectDir)
+                                  }))
+                              )
                             : {})
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
@@ -450,7 +452,7 @@ const renderer =
                     // We want to split the build on local development to reduce memory usage.
                     // It is required to have a single entry point for the remote server.
                     // See pwa-kit-runtime/ssr/server/build-remote-server.js render method.
-                    filename: mode === development ? '[name].js' : 'server-renderer.js',
+                    filename: mode === development ? '[name]-server.js' : 'server-renderer.js',
                     libraryTarget: 'commonjs2'
                 },
                 plugins: [

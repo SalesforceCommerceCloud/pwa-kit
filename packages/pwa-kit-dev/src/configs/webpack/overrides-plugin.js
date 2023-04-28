@@ -9,6 +9,10 @@ import glob from 'glob'
 
 /**
  * @class OverridesResolverPlugin
+ *
+ *  This plugin provides the "Overrides" behavior of the Template Extensibility feature,
+ *  allowing third party implementations that depend on an npm module for the base implementation
+ *  and then overriding only specific files
  */
 class OverridesResolverPlugin {
     /**
@@ -20,11 +24,9 @@ class OverridesResolverPlugin {
      */
     constructor(options) {
         this.overridesDir = options.overridesDir || ''
-        this.overridesFullPath = path.resolve(this.overridesDir)
         this.extends = options.extends || []
         this.projectDir = options.projectDir
         this._allSearchDirs = [this.projectDir + this.overridesDir, ...this.extends]
-        this.projectDir = options.projectDir
         this.pkg = require(path.resolve(this.projectDir, 'package.json'))
         this.extendsHashMap = new Map()
 
@@ -45,16 +47,6 @@ class OverridesResolverPlugin {
                 [end, rest]
             )
         })
-    }
-
-    isRelevant(p) {
-        return [this.overridesDir].concat(this.extends).some((_configPath) => {
-            _configPath.indexOf(p)
-        })
-    }
-
-    isBaseFile(p) {
-        return p.indexOf(this.overridesDir) === 0
     }
 
     /**
@@ -87,14 +79,14 @@ class OverridesResolverPlugin {
         }
     }
 
-    toOverrideRelative(p) {
-        var override = this.findOverride(p)
-        return p.substring(override.length + 1)
+    toOverrideRelative(path) {
+        var override = this.findOverride(path)
+        return path.substring(override.length + 1)
     }
 
-    findOverride(p) {
+    findOverride(path) {
         return this._allSearchDirs.find((override) => {
-            return p.indexOf(override) === 0
+            return path.indexOf(override) === 0
         })
     }
 

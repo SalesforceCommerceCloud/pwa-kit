@@ -186,7 +186,6 @@ const main = async () => {
         'app',
         'ssr.js'
     )
-    console.log('~overrideSSRpath', overrideSSRpath)
     const overrideSSRjs = fse.pathExistsSync(overrideSSRpath)
     const resolvedSSRPath = appSSRjs ? appSSRpath : overrideSSRjs ? overrideSSRpath : null
 
