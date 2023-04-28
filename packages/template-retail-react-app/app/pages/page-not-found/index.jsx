@@ -9,6 +9,7 @@ import React from 'react'
 import {Box, Heading, Flex, Button, Stack, Text} from '@chakra-ui/react'
 import {Helmet} from 'react-helmet'
 import {useIntl} from 'react-intl'
+import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import {SearchIcon} from 'retail-react-app/app/components/icons'
 import {useHistory} from 'react-router-dom'
 import Link from 'retail-react-app/app/components/link'
@@ -16,6 +17,12 @@ import Link from 'retail-react-app/app/components/link'
 const PageNotFound = () => {
     const intl = useIntl()
     const history = useHistory()
+    const {res} = useServerContext()
+
+    if (res) {
+        res.status(404)
+    }
+
     return (
         <Box
             layerStyle="page"
@@ -78,12 +85,6 @@ const PageNotFound = () => {
             </Flex>
         </Box>
     )
-}
-
-PageNotFound.getProps = async ({res}) => {
-    if (res) {
-        res.status(404)
-    }
 }
 
 export default PageNotFound

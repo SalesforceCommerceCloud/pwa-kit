@@ -18,7 +18,6 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from 'retail-react-app/app/utils/url'
 
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
-import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
@@ -119,4 +118,4 @@ const options = {
     }
 }
 
-export default withReactQuery(withLegacyGetProps(AppConfig), options)
+export default withReactQuery(AppConfig, options)

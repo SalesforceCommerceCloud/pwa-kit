@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 /**
  * This PropType represents a `component` object from the ShopperExperience API.
  */
-export const componentType = PropTypes.shape({
+export const componentPropType = PropTypes.shape({
     data: PropTypes.object,
     id: PropTypes.string,
     typeId: PropTypes.string
@@ -18,9 +18,9 @@ export const componentType = PropTypes.shape({
 /**
  * This PropType represents a `region` object from the ShopperExperience API.
  */
-export const regionType = PropTypes.shape({
+export const regionPropType = PropTypes.shape({
     id: PropTypes.string,
-    components: PropTypes.arrayOf(componentType)
+    components: PropTypes.arrayOf(componentPropType)
 })
 
 /**
@@ -31,6 +31,6 @@ export const pageType = PropTypes.shape({
     description: PropTypes.string,
     id: PropTypes.string,
     name: PropTypes.string,
-    regions: PropTypes.arrayOf(regionType),
+    regions: PropTypes.arrayOf(regionPropType),
     typeId: PropTypes.string
 })

@@ -205,7 +205,7 @@ export const Carousel = (props = {}) => {
 }
 
 Carousel.propTypes = {
-    regions: PropTypes.array.isRequired,
+    regions: PropTypes.arrayOf(regionPropType).isRequired,
     textHeadline: PropTypes.string,
     xsCarouselIndicators: PropTypes.bool,
     smCarouselIndicators: PropTypes.bool,

@@ -11,7 +11,7 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {useQueries} from '@tanstack/react-query'
+import {useQuery, useQueries} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
@@ -67,7 +67,6 @@ import {
 } from 'retail-react-app/app/constants'
 
 import Seo from 'retail-react-app/app/components/seo'
-import {resolveLocaleFromUrl, resolveSiteFromUrl} from 'retail-react-app/app/utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -104,7 +103,7 @@ const useLazyLoadCategories = () => {
 }
 
 const App = (props) => {
-    const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
+    const {children} = props
     const {data: categoriesTree} = useLazyLoadCategories()
     const categories = flatten(categoriesTree || {}, 'categories')
 
@@ -120,6 +119,31 @@ const App = (props) => {
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
+
+    const targetLocale = getTargetLocale({
+        getUserPreferredLocales: () => {
+            // CONFIG: This function should return an array of preferred locales. They can be
+            // derived from various sources. Below are some examples of those:
+            //
+            // - client side: window.navigator.languages
+            // - the page URL they're on (example.com/en-GB/home)
+            // - cookie (if their previous preference is saved there)
+            //
+            // If this function returns an empty array (e.g. there isn't locale in the page url),
+            // then the app would use the default locale as the fallback.
+
+            // NOTE: Your implementation may differ, this is just what we did.
+            return [locale?.id || DEFAULT_LOCALE]
+        },
+        l10nConfig: site.l10n
+    })
+
+    // Fetch the translation message data using the target locale.
+    const {data: messages} = useQuery({
+        queryKey: ['app', 'translationas', 'messages', targetLocale],
+        queryFn: () => fetchTranslations(targetLocale),
+        enabled: isServer
+    })
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
@@ -206,6 +230,11 @@ const App = (props) => {
         <Box className="sf-app" {...styles.container}>
             <IntlProvider
                 onError={(err) => {
+                    if (!messages) {
+                        // During the ssr prepass phase the messages object has not loaded, so we can suppress
+                        // errors during this time.
+                        return
+                    }
                     if (err.code === 'MISSING_TRANSLATION') {
                         // NOTE: Remove the console error for missing translations during development,
                         // as we knew translations would be added later.
@@ -319,44 +348,8 @@ const App = (props) => {
     )
 }
 
-App.shouldGetProps = () => {
-    // In this case, we only want to fetch data for the app once, on the server.
-    return typeof window === 'undefined'
-}
-
-App.getProps = async ({res}) => {
-    const site = resolveSiteFromUrl(res.locals.originalUrl)
-    const locale = resolveLocaleFromUrl(res.locals.originalUrl)
-    const l10nConfig = site.l10n
-    const targetLocale = getTargetLocale({
-        getUserPreferredLocales: () => {
-            // CONFIG: This function should return an array of preferred locales. They can be
-            // derived from various sources. Below are some examples of those:
-            //
-            // - client side: window.navigator.languages
-            // - the page URL they're on (example.com/en-GB/home)
-            // - cookie (if their previous preference is saved there)
-            //
-            // If this function returns an empty array (e.g. there isn't locale in the page url),
-            // then the app would use the default locale as the fallback.
-
-            // NOTE: Your implementation may differ, this is just what we did.
-            return [locale?.id]
-        },
-        l10nConfig
-    })
-    const messages = await fetchTranslations(targetLocale)
-
-    return {
-        targetLocale,
-        messages
-    }
-}
-
 App.propTypes = {
-    children: PropTypes.node,
-    targetLocale: PropTypes.string,
-    messages: PropTypes.object
+    children: PropTypes.node
 }
 
 /**

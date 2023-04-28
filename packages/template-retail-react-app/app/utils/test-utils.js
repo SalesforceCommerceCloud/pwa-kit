@@ -9,14 +9,13 @@ import {render} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {ChakraProvider} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import {PageContext, Region} from 'retail-react-app/app/page-designer/core'
 
 import theme from 'retail-react-app/app/theme'
 import {AddToCartModalProvider} from 'retail-react-app/app/hooks/use-add-to-cart-modal'
 import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
-import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
+import {PageContext, Region} from 'commerce-sdk-react-preview/components'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import fallbackMessages from 'retail-react-app/app/translations/compiled/en-GB.json'
 import mockConfig from 'retail-react-app/config/mocks/default'
@@ -170,7 +169,7 @@ TestProviders.propTypes = {
  * @param {object} options
  */
 export const renderWithProviders = (children, options) => {
-    const TestProvidersWithDataAPI = withReactQuery(withLegacyGetProps(TestProviders), {
+    const TestProvidersWithDataAPI = withReactQuery(TestProviders, {
         queryClientConfig: {
             defaultOptions: {
                 queries: {
