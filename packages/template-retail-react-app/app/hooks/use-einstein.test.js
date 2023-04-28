@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import fetch from 'cross-fetch'
 import {EinsteinAPI} from './use-einstein'
 import {
     mockAddToCartProduct,
@@ -15,13 +14,6 @@ import {
     mockRecommenderDetails
 } from './einstein-mock-data'
 
-jest.mock('cross-fetch', () => {
-    return {
-        __esModule: true,
-        default: jest.fn(() => ({json: jest.fn(), ok: true}))
-    }
-})
-
 const einsteinApi = new EinsteinAPI({
     host: `http://localhost/test-path`,
     einsteinId: 'test-id',
@@ -29,14 +21,23 @@ const einsteinApi = new EinsteinAPI({
     cookieId: 'test-usid'
 })
 
-beforeEach(() => {
-    jest.resetModules()
-    fetch.mockClear()
+const fetchMock = require('jest-fetch-mock')
+const fetchOriginal = global.fetch
+
+beforeAll(() => {
+    global.fetch = fetchMock
+    global.fetch.mockResponse(JSON.stringify({}))
+})
+
+afterAll(() => {
+    global.fetch = fetchOriginal
 })
 
 describe('EinsteinAPI', () => {
     test('viewProduct sends expected api request', async () => {
+        
         await einsteinApi.sendViewProduct(mockProduct)
+        
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/viewProduct',
             {
