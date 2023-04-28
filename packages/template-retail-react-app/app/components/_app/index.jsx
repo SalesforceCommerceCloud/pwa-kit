@@ -7,6 +7,7 @@
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
+import {Helmet} from 'react-helmet'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
@@ -223,6 +224,9 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
+            <Helmet>
+                <script src="http://localhost:3000/mobify/bundle/development/static/js/preview.client.js" type="text/javascript" />
+            </Helmet>
             <IntlProvider
                 onError={(err) => {
                     if (!messages) {
