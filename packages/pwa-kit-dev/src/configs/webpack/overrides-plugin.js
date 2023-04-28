@@ -104,13 +104,10 @@ class OverridesResolverPlugin {
         resolver.getHook('resolve').tapAsync(
             'FeatureResolverPlugin',
             function (requestContext, resolveContext, callback) {
-                // exact match ^ means import the "parent" (superModule) of the requesting module
                 if (
                     requestContext.request &&
                     this.isFromExtends(requestContext.request, requestContext.path)
                 ) {
-                    // external dependency requiring app code (app-config, app, ssr, etc)
-                    // TODO: DRY this is nearly the same as the above condition
                     let overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(
                         /$\//,
                         ''
