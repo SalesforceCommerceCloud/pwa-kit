@@ -30,12 +30,11 @@ const main = () => {
     // TODO: during our release process, it looks like we should be tagging with annotated tags:
     // https://lerna.js.org/docs/troubleshooting#publish-does-not-detect-manually-created-tags-in-fixed-mode-with-githubgithub-enterprise
     sh.exec(`lerna version --no-push --no-git-tag-version --yes ${process.argv.slice(2).join(' ')}`)
-    // TODO: is this really necessary? Compare with vs without it, and see if there's any difference in the end result.
     sh.exec(`npm install`)
 
     const lernaConfig = JSON.parse(sh.cat(lernaConfigPath))
     const rootPkg = JSON.parse(sh.cat(rootPkgPath))
-    const rootLockPkg = JSON.parse(sh.cat(rootPkgLockPath))
+    const rootPkgLock = JSON.parse(sh.cat(rootPkgLockPath))
 
     const newVersion = lernaConfig.version
 
@@ -60,9 +59,9 @@ const main = () => {
 
     // update versions for root package and root package lock
     rootPkg.version = newVersion
-    rootLockPkg.version = newVersion
+    rootPkgLock.version = newVersion
     saveJSONToFile(rootPkg, rootPkgPath)
-    saveJSONToFile(rootLockPkg, rootPkgLockPath)
+    saveJSONToFile(rootPkgLock, rootPkgLockPath)
 
     ignoreList.forEach(({pathToPackage, oldVersion}) => {
         restorePackageVersion(pathToPackage, oldVersion)
