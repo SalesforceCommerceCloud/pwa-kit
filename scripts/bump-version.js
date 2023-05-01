@@ -59,6 +59,7 @@ const main = () => {
 
     // update versions for root package and root package lock
     rootPkg.version = newVersion
+    // TODO: there are actually 2 places where 'version' appears -> better to use `npm version <version-number>` to update
     rootPkgLock.version = newVersion
     saveJSONToFile(rootPkg, rootPkgPath)
     saveJSONToFile(rootPkgLock, rootPkgLockPath)
