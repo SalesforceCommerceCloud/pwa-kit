@@ -6,8 +6,9 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Image, Text} from '@chakra-ui/react'
+import {Box, Image, Link as ChakraLink, Text} from '@chakra-ui/react'
 import Link from '../../../components/link'
+import {isAbsoluteURL} from '../../utils'
 
 /**
  * Image with text component
@@ -22,6 +23,9 @@ import Link from '../../../components/link'
  */
 export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     const hasCaption = ITCText || heading
+    const isAbsolute = isAbsoluteURL(ITCLink)
+    const LinkWrapper = isAbsolute ? ChakraLink : Link
+    const linkProps = isAbsolute ? {href: ITCLink} : {to: ITCLink}
 
     return (
         <Box className={'image-with-text'}>
@@ -35,7 +39,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                 <picture>
                     <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
                     <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
-                    <Link to={ITCLink}>
+                    <LinkWrapper {...linkProps}>
                         <Image
                             className={'image-with-text-image'}
                             data-testid={'image-with-text-image'}
@@ -45,7 +49,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                             title={alt}
                             filter={'brightness(40%)'}
                         />
-                    </Link>
+                    </LinkWrapper>
                 </picture>
                 {hasCaption && (
                     <Text as="figcaption">

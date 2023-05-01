@@ -17,7 +17,7 @@
   "files": [
     "CHANGELOG.md",
     "LICENSE",
-    "+(auth|hooks|scripts)/**/!(*.test*).{ts,js}",
+    "+(auth|components|hooks|scripts)/**/!(*.test*).{ts,js}",
     "*.{js,d.ts}",
     "!*.test*.{js,d.ts}",
     "!test*.*",
@@ -27,7 +27,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
     "build:docs": "typedoc",
-    "build:watch": "watch 'npm run build' src/",
+    "build:watch": "nodemon --watch 'src/**' --ext 'tsx,ts' --exec  'npm run build'",
     "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\"",
     "lint": "npm run lint:js && tsc --noEmit",
     "lint:fix": "npm run lint:js -- --fix",
@@ -40,7 +40,7 @@
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
-    "commerce-sdk-isomorphic": "^1.9.0",
+    "commerce-sdk-isomorphic": "^1.10.1",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^3.1.2"
   },
@@ -60,6 +60,7 @@
     "internal-lib-build": "2.8.0-dev",
     "jsonwebtoken": "^8.5.1",
     "nock": "^13.3.0",
+    "nodemon": "^2.0.22",
     "pwa-kit-dev": "2.8.0-dev",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -67,13 +68,15 @@
     "semver": "^7.3.8",
     "shelljs": "^0.8.5",
     "typedoc": "^0.23.28",
-    "typescript": "4.8.3",
-    "watch": "^1.0.2"
+    "typescript": "4.8.3"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^4",
     "react": "^17",
     "react-helmet": "6"
+  },
+  "optionalDependencies": {
+    "prop-types": "^15.8.1"
   },
   "engines": {
     "node": "^16.0.0 || ^18.0.0",

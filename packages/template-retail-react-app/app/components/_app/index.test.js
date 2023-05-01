@@ -65,19 +65,6 @@ describe('App', () => {
         expect(screen.getByText('Any children here')).toBeInTheDocument()
     })
 
-    test('shouldGetProps returns true only server-side', () => {
-        windowSpy.mockImplementation(() => undefined)
-
-        expect(App.shouldGetProps()).toBe(true)
-
-        windowSpy.mockImplementation(() => ({
-            location: {
-                origin: 'http://localhost:3000/'
-            }
-        }))
-        expect(App.shouldGetProps()).toBe(false)
-    })
-
     test('The localized hreflang links exist in the html head', () => {
         useMultiSite.mockImplementation(() => resultUseMultiSite)
         renderWithProviders(

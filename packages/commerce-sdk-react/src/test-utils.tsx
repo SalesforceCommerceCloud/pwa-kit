@@ -159,7 +159,7 @@ const getQueryName = (method: string): string => {
  * Gets the list of API endpoints that have not yet been implemented
  * @param SdkClass Class constructor from commerce-sdk-isomorphic to use as a source for endpoints
  * @param queryHooks Object containing implemented query hooks
- * @param mutationsEnum Enum containing mutation endpoint names
+ * @param mutations Enum containing mutation endpoint names
  * @returns List of endpoints that don't have a query or mutation hook
  */
 export const getUnimplementedEndpoints = (
