@@ -31,9 +31,9 @@
   },
   "dependencies": {
     "@loadable/babel-plugin": "^5.13.2",
-    "aws-sdk": "^2.984.0",
+    "aws-sdk": "^2.1354.0",
     "aws-serverless-express": "3.3.5",
-    "cosmiconfig": "^7.0.1",
+    "cosmiconfig": "^8.0.0",
     "cross-env": "^5.2.0",
     "express": "^4.17.1",
     "header-case": "1.0.1",
