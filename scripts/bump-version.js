@@ -9,17 +9,35 @@
 const sh = require('shelljs')
 const path = require('path')
 
+// Exit upon error
 sh.set('-e')
+
 const lernaConfigPath = path.join(__dirname, '..', 'lerna.json')
 const rootPkgPath = path.join(__dirname, '..', 'package.json')
 const rootPkgLockPath = path.join(__dirname, '..', 'package-lock.json')
 
+const retailReactAppPkgDir = path.join(__dirname, '..', 'packages/template-retail-react-app')
+
 const main = () => {
+    const retailReactAppPkg = JSON.parse(sh.cat(path.join(retailReactAppPkgDir, 'package.json')))
+    const ignoreList = [
+        {
+            pathToPackage: retailReactAppPkgDir, 
+            oldVersion: retailReactAppPkg.version
+        }
+    ]
+
+    // TODO: during our release process, it looks like we should be tagging with annotated tags:
+    // https://lerna.js.org/docs/troubleshooting#publish-does-not-detect-manually-created-tags-in-fixed-mode-with-githubgithub-enterprise
     sh.exec(`lerna version --no-push --no-git-tag-version --yes ${process.argv.slice(2).join(' ')}`)
+    // TODO: is this really necessary? Compare with vs without it, and see if there's any difference in the end result.
     sh.exec(`npm install`)
+
     const lernaConfig = JSON.parse(sh.cat(lernaConfigPath))
     const rootPkg = JSON.parse(sh.cat(rootPkgPath))
     const rootLockPkg = JSON.parse(sh.cat(rootPkgLockPath))
+
+    const newVersion = lernaConfig.version
 
     // find all monorepo packages, look inside each package json, find peerDependency that is a monorepo package
     // and update it with a new version
@@ -34,17 +52,33 @@ const main = () => {
         Object.keys(peerDependencies).forEach((dep) => {
             if (lernaPackageNames.includes(dep)) {
                 console.log(`Found lerna local package ${dep} as a peer dependency of ${pkg.name}.`)
-                peerDependencies[dep] = `^${lernaConfig.version}`
-                new sh.ShellString(JSON.stringify(pkg, null, 2)).to(pkgFilePath)
+                peerDependencies[dep] = `^${newVersion}`
+                saveJSONToFile(pkg, pkgFilePath)
             }
         })
     })
 
     // update versions for root package and root package lock
-    rootPkg.version = lernaConfig.version
-    rootLockPkg.version = lernaConfig.version
-    new sh.ShellString(JSON.stringify(rootPkg, null, 2)).to(rootPkgPath)
-    new sh.ShellString(JSON.stringify(rootLockPkg, null, 2)).to(rootPkgLockPath)
+    rootPkg.version = newVersion
+    rootLockPkg.version = newVersion
+    saveJSONToFile(rootPkg, rootPkgPath)
+    saveJSONToFile(rootLockPkg, rootPkgLockPath)
+
+    ignoreList.forEach(({pathToPackage, oldVersion}) => {
+        restorePackageVersion(pathToPackage, oldVersion)
+        // If the package's dependency versions are updated, this change is still intact.
+        // Only the package's own version is restored.
+    })
+}
+
+const saveJSONToFile = (json, filePath) => {
+    new sh.ShellString(JSON.stringify(json, null, 2)).to(filePath)
+}
+
+const restorePackageVersion = (pathToPackage, versionNumber) => {
+    sh.cd(pathToPackage)
+    sh.exec(`npm version ${versionNumber}`)
+    sh.cd('-')
 }
 
 main()
