@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+// import {createMultiStyleConfigHelpers} from '@chakra-ui/styled-system'
+
 export default {
     baseStyle: {
         container: {
@@ -17,7 +20,8 @@ export default {
         },
         link: {
             paddingTop: 3,
-            paddingBottom: 3
+            paddingBottom: 3,
+            textDecoration: 'none'
         }
     },
     parts: ['container', 'icon', 'link']

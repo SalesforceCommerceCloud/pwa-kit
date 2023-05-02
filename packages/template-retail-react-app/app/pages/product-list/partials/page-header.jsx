@@ -27,7 +27,7 @@ const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...o
                 </Heading>
                 <Heading as="h2" size="lg" marginRight={2}>
                     {isServer ? (
-                        <Fragment>({productSearchResult?.total})</Fragment>
+                        <div>({productSearchResult?.total})</div>
                     ) : (
                         // Fade in the total when available. When it's changed or not available yet, do not render it
                         !isLoading && <Fade in={true}>({productSearchResult?.total})</Fade>

@@ -12,7 +12,7 @@ import Field from '../field'
 
 const LoginFields = ({form, prefix = ''}) => {
     const fields = useLoginFields({form, prefix})
-
+    console.log('fields', fields)
     return (
         <Stack spacing={5}>
             <Field {...fields.email} />
