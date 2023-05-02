@@ -59,7 +59,7 @@ const main = () => {
     })
 
     // update versions for root package and root package lock
-    sh.exec(`npm version --no-git-tag ${newVersion}`)
+    setPackageVersion(newVersion)
 
     ignoreList.forEach(({pathToPackage, oldVersion}) => {
         restorePackageVersion(pathToPackage, oldVersion)
@@ -78,8 +78,12 @@ const saveJSONToFile = (json, filePath) => {
 
 const restorePackageVersion = (pathToPackage, versionNumber) => {
     sh.cd(pathToPackage)
-    sh.exec(`npm version ${versionNumber}`, {silent: true})
+    setPackageVersion(versionNumber)
     sh.cd('-')
+}
+
+const setPackageVersion = (version) => {
+    sh.exec(`npm version --no-git-tag ${version}`, {silent: true})
 }
 
 main()
