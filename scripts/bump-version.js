@@ -71,6 +71,9 @@ const main = () => {
         // Only the package's own version is restored.
     })
     // TODO: some packages may depend on the packages listed in the ignoreList. We'll need to make sure those packages have the correct dependency version.
+
+    sh.echo('\nVersions of packages in the monorepo:')
+    sh.exec('lerna list --all --long')
 }
 
 const saveJSONToFile = (json, filePath) => {
@@ -79,7 +82,7 @@ const saveJSONToFile = (json, filePath) => {
 
 const restorePackageVersion = (pathToPackage, versionNumber) => {
     sh.cd(pathToPackage)
-    sh.exec(`npm version ${versionNumber}`)
+    sh.exec(`npm version ${versionNumber}`, {silent: true})
     sh.cd('-')
 }
 
