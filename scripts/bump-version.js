@@ -30,7 +30,8 @@ const main = () => {
     // TODO: during our release process, it looks like we should be tagging with annotated tags:
     // https://lerna.js.org/docs/troubleshooting#publish-does-not-detect-manually-created-tags-in-fixed-mode-with-githubgithub-enterprise
     sh.exec(`lerna version --no-push --no-git-tag-version --yes ${process.argv.slice(2).join(' ')}`)
-    sh.exec(`npm install`)
+    // TODO: is this really necessary?
+    // sh.exec(`npm install`)
 
     const lernaConfig = JSON.parse(sh.cat(lernaConfigPath))
     const rootPkg = JSON.parse(sh.cat(rootPkgPath))
@@ -69,6 +70,7 @@ const main = () => {
         // If the package's dependency versions are updated, this change is still intact.
         // Only the package's own version is restored.
     })
+    // TODO: some packages may depend on the packages listed in the ignoreList. We'll need to make sure those packages have the correct dependency version.
 }
 
 const saveJSONToFile = (json, filePath) => {
