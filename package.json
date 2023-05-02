@@ -2,7 +2,7 @@
   "name": "pwa-kit",
   "version": "2.8.0-dev",
   "scripts": {
-    "bump-version": "node ./scripts/bump-version.js",
+    "pwa-kit-version": "node ./scripts/bump-version.js",
     "format": "lerna run --stream format",
     "preinstall": "node ./scripts/check-version.js",
     "postinstall": "node ./scripts/bootstrap.js",
