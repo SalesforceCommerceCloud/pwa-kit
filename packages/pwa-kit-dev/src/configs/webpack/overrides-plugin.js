@@ -92,7 +92,6 @@ class OverridesResolverPlugin {
 
     isFromExtends(request, path) {
         return (
-            request &&
             this.extends.includes(request?.split('/')?.[0]) &&
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
@@ -104,34 +103,28 @@ class OverridesResolverPlugin {
         resolver.getHook('resolve').tapAsync(
             'FeatureResolverPlugin',
             function (requestContext, resolveContext, callback) {
-                if (
-                    requestContext.request &&
-                    this.isFromExtends(requestContext.request, requestContext.path)
-                ) {
-                    let overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(
+                let targetFile
+                let overrideRelative
+                if (this.isFromExtends(requestContext.request, requestContext.path)) {
+                    overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(
                         /$\//,
                         ''
                     )
-                    try {
-                        const targetFile = this.findFileMap(overrideRelative, this._allSearchDirs)
-                        if (targetFile) {
-                            const target = resolver.ensureHook('resolved')
-                            requestContext.path = targetFile
-                            resolver.doResolve(
-                                target,
-                                requestContext,
-                                `${this.constructor.name} found base override file`,
-                                resolveContext,
-                                callback
-                            )
-                        } else {
-                            return callback()
-                        }
-                    } catch (e) {
-                        return callback()
-                    }
+                    targetFile = this.findFileMap(overrideRelative, this._allSearchDirs)
+                }
+
+                if (targetFile) {
+                    const target = resolver.ensureHook('resolved')
+                    requestContext.path = targetFile
+                    resolver.doResolve(
+                        target,
+                        requestContext,
+                        `${this.constructor.name} found base override file`,
+                        resolveContext,
+                        callback
+                    )
                 } else {
-                    callback()
+                    return callback()
                 }
             }.bind(this)
         )
