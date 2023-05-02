@@ -6,8 +6,7 @@
  */
 
 import React from 'react'
-import {render, RenderOptions} from '@testing-library/react'
-import {renderHook, WaitForValueToChange} from '@testing-library/react-hooks/dom'
+import {render, RenderOptions, renderHook} from '@testing-library/react'
 import {
     QueryClient,
     QueryClientProvider,
@@ -184,14 +183,15 @@ type GetHookResult<Data, Err, Vars, Ctx> = () =>
     | UseMutationResult<Data, Err, Vars, Ctx>
 /** Helper that waits for a hook to finish loading. */
 const waitForHookToFinish = async <Data, Err, Vars, Ctx>(
-    wait: WaitForValueToChange,
+    wait: any,
     getResult: GetHookResult<Data, Err, Vars, Ctx>
 ) => {
     await wait(() => getResult().isSuccess || getResult().isError)
 }
 /** Helper that asserts that a hook is a success. */
 export const waitAndExpectSuccess = async <Data, Err, Vars, Ctx>(
-    wait: WaitForValueToChange,
+    // TODO: FIX THIS LATER
+    wait: any,
     getResult: GetHookResult<Data, Err, Vars, Ctx>
 ) => {
     await waitForHookToFinish(wait, getResult)
@@ -201,7 +201,8 @@ export const waitAndExpectSuccess = async <Data, Err, Vars, Ctx>(
 }
 /** Helper that asserts that a hook returned an error */
 export const waitAndExpectError = async <Data, Err, Vars, Ctx>(
-    wait: WaitForValueToChange,
+    // TODO: FIX THIS LATER
+    wait: any,
     getResult: GetHookResult<Data, Err, Vars, Ctx>
 ) => {
     await waitForHookToFinish(wait, getResult)

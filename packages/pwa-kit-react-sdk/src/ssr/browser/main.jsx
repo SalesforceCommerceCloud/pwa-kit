@@ -6,7 +6,7 @@
  */
 /* global __webpack_require__ */
 import React, {useRef} from 'react'
-import ReactDOM from 'react-dom'
+import {hydrateRoot} from 'react-dom/client'
 import {BrowserRouter as Router} from 'react-router-dom'
 import DeviceContext from '../universal/device-context'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
@@ -118,7 +118,7 @@ export const start = () => {
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
-            ReactDOM.hydrate(<OuterApp {...props} />, rootEl, () => {
+            hydrateRoot(rootEl, <OuterApp {...props} />, () => {
                 window.__HYDRATING__ = false
             })
         })
