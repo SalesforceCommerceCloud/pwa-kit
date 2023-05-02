@@ -17,16 +17,15 @@ const rootPkgPath = path.join(__dirname, '..', 'package.json')
 const rootPkgLockPath = path.join(__dirname, '..', 'package-lock.json')
 
 const retailReactAppPkgDir = path.join(__dirname, '..', 'packages/template-retail-react-app')
+const retailReactAppPkg = JSON.parse(sh.cat(path.join(retailReactAppPkgDir, 'package.json')))
+const ignoreList = [
+    {
+        pathToPackage: retailReactAppPkgDir, 
+        oldVersion: retailReactAppPkg.version
+    }
+]
 
 const main = () => {
-    const retailReactAppPkg = JSON.parse(sh.cat(path.join(retailReactAppPkgDir, 'package.json')))
-    const ignoreList = [
-        {
-            pathToPackage: retailReactAppPkgDir, 
-            oldVersion: retailReactAppPkg.version
-        }
-    ]
-
     // TODO: during our release process, it looks like we should be tagging with annotated tags:
     // https://lerna.js.org/docs/troubleshooting#publish-does-not-detect-manually-created-tags-in-fixed-mode-with-githubgithub-enterprise
     sh.exec(`lerna version --no-push --no-git-tag-version --yes ${process.argv.slice(2).join(' ')}`)
