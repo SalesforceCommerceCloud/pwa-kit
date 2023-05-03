@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {isServer} from '../../../utils/utils'
 // Components
@@ -26,12 +26,7 @@ const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...o
                     {`${category?.name || searchQuery || ''}`}
                 </Heading>
                 <Heading as="h2" size="lg" marginRight={2}>
-                    {isServer ? (
-                        <div>({productSearchResult?.total})</div>
-                    ) : (
-                        // Fade in the total when available. When it's changed or not available yet, do not render it
-                        !isLoading && <Fade in={true}>({productSearchResult?.total})</Fade>
-                    )}
+                    {!isLoading && <Fade in={true}>({productSearchResult?.total})</Fade>}
                 </Heading>
             </Flex>
         </Box>

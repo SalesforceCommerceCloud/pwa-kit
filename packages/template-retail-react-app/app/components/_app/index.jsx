@@ -332,7 +332,7 @@ const App = (props) => {
                                 </Box>
                             </SkipNavContent>
 
-                            {/*{!isCheckout ? <Footer /> : <CheckoutFooter />}*/}
+                            {!isCheckout ? <Footer /> : <CheckoutFooter />}
 
                             <AuthModal {...authModal} />
                         </AddToCartModalProvider>

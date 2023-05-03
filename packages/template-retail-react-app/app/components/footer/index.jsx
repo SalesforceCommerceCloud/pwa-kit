@@ -12,13 +12,12 @@ import {
     Divider,
     SimpleGrid,
     useMultiStyleConfig,
-    StylesProvider,
     Select,
-    useStyles,
     Heading,
     Input,
     InputGroup,
     InputRightElement,
+    createStylesContext,
     Button,
     FormControl
 } from '@chakra-ui/react'
@@ -31,7 +30,7 @@ import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
 import {isServer} from '../../utils/utils'
-
+const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
@@ -40,7 +39,7 @@ const Footer = ({...otherProps}) => {
     const {l10n} = site
 
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
-    const showLocaleSelector = supportedLocaleIds?.length > 1 && !isServer
+    const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
