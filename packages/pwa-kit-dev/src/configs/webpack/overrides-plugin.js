@@ -32,7 +32,7 @@ class OverridesResolverPlugin {
 
         const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
         const globPattern = `${this.pkg?.ccExtensibility?.overridesDir?.replace(
-            /\//,
+            /^\//,
             ''
         )}/**/*${OVERRIDES_EXTENSIONS}`
         const overridesFsRead = glob.sync(globPattern)
@@ -54,10 +54,10 @@ class OverridesResolverPlugin {
      * @param requestPath
      * @param dirs
      */
-    findFileMap(requestPath, dirs) {
-        var fileExt = path.extname(requestPath)
-        for (var dir of dirs) {
-            var base = path.join(dir, requestPath)
+    findFileFromMap(requestPath, dirs) {
+        const fileExt = path.extname(requestPath)
+        for (const dir of dirs) {
+            let base = path.join(dir, requestPath)
             if (fileExt) {
                 const noExtPath = requestPath.replace(fileExt, '')
                 if (this.extendsHashMap.has(noExtPath)) {
@@ -66,21 +66,19 @@ class OverridesResolverPlugin {
             } else {
                 if (this.extendsHashMap.has(requestPath)) {
                     const end = this.extendsHashMap.get(requestPath)[1]
-
-                    if (end[0] === 'index') {
-                        base = path.join(base, this.extendsHashMap.get(requestPath)[1].join(''))
-                        return base
-                    } else {
-                        base = base?.replace(/$\//, '') + end.join('')
-                        return base
+                    const isRequestingIndex = end[0] === 'index'
+                    let result = base?.replace(/$\//, '') + end.join('')
+                    if (isRequestingIndex) {
+                        result = path.join(base, this.extendsHashMap.get(requestPath)[1].join(''))
                     }
+                    return result
                 }
             }
         }
     }
 
     toOverrideRelative(path) {
-        var override = this.findOverride(path)
+        const override = this.findOverride(path)
         return path.substring(override.length + 1)
     }
 
@@ -115,7 +113,7 @@ class OverridesResolverPlugin {
                         /$\//,
                         ''
                     )
-                    targetFile = this.findFileMap(overrideRelative, this._allSearchDirs)
+                    targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
                 }
 
                 if (targetFile) {
