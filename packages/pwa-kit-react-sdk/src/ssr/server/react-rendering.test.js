@@ -39,11 +39,6 @@ const opts = (overrides = {}) => {
     }
 }
 
-const mobile =
-    'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A543 Safari/419.3'
-const tablet =
-    'Mozilla/5.0 (iPad; CPU OS 6_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B141 Safari/8536.25'
-
 jest.mock('../universal/compatibility', () => {
     const AppConfig = jest.requireActual('../universal/components/_app-config').default
     const {withReactQuery} = jest.requireActual('../universal/components/with-react-query')
@@ -433,10 +428,8 @@ describe('The Node SSR Environment', () => {
                 console.error(html)
                 const doc = parse(html)
                 const include = ['<div>This is a PWA</div>']
-                const data = dataFromHTML(doc)
                 const dataScript = doc.querySelectorAll('script[id=mobify-data]')[0]
                 expect(dataScript.innerHTML.split(/\r\n|\r|\n/)).toHaveLength(1)
-                expect(data.__DEVICE_TYPE__).toBe('DESKTOP')
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
             }
@@ -444,17 +437,12 @@ describe('The Node SSR Environment', () => {
         {
             description: `rendering PWA's for tablet`,
             req: {
-                url: '/pwa/',
-                headers: {
-                    'User-Agent': tablet
-                }
+                url: '/pwa/'
             },
             assertions: (res) => {
                 expect(res.statusCode).toBe(200)
                 const html = res.text
                 const doc = parse(html)
-                const data = dataFromHTML(doc)
-                expect(data.__DEVICE_TYPE__).toBe('TABLET')
                 const include = ['<div>This is a PWA</div>']
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
@@ -463,17 +451,12 @@ describe('The Node SSR Environment', () => {
         {
             description: `rendering PWA's for mobile`,
             req: {
-                url: '/pwa/',
-                headers: {
-                    'User-Agent': mobile
-                }
+                url: '/pwa/'
             },
             assertions: (res) => {
                 expect(res.statusCode).toBe(200)
                 const html = res.text
                 const doc = parse(html)
-                const data = dataFromHTML(doc)
-                expect(data.__DEVICE_TYPE__).toBe('PHONE')
                 const include = ['<div>This is a PWA</div>']
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
