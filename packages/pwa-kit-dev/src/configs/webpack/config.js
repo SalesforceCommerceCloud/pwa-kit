@@ -88,7 +88,7 @@ const getAppEntryPoint = (pkg) => {
     return EXT_OVERRIDES_DIR ? pkg.ccExtensibility.overridesDir + APP_MAIN_PATH : APP_MAIN_PATH
 }
 
-const findDepInStack = (pkg) => {
+const findInProjectThenSDK = (pkg) => {
     // Look for the SDK node_modules in two places because in CI,
     // pwa-kit-dev is published under a 'dist' directory, which
     // changes this file's location relative to the package root.
@@ -164,26 +164,28 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        'babel-runtime': findDepInStack('babel-runtime'),
-                        '@tanstack/react-query': findDepInStack('@tanstack/react-query'),
-                        '@loadable/component': findDepInStack('@loadable/component'),
-                        '@loadable/server': findDepInStack('@loadable/server'),
-                        '@loadable/webpack-plugin': findDepInStack('@loadable/webpack-plugin'),
-                        'svg-sprite-loader': findDepInStack('svg-sprite-loader'),
-                        react: findDepInStack('react'),
-                        'react-router-dom': findDepInStack('react-router-dom'),
-                        'react-dom': findDepInStack('react-dom'),
-                        'react-helmet': findDepInStack('react-helmet'),
-                        'webpack-hot-middleware': findDepInStack('webpack-hot-middleware'),
+                        'babel-runtime': findInProjectThenSDK('babel-runtime'),
+                        '@tanstack/react-query': findInProjectThenSDK('@tanstack/react-query'),
+                        '@loadable/component': findInProjectThenSDK('@loadable/component'),
+                        '@loadable/server': findInProjectThenSDK('@loadable/server'),
+                        '@loadable/webpack-plugin': findInProjectThenSDK(
+                            '@loadable/webpack-plugin'
+                        ),
+                        'svg-sprite-loader': findInProjectThenSDK('svg-sprite-loader'),
+                        react: findInProjectThenSDK('react'),
+                        'react-router-dom': findInProjectThenSDK('react-router-dom'),
+                        'react-dom': findInProjectThenSDK('react-dom'),
+                        'react-helmet': findInProjectThenSDK('react-helmet'),
+                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware'),
 
                         // TODO: these need to be declared in package.json as peerDependencies ?
                         // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
-                        'react-intl': findDepInStack('react-intl'),
-                        '@chakra-ui/icons': findDepInStack('@chakra-ui/icons'),
-                        '@chakra-ui/react': findDepInStack('@chakra-ui/react'),
-                        '@chakra-ui/skip-nav': findDepInStack('@chakra-ui/skip-nav'),
-                        '@emotion/react': findDepInStack('@emotion/react'),
-                        '@emotion/styled': findDepInStack('@emotion/styled'),
+                        'react-intl': findInProjectThenSDK('react-intl'),
+                        '@chakra-ui/icons': findInProjectThenSDK('@chakra-ui/icons'),
+                        '@chakra-ui/react': findInProjectThenSDK('@chakra-ui/react'),
+                        '@chakra-ui/skip-nav': findInProjectThenSDK('@chakra-ui/skip-nav'),
+                        '@emotion/react': findInProjectThenSDK('@emotion/react'),
+                        '@emotion/styled': findInProjectThenSDK('@emotion/styled'),
                         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
@@ -227,17 +229,17 @@ const baseConfig = (target) => {
                         ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
-                            loader: findDepInStack('svg-sprite-loader')
+                            loader: findInProjectThenSDK('svg-sprite-loader')
                         },
                         target === 'web' && {
                             test: /\.svg$/,
-                            loader: findDepInStack('ignore-loader')
+                            loader: findInProjectThenSDK('ignore-loader')
                         },
                         {
                             test: /\.html$/,
                             exclude: /node_modules/,
                             use: {
-                                loader: findDepInStack('html-loader')
+                                loader: findInProjectThenSDK('html-loader')
                             }
                         }
                     ].filter(Boolean)
@@ -297,7 +299,7 @@ const ruleForBabelLoader = (babelPlugins) => {
             : {exclude: /node_modules/}),
         use: [
             {
-                loader: findDepInStack('babel-loader'),
+                loader: findInProjectThenSDK('babel-loader'),
                 options: {
                     rootMode: 'upward',
                     cacheDirectory: true,
