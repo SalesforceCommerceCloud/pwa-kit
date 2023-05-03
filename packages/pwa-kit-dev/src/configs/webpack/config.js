@@ -43,11 +43,13 @@ if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
 
-if (pkg?.ccExtensibility?.extendable && pkg?.ccExtensibility?.extends) {
-    const extendsAsArr = Array.isArray(pkg?.ccExtensibility?.extends)
-        ? pkg?.ccExtensibility?.extends
-        : [pkg?.ccExtensibility?.extends]
-    const conflicts = extendsAsArr.filter((x) => pkg?.ccExtensibility?.extendable?.includes(x))
+const EXT_OVERRIDES_DIR = pkg?.ccExtensibility?.overridesDir
+const EXT_EXTENDS = pkg?.ccExtensibility?.extends
+const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
+
+if (EXT_EXTENDABLE && EXT_EXTENDS) {
+    const extendsAsArr = Array.isArray(EXT_EXTENDS) ? EXT_EXTENDS : [EXT_EXTENDS]
+    const conflicts = extendsAsArr.filter((x) => EXT_EXTENDABLE?.includes(x))
     if (conflicts?.length) {
         throw new Error(
             `Dependencies in 'extendable' and 'extends' cannot overlap, fix these: ${conflicts.join(
@@ -72,12 +74,8 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
 const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
         const primary = resolve(projectDir, ...segments) + ext
-        const override = pkg?.ccExtensibility?.overridesDir
-            ? resolve(
-                  projectDir,
-                  pkg?.ccExtensibility?.overridesDir?.replace(/^\//, ''),
-                  ...segments
-              ) + ext
+        const override = EXT_OVERRIDES_DIR
+            ? resolve(projectDir, EXT_OVERRIDES_DIR?.replace(/^\//, ''), ...segments) + ext
             : null
 
         if (fse.existsSync(primary) || (override && fse.existsSync(override))) {
@@ -89,9 +87,7 @@ const entryPointExists = (segments) => {
 
 const getAppEntryPoint = (pkg) => {
     const APP_MAIN_PATH = '/app/main'
-    return pkg?.ccExtensibility?.overridesDir
-        ? pkg.ccExtensibility.overridesDir + APP_MAIN_PATH
-        : APP_MAIN_PATH
+    return EXT_OVERRIDES_DIR ? pkg.ccExtensibility.overridesDir + APP_MAIN_PATH : APP_MAIN_PATH
 }
 
 const findInProjectThenSDK = (pkg) => {
@@ -171,12 +167,12 @@ const baseConfig = (target) => {
                     path: buildDir
                 },
                 resolve: {
-                    ...(pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir
+                    ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
                         ? {
                               plugins: [
                                   new OverridesResolverPlugin({
-                                      extends: [pkg?.ccExtensibility?.extends],
-                                      overridesDir: pkg?.ccExtensibility?.overridesDir,
+                                      extends: [EXT_EXTENDS],
+                                      overridesDir: EXT_OVERRIDES_DIR,
                                       projectDir: process.cwd()
                                   })
                               ]
@@ -204,7 +200,7 @@ const baseConfig = (target) => {
                         '@chakra-ui/skip-nav': findDepInStack('@chakra-ui/skip-nav'),
                         '@emotion/react': findDepInStack('@emotion/react'),
                         '@emotion/styled': findDepInStack('@emotion/styled'),
-                        ...(pkg?.ccExtensibility?.overridesDir && pkg?.ccExtensibility?.extends
+                        ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
                                   ...[pkg.ccExtensibility.extends].map((extendTarget) => ({
@@ -215,9 +211,9 @@ const baseConfig = (target) => {
                                   }))
                               )
                             : {}),
-                        ...(pkg?.ccExtensibility?.extendable
+                        ...(EXT_EXTENDABLE
                             ? Object.assign(
-                                  ...[pkg?.ccExtensibility?.extendable].map((item) => ({
+                                  ...[EXT_EXTENDABLE].map((item) => ({
                                       [item]: path.resolve(projectDir)
                                   }))
                               )
@@ -311,9 +307,9 @@ const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        ...(pkg?.ccExtensibility?.overridesDir && pkg?.ccExtensibility?.extends
+        ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
             ? // TODO: handle for array here when that's supported
-              {exclude: makeRegExp(`/node_modules(?!/${pkg?.ccExtensibility?.extends})`)}
+              {exclude: makeRegExp(`/node_modules(?!/${EXT_EXTENDS})`)}
             : {exclude: /node_modules/}),
         use: [
             {
@@ -412,14 +408,14 @@ const clientOptional = baseConfig('web')
             entry: {
                 ...optional(
                     'loader',
-                    pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir
-                        ? `.${pkg?.ccExtensibility?.overridesDir}/app/request-processor.js`
+                    EXT_EXTENDS && EXT_OVERRIDES_DIR
+                        ? `.${EXT_OVERRIDES_DIR}/app/request-processor.js`
                         : './app/loader.js'
                 ),
                 ...optional(
                     'worker',
-                    pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir
-                        ? `.${pkg?.ccExtensibility?.overridesDir}/app/request-processor.js`
+                    EXT_EXTENDS && EXT_OVERRIDES_DIR
+                        ? `.${EXT_OVERRIDES_DIR}/app/request-processor.js`
                         : './app/main.js'
                 ),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
@@ -470,12 +466,8 @@ const renderer =
                         patterns: [
                             {
                                 from:
-                                    pkg?.ccExtensibility?.extends &&
-                                    pkg?.ccExtensibility?.overridesDir
-                                        ? `${pkg?.ccExtensibility?.overridesDir?.replace(
-                                              /^\//,
-                                              ''
-                                          )}/app/static`
+                                    EXT_EXTENDS && EXT_OVERRIDES_DIR
+                                        ? `${EXT_OVERRIDES_DIR?.replace(/^\//, '')}/app/static`
                                         : 'app/static/',
                                 to: 'static/',
                                 noErrorOnMissing: true
@@ -499,8 +491,8 @@ const ssr = (() => {
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
                     entry:
-                        pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir
-                            ? `.${pkg?.ccExtensibility?.overridesDir}/app/ssr.js`
+                        EXT_EXTENDS && EXT_OVERRIDES_DIR
+                            ? `.${EXT_OVERRIDES_DIR}/app/ssr.js`
                             : './app/ssr.js',
                     output: {
                         path: buildDir,
@@ -514,12 +506,8 @@ const ssr = (() => {
                             patterns: [
                                 {
                                     from:
-                                        pkg?.ccExtensibility?.extends &&
-                                        pkg?.ccExtensibility?.overridesDir
-                                            ? `${pkg?.ccExtensibility?.overridesDir?.replace(
-                                                  /^\//,
-                                                  ''
-                                              )}/app/static`
+                                        EXT_EXTENDS && EXT_OVERRIDES_DIR
+                                            ? `${EXT_OVERRIDES_DIR?.replace(/^\//, '')}/app/static`
                                             : 'app/static/',
                                     to: 'static/'
                                 }
@@ -544,8 +532,8 @@ const requestProcessor =
                 name: REQUEST_PROCESSOR,
                 // entry: './app/request-processor.js',
                 entry:
-                    pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir
-                        ? `.${pkg?.ccExtensibility?.overridesDir}/app/request-processor.js`
+                    EXT_EXTENDS && EXT_OVERRIDES_DIR
+                        ? `.${EXT_OVERRIDES_DIR}/app/request-processor.js`
                         : './app/request-processor.js',
                 output: {
                     path: buildDir,
