@@ -9,7 +9,6 @@
 
 // For more information on these settings, see https://webpack.js.org/configuration
 import path, {resolve} from 'path'
-import glob from 'glob'
 import fse from 'fs-extra'
 
 import webpack from 'webpack'
@@ -26,7 +25,6 @@ import OverridesResolverPlugin from './overrides-plugin'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
-const sdkDir = resolve(path.join(__dirname, '..', '..', '..'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
     ? resolve(process.env.PWA_KIT_BUILD_DIR)
     : resolve(projectDir, 'build')
@@ -90,7 +88,7 @@ const getAppEntryPoint = (pkg) => {
     return EXT_OVERRIDES_DIR ? pkg.ccExtensibility.overridesDir + APP_MAIN_PATH : APP_MAIN_PATH
 }
 
-const findInProjectThenSDK = (pkg) => {
+const findDepInStack = (pkg) => {
     // Look for the SDK node_modules in two places because in CI,
     // pwa-kit-dev is published under a 'dist' directory, which
     // changes this file's location relative to the package root.
@@ -106,20 +104,6 @@ const findInProjectThenSDK = (pkg) => {
         }
     }
     return candidate
-}
-
-const findDepInStack = (pkg) => {
-    const projectPath = resolve(projectDir, 'node_modules', pkg)
-    const projectFile = glob.sync(projectPath)
-    if (projectFile?.length) {
-        return projectPath
-    }
-    const extendPath = resolve(projectDir, 'node_modules', pkg)
-    const extendFile = glob.sync(extendPath)
-    if (extendFile?.length) {
-        return extendPath
-    }
-    return resolve(sdkDir, 'node_modules', pkg)
 }
 
 const baseConfig = (target) => {
@@ -243,17 +227,17 @@ const baseConfig = (target) => {
                         ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('svg-sprite-loader')
+                            loader: findDepInStack('svg-sprite-loader')
                         },
                         target === 'web' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('ignore-loader')
+                            loader: findDepInStack('ignore-loader')
                         },
                         {
                             test: /\.html$/,
                             exclude: /node_modules/,
                             use: {
-                                loader: findInProjectThenSDK('html-loader')
+                                loader: findDepInStack('html-loader')
                             }
                         }
                     ].filter(Boolean)
@@ -313,7 +297,7 @@ const ruleForBabelLoader = (babelPlugins) => {
             : {exclude: /node_modules/}),
         use: [
             {
-                loader: findInProjectThenSDK('babel-loader'),
+                loader: findDepInStack('babel-loader'),
                 options: {
                     rootMode: 'upward',
                     cacheDirectory: true,
