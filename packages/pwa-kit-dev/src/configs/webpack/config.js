@@ -190,10 +190,13 @@ const baseConfig = (target) => {
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
                                   ...[pkg.ccExtensibility.extends].map((extendTarget) => ({
-                                      [extendTarget]: path.resolve(
-                                          projectDir,
-                                          `node_modules/${extendTarget}`
-                                      )
+                                      [extendTarget]: [
+                                          path.resolve(
+                                              projectDir,
+                                              EXT_OVERRIDES_DIR.replace(/^\//, '')
+                                          ),
+                                          path.resolve(projectDir, `node_modules/${extendTarget}`)
+                                      ]
                                   }))
                               )
                             : {}),

@@ -12,7 +12,7 @@ const projectDir = process.cwd()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require(resolve(projectDir, 'package.json'))
 
-const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
+const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx)'
 
 const getOverridePath = (relativePath) => {
     const extendPath = pkg?.ccExtensibility?.extends
