@@ -9,7 +9,7 @@
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
-import {isTokenValid, createGetTokenBody, hasSFRAAuthStateChanged} from './utils'
+import {isTokenExpired, createGetTokenBody, hasSFRAAuthStateChanged} from './utils'
 import {
     usidStorageKey,
     cidStorageKey,
@@ -142,7 +142,7 @@ class Auth {
 
     get isTokenValid() {
         return (
-            isTokenValid(this.authToken) &&
+            !isTokenExpired(this.authToken) &&
             !hasSFRAAuthStateChanged(this._storage, this._storageCopy)
         )
     }

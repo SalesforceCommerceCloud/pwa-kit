@@ -232,7 +232,7 @@ describe('CommerceAPI', () => {
     })
     test('Use same customer if token is valid', async () => {
         const Utils = require('./utils')
-        jest.spyOn(Utils, 'isTokenValid').mockReturnValue(true)
+        jest.spyOn(Utils, 'isTokenExpired').mockReturnValue(false)
         const _CommerceAPI = require('./index').default
         const api = new _CommerceAPI(apiConfig)
 

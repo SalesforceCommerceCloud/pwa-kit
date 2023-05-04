@@ -7,7 +7,7 @@
 import jwt from 'njwt'
 import {
     camelCaseKeysToUnderscore,
-    isTokenValid,
+    isTokenExpired,
     keysToCamel,
     convertSnakeCaseToSentenceCase,
     handleAsyncError,
@@ -27,20 +27,20 @@ jest.mock('./utils', () => {
     }
 })
 
-describe('isTokenValid', () => {
-    test('returns false when no token given', () => {
-        expect(isTokenValid()).toBe(false)
+describe('isTokenExpired', () => {
+    test('returns true when no token given', () => {
+        expect(isTokenExpired()).toBe(true)
     })
 
-    test('returns true for valid token', () => {
+    test('returns false for valid token', () => {
         const token = createJwt(600)
         const bearerToken = `Bearer ${token}`
-        expect(isTokenValid(token)).toBe(true)
-        expect(isTokenValid(bearerToken)).toBe(true)
+        expect(isTokenExpired(token)).toBe(false)
+        expect(isTokenExpired(bearerToken)).toBe(false)
     })
 
-    test('returns false if token expires within 60 econds', () => {
-        expect(isTokenValid(createJwt(59))).toBe(false)
+    test('returns true if token expires within 60 econds', () => {
+        expect(isTokenExpired(createJwt(59))).toBe(true)
     })
 })
 

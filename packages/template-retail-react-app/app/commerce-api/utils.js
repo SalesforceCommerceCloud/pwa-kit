@@ -17,18 +17,18 @@ import fetch from 'cross-fetch'
  * @param {string} token - The JWT bearer token to be inspected
  * @returns {boolean}
  */
-export function isTokenValid(token) {
+export function isTokenExpired(token) {
     if (!token) {
-        return false
+        return true
     }
     const {exp, iat} = jwtDecode(token.replace('Bearer ', ''))
     const validTimeSeconds = exp - iat - 60
     const tokenAgeSeconds = Date.now() / 1000 - iat
     if (validTimeSeconds > tokenAgeSeconds) {
-        return true
+        return false
     }
 
-    return false
+    return true
 }
 
 // Returns fomrulated body for SopperLogin getToken endpoint
