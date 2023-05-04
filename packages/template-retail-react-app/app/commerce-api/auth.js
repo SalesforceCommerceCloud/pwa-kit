@@ -9,7 +9,20 @@
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
-import {isTokenValid, createGetTokenBody} from './utils'
+import {isTokenValid, createGetTokenBody, hasSFRAAuthStateChanged} from './utils'
+import {
+    usidStorageKey,
+    cidStorageKey,
+    encUserIdStorageKey,
+    tokenStorageKey,
+    refreshTokenRegisteredStorageKey,
+    refreshTokenGuestStorageKey,
+    oidStorageKey,
+    dwSessionIdKey,
+    REFRESH_TOKEN_COOKIE_AGE,
+    EXPIRED_TOKEN,
+    INVALID_TOKEN
+} from './constants'
 import fetch from 'cross-fetch'
 import Cookies from 'js-cookie'
 
@@ -26,19 +39,6 @@ import Cookies from 'js-cookie'
  * @typedef {Object} Customer
  */
 
-const usidStorageKey = 'usid'
-const cidStorageKey = 'cid'
-const encUserIdStorageKey = 'enc-user-id'
-const tokenStorageKey = 'token'
-const refreshTokenRegisteredStorageKey = 'cc-nx'
-const refreshTokenGuestStorageKey = 'cc-nx-g'
-const oidStorageKey = 'oid'
-const dwSessionIdKey = 'dwsid'
-const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridge.
-
-const EXPIRED_TOKEN = 'EXPIRED_TOKEN'
-const INVALID_TOKEN = 'invalid refresh_token'
-
 /**
  * A  class that provides auth functionality for the retail react app.
  */
@@ -48,6 +48,7 @@ class Auth {
         this._api = api
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
+        this._storageCopy = this._onClient ? new LocalStorage() : new Map()
 
         // To store tokens as cookies
         // change the next line to
@@ -139,6 +140,13 @@ class Auth {
         this._storage.set(oidStorageKey, oid)
     }
 
+    get isTokenValid() {
+        return (
+            isTokenValid(this.authToken) &&
+            !hasSFRAAuthStateChanged(this._storage, this._storageCopy)
+        )
+    }
+
     /**
      * Save refresh token in designated storage.
      *
@@ -146,16 +154,30 @@ class Auth {
      * @param {USER_TYPE} type Type of the user.
      */
     _saveRefreshToken(token, type) {
+        /**
+         * For hybrid deployments, We store a copy of the refresh_token
+         * to update access_token whenever customer auth state changes on SFRA.
+         */
         if (type === Auth.USER_TYPE.REGISTERED) {
             this._storage.set(refreshTokenRegisteredStorageKey, token, {
                 expires: REFRESH_TOKEN_COOKIE_AGE
             })
             this._storage.delete(refreshTokenGuestStorageKey)
+
+            this._storageCopy.set(refreshTokenRegisteredStorageKey, token, {
+                expires: REFRESH_TOKEN_COOKIE_AGE
+            })
+            this._storageCopy.delete(refreshTokenGuestStorageKey)
             return
         }
 
         this._storage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
         this._storage.delete(refreshTokenRegisteredStorageKey)
+
+        this._storageCopy.set(refreshTokenGuestStorageKey, token, {
+            expires: REFRESH_TOKEN_COOKIE_AGE
+        })
+        this._storageCopy.delete(refreshTokenRegisteredStorageKey)
     }
 
     /**
@@ -230,7 +252,7 @@ class Auth {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
-            } else if (isTokenValid(this.authToken)) {
+            } else if (this.isTokenValid) {
                 authorizationMethod = '_reuseCurrentLogin'
             } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'

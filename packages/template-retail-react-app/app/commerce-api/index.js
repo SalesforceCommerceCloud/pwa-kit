@@ -199,7 +199,7 @@ class CommerceAPI {
         // If the token is invalid (missing, past/nearing expiration), we issue
         //  a login call, which will attempt to refresh the token or get a new
         //  guest token. Once login is complete, we can proceed.
-        if (!isTokenValid(this.auth.authToken)) {
+        if (!this.auth.isTokenValid) {
             // NOTE: Login will update `this.auth.authToken` with a fresh token
             await this.auth.login()
         }
