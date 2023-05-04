@@ -62,8 +62,5 @@
         }
       ]
     }
-  },
-  "dependencies": {
-    "@testing-library/react": "^14.0.0"
   }
 }
