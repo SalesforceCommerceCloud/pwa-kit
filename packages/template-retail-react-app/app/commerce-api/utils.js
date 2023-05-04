@@ -275,7 +275,7 @@ export const noop = () => {}
 
 /**
  * WARNING: This function is relevant to be used in Hybrid deployments only.
- * Compares the refresh_token keys for guest(cc-nx-g) and registered('cc-nx') login from the cookie received from SFRA with the copy stored in localstorage on PWA Kit
+ * Compares the refresh_token keys for guest('cc-nx-g') and registered('cc-nx') login from the cookie received from SFRA with the copy stored in localstorage on PWA Kit
  * to determine if the login state of the shopper on SFRA site has changed.
  * @param {Storage} storage Cookie storage on PWA Kit in hybrid deployment.
  * @param {LocalStorage} storageCopy Local storage holding the copy of the refresh_token in hybrid deployment.
