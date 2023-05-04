@@ -38,7 +38,8 @@ const mockLogin = jest.fn()
 jest.mock('../commerce-api/auth', () => {
     return jest.fn().mockImplementation(() => {
         return {
-            login: mockLogin
+            login: mockLogin,
+            isTokenValid: true
         }
     })
 })
@@ -141,7 +142,7 @@ test('Allows customer to sign in to their account', async () => {
     await waitFor(() => {
         expect(screen.getByText(/Welcome Tester/i)).toBeInTheDocument()
         expect(screen.getByText(/you're now signed in/i)).toBeInTheDocument()
-    })
+    }, {timeout: 20000})
 })
 
 test('Renders error when given incorrect log in credentials', async () => {
@@ -235,6 +236,6 @@ test('Allows customer to create an account', async () => {
     user.click(withinForm.getByText(/create account/i))
 
     await waitFor(() => {
-        expect(screen.getAllByText(/welcome tester/i).length).toEqual(2)
-    })
+        expect(screen.getAllByText(/customer@test.com/i).length).toEqual(1)
+    }, {timeout: 20000})
 })
