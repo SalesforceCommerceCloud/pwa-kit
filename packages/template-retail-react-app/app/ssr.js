@@ -35,28 +35,27 @@ const options = {
 
 const runtime = getRuntime()
 
-
 // https://account.demandware.com/dwsso/oauth2/.well-known/openid-configuration
 const JWKS_AM = jose.createRemoteJWKSet(
     new URL('https://account.demandware.com:443/dwsso/oauth2/connect/jwk_uri')
 )
 
 async function validateAMJWT(jwt) {
-
-    console.log('validateAMJWT jwt:',jwt)
-
+    let response
     // https://github.com/panva/jose/blob/cb8d91cb59981b16457056f2d3ea2705afb3ca13/docs/interfaces/jwt_verify.JWTVerifyOptions.md
     // `iat|exp|nbf` seems to be automatically validated: https://github.com/panva/jose/blob/cb8d91cb59981b16457056f2d3ea2705afb3ca13/src/lib/jwt_claims_set.ts#L87-L88
     try {
-        return await jose.jwtVerify(jwt, JWKS_AM, {
+        response = await jose.jwtVerify(jwt, JWKS_AM, {
             algorithms: ['RS256'],
             audience: '056a095b-fa17-4fcb-bc76-806718566248',
             issuer: 'https://account.demandware.com:443/dwsso/oauth2'
         })
     } catch (error) {
-        console.log('validateSLASJWT error:', error)
+        console.log('validateAMJWT error:', error)
         return {error}
     }
+
+    return response
 }
 
 // TODO: We can't store secrets in MRT yet, for now we should store it in plain text
@@ -75,6 +74,18 @@ const JWKS_SLAS = jose.createRemoteJWKSet(
 
 function parseSLASSubClaim(sub) {
     return sub.split('::').reduce((acc, part) => {
+        const [key, val] = part.split(':')
+        acc[key] = val
+        return acc
+    }, {})
+}
+
+function parseSLASIssClaim(iss) {
+    return iss.substring(iss.lastIndexOf('/') + 1)
+}
+
+function parseAMtenantFilterClaim(tenantFilter) {
+    return tenantFilter.split(';').reduce((acc, part) => {
         const [key, val] = part.split(':')
         acc[key] = val
         return acc
@@ -104,8 +115,6 @@ async function validateSLASJWT(jwt, expectedClientID) {
     // TODO: Validating the JWT payload
     const {scid} = parseSLASSubClaim(ret.payload.sub)
 
-    console.log('validateSLASJWT scid:', scid)
-    console.log('validateSLASJWT expectedClientID:', expectedClientID)
     if (scid !== expectedClientID) {
         return {error: new Error('Invalid client ID')}
     }
@@ -116,39 +125,48 @@ async function validateSLASJWT(jwt, expectedClientID) {
 // TODO: This endpoint should probably be called something like /protected-shopper-context
 // TSOB === Trusted System On Behalf
 async function handlerStorefrontPreview(req, res) {
+    // [1] Validate AM JWT an retrieve its payload
     // TODO: Verify AM JWT BEFORE processing SLAS JWT. SLAS JWT validation can likely be middleware/decorator.
     const auth = req.get('authorization')
+
     if (!auth) {
         return res.status(403).json({error: 'Missing Authorization header'})
     }
-
     const bits = auth.split(' ')
-
     if (bits.length !== 2 || bits[0] !== 'Bearer') {
         return res.status(403).json({error: 'Invalid Authorization header'})
     }
-
-    req.get('authorization')
-
     const token = bits[1]
 
-    // const {error: amValidationError} = await validateAMJWT(token)
-    // TODO: Skipping failing AM token validation
-    // if (amValidationError) {
-    //     console.log('handlerStorefrontPreview amValidationError:', {amValidationError})
-    //     return res.status(403).json({amValidationError})
-    // }
+    const {payload: amPayload, error: amValidationError} = await validateAMJWT(token)
 
-    // [1] Validate the Shopper JWT, and pull the USID from it.
-    const {payload, error: slasValdiationError} = await validateSLASJWT(
-        token,
+    if (amValidationError) {
+        console.log('handlerStorefrontPreview amValidationError:', {amValidationError})
+        return res.status(403).json({amValidationError})
+    }
+
+    // [2] Validate the Shopper JWT, and pull the USID from it.
+    const {payload: slasPayload, error: slasValdiationError} = await validateSLASJWT(
+        req.body.access_token,
         SLAS_PUBLIC_CLIENT_ID
     )
 
     if (slasValdiationError) {
         return res.status(400).json({slasValdiationError})
     }
-    const {usid} = parseSLASSubClaim(payload.sub)
+
+    // [3] Validate the AM user has access to the ECOM instance
+    const slasEcom = parseSLASIssClaim(slasPayload.iss)
+    const tenantFilter = parseAMtenantFilterClaim(amPayload.tenantFilter)
+
+    if (!tenantFilter?.SLAS_ORGANIZATION_ADMIN.includes(slasEcom)) {
+        return res.status(400).json({error: 'Permissions error'})
+    }
+
+    // [4] Use TSOB to get a token for that USID.
+    const {usid} = parseSLASSubClaim(slasPayload.sub)
+
+    console.log('usid:', usid)
 
     // TODO: replace with import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
     //  Include the 'locale' and 'currency' config we have in the api declaration in _app-config/index.jsx
@@ -162,7 +180,6 @@ async function handlerStorefrontPreview(req, res) {
         throwOnBadResponse: true
     }
 
-    // [2] Use TSOB to get a token for that USID.
     const shopperLogin = new sdk.ShopperLogin(config)
     let tsobToken
     try {
@@ -193,7 +210,7 @@ async function handlerStorefrontPreview(req, res) {
         return res.status(500).json({errorText})
     }
 
-    // [3] Set Shopper Context.
+    // [5] Set Shopper Context.
     // const body = {
     //     // effectiveDateTime: new Date().toISOString(),
     //     // effectiveDateTime: "2020-12-20T00:00:00Z"
@@ -206,13 +223,7 @@ async function handlerStorefrontPreview(req, res) {
 
     // TODO: Find the right way to set 'sourceCode'
     //  https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-context?meta=getShopperContext#:~:text=817c%2D73d6b86872d9-,Responses,-200
-    // body.sourceCode = "testsourcecode"
-    // body.sourceCodeGroup = "testsourcecode"
-    //
-    // body.assignmentQualifiers = {
-    //     sourceCode: "testsourcecode",
-    //     sourceCodeGroup: "testsourcecode"
-    // }
+    // body.sourceCode = "testsourcecode" <---
 
     body.customQualifiers = {
         tester: 'yes'
@@ -233,7 +244,7 @@ async function handlerStorefrontPreview(req, res) {
         })
     } catch (err) {
         const errorText = await err.response.json()
-        console.log({errorText})
+        console.log('error setting ShopperContext:', {errorText})
         return res.status(500).json({errorText})
     }
 
@@ -250,10 +261,10 @@ const {handler} = runtime.createHandler(options, (app) => {
         helmet({
             contentSecurityPolicy: {
                 directives: {
-                    'frame-ancestors': ["'self'", 'localhost:*', '*.mobify-storefront.com' ],
+                    'frame-ancestors': ["'self'", 'localhost:*', '*.mobify-storefront.com'],
                     'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
                     'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
-                    'default-src': helmet.contentSecurityPolicy.dangerouslyDisableDefaultSrc,
+                    'default-src': helmet.contentSecurityPolicy.dangerouslyDisableDefaultSrc
                 }
             },
             hsts: isRemote()

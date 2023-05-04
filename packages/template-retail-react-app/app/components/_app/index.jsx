@@ -84,10 +84,12 @@ const preview = async (AMToken, getTokenWhenReady) => {
     // [2] Set the context by asking to preview with our token.
     let previewResponse = await fetch(new URL('http://localhost:3000/preview'), {
         method: 'POST',
-        body: JSON.stringify({access_token: `Bearer ${AMToken}`}),
+        // SLAS JWT
+        body: JSON.stringify({access_token: token}),
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            // AM JWT
+            Authorization: `Bearer ${AMToken}`
         }
     })
 
@@ -189,7 +191,7 @@ const App = (props) => {
         })
 
         // Receive message from parent
-        window.addEventListener('message', ({ data, origin }) => {
+        window.addEventListener('message', ({data, origin}) => {
             // console.log(`iframe received ${data} from ${origin}`)
             //alert(`iframe received ${data} from ${origin}`);
             // localStorage.setItem("access_token_am", data)
@@ -200,10 +202,10 @@ const App = (props) => {
 
             let AMToken = data
             console.log('AMToken:', AMToken)
-            if(AMToken){
+            if (AMToken) {
                 preview(AMToken, getTokenWhenReady)
             }
-        });
+        })
     }, [])
 
     useEffect(() => {
