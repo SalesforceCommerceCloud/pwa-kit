@@ -164,9 +164,7 @@ class Auth {
             })
             this._storage.delete(refreshTokenGuestStorageKey)
 
-            this._storageCopy.set(refreshTokenRegisteredStorageKey, token, {
-                expires: REFRESH_TOKEN_COOKIE_AGE
-            })
+            this._storageCopy.set(refreshTokenRegisteredStorageKey, token)
             this._storageCopy.delete(refreshTokenGuestStorageKey)
             return
         }
@@ -174,9 +172,7 @@ class Auth {
         this._storage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
         this._storage.delete(refreshTokenRegisteredStorageKey)
 
-        this._storageCopy.set(refreshTokenGuestStorageKey, token, {
-            expires: REFRESH_TOKEN_COOKIE_AGE
-        })
+        this._storageCopy.set(refreshTokenGuestStorageKey, token)
         this._storageCopy.delete(refreshTokenRegisteredStorageKey)
     }
 
