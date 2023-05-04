@@ -92,11 +92,11 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
                     <Container variant="form">
                         <form onSubmit={form.handleSubmit(submitForm)}>
                             <Stack spacing={6}>
-                                {form.errors?.global && (
+                                {form.formState.errors?.global && (
                                     <Alert status="error">
                                         <AlertIcon color="red.500" boxSize={4} />
                                         <Text fontSize="sm" ml={3}>
-                                            {form.errors.global.message}
+                                            {form.formState.errors.global.message}
                                         </Text>
                                     </Alert>
                                 )}
@@ -288,13 +288,16 @@ const AccountAddresses = () => {
                     }
 
                     {isEditing && !selectedAddressId && (
-                        <ShippingAddressForm
-                            form={form}
-                            hasAddresses={hasAddresses}
-                            submitForm={submitForm}
-                            selectedAddressId={selectedAddressId}
-                            toggleEdit={toggleEdit}
-                        />
+                        <>
+                            <div>Testesdfds</div>
+                            <ShippingAddressForm
+                                form={form}
+                                hasAddresses={hasAddresses}
+                                submitForm={submitForm}
+                                selectedAddressId={selectedAddressId}
+                                toggleEdit={toggleEdit}
+                            />
+                        </>
                     )}
 
                     {addresses.map((address) => (
