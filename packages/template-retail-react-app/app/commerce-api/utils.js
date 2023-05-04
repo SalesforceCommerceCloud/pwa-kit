@@ -273,7 +273,6 @@ export const convertSnakeCaseToSentenceCase = (text) => {
  */
 export const noop = () => {}
 
-
 /**
  * WARNING: This function is relevant to be used in Hybrid deployments only.
  * Compares the refresh_token keys for guest(cc-nx-g) and registered('cc-nx') login from the cookie received from SFRA with the copy stored in localstorage on PWA Kit
