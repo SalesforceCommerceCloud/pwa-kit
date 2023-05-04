@@ -48,6 +48,7 @@ jest.mock('../../commerce-api/utils', () => {
     return {
         ...originalModule,
         isTokenValid: jest.fn().mockReturnValue(true),
+        hasSFRAAuthStateChanged: jest.fn().mockReturnValue(false),
         createGetTokenBody: jest.fn().mockReturnValue({
             grantType: 'test',
             code: 'test',

@@ -10,7 +10,8 @@ import {
     isTokenValid,
     keysToCamel,
     convertSnakeCaseToSentenceCase,
-    handleAsyncError
+    handleAsyncError,
+    hasSFRAAuthStateChanged
 } from './utils'
 
 const createJwt = (secondsToExp) => {
@@ -242,5 +243,26 @@ describe('handleAsyncError', () => {
     test('works even if func is not async', async () => {
         const func = jest.fn().mockReturnValue(1)
         expect(await handleAsyncError(func)()).toBe(1)
+    })
+})
+
+describe('hasSFRAAuthStateChanged', () => {
+    test('returns true when refresh_token keys are different', () => {
+        const storage = new Map()
+        const storageCopy = new Map()
+
+        storage.set('cc-nx-g', 'testRefreshToken1')
+        storageCopy.set('cc-nx', 'testRefreshToken2')
+
+        expect(hasSFRAAuthStateChanged(storage, storageCopy)).toBe(true)
+    })
+    test('returns false when refresh_token keys are the same', () => {
+        const storage = new Map()
+        const storageCopy = new Map()
+
+        storage.set('cc-nx-g', 'testRefreshToken1')
+        storageCopy.set('cc-nx-g', 'testRefreshToken2')
+
+        expect(hasSFRAAuthStateChanged(storage, storageCopy)).toBe(false)
     })
 })
