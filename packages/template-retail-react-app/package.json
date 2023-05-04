@@ -1,7 +1,6 @@
 {
   "name": "retail-react-app",
   "version": "2.8.0-dev",
-  "private": true,
   "license": "See license in LICENSE",
   "ccExtensibility": {
     "extendable": ["retail-react-app"]

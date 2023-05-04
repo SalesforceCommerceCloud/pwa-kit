@@ -145,7 +145,7 @@ const runGenerator = (answers, {outputDir, verbose}) => {
         }
     })
 
-    extractTemplate('template-retail-react-app', outputDir)
+    downloadPackage('retail-react-app@latest', outputDir)
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
@@ -401,6 +401,20 @@ const extractTemplate = (templateName, outputDir) => {
         sync: true
     })
     sh.cp('-R', p.join(tmp, templateName), outputDir)
+    sh.rm('-rf', tmp)
+}
+
+const downloadPackage = (packageSpec, outputDir) => {
+    const {stdout: packageVersion} = sh.exec(`npm info ${packageSpec} version`, {silent: true})
+    console.log(`--- downloading ${packageSpec} which maps to ${packageVersion}`)
+
+    const {stdout: packageName} = sh.exec(`npm info ${packageSpec} name`, {silent: true})
+    const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'download-package'))
+
+    sh.exec(`npm install ${packageSpec} --prefix ${tmp}`, {silent: true})
+    console.log('--- copying from', `node_modules/${packageName}`)
+    sh.cp('-R', p.join(tmp, `node_modules/${packageName}`), outputDir)
+
     sh.rm('-rf', tmp)
 }
 

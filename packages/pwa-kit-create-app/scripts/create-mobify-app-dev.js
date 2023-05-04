@@ -104,6 +104,7 @@ const withLocalNPMRepo = (func) => {
             // packages to it. This is safe to do – Verdaccio does not forward these
             // the public NPM repo.
             console.log('Publishing packages to the local NPM repository')
+            // NOTE: this will publish and npm-tag it as `latest`, regardless if the package version is prerelease or not
             sh.exec('npm run lerna -- publish from-package --yes --concurrency 1 --loglevel warn', {
                 cwd: monorepoRoot,
                 fatal: true,
@@ -128,9 +129,17 @@ const runGenerator = () => {
     const foundNpm = cp.spawnSync(npm, ['-v']).stdout.toString().trim()
     const flags = semver.satisfies(foundNpm, '>=7') ? '-y' : ''
 
+    clearNpxCache()
+
     cp.execSync(`npx ${flags} pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`, {
         stdio: 'inherit'
     })
+}
+
+const clearNpxCache = () => {
+    console.log('--- clearing npx cache')
+    // TODO: for cross platform, use `npm config get cache` + '_npx'
+    sh.exec('rm -rf ~/.npm/_npx')
 }
 
 const main = () => {
