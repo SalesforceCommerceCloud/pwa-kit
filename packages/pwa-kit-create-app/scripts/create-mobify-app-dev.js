@@ -104,9 +104,9 @@ const withLocalNPMRepo = (func) => {
             // packages to it. This is safe to do – Verdaccio does not forward these
             // the public NPM repo.
             console.log('Publishing packages to the local NPM repository')
-            // NOTE: this will publish and npm-tag it as `next`, regardless if the package version is prerelease or not
+            // NOTE: this will publish and npm-tag it as `foo`, regardless if the package version is prerelease or not
             sh.exec(
-                'npm run lerna -- publish from-package --dist-tag next --yes --concurrency 1 --loglevel warn',
+                'npm run lerna -- publish from-package --dist-tag foo --yes --concurrency 1 --loglevel warn',
                 {
                     cwd: monorepoRoot,
                     fatal: true,
@@ -138,7 +138,7 @@ const runGenerator = () => {
     const {stdout: distTags} = sh.exec(`npm info pwa-kit-create-app dist-tags`, {silent: true})
     console.log('--- pwa-kit-create-app dist-tags', distTags)
 
-    cp.execSync(`npx ${flags} pwa-kit-create-app@next ${process.argv.slice(2).join(' ')}`, {
+    cp.execSync(`npx ${flags} pwa-kit-create-app@foo ${process.argv.slice(2).join(' ')}`, {
         stdio: 'inherit'
     })
 }
