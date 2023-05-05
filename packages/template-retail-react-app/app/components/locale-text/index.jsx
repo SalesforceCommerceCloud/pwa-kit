@@ -12,7 +12,7 @@ import {chakra, Text} from '@chakra-ui/react'
 
 const LocaleText = ({shortCode, as, ...otherProps}) => {
     const intl = useIntl()
-    const Wrapper = 'option'
+    const Wrapper = as ? chakra(as) : Text
     const message = LOCALE_MESSAGES[shortCode]
 
     if (!message) {

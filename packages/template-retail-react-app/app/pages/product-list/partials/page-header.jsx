@@ -7,7 +7,6 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {isServer} from '../../../utils/utils'
 // Components
 import {Box, Heading, Flex, Text, Fade} from '@chakra-ui/react'
 
