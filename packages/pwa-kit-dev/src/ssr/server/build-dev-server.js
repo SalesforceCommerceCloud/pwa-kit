@@ -25,12 +25,12 @@ import {
     CLIENT_OPTIONAL,
     REQUEST_PROCESSOR
 } from '../../configs/webpack/config-names'
+import {EXT_OVERRIDES_DIR} from '../../configs/webpack/config'
 import {randomUUID} from 'crypto'
 import chalk from 'chalk'
 
 const projectDir = process.cwd()
 const projectPackageJSON = path.resolve(projectDir, 'package.json')
-const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -239,11 +239,7 @@ export const DevServerMixin = {
         //
         // https://salesforce-internal.slack.com/archives/C8YDDMKFZ/p1677793769255659?thread_ts=1677791840.174309&cid=C8YDDMKFZ
         return (req, res) => {
-            const baseDir = path.resolve(
-                req.app.options.projectDir,
-                projectPackageJSON?.ccExtensibility?.overridesDir ?? '',
-                'app'
-            )
+            const baseDir = path.resolve(req.app.options.projectDir, EXT_OVERRIDES_DIR ?? '', 'app')
             return this._serveStaticFile(req, res, baseDir, filePath, opts)
         }
     },

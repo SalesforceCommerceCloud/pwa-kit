@@ -21,7 +21,7 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 import {sdkReplacementPlugin, makeRegExp} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
-import OverridesResolverPlugin from './overrides-plugin'
+import ExtendsCircularImportsPlugin from './overrides-plugin'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -41,9 +41,14 @@ if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
 
-const EXT_OVERRIDES_DIR = pkg?.ccExtensibility?.overridesDir
-const EXT_EXTENDS = pkg?.ccExtensibility?.extends
-const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
+// for API convenience, add the leading slash if missing
+export const EXT_OVERRIDES_DIR =
+    typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
+    !pkg?.ccExtensibility?.overridesDir?.startsWith('/')
+        ? '/' + pkg?.ccExtensibility?.overridesDir
+        : pkg?.ccExtensibility?.overridesDir
+export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
+export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
 if (EXT_EXTENDABLE && EXT_EXTENDS) {
     const extendsAsArr = Array.isArray(EXT_EXTENDS) ? EXT_EXTENDS : [EXT_EXTENDS]
@@ -85,7 +90,7 @@ const entryPointExists = (segments) => {
 
 const getAppEntryPoint = (pkg) => {
     const APP_MAIN_PATH = '/app/main'
-    return EXT_OVERRIDES_DIR ? pkg.ccExtensibility.overridesDir + APP_MAIN_PATH : APP_MAIN_PATH
+    return EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR + APP_MAIN_PATH : APP_MAIN_PATH
 }
 
 const findInProjectThenSDK = (pkg) => {
@@ -154,7 +159,7 @@ const baseConfig = (target) => {
                     ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
                         ? {
                               plugins: [
-                                  new OverridesResolverPlugin({
+                                  new ExtendsCircularImportsPlugin({
                                       extends: [EXT_EXTENDS],
                                       overridesDir: EXT_OVERRIDES_DIR,
                                       projectDir: process.cwd()
@@ -189,7 +194,7 @@ const baseConfig = (target) => {
                         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
-                                  ...[pkg.ccExtensibility.extends].map((extendTarget) => ({
+                                  ...[EXT_EXTENDS].map((extendTarget) => ({
                                       [extendTarget]: [
                                           path.resolve(
                                               projectDir,
