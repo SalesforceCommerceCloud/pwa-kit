@@ -29,6 +29,7 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
+import {useIsHydrated} from '../../hooks/use-is-hydrated'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
@@ -37,9 +38,9 @@ const Footer = ({...otherProps}) => {
     const [locale, setLocale] = useState(intl.locale)
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
-
+    const isHydrated = useIsHydrated()
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
-    const showLocaleSelector = supportedLocaleIds?.length > 1
+    const showLocaleSelector = supportedLocaleIds?.length > 1 && isHydrated
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -190,7 +191,7 @@ export default Footer
 const Subscribe = ({...otherProps}) => {
     const styles = useStyles()
     const intl = useIntl()
-
+    const isHydrated = useIsHydrated()
     return (
         <Box {...styles.subscribe} {...otherProps}>
             <Heading {...styles.subscribeHeading}>
@@ -207,17 +208,23 @@ const Subscribe = ({...otherProps}) => {
             </Text>
 
             <Box>
-                <InputGroup>
-                    <Input type="email" placeholder="you@email.com" {...styles.subscribeField} />
-                    <InputRightElement {...styles.subscribeButtonContainer}>
-                        <Button variant="footer">
-                            {intl.formatMessage({
-                                id: 'footer.subscribe.button.sign_up',
-                                defaultMessage: 'Sign Up'
-                            })}
-                        </Button>
-                    </InputRightElement>
-                </InputGroup>
+                {isHydrated && (
+                    <InputGroup>
+                        <Input
+                            type="email"
+                            placeholder="you@email.com"
+                            {...styles.subscribeField}
+                        />
+                        <InputRightElement {...styles.subscribeButtonContainer}>
+                            <Button variant="footer">
+                                {intl.formatMessage({
+                                    id: 'footer.subscribe.button.sign_up',
+                                    defaultMessage: 'Sign Up'
+                                })}
+                            </Button>
+                        </InputRightElement>
+                    </InputGroup>
+                )}
             </Box>
 
             <SocialIcons variant="flex-start" pinterestInnerColor="black" {...styles.socialIcons} />
