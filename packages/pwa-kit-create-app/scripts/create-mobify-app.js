@@ -406,13 +406,13 @@ const extractTemplate = (templateName, outputDir) => {
 
 const downloadPackage = (packageSpec, outputDir) => {
     const {stdout: packageVersion} = sh.exec(`npm info ${packageSpec} version`, {silent: true})
-    console.log(`--- downloading ${packageSpec} which maps to ${packageVersion}`)
-
     const {stdout: packageName} = sh.exec(`npm info ${packageSpec} name`, {silent: true})
+    const {stdout: distTags} = sh.exec(`npm info ${packageSpec} dist-tags`, {silent: true})
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'download-package'))
 
+    console.log(`--- downloading ${packageSpec} ${packageVersion}`)
+    console.log('--- dist tags', distTags)
     sh.exec(`npm install ${packageSpec} --prefix ${tmp}`, {silent: true})
-    console.log('--- copying from', `node_modules/${packageName}`)
     sh.cp('-R', p.join(tmp, `node_modules/${packageName}`), outputDir)
 
     sh.rm('-rf', tmp)

@@ -281,7 +281,7 @@ jobs:
 
       - name: Generate ${{ matrix.template }} project
         run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-${{ matrix.template }}
+          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 7
