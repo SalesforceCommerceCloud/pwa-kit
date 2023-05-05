@@ -256,13 +256,22 @@ describe('hasSFRAAuthStateChanged', () => {
 
         expect(hasSFRAAuthStateChanged(storage, storageCopy)).toBe(true)
     })
-    test('returns false when refresh_token keys are the same', () => {
+    test('returns false when refresh_token keys and values are the same', () => {
+        const storage = new Map()
+        const storageCopy = new Map()
+
+        storage.set('cc-nx', 'testRefreshToken1')
+        storageCopy.set('cc-nx', 'testRefreshToken1')
+
+        expect(hasSFRAAuthStateChanged(storage, storageCopy)).toBe(false)
+    })
+    test('returns true when refresh_token keys are same but values are the different', () => {
         const storage = new Map()
         const storageCopy = new Map()
 
         storage.set('cc-nx-g', 'testRefreshToken1')
         storageCopy.set('cc-nx-g', 'testRefreshToken2')
 
-        expect(hasSFRAAuthStateChanged(storage, storageCopy)).toBe(false)
+        expect(hasSFRAAuthStateChanged(storage, storageCopy)).toBe(true)
     })
 })

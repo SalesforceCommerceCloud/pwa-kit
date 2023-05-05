@@ -276,7 +276,9 @@ export const noop = () => {}
 /**
  * WARNING: This function is relevant to be used in Hybrid deployments only.
  * Compares the refresh_token keys for guest('cc-nx-g') and registered('cc-nx') login from the cookie received from SFRA with the copy stored in localstorage on PWA Kit
- * to determine if the login state of the shopper on SFRA site has changed.
+ * to determine if the login state of the shopper on SFRA site has changed. If the keys are different we return true considering the login state did change. If the keys are same,
+ * we compare the values of the refresh_token to cover an edge case where the login state might have changed multiple times on SFRA and the eventual refresh_token key might be same
+ * as that on PWA Kit which would incorrectly show both keys to be the same even though the sessions are different.
  * @param {Storage} storage Cookie storage on PWA Kit in hybrid deployment.
  * @param {LocalStorage} storageCopy Local storage holding the copy of the refresh_token in hybrid deployment.
  * @returns {boolean} true if the keys do not match (login state changed), false otherwise.
@@ -290,5 +292,9 @@ export function hasSFRAAuthStateChanged(storage, storageCopy) {
         (storageCopy.get(refreshTokenGuestStorageKey) && refreshTokenGuestStorageKey) ||
         (storageCopy.get(refreshTokenRegisteredStorageKey) && refreshTokenRegisteredStorageKey)
 
-    return refreshTokenKey !== refreshTokenCopyKey
+    if(refreshTokenKey !== refreshTokenCopyKey) {
+        return true;
+    }
+
+    return storage.get(refreshTokenKey) !== storageCopy.get(refreshTokenCopyKey)
 }
