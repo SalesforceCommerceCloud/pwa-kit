@@ -85,7 +85,7 @@ const restorePackageVersion = (pathToPackage, versionNumber) => {
     setPackageVersion(versionNumber, {cwd: pathToPackage})
 }
 
-const setPackageVersion = (version, shellOptions) => {
+const setPackageVersion = (version, shellOptions = {}) => {
     sh.exec(`npm version --no-git-tag ${version}`, {silent: true, ...shellOptions})
 }
 
