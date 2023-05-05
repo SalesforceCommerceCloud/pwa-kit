@@ -13,6 +13,7 @@ const path = require('path')
 sh.set('-e')
 
 const lernaConfigPath = path.join(__dirname, '..', 'lerna.json')
+const rootPath = path.join(__dirname, '..')
 const rootPkgPath = path.join(__dirname, '..', 'package.json')
 const rootPkgLockPath = path.join(__dirname, '..', 'package-lock.json')
 
@@ -58,12 +59,17 @@ const main = () => {
     })
 
     // update versions for root package and root package lock
-    setPackageVersion(newVersion)
+    setPackageVersion(newVersion, {cwd: rootPath})
 
     ignoreList.forEach(({pathToPackage, oldVersion}) => {
         restorePackageVersion(pathToPackage, oldVersion)
         // If the package's dependency versions are updated, this change is still intact.
         // Only the package's own version is restored.
+
+        // But then we'll want to bump up the prerelease version of it too
+        if (process.cwd() === rootPath) {
+            setPackageVersion('prerelease', {cwd: pathToPackage})
+        }
     })
     // TODO: some packages may depend on the packages listed in the ignoreList. We'll need to make sure those packages have the correct dependency version.
 
@@ -76,13 +82,11 @@ const saveJSONToFile = (json, filePath) => {
 }
 
 const restorePackageVersion = (pathToPackage, versionNumber) => {
-    sh.cd(pathToPackage)
-    setPackageVersion(versionNumber)
-    sh.cd('-')
+    setPackageVersion(versionNumber, {cwd: pathToPackage})
 }
 
-const setPackageVersion = (version) => {
-    sh.exec(`npm version --no-git-tag ${version}`, {silent: true})
+const setPackageVersion = (version, shellOptions) => {
+    sh.exec(`npm version --no-git-tag ${version}`, {silent: true, ...shellOptions})
 }
 
 main()
