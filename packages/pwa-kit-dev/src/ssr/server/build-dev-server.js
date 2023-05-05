@@ -30,7 +30,6 @@ import {randomUUID} from 'crypto'
 import chalk from 'chalk'
 
 const projectDir = process.cwd()
-const projectPackageJSON = path.resolve(projectDir, 'package.json')
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
