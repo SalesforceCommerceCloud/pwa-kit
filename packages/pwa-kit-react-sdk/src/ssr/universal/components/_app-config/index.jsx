@@ -78,7 +78,7 @@ class AppConfig extends React.Component {
 
 AppConfig.propTypes = {
     children: PropTypes.node,
-    locals: PropTypes.object,
+    locals: PropTypes.object
 }
 
 export default AppConfig

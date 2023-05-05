@@ -18,6 +18,7 @@ import {
 import {Component} from 'retail-react-app/app/page-designer/core'
 import {ChevronLeftIcon, ChevronRightIcon} from 'retail-react-app/app/components/icons'
 import {useEffect} from 'react'
+import {regionPropType} from 'commerce-sdk-react-preview/components'
 
 /**
  * Display child components in a carousel slider manner. Configurations include the number of

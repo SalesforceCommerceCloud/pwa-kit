@@ -9,7 +9,6 @@
 
 // For more information on these settings, see https://webpack.js.org/configuration
 import path, {resolve} from 'path'
-import glob from 'glob'
 import fse from 'fs-extra'
 
 import webpack from 'webpack'
@@ -22,11 +21,10 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 import {sdkReplacementPlugin, makeRegExp} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
-import OverridesResolverPlugin from './overrides-plugin'
+import ExtendsCircularImportsPlugin from './overrides-plugin'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
-const sdkDir = resolve(path.join(__dirname, '..', '..', '..'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
     ? resolve(process.env.PWA_KIT_BUILD_DIR)
     : resolve(projectDir, 'build')
@@ -43,9 +41,14 @@ if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
 
-const EXT_OVERRIDES_DIR = pkg?.ccExtensibility?.overridesDir
-const EXT_EXTENDS = pkg?.ccExtensibility?.extends
-const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
+// for API convenience, add the leading slash if missing
+export const EXT_OVERRIDES_DIR =
+    typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
+    !pkg?.ccExtensibility?.overridesDir?.startsWith('/')
+        ? '/' + pkg?.ccExtensibility?.overridesDir
+        : pkg?.ccExtensibility?.overridesDir
+export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
+export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
 if (EXT_EXTENDABLE && EXT_EXTENDS) {
     const extendsAsArr = Array.isArray(EXT_EXTENDS) ? EXT_EXTENDS : [EXT_EXTENDS]
@@ -87,7 +90,7 @@ const entryPointExists = (segments) => {
 
 const getAppEntryPoint = (pkg) => {
     const APP_MAIN_PATH = '/app/main'
-    return EXT_OVERRIDES_DIR ? pkg.ccExtensibility.overridesDir + APP_MAIN_PATH : APP_MAIN_PATH
+    return EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR + APP_MAIN_PATH : APP_MAIN_PATH
 }
 
 const findInProjectThenSDK = (pkg) => {
@@ -106,20 +109,6 @@ const findInProjectThenSDK = (pkg) => {
         }
     }
     return candidate
-}
-
-const findDepInStack = (pkg) => {
-    const projectPath = resolve(projectDir, 'node_modules', pkg)
-    const projectFile = glob.sync(projectPath)
-    if (projectFile?.length) {
-        return projectPath
-    }
-    const extendPath = resolve(projectDir, 'node_modules', pkg)
-    const extendFile = glob.sync(extendPath)
-    if (extendFile?.length) {
-        return extendPath
-    }
-    return resolve(sdkDir, 'node_modules', pkg)
 }
 
 const baseConfig = (target) => {
@@ -170,7 +159,7 @@ const baseConfig = (target) => {
                     ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
                         ? {
                               plugins: [
-                                  new OverridesResolverPlugin({
+                                  new ExtendsCircularImportsPlugin({
                                       extends: [EXT_EXTENDS],
                                       overridesDir: EXT_OVERRIDES_DIR,
                                       projectDir: process.cwd()
@@ -180,34 +169,39 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        'babel-runtime': findDepInStack('babel-runtime'),
-                        '@tanstack/react-query': findDepInStack('@tanstack/react-query'),
-                        '@loadable/component': findDepInStack('@loadable/component'),
-                        '@loadable/server': findDepInStack('@loadable/server'),
-                        '@loadable/webpack-plugin': findDepInStack('@loadable/webpack-plugin'),
-                        'svg-sprite-loader': findDepInStack('svg-sprite-loader'),
-                        react: findDepInStack('react'),
-                        'react-router-dom': findDepInStack('react-router-dom'),
-                        'react-dom': findDepInStack('react-dom'),
-                        'react-helmet': findDepInStack('react-helmet'),
-                        'webpack-hot-middleware': findDepInStack('webpack-hot-middleware'),
+                        'babel-runtime': findInProjectThenSDK('babel-runtime'),
+                        '@tanstack/react-query': findInProjectThenSDK('@tanstack/react-query'),
+                        '@loadable/component': findInProjectThenSDK('@loadable/component'),
+                        '@loadable/server': findInProjectThenSDK('@loadable/server'),
+                        '@loadable/webpack-plugin': findInProjectThenSDK(
+                            '@loadable/webpack-plugin'
+                        ),
+                        'svg-sprite-loader': findInProjectThenSDK('svg-sprite-loader'),
+                        react: findInProjectThenSDK('react'),
+                        'react-router-dom': findInProjectThenSDK('react-router-dom'),
+                        'react-dom': findInProjectThenSDK('react-dom'),
+                        'react-helmet': findInProjectThenSDK('react-helmet'),
+                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware'),
 
                         // TODO: these need to be declared in package.json as peerDependencies ?
                         // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
-                        'react-intl': findDepInStack('react-intl'),
-                        '@chakra-ui/icons': findDepInStack('@chakra-ui/icons'),
-                        '@chakra-ui/react': findDepInStack('@chakra-ui/react'),
-                        '@chakra-ui/skip-nav': findDepInStack('@chakra-ui/skip-nav'),
-                        '@emotion/react': findDepInStack('@emotion/react'),
-                        '@emotion/styled': findDepInStack('@emotion/styled'),
+                        'react-intl': findInProjectThenSDK('react-intl'),
+                        '@chakra-ui/icons': findInProjectThenSDK('@chakra-ui/icons'),
+                        '@chakra-ui/react': findInProjectThenSDK('@chakra-ui/react'),
+                        '@chakra-ui/skip-nav': findInProjectThenSDK('@chakra-ui/skip-nav'),
+                        '@emotion/react': findInProjectThenSDK('@emotion/react'),
+                        '@emotion/styled': findInProjectThenSDK('@emotion/styled'),
                         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
-                                  ...[pkg.ccExtensibility.extends].map((extendTarget) => ({
-                                      [extendTarget]: path.resolve(
-                                          projectDir,
-                                          `node_modules/${extendTarget}`
-                                      )
+                                  ...[EXT_EXTENDS].map((extendTarget) => ({
+                                      [extendTarget]: [
+                                          path.resolve(
+                                              projectDir,
+                                              EXT_OVERRIDES_DIR.replace(/^\//, '')
+                                          ),
+                                          path.resolve(projectDir, `node_modules/${extendTarget}`)
+                                      ]
                                   }))
                               )
                             : {}),

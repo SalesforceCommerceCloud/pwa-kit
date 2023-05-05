@@ -7,22 +7,20 @@
 import webpack from 'webpack'
 import path, {resolve} from 'path'
 import glob from 'glob'
-
+import {EXT_OVERRIDES_DIR, EXT_EXTENDS} from './config'
 const projectDir = process.cwd()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require(resolve(projectDir, 'package.json'))
 
-const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
+const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx)'
 
 const getOverridePath = (relativePath) => {
-    const extendPath = pkg?.ccExtensibility?.extends
-        ? `node_modules/${pkg?.ccExtensibility?.extends}`
-        : ''
-    const overridePath = pkg?.ccExtensibility?.overridesDir?.replace(/^\//, '')
+    const extendPath = pkg?.ccExtensibility?.extends ? `node_modules/${EXT_EXTENDS}` : ''
+    const overridePath = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 
     // order matters here, we perform look ups starting in the following order:
     // pkg.ccExtensibility.overridesDir => pkg.ccExtensibility.extends => current projectDir
-    if (pkg?.ccExtensibility?.extends && pkg?.ccExtensibility?.overridesDir) {
+    if (EXT_EXTENDS && EXT_OVERRIDES_DIR) {
         const filePath = `${resolve(
             projectDir,
             overridePath,
