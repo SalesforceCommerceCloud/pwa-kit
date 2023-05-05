@@ -84,12 +84,12 @@ jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     }
 })
 
-// Mock isTokenValid globally
+// Mock isTokenExpired globally
 jest.mock('./app/commerce-api/utils', () => {
     const originalModule = jest.requireActual('./app/commerce-api/utils')
     return {
         ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
+        isTokenExpired: jest.fn().mockReturnValue(false)
     }
 })
 
