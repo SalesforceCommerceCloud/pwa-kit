@@ -39,6 +39,7 @@ import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../hooks/use-einstein'
 import {useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useHydrate} from '@tanstack/react-query'
 
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
@@ -91,7 +92,7 @@ const Account = () => {
     const einstein = useEinstein()
 
     const {buildUrl} = useMultiSite()
-
+    const isHydrated = useHydrate()
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(location.pathname)
@@ -113,7 +114,7 @@ const Account = () => {
     }
     return (
         <Box
-            data-testid={isRegistered ? 'account-page' : 'account-page-skeleton'}
+            data-testid={isRegistered && isHydrated ? 'account-page' : 'account-page-skeleton'}
             layerStyle="page"
             paddingTop={[4, 4, 12, 12, 16]}
         >
