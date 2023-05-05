@@ -10,7 +10,7 @@ import {useState, useEffect} from 'react'
 /**
  * Hook to determine if the code is hydrated
  * Solution for hydration issues with SSR.
- * @returns {boolean} true if the code is finished hydrated
+ * @returns {boolean} true if the code is finished hydration
  */
 export const useIsHydrated = () => {
     const [isHydrated, setIsHydrated] = useState(false)
