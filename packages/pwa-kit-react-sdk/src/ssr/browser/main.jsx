@@ -8,7 +8,6 @@
 import React, {useRef} from 'react'
 import {hydrateRoot} from 'react-dom/client'
 import {BrowserRouter as Router} from 'react-router-dom'
-import DeviceContext from '../universal/device-context'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
 import {getAppConfig} from '../universal/compatibility'
@@ -52,16 +51,14 @@ export const OuterApp = ({routes, error, WrappedApp, locals, callback}) => {
                         return uuidv4()
                     }}
                 >
-                    <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                        <AppConfig locals={locals}>
-                            <Switch
-                                error={error}
-                                appState={window.__PRELOADED_STATE__}
-                                routes={routes}
-                                App={WrappedApp}
-                            />
-                        </AppConfig>
-                    </DeviceContext.Provider>
+                    <AppConfig locals={locals}>
+                        <Switch
+                            error={error}
+                            appState={window.__PRELOADED_STATE__}
+                            routes={routes}
+                            App={WrappedApp}
+                        />
+                    </AppConfig>
                 </CorrelationIdProvider>
             </Router>
         </ServerContext.Provider>
