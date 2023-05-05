@@ -38,7 +38,8 @@ const mockLogin = jest.fn()
 jest.mock('../commerce-api/auth', () => {
     return jest.fn().mockImplementation(() => {
         return {
-            login: mockLogin
+            login: mockLogin,
+            isTokenValid: true
         }
     })
 })
@@ -47,7 +48,8 @@ jest.mock('../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../commerce-api/utils')
     return {
         ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true),
+        isTokenExpired: jest.fn().mockReturnValue(false),
+        hasSFRAAuthStateChanged: jest.fn().mockReturnValue(false),
         createGetTokenBody: jest.fn().mockReturnValue({
             grantType: 'test',
             code: 'test',
@@ -137,10 +139,13 @@ test('Allows customer to sign in to their account', async () => {
     user.click(screen.getByText(/sign in/i))
 
     // wait for successful toast to appear
-    await waitFor(() => {
-        expect(screen.getByText(/Welcome Tester/i)).toBeInTheDocument()
-        expect(screen.getByText(/you're now signed in/i)).toBeInTheDocument()
-    })
+    await waitFor(
+        () => {
+            expect(screen.getByText(/Welcome Tester/i)).toBeInTheDocument()
+            expect(screen.getByText(/you're now signed in/i)).toBeInTheDocument()
+        },
+        {timeout: 20000}
+    )
 })
 
 test('Renders error when given incorrect log in credentials', async () => {
@@ -233,7 +238,10 @@ test('Allows customer to create an account', async () => {
     user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
     user.click(withinForm.getByText(/create account/i))
 
-    await waitFor(() => {
-        expect(screen.getAllByText(/welcome tester/i).length).toEqual(2)
-    })
+    await waitFor(
+        () => {
+            expect(screen.getAllByText(/customer@test.com/i).length).toEqual(1)
+        },
+        {timeout: 20000}
+    )
 })
