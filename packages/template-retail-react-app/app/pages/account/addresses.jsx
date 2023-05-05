@@ -277,7 +277,7 @@ const AccountAddresses = () => {
                             rounded="base"
                             fontWeight="medium"
                             leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
-                            onClick={toggleEdit}
+                            onClick={() => toggleEdit()}
                         >
                             <FormattedMessage
                                 defaultMessage="Add Address"
@@ -289,7 +289,6 @@ const AccountAddresses = () => {
 
                     {isEditing && !selectedAddressId && (
                         <>
-                            <div>Testesdfds</div>
                             <ShippingAddressForm
                                 form={form}
                                 hasAddresses={hasAddresses}
@@ -360,7 +359,7 @@ const AccountAddresses = () => {
                                 defaultMessage: 'Add Address',
                                 id: 'account_addresses.page_action_placeholder.button.add_address'
                             })}
-                            onButtonClick={toggleEdit}
+                            onButtonClick={() => toggleEdit()}
                         />
                     )}
                     {isEditing && !selectedAddressId && (
