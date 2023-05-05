@@ -292,8 +292,8 @@ export function hasSFRAAuthStateChanged(storage, storageCopy) {
         (storageCopy.get(refreshTokenGuestStorageKey) && refreshTokenGuestStorageKey) ||
         (storageCopy.get(refreshTokenRegisteredStorageKey) && refreshTokenRegisteredStorageKey)
 
-    if(refreshTokenKey !== refreshTokenCopyKey) {
-        return true;
+    if (refreshTokenKey !== refreshTokenCopyKey) {
+        return true
     }
 
     return storage.get(refreshTokenKey) !== storageCopy.get(refreshTokenCopyKey)
