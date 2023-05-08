@@ -294,7 +294,7 @@ Besides the collection of query hooks and mutation hooks, here are some ultility
 
 ### `useCommerceApi()`
 
-This hook returns a set of SCAPI clients, which are already initialized client using the configurations passed to the provider. Note: this hook doesn't automatically include auth headers.
+This hook returns a set of SCAPI clients, which are already initialized using the configurations passed to the provider. Note: this hook doesn't automatically include auth headers.
 
 ```jsx
 import {useCommerceApi, useAccessToken} from '@salesforce/commerce-sdk-react'
