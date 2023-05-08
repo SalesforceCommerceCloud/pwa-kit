@@ -182,7 +182,10 @@ const main = async () => {
     const appSSRjs = fse.pathExistsSync(appSSRpath)
     const overrideSSRpath = p.join(
         process.cwd(),
-        projectPkg?.ccExtensibility?.overridesDir ?? '',
+        typeof projectPkg?.ccExtensibility?.overridesDir === 'string' &&
+            !projectPkg?.ccExtensibility?.overridesDir?.startsWith('/')
+            ? '/' + projectPkg?.ccExtensibility?.overridesDir
+            : projectPkg?.ccExtensibility?.overridesDir ?? '',
         'app',
         'ssr.js'
     )
