@@ -65,11 +65,6 @@ const main = () => {
         restorePackageVersion(pathToPackage, oldVersion)
         // If the package's dependency versions are updated, this change is still intact.
         // Only the package's own version is restored.
-
-        // But then we'll want to bump up the prerelease version of it too
-        if (process.cwd() === rootPath) {
-            setPackageVersion('prerelease', {cwd: pathToPackage})
-        }
     })
     // TODO: some packages (see my-extended-retail-app) may depend on the packages listed in the ignoreList. 
     // We'll need to make sure those packages have the correct dependency version.
