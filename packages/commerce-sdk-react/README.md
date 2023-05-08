@@ -225,7 +225,7 @@ For example, `useProduct({parameters: {id: '25592770M', "allImages": true}})` ho
   } ]
 ```
 
-The first element in the query key is always a constant value `commerce-sdk-react`, the namespace provides flexibility for invalidating the entire query cache. This is typically useful when using react-query for multiple services including SCAPI. This allows us to invalidate the entire SCAPI cache without affecting other cache entries, for example, cache for fetching data from a customer CMS provider. To invalidate all SCAPI cache entries, use `queryClient.invalidateQueries(['commerce-sdk-react'])`.
+The first element in the query key is always a constant value, `commerce-sdk-react`. The namespace provides flexibility for invalidating the entire query cache. This is typically useful when using react-query for multiple services including SCAPI. This allows us to invalidate the entire SCAPI cache without affecting other cache entries, such as the cache for fetching data from a customer CMS provider. To invalidate all SCAPI cache entries, use `queryClient.invalidateQueries(['commerce-sdk-react'])`.
 
 The following N elements in the array are the path segment of the actual SCAPI endpoint. This design makes it easier to have granular control over individual cache as well as the ability to do bulk invalidations based on the hierarchy of the entities.
 
