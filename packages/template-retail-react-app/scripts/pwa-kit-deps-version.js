@@ -6,7 +6,6 @@
  */
 
 const sh = require('shelljs')
-const path = require('path')
 
 const SDK_PACKAGES = [
     'pwa-kit-react-sdk',
@@ -16,20 +15,10 @@ const SDK_PACKAGES = [
 ]
 
 const main = () => {
-    setPackageVersion(process.argv[2])
-
-    // Downgrade SDK dependencies to @latest version
-    const {stdout: latestVersion} = sh.exec(`npm info ${SDK_PACKAGES[0]}@latest version`, {
-        silent: true
-    })
+    const version = process.argv[2]
     SDK_PACKAGES.forEach((pkgName) => {
         // TODO: check first whether the dependency exists
-        sh.exec(`npm pkg set devDependencies.${pkgName}=${latestVersion}`)
+        sh.exec(`npm pkg set devDependencies.${pkgName}=${version}`)
     })
 }
-
-const setPackageVersion = (version, shellOptions = {}) => {
-    sh.exec(`npm version --no-git-tag ${version}`, {silent: true, ...shellOptions})
-}
-
 main()
