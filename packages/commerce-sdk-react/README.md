@@ -243,7 +243,7 @@ _💡 Hint: install and include `@tanstack/react-query-devtools` in your React a
 
 ## Mutations
 
-The query hooks correspond to the http POST, PUT, PATCH, DELETE endpoints from the SCAPI family. The mutation hooks follow the signature pattern:
+The query hooks correspond to the http POST, PUT, PATCH, DELETE endpoints from the SCAPI API domains. The mutation hooks follow the signature pattern:
 
 ```
 use<ApiName>Mutations(EndpointName)
