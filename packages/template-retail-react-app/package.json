@@ -3,7 +3,9 @@
   "version": "2.8.0-dev",
   "license": "See license in LICENSE",
   "ccExtensibility": {
-    "extendable": ["retail-react-app"]
+    "extendable": [
+      "retail-react-app"
+    ]
   },
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
@@ -79,7 +81,8 @@
     "react-helmet": "^6.1.0",
     "react-hook-form": "^6.15.8",
     "react-intl": "^5.25.1",
-    "react-router-dom": "^5.3.4"
+    "react-router-dom": "^5.3.4",
+    "shelljs": "^0.8.5"
   },
   "peerDependencies": {
     "@chakra-ui/system": "^1.12.1"
