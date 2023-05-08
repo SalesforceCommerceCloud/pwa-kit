@@ -1,6 +1,6 @@
 {
   "name": "internal-lib-build",
-  "version": "2.8.0-dev",
+  "version": "3.1.0-dev",
   "private": true,
   "description": "Build tools for *libraries* in the monorepo",
   "bugs": {
@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "npm-packlist": "^4.0.0",
-    "pwa-kit-dev": "2.8.0-dev",
+    "pwa-kit-dev": "^3.1.0-dev",
     "typescript": "4.8.3"
   },
   "peerDependencies": {
