@@ -2,7 +2,7 @@
 
 <p align="center">
 A collection of React hooks for <b>fetching</b>, <b>caching</b>, and <b>mutating data</b> from the <b><a href="https://developer.salesforce.com/docs/commerce/commerce-api/overview">Salesforce B2C Commerce API</a></b> (SCAPI).
-The library contains declarative, always-up-to-date auto-managed <b>queries</b> and <b>mutations</b> that directly improve both developer and user experiences.
+The library contains declarative, always-up-to-date auto-managed <b>queries</b> and <b>mutations</b> for a more convenient developer experience.
 </p>
 
 ## 🎯 Features
