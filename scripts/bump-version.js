@@ -71,7 +71,8 @@ const main = () => {
             setPackageVersion('prerelease', {cwd: pathToPackage})
         }
     })
-    // TODO: some packages may depend on the packages listed in the ignoreList. We'll need to make sure those packages have the correct dependency version.
+    // TODO: some packages (see my-extended-retail-app) may depend on the packages listed in the ignoreList. 
+    // We'll need to make sure those packages have the correct dependency version.
 
     sh.echo('\nVersions of packages in the monorepo:')
     sh.exec('lerna list --all --long')

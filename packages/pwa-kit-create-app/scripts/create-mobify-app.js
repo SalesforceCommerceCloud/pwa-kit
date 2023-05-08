@@ -130,7 +130,12 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
 const runGenerator = (answers, {outputDir, verbose}) => {
     checkOutputDir(outputDir)
     // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
-    const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
+    const npmInstallables = [
+        'pwa-kit-react-sdk',
+        'pwa-kit-dev',
+        'pwa-kit-runtime',
+        'commerce-sdk-react-preview'
+    ]
 
     // Check specified SDK versions actually exist on NPM.
     npmInstallables.forEach((pkgName) => {
@@ -151,12 +156,16 @@ const runGenerator = (answers, {outputDir, verbose}) => {
     const pkgJSON = readJson(pkgJsonPath)
     const pkgDataWithAnswers = merge(pkgJSON, answers['retail-react-app'])
 
+    // Pinning the SDK dependencies to a specific version (without the carrot)
+    // And as a side effect, it will also keep that dependency version up-to-date.
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
         keys.forEach((key) => {
             const deps = pkgDataWithAnswers[key]
             if (deps && deps[pkgName]) {
+                console.log('--- deps[pkgName] -before', deps[pkgName])
                 deps[pkgName] = SDK_VERSION
+                console.log('--- deps[pkgName] -after', deps[pkgName])
             }
         })
     })
