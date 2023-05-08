@@ -71,7 +71,7 @@ export default withReactQuery(AppConfig, options)
 
 ## ⚡️ Quickstart (Generic React App)
 
-You can use this library in any React application provided you bring your own QueryClient and QueryClientProvider. Below is a sample integration:
+You can use this library in any React application by creating a new QueryClient and wrap your application with `QueryClientProvider`. For example: 
 
 ```jsx
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
