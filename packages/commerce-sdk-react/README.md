@@ -120,7 +120,7 @@ While the library is getting/refreshing the access token, the network requests w
 
 ### Auth helpers
 
-To leverage the managed shopper authentication feature, you want to use the auth helper hooks for shopper login.
+To leverage the managed shopper authentication feature, use the auth helper hooks for shopper login.
 
 Example:
 
