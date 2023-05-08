@@ -204,7 +204,7 @@ const Example = ({basketId}) => {
 
 ### Advanced: Query Key Structure
 
-On most cases, you don't need to know this! If for advanced use cases where you want to manually update/invalidate the cache entires. Here is the explanation of the cache key structure.
+In most cases, you won't need to use this! This feature is intended for advanced use cases where you want to manually update/invalidate the cache entires. Here is the explanation of the cache key structure.
 
 The query keys are automatically generated in the following format:
 
