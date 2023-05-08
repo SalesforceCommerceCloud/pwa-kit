@@ -140,7 +140,7 @@ const Example = () => {
 
 ### Opt-out from managed shopper authentication
 
-To opt-out from the auto-login, request queue, and stop the library from managing tokens, pass `fetchedToken` (a SLAS JWT) to the provider.
+To opt-out of the auto-login, request queue, and token management features, pass `fetchedToken` (a SLAS JWT) to the provider.
 
 ```jsx
 const MyComponent = ({children}) => {
