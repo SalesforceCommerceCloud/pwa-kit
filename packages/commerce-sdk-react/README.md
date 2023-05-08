@@ -249,7 +249,7 @@ The query hooks correspond to the http POST, PUT, PATCH, DELETE endpoints from t
 use<ApiName>Mutations(EndpointName)
 ```
 
-For example, the [ShopperBaskets API](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=Summary) has a number of endpoints, one of the endpoint is the [addItemToBasket](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addItemToBasket) endpoint (`POST /baskets/{basketId}/items`).
+For example, the [ShopperBaskets API](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=Summary) has a number of endpoints, one of them being the [addItemToBasket](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addItemToBasket) endpoint (`POST /baskets/{basketId}/items`).
 
 ```jsx
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
