@@ -164,6 +164,14 @@ const tlsVersionTest = async (_, res) => {
 }
 
 /**
+ * Express handler that returns all the environment variables set  
+ */
+const envVarsTest = async (_, res) => {
+    res.header('Content-Type', 'application/json')
+    res.send(JSON.stringify(process.env, null, 4))
+}
+
+/**
  * Logging middleware; logs request and response headers (and response status).
  */
 const loggingMiddleware = (req, res, next) => {
@@ -218,6 +226,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     // Configure routes
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)
+    app.get('/env-vars', envVarsTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
