@@ -106,7 +106,7 @@ export default App
 
 _💡 This section assumes you have read and completed the [Authorization for Shopper APIs](https://developer.salesforce.com/docs/commerce/commerce-api/guide/authorization-for-shopper-apis.html) guide._
 
-To help reducing boilerplate code for managing shopper authentication, by default, this library automatically initializes shopper session and manage the tokens for developers. Currently, the library supports the [Public Client login flow](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-public-client.html).
+To help reduce boilerplate code for managing shopper authentication, by default, this library automatically initializes shopper session and manages the tokens for developers. Currently, the library supports the [Public Client login flow](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-public-client.html).
 
 ### Shopper Session Initialization
 
