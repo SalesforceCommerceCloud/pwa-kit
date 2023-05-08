@@ -26,7 +26,7 @@ npm install @salesforce/commerce-sdk-react @tanstack/react-query
 
 ## ⚡️ Quickstart (PWA Kit)
 
-To integrate this library with your PWA Kit application you can use the `CommerceApiProvider` directly, given that you use the `withReactQuery` higher order component to wrap your `AppConfig` component. Below is a snippet of how this is accomplished.
+To integrate this library with your PWA Kit application you can use the `CommerceApiProvider` directly assuming that you use the `withReactQuery` higher order component to wrap your `AppConfig` component. Below is a snippet of how this is accomplished.
 
 ```jsx
 // app/components/_app-config/index.jsx
