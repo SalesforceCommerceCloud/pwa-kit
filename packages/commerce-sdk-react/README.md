@@ -16,7 +16,7 @@ The library contains declarative, always-up-to-date auto-managed <b>queries</b> 
 - Request deduplication
 - Built-in caching for easy state management
   - automatic cache invalidations/updates via the library's built-in mutations
-  - auto cache key generation
+  - automatic cache key generation
 
 ## ⚙️ Installation
 
