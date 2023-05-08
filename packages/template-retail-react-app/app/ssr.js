@@ -158,8 +158,16 @@ async function handlerStorefrontPreview(req, res) {
     // [3] Validate the AM user has access to the ECOM instance
     const slasEcom = parseSLASIssClaim(slasPayload.iss)
     const tenantFilter = parseAMtenantFilterClaim(amPayload.tenantFilter)
+    const ecomInstances = [...tenantFilter?.ECOM_ADMIN, ...tenantFilter?.ECOM_USER]
+    const ecomParts = slasEcom.split('_')
 
-    if (!tenantFilter?.SLAS_ORGANIZATION_ADMIN.includes(slasEcom)) {
+    // The role 'zzrf_sbx' provides access to any sandbox (SBX) instance in the ‘zzrf’ realm.
+    // This includes the SBX instances ‘zzrf_001’, ‘zzrf_002’, etc.
+    const isEcomInTenantFiler = !isNaN(Number(ecomParts[1]))
+        ? ecomInstances.includes(slasEcom) || ecomInstances.includes(`${ecomParts[0]}_sbx`)
+        : ecomInstances.includes(slasEcom)
+
+    if (!isEcomInTenantFiler) {
         return res.status(400).json({error: 'Permissions error'})
     }
 
