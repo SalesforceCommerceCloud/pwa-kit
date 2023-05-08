@@ -19,15 +19,13 @@ const MockComponent = ({updateCart}) => {
     return (
         <div>
             <button onClick={onOpen}>Open Modal</button>
-            {isOpen && (
-                <ProductViewModal
-                    updateCart={updateCart}
-                    onOpen={onOpen}
-                    onClose={onClose}
-                    isOpen={isOpen}
-                    product={mockProductDetail}
-                />
-            )}
+            <ProductViewModal
+                updateCart={updateCart}
+                onOpen={onOpen}
+                onClose={onClose}
+                isOpen={isOpen}
+                product={mockProductDetail}
+            />
         </div>
     )
 }

@@ -106,11 +106,13 @@ test('Renders login modal by default', async () => {
     const trigger = screen.getByText(/open modal/i)
     user.click(trigger)
 
-    expect(screen.getByText(/welcome back/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Password/)).toBeInTheDocument()
-    expect(screen.getByText(/forgot password/i)).toBeInTheDocument()
-    expect(screen.getByText(/sign in/i)).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByText(/welcome back/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/Password/)).toBeInTheDocument()
+        expect(screen.getByText(/forgot password/i)).toBeInTheDocument()
+        expect(screen.getByText(/sign in/i)).toBeInTheDocument()
+    })
 })
 
 // TODO: Fix flaky/broken test
