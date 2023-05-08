@@ -81,6 +81,8 @@ import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
 import {useWishList} from 'retail-react-app/app/hooks/use-wish-list'
 
+import Data from 'retail-react-app/app/components/data'
+
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
 const REFINEMENT_DISALLOW_LIST = ['c_isNew']
@@ -373,6 +375,7 @@ const ProductList = (props) => {
             paddingTop={{base: 6, lg: 8}}
             {...rest}
         >
+            <Data />
             <Helmet>
                 <title>{category?.pageTitle}</title>
                 <meta name="description" content={category?.pageDescription} />

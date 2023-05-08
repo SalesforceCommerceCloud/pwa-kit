@@ -25,16 +25,10 @@ import { routes as _routes } from 'retail-react-app/app/routes'
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Pages
-const Home = loadable(() => import('./pages/home'), { fallback })
 const MyNewRoute = loadable(() => import('./pages/my-new-route'))
 const Login = loadable(() => import('./pages/login'))
 
 const routes = [
-    {
-        path: '/',
-        component: Home,
-        exact: true
-    },
     {
         path: '/my-new-route',
         component: MyNewRoute
