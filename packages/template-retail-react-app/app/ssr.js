@@ -161,13 +161,13 @@ async function handlerStorefrontPreview(req, res) {
     const ecomInstances = [...tenantFilter?.ECOM_ADMIN, ...tenantFilter?.ECOM_USER]
     const ecomParts = slasEcom.split('_')
 
-    // The role 'zzrf_sbx' provides access to any sandbox (SBX) instance in the ‘zzrf’ realm.
+    // The role ‘zzrf_sbx‘ provides access to any sandbox (SBX) instance in the ‘zzrf’ realm.
     // This includes the SBX instances ‘zzrf_001’, ‘zzrf_002’, etc.
-    const isEcomInTenantFiler = !isNaN(Number(ecomParts[1]))
+    const isEcomInTenantFilter = !isNaN(Number(ecomParts[1]))
         ? ecomInstances.includes(slasEcom) || ecomInstances.includes(`${ecomParts[0]}_sbx`)
         : ecomInstances.includes(slasEcom)
 
-    if (!isEcomInTenantFiler) {
+    if (!isEcomInTenantFilter) {
         return res.status(400).json({error: 'Permissions error'})
     }
 
