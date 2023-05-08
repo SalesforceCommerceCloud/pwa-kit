@@ -239,7 +239,7 @@ queryClient.invalidateQueries(['commerce-sdk-react', '/organizations', '/f_ecom_
 queryClient.invalidateQueries(['commerce-sdk-react', '/organizations', '/f_ecom_aaaa_001', '/baskets', '/BASKET_ID', '/shipments', 'SHIPMENT_ID', '/shipping-methods'])
 ```
 
-_💡 Hint: include `@tanstack/react-query-devtools` in your React app to see the queries (and their cache keys)._
+_💡 Hint: install and include `@tanstack/react-query-devtools` in your React app to see the queries (and their cache keys)._
 
 ## Mutations
 
