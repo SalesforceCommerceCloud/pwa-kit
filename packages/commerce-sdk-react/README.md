@@ -162,7 +162,7 @@ The query hooks correspond to the http GET endpoints from the SCAPI family. The 
 use<EntityName>(CommerceClientOptions, ReactQueryOptions)
 ```
 
-For example, the both the __required__ and __optional__ parameters for the underlying `commerce-sdk-isomorphic` call is passed as the first parameter:
+For example, both the __required__ and __optional__ parameters for the underlying `commerce-sdk-isomorphic` call is passed as the first parameter:
 
 ```jsx
 import {useProduct} from '@salesforce/commerce-sdk-react'
