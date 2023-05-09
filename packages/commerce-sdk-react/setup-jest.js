@@ -25,6 +25,9 @@ class LocalStorageMock {
     }
 }
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+global.TextDecoder = require('util').TextDecoder
+
 const localStorageMock = new LocalStorageMock()
 
 Object.defineProperty(window, 'localStorage', {
