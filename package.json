@@ -3,6 +3,7 @@
   "version": "3.1.0-dev",
   "scripts": {
     "pwa-kit-version": "node ./scripts/bump-version.js",
+    "publish-to-npm": "node ./scripts/publish-to-npm.js",
     "format": "lerna run --stream format",
     "preinstall": "node ./scripts/check-version.js",
     "postinstall": "node ./scripts/bootstrap.js",
