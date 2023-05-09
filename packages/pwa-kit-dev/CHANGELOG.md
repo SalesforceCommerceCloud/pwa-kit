@@ -1,24 +1,36 @@
-## v2.7.1-alpha.0 (May 08, 2023)
-## v2.8.0-dev (Mar 03, 2023)
+## v2.7.1 (May 09, 2023)
+
+-   Add suffix to SSR build files [#1157](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1157)
+-   Mitigate local dev memory leaks [#1155](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1155)
+-   Minor performance improvements [#974](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/974)
+-   Fix getConfig referencing config from incorrect location [#1049](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1049)
+-   Moved the MRT reference app to the SDKs, so that we can verify eg. Node support [#966](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/966)
+
 ## v2.7.0 (Mar 03, 2023)
-- Add explicit `ws` dependency [#865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/865)
+
+-   Add explicit `ws` dependency [#865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/865)
 
 ## v2.6.0 (Jan 25, 2023)
-- Upgrade prettier to v2 [#926](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/926)
-- Security package updates
+
+-   Upgrade prettier to v2 [#926](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/926)
+-   Security package updates
 
 ## v2.5.0 (Jan 05, 2023)
-- Logging cid from res header isntead of req in local development [#821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/821)
+
+-   Logging cid from res header isntead of req in local development [#821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/821)
 
 ## v2.4.0 (Dec 01, 2022)
+
 -   Add `tail-logs` command [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
 -   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793)
 
 ## v2.3.0 (Oct 27, 2022)
+
 -   Minimize "Module not found" error during webpack rebuild, whenever a package dependency is being updated/built [#722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/722)
 -   Update minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793)
 
 ## v2.2.0 (Aug 25, 2022)
+
 -   Added option to specify where/from the credentials can be saved/read [#647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/647)
 
 ## v2.1.0 (Jul 05, 2022)
