@@ -100,6 +100,7 @@ jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
 // TextEncoder is a web API, need to import it
 // from nodejs util in testing environment.
 global.TextEncoder = require('util').TextEncoder
+global.TextDecoder = require('util').TextDecoder
 
 // This file consists of global mocks for jsdom.
 class StorageMock {
