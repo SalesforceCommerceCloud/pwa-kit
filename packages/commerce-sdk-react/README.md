@@ -286,7 +286,7 @@ const Example = ({basketId}) => {
 
 Since mutations changes data on the server, the cache entries that are potentially affected by the mutation is automatically invalidated.
 
-For example, a `addItemToBasket` mutation will automatically invalidate `getBasket`  and `customerBaskets` query
+For example, a `addItemToBasket` mutation will automatically invalidate `useBasket`  and `useCustomerBaskets` queries.
 
 ## Ultilities
 
