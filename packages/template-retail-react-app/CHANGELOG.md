@@ -1,4 +1,5 @@
 ## v2.8.0-dev (Mar 03, 2023)
+- Add a redirect to login page after user signs out from checkout page [#1172](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1172)
 - Make `mergeBasket` conditional more robust [#1048](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1048)
 
 ## v2.7.0 (Mar 03, 2023)
