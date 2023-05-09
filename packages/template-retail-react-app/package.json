@@ -51,7 +51,7 @@
     "commerce-sdk-react-preview": "^2.8.0-dev",
     "cross-env": "^5.2.1",
     "focus-visible": "^5.2.0",
-    "framer-motion": "^4.1.17",
+    "framer-motion": "^10.12.9",
     "full-icu": "^1.5.0",
     "helmet": "^4.6.0",
     "jest-fetch-mock": "^2.1.2",
