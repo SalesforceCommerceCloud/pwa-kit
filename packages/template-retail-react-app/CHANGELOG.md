@@ -1,5 +1,6 @@
 ## v2.8.0-dev (Mar 03, 2023)
 
+-   Replace invalid row value with nowrap [#1179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1179)
 -   Add a redirect to login page after user signs out from checkout page [#1172](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1172)
 -   PWA Kit should have a mechanism for replacing the access token when a SFRA login state is changed [#1171](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1171)
 -   Added session bridge call to login for phased launch [#1159](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1159)
