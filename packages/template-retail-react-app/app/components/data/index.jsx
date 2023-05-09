@@ -1,6 +1,6 @@
 import React from 'react'
 
-import data from './data.json'
+import data from 'retail-react-app/app/components/data/data.json'
 
 const Data = () => (
     <div dangerouslySetInnerHTML={{
