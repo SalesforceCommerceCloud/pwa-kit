@@ -421,8 +421,11 @@ class Auth {
      *
      */
     async logout() {
-        // TODO: are we missing a call to /logout?
-        // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
+        // Not awaiting on purpose because there isn't much we can do if this fails.
+        helpers.logout(this.client, {
+            accessToken: this.get('access_token'),
+            refreshToken: this.get('refresh_token_registered')
+        })
         this.clearStorage()
         return this.loginGuestUser()
     }
