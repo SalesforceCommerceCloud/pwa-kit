@@ -7,7 +7,6 @@
 export default {
     baseStyle: {
         container: {
-            height: 'full',
             minWidth: 'xs',
             width: 'full',
             boxShadow: 'base',
