@@ -29,7 +29,8 @@ describe('server', () => {
     test.each([
         ['/', 200, 'application/json; charset=utf-8'],
         ['/tls', 200, 'application/json; charset=utf-8'],
-        ['/exception', 500, 'text/html; charset=utf-8']
+        ['/exception', 500, 'text/html; charset=utf-8'],
+        ['/env-vars', 200, 'application/json; charset=utf-8']
     ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
         return request(app)
             .get(path)
