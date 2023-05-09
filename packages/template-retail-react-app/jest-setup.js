@@ -69,6 +69,9 @@ export const setupMockServer = () => {
         rest.post('*/v3/activities/EinsteinTestSite/*', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json({}))
         }),
+        rest.post('*/activities/EinsteinTestSite/*', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+        }),
         rest.post('*/v3/personalization/recs/EinsteinTestSite/*', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json({}))
         })

@@ -69,6 +69,9 @@ test('should render product list page', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByText(/Classic Glen Plaid Pant/i)).toBeInTheDocument()
+    })
 })
 
 test('should render sort option list page', async () => {
