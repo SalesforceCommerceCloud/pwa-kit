@@ -177,7 +177,8 @@ const tlsVersionTest = async (_, res) => {
  */
 const envVarsEndpoint = async (_, res) => {
     res.header('Content-Type', 'application/json')
-    res.send(JSON.stringify(process.env, null, 4))
+    const exposed = filterAndSortObjectKeys(process.env, ENVS_TO_EXPOSE)
+    res.send(JSON.stringify(exposed, null, 4))
 }
 
 /**
