@@ -88,7 +88,7 @@ const entryPointExists = (segments) => {
     return false
 }
 
-const getAppEntryPoint = (pkg) => {
+const getAppEntryPoint = () => {
     const APP_MAIN_PATH = '/app/main'
     return EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR + APP_MAIN_PATH : APP_MAIN_PATH
 }
@@ -345,7 +345,7 @@ const enableReactRefresh = (config) => {
         },
         entry: {
             ...config.entry,
-            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getAppEntryPoint(pkg)]
+            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getAppEntryPoint()]
         },
         plugins: [
             ...config.plugins,
@@ -374,7 +374,7 @@ const client =
                 // use source map to make debugging easier
                 devtool: mode === development ? 'source-map' : false,
                 entry: {
-                    main: getAppEntryPoint(pkg)
+                    main: getAppEntryPoint()
                 },
                 plugins: [
                     ...config.plugins,
