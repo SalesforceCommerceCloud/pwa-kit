@@ -1,4 +1,5 @@
 ## v2.8.0-dev (Mar 03, 2023)
+- Remove `cross-fetch` dependency [#1160](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1160)
 - Make `mergeBasket` conditional more robust [#1048](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1048)
 
 ## v2.7.0 (Mar 03, 2023)

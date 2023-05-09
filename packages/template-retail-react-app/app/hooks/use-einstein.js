@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useMemo, useState} from 'react'
-import fetch from 'cross-fetch'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {useCommerceApi, useAccessToken, useUsid, useEncUserId} from 'commerce-sdk-react-preview'
 import {keysToCamel} from '../utils/utils'

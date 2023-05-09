@@ -18,7 +18,6 @@ import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
-import DeviceContext from '../universal/device-context'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
@@ -29,7 +28,7 @@ import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
-import {detectDeviceType, isRemote} from 'pwa-kit-runtime/utils/ssr-server'
+import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
@@ -116,7 +115,6 @@ export const render = async (req, res, next) => {
     const component = await route.component.getComponent()
 
     // Step 3 - Init the app state
-    const deviceType = detectDeviceType(req)
     const props = {
         error: null,
         appState: {},
@@ -125,8 +123,7 @@ export const render = async (req, res, next) => {
         res,
         App: WrappedApp,
         routes,
-        location,
-        deviceType
+        location
     }
     let appJSX = <OuterApp {...props} />
 
@@ -167,8 +164,7 @@ export const render = async (req, res, next) => {
             res,
             location,
             config,
-            appJSX,
-            deviceType
+            appJSX
         })
     } catch (e) {
         // This is an unrecoverable error.
@@ -192,17 +188,7 @@ export const render = async (req, res, next) => {
     }
 }
 
-const OuterApp = ({
-    req,
-    res,
-    error,
-    App,
-    appState,
-    routes,
-    routerContext,
-    location,
-    deviceType
-}) => {
+const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()
     return (
         <ServerContext.Provider value={{req, res}}>
@@ -211,11 +197,9 @@ const OuterApp = ({
                     correlationId={res.locals.requestId}
                     resetOnPageChange={false}
                 >
-                    <DeviceContext.Provider value={{type: deviceType}}>
-                        <AppConfig locals={res.locals}>
-                            <Switch error={error} appState={appState} routes={routes} App={App} />
-                        </AppConfig>
-                    </DeviceContext.Provider>
+                    <AppConfig locals={res.locals}>
+                        <Switch error={error} appState={appState} routes={routes} App={App} />
+                    </AppConfig>
                 </CorrelationIdProvider>
             </Router>
         </ServerContext.Provider>
@@ -230,15 +214,14 @@ OuterApp.propTypes = {
     appState: PropTypes.object,
     routes: PropTypes.array,
     routerContext: PropTypes.object,
-    location: PropTypes.object,
-    deviceType: PropTypes.string
+    location: PropTypes.object
 }
 
 const renderToString = (jsx, extractor) =>
     ReactDOMServer.renderToString(extractor.collectChunks(jsx))
 
 const renderApp = (args) => {
-    const {req, res, appStateError, appJSX, appState, config, deviceType} = args
+    const {req, res, appStateError, appJSX, appState, config} = args
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
@@ -300,7 +283,6 @@ const renderApp = (args) => {
     const windowGlobals = {
         __INITIAL_CORRELATION_ID__: res.locals.requestId,
         __CONFIG__: config,
-        __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some
