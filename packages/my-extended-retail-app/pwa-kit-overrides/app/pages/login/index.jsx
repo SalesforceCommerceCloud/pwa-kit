@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, { useEffect } from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import { useIntl, defineMessage } from 'react-intl'
-import { Box, Container } from '@chakra-ui/react'
+import {useIntl, defineMessage} from 'react-intl'
+import {Box, Container} from '@chakra-ui/react'
 import {
     AuthHelpers,
     useAuthHelper,
@@ -19,37 +19,37 @@ import {
 } from 'commerce-sdk-react-preview'
 import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import Seo from 'retail-react-app/app/components/seo'
-import { useForm } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import {useForm} from 'react-hook-form'
+import {useLocation} from 'react-router-dom'
 import useEinstein from 'retail-react-app/app/hooks/use-einstein'
 import LoginForm from 'retail-react-app/app/components/login'
-import { API_ERROR_MESSAGE } from 'retail-react-app/app/constants'
-import { usePrevious } from 'retail-react-app/app/hooks/use-previous'
-import { isServer } from 'retail-react-app/app/utils/utils'
+import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
+import {usePrevious} from 'retail-react-app/app/hooks/use-previous'
+import {isServer} from 'retail-react-app/app/utils/utils'
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
     id: 'login_page.error.incorrect_username_or_password'
 })
 const Login = () => {
-    const { formatMessage } = useIntl()
+    const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const form = useForm()
     const location = useLocation()
     const einstein = useEinstein()
-    const { isRegistered, customerType } = useCustomerType()
+    const {isRegistered, customerType} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
     const customerId = useCustomerId()
     const prevAuthType = usePrevious(customerType)
-    const { data: baskets } = useCustomerBaskets(
-        { parameters: { customerId } },
-        { enabled: !!customerId && !isServer, keepPreviousData: true }
+    const {data: baskets} = useCustomerBaskets(
+        {parameters: {customerId}},
+        {enabled: !!customerId && !isServer, keepPreviousData: true}
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
     const submitForm = async (data) => {
         try {
-            await login.mutateAsync({ username: data.email, password: data.password })
+            await login.mutateAsync({username: data.email, password: data.password})
             const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
             // we only want to merge basket when the user is logged in as a recurring user
             // only recurring users trigger the login mutation, new user triggers register mutation
@@ -72,7 +72,7 @@ const Login = () => {
             const message = /Unauthorized/i.test(error.message)
                 ? formatMessage(LOGIN_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
-            form.setError('global', { type: 'manual', message })
+            form.setError('global', {type: 'manual', message})
         }
     }
 

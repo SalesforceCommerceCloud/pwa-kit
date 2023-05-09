@@ -14,18 +14,18 @@
 
 import React from 'react'
 import loadable from '@loadable/component'
-import { getConfig } from 'pwa-kit-runtime/utils/ssr-config'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 // Components
-import { Skeleton } from '@chakra-ui/react'
-import { configureRoutes } from 'retail-react-app/app/utils/routes-utils'
+import {Skeleton} from '@chakra-ui/react'
+import {configureRoutes} from 'retail-react-app/app/utils/routes-utils'
 
-import { routes as _routes } from 'retail-react-app/app/routes'
+import {routes as _routes} from 'retail-react-app/app/routes'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Pages
-const Home = loadable(() => import('./pages/home'), { fallback })
+const Home = loadable(() => import('./pages/home'), {fallback})
 const MyNewRoute = loadable(() => import('./pages/my-new-route'))
 const Login = loadable(() => import('./pages/login'))
 

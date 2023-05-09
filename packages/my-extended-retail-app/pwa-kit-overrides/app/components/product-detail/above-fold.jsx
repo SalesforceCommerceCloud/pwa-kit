@@ -8,6 +8,7 @@
 import React from 'react'
 import {Box, SimpleGrid, Icon, Text, Stack, Flex} from '@chakra-ui/react'
 import {HeartIcon, SocialTwitterIcon, CheckIcon} from 'retail-react-app/app/components/icons'
+import PropTypes from 'prop-types'
 
 const Feature = ({title, text, icon}) => {
     return (
@@ -58,6 +59,14 @@ const AbovePDP = () => {
             </SimpleGrid>
         </Box>
     )
+}
+
+AbovePDP.displayName = 'AbovePDP'
+
+Feature.propTypes = {
+    title: PropTypes.string.isRequired,
+    text: PropTypes.string.isRequired,
+    icon: PropTypes.string.isRequired
 }
 
 export default AbovePDP

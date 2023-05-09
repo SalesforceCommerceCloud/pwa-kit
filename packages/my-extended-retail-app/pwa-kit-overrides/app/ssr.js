@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
 'use strict'
 
 const path = require('path')
@@ -27,7 +28,7 @@ const options = {
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development.
-    protocol: 'http',
+    protocol: 'http'
 }
 
 const runtime = getRuntime()
@@ -43,10 +44,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
 
                     // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null,
-                },
+                    'upgrade-insecure-requests': isRemote() ? [] : null
+                }
             },
-            hsts: isRemote(),
+            hsts: isRemote()
         })
     )
 
