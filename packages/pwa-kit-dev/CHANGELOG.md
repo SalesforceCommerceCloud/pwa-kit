@@ -1,4 +1,3 @@
-## v2.7.1-preview.0 (May 09, 2023)
 ## v2.7.1 (May 09, 2023)
 
 -   Add suffix to SSR build files [#1157](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1157)

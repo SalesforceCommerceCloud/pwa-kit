@@ -1,4 +1,4 @@
-## v2.7.1 (May 09, 2023)
+## v2.8.0-dev (Mar 03, 2023)
 
 -   Replace invalid row value with nowrap [#1179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1179)
 -   Add a redirect to login page after user signs out from checkout page [#1172](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1172)
