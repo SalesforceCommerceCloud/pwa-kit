@@ -286,7 +286,7 @@ const Example = ({basketId}) => {
 
 Since mutations changes data on the server, the cache entries that are potentially affected by the mutation is automatically invalidated.
 
-For example, an `addItemToBasket` mutation automatically update `useBasket`  and `useCustomerBaskets` query cache, because the mutation result contains the information for the updated basket. In other cases, when the mutation response do not have the updated data, the library will invalidate the cache and trigger a re-fetch.
+For example, an `addItemToBasket` mutation automatically update `useBasket`  and `useCustomerBaskets` query cache, because the mutation result contains the information for the updated basket. In other cases, when the mutation response do not have the updated data, the library will invalidate the cache and trigger a re-fetch. For the DELETE endpoints, the library removes the cache entries on successful mutations.
 
 ## Ultilities
 
