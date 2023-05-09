@@ -246,7 +246,7 @@ _💡 Hint: install and include `@tanstack/react-query-devtools` in your React a
 The query hooks correspond to the http POST, PUT, PATCH, DELETE endpoints from the SCAPI API domains. The mutation hooks follow the signature pattern:
 
 ```
-use<ApiName>Mutations(EndpointName)
+use<ApiName>Mutation(EndpointName)
 ```
 
 For example, the [ShopperBaskets API](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=Summary) has a number of endpoints, one of them being the [addItemToBasket](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addItemToBasket) endpoint (`POST /baskets/{basketId}/items`).
