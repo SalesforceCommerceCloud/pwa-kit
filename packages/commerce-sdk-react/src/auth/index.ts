@@ -422,7 +422,7 @@ class Auth {
      */
     async logout() {
         // Not awaiting on purpose because there isn't much we can do if this fails.
-        helpers.logout(this.client, {
+        void helpers.logout(this.client, {
             accessToken: this.get('access_token'),
             refreshToken: this.get('refresh_token_registered')
         })
