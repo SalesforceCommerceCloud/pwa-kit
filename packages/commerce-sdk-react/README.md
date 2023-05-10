@@ -125,7 +125,7 @@ const Example = () => {
     const logout = useAuthHelper(AuthHelpers.LogOut)
 
     return <button onClick={() => {
-        login.mutate({username, password})
+        login.mutate({username: 'kevin', password: 'pa$$word'})
     }}>
 }
 ```
