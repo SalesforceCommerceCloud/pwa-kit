@@ -16,7 +16,15 @@ describe('Shopper Baskets hooks', () => {
         const unimplemented = getUnimplementedEndpoints(ShopperBaskets, queries, mutations)
         // If this test fails: create a new query hook, add the endpoint to the mutations enum,
         // or add it to the `expected` array with a comment explaining "TODO" or "never" (and why).
-        expect(unimplemented).toEqual([])
+
+        // these new endpoints will not be released in SDK V2
+        expect(unimplemented).toEqual([
+            'updateAsAgentBasket',
+            'addPriceAdjustmentToBasket',
+            'removePriceAdjustmentFromBasket',
+            'updatePriceAdjustmentInBasket',
+            'updateAsStorefrontBasket'
+        ])
     })
     test('all mutations have cache update logic', () => {
         // unimplemented = value in mutations enum, but no method in cache update matrix
