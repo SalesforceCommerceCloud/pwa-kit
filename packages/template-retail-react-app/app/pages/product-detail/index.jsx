@@ -28,7 +28,7 @@ import useEinstein from '../../hooks/use-einstein'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '../../components/recommended-products'
-import ProductView from '../../partials/product-view'
+import ProductView from '../../components/product-view'
 import InformationAccordion from './partials/information-accordion'
 
 // constant
