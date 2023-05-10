@@ -46,7 +46,7 @@ export const EXT_OVERRIDES_DIR =
     typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
     !pkg?.ccExtensibility?.overridesDir?.startsWith('/')
         ? '/' + pkg?.ccExtensibility?.overridesDir
-        : pkg?.ccExtensibility?.overridesDir
+        : pkg?.ccExtensibility?.overridesDir ?? ''
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
