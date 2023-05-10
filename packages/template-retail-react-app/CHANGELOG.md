@@ -1,4 +1,5 @@
 ## v2.8.0-dev (Mar 03, 2023)
+- Add app `above-header` and product-list `above-page-header` convenience components [#1183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1183)
 - Remove `cross-fetch` dependency [#1160](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1160)
 - Make `mergeBasket` conditional more robust [#1048](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1048)
 - Upgrade React v18, React DOM v18, React-hook-form v7, and Chakra 2 libraries [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166) 
