@@ -53,6 +53,7 @@ import Refinements from './partials/refinements'
 import SelectedRefinements from './partials/selected-refinements'
 import EmptySearchResults from './partials/empty-results'
 import PageHeader from './partials/page-header'
+import AbovePageHeader from './partials/above-page-header'
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
@@ -380,8 +381,8 @@ const ProductList = (props) => {
                 <EmptySearchResults searchQuery={searchQuery} category={category} />
             ) : (
                 <>
+                    <AbovePageHeader />
                     {/* Header */}
-
                     <Stack
                         display={{base: 'none', lg: 'flex'}}
                         direction="row"
