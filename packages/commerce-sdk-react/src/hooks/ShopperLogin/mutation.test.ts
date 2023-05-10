@@ -28,7 +28,6 @@ const loginEndpoint = '/shopper/auth/'
 // Additional properties are ignored, so we can use this mega-options object for all endpoints
 const OPTIONS = {
     parameters: {
-        organizationId: 'organizationId',
         client_id: 'client_id',
         refresh_token: 'token'
     },
@@ -61,8 +60,7 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
     id_token: 'id_token',
     refresh_token: 'refresh_tone',
     token_type: 'token_type',
-    usid: 'usid',
-    idp_access_token: 'idp_access_token'
+    usid: 'usid'
 }
 
 // --- TEST CASES --- //
