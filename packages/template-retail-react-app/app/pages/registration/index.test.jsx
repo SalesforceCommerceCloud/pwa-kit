@@ -85,10 +85,11 @@ test('Allows customer to create an account', async () => {
     // fill out form and submit
     const withinForm = within(form)
 
-    await user.paste(withinForm.getByLabelText('First Name'), 'Tester')
-    await user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
-    await user.paste(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
-    await user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+    await user.type(withinForm.getByLabelText('First Name'), 'Tester')
+    await user.type(withinForm.getByLabelText('Last Name'), 'Tester')
+    await user.type(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
+    await user.type(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+    screen.logTestingPlaygroundURL()
 
     // login with credentials
     global.server.use(
@@ -117,6 +118,7 @@ test('Allows customer to create an account', async () => {
 
     // wait for success state to appear
     const myAccount = await screen.findAllByText(/My Account/)
+
     await waitFor(
         () => {
             expect(myAccount).toHaveLength(2)

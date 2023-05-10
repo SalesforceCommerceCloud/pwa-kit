@@ -162,9 +162,7 @@ test.skip('Renders error when given incorrect log in credentials', async () => {
     )
 })
 
-// TODO: investigate why this test is failing when running with other tests
-// eslint-disable-next-line jest/no-disabled-tests
-test.skip('Allows customer to create an account', async () => {
+test('Allows customer to create an account', async () => {
     const user = userEvent.setup()
 
     // render our test component
@@ -198,10 +196,10 @@ test.skip('Allows customer to create an account', async () => {
         expect(firstName).toBeInTheDocument()
     })
 
-    await user.paste(withinForm.getByLabelText('First Name'), 'Tester')
-    await user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
-    await user.paste(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
-    await user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+    await user.type(withinForm.getByLabelText('First Name'), 'Tester')
+    await user.type(withinForm.getByLabelText('Last Name'), 'Tester')
+    await user.type(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
+    await user.type(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
 
     // login with credentials
     global.server.use(
