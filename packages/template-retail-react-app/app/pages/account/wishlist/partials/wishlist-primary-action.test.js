@@ -59,9 +59,7 @@ test('the Add To Cart button', async () => {
     await user.click(addToCartButton)
 
     await waitFor(() => {
-        // Chakra UI renders multiple elements with toast title in DOM for accessibility.
-        // We need to assert the actual text within the alert
-        expect(screen.getAllByRole('alert')[0]).toHaveTextContent(/1 item added to cart/i)
+        expect(screen.getByText(/1 item added to cart/i)).toBeInTheDocument()
     })
 })
 
@@ -75,7 +73,7 @@ test('the Add Set To Cart button', async () => {
     await user.click(button)
 
     await waitFor(() => {
-        expect(screen.getAllByRole('alert')[0]).toHaveTextContent(/2 items added to cart/i)
+        expect(screen.getByText(/2 items added to cart/i)).toBeInTheDocument()
     })
 })
 
