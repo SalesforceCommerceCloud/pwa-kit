@@ -366,6 +366,10 @@ const renderer =
                 },
                 plugins: [
                     ...config.plugins,
+                    // This must only appear on one config – this one is the only mandatory one.
+                    new CopyPlugin({
+                        patterns: [{from: 'app/static/', to: 'static/'}]
+                    }),
 
                     // Keep this on the slowest-to-build item - the server-side bundle.
                     new WebpackNotifierPlugin({
@@ -396,10 +400,6 @@ const ssr = (() => {
                     },
                     plugins: [
                         ...config.plugins,
-                        // This must only appear on one config – this one is the only mandatory one.
-                        new CopyPlugin({
-                            patterns: [{from: 'app/static/', to: 'static/'}]
-                        }),
                         analyzeBundle && getBundleAnalyzerPlugin(SSR)
                     ].filter(Boolean)
                 }
