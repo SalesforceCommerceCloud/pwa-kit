@@ -199,10 +199,3 @@ export const mergeMatchedItems = (arr1 = [], arr2 = []) => {
  * @return {boolean}
  */
 export const isHydrated = () => typeof window !== 'undefined' && !window.__HYDRATING__
-
-console.log(
-    "typeof window !== 'undefined' && !window.__HYDRATING__",
-    typeof window !== 'undefined' ? window.__HYDRATING__ : ''
-)
-
-console.log('isHydrated()', isHydrated())

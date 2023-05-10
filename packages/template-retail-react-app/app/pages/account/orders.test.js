@@ -27,11 +27,8 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     global.server.use(
-        rest.get(
-            '*/customers/:customerId/baskets',
-            (req, res, ctx) =>
-                console.log('basket..............') ||
-                res(ctx.delay(0), ctx.json(mockCustomerBaskets))
+        rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.json(mockCustomerBaskets))
         )
     )
 

@@ -100,7 +100,6 @@ const Account = () => {
     const onSignoutClick = async () => {
         setShowLoading(true)
         await logout.mutateAsync()
-        console.log('log out')
         navigate('/login')
     }
 
