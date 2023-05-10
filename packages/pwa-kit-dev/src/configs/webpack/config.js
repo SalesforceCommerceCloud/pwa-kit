@@ -270,6 +270,7 @@ const baseConfig = (target) => {
 }
 
 const withChunking = (config) => {
+    const sysPath = fse.realpathSync(path.resolve('node_modules', EXT_EXTENDS))
     return {
         ...config,
         output: {
@@ -287,7 +288,12 @@ const withChunking = (config) => {
                         // 2. The package is one of the monorepo packages.
                         //    This is for local development to ensure the bundle
                         //    composition is the same as a production build
-                        test: /(node_modules)|(packages\/.*\/dist)/,
+                        test: (module) => {
+                            if (module?.context?.match(makeRegExp(`${sysPath}/node_modules`))) {
+                                return false
+                            }
+                            return module?.context?.match?.(/(node_modules)|(packages\/.*\/dist)/)
+                        },
                         name: 'vendor',
                         chunks: 'all'
                     }
