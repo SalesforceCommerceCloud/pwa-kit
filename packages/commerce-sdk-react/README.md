@@ -202,45 +202,6 @@ const Example = ({basketId}) => {
 }
 ```
 
-### Advanced: Query Key Structure
-
-In most cases, you won't need to use this! This feature is intended for advanced use cases where you want to manually update/invalidate the cache entires. Here is the explanation of the cache key structure.
-
-The query keys are automatically generated in the following format:
-
-```js
-['commerce-sdk-react', ...RestfulApiPathSegments, {...CommerceClientOptions}]
-```
-
-For example, `useProduct({parameters: {id: '25592770M', "allImages": true}})` hook has query key:
-
-```js
-['commerce-sdk-react', '/organizations', '/f_ecom_aaaa_001', '/products', '/25688443M', {
-    "organizationId": "f_ecom_zzrf_001",
-    "id": "25688443M",
-    "currency": "GBP",
-    "locale": "en-GB",
-    "allImages": true,
-    "siteId": "RefArchGlobal"
-  } ]
-```
-
-The first element in the query key is always a constant value, `commerce-sdk-react`. The namespace provides flexibility for invalidating the entire query cache. This is typically useful when using react-query for multiple services including SCAPI. This allows us to invalidate the entire SCAPI cache without affecting other cache entries, such as the cache for fetching data from a customer CMS provider. To invalidate all SCAPI cache entries, use `queryClient.invalidateQueries(['commerce-sdk-react'])`.
-
-The following N elements in the array are the path segment of the actual SCAPI endpoint. This design makes it easier to have granular control over individual cache as well as the ability to do bulk invalidations based on the hierarchy of the entities.
-
-Example, invalidate customer's basket v.s. invalidate just the shipping address in the basket
-
-```js
-// invalidate entire customer basket cache, including getBasket, getPaymentMethodsForBasket, getPriceBooksForBasket, getShippingMethodsForShipment and getTaxesFromBasket
-queryClient.invalidateQueries(['commerce-sdk-react', '/organizations', '/f_ecom_aaaa_001', '/baskets', '/BASKET_ID'])
-
-// granular invalidation for just the shipping methods
-queryClient.invalidateQueries(['commerce-sdk-react', '/organizations', '/f_ecom_aaaa_001', '/baskets', '/BASKET_ID', '/shipments', 'SHIPMENT_ID', '/shipping-methods'])
-```
-
-_💡 Hint: install and include `@tanstack/react-query-devtools` in your React app to see the queries (and their cache keys)._
-
 ## Mutations
 
 The query hooks correspond to the http POST, PUT, PATCH, DELETE endpoints from the SCAPI API domains. The mutation hooks follow the signature pattern:
