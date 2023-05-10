@@ -12,7 +12,6 @@ import {
     waitAndExpectSuccess
 } from '../../test-utils'
 import * as queries from './query'
-import {waitFor} from '@testing-library/react'
 
 jest.mock('../../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
@@ -45,7 +44,7 @@ describe('Shopper Orders query hooks', () => {
         const {result} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })
-        await waitAndExpectSuccess(waitFor, () => result.current)
+        await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(data)
     })
     // eslint-disable-next-line jest/expect-expect
@@ -54,6 +53,6 @@ describe('Shopper Orders query hooks', () => {
         const {result} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })
-        await waitAndExpectError(waitFor, () => result.current)
+        await waitAndExpectError(() => result.current)
     })
 })

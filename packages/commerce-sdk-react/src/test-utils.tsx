@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {render, RenderOptions, renderHook} from '@testing-library/react'
+import {render, RenderOptions, renderHook, waitFor} from '@testing-library/react'
 import {
     QueryClient,
     QueryClientProvider,
@@ -141,6 +141,7 @@ export const assertInvalidateQuery = (
     expect(queryResult.isRefetching).toBe(true)
 }
 
+// TODO: potentially modify this function
 export const assertRemoveQuery = (queryResult: UseQueryResult) => {
     expect(queryResult.data).not.toBeDefined()
 }
@@ -181,30 +182,21 @@ export const getUnimplementedEndpoints = (
 type GetHookResult<Data, Err, Vars, Ctx> = () =>
     | UseQueryResult
     | UseMutationResult<Data, Err, Vars, Ctx>
-/** Helper that waits for a hook to finish loading. */
-const waitForHookToFinish = async <Data, Err, Vars, Ctx>(
-    wait: any,
-    getResult: GetHookResult<Data, Err, Vars, Ctx>
-) => {
-    await wait(() => getResult().isSuccess || getResult().isError)
-}
 /** Helper that asserts that a hook is a success. */
 export const waitAndExpectSuccess = async <Data, Err, Vars, Ctx>(
-    // TODO: FIX THIS LATER
-    wait: any,
     getResult: GetHookResult<Data, Err, Vars, Ctx>
 ) => {
-    await waitForHookToFinish(wait, getResult)
-    // Checking the error first gives us the best context for failing tests
+    // Checking for success first because result is still in loading state when checking for error first 
+    await waitFor(() => {
+        expect(getResult().isSuccess).toBe(true);
+    });
     expect(getResult().error).toBeNull()
-    expect(getResult().isSuccess).toBe(true)
 }
 /** Helper that asserts that a hook returned an error */
 export const waitAndExpectError = async <Data, Err, Vars, Ctx>(
-    // TODO: FIX THIS LATER
-    wait: any,
     getResult: GetHookResult<Data, Err, Vars, Ctx>
 ) => {
-    await waitForHookToFinish(wait, getResult)
-    expect(getResult().isError).toBe(true)
+    await waitFor(() => {
+        expect(getResult().isError).toBe(true)
+    })
 }
