@@ -78,7 +78,7 @@ const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
         const primary = resolve(projectDir, ...segments) + ext
         const override = EXT_OVERRIDES_DIR
-            ? resolve(projectDir, EXT_OVERRIDES_DIR?.replace(/^\//, ''), ...segments) + ext
+            ? resolve(projectDir, EXT_OVERRIDES_DIR, ...segments) + ext
             : null
 
         if (fse.existsSync(primary) || (override && fse.existsSync(override))) {
@@ -89,8 +89,7 @@ const entryPointExists = (segments) => {
 }
 
 const getAppEntryPoint = () => {
-    const APP_MAIN_PATH = '/app/main'
-    return EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR + APP_MAIN_PATH : APP_MAIN_PATH
+    return EXT_OVERRIDES_DIR + '/app/main'
 }
 
 const findInProjectThenSDK = (pkg) => {
@@ -196,10 +195,7 @@ const baseConfig = (target) => {
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
                                   ...[EXT_EXTENDS].map((extendTarget) => ({
                                       [extendTarget]: [
-                                          path.resolve(
-                                              projectDir,
-                                              EXT_OVERRIDES_DIR.replace(/^\//, '')
-                                          ),
+                                          path.resolve(projectDir, EXT_OVERRIDES_DIR),
                                           path.resolve(projectDir, `node_modules/${extendTarget}`)
                                       ]
                                   }))
@@ -406,18 +402,8 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional(
-                    'loader',
-                    EXT_EXTENDS && EXT_OVERRIDES_DIR
-                        ? `.${EXT_OVERRIDES_DIR}/app/request-processor.js`
-                        : './app/loader.js'
-                ),
-                ...optional(
-                    'worker',
-                    EXT_EXTENDS && EXT_OVERRIDES_DIR
-                        ? `.${EXT_OVERRIDES_DIR}/app/request-processor.js`
-                        : './app/main.js'
-                ),
+                ...optional('loader', `.${EXT_OVERRIDES_DIR}/app/loader.js`),
+                ...optional('worker', `.${EXT_OVERRIDES_DIR}/app/main.js`),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
@@ -465,10 +451,7 @@ const renderer =
                     new CopyPlugin({
                         patterns: [
                             {
-                                from:
-                                    EXT_EXTENDS && EXT_OVERRIDES_DIR
-                                        ? `${EXT_OVERRIDES_DIR?.replace(/^\//, '')}/app/static`
-                                        : 'app/static/',
+                                from: `${EXT_OVERRIDES_DIR}/app/static`,
                                 to: 'static/',
                                 noErrorOnMissing: true
                             }
@@ -490,10 +473,7 @@ const ssr = (() => {
                     ...config,
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
-                    entry:
-                        EXT_EXTENDS && EXT_OVERRIDES_DIR
-                            ? `.${EXT_OVERRIDES_DIR}/app/ssr.js`
-                            : './app/ssr.js',
+                    entry: `.${EXT_OVERRIDES_DIR}/app/ssr.js`,
                     output: {
                         path: buildDir,
                         filename: 'ssr.js',
@@ -505,10 +485,7 @@ const ssr = (() => {
                         new CopyPlugin({
                             patterns: [
                                 {
-                                    from:
-                                        EXT_EXTENDS && EXT_OVERRIDES_DIR
-                                            ? `${EXT_OVERRIDES_DIR?.replace(/^\//, '')}/app/static`
-                                            : 'app/static/',
+                                    from: `${EXT_OVERRIDES_DIR}/app/static`,
                                     to: 'static/'
                                 }
                             ]
@@ -531,10 +508,7 @@ const requestProcessor =
                 ...config,
                 name: REQUEST_PROCESSOR,
                 // entry: './app/request-processor.js',
-                entry:
-                    EXT_EXTENDS && EXT_OVERRIDES_DIR
-                        ? `.${EXT_OVERRIDES_DIR}/app/request-processor.js`
-                        : './app/request-processor.js',
+                entry: `.${EXT_OVERRIDES_DIR}/app/request-processor.js`,
                 output: {
                     path: buildDir,
                     filename: 'request-processor.js',
