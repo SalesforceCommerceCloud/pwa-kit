@@ -85,7 +85,7 @@ test('Renders skeleton until customer and basket are loaded', () => {
     expect(queryByTestId('sf-checkout-container')).not.toBeInTheDocument()
 })
 
-test.only('Can proceed through checkout steps as guest', async () => {
+test('Can proceed through checkout steps as guest', async () => {
     const user = userEvent.setup()
     // Keep a *deep* copy of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
@@ -234,7 +234,7 @@ test.only('Can proceed through checkout steps as guest', async () => {
 
     // Default shipping option should be selected
     const shippingOptionsForm = screen.getByTestId('sf-checkout-shipping-options-form')
-    screen.logTestingPlaygroundURL()
+
     await waitFor(() =>
         expect(shippingOptionsForm).toHaveFormValues({
             'shipping-options-radiogroup': mockShippingMethods.defaultShippingMethodId
