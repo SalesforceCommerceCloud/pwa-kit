@@ -66,11 +66,19 @@
     "regenerator-runtime": "^0.13.11",
     "replace-in-file": "^6.3.5",
     "rimraf": "2.7.1",
-    "shelljs": "^0.8.5",
-    "typescript": "4.8.3"
+    "shelljs": "^0.8.5"
   },
   "devDependencies": {
-    "npm-packlist": "^4.0.0"
+    "npm-packlist": "^4.0.0",
+    "typescript": "4.8.3"
+  },
+  "peerDependencies": {
+    "typescript": "4.8.3"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   },
   "scripts": {
     "lint": "npm run lint:js",
