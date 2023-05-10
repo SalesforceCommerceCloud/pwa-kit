@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen, waitFor, within, act} from '@testing-library/react'
-import user from '@testing-library/user-event'
+import {screen, waitFor, within} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {
@@ -81,6 +81,7 @@ describe('Test redirects', function () {
 })
 
 test('Provides navigation for subpages', async () => {
+    const user = userEvent.setup()
     global.server.use(
         rest.get('*/products', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderProducts))
@@ -89,22 +90,24 @@ test('Provides navigation for subpages', async () => {
             return res(ctx.delay(0), ctx.json(mockOrderHistory))
         })
     )
-    await renderWithProviders(<MockedComponent />, {
+    renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
     expect(await screen.findByTestId('account-page')).toBeInTheDocument()
 
     const nav = within(screen.getByTestId('account-detail-nav'))
-    user.click(nav.getByText('Addresses'))
+    await user.click(nav.getByText('Addresses'))
     await waitFor(() =>
         expect(window.location.pathname).toBe(`${expectedBasePath}/account/addresses`)
     )
-    user.click(nav.getByText('Order History'))
+    await user.click(nav.getByText('Order History'))
     await waitFor(() => expect(window.location.pathname).toBe(`${expectedBasePath}/account/orders`))
 })
 
 describe('Render and logs out', function () {
     test('Renders account detail page by default for logged-in customer, and can log out', async () => {
+        const user = userEvent.setup()
+
         renderWithProviders(<MockedComponent />)
 
         // Render user profile page
@@ -116,9 +119,9 @@ describe('Render and logs out', function () {
             expect(screen.getByText('(727) 555-1234')).toBeInTheDocument()
         })
 
-        user.click(screen.getAllByText(/Log Out/)[0])
+        await user.click(screen.getAllByText(/Log Out/)[0])
         await waitFor(() => {
-            expect(window.location.pathname).toBe(`${expectedBasePath}/login`)
+            expect(screen.getByTestId('login-page')).toBeInTheDocument()
         })
     })
 })
@@ -138,6 +141,7 @@ describe('updating profile', function () {
         )
     })
     test('Allows customer to edit profile details', async () => {
+        const user = userEvent.setup()
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
@@ -147,15 +151,13 @@ describe('updating profile', function () {
         })
         const el = within(screen.getByTestId('sf-toggle-card-my-profile'))
 
-        await act(async () => {
-            user.click(el.getByText(/edit/i))
-        })
-        user.type(el.getByLabelText(/first name/i), 'Geordi')
-        user.type(el.getByLabelText(/Phone Number/i), '5671235585')
+        await user.click(el.getByText(/edit/i))
 
-        await act(async () => {
-            user.click(el.getByText(/save/i))
-        })
+        await user.type(el.getByLabelText(/first name/i), 'Geordi')
+        await user.type(el.getByLabelText(/Phone Number/i), '5671235585')
+
+        await user.click(el.getByText(/save/i))
+
         expect(await screen.findByText('Geordi Tester')).toBeInTheDocument()
         expect(await screen.findByText('(567) 123-5585')).toBeInTheDocument()
     })
@@ -170,19 +172,20 @@ describe('updating password', function () {
         )
     })
     test('Allows customer to update password', async () => {
+        const user = userEvent.setup()
         renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
         const el = within(screen.getByTestId('sf-toggle-card-password'))
-        user.click(el.getByText(/edit/i))
-        user.type(el.getByLabelText(/current password/i), 'Password!12345')
-        user.type(el.getByLabelText(/new password/i), 'Password!98765')
-        user.click(el.getByText(/Forgot password/i))
+        await user.click(el.getByText(/edit/i))
+        await user.type(el.getByLabelText(/current password/i), 'Password!12345')
+        await user.type(el.getByLabelText(/new password/i), 'Password!98765')
+        await user.click(el.getByText(/Forgot password/i))
 
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
-        user.click(el.getByText(/save/i))
+        await user.click(el.getByText(/save/i))
         expect(await screen.findByText('••••••••')).toBeInTheDocument()
     })
 })

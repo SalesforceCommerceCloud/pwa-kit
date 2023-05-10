@@ -247,6 +247,7 @@ describe.skip('Update quantity in product view', function () {
     })
 
     test('Can update item quantity from product view modal', async () => {
+        const user = userEvent.setup()
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -256,23 +257,19 @@ describe.skip('Update quantity in product view', function () {
         )
 
         const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
-        await act(async () => {
-            userEvent.click(editCartButton)
-        })
+        await user.click(editCartButton)
 
         const productView = screen.queryByTestId('product-view')
 
-        await act(async () => {
-            const incrementButton = await within(productView).findByTestId('quantity-increment')
-            // update item quantity
-            fireEvent.pointerDown(incrementButton)
-            // TODO: Fix assertion
-            // eslint-disable-next-line jest/valid-expect
-            expect(within(productView).getByDisplayValue('3'))
+        const incrementButton = await within(productView).findByTestId('quantity-increment')
+        // update item quantity
+        fireEvent.pointerDown(incrementButton)
+        // TODO: Fix assertion
+        // eslint-disable-next-line jest/valid-expect
+        expect(within(productView).getByDisplayValue('3'))
 
-            const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
-            userEvent.click(updateCartButtons[0])
-        })
+        const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
+        await user.click(updateCartButtons[0])
         await waitFor(() => {
             expect(productView).not.toBeInTheDocument()
         })
@@ -300,6 +297,8 @@ describe('Remove item from cart', function () {
     // TODO: Fix flaky/broken test
     // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Can remove item from the cart', async () => {
+        const user = userEvent.setup()
+
         renderWithProviders(<Cart />)
 
         let cartItem
@@ -311,10 +310,10 @@ describe('Remove item from cart', function () {
             expect(cartItem).toBeInTheDocument()
         })
 
-        userEvent.click(within(cartItem).getByText(/remove/i))
+        await user.click(within(cartItem).getByText(/remove/i))
 
         try {
-            userEvent.click(screen.getByText(/yes, remove item/i))
+            await user.click(screen.getByText(/yes, remove item/i))
         } catch {
             // On CI this remove-item button sometimes does not exist yet.
             // But if we then call `await screen.findByText(/yes, remove item/i)` at this point,
@@ -456,13 +455,15 @@ describe('Coupons tests', function () {
         )
     })
     test('Can apply and remove product-level coupon code with promotion', async () => {
+        const user = userEvent.setup()
+
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
         // add coupon
-        userEvent.click(screen.getByText('Do you have a promo code?'))
-        userEvent.type(screen.getByLabelText('Promo Code'), 'MENSSUITS')
-        userEvent.click(screen.getByText('Apply'))
+        await user.click(screen.getByText('Do you have a promo code?'))
+        await user.type(screen.getByLabelText('Promo Code'), 'MENSSUITS')
+        await user.click(screen.getByText('Apply'))
 
         expect(await screen.findByText('Promotion applied')).toBeInTheDocument()
 
@@ -473,7 +474,7 @@ describe('Coupons tests', function () {
         expect(within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)).toBeInTheDocument()
 
         const orderSummary = screen.getByTestId('sf-order-summary')
-        userEvent.click(within(orderSummary).getByText('Remove'))
+        await user.click(within(orderSummary).getByText('Remove'))
 
         expect(await screen.findByText('Promotion removed')).toBeInTheDocument()
         await waitFor(async () => {
