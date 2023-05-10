@@ -71,8 +71,8 @@
     "react-router-dom": "^5.1.2"
   },
   "engines": {
-    "node": "^16.0.0 || ^18.0.0",
-    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+    "node": "^16.1.0 || ^18.0.0",
+    "npm": "^8.0.0 || ^9.0.0"
   },
   "publishConfig": {
     "directory": "dist"
