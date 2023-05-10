@@ -270,7 +270,7 @@ const baseConfig = (target) => {
 }
 
 const withChunking = (config) => {
-    const sysPath = fse.realpathSync(path.resolve('node_modules', EXT_EXTENDS))
+    const sysPath = fse.realpathSync(path.resolve('node_modules', EXT_EXTENDS ?? ''))
     return {
         ...config,
         output: {
