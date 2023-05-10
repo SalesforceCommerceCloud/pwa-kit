@@ -1,19 +1,13 @@
 # Commerce SDK React
 
 <p align="center">
-A collection of React hooks for <b>fetching</b>, <b>caching</b>, and <b>mutating data</b> from the <b><a href="https://developer.salesforce.com/docs/commerce/commerce-api/overview">Salesforce B2C Commerce API</a></b> (SCAPI).
-The library contains declarative, always-up-to-date auto-managed <b>queries</b> and <b>mutations</b> for a more convenient developer experience.
-</p>
+A collection of <a href="https://tanstack.com/query/latest/docs/react/overview">react-query</a> hooks for <b>fetching</b>, <b>caching</b>, and <b>mutating data</b> from the <b><a href="https://developer.salesforce.com/docs/commerce/commerce-api/overview">Salesforce B2C Commerce API</a></b> (SCAPI).</p>
 
 ## 🎯 Features
 
-- [react-query](https://tanstack.com/query/latest/docs/react/overview) and [commerce-sdk-isomorphic](https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic) integration
 - Shopper authentication & token management via [SLAS](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-login)
-- SSR data fetching React Hooks
+- Server side data fetching (in conjuction with PWA Kit)
 - Phased Launch support ([plugin_slas](https://github.com/SalesforceCommerceCloud/plugin_slas) compatible)
-- [TypeScript](https://www.typescriptlang.org/) Support
-- Multi-site and locale/currency support
-- Request deduplication
 - Built-in caching for easy state management
   - automatic cache invalidations/updates via the library's built-in mutations
   - automatic cache key generation
@@ -24,7 +18,7 @@ The library contains declarative, always-up-to-date auto-managed <b>queries</b> 
 npm install @salesforce/commerce-sdk-react @tanstack/react-query
 ```
 
-## ⚡️ Quickstart (PWA Kit)
+## ⚡️ Quickstart (PWA Kit v2.3.0+)
 
 To integrate this library with your PWA Kit application you can use the `CommerceApiProvider` directly assuming that you use the `withReactQuery` higher order component to wrap your `AppConfig` component. Below is a snippet of how this is accomplished.
 
@@ -110,17 +104,15 @@ To help reduce boilerplate code for managing shopper authentication, by default,
 
 ### Shopper Session Initialization
 
-On `CommerceApiProvider` mount, the provider initializes shopper session by initiating the SLAS Public Client login flow. The tokens are stored/managed by the library to support Phased Launch use cases and multi-site setup.
-
-When the access token is expired, the library will automatically try to refresh the access token by calling the `/oauth2/token` endpoint with `grant_type=refresh_token`.
+On `CommerceApiProvider` mount, the provider initializes shopper session by initiating the SLAS __Public Client__ login flow. The tokens are stored/managed/refreshed by the library.
 
 ### Authenticate request queue
 
-While the library is getting/refreshing the access token, the network requests will queue up until there is a valid access token.
+While the library is fetching/refreshing the access token, the network requests will queue up until there is a valid access token.
 
-### Auth helpers
+### Login helpers
 
-To leverage the managed shopper authentication feature, use the auth helper hooks for shopper login.
+To leverage the managed shopper authentication feature, use the `useAuthHelper` hook for shopper login.
 
 Example:
 
@@ -138,31 +130,35 @@ const Example = () => {
 }
 ```
 
-### Opt-out from managed shopper authentication
+### Externally Managed Shopper Authentication
 
-To opt-out of the auto-login, request queue, and token management features, pass `fetchedToken` (a SLAS JWT) to the provider.
+You have the option of handling shopper authentication externally, by providing a SLAS access token. This is useful if you plan on using this library in an application where the authentication mechanism is different.
 
 ```jsx
 const MyComponent = ({children}) => {
     return (
-        <CommerceApiProvider
-            fetchedToken="xxxxxxxxxxxx"
-        >
+        <CommerceApiProvider fetchedToken="xxxxxxxxxxxx">
             {children}
         </CommerceApiProvider>
     )
 } 
 ```
 
-## Queries
+## Hooks
 
-The query hooks correspond to the http GET endpoints from the SCAPI family. The query hooks follow the signature pattern:
+The majority of hooks provided in this library are built on top of the [useQuery](https://tanstack.com/query/latest/docs/react/reference/useQuery) and the [useMutation](https://tanstack.com/query/latest/docs/react/reference/useMutation) hook from [react-query](https://tanstack.com/query/latest). React-query provides a declarative way for fetching and updating data. This library takes advantage of the features provided by react-query and combine with the [commerce-sdk-isomorphic](https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic) API client to create a collection of hooks to simplify data fetching for SCAPI.
+
+The hooks can be categorized into __Query hooks__ and __Mutation hooks__.
+
+### Query hooks
+
+The query hooks correspond to the http GET endpoints from the SCAPI. The query hooks follow the signature pattern:
 
 ```
 use<EntityName>(CommerceClientOptions, ReactQueryOptions)
 ```
 
-For example, both the __required__ and __optional__ parameters for the underlying `commerce-sdk-isomorphic` call is passed as the first parameter:
+Both the __required__ and __optional__ parameters for the underlying `commerce-sdk-isomorphic` call is passed as the first parameter:
 
 ```jsx
 import {useProduct} from '@salesforce/commerce-sdk-react'
@@ -202,9 +198,9 @@ const Example = ({basketId}) => {
 }
 ```
 
-## Mutations
+### Mutation hooks
 
-The query hooks correspond to the http POST, PUT, PATCH, DELETE endpoints from the SCAPI API domains. The mutation hooks follow the signature pattern:
+The query hooks correspond to the http POST, PUT, PATCH, DELETE endpoints from the SCAPI. The mutation hooks follow the signature pattern:
 
 ```
 use<ApiName>Mutation(EndpointName)
@@ -216,7 +212,7 @@ For example, the [ShopperBaskets API](https://developer.salesforce.com/docs/comm
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 const Example = ({basketId}) => {
-    // Typescript IDE intellisense for available options as string
+    // Typescript IDE intellisense for available options
     const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
 
     return <button onClick={() => addItemToBasket.mutate({
@@ -243,11 +239,13 @@ const Example = ({basketId}) => {
 }
 ```
 
-### Auto Cache Invalidations
+### Cache Invalidations and Updates
 
 Since mutations changes data on the server, the cache entries that are potentially affected by the mutation is automatically invalidated.
 
 For example, an `addItemToBasket` mutation automatically update `useBasket`  and `useCustomerBaskets` query cache, because the mutation result contains the information for the updated basket. In other cases, when the mutation response do not have the updated data, the library will invalidate the cache and trigger a re-fetch. For the DELETE endpoints, the library removes the cache entries on successful mutations.
+
+_💡 Debugging hint: install and include `@tanstack/react-query-devtools` in your React app to see the queries (inspect the query states and cache keys)._
 
 ## Ultilities
 
