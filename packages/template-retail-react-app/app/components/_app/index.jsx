@@ -39,6 +39,7 @@ import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
 import DrawerMenu from '../drawer-menu'
 import ListMenu from '../list-menu'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
+import AboveHeader from './partials/above-header'
 
 // Hooks
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
@@ -283,33 +284,35 @@ const App = (props) => {
 
                         <Box {...styles.headerWrapper}>
                             {!isCheckout ? (
-                                <Header
-                                    onMenuClick={onOpen}
-                                    onLogoClick={onLogoClick}
-                                    onMyCartClick={onCartClick}
-                                    onMyAccountClick={onAccountClick}
-                                    onWishlistClick={onWishlistClick}
-                                >
-                                    <HideOnDesktop>
-                                        <DrawerMenu
-                                            isOpen={isOpen}
-                                            onClose={onClose}
-                                            onLogoClick={onLogoClick}
-                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
-                                        />
-                                    </HideOnDesktop>
+                                <>
+                                    <AboveHeader />
+                                    <Header
+                                        onMenuClick={onOpen}
+                                        onLogoClick={onLogoClick}
+                                        onMyCartClick={onCartClick}
+                                        onMyAccountClick={onAccountClick}
+                                        onWishlistClick={onWishlistClick}
+                                    >
+                                        <HideOnDesktop>
+                                            <DrawerMenu
+                                                isOpen={isOpen}
+                                                onClose={onClose}
+                                                onLogoClick={onLogoClick}
+                                                root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                            />
+                                        </HideOnDesktop>
 
-                                    <HideOnMobile>
-                                        <ListMenu
-                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
-                                        />
-                                    </HideOnMobile>
-                                </Header>
+                                        <HideOnMobile>
+                                            <ListMenu
+                                                root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                            />
+                                        </HideOnMobile>
+                                    </Header>
+                                </>
                             ) : (
                                 <CheckoutHeader />
                             )}
                         </Box>
-
                         {!isOnline && <OfflineBanner />}
                         <AddToCartModalProvider>
                             <SkipNavContent

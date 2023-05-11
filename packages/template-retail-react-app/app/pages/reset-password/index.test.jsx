@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
-import user from '@testing-library/user-event'
+import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
@@ -62,12 +62,14 @@ afterEach(() => {
 })
 
 test('Allows customer to go to sign in page', async () => {
+    const user = userEvent.setup()
+
     // render our test component
     await renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
-    user.click(await screen.findByText('Sign in'))
+    await user.click(await screen.findByText('Sign in'))
 
     await waitFor(() => {
         expect(window.location.pathname).toBe('/uk/en-GB/login')
@@ -75,6 +77,8 @@ test('Allows customer to go to sign in page', async () => {
 })
 
 test('Allows customer to generate password token', async () => {
+    const user = userEvent.setup()
+
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
@@ -94,8 +98,10 @@ test('Allows customer to generate password token', async () => {
     })
 
     // enter credentials and submit
-    user.type(await screen.findByLabelText('Email'), 'foo@test.com')
-    user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+    await user.click(
+        within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
+    )
 
     expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
 
@@ -103,9 +109,7 @@ test('Allows customer to generate password token', async () => {
         expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
     })
 
-    await waitFor(() => {
-        user.click(screen.getByText('Back to Sign In'))
-    })
+    await user.click(screen.getByText('Back to Sign In'))
 
     await waitFor(() => {
         expect(window.location.pathname).toBe('/uk/en-GB/login')
@@ -113,6 +117,8 @@ test('Allows customer to generate password token', async () => {
 })
 
 test('Renders error message from server', async () => {
+    const user = userEvent.setup()
+
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
@@ -128,8 +134,10 @@ test('Renders error message from server', async () => {
     )
     await renderWithProviders(<MockedComponent />)
 
-    user.type(await screen.findByLabelText('Email'), 'foo@test.com')
-    user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+    await user.click(
+        within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
+    )
 
     await waitFor(() => {
         expect(screen.getByText('500 Internal Server Error')).toBeInTheDocument()

@@ -34,13 +34,13 @@ export const registerServiceWorker = (url) => {
     })
 }
 
-export const OuterApp = ({routes, error, WrappedApp, locals, callback}) => {
+export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
 
     return (
         <ServerContext.Provider value={{}}>
-            <Router ref={callback}>
+            <Router ref={onHydrate}>
                 <CorrelationIdProvider
                     correlationId={() => {
                         // If we are hydrating an error page use the server correlation id.
@@ -70,7 +70,7 @@ OuterApp.propTypes = {
     error: PropTypes.object,
     WrappedApp: PropTypes.func.isRequired,
     locals: PropTypes.object,
-    callback: PropTypes.func
+    onHydrate: PropTypes.func
 }
 /* istanbul ignore next */
 export const start = () => {
@@ -120,7 +120,7 @@ export const start = () => {
                 rootEl,
                 <OuterApp
                     {...props}
-                    callback={() => {
+                    onHydrate={() => {
                         window.__HYDRATING__ = false
                     }}
                 />

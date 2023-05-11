@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import user from '@testing-library/user-event'
+import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults, guestToken} from '../../utils/test-utils'
 import Login from '.'
@@ -95,6 +95,7 @@ describe('Logging in tests', function () {
         )
     })
     test('Allows customer to sign in to their account', async () => {
+        const user = userEvent.setup()
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
@@ -105,8 +106,8 @@ describe('Logging in tests', function () {
         })
 
         // enter credentials and submit
-        user.type(screen.getByLabelText('Email'), 'customer@test.com')
-        user.type(screen.getByLabelText('Password'), 'Password!1')
+        await user.type(screen.getByLabelText('Email'), 'customer@test.com')
+        await user.type(screen.getByLabelText('Password'), 'Password!1')
         // login with credentials
         global.server.use(
             rest.post('*/oauth2/token', (req, res, ctx) =>
@@ -125,7 +126,7 @@ describe('Logging in tests', function () {
             )
         )
 
-        user.click(screen.getByText(/sign in/i))
+        await user.click(screen.getByText(/sign in/i))
         await waitFor(() => {
             expect(window.location.pathname).toBe('/uk/en-GB/account')
             expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
@@ -158,6 +159,8 @@ describe('Error while logging in', function () {
     // TODO: Fix flaky/broken test
     // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Renders error when given incorrect log in credentials', async () => {
+        const user = userEvent.setup()
+
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
@@ -168,8 +171,8 @@ describe('Error while logging in', function () {
         })
 
         // enter credentials and submit
-        user.type(screen.getByLabelText('Email'), 'foo@test.com')
-        user.type(screen.getByLabelText('Password'), 'SomeFakePassword1!')
+        await user.type(screen.getByLabelText('Email'), 'foo@test.com')
+        await user.type(screen.getByLabelText('Password'), 'SomeFakePassword1!')
 
         // mock failed auth request
         global.server.use(
@@ -181,7 +184,7 @@ describe('Error while logging in', function () {
             })
         )
 
-        user.click(screen.getByText(/sign in/i))
+        await user.click(screen.getByText(/sign in/i))
         // wait for login error alert to appear
         expect(
             await screen.findByText(/Incorrect username or password, please try again./i)
@@ -190,6 +193,8 @@ describe('Error while logging in', function () {
 })
 describe('Navigate away from login page tests', function () {
     test('should navigate to sign up page when the user clicks Create Account', async () => {
+        const user = userEvent.setup()
+
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
@@ -198,7 +203,7 @@ describe('Navigate away from login page tests', function () {
                 isGuest: true
             }
         })
-        user.click(await screen.findByText(/Create Account/i))
+        await user.click(await screen.findByText(/Create Account/i))
 
         await waitFor(async () => {
             // wait for sign up page to appear
@@ -206,6 +211,8 @@ describe('Navigate away from login page tests', function () {
         })
     })
     test('should navigate to reset password page when the user clicks Forgot Password', async () => {
+        const user = userEvent.setup()
+
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
@@ -214,7 +221,7 @@ describe('Navigate away from login page tests', function () {
                 isGuest: true
             }
         })
-        user.click(screen.getByText(/forgot password/i))
+        await user.click(screen.getByText(/forgot password/i))
 
         // wait for sign up page to appear
         expect(

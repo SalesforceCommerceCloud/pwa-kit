@@ -49,30 +49,31 @@ beforeEach(() => {
 })
 
 test('the Add To Cart button', async () => {
+    const user = userEvent.setup()
     const variant = mockWishListDetails.data[3]
     renderWithProviders(<MockedComponent variant={variant} />)
 
     const addToCartButton = await screen.findByRole('button', {
         name: /add to cart/i
     })
-    userEvent.click(addToCartButton)
+    await user.click(addToCartButton)
 
     await waitFor(() => {
-        // Chakra UI renders multiple elements with toast title in DOM for accessibility.
-        // We need to assert the actual text within the alert
-        expect(screen.getAllByRole('alert')[0]).toHaveTextContent(/1 item added to cart/i)
+        expect(screen.getByText(/1 item added to cart/i)).toBeInTheDocument()
     })
 })
 
 test('the Add Set To Cart button', async () => {
+    const user = userEvent.setup()
+
     const productSetWithoutVariants = mockWishListDetails.data[1]
     renderWithProviders(<MockedComponent variant={productSetWithoutVariants} />)
 
     const button = await screen.findByRole('button', {name: /add set to cart/i})
-    userEvent.click(button)
+    await user.click(button)
 
     await waitFor(() => {
-        expect(screen.getAllByRole('alert')[0]).toHaveTextContent(/2 items added to cart/i)
+        expect(screen.getByText(/2 items added to cart/i)).toBeInTheDocument()
     })
 })
 
@@ -85,11 +86,13 @@ test('the View Full Details button', async () => {
 })
 
 test('the View Options button', async () => {
+    const user = userEvent.setup()
+
     const masterProduct = mockWishListDetails.data[2]
     renderWithProviders(<MockedComponent variant={masterProduct} />)
 
     const button = await screen.findByRole('button', {name: /view options/i})
-    userEvent.click(button)
+    await user.click(button)
 
     await waitFor(
         () => {

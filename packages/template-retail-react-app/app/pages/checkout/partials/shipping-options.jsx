@@ -101,7 +101,7 @@ export default function ShippingOptions() {
                                 name="shippingMethodId"
                                 control={form.control}
                                 defaultValue=""
-                                render={({value, onChange}) => (
+                                render={({field: {value, onChange}}) => (
                                     <RadioGroup
                                         name="shipping-options-radiogroup"
                                         value={value}
