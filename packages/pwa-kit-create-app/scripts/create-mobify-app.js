@@ -165,23 +165,23 @@ const runGenerator = (answers, {outputDir, verbose}) => {
 
     writeJson(pkgJsonPath, pkgDataWithAnswers)
 
-    const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
-    const siteName = pkgDataWithAnswers.name
-    replaceJSON(manifest, {
-        name: siteName,
-        short_name: siteName,
-        start_url: '/?homescreen=1',
-        icons: [
-            {
-                src: './img/global/app-icon-192.png',
-                sizes: '192x192'
-            },
-            {
-                src: './img/global/app-icon-512.png',
-                sizes: '512x512'
-            }
-        ]
-    })
+    // const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
+    // const siteName = pkgDataWithAnswers.name
+    // replaceJSON(manifest, {
+    //     name: siteName,
+    //     short_name: siteName,
+    //     start_url: '/?homescreen=1',
+    //     icons: [
+    //         {
+    //             src: './img/global/app-icon-192.png',
+    //             sizes: '192x192'
+    //         },
+    //         {
+    //             src: './img/global/app-icon-512.png',
+    //             sizes: '512x512'
+    //         }
+    //     ]
+    // })
 
     const PWAKitConfigTemplate = require(`../assets/pwa/default`).template
     const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
