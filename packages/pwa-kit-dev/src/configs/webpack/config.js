@@ -46,7 +46,8 @@ export const EXT_OVERRIDES_DIR =
     typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
     !pkg?.ccExtensibility?.overridesDir?.startsWith('/')
         ? '/' + pkg?.ccExtensibility?.overridesDir
-        : pkg?.ccExtensibility?.overridesDir
+        : pkg?.ccExtensibility?.overridesDir ?? ''
+export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
@@ -78,7 +79,7 @@ const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
         const primary = resolve(projectDir, ...segments) + ext
         const override = EXT_OVERRIDES_DIR
-            ? resolve(projectDir, EXT_OVERRIDES_DIR, ...segments) + ext
+            ? resolve(projectDir, EXT_OVERRIDES_DIR_NO_SLASH, ...segments) + ext
             : null
 
         if (fse.existsSync(primary) || (override && fse.existsSync(override))) {
@@ -195,7 +196,7 @@ const baseConfig = (target) => {
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
                                   ...[EXT_EXTENDS].map((extendTarget) => ({
                                       [extendTarget]: [
-                                          path.resolve(projectDir, EXT_OVERRIDES_DIR),
+                                          path.resolve(projectDir, EXT_OVERRIDES_DIR_NO_SLASH),
                                           path.resolve(projectDir, `node_modules/${extendTarget}`)
                                       ]
                                   }))
@@ -451,7 +452,7 @@ const renderer =
                     new CopyPlugin({
                         patterns: [
                             {
-                                from: `${EXT_OVERRIDES_DIR}/app/static`,
+                                from: `${EXT_OVERRIDES_DIR_NO_SLASH}/app/static`,
                                 to: 'static/',
                                 noErrorOnMissing: true
                             }
@@ -485,7 +486,7 @@ const ssr = (() => {
                         new CopyPlugin({
                             patterns: [
                                 {
-                                    from: `${EXT_OVERRIDES_DIR}/app/static`,
+                                    from: `${EXT_OVERRIDES_DIR_NO_SLASH}/app/static`,
                                     to: 'static/'
                                 }
                             ]
