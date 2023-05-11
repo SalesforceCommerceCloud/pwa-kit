@@ -153,7 +153,7 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
         // 2. Iterated over all the template files in the bootstrap template and write them to the distination folder.
         // Loop through all the files in the temp directory
 
-        const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates',)
+        const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
         console.log('inputDir: ', inputDir)
         fs.readdirSync(inputDir, (err, files)=> {
             if (err) {
