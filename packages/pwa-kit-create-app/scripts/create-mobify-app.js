@@ -162,7 +162,7 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
               if (fs.statSync(dirPath + "/" + file).isDirectory()) {
                 arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
               } else {
-                arrayOfFiles.push(path.join(__dirname, dirPath, "/", file))
+                arrayOfFiles.push(p.join(__dirname, dirPath, "/", file))
               }
             })
           
