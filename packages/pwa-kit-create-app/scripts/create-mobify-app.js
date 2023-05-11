@@ -60,7 +60,7 @@ const EXPRESS_MINIMAL_TEST_PROJECT = 'express-minimal-test-project'
 const EXPRESS_MINIMAL = 'express-minimal'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
-const RETAIL_REACT_APP_DEMO_EXTENSIBLE = 'retail-react-app-demo'
+const RETAIL_REACT_APP_DEMO_EXTENSIBLE = 'retail-react-app-demo-extensible'
 const RETAIL_REACT_APP = 'retail-react-app'
 const MRT_REFERENCE_APP = 'mrt-reference-app'
 
