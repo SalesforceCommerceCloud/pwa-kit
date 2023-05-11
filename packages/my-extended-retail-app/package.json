@@ -11,6 +11,7 @@
         "overridesDir": "pwa-kit-overrides"
     },
     "devDependencies": {
+        "@loadable/component": "^5.15.3",
         "retail-react-app": "^3.0.0-dev.0"
     },
     "scripts": {
