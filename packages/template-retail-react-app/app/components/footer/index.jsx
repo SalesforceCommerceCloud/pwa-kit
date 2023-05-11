@@ -205,23 +205,17 @@ const Subscribe = ({...otherProps}) => {
             </Text>
 
             <Box>
-                {isHydrated() && (
-                    <InputGroup>
-                        <Input
-                            type="email"
-                            placeholder="you@email.com"
-                            {...styles.subscribeField}
-                        />
-                        <InputRightElement {...styles.subscribeButtonContainer}>
-                            <Button variant="footer">
-                                {intl.formatMessage({
-                                    id: 'footer.subscribe.button.sign_up',
-                                    defaultMessage: 'Sign Up'
-                                })}
-                            </Button>
-                        </InputRightElement>
-                    </InputGroup>
-                )}
+                <InputGroup>
+                    <InputRightElement {...styles.subscribeButtonContainer}>
+                        <Button variant="footer">
+                            {intl.formatMessage({
+                                id: 'footer.subscribe.button.sign_up',
+                                defaultMessage: 'Sign Up'
+                            })}
+                        </Button>
+                    </InputRightElement>
+                    <Input type="email" placeholder="you@email.com" {...styles.subscribeField} />
+                </InputGroup>
             </Box>
 
             <SocialIcons variant="flex-start" pinterestInnerColor="black" {...styles.socialIcons} />
