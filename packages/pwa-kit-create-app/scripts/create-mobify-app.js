@@ -445,7 +445,7 @@ const downloadAndExtractTemplate = (templateName, outputDir) => {
         cwd: p.join(tmp),
         sync: true
     })
-    sh.cp('-R', p.join(tmp), outputDir)
+    sh.cp('-R', p.join(tmp, 'package'), outputDir)
     sh.rm('-rf', tmp)
 }
 
