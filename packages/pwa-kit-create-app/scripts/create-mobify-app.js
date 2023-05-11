@@ -172,15 +172,9 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
         const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
         console.log('inputDir: ', getAllFiles(inputDir))
         getAllFiles(inputDir).forEach((inputFile) => {
-            const outputFile = inputFile.replace(inputDir, outputDir)
+            const outputFile = inputFile.replace(inputDir, '/' + outputDir)
             console.log('outputFile: ', outputFile)
-            fs.copyFileSync(inputFile, outputFile, (error) => {
-                if (error) {
-                    console.error('File moving error.', error)
-                } else {
-                    console.log("Moved file '%s' to '%s'.", fromPath, toPath)
-                }
-            })
+            fs.copyFileSync(inputFile, outputFile)
         })
 
     } else {
