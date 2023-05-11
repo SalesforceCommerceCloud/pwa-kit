@@ -75,7 +75,6 @@ const PUBLIC_PRESETS = [
     EXPRESS_MINIMAL,
     TYPESCRIPT_MINIMAL
 ]
-const EXTENDABLE_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP]
 const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
@@ -128,8 +127,13 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * Each package name included in the object's keys will be copied into the
  * generated project, all others are excluded.
  */
-const runGenerator = (answers, {outputDir, verbose}) => {
+const runGenerator = (answers, {outputDir, verbose, extensible}) => {
     checkOutputDir(outputDir)
+
+    if (extensible) {
+        console.log('EXTENDING PROJECT!')
+    }
+
     // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
     const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
 
@@ -373,6 +377,28 @@ const runTemplateGenerator = (projectId, {outputDir, verbose}, template) => {
     npmInstall(outputDir, {verbose})
 }
 
+const extensibilityPrompts = async () => {
+    const questions = [
+        {
+            name: 'extensible',
+            message: 'Do you wish to use template extensibility?',
+            type: 'list',
+            choices: [
+                {
+                    name: 'No',
+                    value: false
+                },
+                {
+                    name: 'Yes',
+                    value: true
+                }
+            ]
+        }
+    ]
+
+    return inquirer.prompt(questions)
+}
+
 const presetPrompt = async () => {
     const questions = [
         {
@@ -393,34 +419,8 @@ const presetPrompt = async () => {
     ]
 
     const presetChoice = await inquirer.prompt(questions)
-    let extendsChoice = {}
 
-    if (EXTENDABLE_PRESETS.includes(presetChoice['preset'])) {
-        extendsChoice = await inquirer.prompt({
-            name: 'extendable',
-            message: 'Do you wish to use template extensibility?',
-            type: 'list',
-            choices: [
-                {
-                    name: 'No',
-                    value: false
-                },
-                {
-                    name: 'Yes',
-                    value: true
-                }
-            ]
-        })
-    }
-    console.log({
-        ...presetChoice,
-        ...extendsChoice
-    })
     return presetChoice['preset']
-    // return {
-    //     ...presetChoice,
-    //     ...extendsChoice
-    // }
 }
 
 const extractTemplate = (templateName, outputDir) => {
@@ -504,8 +504,13 @@ const main = (opts) => {
                         'template-mrt-reference-app'
                     )
                 case RETAIL_REACT_APP_DEMO:
-                    return Promise.resolve()
-                        .then(() => runGenerator(demoProjectAnswers(), opts))
+                    return extensibilityPrompts(opts)
+                        .then((answers) =>
+                            runGenerator(demoProjectAnswers(), {
+                                ...opts,
+                                extensible: answers.extensible
+                            })
+                        )
                         .then((result) => {
                             console.log(
                                 '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
