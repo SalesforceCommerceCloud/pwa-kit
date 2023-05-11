@@ -514,7 +514,7 @@ const main = (opts) => {
                     })
                 default:
                     console.error(
-                        `**The preset "${preset}" is not valid. Valid presets are: ${
+                        `The preset "${preset}" is not valid. Valid presets are: ${
                             process.env.GENERATOR_PRESET
                                 ? PRESETS.map((x) => `"${x}"`).join(' ')
                                 : PUBLIC_PRESETS.map((x) => `"${x}"`).join(' ')
