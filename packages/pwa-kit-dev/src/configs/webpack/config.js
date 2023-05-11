@@ -404,7 +404,7 @@ const clientOptional = baseConfig('web')
             name: CLIENT_OPTIONAL,
             entry: {
                 ...optional('loader', `.${EXT_OVERRIDES_DIR}/app/loader.js`),
-                ...optional('worker', `.${EXT_OVERRIDES_DIR}/app/main.js`),
+                ...optional('worker', `./worker/main.js`),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
