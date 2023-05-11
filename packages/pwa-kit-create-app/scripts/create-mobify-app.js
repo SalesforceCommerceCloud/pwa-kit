@@ -437,8 +437,8 @@ const extractTemplate = (templateName, outputDir) => {
 const downloadAndExtractTemplate = (templateName, outputDir) => {
     console.log('downloadAndExtracttemplate')
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir()))
-    console.log(`npm pack pwa-kit-runtime@latest --pack-destination="${tmp}"`)
-    const {stdout: fileName} = sh.exec(`npm pack pwa-kit-runtime@latest --pack-destination="${tmp}"`, { silent: true })
+    console.log(`npm pack ${templateName}@latest --pack-destination="${tmp}"`)
+    const {stdout: fileName} = sh.exec(`npm pack ${templateName}@latest --pack-destination="${tmp}"`, { silent: false })
     console.log('fileName: ', fileName)
     tar.x({
         file: p.join(fileName.trim()),
