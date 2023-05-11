@@ -170,9 +170,9 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
           }
 
         const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
-        console.log('inputDir: ', getAllFiles(inputDir))
         getAllFiles(inputDir).forEach((inputFile) => {
-            const outputFile = inputFile.replace(inputDir, '/' + outputDir)
+            const outputFile = inputFile.replace(inputDir, '') + '/' + outputDir
+            console.log('inputFile: ', outputFile)
             console.log('outputFile: ', outputFile)
             fs.copyFileSync(inputFile, outputFile)
         })
