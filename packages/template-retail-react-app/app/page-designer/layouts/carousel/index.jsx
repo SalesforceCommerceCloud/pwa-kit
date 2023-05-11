@@ -15,10 +15,9 @@ import {
     useBreakpoint,
     useBreakpointValue
 } from '@chakra-ui/react'
-import {Component} from 'retail-react-app/app/page-designer/core'
+import {Component, regionPropType} from 'commerce-sdk-react-preview/components'
 import {ChevronLeftIcon, ChevronRightIcon} from 'retail-react-app/app/components/icons'
 import {useEffect} from 'react'
-import {regionPropType} from 'commerce-sdk-react-preview/components'
 
 /**
  * Display child components in a carousel slider manner. Configurations include the number of

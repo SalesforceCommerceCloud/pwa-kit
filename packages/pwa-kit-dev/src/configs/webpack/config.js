@@ -46,7 +46,8 @@ export const EXT_OVERRIDES_DIR =
     typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
     !pkg?.ccExtensibility?.overridesDir?.startsWith('/')
         ? '/' + pkg?.ccExtensibility?.overridesDir
-        : pkg?.ccExtensibility?.overridesDir
+        : pkg?.ccExtensibility?.overridesDir ?? ''
+export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
@@ -78,7 +79,7 @@ const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
         const primary = resolve(projectDir, ...segments) + ext
         const override = EXT_OVERRIDES_DIR
-            ? resolve(projectDir, EXT_OVERRIDES_DIR?.replace(/^\//, ''), ...segments) + ext
+            ? resolve(projectDir, EXT_OVERRIDES_DIR_NO_SLASH, ...segments) + ext
             : null
 
         if (fse.existsSync(primary) || (override && fse.existsSync(override))) {
@@ -88,9 +89,8 @@ const entryPointExists = (segments) => {
     return false
 }
 
-const getAppEntryPoint = (pkg) => {
-    const APP_MAIN_PATH = '/app/main'
-    return EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR + APP_MAIN_PATH : APP_MAIN_PATH
+const getAppEntryPoint = () => {
+    return EXT_OVERRIDES_DIR + '/app/main'
 }
 
 const findInProjectThenSDK = (pkg) => {
@@ -196,10 +196,7 @@ const baseConfig = (target) => {
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
                                   ...[EXT_EXTENDS].map((extendTarget) => ({
                                       [extendTarget]: [
-                                          path.resolve(
-                                              projectDir,
-                                              EXT_OVERRIDES_DIR.replace(/^\//, '')
-                                          ),
+                                          path.resolve(projectDir, EXT_OVERRIDES_DIR_NO_SLASH),
                                           path.resolve(projectDir, `node_modules/${extendTarget}`)
                                       ]
                                   }))
@@ -270,6 +267,7 @@ const baseConfig = (target) => {
 }
 
 const withChunking = (config) => {
+    const sysPath = fse.realpathSync(path.resolve('node_modules', EXT_EXTENDS ?? ''))
     return {
         ...config,
         output: {
@@ -287,7 +285,12 @@ const withChunking = (config) => {
                         // 2. The package is one of the monorepo packages.
                         //    This is for local development to ensure the bundle
                         //    composition is the same as a production build
-                        test: /(node_modules)|(packages\/.*\/dist)/,
+                        test: (module) => {
+                            if (module?.context?.match(makeRegExp(`${sysPath}/node_modules`))) {
+                                return false
+                            }
+                            return module?.context?.match?.(/(node_modules)|(packages\/.*\/dist)/)
+                        },
                         name: 'vendor',
                         chunks: 'all'
                     }
@@ -345,7 +348,7 @@ const enableReactRefresh = (config) => {
         },
         entry: {
             ...config.entry,
-            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getAppEntryPoint(pkg)]
+            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getAppEntryPoint()]
         },
         plugins: [
             ...config.plugins,
@@ -374,7 +377,7 @@ const client =
                 // use source map to make debugging easier
                 devtool: mode === development ? 'source-map' : false,
                 entry: {
-                    main: getAppEntryPoint(pkg)
+                    main: getAppEntryPoint()
                 },
                 plugins: [
                     ...config.plugins,
@@ -400,18 +403,8 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional(
-                    'loader',
-                    EXT_EXTENDS && EXT_OVERRIDES_DIR
-                        ? `.${EXT_OVERRIDES_DIR}/app/request-processor.js`
-                        : './app/loader.js'
-                ),
-                ...optional(
-                    'worker',
-                    EXT_EXTENDS && EXT_OVERRIDES_DIR
-                        ? `.${EXT_OVERRIDES_DIR}/app/request-processor.js`
-                        : './app/main.js'
-                ),
+                ...optional('loader', `.${EXT_OVERRIDES_DIR}/app/loader.js`),
+                ...optional('worker', `./worker/main.js`),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
@@ -459,10 +452,7 @@ const renderer =
                     new CopyPlugin({
                         patterns: [
                             {
-                                from:
-                                    EXT_EXTENDS && EXT_OVERRIDES_DIR
-                                        ? `${EXT_OVERRIDES_DIR?.replace(/^\//, '')}/app/static`
-                                        : 'app/static/',
+                                from: `${EXT_OVERRIDES_DIR_NO_SLASH}/app/static`,
                                 to: 'static/',
                                 noErrorOnMissing: true
                             }
@@ -484,10 +474,7 @@ const ssr = (() => {
                     ...config,
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
-                    entry:
-                        EXT_EXTENDS && EXT_OVERRIDES_DIR
-                            ? `.${EXT_OVERRIDES_DIR}/app/ssr.js`
-                            : './app/ssr.js',
+                    entry: `.${EXT_OVERRIDES_DIR}/app/ssr.js`,
                     output: {
                         path: buildDir,
                         filename: 'ssr.js',
@@ -499,10 +486,7 @@ const ssr = (() => {
                         new CopyPlugin({
                             patterns: [
                                 {
-                                    from:
-                                        EXT_EXTENDS && EXT_OVERRIDES_DIR
-                                            ? `${EXT_OVERRIDES_DIR?.replace(/^\//, '')}/app/static`
-                                            : 'app/static/',
+                                    from: `${EXT_OVERRIDES_DIR_NO_SLASH}/app/static`,
                                     to: 'static/'
                                 }
                             ]
@@ -525,10 +509,7 @@ const requestProcessor =
                 ...config,
                 name: REQUEST_PROCESSOR,
                 // entry: './app/request-processor.js',
-                entry:
-                    EXT_EXTENDS && EXT_OVERRIDES_DIR
-                        ? `.${EXT_OVERRIDES_DIR}/app/request-processor.js`
-                        : './app/request-processor.js',
+                entry: `.${EXT_OVERRIDES_DIR}/app/request-processor.js`,
                 output: {
                     path: buildDir,
                     filename: 'request-processor.js',

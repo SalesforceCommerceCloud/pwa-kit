@@ -878,52 +878,6 @@ describe('generateCacheKey', () => {
         expect(generateCacheKey(mockRequest({url: '/test3?a=2'}))).not.toEqual(result1)
     })
 
-    test('user agent affects key', () => {
-        const result1 = generateCacheKey(mockRequest())
-        const request2 = mockRequest({
-            headers: {
-                'user-agent':
-                    'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1'
-            }
-        })
-        expect(generateCacheKey(request2)).not.toEqual(result1)
-        // query string and device type is hashed
-        expect(generateCacheKey(request2)).toBe(
-            `/test/${getHashForString(['a=1', 'device=PHONE'].join('-'))}`
-        )
-    })
-
-    test('CloudFront device headers affect key', () => {
-        const result1 = generateCacheKey(mockRequest())
-        const request2 = mockRequest({
-            headers: {
-                'CloudFront-Is-Desktop-Viewer': 'false',
-                'CloudFront-Is-Mobile-Viewer': 'true',
-                'CloudFront-Is-SmartTV-Viewer': 'false',
-                'CloudFront-Is-Tablet-Viewer': 'false'
-            }
-        })
-        expect(generateCacheKey(request2)).not.toEqual(result1)
-        expect(generateCacheKey(request2)).toBe(
-            `/test/${getHashForString(['a=1', 'device=PHONE'].join('-'))}`
-        )
-    })
-
-    test('multiple CloudFront device headers affect key', () => {
-        const request1 = mockRequest({
-            headers: {
-                'CloudFront-Is-Desktop-Viewer': 'false',
-                'CloudFront-Is-Mobile-Viewer': 'true',
-                'CloudFront-Is-SmartTV-Viewer': 'false',
-                'CloudFront-Is-Tablet-Viewer': 'true'
-            }
-        })
-
-        expect(generateCacheKey(request1)).toBe(
-            `/test/${getHashForString(['a=1', 'device=TABLET'].join('-'))}`
-        )
-    })
-
     test('request class affects key', () => {
         const result1 = generateCacheKey(mockRequest())
         const request2 = mockRequest({

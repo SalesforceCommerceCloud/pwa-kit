@@ -14,6 +14,7 @@ module.exports = {
         ...base.moduleNameMapper,
         '^react$': '<rootDir>/node_modules/react/index.js',
         '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.js',
+        '^retail-react-app(.*)$': '<rootDir>$1',
         '^@tanstack/react-query$': '<rootDir>/node_modules/@tanstack/react-query/build/lib/index.js'
     },
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],

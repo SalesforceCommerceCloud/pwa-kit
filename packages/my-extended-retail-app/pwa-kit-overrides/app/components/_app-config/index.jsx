@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@chakra-ui/react'
 
@@ -18,7 +18,6 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from 'retail-react-app/app/utils/url'
 
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
-import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'

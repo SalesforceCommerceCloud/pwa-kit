@@ -71,7 +71,6 @@ class AppConfig extends React.Component {
      * you set up context Providers for a state-management library such as Redux.
      */
     render() {
-        console.log('hello from universal/components/_app-config')
         return <React.Fragment>{this.props.children}</React.Fragment>
     }
 }

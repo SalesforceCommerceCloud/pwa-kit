@@ -16,14 +16,14 @@ module.exports = [
             supportedLocales: [
                 {
                     id: 'en-US',
-                    preferredCurrency: 'USD',
+                    preferredCurrency: 'USD'
                 },
                 {
                     id: 'en-CA',
-                    preferredCurrency: 'USD',
-                },
-            ],
-        },
+                    preferredCurrency: 'USD'
+                }
+            ]
+        }
     },
     {
         id: 'RefArchGlobal',
@@ -33,46 +33,46 @@ module.exports = [
             supportedLocales: [
                 {
                     id: 'de-DE',
-                    preferredCurrency: 'EUR',
+                    preferredCurrency: 'EUR'
                 },
                 {
                     id: 'en-GB',
-                    preferredCurrency: 'GBP',
+                    preferredCurrency: 'GBP'
                 },
                 {
                     id: 'es-MX',
-                    preferredCurrency: 'MXN',
+                    preferredCurrency: 'MXN'
                 },
                 {
                     id: 'fr-FR',
-                    preferredCurrency: 'EUR',
+                    preferredCurrency: 'EUR'
                 },
                 {
                     id: 'it-IT',
-                    preferredCurrency: 'EUR',
+                    preferredCurrency: 'EUR'
                 },
                 {
                     id: 'ja-JP',
-                    preferredCurrency: 'JPY',
+                    preferredCurrency: 'JPY'
                 },
                 {
                     id: 'ko-KR',
-                    preferredCurrency: 'KRW',
+                    preferredCurrency: 'KRW'
                 },
                 {
                     id: 'pt-BR',
-                    preferredCurrency: 'BRL',
+                    preferredCurrency: 'BRL'
                 },
                 {
                     id: 'zh-CN',
-                    preferredCurrency: 'CNY',
+                    preferredCurrency: 'CNY'
                 },
                 {
                     id: 'zh-TW',
-                    preferredCurrency: 'TWD',
-                },
+                    preferredCurrency: 'TWD'
+                }
             ],
-            defaultLocale: 'en-GB',
-        },
-    },
+            defaultLocale: 'en-GB'
+        }
+    }
 ]

@@ -31,9 +31,6 @@ import RecommendedProducts from 'retail-react-app/app/components/recommended-pro
 import ProductView from 'retail-react-app/app/partials/product-view'
 import InformationAccordion from 'retail-react-app/app/pages/product-detail/partials/information-accordion'
 
-//Component Slots
-import AbovePDP from 'retail-react-app/app/components/product-detail/above-fold'
-
 // constant
 import {
     API_ERROR_MESSAGE,
@@ -246,144 +243,141 @@ const ProductDetail = () => {
     }, [product])
 
     return (
-        <>
-            <AbovePDP />
-            <Box
-                className="sf-product-detail-page"
-                layerStyle="page"
-                data-testid="product-details-page"
-            >
-                <Helmet>
-                    <title>{product?.pageTitle}</title>
-                    <meta name="description" content={product?.pageDescription} />
-                </Helmet>
+        <Box
+            className="sf-product-detail-page"
+            layerStyle="page"
+            data-testid="product-details-page"
+        >
+            <Helmet>
+                <title>{product?.pageTitle}</title>
+                <meta name="description" content={product?.pageDescription} />
+            </Helmet>
 
-                <Stack spacing={16}>
-                    {isProductASet ? (
-                        <Fragment>
-                            {/* Product Set: parent product */}
-                            <ProductView
-                                product={product}
-                                category={primaryCategory?.parentCategoryTree || []}
-                                addToCart={handleProductSetAddToCart}
-                                addToWishlist={handleAddToWishlist}
-                                isProductLoading={isProductLoading}
-                                isWishlistLoading={isWishlistLoading}
-                                validateOrderability={handleProductSetValidation}
-                            />
+            <Stack spacing={16}>
+                {isProductASet ? (
+                    <Fragment>
+                        {/* Product Set: parent product */}
+                        <ProductView
+                            product={product}
+                            category={primaryCategory?.parentCategoryTree || []}
+                            addToCart={handleProductSetAddToCart}
+                            addToWishlist={handleAddToWishlist}
+                            isProductLoading={isProductLoading}
+                            isWishlistLoading={isWishlistLoading}
+                            validateOrderability={handleProductSetValidation}
+                        />
 
-                            <hr />
+                        <hr />
 
-                            {/* TODO: consider `childProduct.belongsToSet` */}
-                            {
-                                // Product Set: render the child products
-                                product.setProducts.map((childProduct) => (
-                                    <Box key={childProduct.id} data-testid="child-product">
-                                        <ProductView
-                                            // Do no use an arrow function as we are manipulating the functions scope.
-                                            ref={function (ref) {
-                                                // Assign the "set" scope of the ref, this is how we access the internal
-                                                // validation.
-                                                childProductRefs.current[childProduct.id] = {
-                                                    ref,
-                                                    validateOrderability: this.validateOrderability
-                                                }
-                                            }}
-                                            product={childProduct}
-                                            isProductPartOfSet={true}
-                                            addToCart={(variant, quantity) =>
-                                                handleAddToCart([
-                                                    {product: childProduct, variant, quantity}
-                                                ])
+                        {/* TODO: consider `childProduct.belongsToSet` */}
+                        {
+                            // Product Set: render the child products
+                            product.setProducts.map((childProduct) => (
+                                <Box key={childProduct.id} data-testid="child-product">
+                                    <ProductView
+                                        // Do no use an arrow function as we are manipulating the functions scope.
+                                        ref={function (ref) {
+                                            // Assign the "set" scope of the ref, this is how we access the internal
+                                            // validation.
+                                            childProductRefs.current[childProduct.id] = {
+                                                ref,
+                                                validateOrderability: this.validateOrderability
                                             }
-                                            addToWishlist={handleAddToWishlist}
-                                            onVariantSelected={(product, variant, quantity) => {
-                                                if (quantity) {
-                                                    setProductSetSelection((previousState) => ({
-                                                        ...previousState,
-                                                        [product.id]: {
-                                                            product,
-                                                            variant,
-                                                            quantity
-                                                        }
-                                                    }))
-                                                } else {
-                                                    const selections = {...productSetSelection}
-                                                    delete selections[product.id]
-                                                    setProductSetSelection(selections)
-                                                }
-                                            }}
-                                            isProductLoading={isProductLoading}
-                                            isWishlistLoading={isWishlistLoading}
-                                        />
-                                        <InformationAccordion product={childProduct} />
-
-                                        <Box display={['none', 'none', 'none', 'block']}>
-                                            <hr />
-                                        </Box>
-                                    </Box>
-                                ))
-                            }
-                        </Fragment>
-                    ) : (
-                        <Fragment>
-                            <ProductView
-                                product={product}
-                                category={primaryCategory?.parentCategoryTree || []}
-                                addToCart={(variant, quantity) =>
-                                    handleAddToCart([{product, variant, quantity}])
-                                }
-                                addToWishlist={handleAddToWishlist}
-                                isProductLoading={isProductLoading}
-                                isWishlistLoading={isWishlistLoading}
-                            />
-                            <InformationAccordion product={product} />
-                        </Fragment>
-                    )}
-
-                    {/* Product Recommendations */}
-                    <Stack spacing={16}>
-                        {!isProductASet && (
-                            <RecommendedProducts
-                                title={
-                                    <FormattedMessage
-                                        defaultMessage="Complete the Set"
-                                        id="product_detail.recommended_products.title.complete_set"
+                                        }}
+                                        product={childProduct}
+                                        isProductPartOfSet={true}
+                                        addToCart={(variant, quantity) =>
+                                            handleAddToCart([
+                                                {product: childProduct, variant, quantity}
+                                            ])
+                                        }
+                                        addToWishlist={handleAddToWishlist}
+                                        onVariantSelected={(product, variant, quantity) => {
+                                            if (quantity) {
+                                                setProductSetSelection((previousState) => ({
+                                                    ...previousState,
+                                                    [product.id]: {
+                                                        product,
+                                                        variant,
+                                                        quantity
+                                                    }
+                                                }))
+                                            } else {
+                                                const selections = {...productSetSelection}
+                                                delete selections[product.id]
+                                                setProductSetSelection(selections)
+                                            }
+                                        }}
+                                        isProductLoading={isProductLoading}
+                                        isWishlistLoading={isWishlistLoading}
                                     />
-                                }
-                                recommender={'complete-the-set'}
-                                products={[product]}
-                                mx={{base: -4, md: -8, lg: 0}}
-                                shouldFetch={() => product?.id}
-                            />
-                        )}
+                                    <InformationAccordion product={childProduct} />
+
+                                    <Box display={['none', 'none', 'none', 'block']}>
+                                        <hr />
+                                    </Box>
+                                </Box>
+                            ))
+                        }
+                    </Fragment>
+                ) : (
+                    <Fragment>
+                        <ProductView
+                            product={product}
+                            category={primaryCategory?.parentCategoryTree || []}
+                            addToCart={(variant, quantity) =>
+                                handleAddToCart([{product, variant, quantity}])
+                            }
+                            addToWishlist={handleAddToWishlist}
+                            isProductLoading={isProductLoading}
+                            isWishlistLoading={isWishlistLoading}
+                        />
+                        <InformationAccordion product={product} />
+                    </Fragment>
+                )}
+
+                {/* Product Recommendations */}
+                <Stack spacing={16}>
+                    {!isProductASet && (
                         <RecommendedProducts
                             title={
                                 <FormattedMessage
-                                    defaultMessage="You might also like"
-                                    id="product_detail.recommended_products.title.might_also_like"
+                                    defaultMessage="Complete the Set"
+                                    id="product_detail.recommended_products.title.complete_set"
                                 />
                             }
-                            recommender={'pdp-similar-items'}
+                            recommender={'complete-the-set'}
                             products={[product]}
                             mx={{base: -4, md: -8, lg: 0}}
                             shouldFetch={() => product?.id}
                         />
+                    )}
+                    <RecommendedProducts
+                        title={
+                            <FormattedMessage
+                                defaultMessage="You might also like"
+                                id="product_detail.recommended_products.title.might_also_like"
+                            />
+                        }
+                        recommender={'pdp-similar-items'}
+                        products={[product]}
+                        mx={{base: -4, md: -8, lg: 0}}
+                        shouldFetch={() => product?.id}
+                    />
 
-                        <RecommendedProducts
-                            title={
-                                <FormattedMessage
-                                    defaultMessage="Recently Viewed"
-                                    id="product_detail.recommended_products.title.recently_viewed"
-                                />
-                            }
-                            recommender={'viewed-recently-einstein'}
-                            mx={{base: -4, md: -8, lg: 0}}
-                        />
-                    </Stack>
+                    <RecommendedProducts
+                        title={
+                            <FormattedMessage
+                                defaultMessage="Recently Viewed"
+                                id="product_detail.recommended_products.title.recently_viewed"
+                            />
+                        }
+                        recommender={'viewed-recently-einstein'}
+                        mx={{base: -4, md: -8, lg: 0}}
+                    />
                 </Stack>
-            </Box>
-        </>
+            </Stack>
+        </Box>
     )
 }
 
