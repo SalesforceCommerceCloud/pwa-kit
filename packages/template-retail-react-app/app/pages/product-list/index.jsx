@@ -55,7 +55,7 @@ import Refinements from 'retail-react-app/app/pages/product-list/partials/refine
 import SelectedRefinements from 'retail-react-app/app/pages/product-list/partials/selected-refinements'
 import EmptySearchResults from 'retail-react-app/app/pages/product-list/partials/empty-results'
 import PageHeader from 'retail-react-app/app/pages/product-list/partials/page-header'
-import AbovePageHeader from 'retail-react-app/app/components/_app/partials/above-page-header'
+import AbovePageHeader from 'retail-react-app/app/pages/product-list/partials/above-page-header'
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from 'retail-react-app/app/components/icons'
