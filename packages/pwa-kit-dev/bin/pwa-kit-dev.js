@@ -249,7 +249,7 @@ const main = async () => {
         .addOption(
             new program.Option(
                 '-b, --buildDirectory <buildDirectory>',
-                'a custom project directory where your build is located'
+                'a custom project build directory that you want to push'
             ).default(p.join(process.cwd(), 'build'), './build')
         )
         .addOption(
@@ -285,12 +285,20 @@ const main = async () => {
                 credentialsFile
             }) => {
                 // Set the deployment target env var, this is required to ensure we
-                // get the correct configuration object.
-                process.env.DEPLOY_TARGET = target
+                // get the correct configuration object. Do not assign the variable it if
+                // the target value is `undefined` as it will serialied as a "undefined"
+                // string value.
+                if (target) {
+                    process.env.DEPLOY_TARGET = target
+                }
 
                 const credentials = await scriptUtils.readCredentials(credentialsFile)
 
-                const mobify = getConfig() || {}
+                if (!fse.pathExistsSync(buildDirectory)) {
+                    throw new Error(`Supplied "buildDirectory" does not exist!`)
+                }
+
+                const mobify = getConfig({buildDirectory}) || {}
 
                 if (!projectSlug) {
                     projectSlug = await getProjectName()

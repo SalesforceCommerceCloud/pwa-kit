@@ -10,12 +10,19 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperSearch<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
-    productSearch: ['/organizations/', string, '/product-search', Params<'productSearch'>]
-    getSearchSuggestions: [
+    productSearch: [
+        '/commerce-sdk-react',
         '/organizations/',
-        string,
+        string | undefined,
+        '/product-search',
+        Params<'productSearch'>
+    ]
+    getSearchSuggestions: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
         '/search-suggestions',
         Params<'getSearchSuggestions'>
     ]
@@ -49,7 +56,12 @@ export const productSearch: QueryKeyHelper<'productSearch'> = {
             'offset',
             'limit'
         ]),
-    path: (params) => ['/organizations/', params.organizationId, '/product-search'],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/product-search'
+    ],
     queryKey: (params: Params<'productSearch'>) => [
         ...productSearch.path(params),
         productSearch.parameters(params)
@@ -59,7 +71,12 @@ export const productSearch: QueryKeyHelper<'productSearch'> = {
 export const getSearchSuggestions: QueryKeyHelper<'getSearchSuggestions'> = {
     parameters: (params) =>
         pick(params, ['organizationId', 'siteId', 'q', 'limit', 'currency', 'locale']),
-    path: (params) => ['/organizations/', params.organizationId, '/search-suggestions'],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/search-suggestions'
+    ],
     queryKey: (params: Params<'getSearchSuggestions'>) => [
         ...getSearchSuggestions.path(params),
         getSearchSuggestions.parameters(params)

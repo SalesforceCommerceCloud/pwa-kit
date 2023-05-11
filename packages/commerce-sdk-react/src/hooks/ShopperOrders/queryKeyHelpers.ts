@@ -10,22 +10,31 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperOrders<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
-    getOrder: ['/organizations/', string, '/orders/', string, Params<'getOrder'>]
-    getPaymentMethodsForOrder: [
+    getOrder: [
+        '/commerce-sdk-react',
         '/organizations/',
-        string,
+        string | undefined,
         '/orders/',
-        string,
+        string | undefined,
+        Params<'getOrder'>
+    ]
+    getPaymentMethodsForOrder: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/orders/',
+        string | undefined,
         '/payment-methods',
         Params<'getPaymentMethodsForOrder'>
     ]
     getTaxesFromOrder: [
+        '/commerce-sdk-react',
         '/organizations/',
-        string,
+        string | undefined,
         '/orders/',
-        string,
+        string | undefined,
         '/taxes',
         Params<'getTaxesFromOrder'>
     ]
@@ -47,7 +56,13 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 
 export const getOrder: QueryKeyHelper<'getOrder'> = {
     parameters: (params) => pick(params, ['organizationId', 'orderNo', 'siteId', 'locale']),
-    path: (params) => ['/organizations/', params.organizationId, '/orders/', params.orderNo],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/orders/',
+        params.orderNo
+    ],
     queryKey: (params: Params<'getOrder'>) => [
         ...getOrder.path(params),
         getOrder.parameters(params)
@@ -57,6 +72,7 @@ export const getOrder: QueryKeyHelper<'getOrder'> = {
 export const getPaymentMethodsForOrder: QueryKeyHelper<'getPaymentMethodsForOrder'> = {
     parameters: (params) => pick(params, ['organizationId', 'orderNo', 'siteId', 'locale']),
     path: (params) => [
+        '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/orders/',
@@ -72,6 +88,7 @@ export const getPaymentMethodsForOrder: QueryKeyHelper<'getPaymentMethodsForOrde
 export const getTaxesFromOrder: QueryKeyHelper<'getTaxesFromOrder'> = {
     parameters: (params) => pick(params, ['organizationId', 'orderNo', 'siteId']),
     path: (params) => [
+        '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/orders/',

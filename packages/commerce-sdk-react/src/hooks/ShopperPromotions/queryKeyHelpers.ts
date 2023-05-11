@@ -10,14 +10,21 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperPromotions<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
-    getPromotions: ['/organizations/', string, '/promotions', Params<'getPromotions'>]
-    getPromotionsForCampaign: [
+    getPromotions: [
+        '/commerce-sdk-react',
         '/organizations/',
-        string,
+        string | undefined,
+        '/promotions',
+        Params<'getPromotions'>
+    ]
+    getPromotionsForCampaign: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
         '/promotions/campaigns/',
-        string,
+        string | undefined,
         Params<'getPromotionsForCampaign'>
     ]
 }
@@ -38,7 +45,12 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 
 export const getPromotions: QueryKeyHelper<'getPromotions'> = {
     parameters: (params) => pick(params, ['organizationId', 'siteId', 'ids', 'locale']),
-    path: (params) => ['/organizations/', params.organizationId, '/promotions'],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/promotions'
+    ],
     queryKey: (params: Params<'getPromotions'>) => [
         ...getPromotions.path(params),
         getPromotions.parameters(params)
@@ -56,6 +68,7 @@ export const getPromotionsForCampaign: QueryKeyHelper<'getPromotionsForCampaign'
             'currency'
         ]),
     path: (params) => [
+        '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/promotions/campaigns/',

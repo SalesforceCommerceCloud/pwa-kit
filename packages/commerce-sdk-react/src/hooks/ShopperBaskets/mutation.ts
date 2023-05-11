@@ -7,7 +7,6 @@
 import {ApiClients, ApiMethod, Argument, CacheUpdateGetter, DataType, MergedOptions} from '../types'
 import {useMutation} from '../useMutation'
 import {UseMutationResult} from '@tanstack/react-query'
-import {NotImplementedError} from '../utils'
 import useCommerceApi from '../useCommerceApi'
 import {cacheUpdateMatrix} from './cache'
 
@@ -395,8 +394,6 @@ export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutatio
     mutation: Mutation
 ): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {
     const getCacheUpdates = cacheUpdateMatrix[mutation]
-    // TODO: Remove this check when all mutations are implemented.
-    if (!getCacheUpdates) throw new NotImplementedError(`The '${mutation}' mutation`)
 
     // The `Options` and `Data` types for each mutation are similar, but distinct, and the union
     // type generated from `Client[Mutation]` seems to be too complex for TypeScript to handle.

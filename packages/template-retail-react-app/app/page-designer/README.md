@@ -1,31 +1,34 @@
-        ____                      ____            _                      
+        ____                      ____            _
        / __ \____ _____ ____     / __ \___  _____(_)___ _____  ___  _____
       / /_/ / __ `/ __ `/ _ \   / / / / _ \/ ___/ / __ `/ __ \/ _ \/ ___/
-     / ____/ /_/ / /_/ /  __/  / /_/ /  __(__  ) / /_/ / / / /  __/ /    
-    /_/    \__,_/\__, /\___/  /_____/\___/____/_/\__, /_/ /_/\___/_/     
-                /____/                          /____/                   
+     / ____/ /_/ / /_/ /  __/  / /_/ /  __(__  ) / /_/ / / / /  __/ /
+    /_/    \__,_/\__, /\___/  /_____/\___/____/_/\__, /_/ /_/\___/_/
+                /____/                          /____/
 
 ---
 
-## Summary
+This folder contains React components and utilities that render pages from [Page Designer](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/page_designer/b2c_creating_pd_pages.html).
 
-This folder contains the React components and utilities required to render `pages` created in the Business Managers **Page Desginer** backend in your PWA-Kit app. This is a living folder where you, the developer, can add your own component implementations for those that exist in the **Page Designer** backend, or custom components you may have added via an SFRA cartirdge. We have given you a head start by providing some of the components for layout and visualization (e.g. images, grids, and carousels). 
+Use this folder to add React components that can render Page Designer components that have been serialized to JSON.
 
-## Folders
+This folder includes components for layout and visualization of images, grids, and carousels.
 
-The `Page Desginer` folder is broken down into 3 main sub-folders:
+**By default, Page Designer integration is not enabled in the Retail React App.** Additionally, to utilize the `shopperExperience`
+API used in the example below your commerce API client (SLAS client) needs to include the `sfcc.shopper-experience` scope.
+See [Authorization for Shopper APIs](https://developer.salesforce.com/docs/commerce/commerce-api/guide/authorization-for-shopper-apis.html)
+for more information on configuring your SLAS client.
 
-- **/core** - Contains the _Page_, _Region_, and _Component_ base assets. Think of these as the basic building blocks for rendering your page. You will not spend a lot of time in this folder, but you will definately be using the _Page_ component, as it's the primary component used to render your experience. The other components will also be useful when you are creating new _assets_. 
+## Folder Structure
 
-- **/assets** - This folder contains the non-visual components that you dragged and dropped on your **Page Designer** pages. These include things like "Image", "ImageWithText" and and any other Page Designer assets you want to visualize in your PWA-Kit app. If you need to visualize a new component that we haven't provided, you can add it here.
-
-- **/layouts** - Contrary to the above, this folder contains only components that involve layout of other components. We have gotten you off to a good start by giving you various _grid_ and _carousel_ layout components.
+-   **`/core`** - Base components for rendering: `<Page>`, `<Region>`, and `<Component>`. Use `<Page>` to render Page Designer content. Use `<Region>` and `<Component>` for creating new assets.
+-   **`/assets`** - Non-visual components used in Page Designer. Includes `<Image>` and `<ImageWithText>` as well as any other Page Designer assets that you want to use in your PWA-Kit app. If you need to visualize a component, add it here.
+-   **`/layouts`** - Components responsible for layout. Includes various grids and a `<Carousel>` component.
 
 ## Sample Usage
 
-Below is a sample page that you can use as a starting point in your _retail react app_ to visualize pages that have created in business manager. After starting the dev server you can access the page viewer using the following url `http://localhost:3000/page-viewer/homepage-example`. _Note: "homepage-example is a sample page designer page that is included with all Business Manager backends, if you want to view another page you created, please use that id instead._
+Create a new file called `app/pages/page-viewer/index.jsx`, and add the following:
 
-```
+```jsx
 // app/pages/page-viewer/index.jsx
 
 import React from 'react'
@@ -42,38 +45,38 @@ import {
     MobileGrid3r2c
 } from '../../page-designer/layouts'
 
-const PageViewer = ({page}) => {
-    // Assign the components to be rendered for any given page designer component type.
-    const components = {
-        'commerce_assets.photoTile': ImageTile,
-        'commerce_assets.imageAndText': ImageWithText,
-        'commerce_layouts.carousel': Carousel,
-        'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c,
-        'commerce_layouts.mobileGrid2r1c': MobileGrid2r1c,
-        'commerce_layouts.mobileGrid2r2c': MobileGrid2r2c,
-        'commerce_layouts.mobileGrid2r3c': MobileGrid2r3c,
-        'commerce_layouts.mobileGrid3r1c': MobileGrid3r1c,
-        'commerce_layouts.mobileGrid3r2c': MobileGrid3r2c
-    }
+import {HTTPError, HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
-    return (
-        <Box layerStyle={'page'}>
-            <Page page={page} components={components} />
-        </Box>
-    )
+const PAGEDESIGNER_TO_COMPONENT = {
+    'commerce_assets.photoTile': ImageTile,
+    'commerce_assets.imageAndText': ImageWithText,
+    'commerce_layouts.carousel': Carousel,
+    'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c,
+    'commerce_layouts.mobileGrid2r1c': MobileGrid2r1c,
+    'commerce_layouts.mobileGrid2r2c': MobileGrid2r2c,
+    'commerce_layouts.mobileGrid2r3c': MobileGrid2r3c,
+    'commerce_layouts.mobileGrid3r1c': MobileGrid3r1c,
+    'commerce_layouts.mobileGrid3r2c': MobileGrid3r2c
 }
+
+const PageViewer = ({page}) => (
+    <Box layerStyle={'page'}>
+        <Page page={page} components={PAGEDESIGNER_TO_COMPONENT} />
+    </Box>
+)
 
 PageViewer.getProps = async ({api, params}) => {
     const {pageId} = params
-
-    // Note: There is no error and 404 handling in this example, if you chose to use this code you will have to add that on your own.
     const page = await api.shopperExperience.getPage({
         parameters: {pageId}
     })
 
-    return {
-        page
+    if (page.isError) {
+        let ErrorClass = page.type?.endsWith('page-not-found') ? HTTPNotFound : HTTPError
+        throw new ErrorClass(page.detail)
     }
+
+    return {page}
 }
 
 PageViewer.displayName = 'PageViewer'
@@ -85,18 +88,20 @@ PageViewer.propTypes = {
 export default PageViewer
 ```
 
-_**Note:** To ensure that this page is routeable you need to add it to your applications routes file._
+Open `app/routes.jsx` and add a route for `<PageViewer>`:
 
-```
+```diff
 // app/routes.jsx
 
-// Create new loadabled page for the `page-viewer`
+// Create a loadable page for `page-viewer`.
 + const PageViewer = loadable(() => import('./pages/page-viewer'), {fallback})
 
 
-// Add the new route object to the routes array
+// Add a route.
 +    {
 +        path: '/page-viewer/:pageId',
 +        component: PageViewer
 +    },
 ```
+
+Using the local development server, you can now see Page Designer pages rendered in React.js at `http://localhost:3000/page-viewer/:pageid` by providing their `pageid`.

@@ -5,19 +5,22 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {Query, QueryClient} from '@tanstack/react-query'
-import {ApiClient, ApiOptions, ApiParameter, CacheUpdate, MergedOptions} from './types'
+import {
+    ApiClient,
+    ApiOptions,
+    CacheUpdate,
+    MergedOptions,
+    NullToOptional,
+    OmitNullableParameters
+} from './types'
 
 /** Applies the set of cache updates to the query client. */
 export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate, data: unknown) => {
     cacheUpdates.invalidate?.forEach((invalidate) => {
-        // TODO: Update Shopper Baskets cache logic to not use predicate functions, and then this
-        // check will no longer be needed. (Same for the remove block.)
-        const filters = typeof invalidate === 'function' ? {predicate: invalidate} : invalidate
-        queryClient.invalidateQueries(filters)
+        queryClient.invalidateQueries(invalidate)
     })
     cacheUpdates.remove?.forEach((remove) => {
-        const filters = typeof remove === 'function' ? {predicate: remove} : remove
-        queryClient.removeQueries(filters)
+        queryClient.removeQueries(remove)
     })
     cacheUpdates.update?.forEach(({queryKey, updater}) =>
         // If an updater isn't given, fall back to just setting the data
@@ -38,78 +41,13 @@ export const isObject = (obj: unknown): obj is Record<string, unknown> =>
 
 /** Determines whether a value has all of the given keys. */
 export const hasAllKeys = <T>(object: T, keys: ReadonlyArray<keyof T>): boolean =>
-    keys.every((key) => object[key] !== undefined)
+    keys.every((key) => object[key] !== undefined && object[key] !== null)
 
 /** Creates a query predicate that determines whether a query key starts with the given path segments. */
 export const pathStartsWith =
-    (search: readonly string[]) =>
+    (search: readonly (string | undefined)[]) =>
     ({queryKey}: Query): boolean =>
         queryKey.length >= search.length && search.every((lookup, idx) => queryKey[idx] === lookup)
-
-/** Creates a query predicate that determines whether a query key fully matches the given path segments. */
-export const matchesPath =
-    (search: readonly string[]) =>
-    ({queryKey}: Query): boolean =>
-        // ApiQueryKey = [...path, parameters]
-        queryKey.length === 1 + search.length &&
-        search.every((lookup, idx) => queryKey[idx] === lookup)
-
-/** Does an equality check for two API parameter values */
-const matchParameter = (search: ApiParameter, param: unknown): boolean => {
-    // 1. Are they matching primitives?
-    if (search === param) return true
-    // 2. They're not both primitives. Are they both arrays?
-    if (!Array.isArray(search) || !Array.isArray(param)) return false
-    // 3. They're both arrays. Are they the same length?
-    if (search.length !== param.length) return false
-    // 4. They're the same length. Do all of the values match?
-    return param.every((value, index) => search[index] === value)
-}
-
-/**
- * Creates a query predicate that determines whether the parameters of the query key exactly match
- * the search object. NOTE: This returns `true` even when the query key has additional properties.
- */
-export const matchParametersStrict =
-    (search: Record<string, ApiParameter>) =>
-    ({queryKey}: Query): boolean => {
-        const parameters = queryKey[queryKey.length - 1]
-        if (!isObject(parameters)) return false
-        const searchEntries = Object.entries(search)
-        return (
-            // Can't be a match if we're looking for more values than we have
-            searchEntries.length <= Object.keys(parameters).length &&
-            searchEntries.every(([key, lookup]) => matchParameter(lookup, parameters[key]))
-        )
-    }
-
-/**
- * Creates a query predicate that determines whether the parameters of the query key match the
- * search object, if the value on the search object is not `undefined`.
- */
-export const matchParameters = (
-    parameters: Record<string, ApiParameter | undefined>,
-    keys = Object.keys(parameters)
-) => {
-    const search: Record<string, ApiParameter> = {}
-    for (const key of keys) {
-        const value = parameters[key]
-        if (value !== undefined) search[key] = value
-    }
-    return matchParametersStrict(search)
-}
-
-/** Creates a query predicate that matches against common API config parameters. */
-export const matchesApiConfig = (parameters: Record<string, ApiParameter | undefined>) =>
-    matchParameters(parameters, [
-        // NOTE: `shortCode` and `version` are omitted, as query keys are constructed from endpoint
-        // paths, but the two paarameters are only used to construct the base URI.
-        'clientId',
-        'currency', // TODO: maybe?
-        'locale', // TODO: maybe?
-        'organizationId',
-        'siteId'
-    ])
 
 /** Creates a query predicate that returns true if all of the given predicates return true. */
 export const and =
@@ -134,7 +72,8 @@ export const mergeOptions = <Client extends ApiClient, Options extends ApiOption
             : ({} as {body: never})),
         parameters: {
             ...client.clientConfig.parameters,
-            ...options.parameters
+            // If we pass a blank override, don't actually override it.
+            ...(options.parameters ? omitNullable(options.parameters) : {})
         },
         headers: {
             ...client.clientConfig.parameters,
@@ -149,11 +88,35 @@ export const pick = <T extends object, K extends keyof T>(
     obj: T,
     keys: readonly K[]
 ): Pick<T, K> => {
-    const picked = {} as Pick<T, K> // Assertion is not true, yet, but we make it so!
+    // Assertion is not true, yet, but we make it so!
+    const picked = {} as Pick<T, K>
     keys.forEach((key) => {
         if (key in obj) {
+            // Skip assigning optional/missing parameters
             picked[key] = obj[key]
         }
     })
     return picked
 }
+
+/** Removes keys with `null` or `undefined` values from the given object. */
+export const omitNullable = <T extends object>(obj: T): NullToOptional<T> => {
+    // Assertion is not true, yet, but we make it so!
+    const stripped = {} as NullToOptional<T>
+    // Assertion because `Object.entries` is limited :\
+    const entries = Object.entries(obj) as Array<[keyof T, T[keyof T]]>
+    for (const [key, value] of entries) {
+        if (value !== null && value !== undefined) stripped[key] = value
+    }
+    return stripped
+}
+
+/** Removes keys with `null` or `undefined` values from the `parameters` of the given object. */
+export const omitNullableParameters = <T extends {parameters: object}>(
+    obj: T
+): OmitNullableParameters<T> => ({
+    ...obj,
+    // Without the explicit generic parameter, the generic is inferred as `object`,
+    // the connection to `T` is lost, and TypeScript complains.
+    parameters: omitNullable<T['parameters']>(obj.parameters)
+})

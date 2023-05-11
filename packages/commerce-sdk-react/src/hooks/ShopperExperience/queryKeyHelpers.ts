@@ -10,10 +10,23 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperExperience<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
-    getPages: ['/organizations/', string, '/pages', Params<'getPages'>]
-    getPage: ['/organizations/', string, '/pages/', string, Params<'getPage'>]
+    getPages: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/pages',
+        Params<'getPages'>
+    ]
+    getPage: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/pages/',
+        string | undefined,
+        Params<'getPage'>
+    ]
 }
 
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
@@ -42,7 +55,7 @@ export const getPages: QueryKeyHelper<'getPages'> = {
             'siteId',
             'locale'
         ]),
-    path: (params) => ['/organizations/', params.organizationId, '/pages'],
+    path: (params) => ['/commerce-sdk-react', '/organizations/', params.organizationId, '/pages'],
     queryKey: (params: Params<'getPages'>) => [
         ...getPages.path(params),
         getPages.parameters(params)
@@ -59,6 +72,12 @@ export const getPage: QueryKeyHelper<'getPage'> = {
             'siteId',
             'locale'
         ]),
-    path: (params) => ['/organizations/', params.organizationId, '/pages/', params.pageId],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/pages/',
+        params.pageId
+    ],
     queryKey: (params: Params<'getPage'>) => [...getPage.path(params), getPage.parameters(params)]
 }

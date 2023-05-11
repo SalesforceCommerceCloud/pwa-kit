@@ -20,19 +20,20 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
             {filter.values
                 ?.filter((refinementValue) => refinementValue.hitCount > 0)
                 .map((value, idx) => {
-                    const selected = Array.isArray(selectedFilters)
-                        ? selectedFilters?.includes(value.value)
-                        : selectedFilters === value.value
+                    // Note the loose comparison, for "string == number" checks.
+                    const isSelected = selectedFilters.some(
+                        (filterValue) => filterValue == value.value
+                    )
 
                     return (
                         <Button
                             key={idx}
                             {...styles.swatch}
-                            borderColor={selected ? 'black' : 'gray.200'}
-                            backgroundColor={selected ? 'black' : 'white'}
-                            color={selected ? 'white' : 'gray.900'}
-                            onClick={() => toggleFilter(value, filter.attributeId, selected)}
-                            aria-checked={selectedFilters == value.value}
+                            borderColor={isSelected ? 'black' : 'gray.200'}
+                            backgroundColor={isSelected ? 'black' : 'white'}
+                            color={isSelected ? 'white' : 'gray.900'}
+                            onClick={() => toggleFilter(value, filter.attributeId, isSelected)}
+                            aria-checked={isSelected}
                             variant="outline"
                             marginBottom={0}
                             marginRight={0}
@@ -47,8 +48,6 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
 
 SizeRefinements.propTypes = {
     filter: PropTypes.object,
-    selectedFilterValues: PropTypes.object,
-    categoryId: PropTypes.string,
     selectedFilters: PropTypes.array,
     toggleFilter: PropTypes.func
 }

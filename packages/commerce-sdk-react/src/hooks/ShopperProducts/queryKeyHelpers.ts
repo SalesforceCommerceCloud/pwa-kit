@@ -10,12 +10,38 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperProducts<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
-    getProducts: ['/organizations/', string, '/products', Params<'getProducts'>]
-    getProduct: ['/organizations/', string, '/products/', string, Params<'getProduct'>]
-    getCategories: ['/organizations/', string, '/categories', Params<'getCategories'>]
-    getCategory: ['/organizations/', string, '/categories/', string, Params<'getCategory'>]
+    getProducts: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/products',
+        Params<'getProducts'>
+    ]
+    getProduct: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/products/',
+        string | undefined,
+        Params<'getProduct'>
+    ]
+    getCategories: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/categories',
+        Params<'getCategories'>
+    ]
+    getCategory: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/categories/',
+        string | undefined,
+        Params<'getCategory'>
+    ]
 }
 
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
@@ -45,7 +71,12 @@ export const getProducts: QueryKeyHelper<'getProducts'> = {
             'perPricebook',
             'siteId'
         ]),
-    path: (params) => ['/organizations/', params.organizationId, '/products'],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/products'
+    ],
     queryKey: (params: Params<'getProducts'>) => [
         ...getProducts.path(params),
         getProducts.parameters(params)
@@ -65,7 +96,13 @@ export const getProduct: QueryKeyHelper<'getProduct'> = {
             'perPricebook',
             'siteId'
         ]),
-    path: (params) => ['/organizations/', params.organizationId, '/products/', params.id],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/products/',
+        params.id
+    ],
     queryKey: (params: Params<'getProduct'>) => [
         ...getProduct.path(params),
         getProduct.parameters(params)
@@ -74,7 +111,12 @@ export const getProduct: QueryKeyHelper<'getProduct'> = {
 
 export const getCategories: QueryKeyHelper<'getCategories'> = {
     parameters: (params) => pick(params, ['organizationId', 'ids', 'levels', 'locale', 'siteId']),
-    path: (params) => ['/organizations/', params.organizationId, '/categories'],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/categories'
+    ],
     queryKey: (params: Params<'getCategories'>) => [
         ...getCategories.path(params),
         getCategories.parameters(params)
@@ -83,7 +125,13 @@ export const getCategories: QueryKeyHelper<'getCategories'> = {
 
 export const getCategory: QueryKeyHelper<'getCategory'> = {
     parameters: (params) => pick(params, ['organizationId', 'id', 'levels', 'locale', 'siteId']),
-    path: (params) => ['/organizations/', params.organizationId, '/categories/', params.id],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/categories/',
+        params.id
+    ],
     queryKey: (params: Params<'getCategory'>) => [
         ...getCategory.path(params),
         getCategory.parameters(params)

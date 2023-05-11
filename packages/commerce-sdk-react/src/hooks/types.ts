@@ -54,8 +54,18 @@ export type ExcludeTail<T extends readonly unknown[]> = T extends readonly [...i
         : Readonly<Head>
     : T // If it's a plain array, rather than a tuple, then removing the last element has no effect
 
+/** Adds `null` as an allowed value to all properties. */
+type AllowNull<T> = {[K in keyof T]: T[K] | null}
+
+/** Gets the keys of `T` which allow `null` as a possible value. */
+type NullKeys<T> = {[K in keyof T]-?: null extends T[K] ? K : never}[keyof T]
+
+/** Removes `null` values and marks those properties as optional. */
+export type NullToOptional<T> = Omit<T, NullKeys<T>> & {
+    [K in keyof T]?: NonNullable<T[K]>
+}
+
 // --- API CLIENTS --- //
-export type ApiParameter = string | number | boolean | string[] | number[]
 
 export type ApiClientConfigParams = {
     clientId: string
@@ -131,7 +141,7 @@ export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> 
 
 /** Query key interface used by API query hooks. */
 export type ApiQueryKey<Params extends Record<string, unknown> = Record<string, unknown>> =
-    readonly [...path: string[], parameters: Params]
+    readonly [...path: (string | undefined)[], parameters: Params]
 
 /** Query options for endpoint hooks. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -141,6 +151,17 @@ export type ApiQueryOptions<Method extends ApiMethod<any, unknown>> = Prettify<
         'queryFn' | 'queryKey'
     >
 >
+
+/** Adds `null` as an allowed value to all parameters. */
+export type NullableParameters<T extends {parameters?: object}> = {
+    // This `extends` check allows us to more easily preserve required/optional parameters
+    [K in keyof T]: K extends 'parameters' ? AllowNull<T[K]> : T[K]
+}
+
+/** Remove `null` and `undefined` values from all parameters. */
+export type OmitNullableParameters<T extends {parameters: object}> = Omit<T, 'parameters'> & {
+    parameters: NullToOptional<T['parameters']>
+}
 
 // --- CACHE HELPERS --- //
 
@@ -155,21 +176,17 @@ export type CacheUpdateUpdate<T> = {
 }
 
 /** Query predicate for queries to invalidate */
-export type CacheUpdateInvalidate =
-    | InvalidateQueryFilters
-    // TODO: Change Shopper Baskets cache logic from using predicates to creating query filters
-    // using the query key helpers, then this 'predicate' type can be removed, as can the one in
-    // `CacheUpdateRemove`. The predicate helpers in `utils.ts` should also then be removed.
-    | NonNullable<InvalidateQueryFilters['predicate']>
+export type CacheUpdateInvalidate = InvalidateQueryFilters
 
 /** Query predicate for queries to remove */
-export type CacheUpdateRemove = QueryFilters | NonNullable<QueryFilters['predicate']>
+export type CacheUpdateRemove = QueryFilters
 
 /** Collection of updates to make to the cache when a request completes. */
 export type CacheUpdate = {
     update?: CacheUpdateUpdate<unknown>[]
     invalidate?: CacheUpdateInvalidate[]
     remove?: CacheUpdateRemove[]
+    clear?: boolean
 }
 
 /** Generates a collection of cache updates to make for a given request. */

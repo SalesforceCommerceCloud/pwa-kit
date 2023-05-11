@@ -10,22 +10,36 @@ import {pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperLogin<{shortCode: string}>
-type Params<T extends keyof QueryKeys> = NonNullable<Argument<Client[T]>['parameters']>
+type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
     retrieveCredQualityUserInfo: [
+        '/commerce-sdk-react',
         '/organizations/',
-        string,
+        string | undefined,
         '/cred-qual/user',
         Params<'retrieveCredQualityUserInfo'>
     ]
-    getUserInfo: ['/organizations/', string, '/oauth2/userinfo', Params<'getUserInfo'>]
-    getWellknownOpenidConfiguration: [
+    getUserInfo: [
+        '/commerce-sdk-react',
         '/organizations/',
-        string,
+        string | undefined,
+        '/oauth2/userinfo',
+        Params<'getUserInfo'>
+    ]
+    getWellknownOpenidConfiguration: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
         '/oauth2/.well-known/openid-configuration',
         Params<'getWellknownOpenidConfiguration'>
     ]
-    getJwksUri: ['/organizations/', string, '/oauth2/jwks', Params<'getJwksUri'>]
+    getJwksUri: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/oauth2/jwks',
+        Params<'getJwksUri'>
+    ]
 }
 
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
@@ -44,7 +58,12 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 
 export const retrieveCredQualityUserInfo: QueryKeyHelper<'retrieveCredQualityUserInfo'> = {
     parameters: (params) => pick(params, ['organizationId', 'username']),
-    path: (params) => ['/organizations/', params.organizationId, '/cred-qual/user'],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/cred-qual/user'
+    ],
     queryKey: (params: Params<'retrieveCredQualityUserInfo'>) => [
         ...retrieveCredQualityUserInfo.path(params),
         retrieveCredQualityUserInfo.parameters(params)
@@ -53,7 +72,12 @@ export const retrieveCredQualityUserInfo: QueryKeyHelper<'retrieveCredQualityUse
 
 export const getUserInfo: QueryKeyHelper<'getUserInfo'> = {
     parameters: (params) => pick(params, ['organizationId', 'channel_id']),
-    path: (params) => ['/organizations/', params.organizationId, '/oauth2/userinfo'],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/oauth2/userinfo'
+    ],
     queryKey: (params: Params<'getUserInfo'>) => [
         ...getUserInfo.path(params),
         getUserInfo.parameters(params)
@@ -63,6 +87,7 @@ export const getUserInfo: QueryKeyHelper<'getUserInfo'> = {
 export const getWellknownOpenidConfiguration: QueryKeyHelper<'getWellknownOpenidConfiguration'> = {
     parameters: (params) => pick(params, ['organizationId']),
     path: (params) => [
+        '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/oauth2/.well-known/openid-configuration'
@@ -75,7 +100,12 @@ export const getWellknownOpenidConfiguration: QueryKeyHelper<'getWellknownOpenid
 
 export const getJwksUri: QueryKeyHelper<'getJwksUri'> = {
     parameters: (params) => pick(params, ['organizationId']),
-    path: (params) => ['/organizations/', params.organizationId, '/oauth2/jwks'],
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/oauth2/jwks'
+    ],
     queryKey: (params: Params<'getJwksUri'>) => [
         ...getJwksUri.path(params),
         getJwksUri.parameters(params)

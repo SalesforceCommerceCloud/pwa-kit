@@ -9,7 +9,20 @@
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
-import {isTokenValid, createGetTokenBody} from './utils'
+import {isTokenExpired, createGetTokenBody, hasSFRAAuthStateChanged} from './utils'
+import {
+    usidStorageKey,
+    cidStorageKey,
+    encUserIdStorageKey,
+    tokenStorageKey,
+    refreshTokenRegisteredStorageKey,
+    refreshTokenGuestStorageKey,
+    oidStorageKey,
+    dwSessionIdKey,
+    REFRESH_TOKEN_COOKIE_AGE,
+    EXPIRED_TOKEN,
+    INVALID_TOKEN
+} from './constants'
 import fetch from 'cross-fetch'
 import Cookies from 'js-cookie'
 
@@ -26,19 +39,6 @@ import Cookies from 'js-cookie'
  * @typedef {Object} Customer
  */
 
-const usidStorageKey = 'usid'
-const cidStorageKey = 'cid'
-const encUserIdStorageKey = 'enc-user-id'
-const tokenStorageKey = 'token'
-const refreshTokenRegisteredStorageKey = 'cc-nx'
-const refreshTokenGuestStorageKey = 'cc-nx-g'
-const oidStorageKey = 'oid'
-const dwSessionIdKey = 'dwsid'
-const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridge.
-
-const EXPIRED_TOKEN = 'EXPIRED_TOKEN'
-const INVALID_TOKEN = 'invalid refresh_token'
-
 /**
  * A  class that provides auth functionality for the retail react app.
  */
@@ -48,6 +48,7 @@ class Auth {
         this._api = api
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
+        this._storageCopy = this._onClient ? new LocalStorage() : new Map()
 
         // To store tokens as cookies
         // change the next line to
@@ -139,6 +140,13 @@ class Auth {
         this._storage.set(oidStorageKey, oid)
     }
 
+    get isTokenValid() {
+        return (
+            !isTokenExpired(this.authToken) &&
+            !hasSFRAAuthStateChanged(this._storage, this._storageCopy)
+        )
+    }
+
     /**
      * Save refresh token in designated storage.
      *
@@ -146,16 +154,26 @@ class Auth {
      * @param {USER_TYPE} type Type of the user.
      */
     _saveRefreshToken(token, type) {
+        /**
+         * For hybrid deployments, We store a copy of the refresh_token
+         * to update access_token whenever customer auth state changes on SFRA.
+         */
         if (type === Auth.USER_TYPE.REGISTERED) {
             this._storage.set(refreshTokenRegisteredStorageKey, token, {
                 expires: REFRESH_TOKEN_COOKIE_AGE
             })
             this._storage.delete(refreshTokenGuestStorageKey)
+
+            this._storageCopy.set(refreshTokenRegisteredStorageKey, token)
+            this._storageCopy.delete(refreshTokenGuestStorageKey)
             return
         }
 
         this._storage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
         this._storage.delete(refreshTokenRegisteredStorageKey)
+
+        this._storageCopy.set(refreshTokenGuestStorageKey, token)
+        this._storageCopy.delete(refreshTokenRegisteredStorageKey)
     }
 
     /**
@@ -190,6 +208,31 @@ class Auth {
     }
 
     /**
+     * Make a post request to the OCAPI /session endpoint to bridge the session.
+     *
+     * The HTTP response contains a set-cookie header which sets the dwsid session cookie.
+     * This cookie is used on SFRA, and it allows shoppers to navigate between SFRA and
+     * this PWA site seamlessly; this is often used to enable hybrid deployment.
+     *
+     * (Note: this method is client side only, b/c MRT doesn't support set-cookie header right now)
+     *
+     * @returns {Promise}
+     */
+    createOCAPISession() {
+        return fetch(
+            `${getAppOrigin()}/mobify/proxy/ocapi/s/${
+                this._config.parameters.siteId
+            }/dw/shop/v22_8/sessions`,
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: this.authToken
+                }
+            }
+        )
+    }
+
+    /**
      * Authorizes the customer as a registered or guest user.
      * @param {CustomerCredentials} [credentials]
      * @returns {Promise}
@@ -205,20 +248,26 @@ class Auth {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
-            } else if (isTokenValid(this.authToken)) {
+            } else if (this.isTokenValid) {
                 authorizationMethod = '_reuseCurrentLogin'
             } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
             }
-            return this[authorizationMethod](credentials).catch((error) => {
-                const retryErrors = [INVALID_TOKEN, EXPIRED_TOKEN]
-                if (retries === 0 && retryErrors.includes(error.message)) {
-                    retries = 1 // we only retry once
-                    this._clearAuth()
-                    return startLoginFlow()
-                }
-                throw error
-            })
+            return this[authorizationMethod](credentials)
+                .then((result) => {
+                    // Uncomment the following line for phased launch
+                    // this._onClient && this.createOCAPISession()
+                    return result
+                })
+                .catch((error) => {
+                    const retryErrors = [INVALID_TOKEN, EXPIRED_TOKEN]
+                    if (retries === 0 && retryErrors.includes(error.message)) {
+                        retries = 1 // we only retry once
+                        this._clearAuth()
+                        return startLoginFlow()
+                    }
+                    throw error
+                })
         }
 
         this._pendingLogin = startLoginFlow().finally(() => {
