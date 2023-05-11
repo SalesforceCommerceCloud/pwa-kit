@@ -29,7 +29,6 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
-import {isHydrated} from '../../utils/utils'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
@@ -39,7 +38,7 @@ const Footer = ({...otherProps}) => {
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
-    const showLocaleSelector = supportedLocaleIds?.length > 1 && isHydrated()
+    const showLocaleSelector = supportedLocaleIds?.length > 1
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
             <Box {...styles.content}>
@@ -206,6 +205,10 @@ const Subscribe = ({...otherProps}) => {
 
             <Box>
                 <InputGroup>
+                    {/* Had to swap the following InputRightElement and Input 
+                        to avoid the hydration error due to mismatched html between server and client side.
+                        This is a workaround for Lastpass plugin that automatically injects its icon for input fields.
+                    */}
                     <InputRightElement {...styles.subscribeButtonContainer}>
                         <Button variant="footer">
                             {intl.formatMessage({
