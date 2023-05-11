@@ -150,21 +150,21 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
         }
     })
 
-    extractTemplate(answers.template || 'template-retail-react-app', outputDir)
+    downloadAndExtractTemplate('retail-react-app', outputDir)
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const pkgDataWithAnswers = merge(pkgJSON, answers['retail-react-app'])
 
-    npmInstallables.forEach((pkgName) => {
-        const keys = ['dependencies', 'devDependencies']
-        keys.forEach((key) => {
-            const deps = pkgDataWithAnswers[key]
-            if (deps && deps[pkgName]) {
-                deps[pkgName] = SDK_VERSION
-            }
-        })
-    })
+    // npmInstallables.forEach((pkgName) => {
+    //     const keys = ['dependencies', 'devDependencies']
+    //     keys.forEach((key) => {
+    //         const deps = pkgDataWithAnswers[key]
+    //         if (deps && deps[pkgName]) {
+    //             deps[pkgName] = SDK_VERSION
+    //         }
+    //     })
+    // })
 
     writeJson(pkgJsonPath, pkgDataWithAnswers)
 
@@ -427,6 +427,21 @@ const extractTemplate = (templateName, outputDir) => {
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     tar.x({
         file: p.join(__dirname, '..', 'templates', `${templateName}.tar.gz`),
+        cwd: p.join(tmp),
+        sync: true
+    })
+    sh.cp('-R', p.join(tmp, templateName), outputDir)
+    sh.rm('-rf', tmp)
+}
+
+const downloadAndExtractTemplate = (templateName, outputDir) => {
+    console.log('downloadAndExtracttemplate')
+    const tmp = fs.mkdtempSync(p.resolve(os.tmpdir()))
+    console.log(`npm pack pwa-kit-runtime@latest --pack-destination="${tmp}"`)
+    const {stdout} = sh.exec(`npm pack pwa-kit-runtime@latest --pack-destination="${tmp}"`, { silent: true })
+    console.log('stdout: ', stdout)
+    tar.x({
+        file: p.join(tmp, '..', 'templates', `${templateName}.tar.gz`),
         cwd: p.join(tmp),
         sync: true
     })
