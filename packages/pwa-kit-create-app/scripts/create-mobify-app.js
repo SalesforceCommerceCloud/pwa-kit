@@ -130,83 +130,110 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
 const runGenerator = (answers, {outputDir, verbose, extensible}) => {
     checkOutputDir(outputDir)
 
-    if (extensible) {
-        console.log('EXTENDING PROJECT!')
-    }
-
     // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
-    const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
+    // const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
 
     // Check specified SDK versions actually exist on NPM.
-    npmInstallables.forEach((pkgName) => {
-        const versions = JSON.parse(sh.exec(`npm view ${pkgName} versions --json`, {silent: true}))
-        if (versions.indexOf(SDK_VERSION) < 0) {
-            const msg =
-                `Error: You're generating a project using version "${SDK_VERSION}" of ` +
-                `PWA Kit, but "${pkgName}@${SDK_VERSION}" does not exist on NPM.\n` +
-                `The available versions are:\n${versions.map((v) => `  ${v}`).join('\n')}`
-            console.error(msg)
-            process.exit(1)
-        }
-    })
-
-    downloadAndExtractTemplate('retail-react-app', outputDir)
-
-    const pkgJsonPath = p.resolve(outputDir, 'package.json')
-    const pkgJSON = readJson(pkgJsonPath)
-    const pkgDataWithAnswers = merge(pkgJSON, answers['retail-react-app'])
-
     // npmInstallables.forEach((pkgName) => {
-    //     const keys = ['dependencies', 'devDependencies']
-    //     keys.forEach((key) => {
-    //         const deps = pkgDataWithAnswers[key]
-    //         if (deps && deps[pkgName]) {
-    //             deps[pkgName] = SDK_VERSION
-    //         }
-    //     })
+    //     const versions = JSON.parse(sh.exec(`npm view ${pkgName} versions --json`, {silent: true}))
+    //     if (versions.indexOf(SDK_VERSION) < 0) {
+    //         const msg =
+    //             `Error: You're generating a project using version "${SDK_VERSION}" of ` +
+    //             `PWA Kit, but "${pkgName}@${SDK_VERSION}" does not exist on NPM.\n` +
+    //             `The available versions are:\n${versions.map((v) => `  ${v}`).join('\n')}`
+    //         console.error(msg)
+    //         process.exit(1)
+    //     }
     // })
 
-    writeJson(pkgJsonPath, pkgDataWithAnswers)
+    if (extensible) {
+        // Steps needed to create an extensible app
+        // 1. Check what bootstrap template you need (js or ts) NOTE: TS isn't implemented, but maybe we will in the future.
+        // 2. Iterated over all the template files in the bootstrap template and write them to the distination folder.
+        // Loop through all the files in the temp directory
 
-    // const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
-    // const siteName = pkgDataWithAnswers.name
-    // replaceJSON(manifest, {
-    //     name: siteName,
-    //     short_name: siteName,
-    //     start_url: '/?homescreen=1',
-    //     icons: [
-    //         {
-    //             src: './img/global/app-icon-192.png',
-    //             sizes: '192x192'
-    //         },
-    //         {
-    //             src: './img/global/app-icon-512.png',
-    //             sizes: '512x512'
-    //         }
-    //     ]
-    // })
+        const fromPath = path.join(__dirname, '..', 'assets', 'bootstrap-templates',)
+        fs.readdirSync(p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js'), (err, files)=> {
+            if (err) {
+                console.error('Could not load bootstrap template.', err)
+                process.exit(1)
+            }
+            console.log('files: ', files)
+            // files.forEach((file) => {
+            //     // Make one pass and make the file complete
+            //     var fromPath = path.join(moveFrom, file)
+            //     var toPath = path.join(moveTo, file)
 
-    const PWAKitConfigTemplate = require(`../assets/pwa/default`).template
-    const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
+            //     fs.stat(fromPath, function (error, stat) {
+            //         if (error) {
+            //             console.error('Error stating file.', error)
+            //             return
+            //         }
 
-    const commerceApi = {
-        proxyPath: 'api',
-        instanceUrl: answers['commerce-api'].instanceUrl,
-        clientId: answers['commerce-api'].clientId,
-        organizationId: answers['commerce-api'].organizationId,
-        shortCode: answers['commerce-api'].shortCode,
-        siteId: answers['commerce-api'].siteId
+            //         if (stat.isFile()) console.log("'%s' is a file.", fromPath)
+            //         else if (stat.isDirectory()) console.log("'%s' is a directory.", fromPath)
+
+            //         fs.cop(fromPath, toPath, function (error) {
+            //             if (error) {
+            //                 console.error('File moving error.', error)
+            //             } else {
+            //                 console.log("Moved file '%s' to '%s'.", fromPath, toPath)
+            //             }
+            //         })
+            //     })
+            // })
+        })
+    } else {
+        downloadAndExtractTemplate('retail-react-app', outputDir)
+
+        const pkgJsonPath = p.resolve(outputDir, 'package.json')
+        const pkgJSON = readJson(pkgJsonPath)
+        const pkgDataWithAnswers = merge(pkgJSON, answers['retail-react-app'])
+
+        writeJson(pkgJsonPath, pkgDataWithAnswers)
+
+        // const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
+        // const siteName = pkgDataWithAnswers.name
+        // replaceJSON(manifest, {
+        //     name: siteName,
+        //     short_name: siteName,
+        //     start_url: '/?homescreen=1',
+        //     icons: [
+        //         {
+        //             src: './img/global/app-icon-192.png',
+        //             sizes: '192x192'
+        //         },
+        //         {
+        //             src: './img/global/app-icon-512.png',
+        //             sizes: '512x512'
+        //         }
+        //     ]
+        // })
+
+        const PWAKitConfigTemplate = require(`../assets/pwa/default`).template
+        const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
+
+        const commerceApi = {
+            proxyPath: 'api',
+            instanceUrl: answers['commerce-api'].instanceUrl,
+            clientId: answers['commerce-api'].clientId,
+            organizationId: answers['commerce-api'].organizationId,
+            shortCode: answers['commerce-api'].shortCode,
+            siteId: answers['commerce-api'].siteId
+        }
+        const einsteinApi = {
+            einsteinId: answers['einstein-api'].einsteinId,
+            siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
+        }
+
+        new sh.ShellString(PWAKitConfigTemplate({commerceApi, einsteinApi})).to(
+            p.resolve(outputDir, 'config', 'default.js')
+        )
+
+        new sh.ShellString(PWAKitSitesTemplate(answers)).to(
+            p.resolve(outputDir, 'config', 'sites.js')
+        )
     }
-    const einsteinApi = {
-        einsteinId: answers['einstein-api'].einsteinId,
-        siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
-    }
-
-    new sh.ShellString(PWAKitConfigTemplate({commerceApi, einsteinApi})).to(
-        p.resolve(outputDir, 'config', 'default.js')
-    )
-
-    new sh.ShellString(PWAKitSitesTemplate(answers)).to(p.resolve(outputDir, 'config', 'sites.js'))
 
     npmInstall(outputDir, {verbose})
 }
@@ -434,14 +461,20 @@ const extractTemplate = (templateName, outputDir) => {
     sh.rm('-rf', tmp)
 }
 
+/**
+ * Downloads the provided template project from npm and extracts it to the
+ * output directory. NOTE: Version selection is currently not supported.
+ * @param {*} templateName
+ * @param {*} outputDir
+ */
 const downloadAndExtractTemplate = (templateName, outputDir) => {
-    console.log('downloadAndExtracttemplate')
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir()))
-    console.log(`npm pack ${templateName}@latest --pack-destination="${tmp}"`)
-    const {stdout: fileName} = sh.exec(`npm pack ${templateName}@latest --pack-destination="${tmp}"`, { silent: true })
-    console.log('fileName: ', fileName)
+    const {stdout} = sh.exec(`npm pack ${templateName}@latest --pack-destination="${tmp}"`, {
+        silent: true
+    })
+
     tar.x({
-        file: p.join(tmp, fileName.trim()),
+        file: p.join(tmp, stdout.trim()),
         cwd: p.join(tmp),
         sync: true
     })
