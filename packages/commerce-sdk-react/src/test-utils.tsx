@@ -190,7 +190,7 @@ export const getUnimplementedEndpoints = (
 // Since @react-testing-library/react@14, the waitFor
 // method only checks hook result by interval. Re-renders no longer
 // trigger waitFor. The default interval value is 100ms and it is way
-// to slow for us to assert value changes per re-render. 
+// too slow for us to assert value changes per re-render. 
 // See https://github.com/testing-library/react-hooks-testing-library/blob/chore/migration-guide/MIGRATION_GUIDE.md#waitfor
 const WAIT_FOR_INVERVAL = 5
 /** Helper type for WaitForValueToChange with hooks */
