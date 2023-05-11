@@ -438,10 +438,10 @@ const downloadAndExtractTemplate = (templateName, outputDir) => {
     console.log('downloadAndExtracttemplate')
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir()))
     console.log(`npm pack ${templateName}@latest --pack-destination="${tmp}"`)
-    const {stdout: fileName} = sh.exec(`npm pack ${templateName}@latest --pack-destination="${tmp}"`, { silent: false })
+    const {stdout: fileName} = sh.exec(`npm pack ${templateName}@latest --pack-destination="${tmp}"`, { silent: true })
     console.log('fileName: ', fileName)
     tar.x({
-        file: p.join(fileName.trim()),
+        file: p.join(tmp, fileName.trim()),
         cwd: p.join(tmp),
         sync: true
     })
