@@ -1,5 +1,6 @@
-## v2.7.1 (May 09, 2023)
+## v2.7.1 (May 11, 2023)
 
+-   Fix static file serving [#1196](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1196)
 -   Add suffix to SSR build files [#1157](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1157)
 -   Mitigate local dev memory leaks [#1155](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1155)
 -   Minor performance improvements [#974](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/974)
