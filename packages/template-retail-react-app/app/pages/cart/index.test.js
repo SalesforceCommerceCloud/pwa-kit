@@ -9,7 +9,6 @@ import React from 'react'
 import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Cart from './index'
-import userEvent from '@testing-library/user-event'
 import {
     mockShippingMethods,
     mockCustomerBaskets,
@@ -247,8 +246,7 @@ describe.skip('Update quantity in product view', function () {
     })
 
     test('Can update item quantity from product view modal', async () => {
-        const user = userEvent.setup()
-        renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
 
@@ -297,9 +295,7 @@ describe('Remove item from cart', function () {
     // TODO: Fix flaky/broken test
     // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Can remove item from the cart', async () => {
-        const user = userEvent.setup()
-
-        renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
 
         let cartItem
         await waitFor(() => {
@@ -455,9 +451,7 @@ describe('Coupons tests', function () {
         )
     })
     test('Can apply and remove product-level coupon code with promotion', async () => {
-        const user = userEvent.setup()
-
-        renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
         // add coupon

@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
@@ -62,10 +61,8 @@ afterEach(() => {
 })
 
 test('Allows customer to go to sign in page', async () => {
-    const user = userEvent.setup()
-
     // render our test component
-    await renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
@@ -77,8 +74,6 @@ test('Allows customer to go to sign in page', async () => {
 })
 
 test('Allows customer to generate password token', async () => {
-    const user = userEvent.setup()
-
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
@@ -93,7 +88,7 @@ test('Allows customer to generate password token', async () => {
         )
     )
     // render our test component
-    await renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
@@ -117,8 +112,6 @@ test('Allows customer to generate password token', async () => {
 })
 
 test('Renders error message from server', async () => {
-    const user = userEvent.setup()
-
     global.server.use(
         rest.post('*/create-reset-token', (req, res, ctx) =>
             res(
@@ -132,7 +125,7 @@ test('Renders error message from server', async () => {
             )
         )
     )
-    await renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
 
     await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
     await user.click(

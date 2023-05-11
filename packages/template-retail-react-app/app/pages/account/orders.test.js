@@ -7,7 +7,6 @@
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {mockCustomerBaskets, mockOrderHistory, mockOrderProducts} from '../../mocks/mock-data'
@@ -40,7 +39,6 @@ afterEach(() => {
 })
 
 test('Renders order history and details', async () => {
-    const user = userEvent.setup()
     global.server.use(
         rest.get('*/orders/:orderNo', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderHistory.data[0]))
@@ -52,7 +50,7 @@ test('Renders order history and details', async () => {
             return res(ctx.delay(0), ctx.json(mockOrderProducts))
         })
     )
-    await renderWithProviders(<MockedComponent history={history} />, {
+    const {user} = renderWithProviders(<MockedComponent history={history} />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()

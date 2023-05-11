@@ -10,7 +10,6 @@ import PropTypes from 'prop-types'
 import {rest} from 'msw'
 import {mockProductSearch, mockedEmptyCustomerProductList} from '../../mocks/mock-data'
 import {screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
@@ -108,10 +107,8 @@ test('should display Selected refinements as there are some in the response', as
 // TODO: Fix flaky/broken test
 // eslint-disable-next-line jest/no-disabled-tests
 test.skip('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
-    const user = userEvent.setup()
-
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
     expect(await screen.findAllByText('Black')).toBeInTheDocument()
     const wishlistButton = await screen.getAllByLabelText('Wishlist')
     expect(wishlistButton).toHaveLength(25)
@@ -121,9 +118,8 @@ test.skip('show login modal when an unauthenticated user tries to add an item to
 })
 
 test('clicking a filter will change url', async () => {
-    const user = userEvent.setup()
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
     // NOTE: Look for a better wait to wait an additional render.
@@ -138,14 +134,12 @@ test('clicking a filter will change url', async () => {
 })
 
 test('click on Clear All should clear out all the filter in search params', async () => {
-    const user = userEvent.setup()
-
     window.history.pushState(
         {},
         'ProductList',
         '/uk/en-GB/category/mens-clothing-jackets?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
     )
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
     const clearAllButton = await screen.findAllByText(/Clear All/i)
@@ -162,10 +156,8 @@ test('should display Search Results for when searching', async () => {
 })
 
 test('clicking a filter on search result will change url', async () => {
-    const user = userEvent.setup()
-
     window.history.pushState({}, 'ProductList', '/uk/en-GB/search?q=dress')
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
 

@@ -7,7 +7,6 @@
 
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
@@ -63,7 +62,6 @@ test('Renders the Create Account form for guest customer', async () => {
 })
 
 test('Create Account form - renders error message', async () => {
-    const user = userEvent.setup()
     global.server.use(
         rest.post('*/customers', (_, res, ctx) => {
             const failedAccountCreation = {
@@ -75,7 +73,7 @@ test('Create Account form - renders error message', async () => {
         })
     )
 
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {isGuest: true}
     })
 
@@ -88,15 +86,13 @@ test('Create Account form - renders error message', async () => {
 })
 
 test('Create Account form - successful submission results in redirect to the Account page', async () => {
-    const user = userEvent.setup()
-
     global.server.use(
         rest.post('*/customers', (_, res, ctx) => {
             return res(ctx.status(200))
         })
     )
 
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {isGuest: true}
     })
 

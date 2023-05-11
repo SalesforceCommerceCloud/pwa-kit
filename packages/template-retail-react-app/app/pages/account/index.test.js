@@ -7,7 +7,6 @@
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {
@@ -81,7 +80,6 @@ describe('Test redirects', function () {
 })
 
 test('Provides navigation for subpages', async () => {
-    const user = userEvent.setup()
     global.server.use(
         rest.get('*/products', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrderProducts))
@@ -90,7 +88,7 @@ test('Provides navigation for subpages', async () => {
             return res(ctx.delay(0), ctx.json(mockOrderHistory))
         })
     )
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
     expect(await screen.findByTestId('account-page')).toBeInTheDocument()
@@ -106,9 +104,7 @@ test('Provides navigation for subpages', async () => {
 
 describe('Render and logs out', function () {
     test('Renders account detail page by default for logged-in customer, and can log out', async () => {
-        const user = userEvent.setup()
-
-        renderWithProviders(<MockedComponent />)
+        const {user} = renderWithProviders(<MockedComponent />)
 
         // Render user profile page
         await waitFor(() => {
@@ -141,8 +137,7 @@ describe('updating profile', function () {
         )
     })
     test('Allows customer to edit profile details', async () => {
-        const user = userEvent.setup()
-        renderWithProviders(<MockedComponent />)
+        const {user} = renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
         await waitFor(() => {
@@ -172,8 +167,7 @@ describe('updating password', function () {
         )
     })
     test('Allows customer to update password', async () => {
-        const user = userEvent.setup()
-        renderWithProviders(<MockedComponent />)
+        const {user} = renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 

@@ -9,7 +9,6 @@ import {mockWishListDetails} from './wishlist-primary-action.mock'
 import ItemVariantProvider from '../../../../components/item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistPrimaryAction from './wishlist-primary-action'
-import userEvent from '@testing-library/user-event'
 import {screen, waitFor} from '@testing-library/react'
 import PropTypes from 'prop-types'
 import {rest} from 'msw'
@@ -49,9 +48,8 @@ beforeEach(() => {
 })
 
 test('the Add To Cart button', async () => {
-    const user = userEvent.setup()
     const variant = mockWishListDetails.data[3]
-    renderWithProviders(<MockedComponent variant={variant} />)
+    const {user} = renderWithProviders(<MockedComponent variant={variant} />)
 
     const addToCartButton = await screen.findByRole('button', {
         name: /add to cart/i
@@ -64,10 +62,8 @@ test('the Add To Cart button', async () => {
 })
 
 test('the Add Set To Cart button', async () => {
-    const user = userEvent.setup()
-
     const productSetWithoutVariants = mockWishListDetails.data[1]
-    renderWithProviders(<MockedComponent variant={productSetWithoutVariants} />)
+    const {user} = renderWithProviders(<MockedComponent variant={productSetWithoutVariants} />)
 
     const button = await screen.findByRole('button', {name: /add set to cart/i})
     await user.click(button)
@@ -86,10 +82,8 @@ test('the View Full Details button', async () => {
 })
 
 test('the View Options button', async () => {
-    const user = userEvent.setup()
-
     const masterProduct = mockWishListDetails.data[2]
-    renderWithProviders(<MockedComponent variant={masterProduct} />)
+    const {user} = renderWithProviders(<MockedComponent variant={masterProduct} />)
 
     const button = await screen.findByRole('button', {name: /view options/i})
     await user.click(button)
