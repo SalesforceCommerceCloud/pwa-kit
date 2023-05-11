@@ -173,7 +173,7 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
         console.log('getAllFiles(inputDir): ', getAllFiles(inputDir))
         getAllFiles(inputDir).forEach((inputFile) => {
             const outputFile = outputDir + inputFile.replace(inputDir, '')
-            fs.copyFileSync(inputFile, outputFile)
+            fs.copyFileSync(inputFile, outputFile, fs.constants.COPYFILE_FICLONE)
         })
 
     } else {
