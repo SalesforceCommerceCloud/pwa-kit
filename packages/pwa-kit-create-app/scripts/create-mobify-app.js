@@ -60,6 +60,7 @@ const EXPRESS_MINIMAL_TEST_PROJECT = 'express-minimal-test-project'
 const EXPRESS_MINIMAL = 'express-minimal'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
+const RETAIL_REACT_APP_DEMO_EXTENSIBLE = 'retail-react-app-demo'
 const RETAIL_REACT_APP = 'retail-react-app'
 const MRT_REFERENCE_APP = 'mrt-reference-app'
 
@@ -71,6 +72,7 @@ const PRIVATE_PRESETS = [
 ]
 const PUBLIC_PRESETS = [
     RETAIL_REACT_APP_DEMO,
+    RETAIL_REACT_APP_DEMO_EXTENSIBLE,
     RETAIL_REACT_APP,
     EXPRESS_MINIMAL,
     TYPESCRIPT_MINIMAL
@@ -145,7 +147,7 @@ const runGenerator = (answers, {outputDir, verbose}) => {
         }
     })
 
-    extractTemplate('template-retail-react-app', outputDir)
+    extractTemplate(answers.template || 'template-retail-react-app', outputDir)
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
@@ -384,6 +386,10 @@ const presetPrompt = () => {
                     value: RETAIL_REACT_APP_DEMO
                 },
                 {
+                    name: 'The Retail app using extensibility with demo Commerce Cloud instance',
+                    value: RETAIL_REACT_APP_DEMO_EXTENSIBLE
+                },
+                {
                     name: 'The Retail app using your own Commerce Cloud instance',
                     value: RETAIL_REACT_APP
                 }
@@ -476,6 +482,15 @@ const main = (opts) => {
                 case RETAIL_REACT_APP_DEMO:
                     return Promise.resolve()
                         .then(() => runGenerator(demoProjectAnswers(), opts))
+                        .then((result) => {
+                            console.log(
+                                '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
+                            )
+                            return result
+                        })
+                case RETAIL_REACT_APP_DEMO_EXTENSIBLE:
+                    return Promise.resolve()
+                        .then(() => runGenerator({...demoProjectAnswers(), template: 'my-extended-retail-app'}, opts))
                         .then((result) => {
                             console.log(
                                 '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
