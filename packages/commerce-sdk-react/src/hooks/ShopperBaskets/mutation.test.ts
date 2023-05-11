@@ -288,7 +288,7 @@ describe('ShopperBaskets mutations', () => {
         expect(result.current.basket.data).toEqual(oldBasket)
         expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
         act(() => result.current.mutation.mutate(options))
-        await waitAndExpectSuccess(() => result.current.mutation);
+        await waitAndExpectSuccess(() => result.current.mutation)
         assertRemoveQuery(result.current.basket)
         assertInvalidateQuery(result.current.customerBaskets, oldCustomerBaskets)
     })

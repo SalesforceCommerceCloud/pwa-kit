@@ -190,7 +190,7 @@ export const getUnimplementedEndpoints = (
 // Since @react-testing-library/react@14, the waitFor
 // method only checks hook result by interval. Re-renders no longer
 // trigger waitFor. The default interval value is 100ms and it is way
-// too slow for us to assert value changes per re-render. 
+// too slow for us to assert value changes per re-render.
 // See https://github.com/testing-library/react-hooks-testing-library/blob/chore/migration-guide/MIGRATION_GUIDE.md#waitfor
 const WAIT_FOR_INVERVAL = 5
 /** Helper type for WaitForValueToChange with hooks */
@@ -201,17 +201,23 @@ type GetHookResult<Data, Err, Vars, Ctx> = () =>
 export const waitAndExpectSuccess = async <Data, Err, Vars, Ctx>(
     getResult: GetHookResult<Data, Err, Vars, Ctx>
 ) => {
-    // Checking for success first because result is still in loading state when checking for error first 
-    await waitFor(() => {
-        expect(getResult().isSuccess).toBe(true);
-    }, { interval: WAIT_FOR_INVERVAL });
+    // Checking for success first because result is still in loading state when checking for error first
+    await waitFor(
+        () => {
+            expect(getResult().isSuccess).toBe(true)
+        },
+        {interval: WAIT_FOR_INVERVAL}
+    )
     expect(getResult().error).toBeNull()
 }
 /** Helper that asserts that a hook returned an error */
 export const waitAndExpectError = async <Data, Err, Vars, Ctx>(
     getResult: GetHookResult<Data, Err, Vars, Ctx>
 ) => {
-    await waitFor(() => {
-        expect(getResult().isError).toBe(true)
-    }, { interval: WAIT_FOR_INVERVAL });
+    await waitFor(
+        () => {
+            expect(getResult().isError).toBe(true)
+        },
+        {interval: WAIT_FOR_INVERVAL}
+    )
 }
