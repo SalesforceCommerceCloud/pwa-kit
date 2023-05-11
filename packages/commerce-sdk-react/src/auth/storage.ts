@@ -9,8 +9,8 @@ import Cookies from 'js-cookie'
 export type StorageType = 'cookie' | 'local' | 'memory'
 
 export interface BaseStorageOptions {
-    keyPrefix?: string
-    keyPrefixSeparator?: string
+    keySuffix?: string
+    keySuffixSeparator?: string
 }
 
 export interface MemoryStorageOptions extends BaseStorageOptions {
@@ -19,15 +19,15 @@ export interface MemoryStorageOptions extends BaseStorageOptions {
 export abstract class BaseStorage {
     protected options: Required<BaseStorageOptions>
 
-    constructor(options: BaseStorageOptions = {keyPrefixSeparator: '_'}) {
+    constructor(options: BaseStorageOptions = {keySuffixSeparator: '_'}) {
         this.options = {
-            keyPrefixSeparator: options.keyPrefix ? options.keyPrefixSeparator ?? '_' : '',
-            keyPrefix: options.keyPrefix ?? ''
+            keySuffixSeparator: options.keySuffix ? options.keySuffixSeparator ?? '_' : '',
+            keySuffix: options.keySuffix ?? ''
         }
     }
 
     protected getPrefixedKey(key: string): string {
-        return `${this.options.keyPrefix}${this.options.keyPrefixSeparator}${key}`
+        return `${key}${this.options.keySuffixSeparator}${this.options.keySuffix}`
     }
     abstract set(key: string, value: string, options?: unknown): void
     abstract get(key: string): string
