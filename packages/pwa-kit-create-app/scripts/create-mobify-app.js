@@ -155,37 +155,34 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
 
         const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
         console.log('inputDir: ', inputDir, fs.readdirSync)
-        fs.readdirSync(inputDir, (err, files)=> {
-            console.log('inside read dir sync')
-            if (err) {
-                console.error('Could not load bootstrap template.', err)
-                process.exit(1)
-            }
-            console.log('files: ', files)
-            // files.forEach((file) => {
-            //     // Make one pass and make the file complete
-            //     var fromPath = path.join(moveFrom, file)
-            //     var toPath = path.join(moveTo, file)
-
-            //     fs.stat(fromPath, function (error, stat) {
-            //         if (error) {
-            //             console.error('Error stating file.', error)
-            //             return
-            //         }
-
-            //         if (stat.isFile()) console.log("'%s' is a file.", fromPath)
-            //         else if (stat.isDirectory()) console.log("'%s' is a directory.", fromPath)
-
-            //         fs.cop(fromPath, toPath, function (error) {
-            //             if (error) {
-            //                 console.error('File moving error.', error)
-            //             } else {
-            //                 console.log("Moved file '%s' to '%s'.", fromPath, toPath)
-            //             }
-            //         })
-            //     })
-            // })
-        })
+        fs
+            .readdirSync(inputDir, {recursive: true})
+            .forEach((files) => {
+                console.log('files: ', files)
+                // files.forEach((file) => {
+                //     // Make one pass and make the file complete
+                //     var fromPath = path.join(moveFrom, file)
+                //     var toPath = path.join(moveTo, file)
+    
+                //     fs.stat(fromPath, function (error, stat) {
+                //         if (error) {
+                //             console.error('Error stating file.', error)
+                //             return
+                //         }
+    
+                //         if (stat.isFile()) console.log("'%s' is a file.", fromPath)
+                //         else if (stat.isDirectory()) console.log("'%s' is a directory.", fromPath)
+    
+                //         fs.cop(fromPath, toPath, function (error) {
+                //             if (error) {
+                //                 console.error('File moving error.', error)
+                //             } else {
+                //                 console.log("Moved file '%s' to '%s'.", fromPath, toPath)
+                //             }
+                //         })
+                //     })
+                // })
+            })
     } else {
         downloadAndExtractTemplate('retail-react-app', outputDir)
 
