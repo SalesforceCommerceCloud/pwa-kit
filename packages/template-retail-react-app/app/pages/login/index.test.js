@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults, guestToken} from '../../utils/test-utils'
 import Login from '.'
@@ -95,8 +94,7 @@ describe('Logging in tests', function () {
         )
     })
     test('Allows customer to sign in to their account', async () => {
-        const user = userEvent.setup()
-        renderWithProviders(<MockedComponent />, {
+        const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
@@ -159,9 +157,7 @@ describe('Error while logging in', function () {
     // TODO: Fix flaky/broken test
     // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Renders error when given incorrect log in credentials', async () => {
-        const user = userEvent.setup()
-
-        renderWithProviders(<MockedComponent />, {
+        const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
@@ -193,9 +189,7 @@ describe('Error while logging in', function () {
 })
 describe('Navigate away from login page tests', function () {
     test('should navigate to sign up page when the user clicks Create Account', async () => {
-        const user = userEvent.setup()
-
-        renderWithProviders(<MockedComponent />, {
+        const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
@@ -211,9 +205,7 @@ describe('Navigate away from login page tests', function () {
         })
     })
     test('should navigate to reset password page when the user clicks Forgot Password', async () => {
-        const user = userEvent.setup()
-
-        renderWithProviders(<MockedComponent />, {
+        const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},

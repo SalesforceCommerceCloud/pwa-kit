@@ -8,7 +8,6 @@ import React from 'react'
 import Checkout from './index'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {
     renderWithProviders,
@@ -22,7 +21,7 @@ import {
     mockedCustomerProductLists
 } from '../../mocks/mock-data'
 import mockConfig from '../../../config/mocks/default'
-
+import userEvent from '@testing-library/user-event'
 jest.setTimeout(30000)
 
 // Minimal subset of `ocapiOrderResponse` in app/mocks/mock-data.js
@@ -86,7 +85,6 @@ test('Renders skeleton until customer and basket are loaded', () => {
 })
 
 test('Can proceed through checkout steps as guest', async () => {
-    const user = userEvent.setup()
     // Keep a *deep* copy of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
@@ -186,7 +184,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    renderWithProviders(<WrappedCheckout history={history} />, {
+    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
         wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
@@ -425,7 +423,6 @@ test('Can add address during checkout as a registered customer', async () => {
 })
 
 const logInDuringCheckout = async () => {
-    const user = userEvent.setup()
     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
@@ -536,7 +533,7 @@ const logInDuringCheckout = async () => {
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    renderWithProviders(<WrappedCheckout history={history} />, {
+    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
         wrapperProps: {
             // Not bypassing auth as usual, so we can test the guest-to-registered flow
             bypassAuth: false,

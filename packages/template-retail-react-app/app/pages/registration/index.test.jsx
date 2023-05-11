@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {screen, within, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {guestToken, registerUserToken, renderWithProviders} from '../../utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
@@ -68,9 +67,8 @@ afterEach(() => {
 })
 
 test('Allows customer to create an account', async () => {
-    const user = userEvent.setup()
     // render our test component
-    await renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {
             siteAlias: 'uk',
             locale: {id: 'en-GB'},

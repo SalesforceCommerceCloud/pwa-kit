@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountAddresses from './addresses'
@@ -66,13 +65,12 @@ afterEach(() => {
 })
 
 test('Allows customer to add addresses', async () => {
-    const user = userEvent.setup()
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomerWithNoAddress))
         )
     )
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
@@ -99,14 +97,12 @@ test('Allows customer to add addresses', async () => {
 })
 
 test('Allows customer to remove addresses', async () => {
-    const user = userEvent.setup()
-
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         )
     )
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('123 Main St')).toBeInTheDocument())
 
     global.server.use(

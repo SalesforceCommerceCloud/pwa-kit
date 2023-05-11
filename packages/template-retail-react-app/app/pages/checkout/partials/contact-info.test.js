@@ -6,8 +6,6 @@
  */
 import React from 'react'
 import {screen, within} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-
 import ContactInfo from './contact-info'
 import {renderWithProviders} from '../../../utils/test-utils'
 
@@ -28,9 +26,7 @@ jest.mock('../util/checkout-context', () => {
 })
 
 test('renders component', async () => {
-    const user = userEvent.setup()
-
-    renderWithProviders(<ContactInfo />)
+    const {user} = renderWithProviders(<ContactInfo />)
 
     // switch to login
     const trigger = screen.getByText(/Already have an account\? Log in/i)

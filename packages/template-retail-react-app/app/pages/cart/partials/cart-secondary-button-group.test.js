@@ -11,7 +11,6 @@ import ItemVariantProvider from '../../../components/item-variant'
 import {renderWithProviders} from '../../../utils/test-utils'
 import CartSecondaryButtonGroup from './cart-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {noop} from '../../../utils/utils'
 
 const MockedComponent = ({
@@ -42,8 +41,7 @@ beforeEach(() => {
 })
 
 test('renders secondary action component', async () => {
-    const user = userEvent.setup()
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
     const removeButton = screen.getByRole('button', {
         name: /remove/i
     })
@@ -59,13 +57,11 @@ test('renders secondary action component', async () => {
 })
 
 test('renders secondary with event handlers', async () => {
-    const user = userEvent.setup()
-
     const onRemoveItemClick = jest.fn()
     const onEditClick = jest.fn()
     const onAddToWishlistClick = jest.fn()
 
-    renderWithProviders(
+    const {user} = renderWithProviders(
         <MockedComponent
             onAddToWishlistClick={onAddToWishlistClick}
             onEditClick={onEditClick}
