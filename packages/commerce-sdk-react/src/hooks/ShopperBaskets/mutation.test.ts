@@ -290,6 +290,6 @@ describe('ShopperBaskets mutations', () => {
         act(() => result.current.mutation.mutate(options))
         await waitAndExpectSuccess(() => result.current.mutation);
         assertRemoveQuery(result.current.basket)
-        // assertInvalidateQuery(result.current.customerBaskets, oldCustomerBaskets) TODO: fix
+        assertInvalidateQuery(result.current.customerBaskets, oldCustomerBaskets)
     })
 })

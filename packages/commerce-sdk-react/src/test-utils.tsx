@@ -107,10 +107,18 @@ export const mockMutationEndpoints = (
     // For some reason, re-using scope (i.e. nock() and chained methods)
     // results in duplicate mocked requests, which breaks our validation
     // of # of requests used.
-    nock(DEFAULT_TEST_HOST).delete(matcher).reply(statusCode, response)
-    nock(DEFAULT_TEST_HOST).patch(matcher).reply(statusCode, response)
-    nock(DEFAULT_TEST_HOST).put(matcher).reply(statusCode, response)
-    nock(DEFAULT_TEST_HOST).post(matcher).reply(statusCode, response)
+
+    // For delay(50):
+    // It sucks that we have to do the delay
+    // but since @react-testing-library/react@14, the waitFor
+    // method only checks hook result by interval, there is no
+    // reliable way to trigger waitFor per re-render.
+    // So we need to give the mocks a small delay to ensure that
+    // the waitFor have time to catch every re-render.
+    nock(DEFAULT_TEST_HOST).delete(matcher).delay(50).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).patch(matcher).delay(50).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).put(matcher).delay(50).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).post(matcher).delay(50).reply(statusCode, response)
 }
 
 /** Mocks a GET request to an endpoint. */
@@ -120,7 +128,7 @@ export const mockQueryEndpoint = (
     statusCode = 200
 ) => {
     const matcher = (uri: string) => uri.includes(matchingPath)
-    return nock(DEFAULT_TEST_HOST).get(matcher).reply(statusCode, response)
+    return nock(DEFAULT_TEST_HOST).get(matcher).delay(50).reply(statusCode, response)
 }
 
 export const assertUpdateQuery = (
@@ -178,6 +186,12 @@ export const getUnimplementedEndpoints = (
     })
     return [...unimplemented]
 }
+
+// Since @react-testing-library/react@14, the waitFor
+// method only checks hook result by interval. Re-renders no longer
+// trigger waitFor. The default interval value is 100ms and it is way
+// to slow for us to assert value changes per re-render. 
+const WAIT_FOR_INVERVAL = 5
 /** Helper type for WaitForValueToChange with hooks */
 type GetHookResult<Data, Err, Vars, Ctx> = () =>
     | UseQueryResult
@@ -189,7 +203,7 @@ export const waitAndExpectSuccess = async <Data, Err, Vars, Ctx>(
     // Checking for success first because result is still in loading state when checking for error first 
     await waitFor(() => {
         expect(getResult().isSuccess).toBe(true);
-    });
+    }, { interval: WAIT_FOR_INVERVAL });
     expect(getResult().error).toBeNull()
 }
 /** Helper that asserts that a hook returned an error */
@@ -198,5 +212,5 @@ export const waitAndExpectError = async <Data, Err, Vars, Ctx>(
 ) => {
     await waitFor(() => {
         expect(getResult().isError).toBe(true)
-    })
+    }, { interval: WAIT_FOR_INVERVAL });
 }
