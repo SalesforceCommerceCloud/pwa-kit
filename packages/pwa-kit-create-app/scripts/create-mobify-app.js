@@ -154,8 +154,9 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
         // Loop through all the files in the temp directory
 
         const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
-        console.log('inputDir: ', inputDir)
+        console.log('inputDir: ', inputDir, fs.readdirSync)
         fs.readdirSync(inputDir, (err, files)=> {
+            console.log('inside read dir sync')
             if (err) {
                 console.error('Could not load bootstrap template.', err)
                 process.exit(1)
