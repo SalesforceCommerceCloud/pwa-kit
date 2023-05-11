@@ -1,5 +1,7 @@
-## v2.7.1 (May 09, 2023)
+## v2.7.1 (May 11, 2023)
 
+-   Re-generate lock files and fix hook lib tests [#1186](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1186)
+-   Add additional properties to ShopperLogin test types [#1185](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1185)
 -   Add missing cache invalidation for contexts/customers/login/order [#1073](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1073)
 -   Fix Shopper Baskets Test case [#1082](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1082)
 -   Implement remaining Shopper Baskets cache logic [#1070](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1070)

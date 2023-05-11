@@ -1,4 +1,4 @@
-## v2.7.1 (May 09, 2023)
+## v2.7.1 (May 11, 2023)
 
 -   Moved the MRT reference app to the SDKs, so that we can verify eg. Node support [#966](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/966)
 

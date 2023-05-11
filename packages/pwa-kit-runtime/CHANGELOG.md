@@ -1,4 +1,4 @@
-## v2.7.1-alpha.0 (May 08, 2023)
+## v2.7.1 (May 11, 2023)
 
 -   Add optional parameter to override configuration folder used in `getConfig` [#1049](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1049)
 -   Moved the MRT reference app to the SDKs, so that we can verify eg. Node support [#966](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/966)
