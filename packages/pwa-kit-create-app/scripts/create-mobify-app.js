@@ -147,12 +147,14 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
     // })
 
     if (extensible) {
+        console.log('Creating an extended project!')
         // Steps needed to create an extensible app
         // 1. Check what bootstrap template you need (js or ts) NOTE: TS isn't implemented, but maybe we will in the future.
         // 2. Iterated over all the template files in the bootstrap template and write them to the distination folder.
         // Loop through all the files in the temp directory
 
         const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates',)
+        console.log('inputDir: ', inputDir)
         fs.readdirSync(inputDir, (err, files)=> {
             if (err) {
                 console.error('Could not load bootstrap template.', err)
