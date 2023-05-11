@@ -370,6 +370,7 @@ const client =
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
+            const sysPath = fse.realpathSync(path.resolve('node_modules', EXT_EXTENDS ?? ''))
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
@@ -382,7 +383,15 @@ const client =
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
-                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
+                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT),
+                    // ignore duplicate dependencies in extensible project
+                    EXT_EXTENDS &&
+                        EXT_OVERRIDES_DIR &&
+                        new webpack.IgnorePlugin({
+                            checkResource: (resource, context) => {
+                                return context?.match(sysPath) && !resource?.match(EXT_EXTENDS)
+                            }
+                        })
                 ].filter(Boolean),
                 // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
                 performance: {
