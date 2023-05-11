@@ -60,7 +60,6 @@ const EXPRESS_MINIMAL_TEST_PROJECT = 'express-minimal-test-project'
 const EXPRESS_MINIMAL = 'express-minimal'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
-const RETAIL_REACT_APP_DEMO_EXTENSIBLE = 'retail-react-app-demo-extensible'
 const RETAIL_REACT_APP = 'retail-react-app'
 const MRT_REFERENCE_APP = 'mrt-reference-app'
 
@@ -72,11 +71,11 @@ const PRIVATE_PRESETS = [
 ]
 const PUBLIC_PRESETS = [
     RETAIL_REACT_APP_DEMO,
-    RETAIL_REACT_APP_DEMO_EXTENSIBLE,
     RETAIL_REACT_APP,
     EXPRESS_MINIMAL,
     TYPESCRIPT_MINIMAL
 ]
+const EXTENDABLE_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP]
 const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
@@ -374,7 +373,7 @@ const runTemplateGenerator = (projectId, {outputDir, verbose}, template) => {
     npmInstall(outputDir, {verbose})
 }
 
-const presetPrompt = () => {
+const presetPrompt = async () => {
     const questions = [
         {
             name: 'preset',
@@ -386,17 +385,42 @@ const presetPrompt = () => {
                     value: RETAIL_REACT_APP_DEMO
                 },
                 {
-                    name: 'The Retail app using extensibility with demo Commerce Cloud instance',
-                    value: RETAIL_REACT_APP_DEMO_EXTENSIBLE
-                },
-                {
                     name: 'The Retail app using your own Commerce Cloud instance',
                     value: RETAIL_REACT_APP
                 }
             ]
         }
     ]
-    return inquirer.prompt(questions).then((answers) => answers['preset'])
+
+    const presetChoice = await inquirer.prompt(questions)
+    let extendsChoice = {}
+
+    if (EXTENDABLE_PRESETS.includes(presetChoice['preset'])) {
+        extendsChoice = await inquirer.prompt({
+            name: 'extendable',
+            message: 'Do you wish to use template extensibility?',
+            type: 'list',
+            choices: [
+                {
+                    name: 'No',
+                    value: false
+                },
+                {
+                    name: 'Yes',
+                    value: true
+                }
+            ]
+        })
+    }
+    console.log({
+        ...presetChoice,
+        ...extendsChoice
+    })
+    return presetChoice['preset']
+    // return {
+    //     ...presetChoice,
+    //     ...extendsChoice
+    // }
 }
 
 const extractTemplate = (templateName, outputDir) => {
@@ -482,15 +506,6 @@ const main = (opts) => {
                 case RETAIL_REACT_APP_DEMO:
                     return Promise.resolve()
                         .then(() => runGenerator(demoProjectAnswers(), opts))
-                        .then((result) => {
-                            console.log(
-                                '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
-                            )
-                            return result
-                        })
-                case RETAIL_REACT_APP_DEMO_EXTENSIBLE:
-                    return Promise.resolve()
-                        .then(() => runGenerator({...demoProjectAnswers(), template: 'my-extended-retail-app'}, opts))
                         .then((result) => {
                             console.log(
                                 '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
