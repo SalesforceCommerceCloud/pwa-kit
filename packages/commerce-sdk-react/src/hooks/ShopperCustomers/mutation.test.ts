@@ -172,8 +172,7 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(() => result.current.mutation)
             expect(result.current.mutation.data).toBeUndefined()
-            // assertRemoveQuery(result.current.query) // FAILING --> TODO: fix
-            expect(result.current.query.data?.test).toEqual("this should not get used"); // what is currently happening
+            assertRemoveQuery(result.current.query)
         })
         test('`removeCustomerAddress` updates cache on success', async () => {
             // 0. Setup
@@ -199,8 +198,7 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(() => result.current.mutation)
             expect(result.current.mutation.data).toBeUndefined()
-            // assertRemoveQuery(result.current.query) // FAILING --> TODO: fix
-            expect(result.current.query.data?.test).toEqual("this should not get used"); // what is currently happening
+            assertRemoveQuery(result.current.query)
         })
         test('`updateCustomer` updates cache on success', async () => {
             // 0. Setup
@@ -448,8 +446,7 @@ describe('ShopperCustomers mutations', () => {
             expect(result.current.mutation.data).toBeUndefined()
             expect(result.current.list.data).toEqual(newList)
             expect(result.current.lists.data).toEqual(newListResult)
-            // assertRemoveQuery(result.current.query) // FAILING --> TODO: fix
-            expect(result.current.query.data?.test).toEqual("this should not get used"); // what is currently happening
+            assertRemoveQuery(result.current.query)
         })
         test('`updateCustomerProductListItem` updates cache on success', async () => {
             const oldData = oldProductListItem
