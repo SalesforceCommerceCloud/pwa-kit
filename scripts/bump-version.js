@@ -62,9 +62,9 @@ const main = () => {
     setPackageVersion(newVersion, {cwd: rootPath})
 
     ignoreList.forEach(({pathToPackage, oldVersion}) => {
-        restorePackageVersion(pathToPackage, oldVersion)
-        // If the package's dependency versions are updated, this change is still intact.
-        // Only the package's own version is restored.
+        // Restore and then increment to the next pre-release version
+        setPackageVersion(oldVersion, {cwd: pathToPackage})
+        setPackageVersion('prerelease', {cwd: pathToPackage})
     })
     // TODO: some packages (see my-extended-retail-app) may depend on the packages listed in the ignoreList. 
     // We'll need to make sure those packages have the correct dependency version.
@@ -75,10 +75,6 @@ const main = () => {
 
 const saveJSONToFile = (json, filePath) => {
     new sh.ShellString(JSON.stringify(json, null, 2)).to(filePath)
-}
-
-const restorePackageVersion = (pathToPackage, versionNumber) => {
-    setPackageVersion(versionNumber, {cwd: pathToPackage})
 }
 
 const setPackageVersion = (version, shellOptions = {}) => {
