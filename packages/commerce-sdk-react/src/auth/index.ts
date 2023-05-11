@@ -79,7 +79,7 @@ const DATA_MAP: AuthDataMap = {
         key: 'customer_id'
     },
     usid: {
-        storageType: 'local',
+        storageType: 'cookie',
         key: 'usid'
     },
     enc_user_id: {
