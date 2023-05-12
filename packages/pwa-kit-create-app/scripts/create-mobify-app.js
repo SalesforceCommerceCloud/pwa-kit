@@ -223,7 +223,7 @@ const runGenerator = (answers, {outputDir, verbose}) => {
         const PWAKitConfigTemplate = require(`../assets/pwa/default`).template
         const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
 
-        const commerceApi = {
+        const commerceAPI = {
             proxyPath: 'api',
             instanceUrl: answers.commerceAPI.instanceUrl,
             clientId: answers.commerceAPI.clientId,
@@ -231,12 +231,12 @@ const runGenerator = (answers, {outputDir, verbose}) => {
             shortCode: answers.commerceAPI.shortCode,
             siteId: answers.commerceAPI.siteId
         }
-        const einsteinApi = {
+        const einsteinAPI = {
             einsteinId: answers.einsteinAPI.einsteinId,
             siteId: answers.einsteinAPI.siteId || answers.commerceAPI.siteId
         }
 
-        new sh.ShellString(PWAKitConfigTemplate({commerceApi, einsteinApi})).to(
+        new sh.ShellString(PWAKitConfigTemplate({commerceAPI, einsteinAPI})).to(
             p.resolve(outputDir, 'config', 'default.js')
         )
 
