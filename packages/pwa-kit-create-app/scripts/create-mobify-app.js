@@ -488,7 +488,7 @@ const downloadAndExtractTemplate = (templateName, outputDir) => {
         sync: true
     })
     console.log(`copying ${p.join(tmp, 'package') + `${p.sep}.`} to ${outputDir}`)
-    sh.cp('-R', p.join(tmp, 'package') + `${p.sep}.`, outputDir)
+    sh.cp('-R', p.join(tmp, 'package', 'package'), outputDir)
     sh.rm('-rf', tmp)
 }
 
