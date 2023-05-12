@@ -149,7 +149,6 @@ export const assertInvalidateQuery = (
     expect(queryResult.isRefetching).toBe(true)
 }
 
-// TODO: potentially modify this function
 export const assertRemoveQuery = (queryResult: UseQueryResult) => {
     expect(queryResult.data).not.toBeDefined()
 }
