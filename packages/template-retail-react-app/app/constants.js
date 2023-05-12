@@ -90,3 +90,15 @@ export const TOAST_MESSAGE_REMOVED_FROM_WISHLIST = defineMessage({
     id: 'global.info.removed_from_wishlist',
     defaultMessage: 'Item removed from wishlist'
 })
+
+// Einstein recommender constants used in <RecommendedProducts/>
+export const EINSTEIN_RECOMMENDERS = {
+    ADD_TO_CART_MODAL: 'pdp-similar-items',
+    CART_RECENTLY_VIEWED: 'viewed-recently-einstein',
+    CART_MAY_ALSO_LIKE: 'product-to-product-einstein',
+    PDP_COMPLETE_SET: 'complete-the-set',
+    PDP_MIGHT_ALSO_LIKE: 'pdp-similar-items',
+    PDP_RECENTLY_VIEWED: 'viewed-recently-einstein',
+    EMPTY_SEARCH_RESULTS_TOP_SELLERS: 'home-top-revenue-for-category',
+    EMPTY_SEARCH_RESULTS_MOST_VIEWED: 'products-in-all-categories'
+}

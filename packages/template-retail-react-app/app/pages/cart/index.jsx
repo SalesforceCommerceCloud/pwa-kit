@@ -33,6 +33,7 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 // Constants
 import {
     API_ERROR_MESSAGE,
+    EINSTEIN_RECOMMENDERS,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST
 } from '../../constants'
@@ -302,7 +303,7 @@ const Cart = () => {
                                         id="cart.recommended_products.title.recently_viewed"
                                     />
                                 }
-                                recommender={'viewed-recently-einstein'}
+                                recommender={EINSTEIN_RECOMMENDERS.CART_RECENTLY_VIEWED}
                                 mx={{base: -4, sm: -6, lg: 0}}
                             />
 
@@ -313,7 +314,7 @@ const Cart = () => {
                                         id="cart.recommended_products.title.may_also_like"
                                     />
                                 }
-                                recommender={'product-to-product-einstein'}
+                                recommender={EINSTEIN_RECOMMENDERS.CART_MAY_ALSO_LIKE}
                                 products={basket?.productItems}
                                 shouldFetch={() =>
                                     basket?.basketId && basket.productItems?.length > 0

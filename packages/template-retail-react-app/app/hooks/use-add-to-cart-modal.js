@@ -30,6 +30,7 @@ import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
 import {findImageGroupBy} from '../utils/image-groups-utils'
 import {getDisplayVariationValues} from '../utils/product-utils'
+import {EINSTEIN_RECOMMENDERS} from '../constants'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -229,7 +230,7 @@ export const AddToCartModal = () => {
                                     id="add_to_cart_modal.recommended_products.title.might_also_like"
                                 />
                             }
-                            recommender={'pdp-similar-items'}
+                            recommender={EINSTEIN_RECOMMENDERS.ADD_TO_CART_MODAL}
                             products={[product]}
                             mx={{base: -4, md: -8, lg: 0}}
                             shouldFetch={() => product?.id}
