@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {withReactQuery} from './index'
-import {shallow} from 'enzyme'
+import {render, screen} from '@testing-library/react'
 import React from 'react'
 
 describe('withReactQuery', function () {
@@ -24,8 +24,9 @@ describe('withReactQuery', function () {
     test('Renders correctly', () => {
         const Wrapped = () => <p>Hello world</p>
         const Component = withReactQuery(Wrapped)
-        const wrapper = shallow(<Component locals={{}} />)
-        expect(wrapper.html()).toContain('Hello world')
+        render(<Component locals={{}} />)
+
+        expect(screen.getByText(/Hello world/i)).toBeInTheDocument()
     })
 
     test(`Has working getInitializers method`, () => {
