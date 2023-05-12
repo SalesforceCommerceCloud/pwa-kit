@@ -26,7 +26,7 @@ module.exports = {
         sites,
         // Commerce api config
         commerceAPI: {
-            proxyPath: \`/mobify/proxy/{{commerceAPI.proxyPath}}\`,
+            proxyPath: '/mobify/proxy/{{commerceAPI.proxyPath}}',
             parameters: {
                 clientId: '{{commerceAPI.clientId}}',
                 organizationId: '{{commerceAPI.organizationId}}',
@@ -70,10 +70,6 @@ module.exports = {
             {
                 host: '{{commerceAPI.shortCode}}.api.commercecloud.salesforce.com',
                 path: 'api'
-            },
-            {
-                host: '{{commerceAPI.hostname}}',
-                path: 'ocapi'
             }
         ]
     }
