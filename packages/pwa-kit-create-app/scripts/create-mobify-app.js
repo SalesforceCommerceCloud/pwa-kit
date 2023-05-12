@@ -47,6 +47,7 @@ const tar = require('tar')
 const semver = require('semver')
 const slugify = require('slugify')
 const generatorPkg = require('../package.json')
+const Handlebars = require('handlebars')
 
 const program = new Command()
 
@@ -129,79 +130,118 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  */
 const runGenerator = (answers, {outputDir, verbose}) => {
     checkOutputDir(outputDir)
+    fs.mkdirSync(outputDir)
     // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
-    const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
+    // const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
 
     // Check specified SDK versions actually exist on NPM.
-    npmInstallables.forEach((pkgName) => {
-        const versions = JSON.parse(sh.exec(`npm view ${pkgName} versions --json`, {silent: true}))
-        if (versions.indexOf(SDK_VERSION) < 0) {
-            const msg =
-                `Error: You're generating a project using version "${SDK_VERSION}" of ` +
-                `PWA Kit, but "${pkgName}@${SDK_VERSION}" does not exist on NPM.\n` +
-                `The available versions are:\n${versions.map((v) => `  ${v}`).join('\n')}`
-            console.error(msg)
-            process.exit(1)
+    // npmInstallables.forEach((pkgName) => {
+    //     const versions = JSON.parse(sh.exec(`npm view ${pkgName} versions --json`, {silent: true}))
+    //     if (versions.indexOf(SDK_VERSION) < 0) {
+    //         const msg =
+    //             `Error: You're generating a project using version "${SDK_VERSION}" of ` +
+    //             `PWA Kit, but "${pkgName}@${SDK_VERSION}" does not exist on NPM.\n` +
+    //             `The available versions are:\n${versions.map((v) => `  ${v}`).join('\n')}`
+    //         console.error(msg)
+    //         process.exit(1)
+    //     }
+    // })
+    const extensible = !!answers.templatePackageName
+
+    if (extensible) {
+        // Steps needed to create an extensible app
+        // 1. Check what bootstrap template you need (js or ts) NOTE: TS isn't implemented, but maybe we will in the future.
+        // 2. Iterated over all the template files in the bootstrap template and write them to the distination folder.
+        // Loop through all the files in the temp directory
+
+        // TODO: Move this to a util or something.
+        const getAllFiles = (dirPath, arrayOfFiles) => {
+            files = fs.readdirSync(dirPath)
+
+            arrayOfFiles = arrayOfFiles || []
+
+            files.forEach(function (file) {
+                if (fs.statSync(dirPath + '/' + file).isDirectory()) {
+                    arrayOfFiles = getAllFiles(dirPath + '/' + file, arrayOfFiles)
+                } else {
+                    arrayOfFiles.push(p.join(dirPath, '/', file))
+                }
+            })
+
+            return arrayOfFiles
         }
-    })
 
-    extractTemplate('template-retail-react-app', outputDir)
+        const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
 
-    const pkgJsonPath = p.resolve(outputDir, 'package.json')
-    const pkgJSON = readJson(pkgJsonPath)
-    const pkgDataWithAnswers = merge(pkgJSON, answers['retail-react-app'])
+        // Copy folder to destination and process template if required.
+        getAllFiles(inputDir).forEach((inputFile) => {
+            const outputFile = outputDir + inputFile.replace(inputDir, '')
+            const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
 
-    npmInstallables.forEach((pkgName) => {
-        const keys = ['dependencies', 'devDependencies']
-        keys.forEach((key) => {
-            const deps = pkgDataWithAnswers[key]
-            if (deps && deps[pkgName]) {
-                deps[pkgName] = SDK_VERSION
+            // Create folder if we are doing a deep copy
+            if (destDir) {
+                fs.mkdirSync(destDir, {recursive: true})
+            }
+
+            if (inputFile.endsWith('.hbs')) {
+                const templateString = sh.cat(inputFile)
+                const template = Handlebars.compile(templateString.stdout)
+                fs.writeFileSync(outputFile.replace('.hbs', ''), template(answers))
+            } else {
+                fs.copyFileSync(inputFile, outputFile)
             }
         })
-    })
+    } else {
+        downloadAndExtractTemplate('retail-react-app', outputDir)
 
-    writeJson(pkgJsonPath, pkgDataWithAnswers)
+        const pkgJsonPath = p.resolve(outputDir, 'package.json')
+        const pkgJSON = readJson(pkgJsonPath)
+        const pkgDataWithAnswers = merge(pkgJSON, answers.retailReactApp)
 
-    const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
-    const siteName = pkgDataWithAnswers.name
-    replaceJSON(manifest, {
-        name: siteName,
-        short_name: siteName,
-        start_url: '/?homescreen=1',
-        icons: [
-            {
-                src: './img/global/app-icon-192.png',
-                sizes: '192x192'
-            },
-            {
-                src: './img/global/app-icon-512.png',
-                sizes: '512x512'
-            }
-        ]
-    })
+        writeJson(pkgJsonPath, pkgDataWithAnswers)
 
-    const PWAKitConfigTemplate = require(`../assets/pwa/default`).template
-    const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
+        // const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
+        // const siteName = pkgDataWithAnswers.name
+        // replaceJSON(manifest, {
+        //     name: siteName,
+        //     short_name: siteName,
+        //     start_url: '/?homescreen=1',
+        //     icons: [
+        //         {
+        //             src: './img/global/app-icon-192.png',
+        //             sizes: '192x192'
+        //         },
+        //         {
+        //             src: './img/global/app-icon-512.png',
+        //             sizes: '512x512'
+        //         }
+        //     ]
+        // })
 
-    const commerceApi = {
-        proxyPath: 'api',
-        instanceUrl: answers['commerce-api'].instanceUrl,
-        clientId: answers['commerce-api'].clientId,
-        organizationId: answers['commerce-api'].organizationId,
-        shortCode: answers['commerce-api'].shortCode,
-        siteId: answers['commerce-api'].siteId
+        const PWAKitConfigTemplate = require(`../assets/pwa/default`).template
+        const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
+
+        const commerceAPI = {
+            proxyPath: 'api',
+            instanceUrl: answers.commerceAPI.instanceUrl,
+            clientId: answers.commerceAPI.clientId,
+            organizationId: answers.commerceAPI.organizationId,
+            shortCode: answers.commerceAPI.shortCode,
+            siteId: answers.commerceAPI.siteId
+        }
+        const einsteinAPI = {
+            einsteinId: answers.einsteinAPI.einsteinId,
+            siteId: answers.einsteinAPI.siteId || answers.commerceAPI.siteId
+        }
+
+        new sh.ShellString(PWAKitConfigTemplate({commerceAPI, einsteinAPI})).to(
+            p.resolve(outputDir, 'config', 'default.js')
+        )
+
+        new sh.ShellString(PWAKitSitesTemplate(answers)).to(
+            p.resolve(outputDir, 'config', 'sites.js')
+        )
     }
-    const einsteinApi = {
-        einsteinId: answers['einstein-api'].einsteinId,
-        siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
-    }
-
-    new sh.ShellString(PWAKitConfigTemplate({commerceApi, einsteinApi})).to(
-        p.resolve(outputDir, 'config', 'default.js')
-    )
-
-    new sh.ShellString(PWAKitSitesTemplate(answers)).to(p.resolve(outputDir, 'config', 'sites.js'))
 
     npmInstall(outputDir, {verbose})
 }
@@ -310,13 +350,12 @@ const buildAnswers = ({
 
     return {
         globals: {projectId},
-        'retail-react-app': {
+        retailReactApp: {
             name: projectId,
             version: GENERATED_PROJECT_VERSION
         },
-
-        'commerce-api': {clientId, siteId, organizationId, shortCode, instanceUrl},
-        'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
+        commerceAPI: {clientId, siteId, organizationId, shortCode, instanceUrl},
+        einsteinAPI: {einsteinId, siteId: einsteinSiteId || siteId}
     }
 }
 
@@ -372,7 +411,29 @@ const runTemplateGenerator = (projectId, {outputDir, verbose}, template) => {
     npmInstall(outputDir, {verbose})
 }
 
-const presetPrompt = () => {
+const extensibilityPrompts = async () => {
+    const questions = [
+        {
+            name: 'extensible',
+            message: 'Do you wish to use template extensibility?',
+            type: 'list',
+            choices: [
+                {
+                    name: 'No',
+                    value: false
+                },
+                {
+                    name: 'Yes',
+                    value: true
+                }
+            ]
+        }
+    ]
+
+    return inquirer.prompt(questions)
+}
+
+const presetPrompt = async () => {
     const questions = [
         {
             name: 'preset',
@@ -390,7 +451,10 @@ const presetPrompt = () => {
             ]
         }
     ]
-    return inquirer.prompt(questions).then((answers) => answers['preset'])
+
+    const presetChoice = await inquirer.prompt(questions)
+
+    return presetChoice['preset']
 }
 
 const extractTemplate = (templateName, outputDir) => {
@@ -401,6 +465,28 @@ const extractTemplate = (templateName, outputDir) => {
         sync: true
     })
     sh.cp('-R', p.join(tmp, templateName), outputDir)
+    sh.rm('-rf', tmp)
+}
+
+/**
+ * Downloads the provided template project from npm and extracts it to the
+ * output directory. NOTE: Version selection is currently not supported.
+ * @param {*} templateName
+ * @param {*} outputDir
+ */
+const downloadAndExtractTemplate = (templateName, outputDir) => {
+    const tmp = fs.mkdtempSync(p.resolve(os.tmpdir()))
+    const {stdout} = sh.exec(`npm pack ${templateName}@latest --pack-destination="${tmp}"`, {
+        silent: true
+    })
+
+    tar.x({
+        file: p.join(tmp, stdout.trim()),
+        cwd: p.join(tmp),
+        sync: true
+    })
+    console.log(`copying ${p.join(tmp, 'package', '*')} to ${outputDir}`)
+    sh.cp('-R', p.join(tmp, 'package', '*'), outputDir)
     sh.rm('-rf', tmp)
 }
 
@@ -474,8 +560,18 @@ const main = (opts) => {
                         'template-mrt-reference-app'
                     )
                 case RETAIL_REACT_APP_DEMO:
-                    return Promise.resolve()
-                        .then(() => runGenerator(demoProjectAnswers(), opts))
+                    return extensibilityPrompts(opts)
+                        .then((answers) =>
+                            runGenerator(
+                                {
+                                    ...demoProjectAnswers(),
+                                    ...(answers.extensible
+                                        ? {templatePackageName: 'retail-react-app'}
+                                        : {})
+                                },
+                                opts
+                            )
+                        )
                         .then((result) => {
                             console.log(
                                 '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
