@@ -129,7 +129,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  */
 const runGenerator = (answers, {outputDir, verbose, extensible}) => {
     checkOutputDir(outputDir)
-
+    fs.mkdirSync(outputDir)
     // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
     // const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
 
