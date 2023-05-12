@@ -1,11 +1,11 @@
 {
     "name": "template-express-minimal",
-    "version": "2.7.1",
+    "version": "2.7.2-dev",
     "license": "See license in LICENSE",
     "private": true,
     "devDependencies": {
-        "pwa-kit-dev": "^2.7.1",
-        "pwa-kit-runtime": "^2.7.1",
+        "pwa-kit-dev": "^2.7.2-dev",
+        "pwa-kit-runtime": "^2.7.2-dev",
         "supertest": "^4.0.2"
     },
     "scripts": {
