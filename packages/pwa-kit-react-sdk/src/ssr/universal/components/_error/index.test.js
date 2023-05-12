@@ -16,7 +16,6 @@ describe('Error Page', () => {
     const message = 'Error message'
 
     test('Renders correctly', () => {
-        // const wrapper = mount(<Error message={message} stack={stack} status={status} />)
         render(<Error message={message} stack={stack} status={status} />);
         expect(screen.getByText(message)).toBeInTheDocument();
         expect(screen.getByText(stack)).toBeInTheDocument();
