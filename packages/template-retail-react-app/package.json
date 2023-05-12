@@ -33,7 +33,7 @@
     "Android >= 4.4.4",
     "last 4 ChromeAndroid versions"
   ],
-  "devDependencies": {
+  "dependencies": {
     "@chakra-ui/icons": "^1.1.7",
     "@chakra-ui/react": "^1.8.9",
     "@chakra-ui/skip-nav": "^1.2.6",
@@ -82,8 +82,13 @@
     "react-intl": "^5.25.1",
     "react-router-dom": "^5.3.4"
   },
-  "peerDependencies": {
-    "@chakra-ui/system": "^1.12.1"
+  "devDependencies": {
+    "@testing-library/dom": "^9.0.1",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/react-hooks": "^7.0.2",
+    "@testing-library/user-event": "^12.8.3",
+    "jest-fetch-mock": "^2.1.2"
   },
   "engines": {
     "node": "^16.0.0 || ^18.0.0",
