@@ -49,8 +49,9 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@testing-library/react": "^14.0.0",
     "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
     "internal-lib-build": "2.8.0-dev",
     "node-html-parser": "^3.3.6",
     "nodemon": "^2.0.22",
