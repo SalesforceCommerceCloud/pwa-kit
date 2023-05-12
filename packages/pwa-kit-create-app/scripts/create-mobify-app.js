@@ -198,7 +198,7 @@ const runGenerator = (answers, {outputDir, verbose}) => {
 
         const pkgJsonPath = p.resolve(outputDir, 'package.json')
         const pkgJSON = readJson(pkgJsonPath)
-        const pkgDataWithAnswers = merge(pkgJSON, answers['retail-react-app'])
+        const pkgDataWithAnswers = merge(pkgJSON, answers.retailReactApp)
 
         writeJson(pkgJsonPath, pkgDataWithAnswers)
 
@@ -225,15 +225,15 @@ const runGenerator = (answers, {outputDir, verbose}) => {
 
         const commerceApi = {
             proxyPath: 'api',
-            instanceUrl: answers['commerce-api'].instanceUrl,
-            clientId: answers['commerce-api'].clientId,
-            organizationId: answers['commerce-api'].organizationId,
-            shortCode: answers['commerce-api'].shortCode,
-            siteId: answers['commerce-api'].siteId
+            instanceUrl: answers.commerceAPI.instanceUrl,
+            clientId: answers.commerceAPI.clientId,
+            organizationId: answers.commerceAPI.organizationId,
+            shortCode: answers.commerceAPI.shortCode,
+            siteId: answers.commerceAPI.siteId
         }
         const einsteinApi = {
-            einsteinId: answers['einstein-api'].einsteinId,
-            siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
+            einsteinId: answers.einsteinAPI.einsteinId,
+            siteId: answers.einsteinAPI.siteId || answers.commerceAPI.siteId
         }
 
         new sh.ShellString(PWAKitConfigTemplate({commerceApi, einsteinApi})).to(
@@ -352,13 +352,12 @@ const buildAnswers = ({
 
     return {
         globals: {projectId},
-        'retail-react-app': {
+        retailReactApp: {
             name: projectId,
             version: GENERATED_PROJECT_VERSION
         },
-
-        'commerce-api': {clientId, siteId, organizationId, shortCode, instanceUrl},
-        'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
+        commerceAPI: {clientId, siteId, organizationId, shortCode, instanceUrl},
+        einsteinAPI: {einsteinId, siteId: einsteinSiteId || siteId}
     }
 }
 
