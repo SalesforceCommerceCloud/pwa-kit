@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {OuterApp} from './main'
-import {render, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import {uuidv4} from '../../utils/uuidv4.client'
@@ -27,8 +27,8 @@ describe('main', function () {
             routes: getRoutes(locals),
             WrappedApp: routeComponent(App, false, locals)
         }
-        render(<OuterApp {...props} />);
-        expect(screen.getByText('App')).toBeInTheDocument();
+        render(<OuterApp {...props} />)
+        expect(screen.getByText('App')).toBeInTheDocument()
         window.__PRELOADED_STATE__ = oldPreloadedState
     })
 
@@ -43,8 +43,8 @@ describe('main', function () {
             routes: getRoutes(locals),
             WrappedApp: routeComponent(App, false, locals)
         }
-        render(<OuterApp {...props} />);
-        expect(screen.getByText('Error Status: 404')).toBeInTheDocument();
+        render(<OuterApp {...props} />)
+        expect(screen.getByText('Error Status: 404')).toBeInTheDocument()
         window.__ERROR__ = oldWindowError
     })
 })

@@ -7,7 +7,7 @@
 
 import React from 'react'
 // import {mount} from 'enzyme'
-import {render, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react'
 import Error from './index'
 
 describe('Error Page', () => {
@@ -16,15 +16,16 @@ describe('Error Page', () => {
     const message = 'Error message'
 
     test('Renders correctly', () => {
-        render(<Error message={message} stack={stack} status={status} />);
-        expect(screen.getByText(message)).toBeInTheDocument();
-        expect(screen.getByText(stack)).toBeInTheDocument();
-        expect(screen.getByText(`Error Status: ${status}`)).toBeInTheDocument();
+        render(<Error message={message} stack={stack} status={status} />)
+        expect(screen.getByText(message)).toBeInTheDocument()
+        expect(screen.getByText(stack)).toBeInTheDocument()
+        expect(screen.getByText(`Error Status: ${status}`)).toBeInTheDocument()
     })
 
     test('Ensure that status type is a number', () => {
-        const {container} = render(<Error message={message} status={status} />)
-        screen.debug();
+        const renderObj = render(<Error message={message} status={status} />)
+        console.log(renderObj)
+        // screen.debug()
         // TODO: check if there's an equivalent to test number type
         // expect(typeof wrapper.props().status).toBe('number')
     })
