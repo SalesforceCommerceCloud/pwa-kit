@@ -79,4 +79,12 @@ describe('AppErrorBoundary', () => {
         const result = AppErrorBoundary.getDerivedStateFromError(error)
         expect(result.error.message).toEqual(error.toString())
     })
+
+    test(`componentWillUnmount unlistens to history`, () => {
+        const unlisten = jest.fn()
+        const history = {listen: jest.fn().mockReturnValue(unlisten)}
+        const wrapper = mount(<AppErrorBoundary history={history}>test</AppErrorBoundary>)
+        wrapper.unmount()
+        expect(unlisten).toBeCalled()
+    })
 })
