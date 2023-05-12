@@ -1,5 +1,7 @@
 ## v2.8.0-dev (Mar 03, 2023)
 - Add missing cache invalidation for contexts/customers/login/order [#1073](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1073)
+- Update unit tests to use `waitFor` as a part of upgrade to react 18 [#1184](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1184)
+
 ## v2.7.0 (Mar 03, 2023)
 - Add Page/Region/Component components for shopper experience/page designer page rendering [#963](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/963)
 - Namespace `Auth` storage keys with site identifier to allow multi-site support [#911](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/911)
