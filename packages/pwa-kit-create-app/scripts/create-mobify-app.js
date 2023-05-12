@@ -176,7 +176,8 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
         getAllFiles(inputDir).forEach((inputFile) => {
             const outputFile = outputDir + inputFile.replace(inputDir, '')
 
-            const parts = outputDir.split(p.sep)
+            const parts = outputFile.split(p.sep)
+            console.log('parts: ', parts)
             parts.pop()
             console.log('Making directory: ', parts.join(p.sep))
             if (parts.join(p.sep)) {
