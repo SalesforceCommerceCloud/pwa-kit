@@ -178,8 +178,10 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
 
             const parts = outputDir.split(p.sep)
             parts.pop()
-
-            fs.mkdirSync(parts.join(p.sep), { recursive: true });
+            console.log('Making directory: ', parts.join(p.sep))
+            if (parts.join(p.sep)) {
+                fs.mkdirSync(parts.join(p.sep), { recursive: true });
+            }
 
             fs.copyFileSync(inputFile, outputFile, fs.constants.COPYFILE_FICLONE)
         })
