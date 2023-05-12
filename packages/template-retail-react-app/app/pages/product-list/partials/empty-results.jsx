@@ -103,16 +103,6 @@ const EmptySearchResults = ({searchQuery, category}) => {
                             mx={{base: -4, md: -8, lg: 0}}
                         />
 
-                        <RecommendedProducts
-                            title={
-                                <FormattedMessage
-                                    defaultMessage="Most Viewed"
-                                    id="empty_search_results.recommended_products.title.most_viewed"
-                                />
-                            }
-                            recommender={'products-in-all-categories'}
-                            mx={{base: -4, md: -8, lg: 0}}
-                        />
                     </Stack>
                 </Fragment>
             )}
