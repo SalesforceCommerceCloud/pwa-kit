@@ -11,7 +11,6 @@ import {
     waitAndExpectError,
     waitAndExpectSuccess
 } from '../../test-utils'
-import {waitFor} from '@testing-library/react'
 
 import {Argument} from '../types'
 import * as queries from './query'
@@ -51,7 +50,7 @@ describe('Shopper Baskets query hooks', () => {
         const {result} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })
-        await waitAndExpectSuccess(waitFor, () => result.current)
+        await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(data)
     })
     // eslint-disable-next-line jest/expect-expect
@@ -60,6 +59,6 @@ describe('Shopper Baskets query hooks', () => {
         const {result} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })
-        await waitAndExpectError(waitFor, () => result.current)
+        await waitAndExpectError(() => result.current)
     })
 })

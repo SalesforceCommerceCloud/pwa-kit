@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {act, waitFor} from '@testing-library/react'
+import {act} from '@testing-library/react'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
 import {
@@ -95,7 +95,7 @@ describe('ShopperLogin mutations', () => {
         })
         expect(result.current.data).toBeUndefined()
         act(() => result.current.mutate(options))
-        await waitAndExpectSuccess(waitFor, () => result.current)
+        await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(data)
     })
     test.each(testCases)('`%s` returns error on error', async (mutationName, [options]) => {
@@ -107,7 +107,7 @@ describe('ShopperLogin mutations', () => {
         })
         expect(result.current.error).toBeNull()
         act(() => result.current.mutate(options))
-        await waitAndExpectError(waitFor, () => result.current)
+        await waitAndExpectError(() => result.current)
         // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
         // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
         expect(result.current.error).toHaveProperty('response')
