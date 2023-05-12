@@ -6,7 +6,6 @@
  */
 
 import React from 'react'
-// import {mount} from 'enzyme'
 import {render, screen} from '@testing-library/react'
 import Error from './index'
 
@@ -22,11 +21,9 @@ describe('Error Page', () => {
         expect(screen.getByText(`Error Status: ${status}`)).toBeInTheDocument()
     })
 
+    // TODO: check if there's an equivalent in react test lib to check for number or potentially remove test
     test('Ensure that status type is a number', () => {
-        const renderObj = render(<Error message={message} status={status} />)
-        console.log(renderObj)
-        // screen.debug()
-        // TODO: check if there's an equivalent to test number type
-        // expect(typeof wrapper.props().status).toBe('number')
+        const wrapper = mount(<Error message={message} status={status} />)
+        expect(typeof wrapper.props().status).toBe('number')
     })
 })
