@@ -1,6 +1,6 @@
 {
   "name": "template-mrt-reference-app",
-  "version": "3.0.0-dev.0",
+  "version": "3.0.0-dev",
   "private": true,
   "license": "See license in LICENSE",
   "scripts": {
@@ -18,8 +18,8 @@
     "@loadable/component": "^5.15.0",
     "cross-fetch": "^3.1.4",
     "express-basic-auth": "^1.2.0",
-    "pwa-kit-dev": "^3.0.0-dev.0",
-    "pwa-kit-runtime": "^3.0.0-dev.0",
+    "pwa-kit-dev": "^3.0.0-dev",
+    "pwa-kit-runtime": "^3.0.0-dev",
     "supertest": "^4.0.2"
   },
   "engines": {
