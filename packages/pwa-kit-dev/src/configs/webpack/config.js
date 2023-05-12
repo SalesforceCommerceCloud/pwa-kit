@@ -452,7 +452,9 @@ const renderer =
                     new CopyPlugin({
                         patterns: [
                             {
-                                from: `${EXT_OVERRIDES_DIR_NO_SLASH}/app/static`,
+                                from: `${
+                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR + '/' : ''
+                                }app/static`,
                                 to: 'static/',
                                 noErrorOnMissing: true
                             }
@@ -486,7 +488,9 @@ const ssr = (() => {
                         new CopyPlugin({
                             patterns: [
                                 {
-                                    from: `${EXT_OVERRIDES_DIR_NO_SLASH}/app/static`,
+                                    from: `${
+                                        EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR + '/' : ''
+                                    }app/static`,
                                     to: 'static/'
                                 }
                             ]
