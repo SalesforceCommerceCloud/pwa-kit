@@ -47,6 +47,7 @@ const tar = require('tar')
 const semver = require('semver')
 const slugify = require('slugify')
 const generatorPkg = require('../package.json')
+const Handlebars = require('handlebars')
 
 const program = new Command()
 
@@ -147,12 +148,12 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
     // })
 
     if (extensible) {
-        console.log('Creating an extended project!')
         // Steps needed to create an extensible app
         // 1. Check what bootstrap template you need (js or ts) NOTE: TS isn't implemented, but maybe we will in the future.
         // 2. Iterated over all the template files in the bootstrap template and write them to the distination folder.
         // Loop through all the files in the temp directory
 
+        // TODO: Move this to a util or something.
         const getAllFiles = (dirPath, arrayOfFiles) => {
             files = fs.readdirSync(dirPath)
           
@@ -175,16 +176,20 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
         // Copy folder to destination and process template if required.
         getAllFiles(inputDir).forEach((inputFile) => {
             const outputFile = outputDir + inputFile.replace(inputDir, '')
+            const destDir = outputFile.split(p.sep).slice(0, 1).join(p.sep)
 
-            const parts = outputFile.split(p.sep)
-            console.log('parts: ', parts)
-            parts.pop()
-            console.log('Making directory: ', parts.join(p.sep))
-            if (parts.join(p.sep)) {
-                fs.mkdirSync(parts.join(p.sep), { recursive: true });
+            // Create folder if we are doing a deep copy
+            if (destDir) {
+                fs.mkdirSync(destDir, { recursive: true });
             }
 
-            fs.copyFileSync(inputFile, outputFile, fs.constants.COPYFILE_FICLONE)
+            if (inputFile.endsWith('.hbs')) {
+                const template = Handlebars.compile(sh.cat(inputFile))
+                template(answers)
+                console.log('template(answers): ', template(answers))
+            } else {
+                fs.copyFileSync(inputFile, outputFile)
+            }
         })
 
     } else {
