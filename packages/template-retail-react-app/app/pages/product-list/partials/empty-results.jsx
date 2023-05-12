@@ -12,7 +12,7 @@ import {Link as RouteLink} from 'react-router-dom'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {SearchIcon} from '../../../components/icons'
 import RecommendedProducts from '../../../components/recommended-products'
-import {EINSTEIN_RECOMMENDERS} from "../../../constants";
+import {EINSTEIN_RECOMMENDERS} from '../../../constants'
 
 const contactUsMessage = defineMessage({
     id: 'empty_search_results.link.contact_us',
@@ -103,7 +103,6 @@ const EmptySearchResults = ({searchQuery, category}) => {
                             recommender={EINSTEIN_RECOMMENDERS.EMPTY_SEARCH_RESULTS_MOST_VIEWED}
                             mx={{base: -4, md: -8, lg: 0}}
                         />
-
                     </Stack>
                 </Fragment>
             )}
