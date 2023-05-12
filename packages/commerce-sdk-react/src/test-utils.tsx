@@ -97,6 +97,7 @@ export function renderHookWithProviders<TProps, TResult>(
     })
 }
 
+const NOCK_DELAY = 50;
 /** Mocks DELETE, PATCH, POST, and PUT so we don't have to look up which verb an endpoint uses. */
 export const mockMutationEndpoints = (
     matchingPath: string,
@@ -108,17 +109,17 @@ export const mockMutationEndpoints = (
     // results in duplicate mocked requests, which breaks our validation
     // of # of requests used.
 
-    // For delay(50):
+    // For delay(NOCK_DELAY):
     // It sucks that we have to do the delay
     // but since @react-testing-library/react@14, the waitFor
     // method only checks hook result by interval, there is no
     // reliable way to trigger waitFor per re-render.
     // So we need to give the mocks a small delay to ensure that
     // the waitFor have time to catch every re-render.
-    nock(DEFAULT_TEST_HOST).delete(matcher).delay(50).reply(statusCode, response)
-    nock(DEFAULT_TEST_HOST).patch(matcher).delay(50).reply(statusCode, response)
-    nock(DEFAULT_TEST_HOST).put(matcher).delay(50).reply(statusCode, response)
-    nock(DEFAULT_TEST_HOST).post(matcher).delay(50).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).delete(matcher).delay(NOCK_DELAY).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).patch(matcher).delay(NOCK_DELAY).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).put(matcher).delay(NOCK_DELAY).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).post(matcher).delay(NOCK_DELAY).reply(statusCode, response)
 }
 
 /** Mocks a GET request to an endpoint. */
@@ -128,7 +129,7 @@ export const mockQueryEndpoint = (
     statusCode = 200
 ) => {
     const matcher = (uri: string) => uri.includes(matchingPath)
-    return nock(DEFAULT_TEST_HOST).get(matcher).delay(50).reply(statusCode, response)
+    return nock(DEFAULT_TEST_HOST).get(matcher).delay(NOCK_DELAY).reply(statusCode, response)
 }
 
 export const assertUpdateQuery = (
@@ -191,7 +192,7 @@ export const getUnimplementedEndpoints = (
 // trigger waitFor. The default interval value is 100ms and it is way
 // too slow for us to assert value changes per re-render.
 // See https://github.com/testing-library/react-hooks-testing-library/blob/chore/migration-guide/MIGRATION_GUIDE.md#waitfor
-const WAIT_FOR_INVERVAL = 5
+const WAIT_FOR_INTERVAL = 5
 /** Helper type for WaitForValueToChange with hooks */
 type GetHookResult<Data, Err, Vars, Ctx> = () =>
     | UseQueryResult
@@ -205,7 +206,7 @@ export const waitAndExpectSuccess = async <Data, Err, Vars, Ctx>(
         () => {
             expect(getResult().isSuccess).toBe(true)
         },
-        {interval: WAIT_FOR_INVERVAL}
+        {interval: WAIT_FOR_INTERVAL}
     )
     expect(getResult().error).toBeNull()
 }
@@ -217,6 +218,6 @@ export const waitAndExpectError = async <Data, Err, Vars, Ctx>(
         () => {
             expect(getResult().isError).toBe(true)
         },
-        {interval: WAIT_FOR_INVERVAL}
+        {interval: WAIT_FOR_INTERVAL}
     )
 }
