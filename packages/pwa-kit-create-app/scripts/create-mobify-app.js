@@ -487,10 +487,8 @@ const downloadAndExtractTemplate = (templateName, outputDir) => {
         cwd: p.join(tmp),
         sync: true
     })
-    console.log('downloadTeamplate: copy from ', p.join(tmp, 'package'))
 
-    console.log('downloadTeamplate: outputDir = ', outputDir)
-    sh.cp('-R', p.join(tmp, 'package'), outputDir)
+    sh.cp('-R', p.join(tmp, 'package', '.'), outputDir)
     sh.rm('-rf', tmp)
 }
 
