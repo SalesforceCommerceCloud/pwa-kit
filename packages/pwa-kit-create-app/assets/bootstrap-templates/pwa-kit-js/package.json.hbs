@@ -7,11 +7,11 @@
         "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
     },
     "ccExtensibility": {
-        "extends": "retail-react-app",
+        "extends": "{{templatePackageName}}",
         "overridesDir": "pwa-kit-overrides"
     },
     "devDependencies": {
-        "retail-react-app": "^3.0.0-dev.0"
+        "{{templatePackageName}}": "^3.0.0-dev.0"
     },
     "scripts": {
         "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",

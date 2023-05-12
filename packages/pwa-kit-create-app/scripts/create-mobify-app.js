@@ -128,7 +128,8 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * Each package name included in the object's keys will be copied into the
  * generated project, all others are excluded.
  */
-const runGenerator = (answers, {outputDir, verbose, extensible}) => {
+const runGenerator = (answers, {outputDir, verbose}) => {
+    console.log('answers: ', answers)
     checkOutputDir(outputDir)
     fs.mkdirSync(outputDir)
     // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
@@ -146,6 +147,7 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
     //         process.exit(1)
     //     }
     // })
+    const extensible = !!answers.templatePackageName
 
     if (extensible) {
         // Steps needed to create an extensible app
@@ -171,26 +173,21 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
           }
 
         const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
-        console.log('getAllFiles(inputDir): ', getAllFiles(inputDir))
-
+        
         // Copy folder to destination and process template if required.
         getAllFiles(inputDir).forEach((inputFile) => {
             const outputFile = outputDir + inputFile.replace(inputDir, '')
-            console.log('outputFile: ', outputFile)
             const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
-            console.log('destDir: ', destDir)
+            
             // Create folder if we are doing a deep copy
             if (destDir) {
-                console.log('creating directory')
-                const r = fs.mkdirSync(destDir, { recursive: true })
-                console.log('result: ', r)
+                fs.mkdirSync(destDir, { recursive: true })
             }
 
             if (inputFile.endsWith('.hbs')) {
-                console.log('answers: ', answers)
                 const templateString = sh.cat(inputFile)
                 const template = Handlebars.compile(templateString.stdout)
-                fs.writeFileSync(outputFile, template(answers))
+                fs.writeFileSync(outputFile.replace('.hbs', ''), template(answers))
             } else {
                 fs.copyFileSync(inputFile, outputFile)
             }
@@ -567,10 +564,10 @@ const main = (opts) => {
                 case RETAIL_REACT_APP_DEMO:
                     return extensibilityPrompts(opts)
                         .then((answers) =>
-                            runGenerator(demoProjectAnswers(), {
-                                ...opts,
-                                extensible: answers.extensible
-                            })
+                            runGenerator({
+                                ...demoProjectAnswers(),
+                                ...(answers.extensible ? {templatePackageName: 'retail-react-app'} : {})
+                            }, opts)
                         )
                         .then((result) => {
                             console.log(
