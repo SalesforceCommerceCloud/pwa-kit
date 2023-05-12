@@ -293,6 +293,16 @@ const withChunking = (config) => {
                         },
                         name: 'vendor',
                         chunks: 'all'
+                    },
+                    translations: {
+                        test: (module) => {
+                            if (module?.context?.match(makeRegExp(`${sysPath}/node_modules`))) {
+                                return false
+                            }
+                            return module?.context?.match?.(/(app\/translations)/)
+                        },
+                        name: 'translations',
+                        chunks: 'all'
                     }
                 }
             }
