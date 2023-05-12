@@ -9,7 +9,6 @@ import {OuterApp} from './main'
 import {render, screen} from '@testing-library/react';
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
-import AppErrorBoundary from '../universal/components/app-error-boundary'
 import {uuidv4} from '../../utils/uuidv4.client'
 
 jest.mock('../../utils/uuidv4.client')
@@ -29,9 +28,7 @@ describe('main', function () {
             WrappedApp: routeComponent(App, false, locals)
         }
         render(<OuterApp {...props} />);
-        const appDiv = document.querySelectorAll('div')[1];
-        expect(appDiv).toBeInTheDocument();
-        expect(appDiv.textContent).toEqual('App');
+        expect(screen.getByText('App')).toBeInTheDocument();
         window.__PRELOADED_STATE__ = oldPreloadedState
     })
 
@@ -47,9 +44,7 @@ describe('main', function () {
             WrappedApp: routeComponent(App, false, locals)
         }
         render(<OuterApp {...props} />);
-        screen.debug();
-        // TODO: implement react testing lib equivalent
-        // expect(wrapper.find(AppErrorBoundary)).toHaveLength(1)
+        expect(screen.getByText('Error Status: 404')).toBeInTheDocument();
         window.__ERROR__ = oldWindowError
     })
 })
