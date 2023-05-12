@@ -13,6 +13,6 @@ describe('App', () => {
     test('Renders correctly', () => {
         const body = <p>Hello world</p>
         render(<App>{body}</App>)
-        // expect(screen.getByText(/hello world/i)).toBeInTheDocument()
+        expect(screen.getByText(/hello world/i)).toBeInTheDocument()
     })
 })
