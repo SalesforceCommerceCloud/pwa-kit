@@ -27,7 +27,7 @@
     "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
     "prepare": "npm run build",
-    "test": "internal-lib-build test",
+    "test": "pwa-kit-dev test",
     "test:inspect": "node --inspect-brk jest --runInBand",
     "test:watch": "npm test -- --watch",
     "version": "node ./scripts/version.js"
@@ -37,7 +37,6 @@
     "@loadable/server": "^5.15.3",
     "@loadable/webpack-plugin": "^5.15.2",
     "@tanstack/react-query": "^4.28.0",
-    "@testing-library/react": "^14.0.0",
     "cross-env": "^5.2.1",
     "event-emitter": "^0.3.5",
     "hoist-non-react-statics": "^3.3.2",
@@ -50,7 +49,8 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "enzyme": "^3.11.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/jest-dom": "^5.16.5",
     "internal-lib-build": "2.8.0-dev",
     "node-html-parser": "^3.3.6",
     "nodemon": "^2.0.22",
