@@ -177,19 +177,19 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
         getAllFiles(inputDir).forEach((inputFile) => {
             const outputFile = outputDir + inputFile.replace(inputDir, '')
             const destDir = outputFile.split(p.sep).slice(0, 1).join(p.sep)
-
+            console.log('destDir: ', destDir)
             // Create folder if we are doing a deep copy
             if (destDir) {
-                fs.mkdirSync(destDir, { recursive: true });
+                console.log('creating directory')
+                const r = fs.mkdirSync(destDir, { recursive: true })
+                console.log('result: ', r)
             }
 
             if (inputFile.endsWith('.hbs')) {
                 console.log('answers: ', answers)
                 const templateString = sh.cat(inputFile)
-                console.log('templateString: ', templateString.stdout)
                 const template = Handlebars.compile(templateString.stdout)
-                template(answers)
-                console.log('template(answers): ', template(answers))
+                fs.writeFileSync(outputFile, template(answers))
             } else {
                 fs.copyFileSync(inputFile, outputFile)
             }
