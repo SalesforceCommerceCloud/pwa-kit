@@ -19,6 +19,7 @@ const rootPkgLockPath = path.join(__dirname, '..', 'package-lock.json')
 
 const retailReactAppPkgDir = path.join(__dirname, '..', 'packages/template-retail-react-app')
 const retailReactAppPkg = JSON.parse(sh.cat(path.join(retailReactAppPkgDir, 'package.json')))
+// TODO: `packagesWithIndependentVersion`
 const ignoreList = [
     {
         pathToPackage: retailReactAppPkgDir, 
@@ -29,8 +30,9 @@ const ignoreList = [
 const main = () => {
     // TODO: during our release process, it looks like we should be tagging with annotated tags:
     // https://lerna.js.org/docs/troubleshooting#publish-does-not-detect-manually-created-tags-in-fixed-mode-with-githubgithub-enterprise
-    sh.exec(`lerna version --no-push --no-git-tag-version --yes ${process.argv.slice(2).join(' ')}`)
-    // TODO: is this really necessary?
+    sh.exec(`lerna version --exact --no-push --no-git-tag-version --yes ${process.argv.slice(2).join(' ')}`)
+
+    // TODO: is this really necessary? Well, it does cause some bootstrapping to happen, plus other lifecycle scripts
     // sh.exec(`npm install`)
 
     const lernaConfig = JSON.parse(sh.cat(lernaConfigPath))
@@ -66,6 +68,7 @@ const main = () => {
         setPackageVersion(oldVersion, {cwd: pathToPackage})
         setPackageVersion('prerelease', {cwd: pathToPackage})
     })
+    // !!!
     // TODO: some packages (see my-extended-retail-app) may depend on the packages listed in the ignoreList. 
     // We'll need to make sure those packages have the correct dependency version.
 
