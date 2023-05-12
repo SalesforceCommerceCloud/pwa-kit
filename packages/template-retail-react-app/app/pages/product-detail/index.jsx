@@ -34,6 +34,7 @@ import InformationAccordion from './partials/information-accordion'
 // constant
 import {
     API_ERROR_MESSAGE,
+    EINSTEIN_RECOMMENDERS,
     MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST
@@ -346,7 +347,7 @@ const ProductDetail = () => {
                                     id="product_detail.recommended_products.title.complete_set"
                                 />
                             }
-                            recommender={'complete-the-set'}
+                            recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}
                             products={[product]}
                             mx={{base: -4, md: -8, lg: 0}}
                             shouldFetch={() => product?.id}
@@ -359,7 +360,7 @@ const ProductDetail = () => {
                                 id="product_detail.recommended_products.title.might_also_like"
                             />
                         }
-                        recommender={'pdp-similar-items'}
+                        recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}
                         products={[product]}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
@@ -372,7 +373,7 @@ const ProductDetail = () => {
                                 id="product_detail.recommended_products.title.recently_viewed"
                             />
                         }
-                        recommender={'viewed-recently-einstein'}
+                        recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}
                         mx={{base: -4, md: -8, lg: 0}}
                     />
                 </Stack>

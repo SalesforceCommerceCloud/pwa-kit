@@ -1,6 +1,6 @@
 {
   "name": "typescript-minimal",
-  "version": "2.8.0-dev",
+  "version": "3.0.0-dev",
   "private": true,
   "scripts": {
     "build": "pwa-kit-dev build",
@@ -22,9 +22,9 @@
     "@types/loadable__component": "^5.13.4",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "pwa-kit-dev": "2.8.0-dev",
-    "pwa-kit-react-sdk": "2.8.0-dev",
-    "pwa-kit-runtime": "2.8.0-dev",
+    "pwa-kit-dev": "3.0.0-dev",
+    "pwa-kit-react-sdk": "3.0.0-dev",
+    "pwa-kit-runtime": "3.0.0-dev",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
