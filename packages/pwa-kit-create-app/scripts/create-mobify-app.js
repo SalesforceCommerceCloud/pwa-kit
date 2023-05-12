@@ -184,6 +184,7 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
             }
 
             if (inputFile.endsWith('.hbs')) {
+                console.log('answers: ', answers)
                 const template = Handlebars.compile(sh.cat(inputFile))
                 template(answers)
                 console.log('template(answers): ', template(answers))
