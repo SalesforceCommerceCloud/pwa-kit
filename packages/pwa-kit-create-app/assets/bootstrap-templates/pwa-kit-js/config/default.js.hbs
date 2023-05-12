@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-exports.template = ({commerceApi, einsteinApi}) => `const sites = require('./sites.js')
+const sites = require('./sites.js')
 module.exports = {
     app: {
         // Customize how your 'site' and 'locale' are displayed in the url.
@@ -77,4 +77,4 @@ module.exports = {
             }
         ]
     }
-}`
+}
