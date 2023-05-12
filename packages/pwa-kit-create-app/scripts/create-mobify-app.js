@@ -176,6 +176,7 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
         // Copy folder to destination and process template if required.
         getAllFiles(inputDir).forEach((inputFile) => {
             const outputFile = outputDir + inputFile.replace(inputDir, '')
+            console.log('outputFile: ', outputFile)
             const destDir = outputFile.split(p.sep).slice(0, 1).join(p.sep)
             console.log('destDir: ', destDir)
             // Create folder if we are doing a deep copy
