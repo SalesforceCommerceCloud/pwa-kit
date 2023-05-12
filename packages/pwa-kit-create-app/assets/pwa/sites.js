@@ -10,7 +10,7 @@ exports.template = (
 // You can also provide aliases for your locale. They will be used in place of your locale id when generating paths across the app
 module.exports = [
     {
-        id: '${answers['commerce-api'].siteId}',
+        id: '${answers.commerceAPI.siteId}',
         l10n: {
             supportedCurrencies: ['USD'],
             defaultCurrency: 'USD',
