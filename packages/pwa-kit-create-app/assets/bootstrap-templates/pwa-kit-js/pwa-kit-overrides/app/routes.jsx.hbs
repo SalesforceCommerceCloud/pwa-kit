@@ -6,5 +6,13 @@
  */
 
 import {routes} from '{{templatePackageName}}/app/routes'
+{{!-- TODO: The configure routes should be an optional opt-in provided from the SDK. --}}
+import {configureRoutes} from '{{templatePackageName}}/app/utils/routes-utils'
 
-export default routes
+{{!-- export default routes --}}
+export default () => {
+    const config = getConfig()
+    return configureRoutes(routes, config, {
+        ignoredRoutes: ['/callback', '*']
+    })
+}
