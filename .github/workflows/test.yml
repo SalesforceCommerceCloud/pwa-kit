@@ -19,6 +19,7 @@ on:
       - develop
       # TODO: Should we run on all pushes to release branches, or should we run on GitHub releases?
       - 'release-*'
+      - 'v3'
   schedule:
     # Run every day at 12pm (PST) - cron uses UTC times
     - cron: '0 8 * * *'
@@ -26,22 +27,24 @@ env:
   IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
   DEVELOP: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'develop' }}
   RELEASE: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && startsWith(github.head_ref || github.ref_name, 'release-') }}
+  V3: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'v3' }}
 
 jobs:
   pwa-kit:
     strategy:
+      fail-fast: false
       matrix:
-        node: [14, 16]
-        npm: [6, 7, 8]
-        exclude:
-          - node: 16
-            npm: 6
+        node: [16, 18]
+        npm: [7, 8, 9]
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
-      IS_LATEST_NPM: ${{ matrix.node == 16 && matrix.npm == 8 }}
+      # (We also use this env var for making sure a step runs once for the current node version)
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+      # The current recommended version for Managed Runtime: 
+      # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
+      IS_MRT_NODE: ${{ matrix.node == 16 && matrix.npm == 8 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -63,37 +66,43 @@ jobs:
       - name: Run unit tests
         uses: "./.github/actions/unit_tests"
 
-      - name: Run Lighthouse CI on the PWA
-        if: env.IS_DEFAULT_NPM == 'true'
-        uses: "./.github/actions/lighthouse_ci"
+      - name: Run bundlesize test
+        uses: "./.github/actions/bundle_size_test"
 
       - name: Smoke test scripts
         if: env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' )
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' || env.V3 == 'true' )
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT (Development)
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.DEVELOP == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOP == 'true'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "./packages/template-retail-react-app"
           TARGET: staging
+      
+      - name: Push Bundle to MRT (v3)
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.V3 == 'true'
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "./packages/template-retail-react-app"
+          TARGET: staging-v3
 
       - name: Push Bundle to MRT (Production)
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.RELEASE == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "./packages/template-retail-react-app"
           TARGET: production
 
       - name: Push Bundle to MRT (Commerce SDK React)
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.DEVELOPMENT == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOPMENT == 'true'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "./packages/test-commerce-sdk-react"
@@ -104,7 +113,7 @@ jobs:
         uses: "./.github/actions/check_clean"
 
       - name: Publish to NPM
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.RELEASE == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
         uses: "./.github/actions/publish_to_npm"
         with:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
@@ -122,16 +131,18 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   pwa-kit-windows:
     strategy:
+      fail-fast: false
       matrix:
-        node: [14, 16]
-        npm: [6, 7, 8]
-        exclude:
-          - node: 16
-            npm: 6
+        node: [16, 18]
+        npm: [7, 8, 9]
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
+      # (We also use this env var for making sure a step runs once for the current node version)
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+      # The current recommended version for Managed Runtime: 
+      # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
+      IS_MRT_NODE: ${{ matrix.node == 16 && matrix.npm == 8 }}
     runs-on: windows-latest
     steps:
         - name: Checkout
@@ -158,6 +169,7 @@ jobs:
   # with a few extra steps. Can the workflows be merged? (Add `os` to the matrix?)
   generated:
     strategy:
+      fail-fast: false
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: ubuntu-latest
@@ -171,7 +183,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
@@ -181,7 +193,7 @@ jobs:
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 5
+        timeout-minutes: 8
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
@@ -248,6 +260,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   generated-windows:
     strategy:
+      fail-fast: false
       matrix:
         template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: windows-latest
@@ -261,7 +274,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Setup Windows Machine
         uses: "./.github/actions/setup_windows"
@@ -293,3 +306,24 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
+  lighthouse:
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [16] # Should match node version supported by MRT.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Setup Ubuntu Machine
+        uses: "./.github/actions/setup_ubuntu"
+
+      - name: Run Lighthouse CI on the PWA
+        uses: "./.github/actions/lighthouse_ci"

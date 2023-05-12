@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState, useEffect} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
+import {useSearchSuggestions} from 'commerce-sdk-react-preview'
 import {
     Input,
     InputGroup,
@@ -20,7 +21,6 @@ import {
 } from '@chakra-ui/react'
 import SearchSuggestions from './partials/search-suggestions'
 import {SearchIcon} from '../icons'
-import useSearchSuggestions from '../../commerce-api/hooks/useSearchSuggestions'
 import {capitalize, boldString, getSessionJSONItem, setSessionJSONItem} from '../../utils/utils'
 import useNavigation from '../../hooks/use-navigation'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
@@ -72,27 +72,30 @@ const formatSuggestions = (searchSuggestions, input) => {
  * @return  {React.ReactElement} - SearchInput component
  */
 const Search = (props) => {
-    const navigate = useNavigation()
-    const searchSuggestion = useSearchSuggestions()
-    const searchInputRef = useRef()
     const [isOpen, setIsOpen] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+    const navigate = useNavigation()
+    const searchSuggestion = useSearchSuggestions(
+        {
+            parameters: {
+                q: searchQuery
+            }
+        },
+        {
+            enabled: searchQuery?.length >= RECENT_SEARCH_MIN_LENGTH
+        }
+    )
+    const searchInputRef = useRef()
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
-    const searchSuggestions = formatSuggestions(
-        searchSuggestion.results,
-        searchInputRef?.current?.value
+    const searchSuggestions = useMemo(
+        () => formatSuggestions(searchSuggestion.data, searchInputRef?.current?.value),
+        [searchSuggestion]
     )
 
     // check if popover should open if we have suggestions
     useEffect(() => {
         shouldOpenPopover()
-    }, [searchSuggestions])
-
-    // Want to make sure we clear the suggestions when we are deleting characters
-    useEffect(() => {
-        if (searchInputRef?.current?.value <= 2) {
-            searchSuggestion.clearSuggestedSearch()
-        }
-    }, [searchInputRef?.current?.value])
+    }, [searchQuery, searchSuggestion.data])
 
     const searchSuggestionsAvailable =
         searchSuggestions &&
@@ -116,18 +119,22 @@ const Search = (props) => {
         setSessionJSONItem(RECENT_SEARCH_KEY, searches)
     }
 
-    const debouncedSearch = debounce((input) => searchSuggestion.getSearchSuggestions(input), 300)
+    const debouncedSearch = debounce((input) => {
+        debouncedSearch.cancel()
+        setSearchQuery(input)
+    }, 300)
 
     const onSearchChange = async (e) => {
         const input = e.target.value
         if (input.length >= RECENT_SEARCH_MIN_LENGTH) {
             debouncedSearch(input)
+        } else {
+            setSearchQuery('')
         }
     }
 
     const clearInput = () => {
         searchInputRef.current.blur()
-        searchSuggestion.clearSuggestedSearch()
         setIsOpen(false)
     }
 

@@ -4,9 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-/* eslint-env jest */
-/* eslint max-nested-callbacks:0 */
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -48,7 +46,7 @@ const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
  * An HTTPS.Agent that allows self-signed certificates
  * @type {module:https.Agent}
  */
-export const httpsAgent = new https.Agent({
+const httpsAgent = new https.Agent({
     rejectUnauthorized: false
 })
 
@@ -99,7 +97,7 @@ describe('SSRServer Lambda integration', () => {
                 expect(contentType).toBeDefined()
                 expect(contentType.startsWith('text/html')).toBe(true)
                 expect(response.headers['content-encoding']).toBeFalsy()
-                expect(response.body.includes('<html>')).toBe(true)
+                expect(response.body).toContain('<html>')
             },
             route: (req, res) => {
                 res.send('<html></html>')
@@ -111,7 +109,7 @@ describe('SSRServer Lambda integration', () => {
             validate: (response) => {
                 expect(response.statusCode).toBe(200)
                 expect(response.isBase64Encoded).toBe(true)
-                expect(response.headers['content-type']).toEqual('image/png')
+                expect(response.headers['content-type']).toBe('image/png')
                 expect(response.headers['content-encoding']).toBeFalsy()
                 const data = Buffer.from(response.body, 'base64')
                 expect(data).toEqual(fakeBinaryPayload)
@@ -129,8 +127,8 @@ describe('SSRServer Lambda integration', () => {
                 expect(response.isBase64Encoded).toBe(true)
                 const headers = response.headers
                 expect(headers).toBeDefined()
-                expect(headers['content-type']).toEqual('image/png')
-                expect(headers['content-encoding']).toEqual('gzip')
+                expect(headers['content-type']).toBe('image/png')
+                expect(headers['content-encoding']).toBe('gzip')
                 const data = Buffer.from(response.body, 'base64')
                 const unzipped = zlib.gunzipSync(data)
                 expect(unzipped).toEqual(fakeBinaryPayload)
@@ -154,7 +152,7 @@ describe('SSRServer Lambda integration', () => {
                 const contentType = headers['content-type']
                 expect(contentType).toBeDefined()
                 expect(contentType.startsWith('text/plain')).toBe(true)
-                expect(headers['content-encoding']).toEqual('gzip')
+                expect(headers['content-encoding']).toBe('gzip')
                 const data = Buffer.from(response.body, 'base64')
                 const unzipped = zlib.gunzipSync(data)
                 expect(unzipped).toEqual(fakeBinaryPayload)
@@ -230,7 +228,7 @@ describe('SSRServer Lambda integration', () => {
     ]
 
     lambdaTestCases.forEach((testCase) =>
-        test(testCase.name, () => {
+        test(`${testCase.name}`, () => {
             const options = {
                 buildDir: testFixtures,
                 mainFilename: 'main-big.js',
@@ -421,8 +419,8 @@ describe('SSRServer Lambda integration', () => {
             .then((response) => {
                 // First request - Lambda container created
                 expect(response.statusCode).toBe(200)
-                expect(collectGarbage.mock.calls.length).toBe(0)
-                expect(route.mock.calls.length).toBe(1)
+                expect(collectGarbage.mock.calls).toHaveLength(0)
+                expect(route.mock.calls).toHaveLength(1)
                 expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
                 expect(sendMetric).not.toHaveBeenCalledWith('LambdaReused')
             })
@@ -430,8 +428,8 @@ describe('SSRServer Lambda integration', () => {
             .then((response) => {
                 // Second call - Lambda container reused
                 expect(response.statusCode).toBe(200)
-                expect(collectGarbage.mock.calls.length).toBe(1)
-                expect(route.mock.calls.length).toBe(2)
+                expect(collectGarbage.mock.calls).toHaveLength(1)
+                expect(route.mock.calls).toHaveLength(2)
                 expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
                 expect(sendMetric).toHaveBeenCalledWith('LambdaReused')
             })

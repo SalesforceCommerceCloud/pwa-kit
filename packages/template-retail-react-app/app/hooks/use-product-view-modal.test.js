@@ -12,11 +12,19 @@ import {screen, fireEvent, waitFor} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
 import {IntlProvider} from 'react-intl'
 
-import mockProductDetail from '../commerce-api/mocks/variant-750518699578M'
+import mockProductDetail from '../mocks/variant-750518699578M'
 import {useProductViewModal} from './use-product-view-modal'
 import {DEFAULT_LOCALE, renderWithProviders} from '../utils/test-utils'
 import messages from '../translations/compiled/en-GB.json'
 import {rest} from 'msw'
+
+jest.mock('commerce-sdk-react-preview', () => {
+    const originalModule = jest.requireActual('commerce-sdk-react-preview')
+    return {
+        ...originalModule,
+        useProduct: jest.fn().mockReturnValue({isFetching: false})
+    }
+})
 
 const mockProduct = {
     ...mockProductDetail,
@@ -64,7 +72,7 @@ beforeEach(() => {
 })
 
 describe('useProductViewModal hook', () => {
-    test('return proper data', () => {
+    test('return proper data', async () => {
         const history = createMemoryHistory()
         history.push('/test/path')
         renderWithProviders(<MockComponent product={mockProductDetail} />)
@@ -73,7 +81,7 @@ describe('useProductViewModal hook', () => {
         fireEvent.click(toggleButton)
 
         expect(screen.getByText('750518699578M')).toBeInTheDocument()
-        expect(screen.getByText(/isFetching: false/i)).toBeInTheDocument()
+        expect(await screen.getByText(/isFetching: false/i)).toBeInTheDocument()
         expect(screen.getByTestId('variant')).toHaveTextContent(
             '{"orderable":true,"price":299.99,"productId":"750518699578M","variationValues":{"color":"BLACKFB","size":"038","width":"V"}}'
         )
@@ -98,9 +106,9 @@ describe('useProductViewModal hook', () => {
         fireEvent.click(toggleButton)
         expect(history.location.pathname).toBe('/test/path')
         const searchParams = new URLSearchParams(history.location.search)
-        expect(searchParams.get('color')).toEqual('BLACKFB')
-        expect(searchParams.get('width')).toEqual('V')
-        expect(searchParams.get('pid')).toEqual('750518699578M')
+        expect(searchParams.get('color')).toBe('BLACKFB')
+        expect(searchParams.get('width')).toBe('V')
+        expect(searchParams.get('pid')).toBe('750518699578M')
     })
 
     test("clean up product's related url param when unmounting product content", () => {
@@ -127,9 +135,9 @@ describe('useProductViewModal hook', () => {
         fireEvent.click(toggleButton)
         const searchParams = new URLSearchParams(history.location.search.toString())
         waitFor(() => {
-            expect(searchParams.get('color')).toEqual(undefined)
-            expect(searchParams.get('width')).toEqual(undefined)
-            expect(searchParams.get('pid')).toEqual(undefined)
+            expect(searchParams.get('color')).toBeUndefined()
+            expect(searchParams.get('width')).toBeUndefined()
+            expect(searchParams.get('pid')).toBeUndefined()
         })
     })
 

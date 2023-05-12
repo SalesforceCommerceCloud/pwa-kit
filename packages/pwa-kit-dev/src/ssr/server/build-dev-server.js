@@ -26,8 +26,7 @@ import {
     REQUEST_PROCESSOR
 } from '../../configs/webpack/config-names'
 import {randomUUID} from 'crypto'
-
-const chalk = require('chalk')
+import chalk from 'chalk'
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -54,7 +53,8 @@ export const DevServerMixin = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _getDefaultCacheControl(options) {
         return NO_CACHE
     },
@@ -107,7 +107,8 @@ export const DevServerMixin = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
         proxyConfigs.forEach((config) => {
             app.use(config.proxyPath, config.proxy)
@@ -122,6 +123,7 @@ export const DevServerMixin = {
         // This is separated out because these routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
 
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         let config = require('../../configs/webpack/config')
 
         const projectWebpackPath = path.resolve(app.options.projectDir, 'webpack.config.js')
@@ -266,7 +268,8 @@ export const DevServerMixin = {
     /**
      * @private
      */
-    // eslint-disable-next-line no-unused-vars
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _redirectToLoadingScreen(req, res, next) {
         res.redirect('/__mrt/loading-screen/index.html?loading=1')
     },

@@ -8,7 +8,6 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Box, Flex, Button, Stack, Text, Heading, Divider} from '@chakra-ui/react'
-import useBasket from '../../commerce-api/hooks/useBasket'
 import {BasketIcon, ChevronDownIcon, ChevronUpIcon} from '../icons'
 import Link from '../link'
 import {PromoCode, usePromoCode} from '../promo-code'
@@ -18,9 +17,31 @@ import CartItemVariantName from '../item-variant/item-name'
 import CartItemVariantAttributes from '../item-variant/item-attributes'
 import CartItemVariantPrice from '../item-variant/item-price'
 import PromoPopover from '../promo-popover'
+import {useProducts} from 'commerce-sdk-react-preview'
 
 const CartItems = ({basket}) => {
-    basket = basket || useBasket()
+    const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
+    const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
+    const {data: products} = useProducts(
+        {
+            parameters: {
+                ids: productIds,
+                allImages: true
+            }
+        },
+        {
+            enabled: Boolean(productIds),
+            select: (result) => {
+                // Convert array into key/value object with key is the product id
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
+
     const [cartItemsExpanded, setCartItemsExpanded] = useState(false)
 
     return (
@@ -36,7 +57,7 @@ const CartItems = ({basket}) => {
                         id="order_summary.cart_items.action.num_of_items_in_cart"
                         description="clicking it would expand/show the items in cart"
                         defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart"
-                        values={{itemCount: basket.itemAccumulatedCount}}
+                        values={{itemCount: totalItems}}
                     />
                 </Button>
             </Box>
@@ -46,8 +67,7 @@ const CartItems = ({basket}) => {
                     {basket.productItems?.map((product, idx) => {
                         const variant = {
                             ...product,
-                            ...(basket._productItemsDetail &&
-                                basket._productItemsDetail[product.productId]),
+                            ...(products && products[product.productId]),
                             price: product.price
                         }
                         return (
@@ -91,15 +111,13 @@ const OrderSummary = ({
     isEstimate = false,
     fontSize = 'md'
 }) => {
-    basket = basket || useBasket()
-
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
-    const shippingItem = basket.shippingItems?.[0]
-    const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
-    if (!basket.basketId && !basket.orderNo) {
+    if (!basket?.basketId && !basket?.orderNo) {
         return null
     }
+    const shippingItem = basket.shippingItems?.[0]
+    const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
     return (
         <Stack data-testid="sf-order-summary" spacing={5}>

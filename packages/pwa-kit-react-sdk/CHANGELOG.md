@@ -1,3 +1,7 @@
+## v3.0.0-dev (May 12, 2023)
+
+-   Remove usage of `device-context` due to deprecation of user agent string. [#1168](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1168)
+
 ## v2.7.1 (May 11, 2023)
 
 -   Fix `multi-value` params being lost [#1150](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1150)

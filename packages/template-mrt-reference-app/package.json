@@ -1,48 +1,48 @@
 {
-    "name": "template-mrt-reference-app",
-    "version": "2.7.2-dev",
-    "engines": {
-        "node": "^14.0.0 || ^16.0.0",
-        "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+  "name": "template-mrt-reference-app",
+  "version": "3.0.0-dev",
+  "private": true,
+  "license": "See license in LICENSE",
+  "scripts": {
+    "build": "pwa-kit-dev build",
+    "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
+    "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
+    "lint:fix": "npm run lint -- --fix",
+    "push": "npm run build && pwa-kit-dev push",
+    "save-credentials": "pwa-kit-dev save-credentials",
+    "start": "pwa-kit-dev start",
+    "tail-logs": "pwa-kit-dev tail-logs",
+    "test": "pwa-kit-dev test"
+  },
+  "devDependencies": {
+    "@loadable/component": "^5.15.0",
+    "cross-fetch": "^3.1.4",
+    "express-basic-auth": "^1.2.0",
+    "pwa-kit-dev": "3.0.0-dev",
+    "pwa-kit-runtime": "3.0.0-dev",
+    "supertest": "^4.0.2"
+  },
+  "engines": {
+    "node": "^16.0.0 || ^18.0.0",
+    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+  },
+  "mobify": {
+    "ssrEnabled": true,
+    "ssrParameters": {
+      "ssrFunctionNodeVersion": "16.x",
+      "proxyConfigs": [
+        {
+          "host": "httpbin.org",
+          "path": "httpbin"
+        }
+      ]
     },
-    "license": "See license in LICENSE",
-    "private": true,
-    "devDependencies": {
-        "@loadable/component": "^5.15.0",
-        "cross-fetch": "^3.1.4",
-        "express-basic-auth": "^1.2.0",
-        "pwa-kit-dev": "^2.7.2-dev",
-        "pwa-kit-runtime": "^2.7.2-dev",
-        "supertest": "^4.0.2"
-    },
-    "scripts": {
-        "test": "pwa-kit-dev test",
-        "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
-        "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
-        "lint:fix": "npm run lint -- --fix",
-        "start": "pwa-kit-dev start",
-        "build": "pwa-kit-dev build",
-        "push": "npm run build && pwa-kit-dev push",
-        "save-credentials": "pwa-kit-dev save-credentials",
-        "tail-logs": "pwa-kit-dev tail-logs"
-    },
-    "mobify": {
-        "ssrEnabled": true,
-        "ssrParameters": {
-            "ssrFunctionNodeVersion": "16.x",
-            "proxyConfigs": [
-                {
-                    "host": "httpbin.org",
-                    "path": "httpbin"
-                }
-            ]
-        },
-        "ssrOnly": [
-            "ssr.js",
-            "node_modules/**/*.*"
-        ],
-        "ssrShared": [
-            "intentionally-does-not-exist"
-        ]
-    }
+    "ssrOnly": [
+      "ssr.js",
+      "node_modules/**/*.*"
+    ],
+    "ssrShared": [
+      "intentionally-does-not-exist"
+    ]
+  }
 }

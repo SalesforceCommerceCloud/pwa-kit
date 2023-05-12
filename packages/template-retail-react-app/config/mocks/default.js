@@ -75,7 +75,7 @@ module.exports = {
             }
         },
         einsteinAPI: {
-            host: 'localhost:7777',
+            host: 'http://localhost:7777',
             einsteinId: '11111111',
             // This differs from the siteId in commerceAPIConfig for testing purposes
             siteId: 'EinsteinTestSite',

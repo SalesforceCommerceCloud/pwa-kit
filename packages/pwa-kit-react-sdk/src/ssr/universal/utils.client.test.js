@@ -27,9 +27,9 @@ describe('getAssetUrl (client-side)', () => {
         delete global.Progressive
     })
     test('should return build origin when path is undefined', () => {
-        expect(utils.getAssetUrl()).toEqual('test.com')
+        expect(utils.getAssetUrl()).toBe('test.com')
     })
     test('should return origin + path', () => {
-        expect(utils.getAssetUrl('/path')).toEqual('test.com/path')
+        expect(utils.getAssetUrl('/path')).toBe('test.com/path')
     })
 })

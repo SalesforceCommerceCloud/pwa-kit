@@ -11,7 +11,7 @@ import ProductViewModal from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {fireEvent, screen} from '@testing-library/react'
 import {useDisclosure} from '@chakra-ui/react'
-import mockProductDetail from '../../commerce-api/mocks/variant-750518699578M'
+import mockProductDetail from '../../mocks/variant-750518699578M'
 
 const MockComponent = ({updateCart}) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -43,7 +43,7 @@ test('renders product view modal by default', () => {
     const trigger = screen.getByText(/open modal/i)
     fireEvent.click(trigger)
 
-    expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i).length).toEqual(2)
+    expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
 })
 
 test('renders product view modal with handleUpdateCart handler', () => {

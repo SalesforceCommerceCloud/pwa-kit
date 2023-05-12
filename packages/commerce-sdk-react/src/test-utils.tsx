@@ -38,8 +38,9 @@ export const createQueryClient = () => {
     return new QueryClient({
         logger: {
             ...console,
-            // Disable error logs as we intentionally cause errors during tests
-            error() {} // eslint-disable-line @typescript-eslint/no-empty-function
+            error() {
+                // Disable error logs as we intentionally cause errors during tests
+            }
         },
         // During testing, we want things to fail immediately
         defaultOptions: {queries: {retry: false}, mutations: {retry: false}}
@@ -72,7 +73,6 @@ export const renderWithProviders = (
     options?: Omit<RenderOptions, 'wrapper'>
 ): void => {
     render(children, {
-        // eslint-disable-next-line react/display-name
         wrapper: ({children}: {children?: React.ReactNode}) => (
             <TestProviders {...props}>{children}</TestProviders>
         ),
@@ -92,7 +92,6 @@ export function renderHookWithProviders<TProps, TResult>(
     props?: TestProviderProps
 ) {
     return renderHook(callback, {
-        // eslint-disable-next-line react/display-name
         wrapper: ({children}: {children?: React.ReactNode}) => (
             <TestProviders {...props}>{children}</TestProviders>
         )
@@ -160,7 +159,7 @@ const getQueryName = (method: string): string => {
  * Gets the list of API endpoints that have not yet been implemented
  * @param SdkClass Class constructor from commerce-sdk-isomorphic to use as a source for endpoints
  * @param queryHooks Object containing implemented query hooks
- * @param mutationsEnum Enum containing mutation endpoint names
+ * @param mutations Enum containing mutation endpoint names
  * @returns List of endpoints that don't have a query or mutation hook
  */
 export const getUnimplementedEndpoints = (

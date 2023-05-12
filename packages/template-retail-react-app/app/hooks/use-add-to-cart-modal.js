@@ -24,7 +24,7 @@ import {
     Stack,
     useBreakpointValue
 } from '@chakra-ui/react'
-import useBasket from '../commerce-api/hooks/useBasket'
+import {useCurrentBasket} from './use-current-basket'
 import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
@@ -58,10 +58,13 @@ export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, itemsAdded = []} = data || {}
     const intl = useIntl()
-    const basket = useBasket()
+    const {
+        data: basket = {},
+        derivedData: {totalItems}
+    } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const {currency, productItems, productSubTotal} = basket
-    const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
+    const numerOfItemsAdded = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     if (!isOpen) {
         return null
@@ -83,7 +86,7 @@ export const AddToCartModal = () => {
                                 '{quantity} {quantity, plural, one {item} other {items}} added to cart',
                             id: 'add_to_cart_modal.info.added_to_cart'
                         },
-                        {quantity: totalQuantity}
+                        {quantity: numerOfItemsAdded}
                     )}
                 </ModalHeader>
                 <ModalCloseButton />
@@ -188,7 +191,7 @@ export const AddToCartModal = () => {
                                                 'Cart Subtotal ({itemAccumulatedCount} item)',
                                             id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
-                                        {itemAccumulatedCount: totalQuantity}
+                                        {itemAccumulatedCount: totalItems}
                                     )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
@@ -253,7 +256,7 @@ export const AddToCartModal = () => {
                                     defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)',
                                     id: 'add_to_cart_modal.label.cart_subtotal'
                                 },
-                                {itemAccumulatedCount: totalQuantity}
+                                {itemAccumulatedCount: totalItems}
                             )}
                         </Text>
                         <Text alignSelf="flex-end" fontWeight="600">

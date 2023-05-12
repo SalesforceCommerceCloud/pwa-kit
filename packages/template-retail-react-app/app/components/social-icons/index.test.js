@@ -25,6 +25,6 @@ describe('Social Icons Component', () => {
         const links = document.querySelectorAll('button')
         // click the first link
         fireEvent.click(links[0])
-        expect(global.open).toBeCalled()
+        expect(global.open).toHaveBeenCalled()
     })
 })

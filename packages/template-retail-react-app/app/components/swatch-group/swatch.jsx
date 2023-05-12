@@ -38,6 +38,7 @@ const Swatch = (props) => {
             }}
             aria-checked={selected}
             variant="outline"
+            role="radio"
         >
             <Center {...styles.swatchButton}>
                 {children}

@@ -54,6 +54,7 @@ export const getConfig = (opts = {}) => {
         'package.json'
     ]
 
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const {cosmiconfigSync} = require('cosmiconfig')
 
     // Match config files based on the specificity from most to most general.

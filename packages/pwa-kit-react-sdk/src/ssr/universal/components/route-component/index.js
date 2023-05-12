@@ -56,10 +56,11 @@ const withErrorHandling = (Wrapped) => {
  */
 export const routeComponent = (Wrapped, isPage, locals) => {
     const AppConfig = getAppConfig()
-    const extraArgs = AppConfig.extraGetPropsArgs(locals)
 
     const hocs = AppConfig.getHOCsInUse()
     const getPropsEnabled = hocs.indexOf(withLegacyGetProps) >= 0
+
+    const extraArgs = getPropsEnabled ? AppConfig.extraGetPropsArgs(locals) : {}
 
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
@@ -159,7 +160,6 @@ export const routeComponent = (Wrapped, isPage, locals) => {
          *
          * @return {Promise<Object>}
          */
-        // eslint-disable-next-line
         static getProps(args) {
             if (!getPropsEnabled) {
                 return Promise.resolve({})

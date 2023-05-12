@@ -133,18 +133,7 @@ describe('Auth', () => {
         expect(newAuth.get('access_token')).not.toBe('123')
         expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
-    test('isTokenExpired', () => {
-        const auth = new Auth(config)
-        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
-        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
-        // @ts-expect-error private method
-        expect(auth.isTokenExpired(JWTNotExpired)).toBe(false)
-        // @ts-expect-error private method
-        expect(auth.isTokenExpired(JWTExpired)).toBe(true)
-        // @ts-expect-error private method
-        expect(() => auth.isTokenExpired()).toThrow()
-    })
-    test('ready - re-use pendingToken', () => {
+    test('ready - re-use pendingToken', async () => {
         const auth = new Auth(config)
         const data = {
             refresh_token: 'refresh_token_guest',
@@ -161,14 +150,15 @@ describe('Auth', () => {
         // @ts-expect-error private method
         auth.pendingToken = Promise.resolve(data)
 
-        expect(auth.ready()).resolves.toEqual(data)
+        await expect(auth.ready()).resolves.toEqual(data)
     })
-    test('ready - re-use valid access token', () => {
+    test('ready - re-use valid access token', async () => {
         const auth = new Auth(config)
+        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
 
         const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
-            access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret'),
+            access_token: JWTNotExpired,
             customer_id: 'customer_id',
             enc_user_id: 'enc_user_id',
             expires_in: 1800,
@@ -187,7 +177,9 @@ describe('Auth', () => {
             auth.set(key, data[key])
         })
 
-        expect(auth.ready()).resolves.toEqual(result)
+        await expect(auth.ready()).resolves.toEqual(result)
+        // @ts-expect-error private method
+        expect(auth.pendingToken).toBeUndefined()
     })
     test('ready - use `fetchedToken` and short circuit network request', async () => {
         const fetchedToken = jwt.sign(
@@ -200,7 +192,11 @@ describe('Auth', () => {
         const auth = new Auth({...config, fetchedToken})
         jest.spyOn(auth, 'queueRequest')
         await auth.ready()
+        // The "unbound method" isn't being called, so the rule isn't applicable
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(auth.queueRequest).not.toHaveBeenCalled()
+        // @ts-expect-error private method
+        expect(auth.pendingToken).toBeUndefined()
     })
     test('ready - use `fetchedToken` and auth data is populated for registered user', async () => {
         const usid = 'usidddddd'
@@ -239,10 +235,13 @@ describe('Auth', () => {
     })
     test('ready - use refresh token when access token is expired', async () => {
         const auth = new Auth(config)
+        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
+        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
 
+        // To simulate real-world scenario, let's first test with a good valid token
         const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
-            access_token: jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret'),
+            access_token: JWTNotExpired,
             customer_id: 'customer_id',
             enc_user_id: 'enc_user_id',
             expires_in: 1800,
@@ -252,9 +251,6 @@ describe('Auth', () => {
             usid: 'usid',
             customer_type: 'guest'
         }
-        // Convert stored format to exposed format
-        const result = {...data, refresh_token: 'refresh_token_guest'}
-        delete result.refresh_token_guest
 
         Object.keys(data).forEach((key) => {
             // @ts-expect-error private method
@@ -262,30 +258,37 @@ describe('Auth', () => {
         })
 
         await auth.ready()
-        expect(helpers.refreshAccessToken).toBeCalled()
+        expect(helpers.refreshAccessToken).not.toHaveBeenCalled()
+
+        // And then now test with an _expired_ token
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).toHaveBeenCalled()
     })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
 
         await auth.ready()
-        expect(helpers.loginGuestUser).toBeCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
     test('loginGuestUser', async () => {
         const auth = new Auth(config)
         await auth.loginGuestUser()
-        expect(helpers.loginGuestUser).toBeCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
     test('loginRegisteredUserB2C', async () => {
         const auth = new Auth(config)
         await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
-        expect(helpers.loginRegisteredUserB2C).toBeCalled()
+        expect(helpers.loginRegisteredUserB2C).toHaveBeenCalled()
     })
     test('logout', async () => {
         const auth = new Auth(config)
         await auth.logout()
-        expect(helpers.loginGuestUser).toBeCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
-    test('running on the server uses a shared context memory store', async () => {
+    test('running on the server uses a shared context memory store', () => {
         const refreshTokenGuest = 'guest'
 
         // Mock running on the server so shared context storage is used.

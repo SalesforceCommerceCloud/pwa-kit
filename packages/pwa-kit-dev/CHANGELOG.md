@@ -1,3 +1,4 @@
+## v3.0.0-dev (May 12, 2023)
 ## v2.7.1 (May 11, 2023)
 
 -   Fix static file serving [#1196](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1196)

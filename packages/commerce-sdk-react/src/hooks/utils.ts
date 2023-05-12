@@ -17,6 +17,8 @@ import {
 /** Applies the set of cache updates to the query client. */
 export const updateCache = (queryClient: QueryClient, cacheUpdates: CacheUpdate, data: unknown) => {
     cacheUpdates.invalidate?.forEach((invalidate) => {
+        // TODO: Fix floating promises (convert updateCache to async)
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         queryClient.invalidateQueries(invalidate)
     })
     cacheUpdates.remove?.forEach((remove) => {
@@ -120,3 +122,11 @@ export const omitNullableParameters = <T extends {parameters: object}>(
     // the connection to `T` is lost, and TypeScript complains.
     parameters: omitNullable<T['parameters']>(obj.parameters)
 })
+
+/** Simple deep clone utility */
+export const clone = <T>(val: T): T => {
+    if (typeof val !== 'object' || val === null) return val
+    if (Array.isArray(val)) return val.map(clone) as T
+    const entries = Object.entries(val).map(([k, v]) => [k, clone(v)])
+    return Object.fromEntries(entries) as T
+}

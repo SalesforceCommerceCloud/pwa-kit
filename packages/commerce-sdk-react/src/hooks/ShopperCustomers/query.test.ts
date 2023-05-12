@@ -14,9 +14,9 @@ import {
 import * as queries from './query'
 
 jest.mock('../../auth/index.ts', () => {
-    return jest.fn().mockImplementation(() => ({
-        ready: jest.fn().mockResolvedValue({access_token: 'access_token'})
-    }))
+    const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
+    mockAuth.prototype.ready = jest.fn().mockResolvedValue({access_token: 'access_token'})
+    return mockAuth
 })
 
 type Queries = typeof queries
@@ -66,7 +66,7 @@ const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof
 describe('Shopper Customers query hooks', () => {
     beforeEach(() => nock.cleanAll())
     afterEach(() => {
-        expect(nock.pendingMocks().length).toBe(0)
+        expect(nock.pendingMocks()).toHaveLength(0)
     })
     test.each(testCases)('`%s` returns data on success', async (queryName, data) => {
         mockQueryEndpoint(customersEndpoint, data)
@@ -76,6 +76,7 @@ describe('Shopper Customers query hooks', () => {
         await waitAndExpectSuccess(wait, () => result.current)
         expect(result.current.data).toEqual(data)
     })
+    // eslint-disable-next-line jest/expect-expect
     test.each(testCases)('`%s` returns error on error', async (queryName) => {
         mockQueryEndpoint(customersEndpoint, {}, 400)
         const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {

@@ -9,6 +9,9 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {getRoutes, routeComponent} from './index'
 
+// TODO: The way mocks are set up in this file is kinda weird...
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const delay = (t) => new Promise((resolve) => setTimeout(resolve, t))
 
 /**
@@ -112,8 +115,8 @@ describe('The routeComponent component', () => {
         const Mock = getMockComponent()
         const Component = routeComponent(Mock)
         Component.displayName = 'routeComponent'
-        expect(Mock.shouldGetProps.mock.calls.length).toBe(0)
-        expect(Mock.getProps.mock.calls.length).toBe(0)
+        expect(Mock.shouldGetProps.mock.calls).toHaveLength(0)
+        expect(Mock.getProps.mock.calls).toHaveLength(0)
         let wrapper
 
         return Promise.resolve()
@@ -133,8 +136,8 @@ describe('The routeComponent component', () => {
                 })
             })
             .then(() => {
-                expect(Mock.shouldGetProps.mock.calls.length).toBe(0)
-                expect(Mock.getProps.mock.calls.length).toBe(0)
+                expect(Mock.shouldGetProps.mock.calls).toHaveLength(0)
+                expect(Mock.getProps.mock.calls).toHaveLength(0)
             })
             .then(() => {
                 // Mock Hydrating Complete
@@ -150,8 +153,8 @@ describe('The routeComponent component', () => {
                 })
             })
             .then(() => {
-                expect(Mock.shouldGetProps.mock.calls.length).toBe(1)
-                expect(Mock.getProps.mock.calls.length).toBe(1)
+                expect(Mock.shouldGetProps.mock.calls).toHaveLength(1)
+                expect(Mock.getProps.mock.calls).toHaveLength(1)
             })
     })
 
@@ -170,7 +173,7 @@ describe('The routeComponent component', () => {
                 expect(v).toBe(true)
             ),
             Component.getTemplateName().then((v) => expect(v).toBe('ComponentWithoutStatics')),
-            Component.getProps().then((result) => expect(result).toBe(undefined))
+            Component.getProps().then((result) => expect(result).toBeUndefined())
         ]
         expect.assertions(checks.length)
         return Promise.all(checks)
@@ -270,7 +273,7 @@ describe('The routeComponent component', () => {
 describe('getRoutes', () => {
     test('wraps components with the routeComponent HOC', () => {
         const mappedRoutes = getRoutes()
-        expect(mappedRoutes.length).toBe(2)
+        expect(mappedRoutes).toHaveLength(2)
         const [first, second] = mappedRoutes
         const expectedName = 'WithErrorHandling(withRouter(routeComponent(Component)))'
         expect(first.component.displayName).toBe(expectedName)
@@ -329,7 +332,7 @@ describe('Handles race conditions for getProps', () => {
         })
         await Promise.all([p1, p2])
 
-        expect(MockComponent.getProps.mock.calls.length).toBe(2)
+        expect(MockComponent.getProps.mock.calls).toHaveLength(2)
         expect(render).not.toHaveBeenCalledWith(1)
         expect(render).toHaveBeenCalledWith(2)
     })

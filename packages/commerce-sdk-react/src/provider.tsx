@@ -20,7 +20,6 @@ import {
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -77,7 +76,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientId,
             organizationId,
             shortCode,
-            siteId
+            siteId,
+            locale,
+            currency
         },
         throwOnBadResponse: true,
         fetchOptions
@@ -102,6 +103,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         proxy,
         fetchOptions,
+        locale,
+        currency,
         headers?.['correlation-id']
     ])
 
@@ -127,9 +130,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchedToken
     ])
 
-    useEffect(() => {
-        auth.ready()
-    }, [auth])
+    // Initialize the session
+    useEffect(() => void auth.ready(), [auth])
 
     return (
         <ConfigContext.Provider
@@ -149,7 +151,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             <CommerceApiContext.Provider value={apiClients}>
                 <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
             </CommerceApiContext.Provider>
-            <ReactQueryDevtools />
         </ConfigContext.Provider>
     )
 }

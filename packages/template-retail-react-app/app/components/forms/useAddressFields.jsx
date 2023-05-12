@@ -81,7 +81,7 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             },
             error: errors[`${prefix}phone`],
             inputProps: ({onChange}) => ({
-                inputmode: 'numeric',
+                inputMode: 'numeric',
                 onChange(evt) {
                     onChange(formatPhoneNumber(evt.target.value))
                 }

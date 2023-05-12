@@ -5,25 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import mockProductDetail from '../../commerce-api/mocks/variant-750518699578M'
-import mockProductSet from '../../commerce-api/mocks/product-set-winter-lookM'
+import mockProductDetail from '../../mocks/variant-750518699578M'
+import mockProductSet from '../../mocks/product-set-winter-lookM'
 import ProductView from './index'
 import {renderWithProviders} from '../../utils/test-utils'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import userEvent from '@testing-library/user-event'
-
-jest.mock('../../commerce-api/einstein')
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 const MockComponent = (props) => {
-    const customer = useCustomer()
-    useEffect(() => {
-        if (!customer.isRegistered) {
-            customer.login('customer@test.com', 'password1')
-        }
-    }, [])
+    const {data: customer} = useCurrentCustomer()
     return (
         <div>
             <div>customer: {customer?.authType}</div>
@@ -41,13 +34,12 @@ MockComponent.propTypes = {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
-
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', '/en/account')
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
     sessionStorage.clear()
 })
@@ -56,11 +48,11 @@ test('ProductView Component renders properly', async () => {
     const addToCart = jest.fn()
     await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
 
-    expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i).length).toEqual(2)
-    expect(screen.getAllByText(/299.99/).length).toEqual(2)
-    expect(screen.getAllByText(/Add to cart/i).length).toEqual(2)
-    expect(screen.getAllByRole('radiogroup').length).toEqual(3)
-    expect(screen.getAllByText(/add to cart/i).length).toEqual(2)
+    expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
+    expect(screen.getAllByText(/299.99/)).toHaveLength(2)
+    expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
+    expect(screen.getAllByRole('radiogroup')).toHaveLength(3)
+    expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
 })
 
 test('ProductView Component renders with addToCart event handler', async () => {
@@ -155,8 +147,8 @@ test('renders a product set properly - parent item', () => {
     expect(addSetToWishlistButton).toBeInTheDocument()
 
     // What should _not_ exist:
-    expect(variationAttributes.length).toEqual(0)
-    expect(quantityPicker).toBe(null)
+    expect(variationAttributes).toHaveLength(0)
+    expect(quantityPicker).toBeNull()
 })
 
 test('renders a product set properly - child item', () => {
@@ -177,11 +169,11 @@ test('renders a product set properly - child item', () => {
     // What should exist:
     expect(addToCartButton).toBeInTheDocument()
     expect(addToWishlistButton).toBeInTheDocument()
-    expect(variationAttributes.length).toEqual(2)
+    expect(variationAttributes).toHaveLength(2)
     expect(quantityPicker).toBeInTheDocument()
 
     // What should _not_ exist:
-    expect(startingAtLabels.length).toEqual(0)
+    expect(startingAtLabels).toHaveLength(0)
 })
 
 test('validateOrderability callback is called when adding a set to cart', async () => {
@@ -218,7 +210,7 @@ test('onVariantSelected callback is called after successfully selected a variant
         />
     )
 
-    const size = screen.getByRole('link', {name: /xl/i})
+    const size = screen.getByRole('radio', {name: /xl/i})
     userEvent.click(size)
 
     await waitFor(() => {

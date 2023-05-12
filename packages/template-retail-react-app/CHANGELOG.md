@@ -1,3 +1,7 @@
+## v3.0.0-dev
+- Add app `above-header` and product-list `above-page-header` convenience components [#1183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1183)
+- Remove `cross-fetch` dependency [#1160](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1160)
+
 ## v2.7.1 (May 11, 2023)
 
 -   Replace invalid row value with nowrap [#1179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1179)

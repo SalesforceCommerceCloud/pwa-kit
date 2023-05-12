@@ -6,7 +6,7 @@
  */
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
     Button,
@@ -20,7 +20,17 @@ import {
     useDisclosure,
     useToast
 } from '@chakra-ui/react'
-import useCustomer from '../commerce-api/hooks/useCustomer'
+import {
+    AuthHelpers,
+    useAuthHelper,
+    useCustomer,
+    useCustomerId,
+    useCustomerType,
+    useCustomerBaskets,
+    useShopperCustomersMutation,
+    useShopperBasketsMutation,
+    ShopperCustomersMutations
+} from 'commerce-sdk-react-preview'
 import {BrandLogo} from '../components/icons'
 import LoginForm from '../components/login'
 import ResetPasswordForm from '../components/reset-password'
@@ -28,79 +38,138 @@ import RegisterForm from '../components/register'
 import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
 import useNavigation from './use-navigation'
-
+import {usePrevious} from './use-previous'
+import {isServer} from '../utils/utils'
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
 const PASSWORD_VIEW = 'password'
+
+const LOGIN_ERROR = defineMessage({
+    defaultMessage: "Something's not right with your email or password. Try again.",
+    id: 'auth_modal.error.incorrect_email_or_password'
+})
 
 export const AuthModal = ({
     initialView = LOGIN_VIEW,
     onLoginSuccess = noop,
     onRegistrationSuccess = noop,
-    onPasswordResetSuccess = noop,
+    isOpen,
+    onOpen,
+    onClose,
     ...props
 }) => {
     const {formatMessage} = useIntl()
-    const customer = useCustomer()
+    const customerId = useCustomerId()
+    const {isRegistered, customerType} = useCustomerType()
+    const prevAuthType = usePrevious(customerType)
+
+    const customer = useCustomer(
+        {parameters: {customerId}},
+        {enabled: !!customerId && isRegistered}
+    )
+
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
     const submittedEmail = useRef()
     const toast = useToast()
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const register = useAuthHelper(AuthHelpers.Register)
+
+    const getResetPasswordToken = useShopperCustomersMutation(
+        ShopperCustomersMutations.GetResetPasswordToken
+    )
+
+    const {data: baskets} = useCustomerBaskets(
+        {parameters: {customerId}},
+        {enabled: !!customerId && !isServer, keepPreviousData: true}
+    )
+    const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
     const submitForm = async (data) => {
         form.clearErrors()
 
-        return {
-            login: handleLogin,
-            register: handleRegister,
-            password: handleResetPassword
-        }[currentView](data)
-    }
-
-    const handleLogin = async (data) => {
-        try {
-            await customer.login(data)
-        } catch (error) {
-            const message = /invalid credentials/i.test(error.message)
-                ? formatMessage({
-                      defaultMessage:
-                          "Something's not right with your email or password. Try again.",
-                      id: 'auth_modal.error.incorrect_email_or_password'
-                  })
-                : formatMessage(API_ERROR_MESSAGE)
-            form.setError('global', {type: 'manual', message})
-        }
-    }
-
-    const handleRegister = async (data) => {
-        try {
-            await customer.registerCustomer(data)
+        const onLoginSuccess = () => {
             navigate('/account')
-        } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
         }
-    }
 
-    const handleResetPassword = async ({email}) => {
-        try {
-            await customer.getResetPasswordToken(email)
-            // Execute action to be perfromed on successful passoword reset
-            await onPasswordResetSuccess()
-            submittedEmail.current = email
-        } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
-        }
+        return {
+            login: async (data) => {
+                try {
+                    await login.mutateAsync({
+                        username: data.email,
+                        password: data.password
+                    })
+                    const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
+                    // we only want to merge basket when the user is logged in as a recurring user
+                    // only recurring users trigger the login mutation, new user triggers register mutation
+                    // this logic needs to stay in this block because this is the only place that tells if a user is a recurring user
+                    // if you change logic here, also change it in login page
+                    const shouldMergeBasket = hasBasketItem && prevAuthType === 'guest'
+                    if (shouldMergeBasket) {
+                        mergeBasket.mutate({
+                            headers: {
+                                // This is not required since the request has no body
+                                // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
+                                'Content-Type': 'application/json'
+                            },
+                            parameters: {
+                                createDestinationBasket: true
+                            }
+                        })
+                    }
+                } catch (error) {
+                    const message = /Unauthorized/i.test(error.message)
+                        ? formatMessage(LOGIN_ERROR)
+                        : formatMessage(API_ERROR_MESSAGE)
+                    form.setError('global', {type: 'manual', message})
+                }
+            },
+            register: async (data) => {
+                try {
+                    const body = {
+                        customer: {
+                            firstName: data.firstName,
+                            lastName: data.lastName,
+                            email: data.email,
+                            login: data.email
+                        },
+                        password: data.password
+                    }
+
+                    await register.mutateAsync(body)
+                    onLoginSuccess()
+                } catch (error) {
+                    form.setError('global', {
+                        type: 'manual',
+                        message: formatMessage(API_ERROR_MESSAGE)
+                    })
+                }
+            },
+            password: async (data) => {
+                try {
+                    const body = {
+                        login: data.email
+                    }
+                    await getResetPasswordToken.mutateAsync({body})
+                } catch (e) {
+                    form.setError('global', {
+                        type: 'manual',
+                        message: formatMessage(API_ERROR_MESSAGE)
+                    })
+                }
+            }
+        }[currentView](data)
     }
 
     // Reset form and local state when opening the modal
     useEffect(() => {
-        if (props.isOpen) {
+        if (isOpen) {
             setCurrentView(initialView)
             submittedEmail.current = undefined
             form.reset()
         }
-    }, [props.isOpen])
+    }, [isOpen])
 
     // Auto-focus the first field in each form view
     useEffect(() => {
@@ -122,16 +191,14 @@ export const AuthModal = ({
         // Lets determine if the user has either logged in, or registed.
         const loggingIn = currentView === LOGIN_VIEW
         const registering = currentView === REGISTER_VIEW
-        const {isOpen} = props
-        const isNowRegistered = isOpen && customer.isRegistered && (loggingIn || registering)
-
+        const isNowRegistered = isOpen && isRegistered && (loggingIn || registering)
         // If the customer changed, but it's not because they logged in or registered. Do nothing.
         if (!isNowRegistered) {
             return
         }
 
         // We are done with the modal.
-        props.onClose()
+        onClose()
 
         // Show a toast only for those registed users returning to the site.
         if (loggingIn) {
@@ -143,7 +210,7 @@ export const AuthModal = ({
                         id: 'auth_modal.info.welcome_user'
                     },
                     {
-                        name: customer?.firstName
+                        name: customer.data?.firstName || ''
                     }
                 )}`,
                 description: `${formatMessage({
@@ -163,10 +230,10 @@ export const AuthModal = ({
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
-    }, [customer])
+    }, [isRegistered])
 
     const onBackToSignInClick = () =>
-        initialView === PASSWORD_VIEW ? props.onClose() : setCurrentView(LOGIN_VIEW)
+        initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
     const PasswordResetSuccess = () => (
         <Stack justify="center" align="center" spacing={6}>
@@ -184,7 +251,7 @@ export const AuthModal = ({
                         id="auth_modal.password_reset_success.info.will_email_shortly"
                         values={{
                             email: submittedEmail.current,
-                            // eslint-disable-next-line react/display-name
+
                             b: (chunks) => <b>{chunks}</b>
                         }}
                     />
@@ -199,9 +266,16 @@ export const AuthModal = ({
             </Stack>
         </Stack>
     )
-
     return (
-        <Modal size="sm" closeOnOverlayClick={false} data-testid="sf-auth-modal" {...props}>
+        <Modal
+            size="sm"
+            closeOnOverlayClick={false}
+            data-testid="sf-auth-modal"
+            isOpen={isOpen}
+            onOpen={onOpen}
+            onClose={onClose}
+            {...props}
+        >
             <ModalOverlay />
             <ModalContent>
                 <ModalCloseButton />
@@ -243,8 +317,7 @@ AuthModal.propTypes = {
     onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onLoginSuccess: PropTypes.func,
-    onRegistrationSuccess: PropTypes.func,
-    onPasswordResetSuccess: PropTypes.func
+    onRegistrationSuccess: PropTypes.func
 }
 
 /**

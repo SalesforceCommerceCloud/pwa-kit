@@ -12,8 +12,6 @@ import {createPathWithDefaults, renderWithProviders} from '../../utils/test-util
 import ResetPassword from '.'
 import mockConfig from '../../../config/mocks/default'
 
-jest.mock('../../commerce-api/einstein')
-
 const mockRegisteredCustomer = {
     authType: 'registered',
     customerId: 'registeredCustomerId',
@@ -57,6 +55,7 @@ beforeEach(() => {
     )
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
     jest.clearAllMocks()
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
@@ -71,7 +70,7 @@ test('Allows customer to go to sign in page', async () => {
     user.click(await screen.findByText('Sign in'))
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/login')
+        expect(window.location.pathname).toBe('/uk/en-GB/login')
     })
 })
 
@@ -109,7 +108,7 @@ test('Allows customer to generate password token', async () => {
     })
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/login')
+        expect(window.location.pathname).toBe('/uk/en-GB/login')
     })
 })
 
@@ -132,5 +131,7 @@ test('Renders error message from server', async () => {
     user.type(await screen.findByLabelText('Email'), 'foo@test.com')
     user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
-    expect(await screen.findByText('Something went wrong')).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByText('500 Internal Server Error')).toBeInTheDocument()
+    })
 })

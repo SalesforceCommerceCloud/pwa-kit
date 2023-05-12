@@ -1,11 +1,17 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "2.7.2-dev",
+  "version": "3.0.0-dev",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
-  "engines": {
-    "node": "^14.0.0 || ^16.0.0",
-    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-react-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "cc-pwa-kit@salesforce.com",
   "files": [
     "CHANGELOG.md",
     "LICENSE",
@@ -13,32 +19,19 @@
     "ssr",
     "utils"
   ],
-  "publishConfig": {
-    "directory": "dist"
-  },
   "scripts": {
-    "prepare": "npm run build",
     "build": "cross-env NODE_ENV=production internal-lib-build build",
-    "build:watch": "watch 'npm run build' src/",
+    "build:watch": "nodemon --watch 'src/**' --exec 'npm run build'",
+    "format": "internal-lib-build format \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "internal-lib-build lint \"**/*.{js,jsx}\"",
+    "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
+    "prepare": "npm run build",
     "test": "internal-lib-build test",
-    "test:watch": "npm test -- --watch",
     "test:inspect": "node --inspect-brk jest --runInBand",
-    "version": "node ./scripts/version.js",
-    "format": "internal-lib-build format \"**/*.{js,jsx}\""
+    "test:watch": "npm test -- --watch",
+    "version": "node ./scripts/version.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
-  },
-  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-react-sdk#readme",
-  "bugs": {
-    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
-  },
-  "author": "cc-pwa-kit@salesforce.com",
-  "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@loadable/babel-plugin": "^5.15.3",
     "@loadable/server": "^5.15.3",
@@ -48,19 +41,20 @@
     "event-emitter": "^0.3.5",
     "hoist-non-react-statics": "^3.3.2",
     "prop-types": "^15.8.1",
-    "pwa-kit-runtime": "^2.7.2-dev",
+    "pwa-kit-runtime": "^3.0.0-dev",
     "react-ssr-prepass": "^1.5.0",
     "react-uid": "^2.3.2",
     "serialize-javascript": "^6.0.1",
-    "svg-sprite-loader": "^6.0.11",
-    "watch": "1.0.2"
+    "svg-sprite-loader": "^6.0.11"
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "enzyme": "^3.11.0",
-    "internal-lib-build": "^2.7.2-dev",
+    "internal-lib-build": "3.0.0-dev",
     "node-html-parser": "^3.3.6",
+    "nodemon": "^2.0.22",
+    "pwa-kit-dev": "3.0.0-dev",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "5.2.1",
@@ -75,5 +69,12 @@
     "react-dom": ">=16.14 || <18",
     "react-helmet": "6",
     "react-router-dom": "^5.1.2"
+  },
+  "engines": {
+    "node": "^16.0.0 || ^18.0.0",
+    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+  },
+  "publishConfig": {
+    "directory": "dist"
   }
 }
