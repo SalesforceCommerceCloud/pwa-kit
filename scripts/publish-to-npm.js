@@ -7,57 +7,44 @@
  */
 
 const sh = require('shelljs')
-const path = require('path')
 
 // Exit upon error
 sh.set('-e')
 
-const PWA_KIT_PACKAGES = [
-    'pwa-kit-create-app',
-    'pwa-kit-dev',
-    'pwa-kit-runtime',
-    'pwa-kit-react-sdk',
-    'commerce-sdk-react'
-]
+// The branch naming convention for releasing a particular package is: release-<package-name>-1.1.x
+// For example: 'release-retail-react-app-1.1.x'
+const RELEASE_ONE_PACKAGE = /release-([-a-z]+)-\d+\./i
 
 const main = () => {
+    const {stdout} = sh.exec('git branch --show-current', {silent: true})
     // TODO
-    // - look at the release branch's name
-    // - toggle `private` accordingly
-    // - run `lerna publish`
-    // - restore `private` afterwards
-    const {stdout: branchName} = sh.exec('git branch --show-current', {silent: true})
+    // const branchName = stdout.trim()
+    const branchName = 'release-3.1.x'
+    // const branchName = 'release-retail-react-app-3.1.x'
 
-    // If branch name is `release-3.1.x`
-    // If branch name is `release-retail-react-app-3.1.x`
-    // if (/^release-\d/.test(branchName)) {}
-    // if (/^release-retail-react-app-\d/.test(branchName)) {}
+    console.log('--- branchName', branchName)
 
-    const isReleasingPWAKit = false
-    const isReleasingRetailApp = true
+    const matched = branchName.match(RELEASE_ONE_PACKAGE)
+    const packageName = matched && matched[1]
 
-    if (isReleasingPWAKit) {
-        console.log('--- Planning to release pwa-kit packages...')
-        const pathToRetailApp = path.join(__dirname, '..', 'packages/template-retail-react-app')
+    if (packageName) {
+        console.log(`--- Planning to release ${packageName}...`)
 
-        sh.exec('npm pkg set private=true', {cwd: pathToRetailApp})
+        const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
+        const allOtherPublicPackages = publicPackages
+            .filter((pkg) => pkg.name !== packageName)
+
+        allOtherPublicPackages.forEach((pkg) => {
+            sh.exec('npm pkg set private=true', {cwd: pkg.location})
+        })
         lernaPublish()
-        sh.exec('npm pkg delete private', {cwd: pathToRetailApp})
-
-    } else if (isReleasingRetailApp) {
-        console.log('--- Planning to release retail-react-app...')
-        // TODO: rely on `lerna list --json`
-        PWA_KIT_PACKAGES.forEach((packageName) => {
-            const pathToPackage = path.join(__dirname, '..', `packages/${packageName}`)
-            sh.exec('npm pkg set private=true', {cwd: pathToPackage})
+        allOtherPublicPackages.forEach((pkg) => {
+            sh.exec('npm pkg delete private', {cwd: pkg.location})
         })
 
+    } else {
+        console.log('--- Planning to release all packages...')
         lernaPublish()
-
-        PWA_KIT_PACKAGES.forEach((packageName) => {
-            const pathToPackage = path.join(__dirname, '..', `packages/${packageName}`)
-            sh.exec('npm pkg delete private', {cwd: pathToPackage})
-        })
     }
 }
 
@@ -69,8 +56,8 @@ const lernaPublish = () => {
     // DEBUG: disable for now
     // sh.exec('npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next')
 
-    console.log('--- Would publish some packages that are public:')
-    sh.exec('npm run lerna -- list --long --all')
+    console.log('--- Would publish these public packages:')
+    sh.exec('lerna list --long')
 }
 
 main()
