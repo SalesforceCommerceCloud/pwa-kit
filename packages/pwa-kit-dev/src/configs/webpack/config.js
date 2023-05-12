@@ -295,12 +295,8 @@ const withChunking = (config) => {
                         chunks: 'all'
                     },
                     translations: {
-                        test: (module) => {
-                            if (module?.context?.match(makeRegExp(`${sysPath}/node_modules`))) {
-                                return false
-                            }
-                            return module?.context?.match?.(/(app\/translations)/)
-                        },
+                        priority: 10,
+                        test: (module) => module?.context?.match?.(/app\/translations\/compiled/),
                         name: 'translations',
                         chunks: 'all'
                     }

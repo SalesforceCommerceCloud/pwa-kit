@@ -129,7 +129,6 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * generated project, all others are excluded.
  */
 const runGenerator = (answers, {outputDir, verbose}) => {
-    console.log('answers: ', answers)
     checkOutputDir(outputDir)
     fs.mkdirSync(outputDir)
     // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
@@ -158,30 +157,30 @@ const runGenerator = (answers, {outputDir, verbose}) => {
         // TODO: Move this to a util or something.
         const getAllFiles = (dirPath, arrayOfFiles) => {
             files = fs.readdirSync(dirPath)
-          
+
             arrayOfFiles = arrayOfFiles || []
-          
-            files.forEach(function(file) {
-              if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-                arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
-              } else {
-                arrayOfFiles.push(p.join(dirPath, "/", file))
-              }
+
+            files.forEach(function (file) {
+                if (fs.statSync(dirPath + '/' + file).isDirectory()) {
+                    arrayOfFiles = getAllFiles(dirPath + '/' + file, arrayOfFiles)
+                } else {
+                    arrayOfFiles.push(p.join(dirPath, '/', file))
+                }
             })
-          
+
             return arrayOfFiles
-          }
+        }
 
         const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
-        
+
         // Copy folder to destination and process template if required.
         getAllFiles(inputDir).forEach((inputFile) => {
             const outputFile = outputDir + inputFile.replace(inputDir, '')
             const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
-            
+
             // Create folder if we are doing a deep copy
             if (destDir) {
-                fs.mkdirSync(destDir, { recursive: true })
+                fs.mkdirSync(destDir, {recursive: true})
             }
 
             if (inputFile.endsWith('.hbs')) {
@@ -192,7 +191,6 @@ const runGenerator = (answers, {outputDir, verbose}) => {
                 fs.copyFileSync(inputFile, outputFile)
             }
         })
-
     } else {
         downloadAndExtractTemplate('retail-react-app', outputDir)
 
@@ -564,10 +562,15 @@ const main = (opts) => {
                 case RETAIL_REACT_APP_DEMO:
                     return extensibilityPrompts(opts)
                         .then((answers) =>
-                            runGenerator({
-                                ...demoProjectAnswers(),
-                                ...(answers.extensible ? {templatePackageName: 'retail-react-app'} : {})
-                            }, opts)
+                            runGenerator(
+                                {
+                                    ...demoProjectAnswers(),
+                                    ...(answers.extensible
+                                        ? {templatePackageName: 'retail-react-app'}
+                                        : {})
+                                },
+                                opts
+                            )
                         )
                         .then((result) => {
                             console.log(
