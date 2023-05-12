@@ -171,8 +171,16 @@ const runGenerator = (answers, {outputDir, verbose, extensible}) => {
 
         const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
         console.log('getAllFiles(inputDir): ', getAllFiles(inputDir))
+
+        // Copy folder to destination and process template if required.
         getAllFiles(inputDir).forEach((inputFile) => {
             const outputFile = outputDir + inputFile.replace(inputDir, '')
+
+            const parts = outputDir.split(p.sep)
+            parts.pop()
+
+            fs.mkdirSync(parts.join(p.sep), { recursive: true });
+
             fs.copyFileSync(inputFile, outputFile, fs.constants.COPYFILE_FICLONE)
         })
 
