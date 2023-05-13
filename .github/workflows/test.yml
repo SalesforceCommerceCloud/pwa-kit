@@ -19,7 +19,6 @@ on:
       - develop
       # TODO: Should we run on all pushes to release branches, or should we run on GitHub releases?
       - 'release-*'
-      - 'v3'
   schedule:
     # Run every day at 12pm (PST) - cron uses UTC times
     - cron: '0 8 * * *'
@@ -27,7 +26,6 @@ env:
   IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
   DEVELOP: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'develop' }}
   RELEASE: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && startsWith(github.head_ref || github.ref_name, 'release-') }}
-  V3: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'v3' }}
 
 jobs:
   pwa-kit:
@@ -42,7 +40,7 @@ jobs:
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
       IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
-      # The current recommended version for Managed Runtime: 
+      # The current recommended version for Managed Runtime:
       # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
       IS_MRT_NODE: ${{ matrix.node == 16 && matrix.npm == 8 }}
     steps:
@@ -74,7 +72,7 @@ jobs:
         uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' || env.V3 == 'true' )
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' )
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
@@ -86,13 +84,6 @@ jobs:
         with:
           CWD: "./packages/template-retail-react-app"
           TARGET: staging
-      
-      - name: Push Bundle to MRT (v3)
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.V3 == 'true'
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "./packages/template-retail-react-app"
-          TARGET: staging-v3
 
       - name: Push Bundle to MRT (Production)
         if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
@@ -140,7 +131,7 @@ jobs:
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
       IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
-      # The current recommended version for Managed Runtime: 
+      # The current recommended version for Managed Runtime:
       # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
       IS_MRT_NODE: ${{ matrix.node == 16 && matrix.npm == 8 }}
     runs-on: windows-latest
