@@ -20,10 +20,4 @@ describe('Error Page', () => {
         expect(screen.getByText(stack)).toBeInTheDocument()
         expect(screen.getByText(`Error Status: ${status}`)).toBeInTheDocument()
     })
-
-    // TODO: check if there's an equivalent in react test lib to check for number or potentially remove test
-    test('Ensure that status type is a number', () => {
-        const wrapper = mount(<Error message={message} status={status} />)
-        expect(typeof wrapper.props().status).toBe('number')
-    })
 })
