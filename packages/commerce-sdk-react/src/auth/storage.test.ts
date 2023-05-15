@@ -24,14 +24,13 @@ const testCases = [
     {
         description: 'MemoryStorage works with options',
         storageOptions: {
-            keySuffix: 'prefix',
-            keySuffixSeparator: '$'
+            keySuffix: 'suffix',
         },
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
             expect(storage.get(key)).toBe(value)
             // @ts-expect-error private property
-            expect([...storage.map.keys()]).toEqual([`prefix$${key}`])
+            expect([...storage.map.keys()]).toEqual([`${key}suffix`])
             storage.delete(key)
             expect(storage.get(key)).toBe('')
         }
