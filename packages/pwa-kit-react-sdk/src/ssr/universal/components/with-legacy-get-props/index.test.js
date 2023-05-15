@@ -12,7 +12,7 @@ describe('withLegacyGetProps', function () {
     test('Renders correctly', () => {
         const Wrapped = () => <p>Hello world</p>
         const Component = withLegacyGetProps(Wrapped)
-        const wrapper = render(<Component locals={{}} />)
+        render(<Component locals={{}} />)
         expect(screen.getByText(/Hello world/i)).toBeInTheDocument()
     })
 

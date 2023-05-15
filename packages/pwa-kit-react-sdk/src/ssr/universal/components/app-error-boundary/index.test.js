@@ -53,7 +53,11 @@ describe('AppErrorBoundary', () => {
     cases.forEach(({content, errorFactory, afterErrorAssertions, variation}) => {
         test(`Displays errors correctly (variation: ${variation})`, () => {
             const ref = React.createRef()
-            render(<AppErrorBoundary ref={ref}><>{content}</></AppErrorBoundary>)            
+            render(
+                <AppErrorBoundary ref={ref}>
+                    <>{content}</>
+                </AppErrorBoundary>
+            )
             expect(screen.getByText(content)).toBeInTheDocument()
             act(() => {
                 ref.current.onGetPropsError(errorFactory())
@@ -65,7 +69,11 @@ describe('AppErrorBoundary', () => {
         test(`Watches history, when provided (variation: ${variation})`, () => {
             const history = {listen: sinon.stub().returns(sinon.stub())}
             const ref = React.createRef()
-            render(<AppErrorBoundary ref={ref} history={history}>{content}</AppErrorBoundary>)
+            render(
+                <AppErrorBoundary ref={ref} history={history}>
+                    <>{content}</>
+                </AppErrorBoundary>
+            )
             expect(screen.getByText(content)).toBeInTheDocument()
             act(() => {
                 ref.current.onGetPropsError(errorFactory())
@@ -87,6 +95,6 @@ describe('AppErrorBoundary', () => {
         const history = {listen: jest.fn().mockReturnValue(unlisten)}
         const wrapper = render(<AppErrorBoundary history={history}>test</AppErrorBoundary>)
         wrapper.unmount()
-        expect(unlisten).toBeCalled()
+        expect(unlisten).toHaveBeenCalled()
     })
 })
