@@ -37,7 +37,6 @@ describe('Document', () => {
         // it looks like it returns two html collection, the first one is the React Testing library, the second one is our component we are testing
         const htmlTag = document.getElementsByTagName('html')[1]
         screen.debug()
-        console.log('htmlTag', Object.assign({}, htmlTag))
         expect(svgTag).toBeInTheDocument()
         expect(scriptTag).toBeInTheDocument()
         expect(styleTag).toBeInTheDocument()
