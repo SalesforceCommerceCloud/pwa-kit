@@ -14,8 +14,6 @@ sh.set('-e')
 
 const lernaConfigPath = path.join(__dirname, '..', 'lerna.json')
 const rootPath = path.join(__dirname, '..')
-const rootPkgPath = path.join(__dirname, '..', 'package.json')
-const rootPkgLockPath = path.join(__dirname, '..', 'package-lock.json')
 
 const retailReactAppPkgDir = path.join(__dirname, '..', 'packages/template-retail-react-app')
 const retailReactAppPkg = JSON.parse(sh.cat(path.join(retailReactAppPkgDir, 'package.json')))
@@ -36,28 +34,30 @@ const main = () => {
     // sh.exec(`npm install`)
 
     const lernaConfig = JSON.parse(sh.cat(lernaConfigPath))
-    const rootPkg = JSON.parse(sh.cat(rootPkgPath))
-    const rootPkgLock = JSON.parse(sh.cat(rootPkgLockPath))
-
     const newVersion = lernaConfig.version
 
-    // find all monorepo packages, look inside each package json, find peerDependency that is a monorepo package
-    // and update it with a new version
     const {stdout} = sh.exec('lerna list --all --json', {silent: true})
-    const packages = JSON.parse(stdout.toString())
-    const lernaPackageNames = packages.map((pkg) => pkg.name)
-    packages.forEach(({location}) => {
-        const pkgFilePath = path.join(location, 'package.json')
-        const pkg = JSON.parse(sh.cat(pkgFilePath))
-        const peerDependencies = pkg.peerDependencies
+    const monorepoPackages = JSON.parse(stdout.toString())
+    const packageNames = monorepoPackages.map((pkg) => pkg.name)
+
+    monorepoPackages.forEach(({location}) => {
+        const pathToPkgJson = path.join(location, 'package.json')
+        const pkgJson = JSON.parse(sh.cat(pathToPkgJson))
+        const peerDependencies = pkgJson.peerDependencies
+
         if (!peerDependencies) return
+
         Object.keys(peerDependencies).forEach((dep) => {
-            if (lernaPackageNames.includes(dep)) {
-                console.log(`Found lerna local package ${dep} as a peer dependency of ${pkg.name}.`)
+            if (packageNames.includes(dep)) {
+                console.log(`Found lerna local package ${dep} as a peer dependency of ${pkgJson.name}.`)
                 peerDependencies[dep] = `^${newVersion}`
-                saveJSONToFile(pkg, pkgFilePath)
             }
         })
+        saveJSONToFile(pkgJson, pathToPkgJson)
+
+        // !!!
+        // TODO: some packages (see my-extended-retail-app) may depend on the packages listed in the ignoreList. 
+        // We'll need to make sure those packages have the correct dependency version.
     })
 
     // update versions for root package and root package lock
@@ -68,9 +68,6 @@ const main = () => {
         setPackageVersion(oldVersion, {cwd: pathToPackage})
         setPackageVersion('prerelease', {cwd: pathToPackage})
     })
-    // !!!
-    // TODO: some packages (see my-extended-retail-app) may depend on the packages listed in the ignoreList. 
-    // We'll need to make sure those packages have the correct dependency version.
 
     sh.echo('\nVersions of packages in the monorepo:')
     sh.exec('lerna list --all --long')
