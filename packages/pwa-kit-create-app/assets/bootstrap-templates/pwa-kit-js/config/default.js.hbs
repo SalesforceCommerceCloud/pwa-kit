@@ -17,7 +17,7 @@ module.exports = {
             // showDefaults: true
         },
         // The default site for your app. This value will be used when a siteRef could not be determined from the url
-        defaultSite: '{{commerceAPI.siteId}}',
+        defaultSite: '{{project.siteId}}',
         // Provide aliases for your sites. These will be used in place of your site id when generating paths throughout the application.
         // siteAliases: {
         //     RefArch: 'us'
@@ -28,10 +28,10 @@ module.exports = {
         commerceAPI: {
             proxyPath: '/mobify/proxy/api',
             parameters: {
-                clientId: '{{commerceAPI.clientId}}',
-                organizationId: '{{commerceAPI.organizationId}}',
-                shortCode: '{{commerceAPI.shortCode}}',
-                siteId: '{{commerceAPI.siteId}}'
+                clientId: '{{project.clientId}}',
+                organizationId: '{{project.organizationId}}',
+                shortCode: '{{project.shortCode}}',
+                siteId: '{{project.siteId}}'
             }
         },
         // Einstein api config
@@ -68,7 +68,7 @@ module.exports = {
         ssrFunctionNodeVersion: '16.x',
         proxyConfigs: [
             {
-                host: '{{commerceAPI.shortCode}}.api.commercecloud.salesforce.com',
+                host: '{{project.shortCode}}.api.commercecloud.salesforce.com',
                 path: 'api'
             }
         ]

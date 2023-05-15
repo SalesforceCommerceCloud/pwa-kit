@@ -1,5 +1,5 @@
 {
-  "name": "{{globals.projectName}}",
+  "name": "{{general.projectName}}",
   "version": "0.0.1-dev.0",
   "license": "See license in LICENSE",
   "engines": {
@@ -7,11 +7,11 @@
     "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
   },
   "ccExtensibility": {
-    "extends": "{{templatePackageName}}",
+    "extends": "{{general.templateSource.id}}",
     "overridesDir": "overrides"
   },
   "devDependencies": {
-    "{{templatePackageName}}": "^3.0.0-dev"
+    "{{general.templateSource.id}}": "{{general.templateVersion}}"
   },
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
