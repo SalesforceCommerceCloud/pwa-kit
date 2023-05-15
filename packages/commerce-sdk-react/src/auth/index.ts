@@ -163,9 +163,9 @@ class Auth {
             fetchOptions: config.fetchOptions
         })
 
-        const storageOptions = {keyPrefix: config.siteId}
+        const storageOptions = {keySuffix: config.siteId}
         const serverStorageOptions = {
-            keyPrefix: config.siteId,
+            keySuffix: config.siteId,
             sharedContext: true // This allows use to reused guest authentication tokens accross lambda runs.
         }
 
