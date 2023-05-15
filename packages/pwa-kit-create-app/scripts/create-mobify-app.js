@@ -150,6 +150,7 @@ const runGenerator = (answers, {outputDir, verbose}) => {
         }
     })
 
+    // TODO: Ben (and it should grarefully handle package-not-found error)
     downloadPackage('retail-react-app@latest', outputDir)
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
@@ -164,6 +165,7 @@ const runGenerator = (answers, {outputDir, verbose}) => {
             const deps = pkgDataWithAnswers[key]
             if (deps && deps[pkgName]) {
                 console.log('--- deps[pkgName] -before', deps[pkgName])
+                // TODO: Ben (pinning by simply removing the carrot)
                 deps[pkgName] = SDK_VERSION
                 console.log('--- deps[pkgName] -after', deps[pkgName])
             }
