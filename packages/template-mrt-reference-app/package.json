@@ -1,5 +1,5 @@
 {
-    "name": "p5t",
+    "name": "template-mrt-reference-app",
     "version": "2.8.0-dev",
     "engines": {
         "node": "^14.0.0 || ^16.0.0",
