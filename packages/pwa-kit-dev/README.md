@@ -4,7 +4,7 @@ A command-line tool to develop, build, and deploy PWA Kit projects.
 
 ## Requirements
 
--   Node 16 or later
+-   Node 16.11 or later
 -   npm 8 or later
 
 To see all the available commands, run:

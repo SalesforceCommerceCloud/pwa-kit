@@ -9,7 +9,7 @@ import {Button} from '@chakra-ui/react'
 import {screen, waitFor} from '@testing-library/react'
 import withRegistration from './index'
 import {renderWithProviders} from '../../utils/test-utils'
-import user from '@testing-library/user-event'
+import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {mockedGuestCustomer} from '../../mocks/mock-data'
 
@@ -37,12 +37,14 @@ afterEach(() => {
 
 describe('Registered users tests', function () {
     test('should execute onClick for registered users', async () => {
+        const user = userEvent.setup()
+
         const onClick = jest.fn()
         renderWithProviders(<MockedComponent onClick={onClick} />)
 
         const trigger = screen.getByText(/button/i)
         expect(trigger).toBeInTheDocument()
-        user.click(trigger)
+        await user.click(trigger)
 
         await waitFor(() => {
             expect(onClick).toHaveBeenCalledTimes(1)
@@ -59,6 +61,7 @@ describe('Guest user tests', function () {
         )
     })
     test('should show login modal if user not registered', async () => {
+        const user = userEvent.setup()
         const onClick = jest.fn()
         renderWithProviders(
             <ButtonWithRegistration onClick={onClick}>Button</ButtonWithRegistration>,
@@ -70,9 +73,8 @@ describe('Guest user tests', function () {
         )
 
         const trigger = await screen.findByText(/button/i)
-        await waitFor(() => {
-            user.click(trigger)
-        })
+        await user.click(trigger)
+
         await waitFor(() => {
             expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
             expect(screen.getByLabelText(/Password/)).toBeInTheDocument()

@@ -7,7 +7,6 @@
 
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
@@ -74,14 +73,14 @@ test('Create Account form - renders error message', async () => {
         })
     )
 
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {isGuest: true}
     })
 
     const createAccountButton = await screen.findByRole('button', {name: /create account/i})
     const passwordEl = await screen.findByLabelText('Password')
-    user.type(passwordEl, 'P4ssword!')
-    user.click(createAccountButton)
+    await user.type(passwordEl, 'P4ssword!')
+    await user.click(createAccountButton)
     const alert = await screen.findByRole('alert')
     expect(alert).toBeInTheDocument()
 })
@@ -93,15 +92,15 @@ test('Create Account form - successful submission results in redirect to the Acc
         })
     )
 
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {isGuest: true}
     })
 
     const createAccountButton = await screen.findByRole('button', {name: /create account/i})
     const password = screen.getByLabelText('Password')
 
-    user.type(password, 'P4ssword!')
-    user.click(createAccountButton)
+    await user.type(password, 'P4ssword!')
+    await user.click(createAccountButton)
 
     await waitFor(() => {
         expect(window.location.pathname).toBe('/uk/en-GB/account')
