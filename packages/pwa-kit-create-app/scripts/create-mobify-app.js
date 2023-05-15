@@ -505,7 +505,7 @@ const askExtensibilityQuestions = async (preset) => {
         // want to extend. But for now lets just get the latest version and synthetically
         // inject it as an "answer"
         console.log(`npm view ${templateSource.id} version`)
-        version = sh.execSync(`npm view ${templateSource.id} version`).stdout
+        version = sh.exec(`npm view ${templateSource.id} version`).stdout
     }
 
     answers = {
