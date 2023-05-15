@@ -6,19 +6,34 @@
  */
 
 const sh = require('shelljs')
+const path = require('path')
 
-const SDK_PACKAGES = [
-    'pwa-kit-react-sdk',
-    'pwa-kit-dev',
-    'pwa-kit-runtime',
-    'commerce-sdk-react-preview'
-]
+const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
+const independentPackages = JSON.parse(
+    sh.cat(path.join(__dirname, '../../..', 'scripts/packages-with-independent-version.json'))
+)
+const sdkPackages = publicPackages.filter((pkg) => !independentPackages.includes(pkg.name))
 
 const main = () => {
     const version = process.argv[2]
-    SDK_PACKAGES.forEach((pkgName) => {
-        // TODO: check first whether the dependency exists
-        sh.exec(`npm pkg set devDependencies.${pkgName}=${version}`)
+
+    const pathToPackageJson = path.join(__dirname, '..', 'package.json')
+    const pkgJson = JSON.parse(sh.cat(pathToPackageJson))
+
+    sdkPackages.forEach(({name}) => {
+        if (pkgJson.dependencies?.[name]) {
+            pkgJson.dependencies[name] = version
+        }
+        if (pkgJson.devDependencies?.[name]) {
+            pkgJson.devDependencies[name] = version
+        }
     })
+
+    saveJSONToFile(pkgJson, pathToPackageJson)
 }
+
+const saveJSONToFile = (json, filePath) => {
+    new sh.ShellString(JSON.stringify(json, null, 2)).to(filePath)
+}
+
 main()

@@ -59,7 +59,7 @@ const main = () => {
         saveJSONToFile(pkgJson, pathToPkgJson)
     })
 
-    sh.echo('\nVersions of packages in the monorepo:')
+    sh.echo('\nVersions of packages in the monorepo:\n')
     sh.exec('lerna list --all --long')
 }
 
