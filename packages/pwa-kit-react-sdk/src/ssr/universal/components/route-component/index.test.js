@@ -92,7 +92,6 @@ const getMockComponent = () => {
     MockComponent.displayName = 'MockComponent'
     MockComponent.shouldGetProps = trueOnceThenFalse()
     MockComponent.getProps = jest.fn(() => {
-        console.log('Mock COmponetn getProps---------------------')
         return Promise.resolve()
     })
     MockComponent.getTemplateName = jest.fn(() => 'MockComponent')
