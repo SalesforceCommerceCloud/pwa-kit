@@ -76,7 +76,7 @@ describe('CorrelationIdProvider', function () {
         expect(screen.getByText(id)).toBeInTheDocument()
     })
 
-    test.only('generates a new id when changing page', async () => {
+    test('generates a new id when changing page', async () => {
         const user = userEvent.setup()
         const history = createMemoryHistory()
         const Component = () => {
