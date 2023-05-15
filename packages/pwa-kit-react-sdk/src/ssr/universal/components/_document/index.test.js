@@ -28,7 +28,6 @@ describe('Document', () => {
                 bodyAttributes={bodyAttributes}
             />
         )
-        screen.debug()
         const scriptTag = document.querySelector('script')
         const svgTag = document.querySelector('svg')
         const styleTag = document.querySelector('link')
