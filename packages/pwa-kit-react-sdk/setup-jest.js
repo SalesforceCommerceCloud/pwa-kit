@@ -8,7 +8,6 @@
 
 import 'regenerator-runtime/runtime'
 import '@testing-library/jest-dom'
-require('@testing-library/jest-dom/extend-expect')
 // Mock the application configuration to be used in all tests.
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {
