@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {act, render, screen} from '@testing-library/react'
 import {AppErrorBoundaryWithoutRouter as AppErrorBoundary} from './index'
 import * as errors from '../../errors'
 import sinon from 'sinon'
@@ -14,63 +14,73 @@ import sinon from 'sinon'
 describe('AppErrorBoundary', () => {
     const cases = [
         {
-            content: <p>test 1</p>,
-            errorFactory: () => ({error: {message: 'Not found', status: 404}}),
-            afterErrorAssertions: (renderedResult) => {
-                expect(renderedResult.getByText('Error Status: 404')).toBeInTheDocument()
-                expect(renderedResult.getByText('Not found')).toBeInTheDocument()
+            content: 'test 1',
+            errorFactory: () => new errors.HTTPNotFound('Not found'),
+            afterErrorAssertions: () => {
+                expect(screen.getByText('Error Status: 404')).toBeInTheDocument()
+                expect(screen.getByText('Not found')).toBeInTheDocument()
             },
             variation: 'SDK HTTP Errors'
         },
         {
-            content: <p>test 2</p>,
-            errorFactory: () => ({error: {message: 'Some other error', status: 500}}),
-            afterErrorAssertions: (renderedResult) => {
-                expect(renderedResult.getByText('Error Status: 500')).toBeInTheDocument()
-                expect(renderedResult.getByText('Some other error')).toBeInTheDocument()
+            content: 'test 2',
+            errorFactory: () => new Error('Some other error'),
+            afterErrorAssertions: async () => {
+                expect(screen.getByText('Error Status: 500')).toBeInTheDocument()
+                expect(screen.getByText('Error: Some other error')).toBeInTheDocument()
             },
             variation: 'Generic Javascript Errors'
         },
         {
-            content: <p>test 3</p>,
-            errorFactory: () => ({error: {message: 'Some string error', status: 500}}),
-            afterErrorAssertions: (renderedResult) => {
-                expect(renderedResult.getByText('Error Status: 500')).toBeInTheDocument()
-                expect(renderedResult.getByText('Some string error')).toBeInTheDocument()
+            content: 'test 3',
+            errorFactory: () => 'Some string error',
+            afterErrorAssertions: () => {
+                expect(screen.getByText('Error Status: 500')).toBeInTheDocument()
+                expect(screen.getByText('Some string error')).toBeInTheDocument()
             },
             variation: 'Error Strings'
         },
         {
-            content: <p>test 4</p>,
-            errorFactory: () => ({error: {message: undefined, status: undefined}}), // TODO: potentially modify as message/status are marked as required
-            afterErrorAssertions: (renderedResult) => {
-                expect(renderedResult.getByText('Error Status:')).toBeInTheDocument()
+            content: 'test 4',
+            errorFactory: () => undefined,
+            afterErrorAssertions: () => {
+                expect(screen.getByText('Error Status: 500')).toBeInTheDocument()
+                expect(document.querySelector('pre').innerHTML).toBe('')
             },
             variation: 'Check for message value to be empty if undefined'
         }
     ]
     cases.forEach(({content, errorFactory, afterErrorAssertions, variation}) => {
         test(`Displays errors correctly (variation: ${variation})`, () => {
-            const {unmount, rerender} = render(<AppErrorBoundary>{content}</AppErrorBoundary>)
-            const contentElement = document.querySelector('p')
-            expect(contentElement).toBeInTheDocument()
-            expect(content.props.children).toEqual(contentElement.textContent)
-            // rerender(<AppErrorBoundary {...errorFactory()}>{content}</AppErrorBoundary>) // TODO: understand why this is not working
-            unmount() // ideally replaced with rerender
-            const renderedResult = render(<AppErrorBoundary {...errorFactory()}>{content}</AppErrorBoundary>) // TODO: check if there's a way to call onGetPropsError
-            expect(contentElement).not.toBeInTheDocument()
-            afterErrorAssertions(renderedResult)
+            const ref = React.createRef()
+            render(
+                <AppErrorBoundary ref={ref}>
+                    <>{content}</>
+                </AppErrorBoundary>
+            )
+            expect(screen.getByText(content)).toBeInTheDocument()
+            act(() => {
+                ref.current.onGetPropsError(errorFactory())
+            })
+            expect(screen.queryByText(content)).toBeNull()
+            afterErrorAssertions()
         })
 
-        // TODO: fix test
         test(`Watches history, when provided (variation: ${variation})`, () => {
             const history = {listen: sinon.stub().returns(sinon.stub())}
-            const wrapper = mount(<AppErrorBoundary history={history}>{content}</AppErrorBoundary>)
-            expect(wrapper.contains(content)).toBe(true)
-            wrapper.instance().onGetPropsError(errorFactory())
-            wrapper.update()
-            expect(wrapper.contains(content)).toBe(false)
-            afterErrorAssertions(wrapper)
+            const ref = React.createRef()
+            render(
+                <AppErrorBoundary ref={ref} history={history}>
+                    <>{content}</>
+                </AppErrorBoundary>
+            )
+            expect(screen.getByText(content)).toBeInTheDocument()
+            act(() => {
+                ref.current.onGetPropsError(errorFactory())
+            })
+            expect(screen.queryByText(content)).toBeNull()
+            afterErrorAssertions()
+            expect(history.listen.called).toBe(true)
         })
     })
 
@@ -83,8 +93,8 @@ describe('AppErrorBoundary', () => {
     test(`componentWillUnmount unlistens to history`, () => {
         const unlisten = jest.fn()
         const history = {listen: jest.fn().mockReturnValue(unlisten)}
-        const wrapper = mount(<AppErrorBoundary history={history}>test</AppErrorBoundary>)
+        const wrapper = render(<AppErrorBoundary history={history}>test</AppErrorBoundary>)
         wrapper.unmount()
-        expect(unlisten).toBeCalled()
+        expect(unlisten).toHaveBeenCalled()
     })
 })

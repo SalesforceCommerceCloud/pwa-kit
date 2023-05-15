@@ -12,7 +12,7 @@ import * as errors from '../../errors'
 
 describe('Throw404', () => {
     test('Renders correctly', () => {
-        render(<Throw404/>)
+        render(<Throw404 />)
         const content = document.querySelector('body').firstElementChild.innerHTML
         expect(content).toBe('<div></div>')
     })
