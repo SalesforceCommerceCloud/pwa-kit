@@ -36,7 +36,6 @@ describe('Document', () => {
         const bodyTag = document.querySelectorAll('body')[1]
         // it looks like it returns two html collection, the first one is the React Testing library, the second one is our component we are testing
         const htmlTag = document.getElementsByTagName('html')[1]
-        screen.debug()
         expect(svgTag).toBeInTheDocument()
         expect(scriptTag).toBeInTheDocument()
         expect(styleTag).toBeInTheDocument()
