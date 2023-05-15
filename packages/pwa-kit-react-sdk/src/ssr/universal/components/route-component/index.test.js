@@ -6,9 +6,8 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen, waitFor} from '@testing-library/react'
 import {getRoutes, routeComponent} from './index'
-
 // TODO: The way mocks are set up in this file is kinda weird...
 /* eslint-disable @typescript-eslint/no-var-requires */
 
@@ -107,8 +106,8 @@ describe('The routeComponent component', () => {
     test('Is a higher-order component', () => {
         const Mock = getMockComponent()
         const Component = routeComponent(Mock)
-        const wrapper = mount(<Component isHydrating={false} />)
-        expect(wrapper.contains(<p>MockComponent</p>)).toBe(true)
+        render(<Component isHydrating={false} />)
+        expect(screen.getByText(/mockComponent/i)).toBeInTheDocument()
     })
 
     test('Should call getProps on components at the right times during updates/rendering', () => {
@@ -127,7 +126,7 @@ describe('The routeComponent component', () => {
             .then(() => {
                 // Simulate the initial client-side mount (hydrating=true)
                 return new Promise((resolve) => {
-                    wrapper = mount(
+                    wrapper = render(
                         <Component
                             history={{location: {pathname: '/home/'}}}
                             onUpdateComplete={resolve}
@@ -146,10 +145,12 @@ describe('The routeComponent component', () => {
             .then(() => {
                 // Simulate visiting a different URL, which should trigger shouldMount() and getProps()
                 return new Promise((resolve) => {
-                    wrapper.setProps({
-                        history: {location: {pathname: '/plp/'}},
-                        onGetPropsComplete: resolve
-                    })
+                    wrapper.rerender(
+                        <Component
+                            history={{location: {pathname: '/plp/'}}}
+                            onUpdateComplete={resolve}
+                        />
+                    )
                 })
             })
             .then(() => {
@@ -231,7 +232,7 @@ describe('The routeComponent component', () => {
         const Component = routeComponent(Mock, {}, true)
 
         return new Promise((resolve) =>
-            mount(<Component isHydrating={false} onGetPropsError={resolve} />)
+            render(<Component isHydrating={false} onGetPropsError={resolve} />)
         ).then((caught) => expect(caught).toBe(error))
     })
 
@@ -244,14 +245,18 @@ describe('The routeComponent component', () => {
         const Component = routeComponent(Mock)
 
         return new Promise((resolve) =>
-            mount(<Component isHydrating={false} onGetPropsError={resolve} />)
+            render(<Component isHydrating={false} onGetPropsError={resolve} />)
         ).then((caught) => expect(caught).toBe(errorText))
     })
 
-    test(`Passes props returned from getProps to the wrapped component`, () => {
+    test(`Passes props returned from getProps to the wrapped component`, async () => {
         const initialProps = {foo: 'bar'}
 
-        const Mock = (props) => <div>Mock {JSON.stringify(props)}</div>
+        const Mock = (props) => (
+            <div>
+                <div data-testid="props">{JSON.stringify(props)}</div>
+            </div>
+        )
         Mock.displayName = 'MockComponent'
 
         Mock.getProps = () => delay(150).then(() => initialProps)
@@ -259,14 +264,24 @@ describe('The routeComponent component', () => {
         Mock.shouldGetProps = trueOnceThenFalse()
 
         const Component = routeComponent(Mock, {}, true)
-
-        return new Promise((resolve) => {
-            const wrapper = mount(<Component onUpdateComplete={() => resolve(wrapper)} />)
+        await new Promise((resolve) => {
+            render(
+                <Component
+                    onUpdateComplete={() => {
+                        resolve()
+                    }}
+                />
+            )
         })
-            .then((wrapper) => wrapper.update())
-            .then((wrapper) => {
-                expect(wrapper.find('MockComponent').props()).toMatchObject(initialProps)
-            })
+
+        await waitFor(() => {
+            expect(screen.getByTestId('props').innerHTML).toEqual(
+                JSON.stringify({
+                    foo: 'bar',
+                    isLoading: false
+                })
+            )
+        })
     })
 })
 
@@ -292,12 +307,12 @@ describe('getRoutes', () => {
  */
 describe('Handles race conditions for getProps', () => {
     test(`unresolved calls to 'getProps' are squashed by new new calls`, async () => {
-        const render = jest.fn()
+        const renderFunc = jest.fn()
 
         // We can't inspect the render directly, so include this mock function
         // in the render and inspect that
         // eslint-disable-next-line react/prop-types
-        const MockComponent = ({callId}) => <p>{render(callId)}</p>
+        const MockComponent = ({callId}) => <p>{renderFunc(callId)}</p>
         // Skip getProps on mount by returning false the first time
         MockComponent.shouldGetProps = falseOnceThenTrue()
         MockComponent.getProps = jest
@@ -317,24 +332,24 @@ describe('Handles race conditions for getProps', () => {
         }
         await new Promise((resolve) => {
             resolver.push(resolve)
-            wrapper = mount(<Component onUpdateComplete={onUpdateComplete} />)
+            wrapper = render(<Component onUpdateComplete={onUpdateComplete} />)
         })
 
         // Update the wrappers props 2 times in succession, this will cause `getProps` to be called
         // twice, but only the later should call `setStateAsync` causing a re-render.
         const p1 = new Promise((resolve) => {
             resolver.push(resolve)
-            wrapper.setProps({tick: 1})
+            wrapper.rerender(<Component onUpdateComplete={onUpdateComplete} />)
         })
         const p2 = new Promise((resolve) => {
             resolver.push(resolve)
-            wrapper.setProps({tick: 2})
+            wrapper.rerender(<Component onUpdateComplete={onUpdateComplete} />)
         })
         await Promise.all([p1, p2])
 
         expect(MockComponent.getProps.mock.calls).toHaveLength(2)
-        expect(render).not.toHaveBeenCalledWith(1)
-        expect(render).toHaveBeenCalledWith(2)
+        expect(renderFunc).not.toHaveBeenCalledWith(1)
+        expect(renderFunc).toHaveBeenCalledWith(2)
     })
 })
 
@@ -344,21 +359,24 @@ describe('Uses preloaded props on initial clientside page load', () => {
         const preloadedProps = {foo: 'bar'}
         const expectedPreloadedChildProps = {foo: 'bar', isLoading: false}
 
-        const Mock = (props) => <div>Mock {JSON.stringify(props)}</div>
+        const Mock = (props) => <div data-testid="props">{JSON.stringify(props)}</div>
         Mock.displayName = 'MockComponent'
 
         const Component = routeComponent(Mock, true, {})
 
-        const wrapped = await new Promise((resolve) => {
-            const wrapper = mount(
+        await new Promise((resolve) => {
+            const wrapper = render(
                 <Component
                     preloadedProps={preloadedProps}
                     onUpdateComplete={() => resolve(wrapper)}
                 />
             )
         })
-
-        expect(wrapped.find('MockComponent').props()).toMatchObject(expectedPreloadedChildProps)
+        await waitFor(() => {
+            expect(screen.getByTestId('props').innerHTML).toEqual(
+                JSON.stringify(expectedPreloadedChildProps)
+            )
+        })
     })
 
     test('Does not use preloadedProps when not hydrating', async () => {
@@ -366,13 +384,13 @@ describe('Uses preloaded props on initial clientside page load', () => {
         const preloadedProps = {foo: 'bar'}
         const expectedNotPreloadedChildProps = {isLoading: false}
 
-        const Mock = (props) => <div>Mock {JSON.stringify(props)}</div>
+        const Mock = (props) => <div data-testid="props">{JSON.stringify(props)}</div>
         Mock.displayName = 'MockComponent'
 
         const Component = routeComponent(Mock, true, {})
 
-        const wrapped = await new Promise((resolve) => {
-            const wrapper = mount(
+        await new Promise((resolve) => {
+            const wrapper = render(
                 <Component
                     preloadedProps={preloadedProps}
                     onUpdateComplete={() => resolve(wrapper)}
@@ -380,6 +398,10 @@ describe('Uses preloaded props on initial clientside page load', () => {
             )
         })
 
-        expect(wrapped.find('MockComponent').props()).toMatchObject(expectedNotPreloadedChildProps)
+        await waitFor(() => {
+            expect(screen.getByTestId('props').innerHTML).toEqual(
+                JSON.stringify(expectedNotPreloadedChildProps)
+            )
+        })
     })
 })
