@@ -24,7 +24,7 @@ const testCases = [
     {
         description: 'MemoryStorage works with options',
         storageOptions: {
-            keySuffix: 'suffix',
+            keySuffix: 'suffix'
         },
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
