@@ -15,15 +15,11 @@ sh.set('-e')
 const lernaConfigPath = path.join(__dirname, '..', 'lerna.json')
 const rootPath = path.join(__dirname, '..')
 
-const retailReactAppPkgDir = path.join(__dirname, '..', 'packages/template-retail-react-app')
-const retailReactAppPkg = JSON.parse(sh.cat(path.join(retailReactAppPkgDir, 'package.json')))
-// TODO: `packagesWithIndependentVersion`
-const ignoreList = [
-    {
-        pathToPackage: retailReactAppPkgDir, 
-        oldVersion: retailReactAppPkg.version
-    }
-]
+const INDEPENDENT_PACKAGES = JSON.parse(sh.cat(path.join(__dirname, 'packages-with-independent-version.json')))
+
+const {stdout} = sh.exec('lerna list --all --json', {silent: true})
+const monorepoPackages = JSON.parse(stdout.toString())
+const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) => monorepoPackages.find((pkg) => pkg.name === pkgName))
 
 const main = () => {
     // TODO: during our release process, it looks like we should be tagging with annotated tags:
@@ -36,8 +32,6 @@ const main = () => {
     const lernaConfig = JSON.parse(sh.cat(lernaConfigPath))
     const newVersion = lernaConfig.version
 
-    const {stdout} = sh.exec('lerna list --all --json', {silent: true})
-    const monorepoPackages = JSON.parse(stdout.toString())
     const packageNames = monorepoPackages.map((pkg) => pkg.name)
 
     monorepoPackages.forEach(({location}) => {
@@ -63,10 +57,10 @@ const main = () => {
     // update versions for root package and root package lock
     setPackageVersion(newVersion, {cwd: rootPath})
 
-    ignoreList.forEach(({pathToPackage, oldVersion}) => {
+    independentPackages.forEach(({location, version: oldVersion}) => {
         // Restore and then increment to the next pre-release version
-        setPackageVersion(oldVersion, {cwd: pathToPackage})
-        setPackageVersion('prerelease', {cwd: pathToPackage})
+        setPackageVersion(oldVersion, {cwd: location})
+        setPackageVersion('prerelease', {cwd: location})
     })
 
     sh.echo('\nVersions of packages in the monorepo:')
