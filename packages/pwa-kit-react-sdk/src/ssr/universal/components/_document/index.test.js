@@ -34,10 +34,15 @@ describe('Document', () => {
         // by default, React Testing Library append the test component into a body tag, since our component is a full DOM
         // there will be two body tags in the DOM, we only want to check the second one
         const bodyTag = document.querySelectorAll('body')[1]
+        // it looks like it returns two html collection, the first one is the React Testing library, the second one is our component we are testing
+        const htmlTag = document.getElementsByTagName('html')[1]
+        screen.debug()
+        console.log('htmlTag', Object.assign({}, htmlTag))
         expect(svgTag).toBeInTheDocument()
         expect(scriptTag).toBeInTheDocument()
         expect(styleTag).toBeInTheDocument()
         expect(screen.getByText(/hello world/i)).toBeInTheDocument()
         expect(bodyTag).toHaveAttribute('class', 'root')
+        expect(htmlTag).toHaveAttribute('lang', 'en')
     })
 })
