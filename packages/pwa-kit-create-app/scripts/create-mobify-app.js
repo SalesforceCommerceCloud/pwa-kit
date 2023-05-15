@@ -501,13 +501,12 @@ const askExtensibilityQuestions = async () => {
         // In the future we might want to ask what version of the selected project they
         // want to extend. But for now lets just get the latest version and synthetically
         // inject it as an "answer"
-        // version = sh.exec(`npm view ${projectConfig.id} version`).stdout
-        version = sh.exec(`npm view ${'pwa-kit-react-sdk'} version`).stdout
+        version = sh.execSync(`npm view ${'pwa-kit-react-sdk'} version`).stdout
     }
 
     answers = {
         ...answers,
-        version
+        templateVersion: version
     }
 
     return answers
