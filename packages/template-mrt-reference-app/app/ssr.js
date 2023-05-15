@@ -67,7 +67,7 @@ const ENVS_TO_EXPOSE = [
     'aws_lambda_log_stream_name',
     'aws_region',
     'bundle_id',
-    // These "customer" defined environment variables are set by the Manager 
+    // These "customer" defined environment variables are set by the Manager
     // and expected by the MRT smoke test suite
     'customer_defined_array',
     'customer_defined_boolean',
@@ -81,7 +81,7 @@ const ENVS_TO_EXPOSE = [
     'external_domain_name',
     'mobify_property_id',
     'node_env',
-    'tz',
+    'tz'
 ]
 
 const HEADERS_TO_REDACT = ['x-api-key', 'x-apigateway-context', 'x-apigateway-event']
