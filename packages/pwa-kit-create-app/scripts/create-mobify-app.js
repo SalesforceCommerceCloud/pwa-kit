@@ -474,7 +474,7 @@ const askGeneralQuestions = async () => {
     return await inquirer.prompt(questions)
 }
 
-const askExtensibilityQuestions = async () => {
+const askExtensibilityQuestions = async (preset) => {
     // Returns the extends, and version, and output dir (leave that out for now.)
     const questions = [
         {
@@ -498,10 +498,14 @@ const askExtensibilityQuestions = async () => {
     let version
 
     if (answers.extendable) {
+        // TODO: This needs to be a utility!
+        const templateSource = preset.templateSources.find(({type}) => type === 'npm')
+
         // In the future we might want to ask what version of the selected project they
         // want to extend. But for now lets just get the latest version and synthetically
         // inject it as an "answer"
-        version = sh.execSync(`npm view ${'pwa-kit-react-sdk'} version`).stdout
+        console.log(`npm view ${templateSource.id} version`)
+        version = sh.execSync(`npm view ${templateSource.id} version`).stdout
     }
 
     answers = {
