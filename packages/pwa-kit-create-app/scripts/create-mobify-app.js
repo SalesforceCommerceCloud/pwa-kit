@@ -55,34 +55,233 @@ sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
+// Validations
+const validPreset = (preset) => {
+    return Object.keys(PRESETS).includes(preset)
+}
+
+const validProjectName = (s) => {
+    const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
+    return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
+}
+
+const validUrl = (s) => {
+    try {
+        new URL(s)
+        return true
+    } catch (err) {
+        return 'Value must be an absolute URL'
+    }
+}
+
+const validSiteId = (s) =>
+    /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
+
+// To see definitions for Commerce API configuration values, go to
+// https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
+const defaultCommerceAPIError =
+    'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
+const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
+
+const validClientId = (s) =>
+    /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
+    s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
+    defaultCommerceAPIError
+const validOrganizationId = (s) =>
+    /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
+
+// Project name constants.
+const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
+const RETAIL_REACT_APP_TEST_PROJECT = 'retail-react-app-test-project' // TODO: update the ci scripts
+const RETAIL_REACT_APP = 'retail-react-app'
 const TYPESCRIPT_MINIMAL_TEST_PROJECT = 'typescript-minimal-test-project'
 const TYPESCRIPT_MINIMAL = 'typescript-minimal'
 const EXPRESS_MINIMAL_TEST_PROJECT = 'express-minimal-test-project'
 const EXPRESS_MINIMAL = 'express-minimal'
-const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
-const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
-const RETAIL_REACT_APP = 'retail-react-app'
 const MRT_REFERENCE_APP = 'mrt-reference-app'
 
-const PRIVATE_PRESETS = [
-    TEST_PROJECT,
-    EXPRESS_MINIMAL_TEST_PROJECT,
-    TYPESCRIPT_MINIMAL_TEST_PROJECT,
-    MRT_REFERENCE_APP
-]
-const PUBLIC_PRESETS = [
-    RETAIL_REACT_APP_DEMO,
-    RETAIL_REACT_APP,
-    EXPRESS_MINIMAL,
-    TYPESCRIPT_MINIMAL
-]
-const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
+// Project dictionary describing details and how the gerator should ask questions etc.
+const PRESETS = {
+    [RETAIL_REACT_APP]: {
+        id: RETAIL_REACT_APP,
+        name: 'Retail React App',
+        description: 'The Retail app using your own Commerce Cloud instance',
+        templateSources: [
+            {
+                type: 'npm',
+                id: 'retail-react-app'
+            },
+            {
+                type: 'bundle',
+                id: 'template-retail-react-app'
+            }
+        ],
+        preProcess: async (answers = {}) => {
+            // "answers" are the answers up until asking the detailed project quesions.
+            const questions = [
+                {
+                    name: 'instanceUrl',
+                    message: 'What is the URL for your Commerce Cloud instance?',
+                    validate: validUrl
+                },
+                {
+                    name: 'clientId',
+                    message: 'What is your SLAS Client ID?',
+                    validate: validClientId
+                },
+                {
+                    name: 'siteId',
+                    message: 'What is your Site ID in Business Manager?',
+                    validate: validSiteId
+                },
+                {
+                    name: 'organizationId',
+                    message: 'What is your Commerce API organization ID in Business Manager?',
+                    validate: validOrganizationId
+                },
+                {
+                    name: 'shortCode',
+                    message: 'What is your Commerce API short code in Business Manager?',
+                    validate: validShortCode
+                }
+            ]
+            const projectAnswers = await inquirer.prompt(questions)
 
-const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
+            return {
+                ...answers,
+                project: projectAnswers
+            }
+        },
+        private: false
+    },
+    [RETAIL_REACT_APP_DEMO]: {
+        id: RETAIL_REACT_APP_DEMO,
+        name: 'Retail React App Demo',
+        description: 'The Retail app with demo Commerce Cloud instance',
+        templateSources: [
+            {
+                type: 'bundle',
+                id: 'template-retail-react-app'
+            }
+        ],
+        preProcess: (answers = {}) => {
+            return {
+                ...answers,
+                project: {
+                    projectName: 'demo-storefront',
+                    instanceUrl: 'https://zzte-053.dx.commercecloud.salesforce.com',
+                    clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
+                    siteId: 'RefArch',
+                    organizationId: 'f_ecom_zzte_053',
+                    shortCode: 'kv7kzm78',
+                    einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                    einsteinSiteId: 'aaij-MobileFirst'
+                }
+            }
+        },
+        private: false
+    },
+    [RETAIL_REACT_APP_TEST_PROJECT]: {
+        id: RETAIL_REACT_APP_TEST_PROJECT,
+        name: 'Retail React App Test Project',
+        description: '',
+        templateSources: [
+            {
+                type: 'bundle',
+                id: 'template-retail-react-app'
+            }
+        ],
+        preProcess: () => {
+            return {
+                projectName: 'retail-react-app',
+                instanceUrl: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                siteId: 'RefArch',
+                organizationId: 'f_ecom_zzrf_001',
+                shortCode: 'kv7kzm78',
+                einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                einsteinSiteId: 'aaij-MobileFirst'
+            }
+        },
+        private: false
+    },
+    [TYPESCRIPT_MINIMAL_TEST_PROJECT]: {
+        id: TYPESCRIPT_MINIMAL_TEST_PROJECT,
+        name: 'Template Minimal Test Project',
+        description: '',
+        templateSources: [
+            {
+                type: 'bundle',
+                id: 'template-typescript-minimal'
+            }
+        ],
+        private: true
+    },
+    [TYPESCRIPT_MINIMAL]: {
+        id: TYPESCRIPT_MINIMAL,
+        name: 'Template Minimal Project',
+        description: '',
+        templateSources: [
+            {
+                type: 'bundle',
+                id: 'template-typescript-minimal'
+            }
+        ],
+        private: true
+    },
+    [EXPRESS_MINIMAL_TEST_PROJECT]: {
+        id: EXPRESS_MINIMAL_TEST_PROJECT,
+        name: 'Express Minimal Test Project',
+        description: '',
+        templateSources: [
+            {
+                type: 'bundle',
+                id: 'template-express-minimal'
+            }
+        ],
+        private: true
+    },
+    [EXPRESS_MINIMAL]: {
+        id: EXPRESS_MINIMAL,
+        name: 'Express Minimal Project',
+        description: '',
+        templateSources: [
+            {
+                type: 'bundle',
+                id: 'template-express-minimal'
+            }
+        ],
+        private: true
+    },
+    [MRT_REFERENCE_APP]: {
+        id: MRT_REFERENCE_APP,
+        name: 'Managed Runtime Reference App',
+        description: '',
+        templateSources: [
+            {
+                type: 'bundle',
+                id: 'template-mrt-reference-app'
+            }
+        ],
+        private: true
+    }
+}
+
+const PRIVATE_PRESET_NAMES = Object.values(PRESETS)
+    .filter(({private}) => !!private)
+    .map(({id}) => id)
+
+const PUBLIC_PRESET_NAMES = Object.values(PRESETS)
+    .filter(({private}) => !private)
+    .map(({id}) => id)
+
+const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
 
 const PROJECT_ID_MAX_LENGTH = 20
 
 const SDK_VERSION = generatorPkg.version
+
+// Utilities
 
 const readJson = (path) => JSON.parse(sh.cat(path))
 
@@ -91,11 +290,55 @@ const writeJson = (path, data) => new sh.ShellString(JSON.stringify(data, null, 
 const replaceJSON = (path, replacements) =>
     writeJson(path, Object.assign(readJson(path), replacements))
 
-const slugifyName = (name) => {
-    return slugify(name, {
+const slugifyName = (name) =>
+    slugify(name, {
         lower: true,
         strict: true
     }).slice(0, PROJECT_ID_MAX_LENGTH)
+
+/**
+ * Check if the provided path is an empty directory.
+ * @param {*} path
+ * @returns
+ */
+const isDirEmpty = (path) => fs.readdirSync(path).length === 0
+
+/**
+ * Logs an error and exits the process if the provided path points at a
+ * non-empty directory.
+ *
+ * @param {*} path
+ */
+const checkOutputDir = (path) => {
+    if (sh.test('-e', path) && !isDirEmpty(path)) {
+        console.error(
+            `The output directory "${path}" already exists. Try, for example, ` +
+                `"~/Desktop/my-project" instead of "~/Desktop"`
+        )
+        process.exit(1)
+    }
+}
+
+/**
+ * Returns a list of absolute file paths for a given folder. This will recursively
+ * list files in child folders.
+ *
+ * @param {*} dirPath
+ * @param {*} arrayOfFiles
+ * @returns
+ */
+const getAllFiles = (dirPath, arrayOfFiles = []) => {
+    const files = fs.readdirSync(dirPath)
+
+    files.forEach(function (file) {
+        if (fs.statSync(p.join(dirPath, file)).isDirectory()) {
+            arrayOfFiles = getAllFiles(p.join(dirPath, file), arrayOfFiles)
+        } else {
+            arrayOfFiles.push(p.join(dirPath, file))
+        }
+    })
+
+    return arrayOfFiles
 }
 
 /**
@@ -115,137 +358,10 @@ const slugifyName = (name) => {
 const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => replacement})
 
 /**
- * @param answers - a map of package-names to package.json values that are
- *   deep-merged with each package's original package.json data. Eg:
  *
- *   {
- *      "retail-react-app": {
- *          "name": "new-project-web",
- *          "version": "0.0.1",
- *      }
- *   }
- *
- * Each package name included in the object's keys will be copied into the
- * generated project, all others are excluded.
+ * @param {*} outputDir
+ * @param {*} param1
  */
-const runGenerator = (answers, {outputDir, verbose}) => {
-    checkOutputDir(outputDir)
-    fs.mkdirSync(outputDir)
-    // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
-    // const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
-
-    // Check specified SDK versions actually exist on NPM.
-    // npmInstallables.forEach((pkgName) => {
-    //     const versions = JSON.parse(sh.exec(`npm view ${pkgName} versions --json`, {silent: true}))
-    //     if (versions.indexOf(SDK_VERSION) < 0) {
-    //         const msg =
-    //             `Error: You're generating a project using version "${SDK_VERSION}" of ` +
-    //             `PWA Kit, but "${pkgName}@${SDK_VERSION}" does not exist on NPM.\n` +
-    //             `The available versions are:\n${versions.map((v) => `  ${v}`).join('\n')}`
-    //         console.error(msg)
-    //         process.exit(1)
-    //     }
-    // })
-    const extensible = !!answers.templatePackageName
-
-    if (extensible) {
-        // Steps needed to create an extensible app
-        // 1. Check what bootstrap template you need (js or ts) NOTE: TS isn't implemented, but maybe we will in the future.
-        // 2. Iterated over all the template files in the bootstrap template and write them to the distination folder.
-        // Loop through all the files in the temp directory
-
-        // TODO: Move this to a util or something.
-        const getAllFiles = (dirPath, arrayOfFiles) => {
-            files = fs.readdirSync(dirPath)
-
-            arrayOfFiles = arrayOfFiles || []
-
-            files.forEach(function (file) {
-                if (fs.statSync(dirPath + '/' + file).isDirectory()) {
-                    arrayOfFiles = getAllFiles(dirPath + '/' + file, arrayOfFiles)
-                } else {
-                    arrayOfFiles.push(p.join(dirPath, '/', file))
-                }
-            })
-
-            return arrayOfFiles
-        }
-
-        const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
-
-        // Copy folder to destination and process template if required.
-        getAllFiles(inputDir).forEach((inputFile) => {
-            const outputFile = outputDir + inputFile.replace(inputDir, '')
-            const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
-
-            // Create folder if we are doing a deep copy
-            if (destDir) {
-                fs.mkdirSync(destDir, {recursive: true})
-            }
-
-            if (inputFile.endsWith('.hbs')) {
-                const templateString = sh.cat(inputFile)
-                const template = Handlebars.compile(templateString.stdout)
-                fs.writeFileSync(outputFile.replace('.hbs', ''), template(answers))
-            } else {
-                fs.copyFileSync(inputFile, outputFile)
-            }
-        })
-    } else {
-        downloadAndExtractTemplate('retail-react-app', outputDir)
-
-        const pkgJsonPath = p.resolve(outputDir, 'package.json')
-        const pkgJSON = readJson(pkgJsonPath)
-        const pkgDataWithAnswers = merge(pkgJSON, answers.retailReactApp)
-
-        writeJson(pkgJsonPath, pkgDataWithAnswers)
-
-        // const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
-        // const siteName = pkgDataWithAnswers.name
-        // replaceJSON(manifest, {
-        //     name: siteName,
-        //     short_name: siteName,
-        //     start_url: '/?homescreen=1',
-        //     icons: [
-        //         {
-        //             src: './img/global/app-icon-192.png',
-        //             sizes: '192x192'
-        //         },
-        //         {
-        //             src: './img/global/app-icon-512.png',
-        //             sizes: '512x512'
-        //         }
-        //     ]
-        // })
-
-        const PWAKitConfigTemplate = require(`../assets/pwa/default`).template
-        const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
-
-        const commerceAPI = {
-            proxyPath: 'api',
-            instanceUrl: answers.commerceAPI.instanceUrl,
-            clientId: answers.commerceAPI.clientId,
-            organizationId: answers.commerceAPI.organizationId,
-            shortCode: answers.commerceAPI.shortCode,
-            siteId: answers.commerceAPI.siteId
-        }
-        const einsteinAPI = {
-            einsteinId: answers.einsteinAPI.einsteinId,
-            siteId: answers.einsteinAPI.siteId || answers.commerceAPI.siteId
-        }
-
-        new sh.ShellString(PWAKitConfigTemplate({commerceAPI, einsteinAPI})).to(
-            p.resolve(outputDir, 'config', 'default.js')
-        )
-
-        new sh.ShellString(PWAKitSitesTemplate(answers)).to(
-            p.resolve(outputDir, 'config', 'sites.js')
-        )
-    }
-
-    npmInstall(outputDir, {verbose})
-}
-
 const npmInstall = (outputDir, {verbose}) => {
     console.log('Installing dependencies... This may take a few minutes.\n')
     const npmLogLevel = verbose ? 'notice' : 'error'
@@ -269,152 +385,100 @@ const npmInstall = (outputDir, {verbose}) => {
     }
 }
 
-// Validations
-const validProjectName = (s) => {
-    const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
-    return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
-}
+/**
+ * This function does the bulk of the project generation given the project config
+ * object and the answers returned from the survey process.
+ *
+ * @param {*} preset
+ * @param {*} answers
+ * @param {*} param2
+ */
+const runGenerator = (preset, answers, {outputDir, verbose}) => {
+    console.log('runGenerator: ')
+    console.log('preset: ', preset)
+    console.log('answers: ', answers)
+    const {templateSource, projectId} = answers.general
+    const templateSourceType = templateSource.type
 
-const validUrl = (s) => {
-    try {
-        new URL(s)
-        return true
-    } catch (err) {
-        return 'Value must be an absolute URL'
-    }
-}
-
-const validSiteId = (s) =>
-    /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
-
-// To see definitions for Commerce API configuration values, go to
-// https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
-const defaultCommerceAPIError =
-    'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
-const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
-const validClientId = (s) =>
-    /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
-    s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
-    defaultCommerceAPIError
-const validOrganizationId = (s) =>
-    /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
-
-const retailReactAppPrompts = () => {
-    const questions = [
-        {
-            name: 'projectName',
-            validate: validProjectName,
-            message: 'What is the name of your Project?'
-        },
-        {
-            name: 'instanceUrl',
-            message: 'What is the URL for your Commerce Cloud instance?',
-            validate: validUrl
-        },
-        {
-            name: 'clientId',
-            message: 'What is your SLAS Client ID?',
-            validate: validClientId
-        },
-        {
-            name: 'siteId',
-            message: 'What is your Site ID in Business Manager?',
-            validate: validSiteId
-        },
-        {
-            name: 'organizationId',
-            message: 'What is your Commerce API organization ID in Business Manager?',
-            validate: validOrganizationId
-        },
-        {
-            name: 'shortCode',
-            message: 'What is your Commerce API short code in Business Manager?',
-            validate: validShortCode
-        }
-    ]
-
-    return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
-}
-
-const buildAnswers = ({
-    projectName,
-    instanceUrl,
-    clientId,
-    siteId,
-    organizationId,
-    shortCode,
-    einsteinId,
-    einsteinSiteId
-}) => {
-    const projectId = slugifyName(projectName)
-
-    return {
-        globals: {projectId},
-        retailReactApp: {
-            name: projectId,
-            version: GENERATED_PROJECT_VERSION
-        },
-        commerceAPI: {clientId, siteId, organizationId, shortCode, instanceUrl},
-        einsteinAPI: {einsteinId, siteId: einsteinSiteId || siteId}
-    }
-}
-
-const testProjectAnswers = () => {
-    const config = {
-        projectName: 'retail-react-app',
-        instanceUrl: 'https://zzrf-001.dx.commercecloud.salesforce.com',
-        clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-        siteId: 'RefArch',
-        organizationId: 'f_ecom_zzrf_001',
-        shortCode: 'kv7kzm78',
-        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-        einsteinSiteId: 'aaij-MobileFirst'
-    }
-
-    return buildAnswers(config)
-}
-
-const demoProjectAnswers = () => {
-    const config = {
-        projectName: 'demo-storefront',
-        instanceUrl: 'https://zzte-053.dx.commercecloud.salesforce.com',
-        clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
-        siteId: 'RefArch',
-        organizationId: 'f_ecom_zzte_053',
-        shortCode: 'kv7kzm78',
-        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-        einsteinSiteId: 'aaij-MobileFirst'
-    }
-
-    return buildAnswers(config)
-}
-
-const templateMinimalPrompts = () => {
-    const questions = [
-        {
-            name: 'projectName',
-            validate: validProjectName,
-            message: 'What is the name of your Project?'
-        }
-    ]
-    return inquirer.prompt(questions)
-}
-
-const runTemplateGenerator = (projectId, {outputDir, verbose}, template) => {
+    // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
-    extractTemplate(template, outputDir)
+
+    switch (templateSourceType) {
+        case 'npm': {
+            const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
+
+            // Copy folder to destination and process template if required.
+            getAllFiles(inputDir).forEach((inputFile) => {
+                const outputFile = outputDir + inputFile.replace(inputDir, '')
+                const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
+
+                // Create folder if we are doing a deep copy
+                if (destDir) {
+                    fs.mkdirSync(destDir, {recursive: true})
+                }
+
+                if (inputFile.endsWith('.hbs')) {
+                    const templateString = sh.cat(inputFile)
+                    const template = Handlebars.compile(templateString.stdout)
+                    fs.writeFileSync(outputFile.replace('.hbs', ''), template({answers}))
+                } else {
+                    fs.copyFileSync(inputFile, outputFile)
+                }
+            })
+            break
+        }
+        case 'bundle':
+            prepareTemplate(templateSource.id, {outputDir, source: templateSourceType})
+            break
+        default:
+            console.error('Unknown template source type. How did I get here?')
+            process.exit(1)
+    }
+
+    // This is where we do post processing of the project. Like updating package json values,
+    // etc.
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const finalPkgData = merge(pkgJSON, {name: projectId})
     writeJson(pkgJsonPath, finalPkgData)
 
+    // Finally we install the newly minted projects dependencies
     npmInstall(outputDir, {verbose})
 }
 
-const extensibilityPrompts = async () => {
+/**
+ * Return all the generic questions that relate to all projects that can be
+ * generated with this tool. In this case it's the type of project you want
+ * to generate, but there might be more in the future.
+ *
+ * @returns
+ */
+const askGeneralQuestions = async () => {
+    // 'projectId' is synonymous with the package name.
     const questions = [
         {
-            name: 'extensible',
+            name: 'presetId',
+            message: 'Choose a project preset to get started:',
+            type: 'list',
+            choices: Object.values(PRESETS)
+                .filter(({private}) => !private)
+                .map(({description, id}) => ({name: description, value: id}))
+        },
+        {
+            name: 'projectName',
+            validate: validProjectName,
+            message: 'What is the name of your Project?'
+        }
+    ]
+
+    return await inquirer.prompt(questions)
+}
+
+const askExtensibilityQuestions = async () => {
+    // Returns the extends, and version, and output dir (leave that out for now.)
+    const questions = [
+        {
+            name: 'extend',
             message: 'Do you wish to use template extensibility?',
             type: 'list',
             choices: [
@@ -430,63 +494,57 @@ const extensibilityPrompts = async () => {
         }
     ]
 
-    return inquirer.prompt(questions)
+    let answers = await inquirer.prompt(questions)
+    let version
+
+    if (answers.extendable) {
+        // In the future we might want to ask what version of the selected project they
+        // want to extend. But for now lets just get the latest version and synthetically
+        // inject it as an "answer"
+        // version = sh.exec(`npm view ${projectConfig.id} version`).stdout
+        version = sh.exec(`npm view ${'pwa-kit-react-sdk'} version`).stdout
+    }
+
+    answers = {
+        ...answers,
+        version
+    }
+
+    return answers
 }
 
-const presetPrompt = async () => {
-    const questions = [
-        {
-            name: 'preset',
-            message: 'Choose a project to get started:',
-            type: 'list',
-            choices: [
-                {
-                    name: 'The Retail app with demo Commerce Cloud instance',
-                    value: RETAIL_REACT_APP_DEMO
-                },
-                {
-                    name: 'The Retail app using your own Commerce Cloud instance',
-                    value: RETAIL_REACT_APP
-                }
-            ]
-        }
-    ]
-
-    const presetChoice = await inquirer.prompt(questions)
-
-    return presetChoice['preset']
-}
-
-const extractTemplate = (templateName, outputDir) => {
+const prepareTemplate = (templateName, {outputDir, source = 'bundle'}) => {
+    console.log('prepareTemplate: ', templateName, outputDir, source)
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
-    tar.x({
-        file: p.join(__dirname, '..', 'templates', `${templateName}.tar.gz`),
-        cwd: p.join(tmp),
-        sync: true
-    })
-    sh.cp('-R', p.join(tmp, templateName), outputDir)
-    sh.rm('-rf', tmp)
-}
 
-/**
- * Downloads the provided template project from npm and extracts it to the
- * output directory. NOTE: Version selection is currently not supported.
- * @param {*} templateName
- * @param {*} outputDir
- */
-const downloadAndExtractTemplate = (templateName, outputDir) => {
-    const tmp = fs.mkdtempSync(p.resolve(os.tmpdir()))
-    const {stdout} = sh.exec(`npm pack ${templateName}@latest --pack-destination="${tmp}"`, {
-        silent: true
-    })
+    switch (source) {
+        case 'npm': {
+            const {stdout} = sh.exec(
+                `npm pack ${templateName}@latest --pack-destination="${tmp}"`,
+                {
+                    silent: true
+                }
+            )
+            tar.x({
+                file: p.join(tmp, stdout.trim()),
+                cwd: p.join(tmp),
+                sync: true
+            })
+            sh.cp('-R', p.join(tmp, 'package', '*'), outputDir)
 
-    tar.x({
-        file: p.join(tmp, stdout.trim()),
-        cwd: p.join(tmp),
-        sync: true
-    })
-    console.log(`copying ${p.join(tmp, 'package', '*')} to ${outputDir}`)
-    sh.cp('-R', p.join(tmp, 'package', '*'), outputDir)
+            break
+        }
+        default:
+            tar.x({
+                file: p.join(__dirname, '..', 'templates', `${templateName}.tar.gz`),
+                cwd: p.join(tmp),
+                sync: true
+            })
+            sh.cp('-R', p.join(tmp, templateName), outputDir)
+            sh.rm('-rf', tmp)
+    }
+
+    // Clean up
     sh.rm('-rf', tmp)
 }
 
@@ -494,21 +552,7 @@ const foundNode = process.versions.node
 const requiredNode = generatorPkg.engines.node
 const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
-const isDirEmpty = (path) => {
-    return fs.readdirSync(path).length === 0
-}
-
-const checkOutputDir = (path) => {
-    if (sh.test('-e', path) && !isDirEmpty(path)) {
-        console.error(
-            `The output directory "${path}" already exists. Try, for example, ` +
-                `"~/Desktop/my-project" instead of "~/Desktop"`
-        )
-        process.exit(1)
-    }
-}
-
-const main = (opts) => {
+const main = async (opts) => {
     if (!isUsingCompatibleNode) {
         console.log('')
         console.warn(
@@ -519,91 +563,81 @@ const main = (opts) => {
         console.log('')
     }
 
-    const OUTPUT_DIR_FLAG_ACTIVE = !(opts.outputDir === DEFAULT_OUTPUT_DIR)
+    const OUTPUT_DIR_FLAG_ACTIVE = !!opts.outputDir
 
-    return Promise.resolve()
-        .then(() => opts.preset || process.env.GENERATOR_PRESET || presetPrompt())
-        .then((preset) => {
-            switch (preset) {
-                case TYPESCRIPT_MINIMAL_TEST_PROJECT:
-                    return runTemplateGenerator(
-                        'typescript-minimal',
-                        opts,
-                        'template-typescript-minimal'
-                    )
-                case TYPESCRIPT_MINIMAL:
-                    return templateMinimalPrompts(opts).then((answers) => {
-                        const projectId = slugifyName(answers.projectName)
-                        if (!OUTPUT_DIR_FLAG_ACTIVE) {
-                            opts.outputDir = p.join(process.cwd(), projectId)
-                        }
-                        runTemplateGenerator(projectId, opts, 'template-typescript-minimal')
-                        return opts.outputDir
-                    })
-                case EXPRESS_MINIMAL_TEST_PROJECT:
-                    return runTemplateGenerator('express-minimal', opts, 'template-express-minimal')
-                case EXPRESS_MINIMAL:
-                    return templateMinimalPrompts(opts).then((answers) => {
-                        const projectId = slugifyName(answers.projectName)
-                        if (!OUTPUT_DIR_FLAG_ACTIVE) {
-                            opts.outputDir = p.join(process.cwd(), projectId)
-                        }
-                        runTemplateGenerator(projectId, opts, 'template-express-minimal')
-                        return opts.outputDir
-                    })
-                case TEST_PROJECT:
-                    return runGenerator(testProjectAnswers(), opts)
-                case MRT_REFERENCE_APP:
-                    return runTemplateGenerator(
-                        'mrt-reference-app',
-                        opts,
-                        'template-mrt-reference-app'
-                    )
-                case RETAIL_REACT_APP_DEMO:
-                    return extensibilityPrompts(opts)
-                        .then((answers) =>
-                            runGenerator(
-                                {
-                                    ...demoProjectAnswers(),
-                                    ...(answers.extensible
-                                        ? {templatePackageName: 'retail-react-app'}
-                                        : {})
-                                },
-                                opts
-                            )
-                        )
-                        .then((result) => {
-                            console.log(
-                                '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
-                            )
-                            return result
-                        })
-                case RETAIL_REACT_APP:
-                    console.log(
-                        'For details on configuration options, see https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options\n'
-                    )
-                    return retailReactAppPrompts(opts).then((answers) => {
-                        if (!OUTPUT_DIR_FLAG_ACTIVE) {
-                            opts.outputDir = p.join(
-                                process.cwd(),
-                                slugifyName(answers.globals.projectId)
-                            )
-                        }
+    const presetId = opts.preset || process.env.GENERATOR_PRESET
+    let preset
+    let answers = {
+        general: {
+            projectId: preset
+        }
+    }
 
-                        runGenerator(answers, opts)
-                        return opts.outputDir
-                    })
-                default:
-                    console.error(
-                        `The preset "${preset}" is not valid. Valid presets are: ${
-                            process.env.GENERATOR_PRESET
-                                ? PRESETS.map((x) => `"${x}"`).join(' ')
-                                : PUBLIC_PRESETS.map((x) => `"${x}"`).join(' ')
-                        }.`
-                    )
-                    process.exit(1)
-            }
-        })
+    // Exit is preset is provided by not valid.
+    if (presetId && !validPreset(presetId)) {
+        console.error(
+            `The preset "${preset}" is not valid. Valid presets are: ${
+                process.env.GENERATOR_PRESET
+                    ? ALL_PRESET_NAMES.map((x) => `"${x}"`).join(' ')
+                    : PUBLIC_PRESET_NAMES.map((x) => `"${x}"`).join(' ')
+            }.`
+        )
+        process.exit(1)
+    }
+
+    // Step 1: If we aren't using a preset ask what type of project the user wants to generate.
+    // TODO: We need a flag to show private projects.
+    if (!presetId) {
+        answers.general = await askGeneralQuestions()
+    }
+
+    // Assign project details for use in following steps.
+    preset = PRESETS[answers.general.presetId]
+
+    // For convenience access only
+    const noop = async (x) => x // TODO: Move me.
+    const {preProcess = noop, postProcess = noop} = preset
+
+    if (!OUTPUT_DIR_FLAG_ACTIVE) {
+        opts.outputDir = p.join(process.cwd(), preset.id)
+    }
+
+    // If the preset is configured to allow its template source to be "NPM"
+    // then that means it supports extensibility.
+    const extendable = preset.templateSources.find(({type}) => type === 'npm')
+
+    // Step 2: If extensibility is supported ask if you want to use it.
+    let templateSource
+    let extendableAnswers = {}
+
+    if (extendable) {
+        extendableAnswers = await askExtensibilityQuestions(preset)
+    }
+
+    // Get the templateSource object based on the `extendable` answer.
+    const {extend = false} = extendableAnswers
+    templateSource = preset.templateSources.find(({type}) =>
+        extend || false ? type === 'npm' : type === 'bundle'
+    )
+
+    // TODO: Maybe error when template source is not defined.
+    console.log('templateSource: ', templateSource)
+    answers.general = {
+        ...answers.general,
+        ...extendableAnswers,
+        templateSource
+    }
+
+    // Step 3: Ask project specific questions if there are any.
+    answers = await preProcess(answers)
+
+    // Step 4: Generate the project.
+    runGenerator(preset, answers, {outputDir: opts.outputDir, verbose: opts.verbose})
+
+    // Step 5: Run the post process is one exists
+    await postProcess(opts.outputDir)
+
+    return true
 }
 
 if (require.main === module) {
@@ -637,14 +671,10 @@ if (require.main === module) {
      which to build new TypeScript project templates for Managed Runtime.
    `)
     program
-        .option(
-            '--outputDir <path>',
-            `Path to the output directory for the new project`,
-            DEFAULT_OUTPUT_DIR
-        )
+        .option('--outputDir <path>', `Path to the output directory for the new project`)
         .option(
             '--preset <name>',
-            `The name of a project preset to use (choices: ${PUBLIC_PRESETS.map(
+            `The name of a project preset to use (choices: ${PUBLIC_PRESET_NAMES.map(
                 (x) => `"${x}"`
             ).join(', ')})`
         )
