@@ -26,8 +26,7 @@ describe('Document', () => {
                 beforeBodyEnd={[script]}
                 htmlAttributes={htmlAttributes}
                 bodyAttributes={bodyAttributes}
-            />,
-            {container: document.documentElement}
+            />
         )
         screen.debug()
         const scriptTag = document.querySelector('script')
