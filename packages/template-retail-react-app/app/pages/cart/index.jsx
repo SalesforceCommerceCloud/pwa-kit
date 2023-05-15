@@ -1,11 +1,10 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -25,48 +24,137 @@ import RecommendedProducts from '../../components/recommended-products'
 
 // Hooks
 import {useToast} from '../../hooks/use-toast'
-import useWishlist from '../../hooks/use-wishlist'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useNavigation from '../../hooks/use-navigation'
-import useBasket from '../../commerce-api/hooks/useBasket'
+import {useWishList} from '../../hooks/use-wish-list'
 
 // Constants
 import {
     API_ERROR_MESSAGE,
+    EINSTEIN_RECOMMENDERS,
     TOAST_ACTION_VIEW_WISHLIST,
-    TOAST_MESSAGE_ADDED_TO_WISHLIST
+    TOAST_MESSAGE_ADDED_TO_WISHLIST,
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
 } from '../../constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from './partials/cart-secondary-button-group'
 
 // Utilities
 import debounce from 'lodash/debounce'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
+import {
+    useShopperBasketsMutation,
+    useShippingMethodsForShipment,
+    useProducts,
+    useShopperCustomersMutation
+} from 'commerce-sdk-react-preview'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 const Cart = () => {
-    const basket = useBasket()
-    const customer = useCustomer()
+    const {data: basket, isLoading} = useCurrentBasket()
+
+    const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
+    const {data: products} = useProducts(
+        {
+            parameters: {
+                ids: productIds,
+                allImages: true
+            }
+        },
+        {
+            enabled: Boolean(productIds),
+            select: (result) => {
+                // Convert array into key/value object with key is the product id
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
+    const {data: customer} = useCurrentCustomer()
+    const {customerId, isRegistered} = customer
+
+    /*****************Basket Mutation************************/
+    const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
+    const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
+    const updateShippingMethodForShipmentsMutation = useShopperBasketsMutation(
+        'updateShippingMethodForShipment'
+    )
+    /*****************Basket Mutation************************/
+
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
+
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const toast = useToast()
     const navigate = useNavigation()
     const modalProps = useDisclosure()
+
+    /******************* Shipping Methods for basket shipment *******************/
+    // do this action only if the basket shipping method is not defined
+    // we need to fetch the shippment methods to get the default value before we can add it to the basket
+    useShippingMethodsForShipment(
+        {
+            parameters: {
+                basketId: basket?.basketId,
+                shipmentId: 'me'
+            }
+        },
+        {
+            // only fetch if basket is has no shipping method in the first shipment
+            enabled:
+                !!basket?.basketId &&
+                basket.shipments.length > 0 &&
+                !basket.shipments[0].shippingMethod,
+            onSuccess: (data) => {
+                updateShippingMethodForShipmentsMutation.mutate({
+                    parameters: {
+                        basketId: basket?.basketId,
+                        shipmentId: 'me'
+                    },
+                    body: {
+                        id: data.defaultShippingMethodId
+                    }
+                })
+            }
+        }
+    )
+
+    /************************* Error handling ***********************/
     const showError = () => {
         toast({
             title: formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }
+    /************************* Error handling ***********************/
 
     /**************** Wishlist ****************/
-    const wishlist = useWishlist()
-    // TODO: DRY this handler when intl provider is available globally
+    const {data: wishlist} = useWishList()
+
+    const createCustomerProductListItem = useShopperCustomersMutation(
+        'createCustomerProductListItem'
+    )
     const handleAddToWishlist = async (product) => {
         try {
-            await wishlist.createListItem({
-                id: product.productId,
-                quantity: product.quantity
+            if (!customerId || !wishlist) {
+                return
+            }
+            await createCustomerProductListItem.mutateAsync({
+                parameters: {
+                    listId: wishlist.id,
+                    customerId
+                },
+                body: {
+                    // NOTE: APi does not respect quantity, it always adds 1
+                    quantity: product.quantity,
+                    productId: product.productId,
+                    public: false,
+                    priority: 1,
+                    type: 'product'
+                }
             })
             toast({
                 title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
@@ -86,31 +174,17 @@ const Cart = () => {
             showError()
         }
     }
+    /**************** Wishlist ****************/
 
-    useEffect(() => {
-        // Set the default shipping method if none is already selected
-        if (basket.basketId && basket.shipments.length > 0 && !basket.shipments[0].shippingMethod) {
-            ;(async () => {
-                const shippingMethods = await basket.getShippingMethods()
-                basket.setShippingMethod(shippingMethods.defaultShippingMethodId)
-            })()
-        }
-    }, [basket.basketId])
-
-    if (!basket?.basketId) {
-        return <CartSkeleton />
-    }
-
-    if (!basket?.productItems) {
-        return <EmptyCart isRegistered={customer.isRegistered} />
-    }
-
+    /***************************** Update Cart **************************/
     const handleUpdateCart = async (variant, quantity) => {
         // close the modal before handle the change
         onClose()
+        // using try-catch is better than using onError callback since we have many mutation calls logic here
         try {
             setCartItemLoading(true)
             const productIds = basket.productItems.map(({productId}) => productId)
+
             // The user is selecting different variant, and it has not existed in basket
             if (selectedItem.id !== variant.productId && !productIds.includes(variant.productId)) {
                 const item = {
@@ -118,18 +192,31 @@ const Cart = () => {
                     quantity,
                     price: variant.price
                 }
-                return await basket.updateItemInBasket(item, selectedItem.itemId)
+                return await updateItemInBasketMutation.mutateAsync({
+                    parameters: {
+                        basketId: basket.basketId,
+                        itemId: selectedItem.itemId
+                    },
+                    body: item
+                })
             }
+
             // The user is selecting different variant, and it has existed in basket
             // remove this item in the basket, change the quantity for the new selected variant in the basket
             if (selectedItem.id !== variant.productId && productIds.includes(variant.productId)) {
-                await basket.removeItemFromBasket(selectedItem.itemId)
+                await removeItemFromBasketMutation.mutateAsync({
+                    parameters: {
+                        basketId: basket.basketId,
+                        itemId: selectedItem.itemId
+                    }
+                })
                 const basketItem = basket.productItems.find(
                     ({productId}) => productId === variant.productId
                 )
                 const newQuantity = quantity + basketItem.quantity
                 return await changeItemQuantity(newQuantity, basketItem)
             }
+
             // the user only changes quantity of the same variant
             if (selectedItem.quantity !== quantity) {
                 return await changeItemQuantity(quantity, selectedItem)
@@ -141,31 +228,45 @@ const Cart = () => {
             setSelectedItem(undefined)
         }
     }
+    /***************************** Update Cart **************************/
 
+    /***************************** Update quantity **************************/
     const changeItemQuantity = debounce(async (quantity, product) => {
         // This local state allows the dropdown to show the desired quantity
         // while the API call to update it is happening.
+        const previousQuantity = localQuantity[product.itemId]
         setLocalQuantity({...localQuantity, [product.itemId]: quantity})
         setCartItemLoading(true)
         setSelectedItem(product)
-        try {
-            const item = {
-                productId: product.id,
-                quantity: parseInt(quantity)
+
+        await updateItemInBasketMutation.mutateAsync(
+            {
+                parameters: {basketId: basket?.basketId, itemId: product.itemId},
+                body: {
+                    productId: product.id,
+                    quantity: parseInt(quantity)
+                }
+            },
+            {
+                onSettled: () => {
+                    // reset the state
+                    setCartItemLoading(false)
+                    setSelectedItem(undefined)
+                },
+                onSuccess: () => {
+                    setLocalQuantity({...localQuantity, [product.itemId]: undefined})
+                },
+                onError: () => {
+                    // reset the quantity to the previous value
+                    setLocalQuantity({...localQuantity, [product.itemId]: previousQuantity})
+                    showError()
+                }
             }
-            await basket.updateItemInBasket(item, product.itemId)
-        } catch {
-            showError()
-        } finally {
-            // reset the state
-            setCartItemLoading(false)
-            setSelectedItem(undefined)
-            setLocalQuantity({...localQuantity, [product.itemId]: undefined})
-        }
+        )
     }, 750)
 
     const handleChangeItemQuantity = async (product, value) => {
-        const {stockLevel} = basket._productItemsDetail[product.productId].inventory
+        const {stockLevel} = products[product.productId].inventory
 
         // Handle removing of the items when 0 is selected.
         if (value === 0) {
@@ -195,27 +296,43 @@ const Cart = () => {
 
         return true
     }
+    /***************************** Update quantity **************************/
+
+    /***************************** Remove Item from basket **************************/
     const handleRemoveItem = async (product) => {
         setSelectedItem(product)
         setCartItemLoading(true)
-        try {
-            await basket.removeItemFromBasket(product.itemId)
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'Item removed from cart',
-                    id: 'cart.info.removed_from_cart'
-                }),
-                status: 'success'
-            })
-        } catch {
-            showError()
-        } finally {
-            // reset the state
-            setCartItemLoading(false)
-            setSelectedItem(undefined)
-        }
+        await removeItemFromBasketMutation.mutateAsync(
+            {
+                parameters: {basketId: basket.basketId, itemId: product.itemId}
+            },
+            {
+                onSettled: () => {
+                    // reset the state
+                    setCartItemLoading(false)
+                    setSelectedItem(undefined)
+                },
+                onSuccess: () => {
+                    toast({
+                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        status: 'success'
+                    })
+                },
+                onError: () => {
+                    showError()
+                }
+            }
+        )
     }
 
+    /********* Rendering  UI **********/
+    if (isLoading) {
+        return <CartSkeleton />
+    }
+
+    if (!isLoading && !basket?.productItems?.length) {
+        return <EmptyCart isRegistered={isRegistered} />
+    }
     return (
         <Box background="gray.50" flex="1" data-testid="sf-cart-container">
             <Container
@@ -234,40 +351,42 @@ const Cart = () => {
                         >
                             <GridItem>
                                 <Stack spacing={4}>
-                                    {basket.productItems.map((product, idx) => (
-                                        <ProductItem
-                                            key={product.productId}
-                                            index={idx}
-                                            secondaryActions={
-                                                <CartSecondaryButtonGroup
-                                                    onAddToWishlistClick={handleAddToWishlist}
-                                                    onEditClick={(product) => {
-                                                        setSelectedItem(product)
-                                                        onOpen()
-                                                    }}
-                                                    onRemoveItemClick={handleRemoveItem}
-                                                />
-                                            }
-                                            product={{
-                                                ...product,
-                                                ...(basket._productItemsDetail &&
-                                                    basket._productItemsDetail[product.productId]),
-                                                price: product.price,
-                                                quantity: localQuantity[product.itemId]
-                                                    ? localQuantity[product.itemId]
-                                                    : product.quantity
-                                            }}
-                                            onItemQuantityChange={handleChangeItemQuantity.bind(
-                                                this,
-                                                product
-                                            )}
-                                            showLoading={
-                                                isCartItemLoading &&
-                                                selectedItem?.itemId === product.itemId
-                                            }
-                                            handleRemoveItem={handleRemoveItem}
-                                        />
-                                    ))}
+                                    {basket.productItems?.map((productItem, idx) => {
+                                        return (
+                                            <ProductItem
+                                                key={productItem.productId}
+                                                index={idx}
+                                                secondaryActions={
+                                                    <CartSecondaryButtonGroup
+                                                        onAddToWishlistClick={handleAddToWishlist}
+                                                        onEditClick={(product) => {
+                                                            setSelectedItem(product)
+                                                            onOpen()
+                                                        }}
+                                                        onRemoveItemClick={handleRemoveItem}
+                                                    />
+                                                }
+                                                product={{
+                                                    ...productItem,
+                                                    ...(products &&
+                                                        products[productItem.productId]),
+                                                    price: productItem.price,
+                                                    quantity: localQuantity[productItem.itemId]
+                                                        ? localQuantity[productItem.itemId]
+                                                        : productItem.quantity
+                                                }}
+                                                onItemQuantityChange={handleChangeItemQuantity.bind(
+                                                    this,
+                                                    productItem
+                                                )}
+                                                showLoading={
+                                                    isCartItemLoading &&
+                                                    selectedItem?.itemId === productItem.itemId
+                                                }
+                                                handleRemoveItem={handleRemoveItem}
+                                            />
+                                        )
+                                    })}
                                 </Stack>
                                 <Box>
                                     {isOpen && (
@@ -285,7 +404,11 @@ const Cart = () => {
                             </GridItem>
                             <GridItem>
                                 <Stack spacing={4}>
-                                    <OrderSummary showPromoCodeForm={true} isEstimate={true} />
+                                    <OrderSummary
+                                        showPromoCodeForm={true}
+                                        isEstimate={true}
+                                        basket={basket}
+                                    />
                                     <Box display={{base: 'none', lg: 'block'}}>
                                         <CartCta />
                                     </Box>
@@ -302,7 +425,7 @@ const Cart = () => {
                                         id="cart.recommended_products.title.recently_viewed"
                                     />
                                 }
-                                recommender={'viewed-recently-einstein'}
+                                recommender={EINSTEIN_RECOMMENDERS.CART_RECENTLY_VIEWED}
                                 mx={{base: -4, sm: -6, lg: 0}}
                             />
 
@@ -313,7 +436,7 @@ const Cart = () => {
                                         id="cart.recommended_products.title.may_also_like"
                                     />
                                 }
-                                recommender={'product-to-product-einstein'}
+                                recommender={EINSTEIN_RECOMMENDERS.CART_MAY_ALSO_LIKE}
                                 products={basket?.productItems}
                                 shouldFetch={() =>
                                     basket?.basketId && basket.productItems?.length > 0

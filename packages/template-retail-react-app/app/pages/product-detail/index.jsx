@@ -12,47 +12,83 @@ import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
 import {Box, Button, Stack} from '@chakra-ui/react'
+import {
+    useProduct,
+    useCategory,
+    useShopperBasketsMutation,
+    useShopperCustomersMutation,
+    useCustomerId
+} from 'commerce-sdk-react-preview'
 
 // Hooks
-import useBasket from '../../commerce-api/hooks/useBasket'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {useVariant} from '../../hooks'
-import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../commerce-api/hooks/useEinstein'
-
+import useEinstein from '../../hooks/use-einstein'
+import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '../../components/recommended-products'
 import ProductView from '../../partials/product-view'
 import InformationAccordion from './partials/information-accordion'
 
-// Others/Utils
-import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
-
 // constant
 import {
     API_ERROR_MESSAGE,
+    EINSTEIN_RECOMMENDERS,
     MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST
 } from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
-import {useHistory} from 'react-router-dom'
+import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
+import {useWishList} from '../../hooks/use-wish-list'
 
-const ProductDetail = ({category, product, isLoading}) => {
+const ProductDetail = () => {
     const {formatMessage} = useIntl()
-    const basket = useBasket()
     const history = useHistory()
+    const location = useLocation()
     const einstein = useEinstein()
-    const variant = useVariant(product)
     const toast = useToast()
     const navigate = useNavigation()
-    const [primaryCategory, setPrimaryCategory] = useState(category)
     const [productSetSelection, setProductSetSelection] = useState({})
     const childProductRefs = React.useRef({})
+    const customerId = useCustomerId()
+    /****************************** Basket *********************************/
+    const {data: basket} = useCurrentBasket()
+    const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
+    const {res} = useServerContext()
+    if (res) {
+        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+    }
 
+    /*************************** Product Detail and Category ********************/
+    const {productId} = useParams()
+    const urlParams = new URLSearchParams(location.search)
+    const {data: product, isLoading: isProductLoading} = useProduct(
+        {
+            parameters: {
+                id: urlParams.get('pid') || productId,
+                allImages: true
+            }
+        },
+        {
+            // When shoppers select a different variant (and the app fetches the new data),
+            // the old data is still rendered (and not the skeletons).
+            keepPreviousData: true
+        }
+    )
     const isProductASet = product?.type.set
-
+    // Note: Since category needs id from product detail, it can't be server side rendered atm
+    // until we can do dependent query on server
+    const {data: category} = useCategory({
+        parameters: {
+            id: product?.primaryCategoryId,
+            level: 1
+        }
+    })
+    const [primaryCategory, setPrimaryCategory] = useState(category)
+    const variant = useVariant(product)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
     // attributes are selected (to get the correct inventory values), the category information
@@ -66,6 +102,9 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     /**************** Product Variant ****************/
     useEffect(() => {
+        if (!variant) {
+            return
+        }
         // update the variation attributes parameter on
         // the url accordingly as the variant changes
         const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
@@ -75,34 +114,49 @@ const ProductDetail = ({category, product, isLoading}) => {
     }, [variant])
 
     /**************** Wishlist ****************/
-    const wishlist = useWishlist()
-    // TODO: DRY this handler when intl provider is available globally
-    const handleAddToWishlist = async (product, variant, quantity) => {
-        try {
-            await wishlist.createListItem({
-                id: variant?.productId || product?.id,
-                quantity
-            })
-            toast({
-                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                status: 'success',
-                action: (
-                    // it would be better if we could use <Button as={Link}>
-                    // but unfortunately the Link component is not compatible
-                    // with Chakra Toast, since the ToastManager is rendered via portal
-                    // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
-                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                    </Button>
-                )
-            })
-        } catch {
-            toast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
-            })
-        }
+    const {data: wishlist, isLoading: isWishlistLoading} = useWishList()
+    const createCustomerProductListItem = useShopperCustomersMutation(
+        'createCustomerProductListItem'
+    )
+
+    const handleAddToWishlist = (product, variant, quantity) => {
+        createCustomerProductListItem.mutate(
+            {
+                parameters: {
+                    listId: wishlist.id,
+                    customerId
+                },
+                body: {
+                    // NOTE: APi does not respect quantity, it always adds 1
+                    quantity,
+                    productId: variant?.productId || product?.id,
+                    public: false,
+                    priority: 1,
+                    type: 'product'
+                }
+            },
+            {
+                onSuccess: () => {
+                    toast({
+                        title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
+                        status: 'success',
+                        action: (
+                            // it would be better if we could use <Button as={Link}>
+                            // but unfortunately the Link component is not compatible
+                            // with Chakra Toast, since the ToastManager is rendered via portal
+                            // and the toast doesn't have access to intl provider, which is a
+                            // requirement of the Link component.
+                            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                                {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                            </Button>
+                        )
+                    })
+                },
+                onError: () => {
+                    showError()
+                }
+            }
+        )
     }
 
     /**************** Add To Cart ****************/
@@ -122,9 +176,14 @@ const ProductDetail = ({category, product, isLoading}) => {
                 quantity
             }))
 
-            await basket.addItemToBasket(productItems)
+            await addItemToBasketMutation.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: productItems
+            })
 
-            // If the items were sucessfully added, set the return value to be used
+            einstein.sendAddToCart(productItems)
+
+            // If the items were successfully added, set the return value to be used
             // by the add to cart modal.
             return productSelectionValues
         } catch (error) {
@@ -203,11 +262,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={handleProductSetAddToCart}
-                            addToWishlist={(product, variant, quantity) =>
-                                handleAddToWishlist(product, variant, quantity)
-                            }
-                            isProductLoading={isLoading}
-                            isCustomerProductListLoading={!wishlist.isInitialized}
+                            addToWishlist={handleAddToWishlist}
+                            isProductLoading={isProductLoading}
+                            isWishlistLoading={isWishlistLoading}
                             validateOrderability={handleProductSetValidation}
                         />
 
@@ -235,9 +292,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                                                 {product: childProduct, variant, quantity}
                                             ])
                                         }
-                                        addToWishlist={(product, variant, quantity) =>
-                                            handleAddToWishlist(product, variant, quantity)
-                                        }
+                                        addToWishlist={handleAddToWishlist}
                                         onVariantSelected={(product, variant, quantity) => {
                                             if (quantity) {
                                                 setProductSetSelection((previousState) => ({
@@ -254,8 +309,8 @@ const ProductDetail = ({category, product, isLoading}) => {
                                                 setProductSetSelection(selections)
                                             }
                                         }}
-                                        isProductLoading={isLoading}
-                                        isCustomerProductListLoading={!wishlist.isInitialized}
+                                        isProductLoading={isProductLoading}
+                                        isWishlistLoading={isWishlistLoading}
                                     />
                                     <InformationAccordion product={childProduct} />
 
@@ -274,11 +329,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                             addToCart={(variant, quantity) =>
                                 handleAddToCart([{product, variant, quantity}])
                             }
-                            addToWishlist={(product, variant, quantity) =>
-                                handleAddToWishlist(product, variant, quantity)
-                            }
-                            isProductLoading={isLoading}
-                            isCustomerProductListLoading={!wishlist.isInitialized}
+                            addToWishlist={handleAddToWishlist}
+                            isProductLoading={isProductLoading}
+                            isWishlistLoading={isWishlistLoading}
                         />
                         <InformationAccordion product={product} />
                     </Fragment>
@@ -294,7 +347,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                                     id="product_detail.recommended_products.title.complete_set"
                                 />
                             }
-                            recommender={'complete-the-set'}
+                            recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}
                             products={[product]}
                             mx={{base: -4, md: -8, lg: 0}}
                             shouldFetch={() => product?.id}
@@ -307,7 +360,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 id="product_detail.recommended_products.title.might_also_like"
                             />
                         }
-                        recommender={'pdp-similar-items'}
+                        recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}
                         products={[product]}
                         mx={{base: -4, md: -8, lg: 0}}
                         shouldFetch={() => product?.id}
@@ -320,7 +373,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 id="product_detail.recommended_products.title.recently_viewed"
                             />
                         }
-                        recommender={'viewed-recently-einstein'}
+                        recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}
                         mx={{base: -4, md: -8, lg: 0}}
                     />
                 </Stack>
@@ -331,67 +384,7 @@ const ProductDetail = ({category, product, isLoading}) => {
 
 ProductDetail.getTemplateName = () => 'product-detail'
 
-ProductDetail.shouldGetProps = ({previousLocation, location}) => {
-    const previousParams = new URLSearchParams(previousLocation?.search || '')
-    const params = new URLSearchParams(location.search)
-
-    // If the product changed via the pathname or `pid` param, allow updated
-    // data to be retrieved.
-    return (
-        previousLocation?.pathname !== location.pathname ||
-        previousParams.get('pid') !== params.get('pid')
-    )
-}
-
-ProductDetail.getProps = async ({res, params, location, api}) => {
-    const {productId} = params
-    let category, product
-    const urlParams = new URLSearchParams(location.search)
-
-    product = await api.shopperProducts.getProduct({
-        parameters: {
-            id: urlParams.get('pid') || productId,
-            allImages: true
-        }
-    })
-
-    if (product?.primaryCategoryId) {
-        category = await api.shopperProducts.getCategory({
-            parameters: {id: product?.primaryCategoryId, levels: 1}
-        })
-    }
-
-    // Set the `cache-control` header values similar to those on the product-list.
-    if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-    }
-
-    // The `commerce-isomorphic-sdk` package does not throw errors, so
-    // we have to check the returned object type to inconsistencies.
-    if (typeof product?.type === 'string') {
-        throw new HTTPNotFound(product.detail)
-    }
-    if (typeof category?.type === 'string') {
-        throw new HTTPNotFound(category.detail)
-    }
-
-    return {category, product}
-}
-
 ProductDetail.propTypes = {
-    /**
-     * The category object used for breadcrumb construction.
-     */
-    category: PropTypes.object,
-    /**
-     * The product object to be shown on the page..
-     */
-    product: PropTypes.object,
-    /**
-     * The current state of `getProps` when running this value is `true`, otherwise it's
-     * `false`. (Provided internally)
-     */
-    isLoading: PropTypes.bool,
     /**
      * The current react router match object. (Provided internally)
      */

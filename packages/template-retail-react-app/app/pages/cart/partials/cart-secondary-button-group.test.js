@@ -4,32 +4,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    mockedCustomerProductLists,
-    mockedCustomerProductListsDetails
-} from '../../../commerce-api/mock-data'
+import {mockedCustomerProductListsDetails} from '../../../mocks/mock-data'
 import ItemVariantProvider from '../../../components/item-variant'
 import {renderWithProviders} from '../../../utils/test-utils'
 import CartSecondaryButtonGroup from './cart-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {noop} from '../../../utils/utils'
-import useCustomer from '../../../commerce-api/hooks/useCustomer'
 
 const MockedComponent = ({
     onAddToWishlistClick = noop,
     onEditClick = noop,
     onRemoveItemClick = noop
 }) => {
-    const customer = useCustomer()
-
-    useEffect(() => {
-        if (!customer.isRegistered) {
-            customer.login('customer@test.com', 'password1')
-        }
-    }, [])
     const product = mockedCustomerProductListsDetails.data[0]
     return (
         <ItemVariantProvider variant={{...product, productName: product.name}}>
@@ -47,47 +36,6 @@ MockedComponent.propTypes = {
     onEditClick: PropTypes.func,
     onRemoveItemClick: PropTypes.func
 }
-
-jest.mock('../../../commerce-api/hooks/useBasket', () => {
-    const originalModule = jest.requireActual('../../../commerce-api/hooks/useBasket')
-    const useBasket = originalModule.default
-    return () => {
-        const basket = useBasket()
-
-        return {
-            ...basket,
-            removeItemFromBasket: jest.fn()
-        }
-    }
-})
-
-jest.mock('../../../commerce-api/hooks/useCustomerProductLists', () => {
-    const originalModule = jest.requireActual('../../../commerce-api/hooks/useCustomerProductLists')
-    const useCustomerProductLists = originalModule.default
-    return () => {
-        const customerProductLists = useCustomerProductLists()
-
-        return {
-            ...customerProductLists,
-            ...mockedCustomerProductLists,
-            loaded: jest.fn().mockReturnValue(true),
-            createCustomerProductListItem: jest.fn().mockReturnValue({id: 'testid'})
-        }
-    }
-})
-
-jest.mock('../../../commerce-api/hooks/useCustomer', () => {
-    const originalModule = jest.requireActual('../../../commerce-api/hooks/useCustomer')
-    const useCustomer = originalModule.default
-    return () => {
-        const customer = useCustomer()
-
-        return {
-            ...customer,
-            isRegistered: () => true
-        }
-    }
-})
 
 beforeEach(() => {
     jest.resetModules()

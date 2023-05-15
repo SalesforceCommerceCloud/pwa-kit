@@ -50,7 +50,7 @@ export function useToast() {
         if (action) {
             toastConfig = {
                 ...toastConfig,
-                /* eslint-disable-next-line react/display-name, react/prop-types */
+
                 render: ({onClose}) => (
                     <Alert status={status} variant="subtle" borderRadius="md" py={3} width="sm">
                         <AlertIcon />

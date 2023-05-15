@@ -79,7 +79,7 @@ const DATA_MAP: AuthDataMap = {
         key: 'customer_id'
     },
     usid: {
-        storageType: 'local',
+        storageType: 'cookie',
         key: 'usid'
     },
     enc_user_id: {
@@ -268,15 +268,19 @@ class Auth {
      */
     async queueRequest(fn: () => Promise<TokenResponse>, isGuest: boolean) {
         const queue = this.pendingToken ?? Promise.resolve()
-        this.pendingToken = queue.then(async () => {
-            const token = await fn()
-            this.handleTokenResponse(token, isGuest)
+        this.pendingToken = queue
+            .then(async () => {
+                const token = await fn()
+                this.handleTokenResponse(token, isGuest)
 
-            // Q: Why don't we just return token? Why re-construct the same object again?
-            // A: because a user could open multiple tabs and the data in memory could be out-dated
-            // We must always grab the data from the storage (cookie/localstorage) directly
-            return this.data
-        })
+                // Q: Why don't we just return token? Why re-construct the same object again?
+                // A: because a user could open multiple tabs and the data in memory could be out-dated
+                // We must always grab the data from the storage (cookie/localstorage) directly
+                return this.data
+            })
+            .finally(() => {
+                this.pendingToken = undefined
+            })
         return this.pendingToken
     }
 
@@ -298,8 +302,7 @@ class Auth {
             this.set('customer_id', customerId)
             this.set('usid', usid)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
-            this.pendingToken = Promise.resolve(this.data)
-            return this.pendingToken
+            return this.data
         }
         if (this.pendingToken) {
             return this.pendingToken
@@ -307,21 +310,29 @@ class Auth {
         const accessToken = this.get('access_token')
 
         if (accessToken && !this.isTokenExpired(accessToken)) {
-            this.pendingToken = Promise.resolve(this.data)
-            return this.pendingToken
+            return this.data
         }
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
         if (refreshToken) {
             try {
-                return this.queueRequest(
+                return await this.queueRequest(
                     () => helpers.refreshAccessToken(this.client, {refreshToken}),
                     !!refreshTokenGuest
                 )
-            } catch {
-                // If anything bad happens during refresh token flow
-                // we continue with the PKCE guest user flow.
+            } catch (error) {
+                // If the refresh token is invalid, we need to re-login the user
+                if (error instanceof Error && 'response' in error) {
+                    // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
+                    // We can't use `instanceof`, so instead we just check for the `response` property
+                    // and assume it is a fetch Response.
+                    const json = await (error['response'] as Response).json()
+                    if (json.message === 'invalid refresh_token') {
+                        // clean up storage and restart the login flow
+                        this.clearStorage()
+                    }
+                }
             }
         }
         return this.queueRequest(
@@ -410,8 +421,11 @@ class Auth {
      *
      */
     async logout() {
-        // TODO: are we missing a call to /logout?
-        // Ticket: https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00001EFF4nYAH/view
+        // Not awaiting on purpose because there isn't much we can do if this fails.
+        void helpers.logout(this.client, {
+            accessToken: this.get('access_token'),
+            refreshToken: this.get('refresh_token_registered')
+        })
         this.clearStorage()
         return this.loginGuestUser()
     }
@@ -421,8 +435,13 @@ class Auth {
      *
      */
     parseSlasJWT(jwt: string) {
-        const payload = jwtDecode(jwt) as SlasJwtPayload
+        const payload: SlasJwtPayload = jwtDecode(jwt)
         const {sub, isb} = payload
+
+        if (!sub || !isb) {
+            throw new Error('Unable to parse access token payload: missing sub and isb.')
+        }
+
         // ISB format
         // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
         const isbParts = isb.split('::')

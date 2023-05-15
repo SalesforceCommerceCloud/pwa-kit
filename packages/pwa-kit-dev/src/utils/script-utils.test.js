@@ -5,12 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {mkdtemp, rm, writeFile} from 'fs/promises'
-
-const pkg = require('../../package.json')
-import * as scriptUtils from './script-utils'
+import {mkdtemp, rm, writeFile, readJsonSync} from 'fs-extra'
 import path from 'path'
 import os from 'os'
+import * as scriptUtils from './script-utils'
+const pkg = readJsonSync(path.join(__dirname, '../../package.json'))
 
 describe('scriptUtils', () => {
     const originalEnv = process.env
@@ -73,7 +72,7 @@ describe('scriptUtils', () => {
 
         test('glob works with Array.filter', () => {
             const matched = allPaths.filter(matcher)
-            expect(matched.length).toStrictEqual(expectToMatch.length)
+            expect(matched).toHaveLength(expectToMatch.length)
         })
     })
 
@@ -105,27 +104,27 @@ describe('scriptUtils', () => {
     describe('defaultMessage', () => {
         test('works', async () => {
             const mockGit = {branch: () => 'branch', short: () => 'short'}
-            expect(scriptUtils.defaultMessage(mockGit)).toEqual('branch: short')
+            expect(scriptUtils.defaultMessage(mockGit)).toBe('branch: short')
         })
 
-        test('works outside of a git repo ', async () => {
+        test('works outside of a git repo', async () => {
             const mockGit = {
                 branch: () => {
                     throw {code: 'ENOENT'}
                 },
                 short: () => 'short'
             }
-            expect(scriptUtils.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
+            expect(scriptUtils.defaultMessage(mockGit)).toBe('PWA Kit Bundle')
         })
 
-        test('works with any other error ', async () => {
+        test('works with any other error', async () => {
             const mockGit = {
                 branch: () => {
                     throw new Error()
                 },
                 short: () => 'short'
             }
-            expect(scriptUtils.defaultMessage(mockGit)).toEqual('PWA Kit Bundle')
+            expect(scriptUtils.defaultMessage(mockGit)).toBe('PWA Kit Bundle')
         })
     })
 
@@ -198,7 +197,7 @@ describe('scriptUtils', () => {
             })
 
             expect(bundle.message).toEqual(message)
-            expect(bundle.encoding).toEqual('base64')
+            expect(bundle.encoding).toBe('base64')
             expect(bundle.ssr_parameters).toEqual({})
             expect(bundle.ssr_only).toEqual(['ssr.js'])
             expect(bundle.ssr_shared).toEqual(['ssr.js', 'static/favicon.ico'])
@@ -271,9 +270,12 @@ describe('scriptUtils', () => {
 
                 const fn = async () => await client.push(bundle, projectSlug, targetSlug)
 
+                // TODO: Split up this batch of tests to avoid conditional assertions
                 if (status === 200) {
+                    // eslint-disable-next-line jest/no-conditional-expect
                     expect(await fn()).toBe(goodResponseBody)
                 } else {
+                    // eslint-disable-next-line jest/no-conditional-expect
                     await expect(fn).rejects.toThrow('For more information visit')
                 }
 

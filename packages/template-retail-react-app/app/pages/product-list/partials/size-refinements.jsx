@@ -48,7 +48,7 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
 
 SizeRefinements.propTypes = {
     filter: PropTypes.object,
-    selectedFilters: PropTypes.array,
+    selectedFilters: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string]),
     toggleFilter: PropTypes.func
 }
 

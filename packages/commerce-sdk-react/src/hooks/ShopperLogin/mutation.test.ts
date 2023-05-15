@@ -18,9 +18,9 @@ import {ApiClients, Argument, DataType} from '../types'
 import {ShopperLoginMutation, useShopperLoginMutation} from './mutation'
 
 jest.mock('../../auth/index.ts', () => {
-    return jest.fn().mockImplementation(() => ({
-        ready: jest.fn().mockResolvedValue({access_token: 'access_token'})
-    }))
+    const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
+    mockAuth.prototype.ready = jest.fn().mockResolvedValue({access_token: 'access_token'})
+    return mockAuth
 })
 
 type Client = ApiClients['shopperLogin']
@@ -28,6 +28,7 @@ const loginEndpoint = '/shopper/auth/'
 // Additional properties are ignored, so we can use this mega-options object for all endpoints
 const OPTIONS = {
     parameters: {
+        organizationId: 'organizationId',
         client_id: 'client_id',
         refresh_token: 'token'
     },
@@ -60,7 +61,8 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
     id_token: 'id_token',
     refresh_token: 'refresh_tone',
     token_type: 'token_type',
-    usid: 'usid'
+    usid: 'usid',
+    idp_access_token: 'idp_access_token'
 }
 
 // --- TEST CASES --- //

@@ -1,20 +1,22 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountAddresses from './addresses'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {
+    mockedRegisteredCustomerWithNoAddress,
+    mockedRegisteredCustomer
+} from '../../mocks/mock-data'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 let mockCustomer = {}
-
-jest.setTimeout(30000)
 
 const mockToastSpy = jest.fn()
 jest.mock('@chakra-ui/toast', () => {
@@ -24,13 +26,10 @@ jest.mock('@chakra-ui/toast', () => {
 })
 
 const MockedComponent = () => {
-    const customer = useCustomer()
-    useEffect(() => {
-        customer.login('test@test.com', 'password')
-    }, [])
+    const {data: customer} = useCurrentCustomer()
     return (
         <div>
-            <div>{customer.customerId}</div>
+            <span>Customer Id:</span> {customer.customerId}
             <AccountAddresses />
         </div>
     )
@@ -49,9 +48,9 @@ beforeEach(() => {
         login: 'jkeane@64labs.com'
     }
     global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockCustomer))
-        }),
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        ),
         rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
             mockCustomer.addresses = [req.body]
             return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
@@ -70,33 +69,51 @@ afterEach(() => {
     localStorage.clear()
 })
 
-test('Allows customer to add/edit/remove addresses', async () => {
+test('Allows customer to add addresses', async () => {
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomerWithNoAddress))
+        )
+    )
     renderWithProviders(<MockedComponent />)
-    await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
 
-    expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()
+    })
 
-    // add
     user.click(screen.getByText(/add address/i))
-    user.type(screen.getByLabelText('First Name'), 'Tyler')
-    user.type(screen.getByLabelText('Last Name'), 'Glasnow')
-    user.type(screen.getByLabelText('Phone'), '7277277727')
-    user.type(screen.getByLabelText('Address'), 'Tropicana Field')
-    user.type(screen.getByLabelText('City'), 'St Petersburg')
+    user.type(screen.getByLabelText('First Name'), 'Test')
+    user.type(screen.getByLabelText('Last Name'), 'McTester')
+    user.type(screen.getByLabelText('Phone'), '7275551234')
+    user.type(screen.getByLabelText('Address'), '123 Main St')
+    user.type(screen.getByLabelText('City'), 'Tampa')
     user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
-    user.type(screen.getByLabelText('Zip Code'), '33701')
+    user.type(screen.getByLabelText('Zip Code'), '33712')
+
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        )
+    )
     user.click(screen.getByText(/^Save$/i))
-    expect(await screen.findByText(/Tropicana Field/i)).toBeInTheDocument()
+    expect(await screen.findByText(/123 Main St/i)).toBeInTheDocument()
+})
 
-    // edit
-    user.click(screen.getByText(/edit/i))
-    user.type(screen.getByLabelText('Address'), '333 Main St')
-    user.click(screen.getByLabelText(/set as default/i))
-    user.click(screen.getByText(/Save$/i))
-    expect(await screen.findByText(/333 main st/i)).toBeInTheDocument()
-    expect(await screen.findByText(/default/i)).toBeInTheDocument()
+test('Allows customer to remove addresses', async () => {
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        )
+    )
+    renderWithProviders(<MockedComponent />)
+    await waitFor(() => expect(screen.getByText('123 Main St')).toBeInTheDocument())
 
-    // remove
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomerWithNoAddress))
+        )
+    )
+
     user.click(screen.getByText(/remove/i))
     expect(await screen.findByText(/no saved addresses/i)).toBeInTheDocument()
 })

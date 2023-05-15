@@ -11,14 +11,19 @@ import useConfig from './useConfig'
 const onClient = typeof window !== 'undefined'
 
 /**
- * TBD
+ * Hook that returns the customer ID.
  *
  */
 const useCustomerId = (): string | null => {
     if (onClient) {
+        // `onClient` is a constant, so the hooks will always have the same execution order,
+        // despite technically being inside a conditional.
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         const config = useConfig()
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         return useLocalStorage(`${config.siteId}_customer_id`)
     }
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const auth = useAuthContext()
     return auth.get('customer_id')
 }

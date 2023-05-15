@@ -32,7 +32,7 @@ describe('The usePageUrls', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('limits').text).toEqual(
+        expect(wrapper.getByTestId('limits').text).toBe(
             '["/test/path?limit=25&offset=0","/test/path?limit=25&offset=25","/test/path?limit=25&offset=50","/test/path?limit=25&offset=75"]'
         )
     })

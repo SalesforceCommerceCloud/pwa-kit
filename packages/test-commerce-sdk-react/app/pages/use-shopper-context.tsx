@@ -99,6 +99,9 @@ function UseShopperContext() {
     ].map(({action, body, parameters}) => {
         return {
             name: action,
+            // This is essentially a shorthand to avoid writing out a giant object;
+            // it *technically* violates the rules of hooks, but not in an impactful way.
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             hook: useShopperContextsMutation(action as ShopperContextsMutation),
             body,
             parameters

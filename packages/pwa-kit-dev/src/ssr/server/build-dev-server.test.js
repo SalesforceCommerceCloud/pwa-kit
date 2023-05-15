@@ -6,11 +6,11 @@
  */
 import {NO_CACHE} from 'pwa-kit-runtime/ssr/server/constants'
 import {X_MOBIFY_REQUEST_CLASS, X_PROXY_REQUEST_URL} from 'pwa-kit-runtime/utils/ssr-proxying'
-const {
+import {
     getResponseFromCache,
     sendCachedResponse,
     cacheResponseWhenDone
-} = require('pwa-kit-runtime/ssr/server/express')
+} from 'pwa-kit-runtime/ssr/server/express'
 import fetch from 'node-fetch'
 import request from 'supertest'
 import {makeErrorHandler, DevServerFactory, setLocalAssetHeaders} from './build-dev-server'
@@ -31,8 +31,12 @@ const testFixtures = path.resolve(__dirname, 'test_fixtures')
 // for testing.
 const NoWebpackDevServerFactory = {
     ...DevServerFactory,
-    _addSDKInternalHandlers() {},
-    _getRequestProcessor() {}
+    _addSDKInternalHandlers() {
+        // Override default implementation with no-op
+    },
+    _getRequestProcessor() {
+        // Override default implementation with no-op
+    }
 }
 
 const httpAgent = new http.Agent({})
@@ -41,7 +45,7 @@ const httpAgent = new http.Agent({})
  * An HTTPS.Agent that allows self-signed certificates
  * @type {module:https.Agent}
  */
-export const httpsAgent = new https.Agent({
+const httpsAgent = new https.Agent({
     rejectUnauthorized: false
 })
 
@@ -96,25 +100,21 @@ const opts = (overrides = {}) => {
 }
 
 describe('DevServer error handlers', () => {
-    const testServerErrorHandler = (error, times) => {
-        const exit = jest.fn()
-        const proc = {exit}
-        const close = jest.fn()
-        const devserver = {close}
-        const log = jest.fn()
-        const handler = makeErrorHandler(proc, devserver, log)
-        const e = {code: error}
+    const expectServerErrorHandled = (error, times) => {
+        const proc = {exit: jest.fn()}
+        const devserver = {close: jest.fn()}
+        const handler = makeErrorHandler(proc, devserver, jest.fn())
 
-        handler(e)
-        expect(close).toHaveBeenCalledTimes(times)
+        handler({code: error})
+        expect(devserver.close).toHaveBeenCalledTimes(times)
     }
 
     test('should exit the current process if the requested port is in use', () => {
-        testServerErrorHandler('EADDRINUSE', 1)
+        expectServerErrorHandled('EADDRINUSE', 1)
     })
 
     test('should ignore errors other than EADDRINUSE', () => {
-        testServerErrorHandler('EACCES', 0)
+        expectServerErrorHandled('EACCES', 0)
     })
 })
 
@@ -186,7 +186,7 @@ describe('DevServer request processor support', () => {
             .expect(200)
             .then((response) => {
                 const requestClass = response.headers[X_MOBIFY_REQUEST_CLASS]
-                expect(requestClass).toEqual('bot')
+                expect(requestClass).toBe('bot')
                 expect(route).toHaveBeenCalled()
             })
     })
@@ -209,7 +209,7 @@ describe('DevServer request processor support', () => {
             .get('/')
             .expect(200)
             .then((response) => {
-                expect(response.headers[X_MOBIFY_REQUEST_CLASS]).toBe(undefined)
+                expect(response.headers[X_MOBIFY_REQUEST_CLASS]).toBeUndefined()
                 expect(route).toHaveBeenCalled()
                 expect(response.text).toEqual(helloWorld)
             })
@@ -272,7 +272,7 @@ describe('DevServer listening on http/https protocol', () => {
 
     cases.forEach(({options, env, name}) => {
         const protocol = options.protocol || env.DEV_SERVER_PROTOCOL
-        test(name, () => {
+        test(`${name}`, () => {
             process.env = {...process.env, ...env}
             const {server: _server} = NoWebpackDevServerFactory.createHandler(
                 opts(options),
@@ -383,31 +383,31 @@ describe('DevServer proxying', () => {
                 expect(nockResponse.isDone()).toBe(true)
 
                 // We expect a 200 (that nock returned)
-                expect(response.status).toEqual(200)
+                expect(response.status).toBe(200)
 
                 // We expect that we got a copy of the request headers
-                expect(requestHeaders.length).toBe(1)
+                expect(requestHeaders).toHaveLength(1)
 
                 // Verify that the request headers were rewritten
                 const headers = requestHeaders[0]
-                expect(headers.host).toEqual('test.proxy.com')
-                expect(headers.origin).toEqual('https://test.proxy.com')
+                expect(headers.host).toBe('test.proxy.com')
+                expect(headers.origin).toBe('https://test.proxy.com')
 
                 // Verify that the cookie and multi-value headers are
                 // correctly preserved.
-                expect(headers.cookie).toEqual('abc=123')
+                expect(headers.cookie).toBe('abc=123')
                 const multi = headers['x-multi-value']
-                expect(multi).toEqual('abc, def')
+                expect(multi).toBe('abc, def')
 
                 // Verify that the response contains a Set-Cookie
                 const setCookie = response.headers['set-cookie']
-                expect(setCookie.length).toBe(1)
-                expect(setCookie[0]).toEqual('xyz=456')
+                expect(setCookie).toHaveLength(1)
+                expect(setCookie[0]).toBe('xyz=456')
 
                 // Verify that the x-proxy-request-url header is present in
                 // the response
                 const requestUrl = response.headers[X_PROXY_REQUEST_URL]
-                expect(requestUrl).toEqual(`https://test.proxy.com${targetPath}`)
+                expect(requestUrl).toBe(`https://test.proxy.com${targetPath}`)
             })
     })
 
@@ -424,7 +424,7 @@ describe('DevServer proxying', () => {
             .then((response) => {
                 // Expected that proxy request would not be fetched
                 expect(nockResponse.isDone()).toBe(false)
-                expect(response.status).toEqual(405)
+                expect(response.status).toBe(405)
             })
     })
 
@@ -438,12 +438,12 @@ describe('DevServer proxying', () => {
                 expect('cache-control' in headers).toBe(false)
                 expect('cookie' in headers).toBe(false)
 
-                expect(headers['accept-language']).toEqual('en')
+                expect(headers['accept-language']).toBe('en')
 
-                expect(headers['accept-encoding']).toEqual('gzip')
+                expect(headers['accept-encoding']).toBe('gzip')
 
                 // This value is fixed
-                expect(headers['user-agent']).toEqual('Amazon CloudFront')
+                expect(headers['user-agent']).toBe('Amazon CloudFront')
 
                 return 'Success'
             })
@@ -465,7 +465,7 @@ describe('DevServer proxying', () => {
             .then((response) => {
                 // Expected that proxy request would be fetched
                 expect(nockResponse.isDone()).toBe(true)
-                expect(response.status).toEqual(200)
+                expect(response.status).toBe(200)
             })
     })
 
@@ -567,9 +567,9 @@ describe('DevServer persistent caching support', () => {
             .then(() => request(app).get(url))
             .then((res) => app._requestMonitor._waitForResponses().then(() => res))
             .then((res) => {
-                expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('false')
-                expect(res.headers['content-encoding']).toEqual('gzip')
+                expect(res.status).toBe(200)
+                expect(res.headers['x-mobify-from-cache']).toBe('false')
+                expect(res.headers['content-encoding']).toBe('gzip')
                 expect(res.text).toEqual(expected)
             })
             .then(() =>
@@ -582,9 +582,9 @@ describe('DevServer persistent caching support', () => {
             .then(() => request(app).get(url))
             .then((res) => app._requestMonitor._waitForResponses().then(() => res))
             .then((res) => {
-                expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('false')
-                expect(res.headers['content-encoding']).toEqual('gzip')
+                expect(res.status).toBe(200)
+                expect(res.headers['x-mobify-from-cache']).toBe('false')
+                expect(res.headers['content-encoding']).toBe('gzip')
                 expect(res.text).toEqual(expected)
             })
     })
@@ -596,9 +596,9 @@ describe('DevServer persistent caching support', () => {
             .get(url)
             .then((res) => app._requestMonitor._waitForResponses().then(() => res))
             .then((res) => {
-                expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('false')
-                expect(res.headers['content-encoding']).toEqual('gzip')
+                expect(res.status).toBe(200)
+                expect(res.headers['x-mobify-from-cache']).toBe('false')
+                expect(res.headers['content-encoding']).toBe('gzip')
             })
             .then(() =>
                 app.applicationCache.get({
@@ -649,7 +649,7 @@ describe('DevServer rendering', () => {
         expect(req.app.__hotServerMiddleware).toHaveBeenCalledWith(req, res, next)
     })
 
-    test('uses hot server middleware when ready', () => {
+    test('redirects to loading screen when not ready', () => {
         const TestFactory = {
             ...NoWebpackDevServerFactory,
             _redirectToLoadingScreen: jest.fn()
@@ -723,7 +723,7 @@ describe('DevServer service worker', () => {
     ]
 
     cases.forEach(({file, content, name, requestPath}) => {
-        test(name, async () => {
+        test(`${name}`, async () => {
             const updatedFile = path.resolve(tmpDir, file)
             await fse.writeFile(updatedFile, content)
 

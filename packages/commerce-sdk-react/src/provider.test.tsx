@@ -17,7 +17,7 @@ describe('provider', () => {
         jest.clearAllMocks()
     })
 
-    test('api clients optional config are passed properly', async () => {
+    test('api clients optional config are passed properly', () => {
         const Component = () => {
             const api = useCommerceApi()
             return (

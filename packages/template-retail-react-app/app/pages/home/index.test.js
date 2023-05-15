@@ -8,11 +8,9 @@ import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import HomePage from './index'
 
-jest.mock('../../commerce-api/einstein')
-
 test('Home Page renders without errors', async () => {
     const {getByTestId} = renderWithProviders(<HomePage />)
 
     expect(getByTestId('home-page')).toBeInTheDocument()
-    expect(typeof HomePage.getTemplateName()).toEqual('string')
+    expect(typeof HomePage.getTemplateName()).toBe('string')
 })

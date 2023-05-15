@@ -34,7 +34,10 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                     </Text>
                 </Stack>
             </Stack>
-            <form onSubmit={form.handleSubmit(submitForm)} data-testid="sf-auth-modal-form">
+            <form
+                onSubmit={form.handleSubmit(submitForm)}
+                data-testid="sf-auth-modal-form-register"
+            >
                 <Stack paddingTop={8} spacing={8} paddingLeft={4} paddingRight={4}>
                     {form.errors?.global && (
                         <Alert status="error">
@@ -77,13 +80,12 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                                 id="register_form.message.agree_to_policy_terms"
                                 defaultMessage="By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
                                 values={{
-                                    // eslint-disable-next-line react/display-name
                                     policy: (chunks) => (
                                         <ChakraLink as={Link} to="/privacy-policy" color="blue.600">
                                             {chunks}
                                         </ChakraLink>
                                     ),
-                                    // eslint-disable-next-line react/display-name
+
                                     terms: (chunks) => (
                                         <ChakraLink
                                             as={Link}

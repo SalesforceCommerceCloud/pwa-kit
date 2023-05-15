@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const Writable = require('stream').Writable
+import {Writable} from 'stream'
 /**
  * @private
  * A stream that uses console.log to write log lines

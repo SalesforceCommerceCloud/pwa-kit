@@ -35,7 +35,7 @@ describe('The useSortUrls', () => {
             </Router>
         )
 
-        expect(wrapper.getByTestId('limits').text).toEqual(
+        expect(wrapper.getByTestId('limits').text).toBe(
             '["/test/path?sort=high-to-low&offset=0","/test/path?sort=low-to-high&offset=0"]'
         )
     })

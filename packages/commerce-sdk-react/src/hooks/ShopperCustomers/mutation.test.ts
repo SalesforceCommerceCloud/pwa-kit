@@ -8,7 +8,6 @@ import {act} from '@testing-library/react'
 import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
 import {
-    assertInvalidateQuery,
     assertRemoveQuery,
     assertUpdateQuery,
     mockMutationEndpoints,
@@ -18,13 +17,12 @@ import {
 } from '../../test-utils'
 import {ShopperCustomersMutation, useShopperCustomersMutation} from '../ShopperCustomers'
 import {ApiClients, Argument, DataType, RequireKeys} from '../types'
-import {NotImplementedError} from '../utils'
 import * as queries from './query'
 
 jest.mock('../../auth/index.ts', () => {
-    return jest.fn().mockImplementation(() => ({
-        ready: jest.fn().mockResolvedValue({access_token: 'access_token'})
-    }))
+    const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
+    mockAuth.prototype.ready = jest.fn().mockResolvedValue({access_token: 'access_token'})
+    return mockAuth
 })
 
 type Client = ApiClients['shopperCustomers']
@@ -83,20 +81,8 @@ const createOptions = <Mut extends ShopperCustomersMutation>(
     body: Argument<Client[Mut]> extends {body: infer B} ? B : undefined
 ): Argument<Client[Mut]> => ({...queryOptions, body})
 
-// Not implemented checks are temporary to make sure we don't forget to add tests when adding
-// implentations. When all mutations are added, the "not implemented" tests can be removed,
-// and the `TestMap` type can be changed from optional keys to required keys. Doing so will
-// leverage TypeScript to enforce having tests for all mutations.
-const notImplTestCases: ShopperCustomersMutation[][] = [
-    ['deleteCustomerProductList'],
-    ['updateCustomerProductList']
-]
-
 describe('ShopperCustomers mutations', () => {
     beforeEach(() => nock.cleanAll())
-    test.each(notImplTestCases)('`%s` is not yet implemented', async (mutationName) => {
-        expect(() => useShopperCustomersMutation(mutationName)).toThrow(NotImplementedError)
-    })
     describe('modify a customer', () => {
         test('`createCustomerAddress` updates cache on success', async () => {
             const customer: ShopperCustomersTypes.Customer = {...baseCustomer, addresses: []}
@@ -105,7 +91,7 @@ describe('ShopperCustomers mutations', () => {
             mockQueryEndpoint(customersEndpoint, customer) // getCustomer
             mockMutationEndpoints(customersEndpoint, data) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomer refetch
-            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+            const {result, waitForValueToChange} = renderHookWithProviders(
                 (props: {enabled: boolean} = {enabled: false}) => ({
                     customer: queries.useCustomer(queryOptions),
                     mutation: useShopperCustomersMutation('createCustomerAddress'),
@@ -123,11 +109,6 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
             expect(result.current.mutation.data).toEqual(data)
-            assertInvalidateQuery(result.current.customer, customer)
-
-            // 3. Re-render to validate the created resource was added to cache
-            await rerender({enabled: true})
-            await waitForValueToChange(() => result.current.query)
             assertUpdateQuery(result.current.query, data)
         })
         test('`createCustomerPaymentInstrument` updates cache on success', async () => {
@@ -147,7 +128,7 @@ describe('ShopperCustomers mutations', () => {
             mockQueryEndpoint(customersEndpoint, customer) // getCustomer
             mockMutationEndpoints(customersEndpoint, data) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomer refetch
-            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+            const {result, waitForValueToChange} = renderHookWithProviders(
                 (props: {enabled: boolean} = {enabled: false}) => ({
                     customer: queries.useCustomer(queryOptions),
                     mutation: useShopperCustomersMutation('createCustomerPaymentInstrument'),
@@ -165,11 +146,6 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
             expect(result.current.mutation.data).toEqual(data)
-            assertInvalidateQuery(result.current.customer, customer)
-
-            // 3. Re-render to validate the created resource was added to cache
-            await rerender({enabled: true})
-            await waitForValueToChange(() => result.current.query)
             assertUpdateQuery(result.current.query, data)
         })
         test('`deleteCustomerPaymentInstrument` updates cache on success', async () => {
@@ -196,7 +172,6 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
             expect(result.current.mutation.data).toBeUndefined()
-            assertInvalidateQuery(result.current.customer, customer)
             assertRemoveQuery(result.current.query)
         })
         test('`removeCustomerAddress` updates cache on success', async () => {
@@ -223,7 +198,6 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
             expect(result.current.mutation.data).toBeUndefined()
-            assertInvalidateQuery(result.current.customer, customer)
             assertRemoveQuery(result.current.query)
         })
         test('`updateCustomer` updates cache on success', async () => {
@@ -251,9 +225,6 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
             expect(result.current.mutation.data).toEqual(newCustomer)
-            // `updateCustomer` invalidates all customer endpoints, which one we check isn't important
-            // assertInvalidateQuery(result.current.query, oldAddress)
-            // expect(result.current.customer.data).toEqual(newCustomer)
             assertUpdateQuery(result.current.customer, newCustomer)
         })
         test('`updateCustomerAddress` updates cache on success', async () => {
@@ -285,7 +256,6 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
             expect(result.current.mutation.data).toEqual(newData)
-            assertInvalidateQuery(result.current.customer, customer)
             assertUpdateQuery(result.current.query, newData)
         })
     })
@@ -296,11 +266,20 @@ describe('ShopperCustomers mutations', () => {
                 id: 'listId', // MUST match parameters used
                 customerProductListItems: []
             }
+            const newlistResult = {
+                ...baseListResult,
+                data: [
+                    {
+                        ...baseProductList,
+                        customerProductListItems: []
+                    }
+                ]
+            }
             const options = createOptions<'createCustomerProductList'>(data)
             mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
             mockMutationEndpoints(customersEndpoint, data) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
-            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+            const {result, waitForValueToChange} = renderHookWithProviders(
                 (props: {enabled: boolean} = {enabled: false}) => ({
                     lists: queries.useCustomerProductLists(queryOptions),
                     mutation: useShopperCustomersMutation('createCustomerProductList'),
@@ -318,24 +297,94 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
             expect(result.current.mutation.data).toEqual(data)
-            assertInvalidateQuery(result.current.lists, listResult)
-
-            // 3. Re-render to validate the created resource was added to cache
-            await rerender({enabled: true})
-            await waitForValueToChange(() => result.current.query)
+            expect(result.current.lists.data).toEqual(newlistResult)
             assertUpdateQuery(result.current.query, data)
+        })
+        test('`updateCustomerProductList` updates cache on success', async () => {
+            const listResult = baseListResult
+            const oldList = baseProductList
+            const body: ShopperCustomersTypes.CustomerProductList = {description: 'new description'}
+            const newList = {...oldList, ...body}
+            const data = {body, parameters: PARAMETERS}
+            const options = createOptions<'updateCustomerProductList'>(data)
+
+            const newListResult = {
+                ...listResult,
+                data: [newList]
+            }
+
+            mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
+            mockMutationEndpoints(customersEndpoint, newList) // this mutation
+            mockQueryEndpoint(customersEndpoint, oldList) // getCustomerProductList
+
+            mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
+            const {result, waitForValueToChange} = renderHookWithProviders(
+                (props: {enabled: boolean} = {enabled: false}) => ({
+                    lists: queries.useCustomerProductLists(queryOptions),
+                    mutation: useShopperCustomersMutation('updateCustomerProductList'),
+                    // Initially disabled; not needed until after the creation mutation
+                    query: queries.useCustomerProductList(queryOptions, props)
+                })
+            )
+
+            // 1. Populate cache with initial data
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.lists)
+            expect(result.current.lists.data).toEqual(listResult)
+            expect(result.current.query.data).toBeUndefined()
+
+            // 2. Do creation mutation
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
+            expect(result.current.mutation.data).toEqual(newList)
+            expect(result.current.lists.data).toEqual(newListResult)
+        })
+        test('`deleteCustomerProductList` updates cache on success', async () => {
+            const listResult = baseListResult
+            const options = queryOptions // Can be used for this mutation as it has no body
+            const data = undefined
+
+            mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
+            mockMutationEndpoints(customersEndpoint, data) // this mutation
+            mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
+            const {result, waitForValueToChange} = renderHookWithProviders(
+                (props: {enabled: boolean} = {enabled: false}) => ({
+                    lists: queries.useCustomerProductLists(queryOptions),
+                    mutation: useShopperCustomersMutation('deleteCustomerProductList'),
+                    // Initially disabled; not needed until after the creation mutation
+                    query: queries.useCustomerProductList(queryOptions, props)
+                })
+            )
+
+            // 1. Populate cache with initial data
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.lists)
+            expect(result.current.lists.data).toEqual(listResult)
+            expect(result.current.query.data).toBeUndefined()
+
+            // 2. Do creation mutation
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
+            expect(result.current.mutation.data).toEqual(data)
+            expect(result.current.lists.data).toEqual(emptyListResult)
         })
         test('`createCustomerProductListItem` updates cache on success', async () => {
             const data = oldProductListItem
-            const list = emptyListResult
-            const listResult = emptyListResult
+            const list = baseProductList
+            const listResult = baseListResult
+            const newList = {
+                ...list,
+                customerProductListItems: [...list.customerProductListItems, data]
+            }
+            const newListResult = {
+                ...listResult,
+                data: [newList]
+            }
             const options = createOptions<'createCustomerProductListItem'>(data)
             mockQueryEndpoint(customersEndpoint, list) // getCustomerProductList
             mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
             mockMutationEndpoints(customersEndpoint, data) // this mutation
             mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
             mockQueryEndpoint(customersEndpoint, {test: 'use this? should not be!'}) // getCustomerProductLists refetch
-            const {result, rerender, waitForValueToChange} = renderHookWithProviders(
+            const {result, waitForValueToChange} = renderHookWithProviders(
                 (props: {enabled: boolean} = {enabled: false}) => ({
                     list: queries.useCustomerProductList(queryOptions),
                     lists: queries.useCustomerProductLists(queryOptions),
@@ -355,19 +404,23 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
             expect(result.current.mutation.data).toEqual(data)
-            assertInvalidateQuery(result.current.list, list)
-            assertInvalidateQuery(result.current.lists, listResult)
-
-            // 3. Re-render to validate the created resource was added to cache
-            await rerender({enabled: true})
-            await waitForValueToChange(() => result.current.query)
+            expect(result.current.list.data).toEqual(newList)
+            expect(result.current.lists.data).toEqual(newListResult)
             assertUpdateQuery(result.current.query, data)
         })
-        test.only('`deleteCustomerProductListItem` updates cache on success', async () => {
+        test('`deleteCustomerProductListItem` updates cache on success', async () => {
             const data = oldProductListItem
             const list = baseProductList
             const listResult = baseListResult
             const options = queryOptions // Can be used for this mutation as it has no body
+            const newList = {
+                ...list,
+                customerProductListItems: []
+            }
+            const newListResult = {
+                ...listResult,
+                data: [newList]
+            }
             mockQueryEndpoint(customersEndpoint, list) // getCustomerProductList
             mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
             mockQueryEndpoint(customersEndpoint, data) // getCustomerProductListItem
@@ -391,8 +444,8 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
             expect(result.current.mutation.data).toBeUndefined()
-            assertInvalidateQuery(result.current.list, list)
-            assertInvalidateQuery(result.current.lists, listResult)
+            expect(result.current.list.data).toEqual(newList)
+            expect(result.current.lists.data).toEqual(newListResult)
             assertRemoveQuery(result.current.query)
         })
         test('`updateCustomerProductListItem` updates cache on success', async () => {
@@ -405,6 +458,14 @@ describe('ShopperCustomers mutations', () => {
             }
             const list = baseProductList
             const listResult = baseListResult
+            const newList = {
+                ...list,
+                customerProductListItems: [newData]
+            }
+            const newListResult = {
+                ...listResult,
+                data: [newList]
+            }
             const options = createOptions<'updateCustomerProductListItem'>(newData)
             mockQueryEndpoint(customersEndpoint, list) // getCustomerProductList
             mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
@@ -429,8 +490,8 @@ describe('ShopperCustomers mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
             expect(result.current.mutation.data).toEqual(newData)
-            assertInvalidateQuery(result.current.list, list)
-            assertInvalidateQuery(result.current.lists, listResult)
+            expect(result.current.list.data).toEqual(newList)
+            expect(result.current.lists.data).toEqual(newListResult)
             assertUpdateQuery(result.current.query, newData)
         })
     })

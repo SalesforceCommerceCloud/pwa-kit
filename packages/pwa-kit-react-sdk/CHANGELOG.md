@@ -1,18 +1,28 @@
-## v2.8.0-dev (Mar 03, 2023)
-- Fix `multi-value` params being lost [#1150](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1150)
+## v3.0.0-dev (May 12, 2023)
+
+-   Remove usage of `device-context` due to deprecation of user agent string. [#1168](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1168)
+
+## v2.7.1 (May 11, 2023)
+
+-   Fix `multi-value` params being lost [#1150](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1150)
+
 ## v2.7.0 (Mar 03, 2023)
+
 ## v2.6.0 (Jan 25, 2023)
 
 ## v2.5.0 (Jan 05, 2023)
-- Replace morgan stream to use console.log [#847](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/847)
-- Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
-- Reuse Server Correlation ID when Hydrating Error Pages [#846](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/846)
+
+-   Replace morgan stream to use console.log [#847](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/847)
+-   Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
+-   Reuse Server Correlation ID when Hydrating Error Pages [#846](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/846)
 
 ## v2.4.0 (Dec 01, 2022)
+
 -   Fix `useServerContext` returning isServerSide=false when on server. [#782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/782)
--   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793) 
+-   Upgrade minimatch [#793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/793)
 
 ## v2.3.0 (Oct 27, 2022)
+
 -   Support `react-query` server-side data fetching. [#724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/724)
 -   Add server-safe default configuration for `queryClientConfig` option. [#734](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/734)
 -   Add `useServerContext` hook with the `res` response object and the `isServerSide` flag. [#737](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/737)
@@ -23,9 +33,11 @@
 ## v2.2.0 (Aug 25, 2022)
 
 ## v2.1.0 (Jul 05, 2022)
+
 -   Remove console logs from route component. [#651](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/651)
 
 ## v2.0.0 (May 16, 2022)
+
 -   Drop node 12 support for [#589](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/589)
 -   Improve test coverage [#550](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/550)
 -   Remove lodash and bluebird. [#534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/534)
@@ -36,6 +48,7 @@
 -   Fix upload bug with extending an options object [#419](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/419)
 
 ## v1.5.0 (Mar 17, 2022)
+
 -   Add boolean flag `enableLegacyBodyParser` to `createApp` options. [#446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/446)
 -   Add environment specific configuration support. [#421](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/421)
 -   Remove unused url-parse dependency [#411](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/411)

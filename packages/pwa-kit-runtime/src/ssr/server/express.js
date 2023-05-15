@@ -17,8 +17,7 @@ import {
     parseCacheControl,
     parseEndParameters,
     isRemote,
-    wrapResponseWrite,
-    detectDeviceType
+    wrapResponseWrite
 } from '../../utils/ssr-server'
 import {CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
@@ -53,18 +52,6 @@ export const RESOLVED_PROMISE = Promise.resolve()
  * appropriate to include these, the caller should add their values
  * (or values based on them) to the options.extras array.
  *
- * Requests that come to a deployed Express app contain headers that
- * identify the device type. By default, this method generates different
- * cache keys for different device types (effectively, the values of the
- * headers used by getBrowserSize are included in 'options.extras'). To
- * suppress this, pass true for options.ignoreDeviceType
- * Note: CloudFront will pass 4 device type headers, and ALL of them will
- * be present in the request headers, they are 'CloudFront-Is-Desktop-Viewer',
- * 'CloudFront-Is-Mobile-Viewer', 'CloudFront-Is-SmartTV-Viewer' and
- * 'CloudFront-Is-Tablet-Viewer'. The values can be 'true' or 'false', and it
- * is possible that a device falls into more than one device type category
- * and multiple device type headers can be 'true' at the same time.
- *
  * By default, method will generate different cache keys for requests with
  * different request classes (effectively, the value of the request-class
  * string is included in 'extras'). To suppress this, pass true for
@@ -74,8 +61,6 @@ export const RESOLVED_PROMISE = Promise.resolve()
  * @param [options] {Object} values that affect the cache key generation.
  * @param [options.extras] {Array<String|undefined>} extra string values
  * to be included in the key.
- * @param [options.ignoreDeviceType] {Boolean} set this to true to suppress
- * automatic variation of the key by device type.
  * @param [options.ignoreRequestClass] {Boolean} set this to true to suppress
  * automatic variation of the key by request class.
  * @returns {String} the generated key.
@@ -97,10 +82,6 @@ export const generateCacheKey = (req, options = {}) => {
             .split('&')
             .filter((querystring) => !/^mobify_devicetype=/.test(querystring))
         elements.push(...filteredQueryStrings)
-    }
-
-    if (!options.ignoreDeviceType) {
-        elements.push(`device=${detectDeviceType(req)}`)
     }
 
     if (!options.ignoreRequestClass) {

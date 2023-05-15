@@ -6,8 +6,7 @@
  */
 import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten, getParamsFromPath, resolveLocaleFromUrl, shallowEquals} from './utils'
-import {getSites} from './site-utils'
+import {flatten, shallowEquals} from './utils'
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -22,17 +21,15 @@ jest.mock('./site-utils', () => {
 })
 
 describe('requestIdleCallback should be a working shim', () => {
-    test('without a working implementation built in', () => {
-        return new Promise((resolve) => {
-            utils.requestIdleCallback(resolve)
-        })
+    test('without a working implementation built in', async () => {
+        const result = new Promise((resolve) => utils.requestIdleCallback(resolve))
+        await expect(result).resolves.toBeUndefined()
     })
 
-    test('with a working implementation built in', () => {
+    test('with a working implementation built in', async () => {
         window.requestIdleCallback = (fn) => setTimeout(() => fn(), 1)
-        return new Promise((resolve) => {
-            utils.requestIdleCallback(resolve)
-        })
+        const result = new Promise((resolve) => utils.requestIdleCallback(resolve))
+        await expect(result).resolves.toBeUndefined()
     })
 })
 
@@ -59,24 +56,24 @@ describe('WatchOnlineStatus', () => {
 describe('escapeRegexChars', () => {
     test('escapes special characters', () => {
         const escapedString = utils.escapeRegexChars('{}()*+?.,\\^$|#')
-        expect(escapedString).toEqual('\\{\\}\\(\\)\\*\\+\\?\\.\\,\\\\\\^\\$\\|\\#')
+        expect(escapedString).toBe('\\{\\}\\(\\)\\*\\+\\?\\.\\,\\\\\\^\\$\\|\\#')
     })
 })
 
 describe('boldString & Capitalize test', () => {
     test('boldString returns provided part of string bolded html', () => {
         const boldedString = utils.boldString('boldedString', 'bolded')
-        expect(boldedString).toEqual('<b>bolded</b>String')
+        expect(boldedString).toBe('<b>bolded</b>String')
     })
 
     test('boldString handles special regex characters', () => {
         const boldedString = utils.boldString('some (*special!) chars', '(*special!)')
-        expect(boldedString).toEqual('some <b>(*special!)</b> chars')
+        expect(boldedString).toBe('some <b>(*special!)</b> chars')
     })
 
     test('capitalize capitalizes a string', () => {
         const stringToCapitlize = utils.capitalize('capitalize string test')
-        expect(stringToCapitlize).toEqual('Capitalize String Test')
+        expect(stringToCapitlize).toBe('Capitalize String Test')
     })
 })
 
@@ -84,10 +81,10 @@ describe('session storage tests', () => {
     test('sets,gets and removes item in session storage', () => {
         utils.setSessionJSONItem('test', ['text'])
         let testing = utils.getSessionJSONItem('test')
-        expect(testing.length).toEqual(1)
+        expect(testing).toHaveLength(1)
         utils.clearSessionJSONItem('test')
         testing = utils.getSessionJSONItem('test')
-        expect(testing).not.toBeDefined()
+        expect(testing).toBeUndefined()
     })
 })
 
@@ -99,7 +96,7 @@ describe('flatten', () => {
             children: [{id: 2, item: 2, children: [{id: 3, item: 3}]}]
         })
 
-        expect(JSON.stringify(result)).toEqual(
+        expect(JSON.stringify(result)).toBe(
             '{"1":{"id":1,"item":1,"children":[{"id":2,"item":2,"children":[{"id":3,"item":3}]}]},"2":{"id":2,"item":2,"children":[{"id":3,"item":3}]},"3":{"id":3,"item":3}}'
         )
     })
@@ -114,197 +111,72 @@ describe('shallow', function () {
     })
 })
 
-describe('getParamsFromPath', function () {
-    const cases = [
-        {path: '/us/en-US/', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
-        {path: '/us/en-US', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
-        {path: '/us/en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
-        {path: '/us/en/', expectedRes: {siteRef: 'us', localeRef: 'en'}},
-        {path: '/RefArch/en-US/', expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}},
-        {path: '/RefArch/en/', expectedRes: {siteRef: 'RefArch', localeRef: 'en'}},
-        {path: '/us/en-US/category/womens', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
-        {
-            path: '/RefArch/en-US/category/womens',
-            expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}
-        },
-        {path: '/en-US/category/womens', expectedRes: {siteRef: undefined, localeRef: 'en-US'}},
-        {path: '/en/category/womens', expectedRes: {siteRef: undefined, localeRef: 'en'}},
-        {path: '/category/womens', expectedRes: {siteRef: undefined, localeRef: undefined}},
-        {path: '/en/', expectedRes: {siteRef: undefined, localeRef: 'en'}},
-        {path: '/en', expectedRes: {siteRef: undefined, localeRef: 'en'}},
-        {path: '/ca/', expectedRes: {siteRef: undefined, localeRef: 'ca'}},
-        {path: '/ca', expectedRes: {siteRef: undefined, localeRef: 'ca'}},
-        {path: '/', expectedRes: {site: undefined, localeRef: undefined}},
-        {path: '/?site=us', expectedRes: {siteRef: 'us', localeRef: undefined}},
-        {path: '/?site=us&locale=en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
-        {path: '/en-US/category/womens?site=us', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
-        {
-            path: '/us/category/womens?locale=en-US',
-            expectedRes: {siteRef: 'us', localeRef: 'en-US'}
-        },
-        {path: '/us/category/womens?locale=en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
-        {
-            path: '/category/womens?site=us&locale=en-US',
-            expectedRes: {siteRef: 'us', localeRef: 'en-US'}
-        },
-        {
-            path: '/category/womens?site=RefArch&locale=en-US',
-            expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}
+describe('keysToCamel', () => {
+    test('converts object keys to camelcase', () => {
+        const input = {
+            numba_one: true,
+            'numba-two': false,
+            number3: 'un-changed',
+            c_Custom: 'un_changed',
+            _custom: 'unchanged'
         }
-    ]
-    cases.forEach(({path, expectedRes}) => {
-        test(`return expected values when path is ${path}`, () => {
-            getSites.mockImplementation(() => {
-                return [
-                    {
-                        id: 'RefArch',
-                        alias: 'us',
-                        l10n: {
-                            supportedCurrencies: ['USD'],
-                            defaultCurrency: 'USD',
-                            defaultLocale: 'en-US',
-                            supportedLocales: [
-                                {
-                                    id: 'en-US',
-                                    alias: 'en',
-                                    preferredCurrency: 'USD'
-                                },
-                                {
-                                    id: 'en-CA',
-                                    alias: 'ca',
-                                    preferredCurrency: 'USD'
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        id: 'RefArchGlobal',
-                        alias: 'global',
-                        l10n: {
-                            supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
-                            defaultCurrency: 'GBP',
-                            supportedLocales: [
-                                {
-                                    id: 'de-DE',
-                                    preferredCurrency: 'EUR'
-                                },
-                                {
-                                    id: 'en-GB',
-                                    alias: 'uk',
-                                    preferredCurrency: 'GBP'
-                                }
-                            ],
-                            defaultLocale: 'en-GB'
-                        }
-                    }
-                ]
-            })
-            expect(getParamsFromPath(path)).toEqual(expectedRes)
+
+        const result = utils.keysToCamel(input)
+
+        expect(result).toEqual({
+            numbaOne: true,
+            numbaTwo: false,
+            number3: 'un-changed',
+            c_Custom: 'un_changed',
+            _custom: 'unchanged'
         })
     })
-})
 
-describe('resolveLocaleFromUrl', function () {
-    const cases = [
-        {
-            path: '/',
-            expectedRes: {
-                id: 'en-GB',
-                preferredCurrency: 'GBP'
+    test('converts arrays of objects to camelcase', () => {
+        const input = [
+            {
+                numba_one: true,
+                number3: 'un-changed',
+                c_Custom: 'un_changed',
+                _custom: 'unchanged'
+            },
+            {
+                'numba-two': false
             }
-        },
-        {
-            path: '/uk/en-GB/women/dresses',
-            expectedRes: {
-                id: 'en-GB',
-                preferredCurrency: 'GBP'
+        ]
+
+        const result = utils.keysToCamel(input)
+
+        expect(result).toEqual([
+            {
+                numbaOne: true,
+                number3: 'un-changed',
+                c_Custom: 'un_changed',
+                _custom: 'unchanged'
+            },
+            {
+                numbaTwo: false
             }
-        },
-        {
-            path: '/women/dresses/?site=uk&locale=en-GB',
-            expectedRes: {
-                id: 'en-GB',
-                preferredCurrency: 'GBP'
-            }
-        },
-        {
-            path: '/uk/fr/women/dresses',
-            expectedRes: {
-                id: 'fr-FR',
-                alias: 'fr',
-                preferredCurrency: 'EUR'
-            }
-        },
-        {
-            path: '/women/dresses/?site=uk&locale=fr',
-            expectedRes: {
-                id: 'fr-FR',
-                alias: 'fr',
-                preferredCurrency: 'EUR'
-            }
-        },
-        {
-            path: '/us/en-US/women/dresses',
-            expectedRes: {
-                id: 'en-US',
-                preferredCurrency: 'USD'
-            }
-        },
-        {
-            path: '/women/dresses/?site=us&locale=en-US',
-            expectedRes: {
-                id: 'en-US',
-                preferredCurrency: 'USD'
+        ])
+    })
+
+    test('converts nested keys to camelcase', () => {
+        const input = {
+            numba_one: {
+                sub1: 'unchanged',
+                sub2: {sub_sub_2: 'changed'},
+                sub3: [{sub_sub_3: 'changed', sub3Sub4: 'unchanged'}]
             }
         }
-    ]
-    cases.forEach(({path, expectedRes}) => {
-        test(`returns expected locale with given path ${path}`, () => {
-            getSites.mockImplementation(() => {
-                return [
-                    {
-                        id: 'site-1',
-                        alias: 'uk',
-                        l10n: {
-                            defaultLocale: 'en-GB',
-                            supportedLocales: [
-                                {
-                                    id: 'en-GB',
-                                    preferredCurrency: 'GBP'
-                                },
-                                {
-                                    id: 'fr-FR',
-                                    alias: 'fr',
-                                    preferredCurrency: 'EUR'
-                                },
-                                {
-                                    id: 'it-IT',
-                                    preferredCurrency: 'EUR'
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        id: 'site-2',
-                        alias: 'us',
-                        l10n: {
-                            defaultLocale: 'en-US',
-                            supportedLocales: [
-                                {
-                                    id: 'en-US',
-                                    preferredCurrency: 'USD'
-                                },
-                                {
-                                    id: 'en-CA',
-                                    preferredCurrency: 'USD'
-                                }
-                            ]
-                        }
-                    }
-                ]
-            })
-            const locale = resolveLocaleFromUrl(path)
-            expect(locale).toEqual(expectedRes)
+
+        const result = utils.keysToCamel(input)
+
+        expect(result).toEqual({
+            numbaOne: {
+                sub1: 'unchanged',
+                sub2: {subSub_2: 'changed'},
+                sub3: [{subSub_3: 'changed', sub3Sub4: 'unchanged'}]
+            }
         })
     })
 })

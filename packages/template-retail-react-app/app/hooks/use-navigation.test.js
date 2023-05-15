@@ -35,11 +35,7 @@ jest.mock('react-router', () => {
 })
 
 afterEach(() => {
-    jest.clearAllMocks()
-    const originalLocation = window.location
-
-    // Restore `window.location` to the `jsdom` `Location` object
-    window.location = originalLocation
+    jest.resetModules()
 })
 
 const TestComponent = () => {

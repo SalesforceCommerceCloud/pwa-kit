@@ -1,14 +1,14 @@
 {
   "name": "pwa-kit-dev",
-  "version": "2.8.0-dev",
+  "version": "3.0.0-dev",
   "description": "Build tools for pwa-kit",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
-  },
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-dev#readme",
   "bugs": {
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
@@ -24,14 +24,15 @@
     "configs"
   ],
   "scripts": {
-    "format": "internal-lib-build format \"**/*.{js,jsx}\"",
-    "lint": "npm run lint:js",
-    "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "internal-lib-build lint .",
-    "prepare": "npm run build",
     "build": "cross-env NODE_ENV=production internal-lib-build build",
-    "build:watch": "watch 'npm run build' src/ bin/",
+    "build:watch": "nodemon --watch 'src/**' --watch 'bin/**' --exec 'npm run build'",
+    "format": "internal-lib-build format \"**/*.{js,jsx}\"",
+    "lint": "npm run lint:js && npm run typecheck",
+    "lint:fix": "npm run lint:js -- --fix",
+    "lint:js": "eslint .",
+    "prepare": "npm run build",
     "test": "internal-lib-build test",
+    "typecheck": "tsc --noEmit",
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
@@ -41,7 +42,6 @@
     "@babel/parser": "^7.21.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
     "@babel/plugin-transform-async-to-generator": "^7.20.7",
-    "@babel/plugin-transform-modules-commonjs": "^7.21.2",
     "@babel/plugin-transform-object-assign": "^7.18.6",
     "@babel/plugin-transform-runtime": "^7.21.0",
     "@babel/preset-env": "^7.20.2",
@@ -55,6 +55,8 @@
     "@loadable/server": "^5.15.3",
     "@loadable/webpack-plugin": "^5.15.2",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
     "archiver": "1.3.0",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.3.0",
@@ -65,16 +67,16 @@
     "compression": "1.7.4",
     "copy-webpack-plugin": "^9.1.0",
     "cross-env": "^5.2.1",
-    "eslint": "7.32.0",
-    "eslint-config-prettier": "4.3.0",
-    "eslint-import-resolver-webpack": "0.13.2",
-    "eslint-plugin-header": "^3.1.1",
-    "eslint-plugin-import": "2.27.5",
+    "eslint": "^8.37.0",
+    "eslint-config-prettier": "8.8.0",
+    "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-jsx-a11y": "6.7.1",
-    "eslint-plugin-prettier": "3.4.1",
+    "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-use-effect-no-deps": "^1.1.2",
     "express": "^4.18.2",
-    "fs-extra": "^10.1.0",
+    "fs-extra": "^11.1.1",
     "git-rev-sync": "^3.0.2",
     "glob": "7.2.3",
     "ignore-loader": "^0.1.2",
@@ -86,18 +88,17 @@
     "jest-fetch-mock": "^2.1.2",
     "mime-types": "2.1.35",
     "minimatch": "3.1.2",
+    "node-fetch": "^2.6.9",
     "open": "^8.4.2",
     "prettier": "^2.8.6",
-    "pwa-kit-runtime": "2.8.0-dev",
+    "pwa-kit-runtime": "^3.0.0-dev",
     "react-refresh": "^0.14.0",
     "replace-in-file": "^6.3.5",
-    "request": "^2.88.0",
     "require-from-string": "^2.0.2",
     "rimraf": "2.7.1",
     "speed-measure-webpack-plugin": "^1.5.0",
     "svg-sprite-loader": "^6.0.11",
     "validator": "^13.9.0",
-    "watch": "1.0.2",
     "webpack": "^5.76.3",
     "webpack-bundle-analyzer": "^4.8.0",
     "webpack-cli": "^4.10.0",
@@ -109,17 +110,33 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "internal-lib-build": "2.8.0-dev",
+    "@types/archiver": "^1.3.0",
+    "@types/fs-extra": "^11.0.1",
+    "@types/git-rev-sync": "^2.0.0",
+    "@types/node-fetch": "^2.6.3",
+    "@types/validator": "^13.7.14",
+    "internal-lib-build": "^3.0.0-dev",
     "nock": "^13.3.0",
+    "nodemon": "^2.0.22",
     "superagent": "^6.1.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "typescript": "4.8.3"
   },
   "peerDependencies": {
-    "@loadable/component": "^5.15.0"
+    "@loadable/component": "^5.15.0",
+    "typescript": ">=4.8.3"
+  },
+  "peerDependenciesMeta": {
+    "@loadable/component": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
   },
   "engines": {
-    "node": "^14.0.0 || ^16.0.0",
-    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+    "node": "^16.0.0 || ^18.0.0",
+    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
   },
   "publishConfig": {
     "directory": "dist"

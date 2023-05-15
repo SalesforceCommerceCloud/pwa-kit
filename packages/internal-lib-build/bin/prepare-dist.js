@@ -6,7 +6,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* istanbul ignore file */
-
+/* eslint-disable @typescript-eslint/no-var-requires */
 const promisify = require('util').promisify
 const fs = require('fs')
 const fsPromises = require('fs').promises
