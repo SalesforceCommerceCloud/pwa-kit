@@ -420,7 +420,7 @@ const runGenerator = (preset, answers, {outputDir, verbose}) => {
                 if (inputFile.endsWith('.hbs')) {
                     const templateString = sh.cat(inputFile)
                     const template = Handlebars.compile(templateString.stdout)
-                    fs.writeFileSync(outputFile.replace('.hbs', ''), template({answers}))
+                    fs.writeFileSync(outputFile.replace('.hbs', ''), template(answers))
                 } else {
                     fs.copyFileSync(inputFile, outputFile)
                 }
