@@ -302,7 +302,7 @@ describe('getRoutes', () => {
  * A race condition is created when a user clicks two links for the same
  * component. If the getProps call for the second link resolves before the
  * first, we want to make sure the results of the first are ignored. In this
- * test we setProps twice to trigger getProps calls and make sure only the
+ * test we rerender returned from first rendering twice to trigger getProps calls and make sure only the
  * second one updates the component.
  */
 describe('Handles race conditions for getProps', () => {
