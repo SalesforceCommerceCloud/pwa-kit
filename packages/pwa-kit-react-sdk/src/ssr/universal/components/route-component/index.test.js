@@ -111,7 +111,7 @@ describe('The routeComponent component', () => {
         expect(screen.getByText(/mockComponent/i)).toBeInTheDocument()
     })
 
-    test('Should call getProps on components at the right times during updates/rendering', async () => {
+    test('Should call getProps on components at the right times during updates/rendering',  () => {
         const Mock = getMockComponent()
         const Component = routeComponent(Mock)
         Component.displayName = 'routeComponent'
