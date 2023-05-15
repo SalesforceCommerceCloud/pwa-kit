@@ -66,12 +66,21 @@ const ENVS_TO_EXPOSE = [
     'aws_lambda_log_stream_name',
     'aws_region',
     'bundle_id',
+    // These "customer" defined environment variables are set by the Manager 
+    // and expected by the MRT smoke test suite
+    'customer_defined_array',
+    'customer_defined_boolean',
+    'customer_defined_float',
+    'customer_defined_integer',
+    'customer_defined_json',
+    'customer_defined_null',
+    'customer_defined_string',
     'deploy_id',
     'deploy_target',
     'external_domain_name',
     'mobify_property_id',
     'node_env',
-    'tz'
+    'tz',
 ]
 
 const HEADERS_TO_REDACT = ['x-api-key', 'x-apigateway-context', 'x-apigateway-event']
@@ -164,11 +173,12 @@ const tlsVersionTest = async (_, res) => {
 }
 
 /**
- * Express handler that returns all the environment variables set  
+ * Express handler that returns all the environment variables set
  */
-const envVarsTest = async (_, res) => {
+const envVarsEndpoint = async (_, res) => {
     res.header('Content-Type', 'application/json')
-    res.send(JSON.stringify(process.env, null, 4))
+    const exposed = filterAndSortObjectKeys(process.env, ENVS_TO_EXPOSE)
+    res.send(JSON.stringify(exposed, null, 4))
 }
 
 /**
@@ -226,7 +236,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     // Configure routes
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)
-    app.get('/env-vars', envVarsTest)
+    app.get('/env-vars', envVarsEndpoint)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
