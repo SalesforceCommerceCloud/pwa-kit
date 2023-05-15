@@ -97,7 +97,7 @@ export function renderHookWithProviders<TProps, TResult>(
     })
 }
 
-const NOCK_DELAY = 50;
+const NOCK_DELAY = 50
 /** Mocks DELETE, PATCH, POST, and PUT so we don't have to look up which verb an endpoint uses. */
 export const mockMutationEndpoints = (
     matchingPath: string,
