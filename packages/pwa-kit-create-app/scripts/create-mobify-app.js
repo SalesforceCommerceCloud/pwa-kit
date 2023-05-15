@@ -497,15 +497,13 @@ const askExtensibilityQuestions = async (preset) => {
     let answers = await inquirer.prompt(questions)
     let version
 
-    if (answers.extendable) {
-        // TODO: This needs to be a utility!
-        const templateSource = preset.templateSources.find(({type}) => type === 'npm')
-
+    const {general} = answers
+    if (general.extend) {
         // In the future we might want to ask what version of the selected project they
         // want to extend. But for now lets just get the latest version and synthetically
         // inject it as an "answer"
-        console.log(`npm view ${templateSource.id} version`)
-        version = sh.execSync(`npm view ${templateSource.id} version`).stdout
+        console.log(`npm view ${general.templateSource.id} version`)
+        version = sh.execSync(`npm view ${general.templateSource.id} version`).stdout
     }
 
     answers = {
