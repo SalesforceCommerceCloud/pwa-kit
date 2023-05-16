@@ -1,4 +1,7 @@
 ## v3.0.0-dev (May 12, 2023)
+
+-   Update engines to drop npm 7, and requires Node to start from version 16.11 [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
+
 ## v2.7.1 (May 11, 2023)
 
 -   Fix static file serving [#1196](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1196)
@@ -19,7 +22,7 @@
 
 ## v2.5.0 (Jan 05, 2023)
 
--   Logging cid from res header isntead of req in local development [#821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/821)
+-   Logging cid from res header instead of req in local development [#821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/821)
 
 ## v2.4.0 (Dec 01, 2022)
 

@@ -51,7 +51,7 @@ const NestedAccordion = (props) => {
         typeof itemsFilter === 'function' ? itemsFilter(item) : !!item[itemsFilter]
 
     return (
-        <Accordion className="sf-nested-accordion" allowToggle={true} {...rest}>
+        <Accordion className="sf-nested-accordion" {...rest}>
             {/* Optional accordion items before others in items list.  */}
             {typeof itemsBefore === 'function' ? itemsBefore({item, depth}) : itemsBefore}
 

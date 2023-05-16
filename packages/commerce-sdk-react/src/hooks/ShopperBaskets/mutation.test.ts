@@ -193,23 +193,23 @@ describe('ShopperBaskets mutations', () => {
         '`%s` returns data on success',
         async (mutationName, options) => {
             mockMutationEndpoints(basketsEndpoint, oldBasket)
-            const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+            const {result} = renderHookWithProviders(() => {
                 return useShopperBasketsMutation(mutationName)
             })
             expect(result.current.data).toBeUndefined()
             act(() => result.current.mutate(options))
-            await waitAndExpectSuccess(wait, () => result.current)
+            await waitAndExpectSuccess(() => result.current)
             expect(result.current.data).toEqual(oldBasket)
         }
     )
     test.each(allTestCases)('`%s` returns error on error', async (mutationName, options) => {
         mockMutationEndpoints(basketsEndpoint, {error: true}, 400)
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+        const {result} = renderHookWithProviders(() => {
             return useShopperBasketsMutation(mutationName)
         })
         expect(result.current.error).toBeNull()
         act(() => result.current.mutate(options))
-        await waitAndExpectError(wait, () => result.current)
+        await waitAndExpectError(() => result.current)
         // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
         // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
         expect(result.current.error).toHaveProperty('response')
@@ -220,16 +220,16 @@ describe('ShopperBaskets mutations', () => {
             mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
             mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
             mockMutationEndpoints(basketsEndpoint, newBasket) // this mutation
-            const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
+            const {result} = renderHookWithProviders(() => ({
                 basket: queries.useBasket(getBasketOptions),
                 customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
                 mutation: useShopperBasketsMutation(mutationName)
             }))
-            await waitAndExpectSuccess(wait, () => result.current.basket)
+            await waitAndExpectSuccess(() => result.current.basket)
             expect(result.current.basket.data).toEqual(oldBasket)
             expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
             act(() => result.current.mutation.mutate(options))
-            await waitAndExpectSuccess(wait, () => result.current.mutation)
+            await waitAndExpectSuccess(() => result.current.mutation)
             assertUpdateQuery(result.current.basket, newBasket)
             assertUpdateQuery(result.current.customerBaskets, newCustomerBaskets)
         }
@@ -240,17 +240,17 @@ describe('ShopperBaskets mutations', () => {
             mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
             mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
             mockMutationEndpoints(basketsEndpoint, {error: true}, 400) // this mutation
-            const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
+            const {result} = renderHookWithProviders(() => ({
                 basket: queries.useBasket(getBasketOptions),
                 customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
                 mutation: useShopperBasketsMutation(mutationName)
             }))
-            await waitAndExpectSuccess(wait, () => result.current.basket)
+            await waitAndExpectSuccess(() => result.current.basket)
             expect(result.current.basket.data).toEqual(oldBasket)
             expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
             expect(result.current.mutation.error).toBeNull()
             act(() => result.current.mutation.mutate(options))
-            await waitAndExpectError(wait, () => result.current.mutation)
+            await waitAndExpectError(() => result.current.mutation)
             // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
             // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
             expect(result.current.mutation.error).toHaveProperty('response')
@@ -263,12 +263,12 @@ describe('ShopperBaskets mutations', () => {
         async (mutationName, options) => {
             // Almost the standard 'returns data' test, just a different return type
             mockMutationEndpoints(basketsEndpoint, oldBasket)
-            const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+            const {result} = renderHookWithProviders(() => {
                 return useShopperBasketsMutation(mutationName)
             })
             expect(result.current.data).toBeUndefined()
             act(() => result.current.mutate(options))
-            await waitAndExpectSuccess(wait, () => result.current)
+            await waitAndExpectSuccess(() => result.current)
             expect(result.current.data).toBeUndefined()
         }
     )
@@ -277,18 +277,18 @@ describe('ShopperBaskets mutations', () => {
         const [mutationName, options] = deleteTestCase
         mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
         mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
-        mockMutationEndpoints(basketsEndpoint, newBasket) // this mutation
+        mockMutationEndpoints(basketsEndpoint, newBasket) // tshis mutation
         mockQueryEndpoint(customersEndpoint, deletedCustomerBaskets) // getCustomerBaskets refetch
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
+        const {result} = renderHookWithProviders(() => ({
             basket: queries.useBasket(getBasketOptions),
             customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
             mutation: useShopperBasketsMutation(mutationName)
         }))
-        await waitAndExpectSuccess(wait, () => result.current.basket)
+        await waitAndExpectSuccess(() => result.current.basket)
         expect(result.current.basket.data).toEqual(oldBasket)
         expect(result.current.customerBaskets.data).toEqual(oldCustomerBaskets)
         act(() => result.current.mutation.mutate(options))
-        await waitAndExpectSuccess(wait, () => result.current.mutation)
+        await waitAndExpectSuccess(() => result.current.mutation)
         assertRemoveQuery(result.current.basket)
         assertInvalidateQuery(result.current.customerBaskets, oldCustomerBaskets)
     })

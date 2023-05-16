@@ -7,7 +7,13 @@
 import {useIntl} from 'react-intl'
 import {formatPhoneNumber} from '../../utils/phone-utils'
 
-export default function useProfileFields({form: {control, errors}, prefix = ''}) {
+export default function useProfileFields({
+    form: {
+        control,
+        formState: {errors}
+    },
+    prefix = ''
+}) {
     const {formatMessage} = useIntl()
 
     const fields = {

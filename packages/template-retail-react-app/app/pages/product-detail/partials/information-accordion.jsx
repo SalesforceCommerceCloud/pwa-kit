@@ -23,7 +23,7 @@ const InformationAccordion = ({product}) => {
 
     return (
         <Stack direction="row" spacing={[0, 0, 0, 16]}>
-            <Accordion allowMultiple allowToggle maxWidth={'896px'} flex={[1, 1, 1, 5]}>
+            <Accordion allowMultiple maxWidth={'896px'} flex={[1, 1, 1, 5]}>
                 {/* Details */}
                 <AccordionItem>
                     <h2>

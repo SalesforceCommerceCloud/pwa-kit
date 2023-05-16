@@ -11,25 +11,6 @@ import {screen, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
 import {mockedEmptyWishList, mockedProductLists, mockedWishListProducts} from './index.mock'
 
-jest.mock('commerce-sdk-react-preview', () => {
-    const originalModule = jest.requireActual('commerce-sdk-react-preview')
-    return {
-        ...originalModule,
-        useCustomerBaskets: jest.fn().mockReturnValue({data: {baskets: [{currency: 'GBP'}]}})
-    }
-})
-
-jest.mock('../../../hooks/use-current-customer', () => {
-    return {
-        useCurrentCustomer: jest.fn().mockReturnValue({
-            data: {
-                customerId: 'some_id',
-                isRegistered: true
-            }
-        })
-    }
-})
-
 beforeEach(() => {
     jest.resetModules()
 

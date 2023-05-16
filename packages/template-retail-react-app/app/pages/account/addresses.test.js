@@ -6,32 +6,25 @@
  */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import user from '@testing-library/user-event'
-import {renderWithProviders} from '../../utils/test-utils'
+import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountAddresses from './addresses'
 import {
     mockedRegisteredCustomerWithNoAddress,
     mockedRegisteredCustomer
 } from '../../mocks/mock-data'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {Route, Switch} from 'react-router-dom'
+import mockConfig from '../../../config/mocks/default'
 
 let mockCustomer = {}
 
-const mockToastSpy = jest.fn()
-jest.mock('@chakra-ui/toast', () => {
-    return {
-        useToast: jest.fn(() => mockToastSpy)
-    }
-})
-
 const MockedComponent = () => {
-    const {data: customer} = useCurrentCustomer()
     return (
-        <div>
-            <span>Customer Id:</span> {customer.customerId}
-            <AccountAddresses />
-        </div>
+        <Switch>
+            <Route path={createPathWithDefaults('/account/addresses')}>
+                <AccountAddresses />
+            </Route>
+        </Switch>
     )
 }
 
@@ -64,8 +57,10 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.status(200))
         })
     )
+    window.history.pushState({}, 'Account', createPathWithDefaults('/account/addresses'))
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
 })
 
@@ -75,27 +70,29 @@ test('Allows customer to add addresses', async () => {
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomerWithNoAddress))
         )
     )
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
 
     await waitFor(() => {
         expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()
     })
 
-    user.click(screen.getByText(/add address/i))
-    user.type(screen.getByLabelText('First Name'), 'Test')
-    user.type(screen.getByLabelText('Last Name'), 'McTester')
-    user.type(screen.getByLabelText('Phone'), '7275551234')
-    user.type(screen.getByLabelText('Address'), '123 Main St')
-    user.type(screen.getByLabelText('City'), 'Tampa')
-    user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
-    user.type(screen.getByLabelText('Zip Code'), '33712')
+    await user.click(screen.getByText(/add address/i))
+    await user.type(screen.getByLabelText('First Name'), 'Test')
+    await user.type(screen.getByLabelText('Last Name'), 'McTester')
+    await user.type(screen.getByLabelText('Phone'), '7275551234')
+    await user.type(screen.getByLabelText('Address'), '123 Main St')
+    await user.type(screen.getByLabelText('City'), 'Tampa')
+    await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
+    await user.type(screen.getByLabelText('Zip Code'), '33712')
 
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         )
     )
-    user.click(screen.getByText(/^Save$/i))
+    await user.click(screen.getByText(/^Save$/i))
     expect(await screen.findByText(/123 Main St/i)).toBeInTheDocument()
 })
 
@@ -105,7 +102,7 @@ test('Allows customer to remove addresses', async () => {
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         )
     )
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('123 Main St')).toBeInTheDocument())
 
     global.server.use(
@@ -114,6 +111,6 @@ test('Allows customer to remove addresses', async () => {
         )
     )
 
-    user.click(screen.getByText(/remove/i))
+    await user.click(screen.getByText(/remove/i))
     expect(await screen.findByText(/no saved addresses/i)).toBeInTheDocument()
 })

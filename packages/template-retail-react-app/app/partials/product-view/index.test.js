@@ -106,6 +106,7 @@ test('ProductView Component renders with updateWishlist event handler', async ()
 })
 
 test('Product View can update quantity', async () => {
+    const user = userEvent.setup()
     const addToCart = jest.fn()
     await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
 
@@ -119,7 +120,7 @@ test('Product View can update quantity', async () => {
     })
 
     // update item quantity
-    userEvent.type(quantityBox, '{backspace}3')
+    await user.type(quantityBox, '{backspace}3')
 
     await waitFor(() => {
         expect(quantityBox).toHaveValue('3')
@@ -177,6 +178,8 @@ test('renders a product set properly - child item', () => {
 })
 
 test('validateOrderability callback is called when adding a set to cart', async () => {
+    const user = userEvent.setup()
+
     const parent = mockProductSet
     const validateOrderability = jest.fn()
 
@@ -190,7 +193,7 @@ test('validateOrderability callback is called when adding a set to cart', async 
     )
 
     const button = screen.getByRole('button', {name: /add set to cart/i})
-    userEvent.click(button)
+    await user.click(button)
 
     await waitFor(() => {
         expect(validateOrderability).toHaveBeenCalledTimes(1)
@@ -198,6 +201,8 @@ test('validateOrderability callback is called when adding a set to cart', async 
 })
 
 test('onVariantSelected callback is called after successfully selected a variant', async () => {
+    const user = userEvent.setup()
+
     const onVariantSelected = jest.fn()
     const child = mockProductSet.setProducts[0]
 
@@ -211,7 +216,7 @@ test('onVariantSelected callback is called after successfully selected a variant
     )
 
     const size = screen.getByRole('radio', {name: /xl/i})
-    userEvent.click(size)
+    await user.click(size)
 
     await waitFor(() => {
         expect(onVariantSelected).toHaveBeenCalledTimes(1)
