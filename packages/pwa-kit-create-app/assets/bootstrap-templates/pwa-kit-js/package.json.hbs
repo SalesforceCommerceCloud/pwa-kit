@@ -11,9 +11,9 @@
     "overridesDir": "overrides"
   },
   "devDependencies": {
-    "{{templateSource.id}}": "{{templatePackageJSON.version}}"
+    "{{templateSource.id}}": "{{answers.project.templatePackageJSON.version}}"
   },
-  "scripts": {{templatePackageJSON.scripts}},
+  "scripts": {{answers.project.templatePackageJSON.scripts}},
   "bundlesize": [
     {
       "path": "build/main.js",
