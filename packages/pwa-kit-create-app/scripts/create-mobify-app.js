@@ -633,11 +633,10 @@ const main = async (opts) => {
 
     // Add the selected preset to the context object.
     const selectedPreset = PRESETS.find(({id}) => id === context.answers.general.presetId)
-    context.preset = selectedPreset
-
-    // For convenience access only
-    debugger
     const {preGenerate = noop, postGenerate = noop} = selectedPreset
+
+    // Add the preset to the context. TODO: rename to 'selectedPreset'
+    context.preset = selectedPreset
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
         opts.outputDir = p.join(process.cwd(), selectedPreset.id)
