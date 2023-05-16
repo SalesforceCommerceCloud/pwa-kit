@@ -111,16 +111,10 @@ const PRESETS = [
             Use this preset to connect to an existing instance, such as a sandbox.
         `,
         shortDescription: 'The Retail app using your own Commerce Cloud instance',
-        templateSources: [
-            {
-                type: TEMPLATE_SOURCE_NPM,
-                id: 'retail-react-app'
-            },
-            {
-                type: TEMPLATE_SOURCE_BUNDLE,
-                id: 'template-retail-react-app'
-            }
-        ],
+        templateSource: {
+            type: TEMPLATE_SOURCE_NPM,
+            id: 'retail-react-app'
+        },
         preGenerate: async (context = {}) => {
             const commerceQuestions = [
                 {
@@ -174,16 +168,10 @@ const PRESETS = [
             Use this preset to try out PWA Kit.
         `,
         shortDescription: 'The Retail app with demo Commerce Cloud instance',
-        templateSources: [
-            {
-                type: TEMPLATE_SOURCE_NPM,
-                id: 'retail-react-app'
-            },
-            {
-                type: TEMPLATE_SOURCE_BUNDLE,
-                id: 'template-retail-react-app'
-            }
-        ],
+        templateSource: {
+            type: TEMPLATE_SOURCE_NPM,
+            id: 'retail-react-app'
+        },
         preGenerate: (context = {}) => {
             return merge(context, {
                 answers: {
@@ -205,12 +193,14 @@ const PRESETS = [
             })
         },
         postGenerate: (context, {outputDir}) => {
-            console.log('Running bost generate1')
             const {answers} = context
 
             if (!answers.general.extend) {
                 console.log('copying templates')
-                bootstrapTemplate(context, {filterRegex: /(sites.js.hbs|default.js.hbs)$/, outputDir})
+                bootstrapTemplate(context, {
+                    filterRegex: /(sites.js.hbs|default.js.hbs)$/,
+                    outputDir
+                })
             }
         },
         private: false
@@ -219,12 +209,10 @@ const PRESETS = [
         id: 'retail-react-app-test-project',
         name: 'Retail React App Test Project',
         description: '',
-        templateSources: [
-            {
-                type: TEMPLATE_SOURCE_BUNDLE,
-                id: 'template-retail-react-app'
-            }
-        ],
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'template-retail-react-app'
+        },
         preGenerate: (context = {}) => {
             return merge(context, {
                 answers: {
@@ -251,12 +239,10 @@ const PRESETS = [
         id: 'typescript-minimal-test-project',
         name: 'Template Minimal Test Project',
         description: '',
-        templateSources: [
-            {
-                type: TEMPLATE_SOURCE_BUNDLE,
-                id: 'template-typescript-minimal'
-            }
-        ],
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'template-typescript-minimal'
+        },
         private: true
     },
     {
@@ -268,24 +254,20 @@ const PRESETS = [
             Use this as a TypeScript starting point or as a base on top of 
             which to build new TypeScript project templates for Managed Runtime.
         `,
-        templateSources: [
-            {
-                type: TEMPLATE_SOURCE_BUNDLE,
-                id: 'template-typescript-minimal'
-            }
-        ],
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'template-typescript-minimal'
+        },
         private: true
     },
     {
         id: 'express-minimal-test-project',
         name: 'Express Minimal Test Project',
         description: '',
-        templateSources: [
-            {
-                type: TEMPLATE_SOURCE_BUNDLE,
-                id: 'template-express-minimal'
-            }
-        ],
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'template-express-minimal'
+        },
         private: true
     },
     {
@@ -297,24 +279,20 @@ const PRESETS = [
             Use this as a starting point for APIs or as a base on top of
             which to build new project templates for Managed Runtime.
         `,
-        templateSources: [
-            {
-                type: TEMPLATE_SOURCE_BUNDLE,
-                id: 'template-express-minimal'
-            }
-        ],
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'template-express-minimal'
+        },
         private: true
     },
     {
         id: 'mrt-reference-app',
         name: 'Managed Runtime Reference App',
         description: '',
-        templateSources: [
-            {
-                type: TEMPLATE_SOURCE_BUNDLE,
-                id: 'template-mrt-reference-app'
-            }
-        ],
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'template-mrt-reference-app'
+        },
         private: true
     }
 ]
@@ -443,24 +421,20 @@ const npmInstall = (outputDir, {verbose}) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir, verbose}) => {
+const runGenerator = (context, {outputDir}) => {
     debugger
-    const {answers, templateSource} = context
-    const templateSourceType = templateSource.type
+    const {answers, preset} = context
+    const {templateSource} = preset
     const {extend} = answers.general
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
 
     if (extend) {
-        // Process the boostrap
         bootstrapTemplate(context, {outputDir})
     } else {
-        prepareTemplate(templateSource.id, {outputDir, source: templateSourceType})
+        prepareTemplate(templateSource.id, {outputDir, source: templateSource.type})
     }
-
-    // Finally we install the newly minted projects dependencies
-    npmInstall(outputDir, {verbose})
 }
 
 /**
@@ -500,7 +474,7 @@ const askGeneralQuestions = async () => {
  * @returns
  */
 const askExtensibilityQuestions = async (context) => {
-    // Returns the extends, and version, and output dir (leave that out for now.)
+    const {templateSource} = context.preset
     const questions = [
         {
             name: 'extend',
@@ -523,11 +497,6 @@ const askExtensibilityQuestions = async (context) => {
     let pkgJSON
 
     if (answers.extend) {
-        // TODO: This needs to be a utility!
-        const templateSource = context.preset.templateSources.find(
-            ({type}) => type === TEMPLATE_SOURCE_NPM
-        )
-
         // In the future we might want to ask what version of the selected project they
         // want to extend. But for now lets just get the latest version and synthetically
         // inject it as an "answer"
@@ -585,6 +554,7 @@ const prepareTemplate = (templateName, {outputDir, source = TEMPLATE_SOURCE_BUND
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     switch (source) {
         case TEMPLATE_SOURCE_NPM: {
+            console.log('Downloading Template from NPM')
             const {stdout} = sh.exec(
                 `npm pack ${templateName}@latest --pack-destination="${tmp}"`,
                 {
@@ -600,6 +570,7 @@ const prepareTemplate = (templateName, {outputDir, source = TEMPLATE_SOURCE_BUND
             break
         }
         default:
+            console.log('Extracting Template from Bundle')
             tar.x({
                 file: p.join(__dirname, '..', 'templates', `${templateName}.tar.gz`),
                 cwd: p.join(tmp),
@@ -672,25 +643,15 @@ const main = async (opts) => {
         opts.outputDir = p.join(process.cwd(), selectedPreset.id)
     }
 
-    // If the preset is configured to allow its template source to be "NPM"
-    // then that means it supports extensibility.
-    const extendable = selectedPreset.templateSources.find(({type}) => type === 'npm')
+    // If the template source is NPM then we know the template can be extended.
+    const extendable = selectedPreset.templateSource.type === TEMPLATE_SOURCE_NPM
 
     // Step 2: If extensibility is supported ask if you want to use it.
-    let templateSource
     let extendableAnswers = {}
 
     if (extendable) {
         extendableAnswers = await askExtensibilityQuestions(context)
     }
-
-    // Get the templateSource object based on the `extendable` answer.
-    const {extend = false} = extendableAnswers
-    templateSource = selectedPreset.templateSources.find(({type}) =>
-        extend || false ? type === 'npm' : type === 'bundle'
-    )
-
-    context.templateSource = templateSource // TODO? Rename to selectedTemplateSrouce?
 
     // Update the context answers.
     context.answers.general = {
