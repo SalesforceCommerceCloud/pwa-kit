@@ -50,6 +50,69 @@ export const EXT_OVERRIDES_DIR =
 export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
+// in a Template Extensibility project, these can include BOTH the node_modules/*
+// AND the node_modules/<extends>/node_modules/* npm deps, so we route here to
+// prevent duplication in the final bundle. We want a better way of doing this,
+// but for now this is the best option we've found.
+
+// TODO: can these be handled in package.json as peerDependencies?
+// https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
+
+export const OVERRIDABLE_DEPS = [
+    '@chakra-ui/icons',
+    '@chakra-ui/react',
+    '@chakra-ui/skip-nav',
+    '@chakra-ui/system',
+    '@chakra-ui/theme',
+    '@emotion/react',
+    '@emotion/styled',
+    '@formatjs/cli',
+    '@lhci/cli',
+    '@loadable/component',
+    '@loadable/server',
+    '@peculiar/webcrypto',
+    '@loadable/webpack-plugin',
+    '@tanstack/react-query',
+    '@tanstack/react-query-devtools',
+    '@testing-library/dom',
+    '@testing-library/jest-dom',
+    '@testing-library/react',
+    '@testing-library/react-hooks',
+    '@testing-library/user-event',
+    'babel-runtime',
+    'base64-arraybuffer',
+    'bundlesize2',
+    'card-validator',
+    'commerce-sdk-react-preview',
+    'cross-env',
+    'focus-visible',
+    'framer-motion',
+    'full-icu',
+    'helmet',
+    'jest-fetch-mock',
+    'js-cookie',
+    'jsonwebtoken',
+    'jwt-decode',
+    'lodash',
+    'msw',
+    'nanoid',
+    'njwt',
+    'prop-types',
+    'pwa-kit-dev',
+    'pwa-kit-react-sdk',
+    'pwa-kit-runtime',
+    'query-string',
+    'raf',
+    'randomstring',
+    'react',
+    'react-dom',
+    'react-helmet',
+    'react-hook-form',
+    'react-intl',
+    'react-router-dom',
+    'svg-sprite-loader',
+    'webpack-hot-middleware'
+]
 
 if (EXT_EXTENDABLE && EXT_EXTENDS) {
     const extendsAsArr = Array.isArray(EXT_EXTENDS) ? EXT_EXTENDS : [EXT_EXTENDS]
@@ -93,7 +156,7 @@ const getAppEntryPoint = () => {
     return EXT_OVERRIDES_DIR + '/app/main'
 }
 
-const findInProjectThenSDK = (pkg) => {
+const findDepInStack = (pkg) => {
     // Look for the SDK node_modules in two places because in CI,
     // pwa-kit-dev is published under a 'dist' directory, which
     // changes this file's location relative to the package root.
@@ -169,28 +232,11 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        'babel-runtime': findInProjectThenSDK('babel-runtime'),
-                        '@tanstack/react-query': findInProjectThenSDK('@tanstack/react-query'),
-                        '@loadable/component': findInProjectThenSDK('@loadable/component'),
-                        '@loadable/server': findInProjectThenSDK('@loadable/server'),
-                        '@loadable/webpack-plugin': findInProjectThenSDK(
-                            '@loadable/webpack-plugin'
+                        ...Object.assign(
+                            ...OVERRIDABLE_DEPS.map((dep) => ({
+                                [dep]: findDepInStack(dep)
+                            }))
                         ),
-                        'svg-sprite-loader': findInProjectThenSDK('svg-sprite-loader'),
-                        react: findInProjectThenSDK('react'),
-                        'react-router-dom': findInProjectThenSDK('react-router-dom'),
-                        'react-dom': findInProjectThenSDK('react-dom'),
-                        'react-helmet': findInProjectThenSDK('react-helmet'),
-                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware'),
-
-                        // TODO: these need to be declared in package.json as peerDependencies ?
-                        // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
-                        'react-intl': findInProjectThenSDK('react-intl'),
-                        '@chakra-ui/icons': findInProjectThenSDK('@chakra-ui/icons'),
-                        '@chakra-ui/react': findInProjectThenSDK('@chakra-ui/react'),
-                        '@chakra-ui/skip-nav': findInProjectThenSDK('@chakra-ui/skip-nav'),
-                        '@emotion/react': findInProjectThenSDK('@emotion/react'),
-                        '@emotion/styled': findInProjectThenSDK('@emotion/styled'),
                         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
@@ -234,17 +280,17 @@ const baseConfig = (target) => {
                         ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('svg-sprite-loader')
+                            loader: findDepInStack('svg-sprite-loader')
                         },
                         target === 'web' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('ignore-loader')
+                            loader: findDepInStack('ignore-loader')
                         },
                         {
                             test: /\.html$/,
                             exclude: /node_modules/,
                             use: {
-                                loader: findInProjectThenSDK('html-loader')
+                                loader: findDepInStack('html-loader')
                             }
                         }
                     ].filter(Boolean)
@@ -285,12 +331,7 @@ const withChunking = (config) => {
                         // 2. The package is one of the monorepo packages.
                         //    This is for local development to ensure the bundle
                         //    composition is the same as a production build
-                        test: (module) => {
-                            if (module?.context?.match(makeRegExp(`${sysPath}/node_modules`))) {
-                                return false
-                            }
-                            return module?.context?.match?.(/(node_modules)|(packages\/.*\/dist)/)
-                        },
+                        test: /(node_modules)|(packages\/.*\/dist)/,
                         name: 'vendor',
                         chunks: 'all'
                     }
@@ -310,7 +351,7 @@ const ruleForBabelLoader = (babelPlugins) => {
             : {exclude: /node_modules/}),
         use: [
             {
-                loader: findInProjectThenSDK('babel-loader'),
+                loader: findDepInStack('babel-loader'),
                 options: {
                     rootMode: 'upward',
                     cacheDirectory: true,
@@ -371,6 +412,7 @@ const client =
         .extend(withChunking)
         .extend((config) => {
             const sysPath = fse.realpathSync(path.resolve('node_modules', EXT_EXTENDS ?? ''))
+            const depsMap = new Map()
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
@@ -383,15 +425,7 @@ const client =
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
-                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT),
-                    // ignore duplicate dependencies in extensible project
-                    EXT_EXTENDS &&
-                        EXT_OVERRIDES_DIR &&
-                        new webpack.IgnorePlugin({
-                            checkResource: (resource, context) => {
-                                return context?.match(sysPath) && !resource?.match(EXT_EXTENDS)
-                            }
-                        })
+                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
                 ].filter(Boolean),
                 // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
                 performance: {
