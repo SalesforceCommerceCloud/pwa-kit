@@ -438,12 +438,12 @@ const runGenerator = (context, {outputDir, verbose}) => {
     debugger
     const {answers, templateSource} = context
     const templateSourceType = templateSource.type
-    const {extended} = answers.general
+    const {extend} = answers.general
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
 
-    if (extended) {
+    if (extend) {
         // Process the boostrap 
         bootstrapTemplate(context, {outputDir})
     } else {
