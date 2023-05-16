@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --inspect
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
@@ -435,6 +435,7 @@ const npmInstall = (outputDir, {verbose}) => {
  * @param {*} param2
  */
 const runGenerator = (context, {outputDir, verbose}) => {
+    debugger
     const {answers, templateSource} = context
     const templateSourceType = templateSource.type
     const {extended} = answers.general
