@@ -49,6 +49,9 @@ const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
 
+// Register Handlebars helper to allow use to display objects.
+Handlebars.registerHelper('json', (context) => (JSON.stringify(context)))
+
 const program = new Command()
 
 sh.set('-e')
