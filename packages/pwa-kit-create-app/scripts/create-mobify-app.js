@@ -526,7 +526,7 @@ const bootstrapTemplate = (context, {lang = 'js', outputDir, filterRegex}) => {
     const files = getAllFiles(inputDir)
 
     files
-        .filter((file) => !filterRegex || !!file.match(file))
+        .filter((file) => !filterRegex || !!file.match(filterRegex))
         .forEach((inputFile) => {
             const outputFile = outputDir + inputFile.replace(inputDir, '')
             const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
