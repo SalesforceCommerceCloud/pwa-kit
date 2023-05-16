@@ -630,6 +630,11 @@ const main = async (opts) => {
     // Step 1: If we aren't using a preset, ask what type of project the user wants to generate.
     if (!presetId) {
         context.answers.general = await askGeneralQuestions()
+    } else {
+        // This is ugly.. I'll clean it up later
+        context.answers.general = {
+            presetId
+        }
     }
 
     // Add the selected preset to the context object.
