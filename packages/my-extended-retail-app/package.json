@@ -67,9 +67,9 @@
     "scripts": {
         "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
         "build-translations": "npm run extract-default-translations && npm run compile-translations",
-        "compile-translations": "formatjs compile-folder --ast app/translations app/translations/compiled",
-        "compile-translations:pseudo": "formatjs compile --ast app/translations/en-US.json --out-file app/translations/compiled/en-XB.json --pseudo-locale en-XB",
-        "extract-default-translations": "formatjs extract 'app/**/*.{js,jsx}' --out-file app/translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
+        "compile-translations": "formatjs compile-folder --ast pwa-kit-overrides/app/translations pwa-kit-overrides/app/translations/compiled",
+        "compile-translations:pseudo": "formatjs compile --ast pwa-kit-overrides/app/translations/en-US.json --out-file pwa-kit-overrides/app/translations/compiled/en-XB.json --pseudo-locale en-XB",
+        "extract-default-translations": "formatjs extract './node_modules/retail-react-app/app/**/*.{js,jsx}' 'pwa-kit-overrides/app/**/*.{js,jsx}' --out-file pwa-kit-overrides/app/translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
         "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
         "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
         "lint:fix": "npm run lint -- --fix",

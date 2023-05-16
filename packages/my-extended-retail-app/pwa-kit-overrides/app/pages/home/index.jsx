@@ -98,8 +98,8 @@ const Home = () => {
                             _hover={{textDecoration: 'none'}}
                         >
                             <FormattedMessage
-                                defaultMessage="Get started"
-                                id="home.link.get_started"
+                                defaultMessage="Get started Extended App"
+                                id="home.link.get_started_extended_app"
                             />
                         </Button>
                     </Stack>
