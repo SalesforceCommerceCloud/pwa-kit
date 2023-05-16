@@ -144,6 +144,8 @@ const Footer = ({...otherProps}) => {
                                     variant="filled"
                                     {...styles.localeDropdown}
                                 >
+                                    {/* NOTE: this needs to be a native <option> (and not <chakra.option>)
+                                        It's a workaround to fix hydration error, by making sure that the `selected` property is set */}
                                     {supportedLocaleIds.map((locale) => (
                                         <option
                                             key={locale}
