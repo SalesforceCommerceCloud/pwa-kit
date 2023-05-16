@@ -422,6 +422,7 @@ const npmInstall = (outputDir, {verbose}) => {
  * @param {*} param2
  */
 const runGenerator = (context, {outputDir}) => {
+    console.log('runGenerator: ', context)
     debugger
     const {answers, preset} = context
     const {templateSource} = preset
