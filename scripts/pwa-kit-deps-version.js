@@ -10,14 +10,16 @@ const path = require('path')
 
 const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
 const independentPackages = JSON.parse(
-    sh.cat(path.join(__dirname, '../../..', 'scripts/packages-with-independent-version.json'))
+    sh.cat(path.join(__dirname, 'packages-with-independent-version.json'))
 )
 const sdkPackages = publicPackages.filter((pkg) => !independentPackages.includes(pkg.name))
 
+// Assuming that this is run within a specific package,
+// the script would update the version of all its pwa-kit/sdk dependencies.
 const main = () => {
     const version = process.argv[2]
 
-    const pathToPackageJson = path.join(__dirname, '..', 'package.json')
+    const pathToPackageJson = path.join(process.cwd(), 'package.json')
     const pkgJson = JSON.parse(sh.cat(pathToPackageJson))
 
     sdkPackages.forEach(({name}) => {
