@@ -15,18 +15,20 @@ sh.set('-e')
 const lernaConfigPath = path.join(__dirname, '..', 'lerna.json')
 const rootPath = path.join(__dirname, '..')
 
-const INDEPENDENT_PACKAGES = JSON.parse(sh.cat(path.join(__dirname, 'packages-with-independent-version.json')))
-
 const {stdout} = sh.exec('lerna list --all --json', {silent: true})
 const monorepoPackages = JSON.parse(stdout.toString())
 const monorepoPackageNames = monorepoPackages.map((pkg) => pkg.name)
 
-const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) => monorepoPackages.find((pkg) => pkg.name === pkgName))
+const INDEPENDENT_PACKAGES = JSON.parse(
+    sh.cat(path.join(__dirname, 'packages-with-independent-version.json'))
+)
+const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) =>
+    monorepoPackages.find((pkg) => pkg.name === pkgName)
+)
 
 const main = () => {
-    // TODO: during our release process, it looks like we should be tagging with annotated tags:
-    // https://lerna.js.org/docs/troubleshooting#publish-does-not-detect-manually-created-tags-in-fixed-mode-with-githubgithub-enterprise
-    sh.exec(`lerna version --exact --no-push --no-git-tag-version --yes ${process.argv.slice(2).join(' ')}`)
+    const args = process.argv.slice(2).join(' ')
+    sh.exec(`lerna version --exact --no-push --no-git-tag-version --yes ${args}`)
 
     // TODO: is this really necessary? Well, it does cause some bootstrapping to happen, plus other lifecycle scripts
     // sh.exec(`npm install`)

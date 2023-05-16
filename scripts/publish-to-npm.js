@@ -31,8 +31,7 @@ const main = () => {
         console.log(`--- Planning to release ${packageName}...`)
 
         const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
-        const allOtherPublicPackages = publicPackages
-            .filter((pkg) => pkg.name !== packageName)
+        const allOtherPublicPackages = publicPackages.filter((pkg) => pkg.name !== packageName)
 
         allOtherPublicPackages.forEach((pkg) => {
             sh.exec('npm pkg set private=true', {cwd: pkg.location})
@@ -41,7 +40,6 @@ const main = () => {
         allOtherPublicPackages.forEach((pkg) => {
             sh.exec('npm pkg delete private', {cwd: pkg.location})
         })
-
     } else {
         console.log('--- Planning to release all packages...')
         lernaPublish()
