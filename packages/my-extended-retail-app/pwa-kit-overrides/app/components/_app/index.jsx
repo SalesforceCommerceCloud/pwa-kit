@@ -5,13 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useLocation} from 'react-router-dom'
-import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {useQueries} from '@tanstack/react-query'
+import { useHistory, useLocation } from 'react-router-dom'
+import { getAssetUrl } from 'pwa-kit-react-sdk/ssr/universal/utils'
+import { getAppOrigin } from 'pwa-kit-react-sdk/utils/url'
+import { getConfig } from 'pwa-kit-runtime/utils/ssr-config'
+import { useQueries } from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
@@ -22,11 +22,11 @@ import {
 } from 'commerce-sdk-react-preview'
 import * as queryKeyHelpers from 'commerce-sdk-react-preview/hooks/ShopperProducts/queryKeyHelpers'
 // Chakra
-import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
-import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
+import { Box, useDisclosure, useStyleConfig } from '@chakra-ui/react'
+import { SkipNavLink, SkipNavContent } from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CurrencyProvider} from 'retail-react-app/app/contexts'
+import { CurrencyProvider } from 'retail-react-app/app/contexts'
 
 // Local Project Components
 import Header from 'retail-react-app/app/components/header'
@@ -40,16 +40,16 @@ import CheckoutHeader from 'retail-react-app/app/pages/checkout/partials/checkou
 import DrawerMenu from 'retail-react-app/app/components/drawer-menu'
 import ListMenu from 'retail-react-app/app/components/list-menu'
 
-import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/responsive'
+import { HideOnDesktop, HideOnMobile } from 'retail-react-app/app/components/responsive'
 
 // Hooks
-import {AuthModal, useAuthModal} from 'retail-react-app/app/hooks/use-auth-modal'
-import {AddToCartModalProvider} from 'retail-react-app/app/hooks/use-add-to-cart-modal'
+import { AuthModal, useAuthModal } from 'retail-react-app/app/hooks/use-auth-modal'
+import { AddToCartModalProvider } from 'retail-react-app/app/hooks/use-add-to-cart-modal'
 import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+import { useCurrentCustomer } from 'retail-react-app/app/hooks/use-current-customer'
 
 // Localization
-import {IntlProvider} from 'react-intl'
+import { IntlProvider } from 'react-intl'
 
 // Others
 import {
@@ -58,18 +58,20 @@ import {
     mergeMatchedItems,
     isServer
 } from 'retail-react-app/app/utils/utils'
-import {getTargetLocale, fetchTranslations} from 'retail-react-app/app/utils/locale'
+import { getTargetLocale, fetchTranslations } from 'retail-react-app/app/utils/locale'
 import {
-    DEFAULT_SITE_TITLE,
     HOME_HREF,
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE
 } from 'retail-react-app/app/constants'
+import {
+    DEFAULT_SITE_TITLE
+} from '../../constants'
 
 import Seo from 'retail-react-app/app/components/seo'
-import {resolveSiteFromUrl, resolveLocaleFromUrl} from 'retail-react-app/app/utils/site-utils'
+import { resolveSiteFromUrl, resolveLocaleFromUrl } from 'retail-react-app/app/utils/site-utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -82,7 +84,7 @@ const useLazyLoadCategories = () => {
     const itemsKey = 'categories'
 
     const levelZeroCategoriesQuery = useCategory({
-        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
+        parameters: { id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH }
     })
 
     const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
@@ -106,8 +108,8 @@ const useLazyLoadCategories = () => {
 }
 
 const App = (props) => {
-    const {children, targetLocale = DEFAULT_LOCALE, messages = {}} = props
-    const {data: categoriesTree} = useLazyLoadCategories()
+    const { children, targetLocale = DEFAULT_LOCALE, messages = {} } = props
+    const { data: categoriesTree } = useLazyLoadCategories()
     const categories = flatten(categoriesTree || {}, 'categories')
 
     const appOrigin = getAppOrigin()
@@ -115,27 +117,27 @@ const App = (props) => {
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
-    const {isRegistered} = useCustomerType()
-    const {site, locale, buildUrl} = useMultiSite()
+    const { isRegistered } = useCustomerType()
+    const { site, locale, buildUrl } = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const { isOpen, onOpen, onClose } = useDisclosure()
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
-    const {l10n} = site
+    const { l10n } = site
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
 
     // Handle creating a new basket if there isn't one already assigned to the current
     // customer.
-    const {data: customer} = useCurrentCustomer()
-    const {data: baskets} = useCustomerBaskets(
-        {parameters: {customerId: customer.customerId}},
-        {enabled: !!customer.customerId && !isServer}
+    const { data: customer } = useCurrentCustomer()
+    const { data: baskets } = useCustomerBaskets(
+        { parameters: { customerId: customer.customerId } },
+        { enabled: !!customer.customerId && !isServer }
     )
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
@@ -150,8 +152,8 @@ const App = (props) => {
         // update the basket currency if it doesn't match the current locale currency
         if (baskets?.baskets?.[0]?.currency && baskets.baskets[0].currency !== currency) {
             updateBasket.mutate({
-                parameters: {basketId: baskets.baskets[0].basketId},
-                body: {currency}
+                parameters: { basketId: baskets.baskets[0].basketId },
+                body: { currency }
             })
         }
     }, [baskets])
@@ -326,7 +328,7 @@ App.shouldGetProps = () => {
     return typeof window === 'undefined'
 }
 
-App.getProps = async ({res}) => {
+App.getProps = async ({ res }) => {
     const site = resolveSiteFromUrl(res.locals.originalUrl)
     const locale = resolveLocaleFromUrl(res.locals.originalUrl)
     const l10nConfig = site.l10n
@@ -369,14 +371,14 @@ App.propTypes = {
  */
 export const useCategoryBulk = (ids = [], queryOptions) => {
     const api = useCommerceApi()
-    const {getTokenWhenReady} = useAccessToken()
+    const { getTokenWhenReady } = useAccessToken()
     const {
-        app: {commerceAPI}
+        app: { commerceAPI }
     } = getConfig()
     const {
-        parameters: {organizationId}
+        parameters: { organizationId }
     } = commerceAPI
-    const {site} = useMultiSite()
+    const { site } = useMultiSite()
 
     const queries = ids.map((id) => {
         return {
@@ -389,7 +391,7 @@ export const useCategoryBulk = (ids = [], queryOptions) => {
             queryFn: async () => {
                 const token = await getTokenWhenReady()
                 const res = await api.shopperProducts.getCategory({
-                    parameters: {id, levels: 2},
+                    parameters: { id, levels: 2 },
                     headers: {
                         authorization: `Bearer ${token}`
                     }
@@ -400,7 +402,7 @@ export const useCategoryBulk = (ids = [], queryOptions) => {
             enabled: queryOptions.enabled !== false && Boolean(id)
         }
     })
-    const res = useQueries({queries})
+    const res = useQueries({ queries })
     return res
 }
 
