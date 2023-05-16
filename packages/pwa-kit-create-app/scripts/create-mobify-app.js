@@ -63,7 +63,7 @@ const noop = async (x) => x
 
 // Validations
 const validPreset = (preset) => {
-    return Object.keys(PRESETS).includes(preset)
+    return ALL_PRESET_NAMES.includes(preset)
 }
 
 const validProjectName = (s) => {
