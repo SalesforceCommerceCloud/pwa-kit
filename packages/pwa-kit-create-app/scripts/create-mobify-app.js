@@ -50,7 +50,7 @@ const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
 
 // Register Handlebars helper to allow use to display objects.
-Handlebars.registerHelper('json', (context) => (JSON.stringify(context)))
+Handlebars.registerHelper('json', (context) => JSON.stringify(context, null, 2))
 
 const program = new Command()
 
@@ -427,8 +427,6 @@ const npmInstall = (outputDir, {verbose}) => {
  * @param {*} param2
  */
 const runGenerator = (context, {outputDir, verbose}) => {
-    console.log('runGenerator: ')
-    console.log('context: ', context)
     const {answers, templateSource} = context
     const {projectId} = answers.general
     const templateSourceType = templateSource.type
@@ -488,7 +486,6 @@ const runGenerator = (context, {outputDir, verbose}) => {
  * @returns
  */
 const askGeneralQuestions = async () => {
-    // 'projectId' is synonymous with the package name.
     const questions = [
         {
             name: 'presetId',
