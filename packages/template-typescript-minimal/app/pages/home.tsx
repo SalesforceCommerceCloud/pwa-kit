@@ -117,26 +117,28 @@ const Home = ({value}: Props) => {
                 </div>
                 <div className="panel">
                     <p style={{width: '300px'}} className="fade-in fade-in-0">
-                        <b>This page is written in Typescript</b>
-                        <br />
-                        <br />
-                        React query works if this is not empty: &quot;{query.data}&quot;
-                        <br />
-                        <br />
-                        Server-side getProps works if this is a valid expression: &quot;5 times 7 is{' '}
-                        {value}
-                        &quot;
-                        <br />
-                        <br />
-                        Client-side JS works if this counter increments: {counter}
-                        <br />
-                        <br />
-                        <b>You can mix-and-match JS and TS</b>
-                        <br />
-                        <br />
-                        <HelloJS />
-                        &nbsp;
-                        <HelloTS message="it works!" />
+                        <>
+                            <b>This page is written in Typescript</b>
+                            <br />
+                            <br />
+                            React query works if this is not empty: &quot;{query.data}&quot;
+                            <br />
+                            <br />
+                            Server-side getProps works if this is a valid expression: &quot;5 times
+                            7 is {value}
+                            &quot;
+                            <br />
+                            <br />
+                            Client-side JS works if this counter increments: {counter}
+                            <br />
+                            <br />
+                            <b>You can mix-and-match JS and TS</b>
+                            <br />
+                            <br />
+                            <HelloJS />
+                            &nbsp;
+                            <HelloTS message="it works!" />
+                        </>
                     </p>
                 </div>
             </div>

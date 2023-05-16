@@ -6,14 +6,15 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import Throw404 from './index'
 import * as errors from '../../errors'
 
 describe('Throw404', () => {
     test('Renders correctly', () => {
-        const wrapper = shallow(<Throw404 />)
-        expect(wrapper.html()).toBe('<div></div>')
+        render(<Throw404 />)
+        const content = document.querySelector('body').firstElementChild.innerHTML
+        expect(content).toBe('<div></div>')
     })
 
     test('Throws on getProps', () => {

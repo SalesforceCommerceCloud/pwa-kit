@@ -29,6 +29,12 @@
       "value": "Add Address"
     }
   ],
+  "account_addresses.info.address_removed": [
+    {
+      "type": 0,
+      "value": "Address removed"
+    }
+  ],
   "account_addresses.info.address_updated": [
     {
       "type": 0,
@@ -143,6 +149,24 @@
       "value": "Back to Order History"
     }
   ],
+  "account_order_detail.shipping_status.not_shipped": [
+    {
+      "type": 0,
+      "value": "Not shipped"
+    }
+  ],
+  "account_order_detail.shipping_status.part_shipped": [
+    {
+      "type": 0,
+      "value": "Partially shipped"
+    }
+  ],
+  "account_order_detail.shipping_status.shipped": [
+    {
+      "type": 0,
+      "value": "Shipped"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,
@@ -217,36 +241,6 @@
     {
       "type": 0,
       "value": "Order History"
-    }
-  ],
-  "account_payment_methods.button.add_method": [
-    {
-      "type": 0,
-      "value": "Add Payment Method"
-    }
-  ],
-  "account_payment_methods.description.add_method_for_faster_checkout": [
-    {
-      "type": 0,
-      "value": "Add a new payment method for faster checkout."
-    }
-  ],
-  "account_payment_methods.heading.no_saved_methods": [
-    {
-      "type": 0,
-      "value": "No Saved Payment Methods"
-    }
-  ],
-  "account_payment_methods.info.new_method_saved": [
-    {
-      "type": 0,
-      "value": "New Payment Method Saved"
-    }
-  ],
-  "account_payment_methods.title.payment_methods": [
-    {
-      "type": 0,
-      "value": "Payment Methods"
     }
   ],
   "account_wishlist.button.continue_shopping": [
@@ -419,50 +413,6 @@
       "value": "Password Reset"
     }
   ],
-  "card_payment_form.heading.new_payment_method": [
-    {
-      "type": 0,
-      "value": "Add New Payment Method"
-    }
-  ],
-  "cart.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "items"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " added to wishlist"
-    }
-  ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
@@ -593,6 +543,12 @@
     {
       "type": 0,
       "value": "Place Order"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "An unexpected error occurred during checkout."
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -1009,12 +965,6 @@
       "value": "Order History"
     }
   ],
-  "drawer_menu.button.payment_methods": [
-    {
-      "type": 0,
-      "value": "Payment Methods"
-    }
-  ],
   "drawer_menu.link.about_us": [
     {
       "type": 0,
@@ -1311,12 +1261,6 @@
       "value": "Order History"
     }
   ],
-  "global.account.link.payment_methods": [
-    {
-      "type": 0,
-      "value": "Payment Methods"
-    }
-  ],
   "global.account.link.wishlist": [
     {
       "type": 0,
@@ -1329,10 +1273,54 @@
       "value": "Something went wrong. Try again!"
     }
   ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to wishlist"
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
       "value": "Item removed from wishlist"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "View"
     }
   ],
   "header.button.assistive_msg.logo": [
@@ -1567,6 +1555,12 @@
     {
       "type": 0,
       "value": "Sale"
+    }
+  ],
+  "item_price.label.starting_at": [
+    {
+      "type": 0,
+      "value": "Starting at"
     }
   ],
   "lCPCxk": [
@@ -2139,28 +2133,10 @@
       "value": "1 uppercase letter"
     }
   ],
-  "payment_selection.button.save_and_continue": [
-    {
-      "type": 0,
-      "value": "Save & Continue"
-    }
-  ],
-  "payment_selection.heading.add_new_card": [
-    {
-      "type": 0,
-      "value": "Add New Card"
-    }
-  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "Credit Card"
-    }
-  ],
-  "payment_selection.message.select_payment_method": [
-    {
-      "type": 0,
-      "value": "Please select a payment method."
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2203,44 +2179,6 @@
     {
       "type": 0,
       "value": "Coming Soon"
-    }
-  ],
-  "product_detail.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "items"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " added to wishlist"
     }
   ],
   "product_detail.recommended_products.title.complete_set": [
@@ -2289,44 +2227,6 @@
       "value": "Sort By"
     }
   ],
-  "product_list.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "items"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " added to wishlist"
-    }
-  ],
   "product_list.modal.button.clear_filters": [
     {
       "type": 0,
@@ -2369,6 +2269,24 @@
       "value": "Wishlist"
     }
   ],
+  "product_tile.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "Starting at"
+    }
+  ],
+  "product_view.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Add Set to Cart"
+    }
+  ],
+  "product_view.button.add_set_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Add Set to Wishlist"
+    }
+  ],
   "product_view.button.add_to_cart": [
     {
       "type": 0,
@@ -2391,6 +2309,12 @@
     {
       "type": 0,
       "value": "Quantity"
+    }
+  ],
+  "product_view.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "Starting at"
     }
   ],
   "product_view.link.full_details": [
@@ -2463,44 +2387,6 @@
     {
       "type": 0,
       "value": "Recent Searches"
-    }
-  ],
-  "recommended_products.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "items"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " added to wishlist"
     }
   ],
   "register_form.action.sign_in": [
@@ -3241,6 +3127,30 @@
     {
       "type": 0,
       "value": "New Password"
+    }
+  ],
+  "wishlist_primary_action.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Add Set to Cart"
+    }
+  ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "Add to Cart"
+    }
+  ],
+  "wishlist_primary_action.button.view_full_details": [
+    {
+      "type": 0,
+      "value": "View Full Details"
+    }
+  ],
+  "wishlist_primary_action.button.view_options": [
+    {
+      "type": 0,
+      "value": "View Options"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [

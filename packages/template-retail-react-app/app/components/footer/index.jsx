@@ -12,13 +12,12 @@ import {
     Divider,
     SimpleGrid,
     useMultiStyleConfig,
-    StylesProvider,
     Select,
-    useStyles,
     Heading,
     Input,
     InputGroup,
     InputRightElement,
+    createStylesContext,
     Button,
     FormControl
 } from '@chakra-ui/react'
@@ -31,16 +30,15 @@ import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
 
+const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
-
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
-
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
             <Box {...styles.content}>
@@ -190,7 +188,6 @@ export default Footer
 const Subscribe = ({...otherProps}) => {
     const styles = useStyles()
     const intl = useIntl()
-
     return (
         <Box {...styles.subscribe} {...otherProps}>
             <Heading {...styles.subscribeHeading}>
@@ -208,7 +205,10 @@ const Subscribe = ({...otherProps}) => {
 
             <Box>
                 <InputGroup>
-                    <Input type="email" placeholder="you@email.com" {...styles.subscribeField} />
+                    {/* Had to swap the following InputRightElement and Input 
+                        to avoid the hydration error due to mismatched html between server and client side.
+                        This is a workaround for Lastpass plugin that automatically injects its icon for input fields.
+                    */}
                     <InputRightElement {...styles.subscribeButtonContainer}>
                         <Button variant="footer">
                             {intl.formatMessage({
@@ -217,6 +217,7 @@ const Subscribe = ({...otherProps}) => {
                             })}
                         </Button>
                     </InputRightElement>
+                    <Input type="email" placeholder="you@email.com" {...styles.subscribeField} />
                 </InputGroup>
             </Box>
 

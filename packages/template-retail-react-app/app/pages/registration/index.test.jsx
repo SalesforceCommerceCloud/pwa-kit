@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {screen, within, waitFor} from '@testing-library/react'
-import user from '@testing-library/user-event'
 import {guestToken, registerUserToken, renderWithProviders} from '../../utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
@@ -69,7 +68,7 @@ afterEach(() => {
 
 test('Allows customer to create an account', async () => {
     // render our test component
-    await renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
@@ -84,10 +83,11 @@ test('Allows customer to create an account', async () => {
     // fill out form and submit
     const withinForm = within(form)
 
-    user.paste(withinForm.getByLabelText('First Name'), 'Tester')
-    user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
-    user.paste(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
-    user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+    await user.type(withinForm.getByLabelText('First Name'), 'Tester')
+    await user.type(withinForm.getByLabelText('Last Name'), 'Tester')
+    await user.type(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
+    await user.type(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+    screen.logTestingPlaygroundURL()
 
     // login with credentials
     global.server.use(
@@ -112,10 +112,11 @@ test('Allows customer to create an account', async () => {
         })
     )
 
-    user.click(withinForm.getByText(/create account/i))
+    await user.click(withinForm.getByText(/create account/i))
 
     // wait for success state to appear
     const myAccount = await screen.findAllByText(/My Account/)
+
     await waitFor(
         () => {
             expect(myAccount).toHaveLength(2)

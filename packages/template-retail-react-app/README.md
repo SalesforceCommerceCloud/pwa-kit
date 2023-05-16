@@ -6,7 +6,7 @@ Developers don’t have to worry about the underlying infrastructure, whether th
 
 ## Requirements
 
--   Node 16 or later
+-   Node 16.11 or later
 -   npm 8 or later
 
 ## Get Started
