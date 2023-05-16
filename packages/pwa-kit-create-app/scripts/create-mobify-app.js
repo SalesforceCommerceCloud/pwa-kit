@@ -569,6 +569,8 @@ const main = async (opts) => {
     const OUTPUT_DIR_FLAG_ACTIVE = !!opts.outputDir
 
     const presetId = opts.preset || process.env.GENERATOR_PRESET
+    // TODO: Think about creating a "Context" object to hold the selected preset and answers.
+    // It will make more sense to pass this around tot he pre and post generation steps.
     let preset
     let answers = {
         general: {
