@@ -204,6 +204,15 @@ const PRESETS = [
                 }
             })
         },
+        postGenerate: (context, {outputDir}) => {
+            console.log('Running bost generate1')
+            const {answers} = context
+
+            if (!answers.general.extend) {
+                console.log('copying templates')
+                bootstrapTemplate(context, {filterRegex: /(sites.js.hbs|default.js.hbs)$/, outputDir})
+            }
+        },
         private: false
     },
     {
@@ -444,7 +453,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
     checkOutputDir(outputDir)
 
     if (extend) {
-        // Process the boostrap 
+        // Process the boostrap
         bootstrapTemplate(context, {outputDir})
     } else {
         prepareTemplate(templateSource.id, {outputDir, source: templateSourceType})
@@ -515,12 +524,18 @@ const askExtensibilityQuestions = async (context) => {
 
     if (answers.extend) {
         // TODO: This needs to be a utility!
-        const templateSource = context.preset.templateSources.find(({type}) => type === TEMPLATE_SOURCE_NPM)
+        const templateSource = context.preset.templateSources.find(
+            ({type}) => type === TEMPLATE_SOURCE_NPM
+        )
 
         // In the future we might want to ask what version of the selected project they
         // want to extend. But for now lets just get the latest version and synthetically
         // inject it as an "answer"
-        pkgJSON = JSON.parse(sh.exec(`npm view ${templateSource.id} --json`).stdout)
+        pkgJSON = JSON.parse(
+            sh.exec(`npm view ${templateSource.id} --json`, {
+                silent: true
+            }).stdout
+        )
     }
 
     answers = {
@@ -532,31 +547,33 @@ const askExtensibilityQuestions = async (context) => {
 }
 
 /**
-     * 
-     * @param {*} generatorContext 
-     * @param {*} param1 
-     */
-const bootstrapTemplate = (context, {lang = 'js', outputDir, filters = []}) => {
+ *
+ * @param {*} generatorContext
+ * @param {*} param1
+ */
+const bootstrapTemplate = (context, {lang = 'js', outputDir, filterRegex}) => {
     const inputDir = p.join(BOOTSTRAP_DIR, lang)
     const files = getAllFiles(inputDir)
 
-    files.forEach((inputFile) => {
-        const outputFile = outputDir + inputFile.replace(inputDir, '')
-        const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
+    files
+        .filter((file) => !filterRegex || !!file.match(file))
+        .forEach((inputFile) => {
+            const outputFile = outputDir + inputFile.replace(inputDir, '')
+            const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
 
-        // Create folder if we are doing a deep copy
-        if (destDir) {
-            fs.mkdirSync(destDir, {recursive: true})
-        }
+            // Create folder if we are doing a deep copy
+            if (destDir) {
+                fs.mkdirSync(destDir, {recursive: true})
+            }
 
-        if (inputFile.endsWith('.hbs')) {
-            const templateString = sh.cat(inputFile)
-            const template = Handlebars.compile(templateString.stdout)
-            fs.writeFileSync(outputFile.replace('.hbs', ''), template(context))
-        } else {
-            fs.copyFileSync(inputFile, outputFile)
-        }
-    })
+            if (inputFile.endsWith('.hbs')) {
+                const templateString = sh.cat(inputFile)
+                const template = Handlebars.compile(templateString.stdout)
+                fs.writeFileSync(outputFile.replace('.hbs', ''), template(context))
+            } else {
+                fs.copyFileSync(inputFile, outputFile)
+            }
+        })
 }
 
 /**
@@ -566,7 +583,6 @@ const bootstrapTemplate = (context, {lang = 'js', outputDir, filters = []}) => {
  */
 const prepareTemplate = (templateName, {outputDir, source = TEMPLATE_SOURCE_BUNDLE}) => {
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
-    console.log('prepareTemplate: ', source)
     switch (source) {
         case TEMPLATE_SOURCE_NPM: {
             const {stdout} = sh.exec(
@@ -692,7 +708,10 @@ const main = async (opts) => {
     runGenerator(context, {outputDir: opts.outputDir, verbose: opts.verbose})
 
     // Step 5: Run the post process is one exists
-    await postGenerate(context)
+    await postGenerate(context, {outputDir: opts.outputDir})
+
+    // Finally we install the newly minted projects dependencies
+    npmInstall(opts.outputDir, {verbose: opts.verbose})
 
     return true
 }
