@@ -96,6 +96,9 @@ const validClientId = (s) =>
 const validOrganizationId = (s) =>
     /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
 
+const TEMPLATE_SOURCE_NPM = 'npm'
+const TEMPLATE_SOURCE_BUNDLE = 'bundle'
+
 // Project dictionary describing details and how the gerator should ask questions etc.
 const PRESETS = [
     {
@@ -110,16 +113,15 @@ const PRESETS = [
         shortDescription: 'The Retail app using your own Commerce Cloud instance',
         templateSources: [
             {
-                type: 'npm',
+                type: TEMPLATE_SOURCE_NPM,
                 id: 'retail-react-app'
             },
             {
-                type: 'bundle',
+                type: TEMPLATE_SOURCE_BUNDLE,
                 id: 'template-retail-react-app'
             }
         ],
         preGenerate: async (context = {}) => {
-            // "answers" are the answers up until asking the detailed project quesions.
             const commerceQuestions = [
                 {
                     name: 'instanceUrl',
@@ -174,11 +176,11 @@ const PRESETS = [
         shortDescription: 'The Retail app with demo Commerce Cloud instance',
         templateSources: [
             {
-                type: 'npm',
+                type: TEMPLATE_SOURCE_NPM,
                 id: 'retail-react-app'
             },
             {
-                type: 'bundle',
+                type: TEMPLATE_SOURCE_BUNDLE,
                 id: 'template-retail-react-app'
             }
         ],
@@ -210,7 +212,7 @@ const PRESETS = [
         description: '',
         templateSources: [
             {
-                type: 'bundle',
+                type: TEMPLATE_SOURCE_BUNDLE,
                 id: 'template-retail-react-app'
             }
         ],
@@ -242,7 +244,7 @@ const PRESETS = [
         description: '',
         templateSources: [
             {
-                type: 'bundle',
+                type: TEMPLATE_SOURCE_BUNDLE,
                 id: 'template-typescript-minimal'
             }
         ],
@@ -259,7 +261,7 @@ const PRESETS = [
         `,
         templateSources: [
             {
-                type: 'bundle',
+                type: TEMPLATE_SOURCE_BUNDLE,
                 id: 'template-typescript-minimal'
             }
         ],
@@ -271,7 +273,7 @@ const PRESETS = [
         description: '',
         templateSources: [
             {
-                type: 'bundle',
+                type: TEMPLATE_SOURCE_BUNDLE,
                 id: 'template-express-minimal'
             }
         ],
@@ -288,7 +290,7 @@ const PRESETS = [
         `,
         templateSources: [
             {
-                type: 'bundle',
+                type: TEMPLATE_SOURCE_BUNDLE,
                 id: 'template-express-minimal'
             }
         ],
@@ -300,7 +302,7 @@ const PRESETS = [
         description: '',
         templateSources: [
             {
-                type: 'bundle',
+                type: TEMPLATE_SOURCE_BUNDLE,
                 id: 'template-mrt-reference-app'
             }
         ],
@@ -434,50 +436,17 @@ const npmInstall = (outputDir, {verbose}) => {
  */
 const runGenerator = (context, {outputDir, verbose}) => {
     const {answers, templateSource} = context
-    const {projectId} = answers.general
     const templateSourceType = templateSource.type
+    const {extended} = answers.general
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
 
-    switch (templateSourceType) {
-        case 'npm': {
-            const inputDir = p.join(BOOTSTRAP_DIR, 'js')
-
-            // Copy folder to destination and process template if required.
-            getAllFiles(inputDir).forEach((inputFile) => {
-                const outputFile = outputDir + inputFile.replace(inputDir, '')
-                const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
-
-                // Create folder if we are doing a deep copy
-                if (destDir) {
-                    fs.mkdirSync(destDir, {recursive: true})
-                }
-
-                if (inputFile.endsWith('.hbs')) {
-                    const templateString = sh.cat(inputFile)
-                    const template = Handlebars.compile(templateString.stdout)
-                    fs.writeFileSync(outputFile.replace('.hbs', ''), template(context))
-                } else {
-                    fs.copyFileSync(inputFile, outputFile)
-                }
-            })
-            break
-        }
-        case 'bundle': {
-            prepareTemplate(templateSource.id, {outputDir, source: templateSourceType})
-
-            // Update the `package.json` manually. We don't have to do this step in `bootstrapped` projects
-            // because the package.json is templated in that scenario.
-            const pkgJsonPath = p.resolve(outputDir, 'package.json')
-            const pkgJSON = readJson(pkgJsonPath)
-            const finalPkgData = merge(pkgJSON, {name: projectId})
-
-            writeJson(pkgJsonPath, finalPkgData)
-            break
-        }
-        default:
-            process.exit(1)
+    if (extended) {
+        // Process the boostrap 
+        bootstrapTemplate(context, {outputDir})
+    } else {
+        prepareTemplate(templateSource.id, {outputDir, source: templateSourceType})
     }
 
     // Finally we install the newly minted projects dependencies
@@ -545,7 +514,7 @@ const askExtensibilityQuestions = async (context) => {
 
     if (answers.extend) {
         // TODO: This needs to be a utility!
-        const templateSource = context.preset.templateSources.find(({type}) => type === 'npm')
+        const templateSource = context.preset.templateSources.find(({type}) => type === TEMPLATE_SOURCE_NPM)
 
         // In the future we might want to ask what version of the selected project they
         // want to extend. But for now lets just get the latest version and synthetically
@@ -562,15 +531,43 @@ const askExtensibilityQuestions = async (context) => {
 }
 
 /**
+     * 
+     * @param {*} generatorContext 
+     * @param {*} param1 
+     */
+const bootstrapTemplate = (context, {lang = 'js', outputDir, filters = []}) => {
+    const inputDir = p.join(BOOTSTRAP_DIR, lang)
+    const files = getAllFiles(inputDir)
+
+    files.forEach((inputFile) => {
+        const outputFile = outputDir + inputFile.replace(inputDir, '')
+        const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
+
+        // Create folder if we are doing a deep copy
+        if (destDir) {
+            fs.mkdirSync(destDir, {recursive: true})
+        }
+
+        if (inputFile.endsWith('.hbs')) {
+            const templateString = sh.cat(inputFile)
+            const template = Handlebars.compile(templateString.stdout)
+            fs.writeFileSync(outputFile.replace('.hbs', ''), template(context))
+        } else {
+            fs.copyFileSync(inputFile, outputFile)
+        }
+    })
+}
+
+/**
  *
  * @param {*} templateName
  * @param {*} param1
  */
-const prepareTemplate = (templateName, {outputDir, source = 'bundle'}) => {
+const prepareTemplate = (templateName, {outputDir, source = TEMPLATE_SOURCE_BUNDLE}) => {
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
-
+    console.log('prepareTemplate: ', source)
     switch (source) {
-        case 'npm': {
+        case TEMPLATE_SOURCE_NPM: {
             const {stdout} = sh.exec(
                 `npm pack ${templateName}@latest --pack-destination="${tmp}"`,
                 {
