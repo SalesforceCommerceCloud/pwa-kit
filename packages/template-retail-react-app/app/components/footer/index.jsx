@@ -145,13 +145,13 @@ const Footer = ({...otherProps}) => {
                                     {...styles.localeDropdown}
                                 >
                                     {supportedLocaleIds.map((locale) => (
-                                        <LocaleText
-                                            as="option"
-                                            value={locale}
-                                            shortCode={locale}
+                                        <option
                                             key={locale}
-                                            {...styles.localeDropdownOption}
-                                        />
+                                            value={locale}
+                                            style={{color: 'black'}}
+                                        >
+                                            <LocaleText shortCode={locale} />
+                                        </option>
                                     ))}
                                 </Select>
                             </FormControl>
