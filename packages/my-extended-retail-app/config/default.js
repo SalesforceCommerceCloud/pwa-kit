@@ -30,10 +30,11 @@ module.exports = {
             }
         },
         einsteinAPI: {
-            proxyPath: `/mobify/proxy/einstein`,
+            host: 'https://api.cquotient.com',
             einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             // This differs from the siteId in commerceAPIConfig for testing purposes
-            siteId: 'aaij-MobileFirst'
+            siteId: 'aaij-MobileFirst',
+            isProduction: false
         }
     },
     externals: [],
@@ -48,19 +49,15 @@ module.exports = {
         '**/*.json'
     ],
     ssrParameters: {
-        ssrFunctionNodeVersion: '14.x',
+        ssrFunctionNodeVersion: '16.x',
         proxyConfigs: [
             {
                 host: 'kv7kzm78.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.sandbox.us03.dx.commercecloud.salesforce.com',
+                host: 'zzrf-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
-            },
-            {
-                host: 'api.cquotient.com',
-                path: 'einstein'
             }
         ]
     }
