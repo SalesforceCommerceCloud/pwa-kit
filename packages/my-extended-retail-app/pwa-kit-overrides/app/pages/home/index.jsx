@@ -9,18 +9,7 @@ import {useIntl, FormattedMessage} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 
 // Components
-import {
-    Box,
-    Button,
-    SimpleGrid,
-    HStack,
-    VStack,
-    Text,
-    Flex,
-    Stack,
-    Container,
-    Link
-} from '@chakra-ui/react'
+import {Box, Button, Stack, Link} from '@chakra-ui/react'
 
 // Project Components
 import Hero from 'retail-react-app/app/components/hero'
@@ -30,7 +19,6 @@ import ProductScroller from 'retail-react-app/app/components/product-scroller'
 
 // Others
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
-import {heroFeatures, features} from 'retail-react-app/app/pages/home/data'
 
 //Hooks
 import useEinstein from 'retail-react-app/app/hooks/use-einstein'
