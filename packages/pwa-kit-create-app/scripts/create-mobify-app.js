@@ -308,6 +308,8 @@ const PRESETS = [
     }
 ]
 
+const BOOTSTRAP_DIR = p.join(__dirname, '..', 'assets', 'bootstrap')
+
 const PRIVATE_PRESET_NAMES = PRESETS.filter(({private}) => !!private).map(({id}) => id)
 
 const PUBLIC_PRESET_NAMES = PRESETS.filter(({private}) => !private).map(({id}) => id)
@@ -440,7 +442,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
 
     switch (templateSourceType) {
         case 'npm': {
-            const inputDir = p.join(__dirname, '..', 'assets', 'bootstrap-templates', 'pwa-kit-js')
+            const inputDir = p.join(BOOTSTRAP_DIR, 'js')
 
             // Copy folder to destination and process template if required.
             getAllFiles(inputDir).forEach((inputFile) => {
@@ -565,7 +567,6 @@ const askExtensibilityQuestions = async (context) => {
  * @param {*} param1
  */
 const prepareTemplate = (templateName, {outputDir, source = 'bundle'}) => {
-    console.log('prepareTemplate: ', templateName, outputDir, source)
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
 
     switch (source) {
@@ -582,7 +583,6 @@ const prepareTemplate = (templateName, {outputDir, source = 'bundle'}) => {
                 sync: true
             })
             sh.cp('-R', p.join(tmp, 'package', '*'), outputDir)
-
             break
         }
         default:
